@@ -1,0 +1,21 @@
+isco_08,task_id,title,task_text,score_2025,potential25,potential23,mean_score_2025,source,source_year
+5221,1,Shopkeepers,"Determining product mix, stock and price levels for goods to be sold;",0.45,Exposed: Gradient 2,The Big Uknown,0.43,reconciled,2025
+5221,2,Shopkeepers,"Purchasing and ordering goods for sale from markets, wholesalers and other suppliers;",0.49,Exposed: Gradient 2,The Big Uknown,0.43,predicted,2025
+5221,3,Shopkeepers,Budgeting and maintaining records of stock levels and financial transactions;,0.59,Exposed: Gradient 2,The Big Uknown,0.43,predicted,2025
+5221,4,Shopkeepers,Determining prices and displaying goods for sale;,0.39,Exposed: Gradient 2,The Big Uknown,0.43,predicted,2025
+5221,5,Shopkeepers,Selling goods to customers and advising them on product use;,0.4525,Exposed: Gradient 2,The Big Uknown,0.43,predicted,2025
+5221,6,Shopkeepers,Examining returned goods and deciding on appropriate action;,0.29,Exposed: Gradient 2,The Big Uknown,0.43,predicted,2025
+5221,7,Shopkeepers,Taking inventory of goods in stock.,0.3525,Exposed: Gradient 2,The Big Uknown,0.43,predicted,2025
+5222,1,Shop Supervisors,Planning and preparing work schedules and assigning staff to specific duties;,0.525,Minimal Exposure,The Big Uknown,0.36,predicted,2025
+5222,2,Shop Supervisors,"Instructing staff on sales procedures, including how to handle difficult or complex cases;",0.365,Minimal Exposure,The Big Uknown,0.36,predicted,2025
+5222,3,Shop Supervisors,Ensuring that customers receive prompt service;,0.515,Minimal Exposure,The Big Uknown,0.36,predicted,2025
+5222,4,Shop Supervisors,"Participating in and providing advice to managers on interviewing, hiring, training, evaluating, promoting and dismissing staff, and resolving staff grievances;",0.3075,Minimal Exposure,The Big Uknown,0.36,predicted,2025
+5222,5,Shop Supervisors,Examining returned goods and deciding on appropriate action;,0.27,Minimal Exposure,The Big Uknown,0.36,predicted,2025
+5222,6,Shop Supervisors,Taking inventory of goods for sale and ordering new stock;,0.33,Minimal Exposure,The Big Uknown,0.36,predicted,2025
+5222,7,Shop Supervisors,Ensuring that goods and services are correctly priced and displayed;,0.4125,Minimal Exposure,The Big Uknown,0.36,predicted,2025
+5222,8,Shop Supervisors,Ensuring that safety procedures are enforced.,0.1575,Minimal Exposure,The Big Uknown,0.36,predicted,2025
+5223,1,Shop Sales Assistants,"Determining customer requirements and advising on product range, price, delivery, warranties and product use and care;",0.47,Exposed: Gradient 1,The Big Uknown,0.38,reconciled,2025
+5223,2,Shop Sales Assistants,Demonstrating and explaining to customers the establishment's goods and services;,0.45,Exposed: Gradient 1,The Big Uknown,0.38,predicted,2025
+5223,3,Shop Sales Assistants,"Selling goods and services, accepting payment by a variety of payment methods, preparing sales invoices and recording sales using cash registers;",0.55,Exposed: Gradient 1,The Big Uknown,0.38,predicted,2025
+5223,4,Shop Sales Assistants,Assisting with the ongoing management of stock such as product inventories and participating in stock takes;,0.295,Exposed: Gradient 1,The Big Uknown,0.38,predicted,2025
+5223,5,Shop Sales Assistants,"Stacking and displaying goods for sale, and wrapping and packing goods sold.",0.1575,Exposed: Gradient 1,The Big Uknown,0.38,predicted,2025

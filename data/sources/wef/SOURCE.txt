@@ -1,0 +1,32 @@
+WEF Future of Jobs — original sources (do not edit)
+
+Publication
+  World Economic Forum, Future of Jobs Report 2025
+  Survey: Future of Jobs Survey 2024
+  Taxonomy: World Economic Forum Global Skills Taxonomy
+
+Figures compiled into the skill master table
+  figure_3_3_core_skills_2025.png
+    FIGURE 3.3 Core skills in 2025
+    Share of employers who consider the stated skills to be core skills
+    Supplies: skill name, WEF skill group, core_skill_importance_2025_pct
+
+  figure_3_4_skills_on_the_rise_2025_2030.png
+    FIGURE 3.4 Skills on the rise, 2025-2030
+    Share of employers: decreasing / stable / increasing use
+    Supplies: future_net_increase_2025_2030
+    Net increase = % increasing minus % decreasing
+
+  figure_b3_1_genai_substitution_by_skill_group.png
+    FIGURE B3.1 Current capacity for substitution by Generative AI, by skill group
+    Indeed analysis of 2,800+ granular skills (August 2024); WEF Global Skills Taxonomy
+    Supplies: genai_substitution_capacity_category_derived (visual category, not exact %)
+    Note: no skill group was rated "very high capacity"
+
+Compiled table (hand-typed from the three figures)
+  WEF_Future_of_Jobs_2025_skill_master_table.csv
+
+Cleaning
+  Run: python data/raw/clean_row_tables.py
+  Output: data/raw/wef_skill_master_raw.csv
+  Rules are recorded in that script (WEF section of the module docstring).
