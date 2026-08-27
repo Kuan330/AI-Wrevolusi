@@ -1,0 +1,27 @@
+wef_skill_id,core_skill,wef_skill_group,core_skill_importance_2025_pct,future_net_increase_2025_2030,future_trend_category,genai_substitution_capacity_category,genai_chart_label,source,source_year,source_figures
+1,Analytical thinking,Cognitive skills,69,55,High Growth,Low,Analytical thinking,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+2,"Resilience, flexibility and agility",Self-efficacy,67,66,Very High Growth,Very Low-Low,"Resilience, flexibility and agility",WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+3,Leadership and social influence,Working with others,61,58,High Growth,Low,Leadership and social influence,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+4,Creative thinking,Cognitive skills,57,66,Very High Growth,Low,Creative thinking,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+5,Motivation and self-awareness,Self-efficacy,52,47,High Growth,Not shown,,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+6,Technological literacy,Technology skills,51,68,Very High Growth,Low-Moderate,Technology literacy,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+7,Empathy and active listening,Working with others,50,46,High Growth,Very Low-Low,Empathy and active listening,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+8,Curiosity and lifelong learning,Self-efficacy,50,61,Very High Growth,Low-Moderate,Curiosity and lifelong learning,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+9,Talent management,Management skills,47,58,High Growth,Low,Talent management,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+10,Service orientation and customer service,Engagement skills,47,41,High Growth,Low,Service orientation and customer service,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+11,AI and big data,Technology skills,45,87,Very High Growth,Moderate-High,Artificial intelligence and big data,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+12,Systems thinking,Cognitive skills,42,51,High Growth,Moderate,Systems thinking,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+13,Resource management and operations,Working with others,41,24,Moderate Growth,Low-Moderate,Operations and logistics,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+14,Dependability and attention to detail,Self-efficacy,37,12,Slight Growth,Low-Moderate,Dependability and attention to detail,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+15,Quality control,Management skills,35,20,Moderate Growth,Low-Moderate,Quality management,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+16,Teaching and mentoring,Working with others,26,30,Moderate Growth,Low,"Teaching, mentoring, and coaching",WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+17,Networks and cybersecurity,Technology skills,25,70,Very High Growth,Low-Moderate,Networks and cybersecurity,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+18,Design and user experience,Technology skills,25,45,High Growth,Low-Moderate,Design and user experience,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+19,Multi-lingualism,Cognitive skills,23,16,Slight Growth,Moderate,Multi-lingualism,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+20,Marketing and media,Engagement skills,21,25,Moderate Growth,Moderate,Marketing and media,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+21,"Reading, writing and mathematics",Cognitive skills,21,-4,Declining,Moderate-High,"Reading, writing and mathematics",WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+22,Environmental stewardship,Ethics,20,53,High Growth,Low,Environmental stewardship,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+23,Programming,Technology skills,17,27,Moderate Growth,Moderate,Programming,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+24,"Manual dexterity, endurance and precision",Physical abilities,14,-24,Declining,Very Low-Low,"Manual dexterity, endurance and precision",WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+25,Global citizenship,Ethics,13,19,Slight Growth,Low,Global citizenship,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1
+26,Sensory-processing abilities,Physical abilities,6,13,Slight Growth,Very Low-Low,Sensory-processing abilities,WEF Future of Jobs Report 2025,2025,Figure 3.3; Figure 3.4; Figure B3.1

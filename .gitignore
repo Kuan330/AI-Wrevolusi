@@ -1,0 +1,9 @@
+.env
+.venv/
+.venv-seed/
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+.cursor/
+db/_dev_seed_statements.json
