@@ -7,7 +7,9 @@ import { referenceService } from "@/services/referenceService";
 export const toProfileTask = (
   wording: string,
   source: ProfileTask["source"],
-  extras?: Partial<Pick<ProfileTask, "iloTaskId" | "timeSpent" | "responsibility">>,
+  extras?: Partial<
+    Pick<ProfileTask, "iloTaskId" | "timeSpent" | "responsibility" | "score2025" | "potential25" | "meanScore2025">
+  >,
 ): ProfileTask => ({
   id: createTaskId(),
   wording,
@@ -16,6 +18,9 @@ export const toProfileTask = (
   source,
   iloTaskId: extras?.iloTaskId,
   originalWording: source === "ilo" ? wording : undefined,
+  score2025: extras?.score2025,
+  potential25: extras?.potential25,
+  meanScore2025: extras?.meanScore2025,
 });
 
 export const useProfileTasks = () => {
@@ -33,7 +38,16 @@ export const useProfileTasks = () => {
     setError(null);
     try {
       const rows = await referenceService.tasks(occupationCode);
-      setTasks(rows.map((task) => toProfileTask(task.task_text, "ilo", { iloTaskId: task.task_id })));
+      setTasks(
+        rows.map((task) =>
+          toProfileTask(task.task_text, "ilo", {
+            iloTaskId: task.task_id,
+            score2025: task.score_2025,
+            potential25: task.potential25,
+            meanScore2025: task.mean_score_2025,
+          }),
+        ),
+      );
       if (rows.length === 0) {
         setError("No starter tasks are available for this occupation yet. You can add your own.");
       }
@@ -57,16 +71,19 @@ export const useProfileTasks = () => {
 
   const updateTask = (taskId: string, values: TaskEditorValues) => {
     setTasks((current) =>
-      current.map((task) =>
-        task.id === taskId
-          ? {
-              ...task,
-              wording: values.wording.trim(),
-              timeSpent: values.timeSpent,
-              responsibility: values.responsibility,
-            }
-          : task,
-      ),
+      current.map((task) => {
+        if (task.id !== taskId) return task;
+        const wording = values.wording.trim();
+        const edited = task.source === "ilo" && wording !== (task.originalWording ?? task.wording);
+        return {
+          ...task,
+          wording,
+          timeSpent: values.timeSpent,
+          responsibility: values.responsibility,
+          score2025: edited ? null : task.score2025,
+          potential25: edited ? null : task.potential25,
+        };
+      }),
     );
   };
 

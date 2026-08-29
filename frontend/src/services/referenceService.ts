@@ -4,8 +4,9 @@ import {
   listPilotTasks,
   searchPilotOccupations,
 } from "@/data/pilotReference";
+import { PILOT_WEF_SKILLS } from "@/data/pilotWefSkills";
 import { api } from "@/services/api";
-import type { ReferenceOccupation, ReferenceTask } from "@/types/reference";
+import type { ReferenceOccupation, ReferenceTask, WefSkill } from "@/types/reference";
 
 const withPilotFallback = async <T>(request: () => Promise<T>, fallback: () => T): Promise<T> => {
   try {
@@ -54,6 +55,11 @@ export const referenceService = {
           `/reference/occupations/${encodeURIComponent(occupationCode)}/tasks`,
         ),
       () => listPilotTasks(occupationCode),
+    ),
+  wefSkills: () =>
+    withPilotFallback(
+      () => api.get<WefSkill[]>("/reference/wef-skills"),
+      () => PILOT_WEF_SKILLS,
     ),
 };
 

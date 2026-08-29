@@ -1,5 +1,5 @@
 import { MenuIcon } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,20 @@ import {
 import { SIDEBAR_MENU } from "@/constants/menu";
 import { ROUTES } from "@/constants/routes";
 
+const itemIsActive = (path: string, pathname: string, hash: string) => {
+  const [base, itemHash] = path.split("#");
+  if (itemHash) {
+    return pathname === base && hash === `#${itemHash}`;
+  }
+  if (path === ROUTES.dashboard) {
+    return pathname === ROUTES.dashboard && hash === "";
+  }
+  return pathname === path;
+};
+
 const MobileMenu = () => {
+  const { pathname, hash } = useLocation();
+
   return (
     <Dialog>
       <DialogTrigger>
@@ -29,8 +42,9 @@ const MobileMenu = () => {
             <NavLink
               key={item.key}
               to={item.path}
-              end={item.path === ROUTES.dashboard || item.path === ROUTES.workProfile}
-              className="block rounded-md border border-border p-3 text-sm hover:bg-muted"
+              className={`block rounded-md border border-border p-3 text-sm hover:bg-muted ${
+                itemIsActive(item.path, pathname, hash) ? "border-primary/30 bg-primary/10" : ""
+              }`}
             >
               <p className="font-medium">{item.label}</p>
               <p className="text-xs text-muted-foreground">{item.description}</p>
