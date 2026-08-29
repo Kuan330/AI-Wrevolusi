@@ -14,7 +14,7 @@ const Sidebar = () => {
           <NavLink
             key={item.key}
             to={item.path}
-            end={item.path === ROUTES.dashboard}
+            end={item.path === ROUTES.dashboard || item.path === ROUTES.workProfile}
             className={({ isActive }) =>
               `block rounded-lg border p-3 text-sm transition ${
                 isActive

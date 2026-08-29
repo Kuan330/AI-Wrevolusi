@@ -1,17 +1,59 @@
+import {
+  getPilotOccupation,
+  listPilotOccupations,
+  listPilotTasks,
+  searchPilotOccupations,
+} from "@/data/pilotReference";
 import { api } from "@/services/api";
 import type { ReferenceOccupation, ReferenceTask } from "@/types/reference";
 
+const withPilotFallback = async <T>(request: () => Promise<T>, fallback: () => T): Promise<T> => {
+  try {
+    return await request();
+  } catch {
+    return fallback();
+  }
+};
+
+const onlyUnits = (rows: ReferenceOccupation[]) => rows.filter((item) => item.level === "unit");
+
 export const referenceService = {
   occupations: (parent?: string) =>
-    api.get<ReferenceOccupation[]>(
-      parent ? `/reference/occupations?parent=${encodeURIComponent(parent)}` : "/reference/occupations",
+    withPilotFallback(
+      () =>
+        api.get<ReferenceOccupation[]>(
+          parent
+            ? `/reference/occupations?parent=${encodeURIComponent(parent)}`
+            : "/reference/occupations",
+        ),
+      () => listPilotOccupations(parent),
     ),
-  searchOccupations: (query: string) =>
-    api.get<ReferenceOccupation[]>(
-      `/reference/occupations?q=${encodeURIComponent(query)}`,
+  getOccupation: (code: string) =>
+    withPilotFallback(
+      () => api.get<ReferenceOccupation>(`/reference/occupations/${encodeURIComponent(code)}`),
+      () => {
+        const row = getPilotOccupation(code);
+        if (!row) throw new Error("occupation not found");
+        return row;
+      },
     ),
+  searchOccupations: async (query: string) => {
+    const rows = await withPilotFallback(
+      () =>
+        api.get<ReferenceOccupation[]>(
+          `/reference/occupations?q=${encodeURIComponent(query)}`,
+        ),
+      () => searchPilotOccupations(query),
+    );
+    return onlyUnits(rows);
+  },
   tasks: (occupationCode: string) =>
-    api.get<ReferenceTask[]>(
-      `/reference/occupations/${encodeURIComponent(occupationCode)}/tasks`,
+    withPilotFallback(
+      () =>
+        api.get<ReferenceTask[]>(
+          `/reference/occupations/${encodeURIComponent(occupationCode)}/tasks`,
+        ),
+      () => listPilotTasks(occupationCode),
     ),
 };
+
