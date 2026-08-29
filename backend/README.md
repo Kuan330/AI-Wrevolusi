@@ -18,9 +18,19 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp .env .env.local  # optional local copy
+cp .env.example .env  # if .env does not exist yet
+```
+
+Set a real `DATABASE_URL` in `.env`, then start:
+
+```bash
 uvicorn app.main:app --reload
 ```
+
+Backend URL:
+
+- API base: `http://127.0.0.1:8000/api/v1`
+- Docs: `http://127.0.0.1:8000/docs`
 
 ## Database & migrations
 
