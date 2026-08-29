@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { SIDEBAR_MENU } from "@/constants/menu";
+import { ROUTES } from "@/constants/routes";
 
 const MobileMenu = () => {
   return (
@@ -28,7 +29,7 @@ const MobileMenu = () => {
             <NavLink
               key={item.key}
               to={item.path}
-              end={item.path === "/"}
+              end={item.path === ROUTES.dashboard}
               className="block rounded-md border border-border p-3 text-sm hover:bg-muted"
             >
               <p className="font-medium">{item.label}</p>

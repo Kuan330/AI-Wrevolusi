@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -52,7 +53,13 @@ class Settings(BaseSettings):
         """Accept Neon URLs copied from the console and adapt them for asyncpg."""
         if value.startswith('postgresql://'):
             value = value.replace('postgresql://', 'postgresql+asyncpg://', 1)
-        return value.replace('sslmode=require', 'ssl=require')
+        parts = urlsplit(value)
+        query: list[tuple[str, str]] = []
+        for key, item in parse_qsl(parts.query, keep_blank_values=True):
+            if key == 'channel_binding':
+                continue
+            query.append(('ssl' if key == 'sslmode' else key, item))
+        return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
 
 
 @lru_cache

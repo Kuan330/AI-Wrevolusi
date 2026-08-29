@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 
 import { SIDEBAR_MENU } from "@/constants/menu";
+import { ROUTES } from "@/constants/routes";
 
 const Sidebar = () => {
   return (
@@ -13,7 +14,7 @@ const Sidebar = () => {
           <NavLink
             key={item.key}
             to={item.path}
-            end={item.path === "/"}
+            end={item.path === ROUTES.dashboard}
             className={({ isActive }) =>
               `block rounded-lg border p-3 text-sm transition ${
                 isActive

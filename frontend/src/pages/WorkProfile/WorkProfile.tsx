@@ -1,14 +1,14 @@
 import PageHeader from "@/components/common/PageHeader";
-import TaskList from "@/pages/WorkProfile/components/TaskList";
+import OccupationJourney from "@/pages/WorkProfile/components/OccupationJourney";
 
 const WorkProfile = () => {
   return (
     <div>
       <PageHeader
-        title="Work Profile (E1)"
-        description="Capture real tasks and confirm what you actually do at work."
+        title="Build your work profile"
+        description="Choose the closest occupation, then keep only the tasks that reflect your real work."
       />
-      <TaskList />
+      <OccupationJourney />
     </div>
   );
 };
