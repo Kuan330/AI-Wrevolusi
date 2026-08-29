@@ -1,0 +1,8 @@
+export { default as LandingNav } from "./LandingNav";
+export { default as HeroSection } from "./HeroSection";
+export { default as TrustBar } from "./TrustBar";
+export { default as StepsSection } from "./StepsSection";
+export { default as ReportSection } from "./ReportSection";
+export { default as TestimonialsSection } from "./TestimonialsSection";
+export { default as CtaSection } from "./CtaSection";
+export { default as LandingFooter } from "./LandingFooter";
