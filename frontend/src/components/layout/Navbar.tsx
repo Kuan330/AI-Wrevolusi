@@ -21,10 +21,10 @@ const Navbar = () => {
       <div className="flex h-16 items-center justify-between px-4 lg:px-6">
         <div className="flex items-center gap-3">
           <MobileMenu />
-          <Logo />
+          <Logo showWordmark />
         </div>
         <div className="hidden items-center gap-2 md:flex">
-          <Badge variant="outline">Christine · Sales Supervisor</Badge>
+          <Badge variant="outline">Shared Neon workspace</Badge>
           <Badge>{currentLabel}</Badge>
         </div>
       </div>

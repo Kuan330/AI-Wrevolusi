@@ -11,6 +11,14 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        brand: {
+          brown: "#C7958B",
+          rose: "#E7BDBC",
+          pink: "#F9E0E4",
+          "sky-light": "#C7DBEB",
+          sky: "#9EC9E4",
+          "sky-deep": "#4F91BA",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
