@@ -205,4 +205,5 @@ Unconfirmed tasks must not go to E2/E3. Later stages read **confirmed** values.
 | Reference | `data/reference/ref_wef_skills.csv` |
 | Database | `db/schema.sql` |
 | Database | `db/seed_reference.py` |
+| Process | `docs/iteration1_data_management.md` |
 | Business CSV sketches | `data/business/*.csv` |
