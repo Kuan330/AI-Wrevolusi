@@ -1,7 +1,6 @@
-import { mockUser } from "@/data/user";
-import { api } from "@/services/api";
-import type { UserProfile } from "@/types/user";
+import { authService } from "@/services/authService";
+import type { AuthUser } from "@/types/auth";
 
 export const userService = {
-  me: () => api.get<UserProfile>(mockUser),
+  me: (): Promise<AuthUser> => authService.me(),
 };

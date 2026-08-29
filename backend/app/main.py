@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.db.session import init_models
 from app.routers import (
     auth,
     capabilities,
@@ -37,6 +38,12 @@ app.include_router(exposure.router, prefix=api_prefix)
 app.include_router(capabilities.router, prefix=api_prefix)
 app.include_router(preparation.router, prefix=api_prefix)
 app.include_router(schedule.router, prefix=api_prefix)
+
+
+@app.on_event('startup')
+async def startup_event() -> None:
+    if settings.auto_create_tables:
+        await init_models()
 
 
 @app.get('/healthz', tags=['System'])

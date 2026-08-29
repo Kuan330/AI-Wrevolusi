@@ -8,7 +8,7 @@ import type { Task } from "@/types/task";
 
 interface TaskCardProps {
   task: Task;
-  onDelete: (taskId: string) => void;
+  onDelete: (taskId: string) => Promise<void> | void;
 }
 
 const TaskCard = ({ task, onDelete }: TaskCardProps) => {
@@ -24,7 +24,14 @@ const TaskCard = ({ task, onDelete }: TaskCardProps) => {
         <p className="text-sm text-muted-foreground">
           Exposure: {task.exposure?.replaceAll("_", " ") ?? "not assessed"}
         </p>
-        <Button variant="ghost" size="icon" onClick={() => onDelete(task.id)} aria-label="Delete task">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => {
+            void onDelete(task.id);
+          }}
+          aria-label="Delete task"
+        >
           <Trash2Icon className="size-4" />
         </Button>
       </CardContent>

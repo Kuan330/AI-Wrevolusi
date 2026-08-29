@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     api_version: str = 'v1'
     debug: bool = False
     sql_echo: bool = False
+    auto_create_tables: bool = False
 
     database_url: str = Field(
         default='postgresql+asyncpg://postgres:postgres@localhost:5432/aiwrevolusi'
