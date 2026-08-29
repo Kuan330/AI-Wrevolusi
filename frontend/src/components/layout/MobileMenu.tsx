@@ -29,7 +29,7 @@ const MobileMenu = () => {
             <NavLink
               key={item.key}
               to={item.path}
-              end={item.path === ROUTES.dashboard}
+              end={item.path === ROUTES.dashboard || item.path === ROUTES.workProfile}
               className="block rounded-md border border-border p-3 text-sm hover:bg-muted"
             >
               <p className="font-medium">{item.label}</p>
