@@ -1,7 +1,8 @@
 export const ROUTES = {
   home: "/",
   dashboard: "/dashboard",
-  workProfile: "/work-profile",
+  workProfile: "/profile",
+  task: "/profile/tasks",
   aiExposure: "/ai-exposure",
   capabilities: "/capabilities",
   interpretation: "/interpretation",

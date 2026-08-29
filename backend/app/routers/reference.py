@@ -19,7 +19,8 @@ async def list_reference_occupations(
         result = await db.execute(
             text(
                 f'SELECT {OCCUPATION_COLUMNS} FROM ref_occupations '
-                'WHERE title ILIKE :query OR description ILIKE :query '
+                'WHERE (title ILIKE :query OR description ILIKE :query) '
+                "AND level = 'unit' "
                 'ORDER BY occupation_code'
             ),
             {'query': f'%{q.strip()}%'},

@@ -26,28 +26,41 @@ const parseResponseBody = async (response: Response): Promise<unknown> => {
 };
 
 const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
-    ...init,
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 4000);
 
-  const body = await parseResponseBody(response);
-  if (!response.ok) {
-    const detail =
-      typeof body === "object" &&
-      body !== null &&
-      "detail" in body &&
-      typeof body.detail === "string"
-        ? body.detail
-        : `Request failed with status ${response.status}`;
-    throw new ApiError(detail, response.status);
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...(init?.headers ?? {}),
+      },
+      ...init,
+      signal: controller.signal,
+    });
+
+    const body = await parseResponseBody(response);
+    if (!response.ok) {
+      const detail =
+        typeof body === "object" &&
+        body !== null &&
+        "detail" in body &&
+        typeof body.detail === "string"
+          ? body.detail
+          : `Request failed with status ${response.status}`;
+      throw new ApiError(detail, response.status);
+    }
+
+    return body as T;
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new ApiError("Request timed out", 408);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
   }
-
-  return body as T;
 };
 
 export const api = {
