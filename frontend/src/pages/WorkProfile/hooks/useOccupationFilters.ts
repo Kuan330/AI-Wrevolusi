@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   FILTER_ORDER,
@@ -7,6 +7,12 @@ import {
 } from "@/pages/WorkProfile/occupationFilters";
 import { referenceService } from "@/services/referenceService";
 import type { ReferenceOccupation } from "@/types/reference";
+
+export type OccupationSearchResult = {
+  unit: ReferenceOccupation;
+  path: ReferenceOccupation[];
+  pathLabel: string;
+};
 
 const emptySelections = (): Record<OccupationFilterKey, ReferenceOccupation | null> => ({
   major: null,
@@ -26,19 +32,36 @@ export const useOccupationFilters = () => {
   const [selections, setSelections] = useState(emptySelections);
   const [options, setOptions] = useState(emptyOptions);
   const [query, setQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<ReferenceOccupation[]>([]);
+  const [searchResults, setSearchResults] = useState<OccupationSearchResult[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const occupationCacheRef = useRef(new Map<string, ReferenceOccupation>());
+  const activeSearchRequestRef = useRef(0);
 
   const selectedUnit = selections.unit;
   const selectedPath = FILTER_ORDER.map((key) => selections[key]).filter(
     (item): item is ReferenceOccupation => Boolean(item),
   );
 
+  const cacheOccupations = useCallback((rows: ReferenceOccupation[]) => {
+    rows.forEach((row) => {
+      occupationCacheRef.current.set(row.occupation_code, row);
+    });
+  }, []);
+
+  const getOccupationByCode = useCallback(async (code: string) => {
+    const cached = occupationCacheRef.current.get(code);
+    if (cached) return cached;
+    const row = await referenceService.getOccupation(code);
+    occupationCacheRef.current.set(row.occupation_code, row);
+    return row;
+  }, []);
+
   const loadLevel = async (key: OccupationFilterKey, parent?: string) => {
     const rows = await referenceService.occupations(parent);
+    cacheOccupations(rows);
     setOptions((current) => ({ ...current, [key]: rows }));
     return rows;
   };
@@ -48,6 +71,7 @@ export const useOccupationFilters = () => {
     void referenceService
       .occupations()
       .then((rows) => {
+        cacheOccupations(rows);
         if (active) setOptions((current) => ({ ...current, major: rows }));
       })
       .catch(() => {
@@ -79,6 +103,26 @@ export const useOccupationFilters = () => {
     });
   };
 
+  const resetFilters = () => {
+    setSelections(emptySelections());
+    setOptions((current) => ({
+      major: current.major,
+      sub_major: [],
+      minor: [],
+      unit: [],
+    }));
+    setError(null);
+  };
+
+  const resetSearch = () => {
+    activeSearchRequestRef.current += 1;
+    setQuery("");
+    setSearchResults([]);
+    setHasSearched(false);
+    setSearching(false);
+    setError(null);
+  };
+
   const selectFilter = async (key: OccupationFilterKey, code: string) => {
     setError(null);
     if (!code) {
@@ -104,31 +148,70 @@ export const useOccupationFilters = () => {
     }
   };
 
-  const searchUnits = async () => {
-    if (query.trim().length < 2) return;
-    setSearching(true);
-    setHasSearched(true);
-    setError(null);
-    try {
-      setSearchResults(await referenceService.searchOccupations(query.trim()));
-    } catch {
-      setError("Search is temporarily unavailable.");
-      setSearchResults([]);
-    } finally {
-      setSearching(false);
-    }
-  };
-
-  const pathForUnit = async (unit: ReferenceOccupation) => {
+  const pathForUnit = useCallback(async (unit: ReferenceOccupation) => {
+    cacheOccupations([unit]);
     const path: ReferenceOccupation[] = [unit];
     let parent = unit.parent_code;
     while (parent) {
-      const node = await referenceService.getOccupation(parent);
+      const node = await getOccupationByCode(parent);
       path.unshift(node);
       parent = node.parent_code;
     }
     return path;
-  };
+  }, [cacheOccupations, getOccupationByCode]);
+
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      setHasSearched(false);
+      setSearching(false);
+      setSearchResults([]);
+      return;
+    }
+
+    const requestId = activeSearchRequestRef.current + 1;
+    activeSearchRequestRef.current = requestId;
+    setSearching(true);
+    setError(null);
+
+    const timer = setTimeout(() => {
+      void (async () => {
+        try {
+          const matches = await referenceService.searchOccupations(trimmed);
+          cacheOccupations(matches);
+          const expanded = await Promise.all(
+            matches.map(async (unit) => {
+              const path = await pathForUnit(unit);
+              const parentPath = path
+                .slice(0, -1)
+                .map((item) => item.title)
+                .join(" › ");
+
+              return {
+                unit,
+                path,
+                pathLabel: parentPath,
+              };
+            }),
+          );
+          if (activeSearchRequestRef.current !== requestId) return;
+          setSearchResults(expanded);
+          setHasSearched(true);
+        } catch {
+          if (activeSearchRequestRef.current !== requestId) return;
+          setError("Search is temporarily unavailable.");
+          setSearchResults([]);
+          setHasSearched(true);
+        } finally {
+          if (activeSearchRequestRef.current === requestId) {
+            setSearching(false);
+          }
+        }
+      })();
+    }, 220);
+
+    return () => clearTimeout(timer);
+  }, [cacheOccupations, pathForUnit, query]);
 
   return {
     selections,
@@ -143,7 +226,8 @@ export const useOccupationFilters = () => {
     selectedUnit,
     selectedPath,
     selectFilter,
-    searchUnits,
     pathForUnit,
+    resetFilters,
+    resetSearch,
   };
 };

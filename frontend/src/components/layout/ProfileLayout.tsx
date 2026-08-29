@@ -5,18 +5,28 @@ import { ROUTES } from "@/constants/routes";
 
 const ProfileLayout = () => {
   const { pathname } = useLocation();
-  const wide = pathname === ROUTES.dashboard;
-  const width = wide ? "max-w-6xl" : "max-w-3xl";
+  const wide = pathname === ROUTES.workProfile || pathname === ROUTES.dashboard;
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
-        <div className={`mx-auto flex h-16 items-center justify-between px-4 ${width} lg:px-0`}>
+    <div
+      className="min-h-screen"
+      style={{
+        background: "linear-gradient(90deg, #eaf3fb 0%, #f5f3f8 48%, #f8ecef 100%)",
+      }}
+    >
+      <header className="sticky top-0 z-30 border-b border-white/70 bg-white/45 backdrop-blur-xl">
+        <div
+          className={`mx-auto flex h-16 items-center justify-between px-4 lg:px-0 ${
+            wide ? "max-w-6xl" : "max-w-3xl"
+          }`}
+        >
           <Logo showWordmark />
           <span className="text-sm font-medium text-muted-foreground">Your profile</span>
         </div>
       </header>
-      <main className={`mx-auto px-4 py-6 ${width} lg:px-0 lg:py-10`}>
+      <main
+        className={`mx-auto px-4 py-6 lg:px-0 lg:py-10 ${wide ? "max-w-6xl" : "max-w-3xl"}`}
+      >
         <Outlet />
       </main>
     </div>

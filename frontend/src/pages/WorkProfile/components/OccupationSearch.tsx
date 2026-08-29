@@ -1,16 +1,17 @@
 import { Search } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import type { ReferenceOccupation } from "@/types/reference";
+import { useState } from "react";
+
+import type { OccupationSearchResult } from "@/pages/WorkProfile/hooks/useOccupationFilters";
 
 type OccupationSearchProps = {
   query: string;
   searching: boolean;
   hasSearched: boolean;
-  results: ReferenceOccupation[];
+  results: OccupationSearchResult[];
   onQueryChange: (value: string) => void;
-  onSearch: () => void;
-  onChoose: (occupation: ReferenceOccupation) => void;
+  onChoose: (occupation: OccupationSearchResult) => void;
+  selectedCode: string | null;
 };
 
 const OccupationSearch = ({
@@ -19,55 +20,77 @@ const OccupationSearch = ({
   hasSearched,
   results,
   onQueryChange,
-  onSearch,
   onChoose,
+  selectedCode,
 }: OccupationSearchProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const canSearch = query.trim().length >= 2;
+  const showDropdown = isOpen && canSearch;
+
   return (
-    <div className="space-y-3 border-t pt-6">
-      <div>
-        <p className="text-sm font-medium">Or search for a specific occupation</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Search only returns specific occupations, not broader groups.
-        </p>
-      </div>
-      <div className="flex gap-2">
-        <div className="relative flex-1">
+    <div className="space-y-3">
+      <div className="relative">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={query}
-            onChange={(event) => onQueryChange(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") onSearch();
+            onFocus={() => setIsOpen(true)}
+            onBlur={() => {
+              window.setTimeout(() => setIsOpen(false), 120);
+            }}
+            onChange={(event) => {
+              onQueryChange(event.target.value);
+              setIsOpen(true);
             }}
             placeholder="Search by job title"
-            className="h-11 w-full rounded-xl border bg-background pl-10 pr-4 text-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+            className="h-12 w-full rounded-xl border border-white/80 bg-white/95 pl-10 pr-4 text-sm outline-none shadow-sm transition focus:border-primary focus:ring-4 focus:ring-primary/10"
           />
         </div>
-        <Button className="h-11 rounded-xl px-5" disabled={searching} onClick={onSearch}>
-          Search
-        </Button>
+        {showDropdown ? (
+          <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-72 overflow-y-auto rounded-xl border border-white/85 bg-white p-2 shadow-lg">
+            {searching ? (
+              <p className="px-3 py-2 text-sm text-muted-foreground">Searching occupations...</p>
+            ) : null}
+            {!searching && hasSearched && results.length === 0 ? (
+              <p className="px-3 py-2 text-sm text-muted-foreground">
+                No specific occupations match that title.
+              </p>
+            ) : null}
+            {!searching && results.length > 0 ? (
+              <div className="space-y-1">
+                {results.map((item) => (
+                  <button
+                    key={item.unit.occupation_code}
+                    type="button"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => {
+                      onChoose(item);
+                      setIsOpen(false);
+                    }}
+                    className={`w-full rounded-lg px-3 py-2.5 text-left transition ${
+                      selectedCode === item.unit.occupation_code
+                        ? "bg-primary/10 ring-1 ring-primary/35"
+                        : "hover:bg-muted/60"
+                    }`}
+                  >
+                    <p className="text-sm font-medium text-foreground">{item.unit.title}</p>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      {item.pathLabel
+                        ? `${item.unit.title} - ${item.pathLabel}`
+                        : item.unit.title}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
-      {hasSearched && results.length === 0 && !searching ? (
-        <p className="text-sm text-muted-foreground">No specific occupations match that title.</p>
+      {!canSearch ? (
+        <p className="text-xs text-muted-foreground">Type at least 2 characters to search.</p>
       ) : null}
-      {results.length > 0 ? (
-        <div className="space-y-2">
-          {results.map((occupation) => (
-            <button
-              key={occupation.occupation_code}
-              type="button"
-              onClick={() => onChoose(occupation)}
-              className="w-full rounded-xl border bg-card p-4 text-left transition hover:border-primary/35"
-            >
-              <p className="font-medium">{occupation.title}</p>
-              {occupation.description ? (
-                <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">
-                  {occupation.description}
-                </p>
-              ) : null}
-            </button>
-          ))}
-        </div>
+      {selectedCode ? (
+        <p className="text-xs text-primary">Occupation selected. You can continue now.</p>
       ) : null}
     </div>
   );
