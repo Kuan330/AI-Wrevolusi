@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import PageHeader from "@/components/common/PageHeader";
+import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
+import { saveConfirmedAnalysis } from "@/pages/Dashboard/analysisSession";
 import ProfileTaskList from "@/pages/WorkProfile/components/ProfileTaskList";
 import TaskEditorDialog from "@/pages/WorkProfile/components/TaskEditorDialog";
 import { useProfileTasks } from "@/pages/WorkProfile/hooks/useProfileTasks";
@@ -23,6 +25,7 @@ const valuesFromTask = (task: ProfileTask): TaskEditorValues => ({
 
 const ProfileTasks = () => {
   const selected = readSelectedOccupation();
+  const navigate = useNavigate();
   const profileTasks = useProfileTasks();
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<"add" | "edit">("add");
@@ -67,6 +70,19 @@ const ProfileTasks = () => {
     profileTasks.addTask(values);
   };
 
+  const confirmTasks = () => {
+    const scored = profileTasks.tasks.find((task) => task.potential25 || typeof task.meanScore2025 === "number");
+    saveConfirmedAnalysis({
+      occupationTitle: selected.unit.title,
+      occupationPath: selected.path.map((item) => item.title),
+      occupationCode: selected.unit.occupation_code,
+      potential25: scored?.potential25 ?? null,
+      meanScore2025: scored?.meanScore2025 ?? null,
+      tasks: profileTasks.tasks,
+    });
+    navigate(ROUTES.dashboard);
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -91,6 +107,12 @@ const ProfileTasks = () => {
         onEdit={openEditDialog}
         onDelete={profileTasks.removeTask}
       />
+
+      <div className="flex justify-end border-t pt-4">
+        <Button className="h-11 rounded-full px-6" disabled={profileTasks.tasks.length === 0} onClick={confirmTasks}>
+          Confirm these tasks
+        </Button>
+      </div>
 
       <TaskEditorDialog
         open={editorOpen}

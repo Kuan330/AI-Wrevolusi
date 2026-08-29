@@ -8,6 +8,9 @@ export interface ProfileTask {
   source: ProfileTaskSource;
   iloTaskId?: string;
   originalWording?: string;
+  score2025?: number | null;
+  potential25?: string | null;
+  meanScore2025?: number | null;
 }
 
 export interface TaskEditorValues {
