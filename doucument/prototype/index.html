@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI-Wrevolusi · Iteration 1 Website Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  :root {
+    --ink: #2a211c;
+    --muted: #5c4f47;
+    --line: #e2d5cb;
+    --paper: #f7f1ea;
+    --card: #fffdfb;
+    --brand: #b56f5f;
+    --brand-deep: #6b3d34;
+    --accent: #d9897a;
+    --glow: #ff9eaa;
+    --sky: #8f5e52;
+    --ok: #3f6b45;
+    --warn: #9a6a2e;
+    --danger: #a94444;
+    --suggest: #f6e8e1;
+    --shadow: 0 18px 40px rgba(42, 33, 28, 0.1);
+    --shadow-soft: 0 8px 24px rgba(42, 33, 28, 0.08);
+    --radius: 24px;
+    --radius-sm: 16px;
+    --max: 1080px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "Outfit", system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(ellipse at 18% 8%, rgba(255, 188, 178, 0.28) 0%, transparent 42%),
+      radial-gradient(ellipse at 88% 0%, rgba(255, 214, 196, 0.32) 0%, transparent 40%),
+      linear-gradient(165deg, #f4ebe3 0%, #efe4da 50%, #f6eee7 100%);
+    min-height: 100vh;
+  }
+  button, input, select, textarea { font: inherit; }
+  button { cursor: pointer; }
+
+  .site-header {
+    position: sticky; top: 0; z-index: 20;
+    backdrop-filter: blur(16px);
+    background: rgba(255, 253, 251, 0.92);
+    border-bottom: 1px solid var(--line);
+  }
+  .site-header .inner {
+    max-width: var(--max); margin: 0 auto;
+    padding: 14px 24px;
+    display: flex; align-items: center; gap: 18px;
+  }
+  .logo {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 26px; font-weight: 600; color: var(--brand-deep); margin: 0; white-space: nowrap;
+    letter-spacing: 0.01em;
+  }
+  .steps { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
+  .steps button {
+    border: 1px solid transparent; background: transparent;
+    border-radius: 999px; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--muted);
+  }
+  .steps button.active {
+    background: rgba(255,252,249,0.95); border-color: var(--line); color: var(--brand-deep);
+    box-shadow: var(--shadow-soft), 0 0 0 1px rgba(255,158,170,0.12);
+  }
+  .steps button.done { color: var(--brand); }
+
+  main { max-width: var(--max); margin: 0 auto; padding: 28px 24px 64px; }
+  .page { display: none; animation: rise .28s ease; }
+  .page.active { display: block; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .layer {
+    display: inline-flex; align-items: center;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--brand-deep); background: rgba(232, 165, 152, 0.18);
+    padding: 6px 11px; border-radius: 999px; margin-bottom: 12px;
+    border: 1px solid rgba(196, 139, 123, 0.18);
+  }
+  h1 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: clamp(32px, 4.5vw, 46px); line-height: 1.12; font-weight: 600;
+    margin: 0 0 10px; color: var(--brand-deep); max-width: 16ch;
+  }
+  .lead { margin: 0 0 22px; color: var(--muted); font-size: 16px; line-height: 1.6; max-width: 58ch; }
+
+  /* Homepage board — illustration background */
+  .page[data-page="P0"].active {
+    margin: -28px -24px -64px;
+    min-height: calc(100vh - 58px);
+  }
+  .home-board {
+    min-height: calc(100vh - 58px);
+    background:
+      url("assets/home-workspace-bg.png") center center / cover no-repeat,
+      #f7f1ea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px 56px;
+    position: relative;
+  }
+  .home-board::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: rgba(42, 33, 28, 0.18);
+    pointer-events: none;
+  }
+  .home-copy {
+    position: relative; z-index: 1;
+    width: min(580px, 100%);
+    text-align: center;
+    background: #fffdfb;
+    border: 1px solid #e2d5cb;
+    border-radius: 32px;
+    padding: 40px 36px 36px;
+    box-shadow: 0 28px 60px rgba(42, 33, 28, 0.22);
+  }
+  .home-copy .logo {
+    color: var(--brand-deep); font-size: 42px; margin: 0 0 14px; font-weight: 700;
+  }
+  .home-copy h1 {
+    color: #2a211c; max-width: none; margin: 0 auto 12px;
+    font-size: clamp(34px, 5vw, 48px); font-weight: 700;
+  }
+  .home-copy .lead {
+    margin: 0 auto 20px; max-width: 40ch; color: #5c4f47; font-weight: 500;
+  }
+  .home-points {
+    display: grid; gap: 10px; margin: 0 0 24px; text-align: left;
+  }
+  .home-points div {
+    background: #f6e8e1;
+    border: 1px solid #e2d5cb;
+    border-radius: 16px; padding: 12px 14px; font-size: 14px; color: #2a211c; font-weight: 500;
+  }
+  .home-copy .btn { min-width: 200px; }
+  .home-note {
+    margin-top: 16px; font-size: 13px; color: #5c4f47; line-height: 1.45; font-weight: 500;
+  }
+  @media (max-width: 720px) {
+    .steps { display: none; }
+    .home-copy { padding: 28px 22px; }
+  }
+
+  .panel {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 24px;
+    box-shadow: var(--shadow); margin-bottom: 16px;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  label.field { display: grid; gap: 7px; font-size: 13px; font-weight: 600; margin-bottom: 14px; color: var(--brand-deep); }
+  input, select, textarea {
+    width: 100%; border: 1px solid var(--line); border-radius: 14px;
+    padding: 12px 14px; background: rgba(255,252,249,0.95); color: var(--ink);
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(232, 165, 152, 0.22);
+  }
+  select:disabled { background: #f3ebe4; color: var(--muted); }
+
+  .btn {
+    border: none; border-radius: 999px; padding: 12px 18px; font-weight: 650; font-size: 14px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+  .btn-primary {
+    background: #6b3d34;
+    color: #fffdfb; box-shadow: 0 10px 24px rgba(107, 61, 52, 0.28);
+  }
+  .btn-accent {
+    background: rgba(255,252,249,0.92); color: var(--brand-deep);
+    border: 1px solid rgba(255,255,255,0.55);
+    box-shadow: 0 10px 28px rgba(143,94,82,0.12), 0 0 24px rgba(255,158,170,0.25);
+  }
+  .btn-ghost {
+    background: rgba(255,252,249,0.9); color: var(--ink); border: 1px solid var(--line);
+    box-shadow: var(--shadow-soft);
+  }
+  .btn-soft {
+    background: rgba(232, 165, 152, 0.16); color: var(--brand-deep);
+    border: 1px solid rgba(196, 139, 123, 0.18);
+  }
+  .btn-danger {
+    background: rgba(196, 107, 107, 0.12); color: var(--danger);
+    border: 1px solid rgba(196, 107, 107, 0.18);
+  }
+  .btn.small { padding: 8px 12px; font-size: 12.5px; }
+  .btn-link { background: none; border: none; color: var(--brand-deep); font-weight: 700; font-size: 13px; padding: 0; box-shadow: none; }
+  .btn-link:hover { color: var(--brand); transform: none; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .actions.spread { justify-content: space-between; align-items: center; }
+
+  .badge {
+    display: inline-flex; align-items: center; font-size: 11px; font-weight: 700;
+    padding: 4px 9px; border-radius: 999px; margin-right: 6px;
+  }
+  .b-ok { background: rgba(122, 143, 110, 0.14); color: var(--ok); }
+  .b-rec { background: rgba(232, 165, 152, 0.2); color: var(--brand-deep); }
+  .b-state { background: rgba(196, 139, 123, 0.14); color: var(--brand-deep); }
+
+  .occ-card {
+    border: 1px solid var(--line); border-radius: 20px; padding: 18px;
+    background: rgba(255,252,249,0.88); margin-top: 8px;
+    box-shadow: var(--shadow-soft);
+  }
+  .occ-card.selected {
+    border-color: rgba(196, 139, 123, 0.45);
+    background: linear-gradient(180deg, #fff8f4, #f7ebe4);
+    box-shadow: 0 12px 28px rgba(196, 139, 123, 0.12), 0 0 0 1px rgba(255,158,170,0.12);
+  }
+
+  .toolbar {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    flex-wrap: wrap; margin-bottom: 14px;
+  }
+  .toolbar-left, .toolbar-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  .list { display: grid; gap: 12px; }
+  .row {
+    display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start;
+    border: 1px solid var(--line); border-radius: 18px; padding: 16px;
+    background: rgba(255,252,249,0.95);
+    box-shadow: 0 6px 18px rgba(143, 94, 82, 0.04);
+  }
+  .row.selected { border-color: var(--accent); background: #fff6f2; }
+  .row h3 { margin: 0 0 4px; font-size: 15px; font-weight: 650; color: var(--brand-deep); }
+  .meta { font-size: 13px; color: var(--muted); line-height: 1.45; }
+  .context-missing {
+    display: inline-block; margin-top: 6px;
+    font-size: 12.5px; font-weight: 700;
+    color: #9a5a3c; background: #ffe6d8; border: 1px solid #f2c4a8;
+    padding: 4px 9px; border-radius: 999px;
+  }
+  .context-set {
+    display: inline-block; margin-top: 6px;
+    font-size: 12.5px; font-weight: 600; color: var(--ok);
+    background: rgba(122, 143, 110, 0.12);
+    padding: 4px 9px; border-radius: 999px;
+  }
+  .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .hint {
+    margin-top: 10px; padding: 12px 14px; border-radius: 16px;
+    background: rgba(255, 236, 224, 0.85); border: 1px solid #f0d2c0;
+    color: #8a5a45; font-size: 13px;
+  }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(74, 63, 56, 0.28);
+    backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 50; padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    width: min(520px, 100%);
+    background: linear-gradient(180deg, #fffaf7, #f8efe8);
+    border: 1px solid rgba(234, 223, 214, 0.95);
+    border-radius: 28px;
+    box-shadow: 0 28px 70px rgba(143,94,82,0.18), 0 0 40px rgba(255,158,170,0.12);
+    padding: 24px;
+    max-height: min(80vh, 640px); overflow: auto;
+  }
+  .modal h2 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 28px; font-weight: 600; margin: 0 0 8px; color: var(--brand-deep);
+  }
+  .modal .body { color: var(--muted); font-size: 14px; line-height: 1.55; margin-bottom: 16px; }
+  .modal .body strong { color: var(--ink); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+
+  .toast {
+    position: fixed; right: 20px; bottom: 20px; z-index: 60;
+    background: linear-gradient(135deg, #d4a094, #c48b7b); color: #fffaf7;
+    border-radius: 999px; padding: 12px 16px; font-size: 13px;
+    opacity: 0; pointer-events: none; transition: opacity .2s ease;
+    max-width: 320px;
+    box-shadow: 0 12px 30px rgba(196,139,123,0.35), 0 0 24px rgba(255,158,170,0.28);
+  }
+  .toast.show { opacity: 1; }
+
+  .bridge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .bridge-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <p class="logo">AI-Wrevolusi</p>
+    <nav class="steps" id="steps"></nav>
+  </div>
+</header>
+
+<main>
+  <section class="page active" data-page="P0">
+    <div class="home-board">
+      <div class="home-copy">
+        <div class="logo">AI-Wrevolusi</div>
+        <h1>See how AI may change your work.</h1>
+        <p class="lead">Built for working women in Malaysia. You stay in control: review and adjust before anything moves forward.</p>
+        <div class="home-points">
+          <div>Start from your real tasks, not a job title alone.</div>
+          <div>Possible change — not a prediction that your whole job disappears.</div>
+        </div>
+        <button class="btn btn-primary" onclick="go('P1')">Describe my work</button>
+        <p class="home-note">Iteration 1 · Understand my work · Pilot: Sales Supervisor + up to two related occupations</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" data-page="P1">
+    <div class="layer">E1 · US1.1 · Industry → occupation</div>
+    <h1>Match my work</h1>
+    <p class="lead">Choose an industry first. Occupations update with that industry. Selecting an occupation shows its details below and enables Continue.</p>
+    <div class="panel">
+      <div class="grid-2">
+        <label class="field">Industry
+          <select id="industry" onchange="onIndustryChange()"></select>
+        </label>
+        <label class="field">Occupation
+          <select id="occupation" onchange="onOccupationChange()" disabled>
+            <option value="">Select industry first</option>
+          </select>
+        </label>
+      </div>
+      <div id="matchPanel" hidden></div>
+      <div class="actions spread">
+        <button class="btn btn-ghost" onclick="go('P0')">Back</button>
+        <button class="btn btn-primary" id="p1Continue" disabled onclick="go('P2')">Continue</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" data-page="P2">
+    <div class="layer">E1 · US1.2 / US1.3 · List + add / edit / remove</div>
+    <h1>Review my work tasks</h1>
+    <p class="lead">Edit or remove tasks that do not fit. Changes here count as your confirmed task list — next step goes straight into AI task analysis.</p>
+    <div class="panel" id="occSummary"></div>
+    <div class="panel">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button class="btn btn-primary small" onclick="openAddTaskModal()">+ Add task</button>
+        </div>
+      </div>
+      <div class="list" id="taskList"></div>
+      <div id="taskHint" class="hint" hidden></div>
+      <div class="actions spread">
+        <button class="btn btn-ghost" onclick="go('P1')">Back</button>
+        <button class="btn btn-primary" id="p2Continue" disabled onclick="continueFromTasks()">Continue to AI changes</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" data-page="P4">
+    <div class="layer">E2 + E4 · Detail modal for Why</div>
+    <h1>How AI may change my tasks</h1>
+    <p class="lead">Each task shows a possible change. Use Detail for the explanation. Edit interpretations through a confirmation modal.</p>
+    <div class="panel">
+      <div class="list" id="changeList"></div>
+      <div id="changeHint" class="hint" hidden></div>
+      <div class="actions spread">
+        <button class="btn btn-ghost" onclick="go('P2')">Back</button>
+        <button class="btn btn-primary" id="p4Continue" disabled onclick="go('P5')">Continue</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" data-page="P5">
+    <div class="layer">E3 + E4 · Detail modal for Basis</div>
+    <h1>Capabilities from my work</h1>
+    <p class="lead">Suggested from your tasks — not a readiness score. Add capabilities in your own words, use Detail for the basis, and edit or remove via modal confirmation.</p>
+    <div class="panel">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button class="btn btn-primary small" onclick="openAddCapModal()">+ Add capability</button>
+        </div>
+      </div>
+      <div class="list" id="capList"></div>
+      <div id="capHint" class="hint" hidden></div>
+      <div class="actions spread">
+        <button class="btn btn-ghost" onclick="go('P4')">Back</button>
+        <button class="btn btn-primary" id="p5Continue" disabled onclick="go('P6')">Review my summary</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" data-page="P6">
+    <div class="layer">Read-only overview · jump back to edit</div>
+    <h1>Iteration 1 overview</h1>
+    <p class="lead">A cross-check of E1–E4. Editing stays on earlier pages — not here.</p>
+    <div id="overview"></div>
+    <div class="actions spread">
+      <button class="btn btn-ghost" onclick="go('P5')">Back</button>
+      <button class="btn btn-primary" id="releaseBtn" disabled onclick="go('BRIDGE')">Enter Choose My Direction</button>
+    </div>
+    <p class="meta" style="margin-top:10px">Next: Iteration 2 · E5 optional · E6 priorities</p>
+  </section>
+
+  <section class="page" data-page="BRIDGE">
+    <div class="layer">Bridge · Choose My Direction</div>
+    <h1>What would you like next?</h1>
+    <p class="lead">E5 is optional. You can skip straight to preparation priorities (E6).</p>
+    <div class="bridge-grid">
+      <div class="panel">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin:0 0 8px;color:var(--brand-deep)">Explore nearby occupations</h2>
+        <p class="meta">E5 · optional. Compare a small set of Malaysian pathways. Not a job guarantee.</p>
+        <button class="btn btn-soft" style="margin-top:14px" onclick="showToast('E5 is outside this Iteration 1 prototype.')">Explore pathways (optional)</button>
+      </div>
+      <div class="panel">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin:0 0 8px;color:var(--brand-deep)">Skip to preparation priorities</h2>
+        <p class="meta">E6 · Choose what to prepare first using your confirmed Iteration 1 results.</p>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="showToast('E6 starts Iteration 2 — out of this prototype.')">Skip E5 → E6</button>
+      </div>
+    </div>
+    <div class="actions"><button class="btn btn-ghost" onclick="go('P6')">Back to overview</button></div>
+  </section>
+</main>
+
+<div class="modal-backdrop" id="modal" onclick="backdropClose(event)">
+  <div class="modal" role="dialog" aria-modal="true" id="modalCard"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const INDUSTRIES = [
+  {
+    id: "retail",
+    label: "Wholesale & retail trade",
+    occupations: [
+      {
+        id: "sales-supervisor",
+        title: "Sales Supervisor",
+        desc: "Supervises sales teams, coordinates targets, and handles key customer issues.",
+        source: "MASCO 2020 · pilot",
+        tasks: [
+          { id: "t1", name: "Coordinate team sales targets and weekly reviews", source: "MASCO representative task" },
+          { id: "t2", name: "Handle escalated customer complaints", source: "MASCO representative task" },
+          { id: "t3", name: "Prepare sales performance reports", source: "MASCO representative task" },
+          { id: "t4", name: "Coach junior sales staff on product pitches", source: "MASCO representative task" },
+        ],
+      },
+      {
+        id: "retail-supervisor",
+        title: "Retail Supervisor",
+        desc: "Oversees shop-floor operations, staff rostering, and service standards.",
+        source: "MASCO 2020 · related pilot",
+        tasks: [
+          { id: "r1", name: "Oversee daily shop-floor operations", source: "MASCO representative task" },
+          { id: "r2", name: "Plan staff rosters and coverage", source: "MASCO representative task" },
+          { id: "r3", name: "Maintain service and merchandising standards", source: "MASCO representative task" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "admin",
+    label: "Administrative & support services",
+    occupations: [
+      {
+        id: "customer-service-supervisor",
+        title: "Customer Service Supervisor",
+        desc: "Leads service staff, escalations, and quality of client interactions.",
+        source: "MASCO 2020 · related pilot",
+        tasks: [
+          { id: "c1", name: "Lead service quality checks", source: "MASCO representative task" },
+          { id: "c2", name: "Handle complex client escalations", source: "MASCO representative task" },
+          { id: "c3", name: "Coach agents on difficult conversations", source: "MASCO representative task" },
+        ],
+      },
+    ],
+  },
+];
+
+const CHANGE_DEFAULT = {
+  t1: { state: "reshaped", why: "Coordination stays human-led, but scheduling and target dashboards may be AI-assisted." },
+  t2: { state: "human-led", why: "Judgement and empathy remain central; AI may draft talking points only." },
+  t3: { state: "partly automated", why: "Routine compilation of figures is highly exposable; interpretation still needs you." },
+  t4: { state: "AI-assisted", why: "Coaching plans can be suggested; feedback quality stays with you." },
+  r1: { state: "AI-assisted", why: "Operational checklists may be assisted; floor judgement remains yours." },
+  r2: { state: "partly automated", why: "Roster drafting can automate; fairness and exceptions need you." },
+  r3: { state: "reshaped", why: "Standards monitoring may change tools; customer-facing judgement stays." },
+  c1: { state: "AI-assisted", why: "Quality scoring may be assisted; coaching conversations stay human-led." },
+  c2: { state: "human-led", why: "Complex escalations rely on accountability and rapport." },
+  c3: { state: "reshaped", why: "Practice scenarios may be AI-supported; trust-building remains yours." },
+};
+
+const CAP_SEED = [
+  { id: "cap1", name: "Judgement under pressure", evolve: "Continue to be useful", why: "Linked to escalations and customer issues." },
+  { id: "cap2", name: "Team coordination", evolve: "Needs updating as tasks change", why: "Tied to planning, coaching and oversight tasks." },
+  { id: "cap3", name: "Clear workplace communication", evolve: "Needs strengthening", why: "Reports and difficult conversations still need your voice." },
+];
+
+const state = {
+  page: "P0",
+  industryId: "",
+  occupation: null,
+  tasks: [],
+  changes: {},
+  caps: [],
+  profileConfirmed: false,
+  modalAction: null,
+};
+
+const PAGE_META = [
+  { id: "P0", label: "Entry" },
+  { id: "P1", label: "Match" },
+  { id: "P2", label: "Tasks" },
+  { id: "P4", label: "Changes" },
+  { id: "P5", label: "Capabilities" },
+  { id: "P6", label: "Overview" },
+  { id: "BRIDGE", label: "Next" },
+];
+
+function showToast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 2200);
+}
+function showHint(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.hidden = !msg;
+  el.textContent = msg || "";
+}
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+function escapeAttr(str) { return escapeHtml(str).replaceAll("'", "&#39;"); }
+
+function openModal(html) {
+  document.getElementById("modalCard").innerHTML = html;
+  document.getElementById("modal").classList.add("open");
+}
+function closeModal() {
+  document.getElementById("modal").classList.remove("open");
+  state.modalAction = null;
+}
+function backdropClose(e) {
+  if (e.target.id === "modal") closeModal();
+}
+
+function renderSteps() {
+  const order = PAGE_META.map(p => p.id);
+  const idx = order.indexOf(state.page);
+  document.getElementById("steps").innerHTML = PAGE_META.map((p, i) => {
+    const cls = [p.id === state.page ? "active" : "", i < idx ? "done" : ""].join(" ");
+    return `<button class="${cls}" onclick="go('${p.id}')">${p.label}</button>`;
+  }).join("");
+}
+
+function go(page) {
+  if (page === "P2" && !state.occupation) {
+    showToast("Select an occupation first.");
+    page = "P1";
+  }
+  if (page === "P4") {
+    if (!state.occupation || !state.tasks.length) {
+      showToast("Complete your task list first.");
+      page = state.occupation ? "P2" : "P1";
+    } else if (!state.profileConfirmed) {
+      // Tasks page edits already count as confirmed input
+      state.profileConfirmed = true;
+      state.changes = {};
+      state.tasks.forEach(t => {
+        const seed = CHANGE_DEFAULT[t.id] || {
+          state: "insufficient data",
+          why: "No checked MASCO-to-ISCO correspondence for this task wording.",
+        };
+        state.changes[t.id] = { ...seed };
+      });
+      state.caps = CAP_SEED.map(c => ({ ...c }));
+    }
+  }
+  if ((page === "P5" || page === "P6" || page === "BRIDGE") && !state.profileConfirmed) {
+    showToast("Continue from your task list first.");
+    page = state.occupation ? "P2" : "P1";
+  }
+  state.page = page;
+  // Keep shareable URL in sync for Figma capture / deep links
+  const url = new URL(location.href);
+  url.searchParams.set("page", page);
+  history.replaceState(null, "", url);
+  document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.dataset.page === page));
+  renderSteps();
+  if (page === "P1") renderMatch();
+  if (page === "P2") renderTasks();
+  if (page === "P4") renderChanges();
+  if (page === "P5") renderCaps();
+  if (page === "P6") renderOverview();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function initIndustrySelect() {
+  document.getElementById("industry").innerHTML =
+    `<option value="">Select an industry</option>` +
+    INDUSTRIES.map(i => `<option value="${i.id}">${i.label}</option>`).join("");
+}
+
+function onIndustryChange() {
+  const industryId = document.getElementById("industry").value;
+  state.industryId = industryId;
+  state.occupation = null;
+  state.profileConfirmed = false;
+  const occSel = document.getElementById("occupation");
+  const industry = INDUSTRIES.find(i => i.id === industryId);
+  if (!industry) {
+    occSel.disabled = true;
+    occSel.innerHTML = `<option value="">Select industry first</option>`;
+    renderMatch();
+    return;
+  }
+  occSel.disabled = false;
+  occSel.innerHTML = `<option value="">Select an occupation</option>` +
+    industry.occupations.map(o =>
+      `<option value="${o.id}">${o.title}</option>`
+    ).join("");
+  renderMatch();
+}
+
+function onOccupationChange() {
+  const industry = INDUSTRIES.find(i => i.id === state.industryId);
+  const occId = document.getElementById("occupation").value;
+  const occ = industry?.occupations.find(o => o.id === occId) || null;
+  state.occupation = occ ? { ...occ } : null;
+  state.profileConfirmed = false;
+  state.tasks = occ ? occ.tasks.map(t => ({ ...t, time: "", responsibility: "" })) : [];
+  renderMatch();
+}
+
+function currentIndustryOccupations() {
+  return INDUSTRIES.find(i => i.id === state.industryId)?.occupations || [];
+}
+
+function renderMatch() {
+  const panel = document.getElementById("matchPanel");
+  const cont = document.getElementById("p1Continue");
+  if (!state.industryId) {
+    panel.hidden = true;
+    cont.disabled = true;
+    return;
+  }
+  if (!state.occupation) {
+    panel.hidden = false;
+    panel.innerHTML = `<div class="hint">Select an occupation to see its details and continue.</div>`;
+    cont.disabled = true;
+    return;
+  }
+  panel.hidden = false;
+  panel.innerHTML = `
+    <div class="occ-card selected">
+      <span class="badge b-ok">Selected</span>
+      <h3 style="margin:8px 0 6px;font-size:18px">${escapeHtml(state.occupation.title)}</h3>
+      <p class="meta">${escapeHtml(state.occupation.desc)}</p>
+      <p class="meta" style="margin-top:8px"><strong>Source:</strong> ${escapeHtml(state.occupation.source)}</p>
+      <p class="meta" style="margin-top:8px">Changing the occupation above updates this detail and replaces the task list on the next step.</p>
+    </div>`;
+  cont.disabled = false;
+}
+
+function continueFromTasks() {
+  if (!state.tasks.length) {
+    showHint("taskHint", "Keep at least one task before continuing.");
+    return;
+  }
+  state.profileConfirmed = true;
+  state.changes = {};
+  state.tasks.forEach(t => {
+    const seed = CHANGE_DEFAULT[t.id] || {
+      state: "insufficient data",
+      why: "No checked MASCO-to-ISCO correspondence for this task wording.",
+    };
+    state.changes[t.id] = { ...seed };
+  });
+  state.caps = CAP_SEED.map(c => ({ ...c }));
+  go("P4");
+}
+
+function renderTasks() {
+  const industry = INDUSTRIES.find(i => i.id === state.industryId);
+  document.getElementById("occSummary").innerHTML = `
+    <span class="badge b-ok">Selected</span>
+    <strong>${escapeHtml(state.occupation.title)}</strong>
+    <span class="meta"> · ${escapeHtml(industry?.label || "")}</span>
+    <p class="meta" style="margin:8px 0 0">${escapeHtml(state.occupation.desc)}</p>
+    <div style="margin-top:8px"><button class="btn-link" onclick="go('P1')">Change occupation</button></div>`;
+
+  const list = document.getElementById("taskList");
+  if (!state.tasks.length) {
+    list.innerHTML = `<div class="hint">No tasks yet. Use + Add task, or go back and choose a different match.</div>`;
+  } else {
+    list.innerHTML = state.tasks.map((t) => {
+      const context = (t.time || t.responsibility)
+        ? `<span class="context-set">${[t.time && `Time: ${t.time}`, t.responsibility && `Responsibility: ${t.responsibility}`].filter(Boolean).join(" · ")}</span>`
+        : `<span class="context-missing">Optional context not set</span>`;
+      return `<div class="row" style="grid-template-columns:1fr auto">
+        <div>
+          <h3>${escapeHtml(t.name)}</h3>
+          <div class="meta">Source: ${escapeHtml(t.source)}</div>
+          ${context}
+        </div>
+        <div class="row-actions">
+          <button class="btn btn-ghost small" onclick="openEditTaskModal('${t.id}')">Edit</button>
+          <button class="btn btn-danger small" onclick="openDeleteTaskModal('${t.id}')">Remove</button>
+        </div>
+      </div>`;
+    }).join("");
+  }
+  document.getElementById("p2Continue").disabled = state.tasks.length === 0;
+}
+
+function openAddTaskModal() {
+  openModal(`
+    <h2>Add a task</h2>
+    <div class="body">Describe a task you actually perform. It will be added to your confirmed list.</div>
+    <label class="field">Task wording<input id="modal-task-name" placeholder="e.g. Brief the team on weekly targets" /></label>
+    <div class="grid-2">
+      <label class="field">Approx. time (optional)
+        <select id="modal-task-time"><option value="">Skip</option><option>Low</option><option>Medium</option><option>High</option></select>
+      </label>
+      <label class="field">Responsibility (optional)
+        <select id="modal-task-resp"><option value="">Skip</option><option>Support</option><option>Shared</option><option>Accountable</option></select>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmAddTask()">Add task</button>
+    </div>`);
+}
+function confirmAddTask() {
+  const name = document.getElementById("modal-task-name").value.trim();
+  if (!name) {
+    showToast("Task wording cannot be empty.");
+    return;
+  }
+  state.tasks.push({
+    id: "u" + Date.now(),
+    name,
+    source: "User added",
+    time: document.getElementById("modal-task-time").value,
+    responsibility: document.getElementById("modal-task-resp").value,
+  });
+  state.profileConfirmed = false;
+  closeModal();
+  showHint("taskHint", "Task added to your list.");
+  renderTasks();
+}
+
+function openEditTaskModal(id) {
+  const t = state.tasks.find(x => x.id === id);
+  if (!t) return;
+  openModal(`
+    <h2>Edit task</h2>
+    <div class="body">Confirm your changes to update this task in your list.</div>
+    <label class="field">Task wording<input id="modal-task-name" value="${escapeAttr(t.name)}" /></label>
+    <div class="grid-2">
+      <label class="field">Approx. time (optional)
+        <select id="modal-task-time">
+          <option value="">Skip</option>
+          ${["Low","Medium","High"].map(v => `<option ${t.time===v?"selected":""}>${v}</option>`).join("")}
+        </select>
+      </label>
+      <label class="field">Responsibility (optional)
+        <select id="modal-task-resp">
+          <option value="">Skip</option>
+          ${["Support","Shared","Accountable"].map(v => `<option ${t.responsibility===v?"selected":""}>${v}</option>`).join("")}
+        </select>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmEditTask('${id}')">Save changes</button>
+    </div>`);
+}
+function confirmEditTask(id) {
+  const t = state.tasks.find(x => x.id === id);
+  if (!t) return;
+  const name = document.getElementById("modal-task-name").value.trim();
+  if (!name) {
+    showToast("Task wording cannot be empty.");
+    return;
+  }
+  t.name = name;
+  t.time = document.getElementById("modal-task-time").value;
+  t.responsibility = document.getElementById("modal-task-resp").value;
+  t.source = "User edited";
+  state.profileConfirmed = false;
+  closeModal();
+  showHint("taskHint", "Task updated.");
+  renderTasks();
+}
+
+function openDeleteTaskModal(id) {
+  const t = state.tasks.find(x => x.id === id);
+  if (!t) return;
+  openModal(`
+    <h2>Remove this task?</h2>
+    <div class="body">This will remove <strong>${escapeHtml(t.name)}</strong> from your confirmed task list.</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDeleteTask('${id}')">Remove task</button>
+    </div>`);
+}
+function confirmDeleteTask(id) {
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  state.profileConfirmed = false;
+  closeModal();
+  showHint("taskHint", "Task removed.");
+  renderTasks();
+}
+
+function renderChanges() {
+  const list = document.getElementById("changeList");
+  if (!state.tasks.length) {
+    list.innerHTML = `<div class="hint">No tasks left. Return to your task list.</div>`;
+    document.getElementById("p4Continue").disabled = true;
+    return;
+  }
+  list.innerHTML = state.tasks.map(t => {
+    const c = state.changes[t.id] || { state: "insufficient data", why: "" };
+    return `<div class="row" style="grid-template-columns:1fr auto">
+      <div>
+        <span class="badge b-state">${escapeHtml(c.state)}</span>
+        <h3 style="display:inline">${escapeHtml(t.name)}</h3>
+        <div class="meta">Possible change — not a job-loss prediction.</div>
+      </div>
+      <div class="row-actions">
+        <button class="btn btn-soft small" onclick="openWhyModal('${t.id}')">Detail</button>
+        <button class="btn btn-ghost small" onclick="openEditChangeModal('${t.id}')">Edit</button>
+      </div>
+    </div>`;
+  }).join("");
+  document.getElementById("p4Continue").disabled = state.tasks.length === 0;
+}
+
+function openWhyModal(id) {
+  const t = state.tasks.find(x => x.id === id);
+  const c = state.changes[id];
+  if (!t || !c) return;
+  openModal(`
+    <h2>Why this interpretation</h2>
+    <div class="body">
+      <strong>Task:</strong> ${escapeHtml(t.name)}<br/><br/>
+      <strong>Suggested state:</strong> ${escapeHtml(c.state)}<br/><br/>
+      <strong>Source:</strong> ${escapeHtml(t.source)}<br/><br/>
+      <strong>Reasoning:</strong> ${escapeHtml(c.why)}<br/><br/>
+      <strong>Uncertainty:</strong> Pilot mapping; limited confidence outside validated correspondences.<br/><br/>
+      <strong>Limitation:</strong> Describes possible task transformation only — not job replacement.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal()">Close</button>
+    </div>`);
+}
+
+function openEditChangeModal(id) {
+  const t = state.tasks.find(x => x.id === id);
+  const c = state.changes[id];
+  if (!t || !c) return;
+  openModal(`
+    <h2>Edit interpretation</h2>
+    <div class="body">Update how this task may change. Confirm to save.</div>
+    <label class="field">Interpretation
+      <select id="modal-change-state">
+        ${["AI-assisted","partly automated","reshaped","human-led","insufficient data"].map(s =>
+          `<option ${c.state===s?"selected":""}>${s}</option>`).join("")}
+      </select>
+    </label>
+    <label class="field">Short reason
+      <textarea id="modal-change-why" rows="4">${escapeHtml(c.why)}</textarea>
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmEditChange('${id}')">Save changes</button>
+    </div>`);
+}
+function confirmEditChange(id) {
+  state.changes[id].state = document.getElementById("modal-change-state").value;
+  state.changes[id].why = document.getElementById("modal-change-why").value.trim() || state.changes[id].why;
+  closeModal();
+  showHint("changeHint", "Interpretation updated.");
+  renderChanges();
+}
+
+function renderCaps() {
+  const list = document.getElementById("capList");
+  if (!state.caps.length) {
+    list.innerHTML = `<div class="hint">No capabilities yet. Use + Add capability to describe one in your own words.</div>`;
+    document.getElementById("p5Continue").disabled = false;
+    return;
+  }
+  list.innerHTML = state.caps.map((c, i) => `
+    <div class="row" style="grid-template-columns:1fr auto">
+      <div>
+        <h3>${escapeHtml(c.name)}</h3>
+        <div class="meta">May: <strong>${escapeHtml(c.evolve)}</strong></div>
+      </div>
+      <div class="row-actions">
+        <button class="btn btn-soft small" onclick="openBasisModal(${i})">Detail</button>
+        <button class="btn btn-ghost small" onclick="openEditCapModal(${i})">Edit</button>
+        <button class="btn btn-danger small" onclick="openDeleteCapModal(${i})">Remove</button>
+      </div>
+    </div>`).join("");
+  document.getElementById("p5Continue").disabled = false;
+}
+
+function openAddCapModal() {
+  openModal(`
+    <h2>Add a capability</h2>
+    <div class="body">Describe a capability you already demonstrate at work, in your own words.</div>
+    <label class="field">Capability in your words
+      <input id="modal-cap-name" placeholder="e.g. Calm decision-making with upset customers" />
+    </label>
+    <label class="field">How it may evolve
+      <select id="modal-cap-evolve">
+        <option>Continue to be useful</option>
+        <option>Needs strengthening</option>
+        <option>Needs updating as tasks change</option>
+      </select>
+    </label>
+    <label class="field">Optional basis / workplace example
+      <textarea id="modal-cap-why" rows="3" placeholder="e.g. Linked to how I handle escalations on the shop floor"></textarea>
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmAddCap()">Add capability</button>
+    </div>`);
+}
+function confirmAddCap() {
+  const name = document.getElementById("modal-cap-name").value.trim();
+  if (!name) {
+    showToast("Capability name cannot be empty.");
+    return;
+  }
+  const evolve = document.getElementById("modal-cap-evolve").value;
+  const why = document.getElementById("modal-cap-why").value.trim() || "Added by you from workplace experience.";
+  state.caps.push({
+    id: "cap-u" + Date.now(),
+    name,
+    evolve,
+    why,
+  });
+  closeModal();
+  showHint("capHint", "Capability added to your list.");
+  renderCaps();
+}
+
+function openBasisModal(i) {
+  const c = state.caps[i];
+  if (!c) return;
+  openModal(`
+    <h2>Capability basis</h2>
+    <div class="body">
+      <strong>Capability:</strong> ${escapeHtml(c.name)}<br/><br/>
+      <strong>May evolve as:</strong> ${escapeHtml(c.evolve)}<br/><br/>
+      <strong>Basis:</strong> ${escapeHtml(c.why)}<br/><br/>
+      This is not a readiness score, professional assessment, or certificate.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal()">Close</button>
+    </div>`);
+}
+
+function openEditCapModal(i) {
+  const c = state.caps[i];
+  if (!c) return;
+  openModal(`
+    <h2>Edit capability</h2>
+    <div class="body">Confirm to save changes to your capability list.</div>
+    <label class="field">Capability in your words
+      <input id="modal-cap-name" value="${escapeAttr(c.name)}" />
+    </label>
+    <label class="field">How it may evolve
+      <select id="modal-cap-evolve">
+        ${["Continue to be useful","Needs strengthening","Needs updating as tasks change"].map(v =>
+          `<option ${c.evolve===v?"selected":""}>${v}</option>`).join("")}
+      </select>
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmEditCap(${i})">Save changes</button>
+    </div>`);
+}
+function confirmEditCap(i) {
+  const name = document.getElementById("modal-cap-name").value.trim();
+  if (!name) {
+    showToast("Capability name cannot be empty.");
+    return;
+  }
+  state.caps[i].name = name;
+  state.caps[i].evolve = document.getElementById("modal-cap-evolve").value;
+  closeModal();
+  showHint("capHint", "Capability updated.");
+  renderCaps();
+}
+
+function openDeleteCapModal(i) {
+  const c = state.caps[i];
+  if (!c) return;
+  openModal(`
+    <h2>Remove this capability?</h2>
+    <div class="body">This will remove <strong>${escapeHtml(c.name)}</strong> from your capability list.</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDeleteCap(${i})">Remove</button>
+    </div>`);
+}
+function confirmDeleteCap(i) {
+  const name = state.caps[i].name;
+  state.caps.splice(i, 1);
+  closeModal();
+  showHint("capHint", `Removed “${name}”.`);
+  renderCaps();
+}
+
+function renderOverview() {
+  const industry = INDUSTRIES.find(i => i.id === state.industryId);
+  document.getElementById("overview").innerHTML = `
+    <div class="panel">
+      <div class="meta" style="text-transform:uppercase;font-size:11px;font-weight:700;letter-spacing:.05em">E1 · Work profile</div>
+      <strong>${escapeHtml(state.occupation?.title || "—")}</strong>
+      <div class="meta">${escapeHtml(industry?.label || "")} · ${state.tasks.length} tasks</div>
+      <button class="btn-link" onclick="go('P2')">Edit on Tasks page</button>
+    </div>
+    <div class="panel">
+      <div class="meta" style="text-transform:uppercase;font-size:11px;font-weight:700;letter-spacing:.05em">E2 · Task changes</div>
+      ${state.tasks.map(t => `<div class="meta" style="margin:6px 0"><span class="badge b-state">${escapeHtml(state.changes[t.id]?.state || "—")}</span>${escapeHtml(t.name)}</div>`).join("") || "<div class='meta'>None</div>"}
+      <button class="btn-link" onclick="go('P4')">Edit on Changes page</button>
+    </div>
+    <div class="panel">
+      <div class="meta" style="text-transform:uppercase;font-size:11px;font-weight:700;letter-spacing:.05em">E3 · Capabilities</div>
+      ${state.caps.map(c => `<div class="meta" style="margin:6px 0">${escapeHtml(c.name)} · ${escapeHtml(c.evolve)}</div>`).join("") || "<div class='meta'>None remaining</div>"}
+      <button class="btn-link" onclick="go('P5')">Edit on Capabilities page</button>
+    </div>`;
+  document.getElementById("releaseBtn").disabled = !(state.profileConfirmed && state.occupation && state.tasks.length);
+}
+
+initIndustrySelect();
+renderSteps();
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+function seedForCapture(page) {
+  // Populate sample data so later screens capture with realistic content
+  if (["P1","P2","P4","P5","P6","BRIDGE"].includes(page) && !state.occupation) {
+    state.industryId = "retail";
+    document.getElementById("industry").value = "retail";
+    onIndustryChange();
+    if (page !== "P1" || new URLSearchParams(location.search).get("selected") === "1") {
+      document.getElementById("occupation").value = "sales-supervisor";
+      onOccupationChange();
+    }
+  }
+  if (["P4","P5","P6","BRIDGE"].includes(page) && state.tasks.length) {
+    state.profileConfirmed = true;
+    state.changes = {};
+    state.tasks.forEach(t => {
+      const seed = CHANGE_DEFAULT[t.id] || {
+        state: "insufficient data",
+        why: "No checked MASCO-to-ISCO correspondence for this task wording.",
+      };
+      state.changes[t.id] = { ...seed };
+    });
+    state.caps = CAP_SEED.map(c => ({ ...c }));
+  }
+}
+
+function openModalFromRoute(modal) {
+  const firstTaskId = state.tasks[0]?.id;
+  const map = {
+    "add-task": () => openAddTaskModal(),
+    "edit-task": () => firstTaskId && openEditTaskModal(firstTaskId),
+    "delete-task": () => firstTaskId && openDeleteTaskModal(firstTaskId),
+    "why": () => firstTaskId && openWhyModal(firstTaskId),
+    "edit-change": () => firstTaskId && openEditChangeModal(firstTaskId),
+    "add-cap": () => openAddCapModal(),
+    "basis": () => openBasisModal(0),
+    "edit-cap": () => openEditCapModal(0),
+    "delete-cap": () => openDeleteCapModal(0),
+  };
+  const fn = map[modal];
+  if (fn) setTimeout(fn, 50);
+}
+
+function applyRoute() {
+  const params = new URLSearchParams(location.search);
+  const page = params.get("page") || "P0";
+  const modal = params.get("modal") || "";
+  const valid = PAGE_META.some(p => p.id === page);
+  if (!valid) return;
+  seedForCapture(page);
+  go(page);
+  if (modal) openModalFromRoute(modal);
+}
+
+// Do not bind hashchange — Figma capture uses #figmacapture=...
+applyRoute();
+</script>
+</body>
+</html>
