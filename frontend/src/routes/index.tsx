@@ -6,6 +6,7 @@ import AIExposure from "@/pages/AIExposure/AIExposure";
 import Capabilities from "@/pages/Capabilities/Capabilities";
 import Dashboard from "@/pages/Dashboard/Dashboard";
 import Flexibility from "@/pages/Flexibility/Flexibility";
+import Home from "@/pages/Home/Home";
 import Interpretation from "@/pages/Interpretation/Interpretation";
 import Preparation from "@/pages/Preparation/Preparation";
 import Priorities from "@/pages/Priorities/Priorities";
@@ -16,6 +17,7 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path={ROUTES.home} element={<Home />} />
         <Route element={<MainLayout />}>
           <Route path={ROUTES.dashboard} element={<Dashboard />} />
           <Route path={ROUTES.workProfile} element={<WorkProfile />} />
