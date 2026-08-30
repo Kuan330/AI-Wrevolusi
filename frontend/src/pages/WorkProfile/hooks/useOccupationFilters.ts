@@ -66,6 +66,27 @@ export const useOccupationFilters = () => {
     return rows;
   };
 
+  const hydrateFromPath = useCallback(async (path: ReferenceOccupation[]) => {
+    if (path.length === 0) return;
+    cacheOccupations(path);
+    const nextSelections = emptySelections();
+    FILTER_ORDER.forEach((key, index) => {
+      if (path[index]) nextSelections[key] = path[index];
+    });
+    setSelections(nextSelections);
+
+    for (let index = 0; index < FILTER_ORDER.length - 1; index += 1) {
+      const current = path[index];
+      const nextKey = FILTER_ORDER[index + 1];
+      if (!current || !nextKey) break;
+      try {
+        await loadLevel(nextKey, current.occupation_code);
+      } catch {
+        break;
+      }
+    }
+  }, [cacheOccupations]);
+
   useEffect(() => {
     let active = true;
     void referenceService
@@ -227,6 +248,7 @@ export const useOccupationFilters = () => {
     selectedPath,
     selectFilter,
     pathForUnit,
+    hydrateFromPath,
     resetFilters,
     resetSearch,
   };

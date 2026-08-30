@@ -1,0 +1,221 @@
+.work-profile-page .dashboard-page {
+  --de-card-bg: rgba(255, 255, 255, 0.78);
+  --de-card-border: rgba(255, 255, 255, 0.84);
+  --de-shadow: 0 14px 34px rgba(61, 43, 54, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 5.5rem);
+  min-height: 560px;
+}
+
+.work-profile-page .dashboard-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-shrink: 0;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.work-profile-page .dashboard-page__header h1 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  min-height: 2.5rem;
+  line-height: 1.2;
+}
+
+.work-profile-page .dashboard-page__header-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  align-self: center;
+  gap: 0.5rem;
+}
+
+.work-profile-page .dashboard-card {
+  background: var(--de-card-bg);
+  border-color: var(--de-card-border);
+}
+
+.work-profile-page .dashboard-overview__grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(280px, 1.25fr) minmax(240px, 0.95fr) minmax(300px, 1fr);
+  grid-template-rows: minmax(260px, 0.58fr) minmax(0, 1fr);
+  grid-template-areas:
+    "capability pie list"
+    "bubble     bubble list";
+  gap: 0.875rem;
+}
+
+.work-profile-page .dashboard-overview__capability {
+  grid-area: capability;
+}
+
+.work-profile-page .dashboard-overview__pie {
+  grid-area: pie;
+}
+
+.work-profile-page .dashboard-overview__list {
+  grid-area: list;
+}
+
+.work-profile-page .dashboard-overview__bubble {
+  grid-area: bubble;
+}
+
+.work-profile-page .dashboard-pie {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  align-items: center;
+  gap: 0.875rem;
+  padding-top: 0.35rem;
+}
+
+.work-profile-page .dashboard-pie__chart {
+  width: 176px;
+  height: 176px;
+  flex-shrink: 0;
+}
+
+.work-profile-page .dashboard-pie__legend {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.work-profile-page .dashboard-pie__legend-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.625rem;
+  line-height: 1.25;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  text-align: left;
+}
+
+.work-profile-page .dashboard-pie__legend-btn.is-active {
+  background: rgba(79, 145, 186, 0.12);
+  border-color: rgba(79, 145, 186, 0.28);
+  color: #2f2430;
+  font-weight: 600;
+}
+
+.work-profile-page .dashboard-pie__legend-btn:not(.is-active) {
+  color: #7f7280;
+}
+
+.work-profile-page .dashboard-list-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.work-profile-page .dashboard-list-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.work-profile-page .dashboard-list-scroll::-webkit-scrollbar-thumb {
+  background: rgba(79, 145, 186, 0.35);
+  border-radius: 999px;
+}
+
+.work-profile-page .dashboard-task-item {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.75rem 0.875rem;
+}
+
+.work-profile-page .dashboard-task-item.is-highlighted {
+  border-color: rgba(79, 145, 186, 0.45);
+  box-shadow: 0 0 0 1px rgba(79, 145, 186, 0.18);
+}
+
+.work-profile-page .dashboard-skill-bubble {
+  position: absolute;
+  z-index: 1;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: var(--bubble-color);
+  outline: none;
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, border-width 0.2s ease;
+}
+
+.work-profile-page .dashboard-skill-bubble:focus,
+.work-profile-page .dashboard-skill-bubble:focus-visible {
+  outline: none;
+}
+
+.work-profile-page .dashboard-skill-bubble.is-dimmed {
+  opacity: 0.28;
+  z-index: 0;
+}
+
+.work-profile-page .dashboard-skill-bubble.is-selected {
+  z-index: 6;
+  border-width: 1px;
+  border-color: color-mix(in srgb, var(--bubble-color) 58%, #1a1218);
+  transform: translate(-50%, -50%) scale(1.12);
+}
+
+.work-profile-page .dashboard-skill-bubble__label {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  z-index: 7;
+  max-width: none;
+  opacity: 0;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.work-profile-page .dashboard-skill-bubble:hover:not(.is-dimmed) .dashboard-skill-bubble__label,
+.work-profile-page .dashboard-skill-bubble.is-selected .dashboard-skill-bubble__label {
+  opacity: 1;
+}
+
+.work-profile-page .dashboard-skill-bubble:hover:not(.is-dimmed) {
+  z-index: 5;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.work-profile-page .dashboard-skill-bubble.is-selected:hover {
+  transform: translate(-50%, -50%) scale(1.22);
+}
+
+@media (max-width: 1023px) {
+  .work-profile-page .dashboard-page {
+    height: auto;
+    min-height: 0;
+  }
+
+  .work-profile-page .dashboard-overview__grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto minmax(280px, 1fr) minmax(320px, 1fr);
+    grid-template-areas:
+      "capability"
+      "pie"
+      "bubble"
+      "list";
+  }
+
+  .work-profile-page .dashboard-overview__list {
+    max-height: 28rem;
+  }
+}
