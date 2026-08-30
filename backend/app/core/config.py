@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import lru_cache
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -39,6 +41,16 @@ class Settings(BaseSettings):
     cookie_samesite: str = 'lax'
 
     cors_origins: list[str] = ['http://localhost:5173', 'http://127.0.0.1:5173']
+
+    nlp_embedding_model: str = 'intfloat/multilingual-e5-small'
+    nlp_ilo_csv: Path = REPO_DIR / 'data' / 'raw' / 'ilo_task_score_raw.csv'
+    nlp_index_dir: Path = REPO_DIR / 'data' / 'nlp'
+    nlp_warmup_on_startup: bool = True
+    nlp_retrieve_k: int = 5
+    nlp_exposure_min_chars: int = 12
+    nlp_exposure_min_sim: float = 0.55
+    nlp_exposure_minor_min_sim: float = 0.58
+    nlp_exposure_global_min_sim: float = 0.78
 
     @field_validator('cors_origins', mode='before')
     @classmethod

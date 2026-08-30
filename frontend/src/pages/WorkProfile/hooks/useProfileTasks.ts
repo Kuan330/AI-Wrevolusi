@@ -9,7 +9,17 @@ export const toProfileTask = (
   wording: string,
   source: ProfileTask["source"],
   extras?: Partial<
-    Pick<ProfileTask, "iloTaskId" | "timeSpent" | "responsibility" | "score2025" | "potential25" | "meanScore2025">
+    Pick<
+      ProfileTask,
+      | "iloTaskId"
+      | "timeSpent"
+      | "responsibility"
+      | "score2025"
+      | "originalScore2025"
+      | "scoreSource"
+      | "potential25"
+      | "meanScore2025"
+    >
   >,
 ): ProfileTask => ({
   id: createTaskId(),
@@ -19,7 +29,10 @@ export const toProfileTask = (
   source,
   iloTaskId: extras?.iloTaskId,
   originalWording: source === "ilo" ? wording : undefined,
+  originalScore2025: source === "ilo" ? extras?.originalScore2025 ?? extras?.score2025 : undefined,
   score2025: extras?.score2025,
+  scoreSource:
+    extras?.scoreSource ?? (source === "ilo" && typeof extras?.score2025 === "number" ? "official" : undefined),
   potential25: extras?.potential25,
   meanScore2025: extras?.meanScore2025,
 });
@@ -28,6 +41,8 @@ export const useProfileTasks = (occupationCode?: string) => {
   const [tasks, setTasks] = useState<ProfileTask[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [occupationPotential25, setOccupationPotential25] = useState<string | null>(null);
+  const [occupationMeanScore2025, setOccupationMeanScore2025] = useState<number | null>(null);
 
   const persist = (next: ProfileTask[]) => {
     if (!occupationCode) return;
@@ -39,10 +54,15 @@ export const useProfileTasks = (occupationCode?: string) => {
     setError(null);
     try {
       const rows = await referenceService.tasks(code);
+      const occupationRow = rows.find((task) => task.potential25 || typeof task.mean_score_2025 === "number");
+      setOccupationPotential25(occupationRow?.potential25 ?? null);
+      setOccupationMeanScore2025(occupationRow?.mean_score_2025 ?? null);
       const next = rows.map((task) =>
         toProfileTask(task.task_text, "ilo", {
           iloTaskId: task.task_id,
           score2025: task.score_2025,
+          originalScore2025: task.score_2025,
+          scoreSource: typeof task.score_2025 === "number" ? "official" : undefined,
           potential25: task.potential25,
           meanScore2025: task.mean_score_2025,
         }),
@@ -55,6 +75,8 @@ export const useProfileTasks = (occupationCode?: string) => {
     } catch {
       setError("Occupation selected, but its reference tasks could not be loaded.");
       setTasks([]);
+      setOccupationPotential25(null);
+      setOccupationMeanScore2025(null);
       saveProfileTasks(code, []);
     } finally {
       setLoading(false);
@@ -66,18 +88,23 @@ export const useProfileTasks = (occupationCode?: string) => {
     const saved = readProfileTasks(occupationCode);
     if (saved) {
       setTasks(saved);
+      const occupationRow = saved.find((task) => task.potential25 || typeof task.meanScore2025 === "number");
+      setOccupationPotential25(occupationRow?.potential25 ?? null);
+      setOccupationMeanScore2025(occupationRow?.meanScore2025 ?? null);
       setError(saved.length === 0 ? "No starter tasks are available for this occupation yet. You can add your own." : null);
       return;
     }
     void loadStarterTasks(occupationCode);
   }, [occupationCode]);
 
-  const addTask = (values: TaskEditorValues) => {
+  const addTask = (values: TaskEditorValues, extras?: Pick<ProfileTask, "score2025" | "scoreSource">) => {
     setTasks((current) => {
       const next = [
         toProfileTask(values.wording.trim(), "user", {
           timeSpent: values.timeSpent,
           responsibility: values.responsibility,
+          score2025: extras?.score2025,
+          scoreSource: extras?.scoreSource,
         }),
         ...current,
       ];
@@ -86,19 +113,24 @@ export const useProfileTasks = (occupationCode?: string) => {
     });
   };
 
-  const updateTask = (taskId: string, values: TaskEditorValues) => {
+  const updateTask = (
+    taskId: string,
+    values: TaskEditorValues,
+    extras?: Pick<ProfileTask, "score2025" | "scoreSource">,
+  ) => {
     setTasks((current) => {
       const next = current.map((task) => {
         if (task.id !== taskId) return task;
         const wording = values.wording.trim();
-        const edited = task.source === "ilo" && wording !== (task.originalWording ?? task.wording);
+        const restored = task.source === "ilo" && wording === (task.originalWording ?? "").trim();
+        const edited = task.source === "ilo" && !restored;
         return {
           ...task,
           wording,
           timeSpent: values.timeSpent,
           responsibility: values.responsibility,
-          score2025: edited ? null : task.score2025,
-          potential25: edited ? null : task.potential25,
+          score2025: restored ? task.originalScore2025 : extras?.score2025 ?? (edited ? null : task.score2025),
+          scoreSource: restored ? "official" : extras?.scoreSource ?? (edited ? undefined : task.scoreSource),
         };
       });
       persist(next);
@@ -127,6 +159,8 @@ export const useProfileTasks = (occupationCode?: string) => {
     tasks,
     loading,
     error,
+    occupationPotential25,
+    occupationMeanScore2025,
     loadStarterTasks,
     addTask,
     updateTask,

@@ -46,6 +46,10 @@ app.include_router(reference.router, prefix=api_prefix)
 async def startup_event() -> None:
     if settings.auto_create_tables:
         await init_models()
+    if settings.nlp_warmup_on_startup:
+        from app.nlp.runtime import warmup_exposure_runtime
+
+        warmup_exposure_runtime()
 
 
 @app.get('/healthz', tags=['System'])

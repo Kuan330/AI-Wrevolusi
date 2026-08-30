@@ -1,5 +1,10 @@
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
+
+try:
+    from datetime import UTC
+except ImportError:
+    UTC = timezone.utc
 
 from jose import JWTError, jwt
 from pwdlib import PasswordHash
