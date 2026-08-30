@@ -25,6 +25,12 @@ const taskMeta = (task: ProfileTask) => {
   return [time, responsibility].filter(Boolean).join(" · ");
 };
 
+const scoreMeta = (task: ProfileTask) => {
+  if (typeof task.score2025 !== "number") return null;
+  const source = task.scoreSource === "official" ? "Official" : "Estimated";
+  return `${source} score ${task.score2025.toFixed(3)}`;
+};
+
 const ProfileTaskList = ({
   tasks,
   loading,
@@ -64,46 +70,44 @@ const ProfileTaskList = ({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-end gap-2">
-          {batchMode ? (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                className="profile-outline-btn h-10 rounded-full px-4"
-                onClick={exitBatchMode}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                className="profile-batch-btn h-10 rounded-full px-4"
-                disabled={selectedIds.size === 0}
-                onClick={() => setBatchDeleteOpen(true)}
-              >
-                <img src="/images/icons/icon-delete-black.svg" alt="" className="h-5 w-5" />
-                Delete selected ({selectedIds.size})
-              </Button>
-            </>
-          ) : (
+        {batchMode ? (
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              className="profile-outline-btn h-10 rounded-full px-4"
+              onClick={exitBatchMode}
+            >
+              Cancel
+            </Button>
             <Button
               type="button"
               className="profile-batch-btn h-10 rounded-full px-4"
-              disabled={tasks.length === 0}
-              onClick={() => setBatchMode(true)}
+              disabled={selectedIds.size === 0}
+              onClick={() => setBatchDeleteOpen(true)}
             >
               <img src="/images/icons/icon-delete-black.svg" alt="" className="h-5 w-5" />
-              Batch delete
+              Delete selected ({selectedIds.size})
             </Button>
-          )}
-          <Button className="profile-gradient-btn h-10 rounded-full px-4" onClick={onAdd}>
-            <Plus className="h-4 w-4" />
-            Add a task
+          </>
+        ) : (
+          <Button
+            type="button"
+            className="profile-batch-btn h-10 rounded-full px-4"
+            disabled={tasks.length === 0}
+            onClick={() => setBatchMode(true)}
+          >
+            <img src="/images/icons/icon-delete-black.svg" alt="" className="h-5 w-5" />
+            Batch delete
           </Button>
+        )}
+        <Button className="profile-gradient-btn h-10 rounded-full px-4" onClick={onAdd}>
+          <Plus className="h-4 w-4" />
+          Add a task
+        </Button>
       </div>
 
-      {batchMode ? (
-        <p className="text-sm text-[#7f7280]">Select the tasks you want to remove.</p>
-      ) : null}
+      {batchMode ? <p className="text-sm text-[#7f7280]">Select the tasks you want to remove.</p> : null}
 
       {error ? (
         <div className="rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
@@ -169,9 +173,10 @@ const ProfileTaskList = ({
                 ) : null}
               </div>
               {taskMeta(task) ? (
-                <p className={`mt-2 text-xs text-[#7f7280] ${batchMode ? "pl-[52px]" : ""}`}>
-                  {taskMeta(task)}
-                </p>
+                <p className={`mt-2 text-xs text-[#7f7280] ${batchMode ? "pl-[52px]" : ""}`}>{taskMeta(task)}</p>
+              ) : null}
+              {scoreMeta(task) ? (
+                <p className={`mt-1 text-xs text-[#7f7280] ${batchMode ? "pl-[52px]" : ""}`}>{scoreMeta(task)}</p>
               ) : null}
             </div>
           );

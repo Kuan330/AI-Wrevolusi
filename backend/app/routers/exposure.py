@@ -5,10 +5,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.repositories.tasks import TaskRepository
-from app.schemas.exposure import ExposureResult
+from app.schemas.exposure import ExposureEstimateRequest, ExposureEstimateResponse, ExposureResult
 from app.services.exposure import infer_exposure_state
+from app.services.exposure_inference import ExposureInferenceService
 
 router = APIRouter(prefix='/exposure', tags=['Exposure'])
+
+
+@router.post('/estimate', response_model=ExposureEstimateResponse)
+async def estimate_task_exposure(payload: ExposureEstimateRequest) -> ExposureEstimateResponse:
+    return ExposureInferenceService.estimate_batch(payload)
 
 
 @router.get('/tasks/{task_id}', response_model=ExposureResult)

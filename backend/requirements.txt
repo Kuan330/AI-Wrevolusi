@@ -11,3 +11,5 @@ python-multipart
 email-validator
 pytest
 httpx
+numpy
+sentence-transformers

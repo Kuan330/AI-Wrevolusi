@@ -55,13 +55,18 @@ const TaskList = ({ tasks, activeBand, highlightedIds }: TaskListProps) => {
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-sm leading-6 text-[#2f2430]">{task.wording}</p>
                   {band ? (
-                    <Badge
-                      variant="outline"
-                      className="shrink-0 rounded-full border-0 px-2 py-0.5 text-[11px] font-medium"
-                      style={{ background: `${band.color}55`, color: band.ink }}
-                    >
-                      {band.label}
-                    </Badge>
+                    <span className="flex shrink-0 items-center gap-1">
+                      <Badge
+                        variant="outline"
+                        className="rounded-full border-0 px-2 py-0.5 text-[11px] font-medium"
+                        style={{ background: `${band.color}55`, color: band.ink }}
+                      >
+                        {band.label}
+                      </Badge>
+                      {task.scoreSource === "estimated" ? (
+                        <span className="text-[11px] text-[#7f7280]">Estimated</span>
+                      ) : null}
+                    </span>
                   ) : (
                     <span className="shrink-0 text-[11px] text-[#7f7280]">Not scored yet</span>
                   )}

@@ -16,9 +16,10 @@ import { validateTaskTitle } from "@/utils/validation";
 type TaskEditorDialogProps = {
   open: boolean;
   mode: "add" | "edit";
+  saving?: boolean;
   initialValues: TaskEditorValues;
   onClose: () => void;
-  onSave: (values: TaskEditorValues) => void;
+  onSave: (values: TaskEditorValues) => Promise<boolean> | boolean;
 };
 
 const emptyValues = (): TaskEditorValues => ({
@@ -27,7 +28,14 @@ const emptyValues = (): TaskEditorValues => ({
   responsibility: "",
 });
 
-const TaskEditorDialog = ({ open, mode, initialValues, onClose, onSave }: TaskEditorDialogProps) => {
+const TaskEditorDialog = ({
+  open,
+  mode,
+  saving = false,
+  initialValues,
+  onClose,
+  onSave,
+}: TaskEditorDialogProps) => {
   const [values, setValues] = useState<TaskEditorValues>(emptyValues);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -42,22 +50,22 @@ const TaskEditorDialog = ({ open, mode, initialValues, onClose, onSave }: TaskEd
     setValues((current) => ({ ...current, [field]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const validationError = validateTaskTitle(values.wording);
     if (validationError) {
       setFormError(validationError);
       return;
     }
-    onSave({
+    const saved = await onSave({
       wording: values.wording.trim(),
       timeSpent: values.timeSpent,
       responsibility: values.responsibility,
     });
-    onClose();
+    if (saved) onClose();
   };
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
+    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && !saving && onClose()}>
       <DialogContent className="profile-dialog-surface max-w-lg rounded-[24px] border border-white/80 p-6 shadow-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-[#2f2430]">
@@ -75,6 +83,7 @@ const TaskEditorDialog = ({ open, mode, initialValues, onClose, onSave }: TaskEd
             <span className="text-sm font-semibold text-[#2f2430]">Task wording</span>
             <input
               value={values.wording}
+              disabled={saving}
               onChange={(event) => updateField("wording", event.target.value)}
               className="h-12 w-full rounded-xl border border-white/80 bg-white/90 px-4 text-sm outline-none focus:border-[#4f91ba] focus:ring-4 focus:ring-[#4f91ba]/10"
             />
@@ -85,6 +94,7 @@ const TaskEditorDialog = ({ open, mode, initialValues, onClose, onSave }: TaskEd
               <span className="text-sm font-semibold text-[#2f2430]">Approx. time (optional)</span>
               <select
                 value={values.timeSpent}
+                disabled={saving}
                 onChange={(event) => updateField("timeSpent", event.target.value)}
                 className="h-12 w-full rounded-xl border border-white/80 bg-white/90 px-4 text-sm outline-none focus:border-[#4f91ba]"
               >
@@ -99,6 +109,7 @@ const TaskEditorDialog = ({ open, mode, initialValues, onClose, onSave }: TaskEd
               <span className="text-sm font-semibold text-[#2f2430]">Responsibility (optional)</span>
               <select
                 value={values.responsibility}
+                disabled={saving}
                 onChange={(event) => updateField("responsibility", event.target.value)}
                 className="h-12 w-full rounded-xl border border-white/80 bg-white/90 px-4 text-sm outline-none focus:border-[#4f91ba]"
               >
@@ -118,6 +129,7 @@ const TaskEditorDialog = ({ open, mode, initialValues, onClose, onSave }: TaskEd
             type="button"
             variant="outline"
             className="profile-outline-btn h-10 rounded-full px-5"
+            disabled={saving}
             onClick={onClose}
           >
             Cancel
@@ -125,9 +137,10 @@ const TaskEditorDialog = ({ open, mode, initialValues, onClose, onSave }: TaskEd
           <Button
             type="button"
             className="profile-primary-btn h-10 rounded-full px-5"
-            onClick={handleSave}
+            disabled={saving}
+            onClick={() => void handleSave()}
           >
-            {mode === "add" ? "Add task" : "Save changes"}
+            {saving ? "Matching task…" : mode === "add" ? "Add task" : "Save changes"}
           </Button>
         </DialogFooter>
       </DialogContent>

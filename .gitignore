@@ -11,3 +11,4 @@ __pycache__/
 db/_dev_seed_statements.json
 node_modules/
 frontend/dist/
+data/nlp/*.npz

@@ -12,7 +12,9 @@ Column meanings are **not** in this file. Use:
 
 ## 1. Purpose and scope
 
-This process covers **Iteration 1 (E1–E4)** for AI-Wrevolusi: occupation browse, ILO starter tasks and exposure scores, WEF 26 core skills as labels after matching, and user confirmations.
+This process covers **Iteration 1 (E1–E4)** for AI-Wrevolusi: occupation browse, ILO starter tasks and exposure scores, WEF 26 core skills as labels after matching, and optional user feedback on inferred skills.
+
+Task-to-skill product behaviour is defined in [task_to_skill_inference_business_rules.md](task_to_skill_inference_business_rules.md).
 
 In scope:
 
@@ -82,8 +84,9 @@ User drills MASCO tree (major → sub-major → minor → unit)
   → user confirms / edits / adds tasks (add may use speech-to-text)
   → ILO-linked task: exposure from the ILO row (match_layer = exact)
      user-added/edited task: NLP then LLM
-  → each confirmed task → WEF 26 core skills (NLP then LLM; no 4-digit join)
-  → E4 confirm / correct
+  → each retained task → WEF 26 core skills (NLP then LLM; no 4-digit join)
+  → inferred skills automatically appear in the capability profile
+  → E4 optional feedback / correction (not a publication gate)
 ```
 
 Rules that the pipeline must preserve:
@@ -93,7 +96,7 @@ Rules that the pipeline must preserve:
 - `work_profiles.occupation_code` stores the **unit** only. Intermediate drill-down is a UI query on `ref_occupations.parent_code`, not extra business columns.
 - Speech-to-text is `profile_tasks.input_method = speech`, not a table.
 - `wef_skill_task_links` is matcher output, not an official crosswalk.
-- Unconfirmed tasks must not go to E2/E3.
+- Only tasks retained in the user's work profile go to E2/E3. Skill confirmation is not required before an inference appears in the capability profile.
 
 ---
 
@@ -216,7 +219,7 @@ Rebuilds **lookup** tables from CSV. Use when a key was renamed and leftover row
 | `ref_occupations` | Read: drill-down (`parent_code` / `level`) and title search |
 | `ref_ilo_tasks` | Read after the user confirms a **unit** |
 | `ref_wef_skills` | Read for E3 labels |
-| `work_profiles` and other business tables | Write when the user confirms occupation, tasks, assessments, skills, reviews |
+| `work_profiles` and other business tables | Write confirmed occupation/tasks, inferred skills, and optional user feedback/reviews |
 
 ETL must never `DELETE FROM users` (or other business tables). Seed only upserts `ref_*`.
 
