@@ -79,7 +79,7 @@ const WorkProfile = () => {
         </div>
       ) : null}
 
-      <section className="rounded-2xl border border-white/75 bg-white/70 p-5 shadow-[0_10px_28px_rgba(61,43,54,0.08)] backdrop-blur-xl">
+      <section className="profile-glass-card p-5">
         {mode === "filters" ? (
           <>
             <div className="mb-4 flex items-start justify-between gap-4">
@@ -141,7 +141,7 @@ const WorkProfile = () => {
             {activeUnit ? `Selected: ${activeUnit.title}` : "No occupation selected yet."}
           </p>
           <Button
-            className="mt-3 h-11 w-full rounded-xl bg-[#c99589] text-white shadow-[0_8px_18px_rgba(201,149,137,0.34)] hover:bg-[#b98579]"
+            className="profile-primary-btn mt-3 h-11 w-full rounded-xl"
             disabled={!activeUnit}
             onClick={handleContinue}
           >

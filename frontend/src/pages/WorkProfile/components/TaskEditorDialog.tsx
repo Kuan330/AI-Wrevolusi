@@ -58,12 +58,12 @@ const TaskEditorDialog = ({ open, mode, initialValues, onClose, onSave }: TaskEd
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-lg rounded-[28px] border-0 bg-[#FBF6F4] p-8 shadow-2xl">
+      <DialogContent className="profile-dialog-surface max-w-lg rounded-[24px] border border-white/80 p-6 shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold text-[#5C3A36]">
+          <DialogTitle className="text-xl font-semibold text-[#2f2430]">
             {mode === "add" ? "Add a task" : "Edit task"}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-[#574a55]">
             {mode === "add"
               ? "Describe a task you actually do. Time and responsibility are optional."
               : "Confirm your changes to update this task in your list."}
@@ -72,21 +72,21 @@ const TaskEditorDialog = ({ open, mode, initialValues, onClose, onSave }: TaskEd
 
         <div className="space-y-4">
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-[#5C3A36]">Task wording</span>
+            <span className="text-sm font-semibold text-[#2f2430]">Task wording</span>
             <input
               value={values.wording}
               onChange={(event) => updateField("wording", event.target.value)}
-              className="h-12 w-full rounded-full border bg-white px-5 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"
+              className="h-12 w-full rounded-xl border border-white/80 bg-white/90 px-4 text-sm outline-none focus:border-[#4f91ba] focus:ring-4 focus:ring-[#4f91ba]/10"
             />
           </label>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block space-y-2">
-              <span className="text-sm font-semibold text-[#5C3A36]">Approx. time (optional)</span>
+              <span className="text-sm font-semibold text-[#2f2430]">Approx. time (optional)</span>
               <select
                 value={values.timeSpent}
                 onChange={(event) => updateField("timeSpent", event.target.value)}
-                className="h-12 w-full rounded-full border bg-white px-4 text-sm outline-none focus:border-primary"
+                className="h-12 w-full rounded-xl border border-white/80 bg-white/90 px-4 text-sm outline-none focus:border-[#4f91ba]"
               >
                 {TIME_SPENT_OPTIONS.map((option) => (
                   <option key={option.value || "skip"} value={option.value}>
@@ -96,11 +96,11 @@ const TaskEditorDialog = ({ open, mode, initialValues, onClose, onSave }: TaskEd
               </select>
             </label>
             <label className="block space-y-2">
-              <span className="text-sm font-semibold text-[#5C3A36]">Responsibility (optional)</span>
+              <span className="text-sm font-semibold text-[#2f2430]">Responsibility (optional)</span>
               <select
                 value={values.responsibility}
                 onChange={(event) => updateField("responsibility", event.target.value)}
-                className="h-12 w-full rounded-full border bg-white px-4 text-sm outline-none focus:border-primary"
+                className="h-12 w-full rounded-xl border border-white/80 bg-white/90 px-4 text-sm outline-none focus:border-[#4f91ba]"
               >
                 {RESPONSIBILITY_OPTIONS.map((option) => (
                   <option key={option.value || "skip"} value={option.value}>
@@ -117,14 +117,14 @@ const TaskEditorDialog = ({ open, mode, initialValues, onClose, onSave }: TaskEd
           <Button
             type="button"
             variant="outline"
-            className="h-11 rounded-full bg-white px-6"
+            className="profile-outline-btn h-10 rounded-full px-5"
             onClick={onClose}
           >
             Cancel
           </Button>
           <Button
             type="button"
-            className="h-11 rounded-full bg-[#5C3A36] px-6 text-white hover:bg-[#4a2e2b]"
+            className="profile-primary-btn h-10 rounded-full px-5"
             onClick={handleSave}
           >
             {mode === "add" ? "Add task" : "Save changes"}
