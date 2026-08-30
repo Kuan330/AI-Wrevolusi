@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 
-import Logo from "@/components/common/Logo";
+import AppHeader from "@/components/layout/AppHeader";
 import { ROUTES } from "@/constants/routes";
 import "@/pages/WorkProfile/workProfile.css";
 
@@ -15,18 +15,11 @@ const ProfileLayout = () => {
         background: "linear-gradient(90deg, #eaf3fb 0%, #f5f3f8 48%, #f8ecef 100%)",
       }}
     >
-      <header className="sticky top-0 z-30 border-b border-white/70 bg-white/45 backdrop-blur-xl">
-        <div
-          className={`mx-auto flex h-16 items-center justify-between px-4 lg:px-0 ${
-            wide ? "max-w-6xl" : "max-w-2xl"
-          }`}
-        >
-          <Logo showWordmark />
-          <span className="text-sm font-medium text-[#7f7280]">Your profile</span>
-        </div>
-      </header>
+      <AppHeader />
       <main
-        className={`mx-auto px-4 py-6 lg:px-0 lg:py-10 ${wide ? "max-w-6xl" : "max-w-2xl"}`}
+        className={`mx-auto px-4 lg:px-6 ${
+          wide ? "max-w-[1440px] py-4 lg:py-5" : "max-w-2xl py-6 lg:px-0 lg:py-10"
+        }`}
       >
         <Outlet />
       </main>
