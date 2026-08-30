@@ -2,14 +2,15 @@ import { Outlet, useLocation } from "react-router-dom";
 
 import Logo from "@/components/common/Logo";
 import { ROUTES } from "@/constants/routes";
+import "@/pages/WorkProfile/workProfile.css";
 
 const ProfileLayout = () => {
   const { pathname } = useLocation();
-  const wide = pathname === ROUTES.workProfile || pathname === ROUTES.dashboard;
+  const wide = pathname === ROUTES.dashboard;
 
   return (
     <div
-      className="min-h-screen"
+      className="work-profile-page min-h-screen"
       style={{
         background: "linear-gradient(90deg, #eaf3fb 0%, #f5f3f8 48%, #f8ecef 100%)",
       }}
@@ -17,15 +18,15 @@ const ProfileLayout = () => {
       <header className="sticky top-0 z-30 border-b border-white/70 bg-white/45 backdrop-blur-xl">
         <div
           className={`mx-auto flex h-16 items-center justify-between px-4 lg:px-0 ${
-            wide ? "max-w-6xl" : "max-w-3xl"
+            wide ? "max-w-6xl" : "max-w-2xl"
           }`}
         >
           <Logo showWordmark />
-          <span className="text-sm font-medium text-muted-foreground">Your profile</span>
+          <span className="text-sm font-medium text-[#7f7280]">Your profile</span>
         </div>
       </header>
       <main
-        className={`mx-auto px-4 py-6 lg:px-0 lg:py-10 ${wide ? "max-w-6xl" : "max-w-3xl"}`}
+        className={`mx-auto px-4 py-6 lg:px-0 lg:py-10 ${wide ? "max-w-6xl" : "max-w-2xl"}`}
       >
         <Outlet />
       </main>

@@ -1,0 +1,180 @@
+.work-profile-page {
+  --wp-bg-start: #eaf3fb;
+  --wp-bg-mid: #f5f3f8;
+  --wp-bg-end: #f8ecef;
+  --wp-text: #2f2430;
+  --wp-text-secondary: #574a55;
+  --wp-text-muted: #7f7280;
+  --wp-brown: #c99589;
+  --wp-brown-hover: #b98579;
+  --wp-blue: #4f91ba;
+  --wp-glass-bg: rgba(255, 255, 255, 0.7);
+  --wp-glass-border: rgba(255, 255, 255, 0.76);
+  --wp-shadow: 0 14px 34px rgba(61, 43, 54, 0.12);
+}
+
+:root {
+  --wp-bg-start: #eaf3fb;
+  --wp-bg-mid: #f5f3f8;
+  --wp-bg-end: #f8ecef;
+  --wp-brown: #c99589;
+  --wp-brown-hover: #b98579;
+  --wp-blue: #4f91ba;
+}
+
+.work-profile-page .profile-glass-card {
+  background: var(--wp-glass-bg);
+  backdrop-filter: blur(26px) saturate(1.2);
+  -webkit-backdrop-filter: blur(26px) saturate(1.2);
+  border: 1px solid var(--wp-glass-border);
+  border-radius: 20px;
+  box-shadow: var(--wp-shadow);
+}
+
+.work-profile-page .profile-dialog-surface,
+.profile-dialog-surface {
+  background: linear-gradient(
+    90deg,
+    var(--wp-bg-start) 0%,
+    var(--wp-bg-mid) 48%,
+    var(--wp-bg-end) 100%
+  );
+}
+
+.work-profile-page .profile-task-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(1.15);
+  -webkit-backdrop-filter: blur(20px) saturate(1.15);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(61, 43, 54, 0.08);
+}
+
+.work-profile-page .profile-icon-btn {
+  display: inline-flex;
+  height: 40px;
+  width: 40px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.88);
+  padding: 0;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.work-profile-page .profile-icon-btn img {
+  display: block;
+  height: 20px;
+  width: 20px;
+  object-fit: contain;
+}
+
+.work-profile-page .profile-icon-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+}
+
+.work-profile-page .profile-icon-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  align-self: center;
+}
+
+.work-profile-page .profile-batch-btn,
+.profile-batch-btn {
+  background: #e8e8e8 !important;
+  color: #1a1a1a !important;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: none;
+}
+
+.work-profile-page .profile-batch-btn:hover:not(:disabled),
+.profile-batch-btn:hover:not(:disabled) {
+  background: #dcdcdc !important;
+  color: #1a1a1a !important;
+}
+
+.work-profile-page .profile-batch-btn:disabled,
+.profile-batch-btn:disabled {
+  opacity: 0.45;
+}
+
+.work-profile-page .profile-task-checkbox {
+  display: inline-flex;
+  height: 44px;
+  width: 44px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.work-profile-page .profile-primary-btn,
+.profile-primary-btn {
+  background: var(--wp-brown) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(201, 149, 137, 0.28);
+  border: none;
+}
+
+.work-profile-page .profile-primary-btn:hover,
+.profile-primary-btn:hover {
+  background: var(--wp-brown-hover) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(201, 149, 137, 0.36);
+}
+
+.work-profile-page .profile-gradient-btn,
+.profile-gradient-btn {
+  background: linear-gradient(
+    90deg,
+    var(--wp-bg-start) 0%,
+    var(--wp-bg-mid) 48%,
+    var(--wp-bg-end) 100%
+  ) !important;
+  color: var(--wp-blue) !important;
+  border: 1px solid rgba(79, 145, 186, 0.28);
+  box-shadow: 0 4px 12px rgba(61, 43, 54, 0.06);
+}
+
+.work-profile-page .profile-gradient-btn:hover,
+.profile-gradient-btn:hover {
+  filter: brightness(0.97);
+  color: var(--wp-blue) !important;
+}
+
+.work-profile-page .profile-outline-btn,
+.profile-outline-btn {
+  border: 1px solid rgba(79, 145, 186, 0.28);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--wp-blue);
+}
+
+.work-profile-page .profile-outline-btn:hover,
+.profile-outline-btn:hover {
+  background: #fff;
+}
+
+.work-profile-page .profile-blue-btn,
+.profile-blue-btn {
+  background: var(--wp-blue) !important;
+  color: #fff !important;
+  border: none;
+  box-shadow: 0 4px 16px rgba(79, 145, 186, 0.28);
+}
+
+.work-profile-page .profile-blue-btn:hover,
+.profile-blue-btn:hover {
+  background: #3f7da3 !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.36);
+}

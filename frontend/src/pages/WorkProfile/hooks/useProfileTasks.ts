@@ -91,6 +91,11 @@ export const useProfileTasks = () => {
     setTasks((current) => current.filter((task) => task.id !== taskId));
   };
 
+  const removeTasks = (taskIds: string[]) => {
+    const idSet = new Set(taskIds);
+    setTasks((current) => current.filter((task) => !idSet.has(task.id)));
+  };
+
   return {
     tasks,
     loading,
@@ -100,5 +105,6 @@ export const useProfileTasks = () => {
     addTask,
     updateTask,
     removeTask,
+    removeTasks,
   };
 };

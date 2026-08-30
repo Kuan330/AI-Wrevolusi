@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
-import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { saveConfirmedAnalysis } from "@/pages/Dashboard/analysisSession";
@@ -80,39 +79,49 @@ const ProfileTasks = () => {
       meanScore2025: scored?.meanScore2025 ?? null,
       tasks: profileTasks.tasks,
     });
-    navigate(ROUTES.dashboard);
+    navigate(`${ROUTES.dashboard}#exposure`);
   };
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Your tasks"
-        description={`These are the tasks for ${selected.unit.title}. Add, edit, or remove anything that does not match your work.`}
-        actions={
-          <Link to={ROUTES.workProfile} className="text-sm font-medium text-primary hover:underline">
-            Change occupation
-          </Link>
-        }
-      />
+    <div className="space-y-5">
+      <header className="space-y-3 border-b border-white/70 pb-4">
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-semibold text-[#2f2430]">Your tasks</h1>
+          <div className="flex shrink-0 items-center gap-2">
+            <Button
+              asChild
+              className="profile-primary-btn h-10 whitespace-nowrap rounded-full px-5"
+            >
+              <Link to={ROUTES.workProfile}>Change occupation</Link>
+            </Button>
+            <Button
+              type="button"
+              className="profile-blue-btn h-10 whitespace-nowrap rounded-full px-5"
+              disabled={profileTasks.tasks.length === 0}
+              onClick={confirmTasks}
+            >
+              View AI exposure
+            </Button>
+          </div>
+        </div>
+        {selected.path.length > 0 ? (
+          <p className="text-sm text-[#7f7280]">
+            {selected.path.map((item) => item.title).join(" → ")}
+          </p>
+        ) : null}
+      </header>
 
-      {selected.path.length > 0 ? (
-        <p className="text-sm text-muted-foreground">{selected.path.map((item) => item.title).join(" → ")}</p>
-      ) : null}
-
-      <ProfileTaskList
-        tasks={profileTasks.tasks}
-        loading={profileTasks.loading}
-        error={profileTasks.error}
-        onAdd={openAddDialog}
-        onEdit={openEditDialog}
-        onDelete={profileTasks.removeTask}
-      />
-
-      <div className="flex justify-end border-t pt-4">
-        <Button className="h-11 rounded-full px-6" disabled={profileTasks.tasks.length === 0} onClick={confirmTasks}>
-          Confirm these tasks
-        </Button>
-      </div>
+      <section className="profile-glass-card p-5">
+        <ProfileTaskList
+          tasks={profileTasks.tasks}
+          loading={profileTasks.loading}
+          error={profileTasks.error}
+          onAdd={openAddDialog}
+          onEdit={openEditDialog}
+          onDelete={profileTasks.removeTask}
+          onBatchDelete={profileTasks.removeTasks}
+        />
+      </section>
 
       <TaskEditorDialog
         open={editorOpen}
