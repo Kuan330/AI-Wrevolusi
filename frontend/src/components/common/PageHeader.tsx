@@ -1,21 +1,29 @@
 import type { ReactNode } from "react";
 
-interface PageHeaderProps {
-  title: string;
-  description?: string;
-  actions?: ReactNode;
-}
+import { cn } from "@/lib/utils";
 
-const PageHeader = ({ title, description, actions }: PageHeaderProps) => {
+type PageHeaderProps = {
+  title: string;
+  description?: ReactNode;
+  actions?: ReactNode;
+  className?: string;
+};
+
+const PageHeader = ({ title, description, actions, className }: PageHeaderProps) => {
   return (
-    <div className="mb-6 flex flex-col gap-3 border-b border-border pb-4 md:flex-row md:items-end md:justify-between">
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
-        {description ? (
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-        ) : null}
+    <div
+      className={cn(
+        "flex items-center justify-between gap-4 border-b border-white/70 pb-4",
+        className,
+      )}
+    >
+      <div className="min-w-0">
+        <h1 className="m-0 flex min-h-10 items-center text-2xl font-semibold leading-[1.2] text-[#2f2430]">
+          {title}
+        </h1>
+        {description ? <div className="mt-1 text-sm text-[#7f7280]">{description}</div> : null}
       </div>
-      {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+      {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
     </div>
   );
 };

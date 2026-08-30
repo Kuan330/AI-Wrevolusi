@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -25,18 +25,12 @@ const valuesFromTask = (task: ProfileTask): TaskEditorValues => ({
 const ProfileTasks = () => {
   const selected = readSelectedOccupation();
   const navigate = useNavigate();
-  const profileTasks = useProfileTasks();
+  const profileTasks = useProfileTasks(selected?.unit.occupation_code);
+
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<"add" | "edit">("add");
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editorValues, setEditorValues] = useState<TaskEditorValues>(emptyEditorValues);
-
-  useEffect(() => {
-    if (!selected?.unit.occupation_code) return;
-    void profileTasks.loadStarterTasks(selected.unit.occupation_code);
-    // Load once for the occupation stored in this session.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected?.unit.occupation_code]);
 
   if (!selected) {
     return <Navigate to={ROUTES.workProfile} replace />;
@@ -100,7 +94,7 @@ const ProfileTasks = () => {
               disabled={profileTasks.tasks.length === 0}
               onClick={confirmTasks}
             >
-              View AI exposure
+              Explore AI impact
             </Button>
           </div>
         </div>
@@ -111,7 +105,7 @@ const ProfileTasks = () => {
         ) : null}
       </header>
 
-      <section className="profile-glass-card p-5">
+      <section className="profile-glass-card flex flex-col gap-5 p-5">
         <ProfileTaskList
           tasks={profileTasks.tasks}
           loading={profileTasks.loading}
@@ -121,6 +115,16 @@ const ProfileTasks = () => {
           onDelete={profileTasks.removeTask}
           onBatchDelete={profileTasks.removeTasks}
         />
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            className="profile-blue-btn h-10 whitespace-nowrap rounded-full px-5"
+            disabled={profileTasks.tasks.length === 0}
+            onClick={confirmTasks}
+          >
+            Explore AI impact
+          </Button>
+        </div>
       </section>
 
       <TaskEditorDialog

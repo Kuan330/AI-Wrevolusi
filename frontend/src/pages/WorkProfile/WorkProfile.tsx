@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
+import { GradientPill } from "@/components/ui/gradient-pill";
 import { ROUTES } from "@/constants/routes";
 import OccupationFilters from "@/pages/WorkProfile/components/OccupationFilters";
 import OccupationSearch from "@/pages/WorkProfile/components/OccupationSearch";
@@ -10,31 +11,53 @@ import {
   useOccupationFilters,
   type OccupationSearchResult,
 } from "@/pages/WorkProfile/hooks/useOccupationFilters";
-import { saveSelectedOccupation } from "@/pages/WorkProfile/occupationSession";
+import { readSelectedOccupation, saveSelectedOccupation } from "@/pages/WorkProfile/occupationSession";
 import type { ReferenceOccupation } from "@/types/reference";
 
 type WorkProfileMode = "search" | "filters";
-
-const modeSwitchClassName =
-  "inline-flex h-8 shrink-0 items-center rounded-full px-3.5 text-xs font-semibold text-[#3d5f7a] shadow-sm transition hover:brightness-[0.97]";
-
-const modeSwitchStyle = {
-  background: "linear-gradient(90deg, #eaf3fb 0%, #f5f3f8 48%, #f8ecef 100%)",
-} as const;
 
 const WorkProfile = () => {
   const navigate = useNavigate();
   const occupation = useOccupationFilters();
   const [mode, setModeState] = useState<WorkProfileMode>("filters");
   const [selectedFromSearch, setSelectedFromSearch] = useState<OccupationSearchResult | null>(null);
+  const [savedOccupation, setSavedOccupation] = useState(() => readSelectedOccupation());
+  const [hydrated, setHydrated] = useState(false);
+
+  const persistOccupation = (unit: ReferenceOccupation, path: ReferenceOccupation[]) => {
+    const next = { unit, path };
+    saveSelectedOccupation(next);
+    setSavedOccupation(next);
+  };
+
+  useEffect(() => {
+    if (hydrated || occupation.loading || occupation.options.major.length === 0) return;
+    const saved = readSelectedOccupation();
+    if (!saved?.path.length) {
+      setHydrated(true);
+      return;
+    }
+    void occupation.hydrateFromPath(saved.path).finally(() => setHydrated(true));
+    // Restore saved occupation once majors are ready (Change occupation).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated, occupation.loading, occupation.options.major.length]);
 
   const goToTasks = (unit: ReferenceOccupation, path: ReferenceOccupation[]) => {
-    saveSelectedOccupation({ unit, path });
+    persistOccupation(unit, path);
     navigate(ROUTES.task);
   };
 
   const activeUnit = mode === "search" ? selectedFromSearch?.unit ?? null : occupation.selectedUnit;
   const activePath = mode === "search" ? selectedFromSearch?.path ?? [] : occupation.selectedPath;
+  const confirmedUnit = activeUnit ?? savedOccupation?.unit ?? null;
+  const confirmedPath = activeUnit ? activePath : savedOccupation?.path ?? [];
+
+  useEffect(() => {
+    if (!activeUnit) return;
+    persistOccupation(activeUnit, activePath);
+    // Persist when the chosen occupation code changes, not on every path array identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeUnit?.occupation_code]);
 
   const setMode = (nextMode: WorkProfileMode) => {
     if (nextMode === mode) return;
@@ -50,13 +73,14 @@ const WorkProfile = () => {
   };
 
   const handleContinue = () => {
-    if (!activeUnit) return;
-    goToTasks(activeUnit, activePath);
+    if (!confirmedUnit) return;
+    goToTasks(confirmedUnit, confirmedPath);
   };
 
   const handleSearchChoice = (result: OccupationSearchResult) => {
     setSelectedFromSearch(result);
     occupation.setQuery(result.unit.title);
+    persistOccupation(result.unit, result.path);
   };
 
   const handleQueryChange = (value: string) => {
@@ -89,14 +113,11 @@ const WorkProfile = () => {
                   Choose from the form fields to narrow down your exact occupation.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setMode("search")}
-                className={modeSwitchClassName}
-                style={modeSwitchStyle}
-              >
-                Search by job title instead
-              </button>
+              <GradientPill asChild className="shrink-0 transition hover:brightness-[0.97]">
+                <button type="button" onClick={() => setMode("search")}>
+                  Search by job title instead
+                </button>
+              </GradientPill>
             </div>
             <OccupationFilters
               options={occupation.options}
@@ -115,21 +136,18 @@ const WorkProfile = () => {
                   Type and see matching occupations instantly.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setMode("filters")}
-                className={modeSwitchClassName}
-                style={modeSwitchStyle}
-              >
-                Back to category filters
-              </button>
+              <GradientPill asChild className="shrink-0 transition hover:brightness-[0.97]">
+                <button type="button" onClick={() => setMode("filters")}>
+                  Back to category filters
+                </button>
+              </GradientPill>
             </div>
             <OccupationSearch
               query={occupation.query}
               searching={occupation.searching}
               hasSearched={occupation.hasSearched}
               results={occupation.searchResults}
-              selectedCode={selectedFromSearch?.unit.occupation_code ?? null}
+              selectedCode={selectedFromSearch?.unit.occupation_code ?? savedOccupation?.unit.occupation_code ?? null}
               onQueryChange={handleQueryChange}
               onChoose={handleSearchChoice}
             />
@@ -138,11 +156,11 @@ const WorkProfile = () => {
 
         <div className="mt-4 border-t border-white/70 pt-4">
           <p className="text-sm text-muted-foreground">
-            {activeUnit ? `Selected: ${activeUnit.title}` : "No occupation selected yet."}
+            {confirmedUnit ? `Selected: ${confirmedUnit.title}` : "No occupation selected yet."}
           </p>
           <Button
             className="profile-primary-btn mt-3 h-11 w-full rounded-xl"
-            disabled={!activeUnit}
+            disabled={!confirmedUnit}
             onClick={handleContinue}
           >
             Confirm and continue

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, User, X } from "lucide-react";
 
 import Logo from "@/components/common/Logo";
 import { ROUTES } from "@/constants/routes";
@@ -20,13 +20,12 @@ const LandingNav = () => {
               {link.label}
             </a>
           ))}
-                  <Link
-                    to={ROUTES.workProfile}
-                    className="btn btn-primary btn-sm"
-                    style={{ color: "#fff" }}
-                  >
+          <Link to={ROUTES.workProfile} className="btn btn-primary btn-sm" style={{ color: "#fff" }}>
             Start free analysis
           </Link>
+          <button type="button" aria-label="Account" className="landing-nav-avatar">
+            <User className="h-4 w-4" aria-hidden />
+          </button>
         </div>
         <button
           type="button"
@@ -46,7 +45,7 @@ const LandingNav = () => {
         <Link
           to={ROUTES.workProfile}
           className="btn btn-primary btn-sm"
-                  style={{ color: "#fff", alignSelf: "flex-start" }}
+          style={{ color: "#fff", alignSelf: "flex-start" }}
         >
           Start free analysis
         </Link>
