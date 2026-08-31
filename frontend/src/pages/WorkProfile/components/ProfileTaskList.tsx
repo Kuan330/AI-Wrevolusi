@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -76,28 +76,26 @@ const ProfileTaskList = ({
               </Button>
               <Button
                 type="button"
-                variant="outline"
-                className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-semibold shadow-sm"
+                className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal"
                 disabled={selectedIds.size === 0}
                 onClick={() => setBatchDeleteOpen(true)}
               >
-                <img src="/images/icons/icon-delete-black.svg" alt="" className="h-4 w-4" />
+                <Trash2 className="h-4 w-4" aria-hidden />
                 Delete selected ({selectedIds.size})
               </Button>
             </>
           ) : (
             <Button
               type="button"
-              variant="outline"
-              className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-semibold shadow-sm"
+              className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal"
               disabled={tasks.length === 0}
               onClick={() => setBatchMode(true)}
             >
-              <img src="/images/icons/icon-delete-black.svg" alt="" className="h-4 w-4" />
+              <Trash2 className="h-4 w-4" aria-hidden />
               Batch delete
             </Button>
           )}
-          <Button className="profile-gradient-btn h-10 rounded-full px-4" onClick={onAdd}>
+          <Button className="profile-blue-btn inline-flex h-10 items-center gap-2 rounded-full px-4 font-normal" onClick={onAdd}>
             <Plus className="h-4 w-4" />
             Add a task
           </Button>
@@ -161,11 +159,11 @@ const ProfileTaskList = ({
                     </button>
                     <button
                       type="button"
-                      className="profile-icon-btn"
+                      className="profile-icon-btn profile-icon-btn--delete"
                       aria-label="Delete task"
                       onClick={() => setDeleteTarget(task)}
                     >
-                      <img src="/images/icons/icon-delete.svg" alt="" />
+                      <Trash2 className="h-4 w-4" aria-hidden />
                     </button>
                   </div>
                 ) : null}

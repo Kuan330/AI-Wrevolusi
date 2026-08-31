@@ -33,15 +33,14 @@ const DeleteTaskDialog = ({ open, taskWording, onClose, onConfirm }: DeleteTaskD
         <DialogFooter className="gap-2 sm:space-x-0">
           <Button
             type="button"
-            variant="outline"
-            className="profile-outline-btn h-10 rounded-full px-5"
+            className="profile-dialog-cancel-btn h-10 rounded-full px-5 font-normal"
             onClick={onClose}
           >
             Cancel
           </Button>
           <Button
             type="button"
-            className="profile-primary-btn h-10 rounded-full px-5"
+            className="profile-dialog-btn h-10 rounded-full px-5 font-normal"
             onClick={() => {
               onConfirm();
               onClose();
