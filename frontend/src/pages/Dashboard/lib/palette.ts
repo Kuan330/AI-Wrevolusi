@@ -273,6 +273,16 @@ export const OccupationBandColor = {
 } as const;
 export type OccupationBandColor = (typeof OccupationBandColor)[keyof typeof OccupationBandColor];
 
+export const OccupationBandInk = {
+  NotExposed: "#2F6F5C",
+  MinimalExposure: "#2F5F80",
+  Gradient1: "#7A6512",
+  Gradient2: "#8F4F1F",
+  Gradient3: "#9A3F32",
+  Gradient4: "#8B2E2E",
+} as const;
+export type OccupationBandInk = (typeof OccupationBandInk)[keyof typeof OccupationBandInk];
+
 export const OCCUPATION_BAND_COLOR: Record<OccupationBandId, OccupationBandColor> = {
   [OccupationBandId.NotExposed]: OccupationBandColor.NotExposed,
   [OccupationBandId.MinimalExposure]: OccupationBandColor.MinimalExposure,
@@ -280,6 +290,15 @@ export const OCCUPATION_BAND_COLOR: Record<OccupationBandId, OccupationBandColor
   [OccupationBandId.Gradient2]: OccupationBandColor.Gradient2,
   [OccupationBandId.Gradient3]: OccupationBandColor.Gradient3,
   [OccupationBandId.Gradient4]: OccupationBandColor.Gradient4,
+};
+
+export const OCCUPATION_BAND_INK: Record<OccupationBandId, OccupationBandInk> = {
+  [OccupationBandId.NotExposed]: OccupationBandInk.NotExposed,
+  [OccupationBandId.MinimalExposure]: OccupationBandInk.MinimalExposure,
+  [OccupationBandId.Gradient1]: OccupationBandInk.Gradient1,
+  [OccupationBandId.Gradient2]: OccupationBandInk.Gradient2,
+  [OccupationBandId.Gradient3]: OccupationBandInk.Gradient3,
+  [OccupationBandId.Gradient4]: OccupationBandInk.Gradient4,
 };
 
 export const UseTrendId = {

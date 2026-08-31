@@ -3,21 +3,24 @@ import { User } from "lucide-react";
 
 import Logo from "@/components/common/Logo";
 import { ROUTES } from "@/constants/routes";
+import { hasConfirmedAnalysis } from "@/pages/Dashboard/analysisSession";
 import { cn } from "@/lib/utils";
 
-const APP_NAV_ITEMS = [
-  { to: ROUTES.task, label: "Your tasks" },
-  { to: ROUTES.dashboard, label: "AI impact" },
-] as const;
-
 const AppHeader = () => {
+  const showAiImpact = hasConfirmedAnalysis();
+
+  const navItems = [
+    { to: ROUTES.task, label: "Your tasks" },
+    ...(showAiImpact ? [{ to: ROUTES.dashboard, label: "AI impact" }] : []),
+  ];
+
   return (
     <header className="app-header sticky top-0 z-30 shrink-0 border-b border-white/70 bg-white/45 backdrop-blur-xl">
       <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center justify-between gap-4 px-4 lg:px-6">
         <div className="flex min-w-0 items-center gap-8">
           <Logo showWordmark />
           <nav className="app-header-nav" aria-label="Primary">
-            {APP_NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}

@@ -124,3 +124,8 @@ export const saveConfirmedAnalysis = (analysis: ConfirmedAnalysis) => {
 
 export const readConfirmedAnalysis = (): ConfirmedAnalysis | null =>
   readUserProfile().analysis ?? readLegacyAnalysis();
+
+export const hasConfirmedAnalysis = (): boolean => {
+  const analysis = readConfirmedAnalysis();
+  return Boolean(analysis && analysis.tasks.length > 0);
+};
