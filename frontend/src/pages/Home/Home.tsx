@@ -16,12 +16,14 @@ const Home = () => {
   return (
     <div className="landing-page">
       <LandingNav />
-      <ScrollReveal threshold={0.05}>
-        <HeroSection />
-      </ScrollReveal>
-      <ScrollReveal delay={40}>
-        <TrustBar />
-      </ScrollReveal>
+      <div className="landing-hero-scene">
+        <ScrollReveal threshold={0.05}>
+          <HeroSection />
+        </ScrollReveal>
+        <ScrollReveal delay={40}>
+          <TrustBar />
+        </ScrollReveal>
+      </div>
       <ScrollReveal delay={80}>
         <StepsSection />
       </ScrollReveal>
