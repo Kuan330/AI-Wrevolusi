@@ -1,10 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 
-import EmptyState from "@/components/common/EmptyState";
-import PageHeader from "@/components/common/PageHeader";
-import { Button } from "@/components/ui/button";
-import { ROUTES } from "@/constants/routes";
 import { readConfirmedAnalysis } from "@/pages/Dashboard/analysisSession";
 import CapabilityCard from "@/pages/Dashboard/components/CapabilityCard";
 import DashboardHeader from "@/pages/Dashboard/components/DashboardHeader";
@@ -68,26 +63,7 @@ const Dashboard = () => {
   }, [analysis]);
 
   if (!analysis) {
-    return (
-      <div className="mx-auto max-w-3xl space-y-6">
-        <PageHeader
-          title="Your analysis"
-          description="Confirm an occupation and tasks first. This page then shows occupation exposure, task change, and capabilities together."
-        />
-        <EmptyState
-          title="No analysis yet"
-          message="Choose your occupation, review the starter tasks, then confirm them to see this overview."
-        />
-        <div className="flex flex-wrap gap-3">
-          <Button asChild>
-            <Link to={ROUTES.workProfile}>Choose occupation</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link to={ROUTES.task}>Review tasks</Link>
-          </Button>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   const selected = skills.find((skill) => skill.wef_skill_id === selectedSkillId) ?? null;
