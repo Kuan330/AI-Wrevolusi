@@ -1,3 +1,6 @@
+import { ChevronDown } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import DashboardCard, { type TitleTone } from "@/pages/Dashboard/components/DashboardCard";
 import TaskList from "@/pages/Dashboard/components/TaskList";
@@ -25,6 +28,35 @@ const TaskListCard = ({
   highlightedIds,
   onClear,
 }: TaskListCardProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollHint, setScrollHint] = useState({ canScroll: false, atBottom: true });
+
+  const updateScrollHint = useCallback(() => {
+    const element = scrollRef.current;
+    if (!element) return;
+    const canScroll = element.scrollHeight > element.clientHeight + 1;
+    const atBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 8;
+    setScrollHint({ canScroll, atBottom });
+  }, []);
+
+  useEffect(() => {
+    updateScrollHint();
+    const element = scrollRef.current;
+    if (!element) return undefined;
+
+    const observer = new ResizeObserver(updateScrollHint);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [tasks.length, activeBand, highlightedIds.length, updateScrollHint]);
+
+  const showScrollHint = scrollHint.canScroll && !scrollHint.atBottom;
+
+  const scrollTowardBottom = () => {
+    const element = scrollRef.current;
+    if (!element) return;
+    element.scrollBy({ top: Math.max(120, element.clientHeight * 0.65), behavior: "smooth" });
+  };
+
   return (
     <DashboardCard
       className="dashboard-overview__list"
@@ -46,8 +78,27 @@ const TaskListCard = ({
       }
       contentClassName="pt-1"
     >
-      <div className="dashboard-list-scroll">
-        <TaskList tasks={tasks} activeBand={activeBand} highlightedIds={highlightedIds} />
+      <div className="relative min-h-0 flex-1">
+        <div
+          ref={scrollRef}
+          className="dashboard-list-scroll h-full min-h-0"
+          onScroll={updateScrollHint}
+        >
+          <div className="pb-10">
+            <TaskList tasks={tasks} activeBand={activeBand} highlightedIds={highlightedIds} />
+          </div>
+        </div>
+
+        {showScrollHint ? (
+          <button
+            type="button"
+            className="dashboard-list-scroll-hint"
+            aria-label="Scroll to see more tasks"
+            onClick={scrollTowardBottom}
+          >
+            <ChevronDown className="h-4 w-4" aria-hidden />
+          </button>
+        ) : null}
       </div>
     </DashboardCard>
   );

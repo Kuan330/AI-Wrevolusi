@@ -38,11 +38,12 @@ const ConfirmDialog = ({
         </DialogHeader>
         {children}
         <DialogFooter className="gap-2 sm:space-x-0">
-          <AppButton type="button" variant="outline" tone="outline" onClick={onClose}>
+          <AppButton type="button" className="profile-dialog-cancel-btn font-normal" onClick={onClose}>
             Cancel
           </AppButton>
           <AppButton
             type="button"
+            className="profile-dialog-btn font-normal"
             onClick={() => {
               onConfirm();
               onClose();

@@ -1,24 +1,36 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { User } from "lucide-react";
 
 import Logo from "@/components/common/Logo";
-import { PAGE_GRADIENT_CSS, Palette } from "@/pages/Dashboard/lib/palette";
 import { ROUTES } from "@/constants/routes";
+import { hasConfirmedAnalysis } from "@/pages/Dashboard/analysisSession";
+import { cn } from "@/lib/utils";
 
 const AppHeader = () => {
+  const showAiImpact = hasConfirmedAnalysis();
+
+  const navItems = [
+    { to: ROUTES.task, label: "Your tasks" },
+    ...(showAiImpact ? [{ to: ROUTES.dashboard, label: "AI impact" }] : []),
+  ];
+
   return (
-    <header className="sticky top-0 z-30 border-b border-white/70 bg-white/45 backdrop-blur-xl">
+    <header className="app-header sticky top-0 z-30 shrink-0 border-b border-white/70 bg-white/45 backdrop-blur-xl">
       <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center justify-between gap-4 px-4 lg:px-6">
-        <div className="flex min-w-0 items-center gap-5">
+        <div className="flex min-w-0 items-center gap-8">
           <Logo showWordmark />
-          <nav aria-label="Primary">
-            <Link
-              to={ROUTES.home}
-              className="inline-flex h-9 items-center rounded-full px-4 text-[15px] font-bold"
-              style={{ background: PAGE_GRADIENT_CSS, color: Palette.Blue }}
-            >
-              Home
-            </Link>
+          <nav className="app-header-nav" aria-label="Primary">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  cn("app-header-nav__link", isActive && "is-active")
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
           </nav>
         </div>
 

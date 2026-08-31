@@ -201,8 +201,8 @@ const ProfileTasks = () => {
   };
 
   return (
-    <div className="space-y-5">
-      <header className="space-y-3 border-b border-white/70 pb-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
+      <header className="shrink-0 space-y-3 border-b border-white/70 pb-4">
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-2xl font-semibold text-[#2f2430]">Your tasks</h1>
           <div className="flex shrink-0 items-center gap-2">
@@ -211,7 +211,7 @@ const ProfileTasks = () => {
             </Button>
             <Button
               type="button"
-              className="profile-blue-btn h-10 whitespace-nowrap rounded-full px-5"
+              className="profile-gradient-btn h-10 whitespace-nowrap rounded-full px-5 font-normal"
               disabled={profileTasks.tasks.length === 0 || confirming || saving}
               onClick={() => void confirmTasks()}
             >
@@ -224,7 +224,7 @@ const ProfileTasks = () => {
         ) : null}
       </header>
 
-      <section className="profile-glass-card flex flex-col gap-5 p-5">
+      <section className="profile-glass-card flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-5">
         <ProfileTaskList
           tasks={profileTasks.tasks}
           loading={profileTasks.loading}
@@ -235,12 +235,12 @@ const ProfileTasks = () => {
           onBatchDelete={profileTasks.removeTasks}
         />
 
-        {confirmError ? <p className="text-sm text-destructive">{confirmError}</p> : null}
+        {confirmError ? <p className="shrink-0 text-sm text-destructive">{confirmError}</p> : null}
 
-        <div className="flex justify-end">
+        <div className="flex shrink-0 justify-end pt-1">
           <Button
             type="button"
-            className="profile-blue-btn h-10 whitespace-nowrap rounded-full px-5"
+            className="profile-gradient-btn h-10 shrink-0 whitespace-nowrap rounded-full px-5 font-normal"
             disabled={profileTasks.tasks.length === 0 || confirming || saving}
             onClick={() => void confirmTasks()}
           >
