@@ -59,10 +59,38 @@
   left: 0;
   right: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(20px) saturate(1.2);
   -webkit-backdrop-filter: blur(20px) saturate(1.2);
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+.landing-page .landing-hero-scene {
+  position: relative;
+  isolation: isolate;
+  background-color: #eef4f8;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.94) 0%,
+      rgba(255, 255, 255, 0.78) 34%,
+      rgba(255, 255, 255, 0.34) 58%,
+      rgba(255, 255, 255, 0.08) 100%
+    ),
+    url("/images/home-hero-bg.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 26% center;
+}
+
+.landing-page .landing-hero-scene::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  z-index: -1;
+  height: 96px;
+  background: linear-gradient(180deg, transparent 0%, var(--c-bg-mid) 100%);
+  pointer-events: none;
 }
 
 .landing-page .nav-inner {
@@ -300,7 +328,7 @@
   gap: 32px;
   justify-content: center;
   flex-wrap: wrap;
-  padding: 12px 0 6px;
+  padding: 8px 0 28px;
 }
 
 .landing-page .trust-item {
@@ -608,7 +636,7 @@
 .landing-page .cta-bottom {
   margin-top: 24px;
   padding: 48px 24px;
-  background-image: url("/images/hero/cta-woman-ai-bg.svg");
+  background-image: url("/images/cta-woman-ai-bg.svg");
   background-color: #d9edf9;
   background-repeat: no-repeat;
   background-size: cover;
@@ -781,6 +809,10 @@
   .landing-page .hero {
     padding-top: 96px;
     padding-bottom: 30px;
+  }
+
+  .landing-page .landing-hero-scene {
+    background-position: 32% center;
   }
 
   .landing-page .section,
