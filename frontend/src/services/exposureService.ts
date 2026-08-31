@@ -26,6 +26,7 @@ export interface ExposureEstimateItem {
   client_task_id: string;
   score_2025: number | null;
   band: string;
+  potential25?: string | null;
   match_layer: string;
   score_source: string;
   reject_reason?: string | null;

@@ -1,0 +1,91 @@
+{
+  "skill_id": "WEF-20",
+  "wef_skill_id": 20,
+  "name_en": "Marketing and media",
+  "name_ms": "Pemasaran dan media",
+  "skill_group": "Engagement skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to create, distribute, and manage content and campaigns that promote products, services, or ideas to target audiences.",
+  "definition_ms": "Keupayaan untuk menghasilkan, mengedar dan mengurus kandungan serta kempen yang mempromosikan produk, perkhidmatan atau idea kepada khalayak sasaran.",
+  "typical_tasks_en": "• Create a social media campaign to attract young mothers to the parenting workshop.\n• Write a press release announcing the new sustainability initiative.\n• Analyse engagement rates across Instagram and TikTok posts.",
+  "typical_tasks_ms": "• Cipta kempen media sosial untuk menarik ibu muda ke bengkel keibubapaan.\n• Tulis siaran akhbar mengumumkan inisiatif kemampanan baharu.\n• Analisis kadar penglibatan merentasi siaran Instagram dan TikTok.",
+  "aliases_en": [
+    "digital marketing",
+    "brand management",
+    "advertising",
+    "content marketing",
+    "social media",
+    "PR",
+    "communications",
+    "market positioning"
+  ],
+  "aliases_ms": [
+    "pemasaran digital",
+    "pengurusan jenama",
+    "pengiklanan",
+    "pemasaran kandungan",
+    "media sosial",
+    "perhubungan awam",
+    "kedudukan pasaran"
+  ],
+  "manglish_aliases": [
+    "Social media campaign",
+    "marketing",
+    "promote product"
+  ],
+  "inclusion_rules": "• The task involves creating promotional or brand content\n• The task requires managing advertising or media campaigns\n• The task involves analysing audience engagement or market trends\n• The task requires managing social media or public relations\n• The task involves positioning products or services in the market",
+  "exclusion_rules": "• The task involves only internal communication without promotion\n• The user shares information without any marketing intent\n• The task requires no understanding of audience or market\n• The user is simply posting content without strategic purpose",
+  "insufficient_context_rule": "Return insufficient_context=true when the task shares information internally with no promotional intent or audience targeting.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-04",
+      "confusable_skill_name": "Creative thinking",
+      "boundary_rule": "Marketing uses creative ideas strategically to reach audiences.",
+      "example_task": "Develop a creative campaign to launch the new product.",
+      "expected_labels": "Creative thinking; Marketing and media"
+    },
+    {
+      "confusable_skill_id": "WEF-10",
+      "confusable_skill_name": "Service orientation and customer service",
+      "boundary_rule": "Marketing attracts customers. Service supports existing customers.",
+      "example_task": "Create a campaign to win back former customers.",
+      "expected_labels": "Marketing and media; Service orientation and customer service"
+    },
+    {
+      "confusable_skill_id": "WEF-18",
+      "confusable_skill_name": "Design and user experience",
+      "boundary_rule": "Marketing focuses on message and reach. Design focuses on user experience.",
+      "example_task": "Design promotional materials that are also accessible.",
+      "expected_labels": "Marketing and media; Design and user experience"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-153",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Create a social media campaign to attract young mothers to the parenting workshop.",
+      "evidence": "Create a social media campaign",
+      "reason": "Requires promotional content creation."
+    },
+    {
+      "example_id": "AE-154",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Write a press release announcing the new sustainability initiative.",
+      "evidence": "Write a press release",
+      "reason": "Requires managing media content."
+    },
+    {
+      "example_id": "AE-158",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Answer a customer's question about store location.",
+      "evidence": "Answer a customer's question",
+      "reason": "Customer service, not marketing."
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "skill_id": "WEF-17",
+  "wef_skill_id": 17,
+  "name_en": "Networks and cybersecurity",
+  "name_ms": "Rangkaian dan keselamatan siber",
+  "skill_group": "Technology skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to design, manage, and secure computer networks, protect systems from threats, and ensure data integrity and privacy.",
+  "definition_ms": "Keupayaan untuk mereka bentuk, mengurus dan melindungi rangkaian komputer, melindungi sistem daripada ancaman, serta memastikan integriti dan privasi data.",
+  "typical_tasks_en": "• Configure the office firewall to block unauthorised access.\n• Monitor network logs for signs of a phishing attack.\n• Set up VPN access for remote staff and enforce two-factor authentication.",
+  "typical_tasks_ms": "• Konfigurasikan tembok api pejabat untuk menyekat akses tanpa kebenaran.\n• Pantau log rangkaian untuk tanda serangan phishing.\n• Sediakan akses VPN untuk kakitangan jarak jauh dan laksanakan pengesahan dua faktor.",
+  "aliases_en": [
+    "network administration",
+    "InfoSec",
+    "IT security",
+    "network engineering",
+    "threat detection",
+    "cyber defence",
+    "data protection"
+  ],
+  "aliases_ms": [
+    "pentadbiran rangkaian",
+    "keselamatan maklumat",
+    "keselamatan IT",
+    "kejuruteraan rangkaian",
+    "pengesanan ancaman",
+    "pertahanan siber",
+    "perlindungan data"
+  ],
+  "manglish_aliases": [
+    "Network security",
+    "setup firewall",
+    "cybersecurity",
+    "configure VPN"
+  ],
+  "inclusion_rules": "• The task involves configuring or managing network infrastructure\n• The task requires implementing security measures or protocols\n• The task involves monitoring for security threats or vulnerabilities\n• The task requires responding to cyber incidents or breaches\n• The task involves ensuring data privacy and access controls",
+  "exclusion_rules": "• The task involves only using networks without managing them\n• The user performs general IT support without security focus\n• The task requires no understanding of network architecture or threats\n• The user is simply following security policies without technical implementation",
+  "insufficient_context_rule": "Return insufficient_context=true when the task only uses a network or follows security policy without technical security work.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-23",
+      "confusable_skill_name": "Programming",
+      "boundary_rule": "Networks focuses on infrastructure security. Programming is software development.",
+      "example_task": "Secure the API endpoints that the development team built.",
+      "expected_labels": "Networks and cybersecurity; Programming"
+    },
+    {
+      "confusable_skill_id": "WEF-06",
+      "confusable_skill_name": "Technological literacy",
+      "boundary_rule": "Technological literacy includes basic security awareness. Networks is specialised.",
+      "example_task": "Configure the firewall and monitor network traffic.",
+      "expected_labels": "Networks and cybersecurity"
+    },
+    {
+      "confusable_skill_id": "WEF-11",
+      "confusable_skill_name": "AI and big data",
+      "boundary_rule": "Networks secures data flow. AI analyses data.",
+      "example_task": "Use AI to detect unusual network traffic patterns.",
+      "expected_labels": "Networks and cybersecurity; AI and big data"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-129",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Configure the office firewall to block unauthorised access.",
+      "evidence": "Configure the office firewall",
+      "reason": "Requires implementing security measures."
+    },
+    {
+      "example_id": "AE-130",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Monitor network logs for signs of a phishing attack.",
+      "evidence": "Monitor network logs",
+      "reason": "Requires monitoring for security threats."
+    },
+    {
+      "example_id": "AE-134",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Connect my laptop to the office Wi-Fi.",
+      "evidence": "Connect my laptop",
+      "reason": "Basic network use, not management or security."
+    }
+  ]
+}

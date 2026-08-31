@@ -9,6 +9,7 @@ type SkillMapCardProps = {
   litSkillIds: number[];
   tasksBySkill: Record<number, ProfileTask[]>;
   selectedSkillId: number | null;
+  skillsLoading?: boolean;
   onSelectSkill: (skillId: number | null) => void;
 };
 
@@ -17,13 +18,18 @@ const SkillMapCard = ({
   litSkillIds,
   tasksBySkill,
   selectedSkillId,
+  skillsLoading = false,
   onSelectSkill,
 }: SkillMapCardProps) => {
+  const description = skillsLoading
+    ? "Matching skills to your tasks…"
+    : `${litSkillIds.length} skills · click a bubble to filter tasks`;
+
   return (
     <DashboardCard
       className="dashboard-overview__bubble"
       eyebrow="Where your skills sit"
-      description={`${litSkillIds.length} skills · click a bubble to filter tasks`}
+      description={description}
       action={
         selectedSkillId ? (
           <Button

@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SkillInferenceResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "model_version",
+    "prompt_version",
+    "taxonomy_version",
+    "predictions",
+    "insufficient_context"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "pattern": "^TASK-[A-Za-z0-9_-]+$"
+    },
+    "model_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prompt_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "taxonomy_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "predictions": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "skill_id",
+          "confidence",
+          "evidence",
+          "reason"
+        ],
+        "properties": {
+          "skill_id": {
+            "type": "string",
+            "enum": [
+              "WEF-01",
+              "WEF-02",
+              "WEF-03",
+              "WEF-04",
+              "WEF-05",
+              "WEF-06",
+              "WEF-07",
+              "WEF-08",
+              "WEF-09",
+              "WEF-10",
+              "WEF-11",
+              "WEF-12",
+              "WEF-13",
+              "WEF-14",
+              "WEF-15",
+              "WEF-16",
+              "WEF-17",
+              "WEF-18",
+              "WEF-19",
+              "WEF-20",
+              "WEF-21",
+              "WEF-22",
+              "WEF-23",
+              "WEF-24",
+              "WEF-25",
+              "WEF-26"
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "insufficient_context": {
+      "type": "boolean"
+    }
+  }
+}

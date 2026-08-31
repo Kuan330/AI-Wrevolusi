@@ -1,0 +1,91 @@
+{
+  "skill_id": "WEF-18",
+  "wef_skill_id": 18,
+  "name_en": "Design and user experience",
+  "name_ms": "Reka bentuk dan pengalaman pengguna",
+  "skill_group": "Technology skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to create user-centred designs for products, interfaces, or services, ensuring usability, accessibility, and aesthetic quality.",
+  "definition_ms": "Keupayaan untuk menghasilkan reka bentuk berpusatkan pengguna bagi produk, antara muka atau perkhidmatan, memastikan kebolehgunaan, kebolehaksesan dan kualiti estetik.",
+  "typical_tasks_en": "• Redesign the clinic appointment booking page to reduce confusion for elderly users.\n• Prototype a mobile checkout flow and test it with five customers.\n• Choose colour contrasts that meet accessibility guidelines for the new app.",
+  "typical_tasks_ms": "• Reka bentuk semula halaman tempahan janji temu klinik untuk mengurangkan kekeliruan warga emas.\n• Prototaip aliran daftar keluar mudah alih dan uji dengan lima pelanggan.\n• Pilih kontras warna yang memenuhi garis panduan kebolehcapaian untuk aplikasi baharu.",
+  "aliases_en": [
+    "UX design",
+    "UI design",
+    "user-centred design",
+    "usability",
+    "interaction design",
+    "prototyping",
+    "visual design",
+    "human-centred design"
+  ],
+  "aliases_ms": [
+    "reka bentuk UX",
+    "reka bentuk UI",
+    "reka bentuk berpusatkan pengguna",
+    "kebolehgunaan",
+    "reka bentuk interaksi",
+    "prototaip",
+    "reka bentuk visual"
+  ],
+  "manglish_aliases": [
+    "Design UI",
+    "improve user experience",
+    "buat prototype"
+  ],
+  "inclusion_rules": "• The task involves creating visual or interactive designs\n• The task requires researching user needs and behaviours\n• The task involves prototyping or wireframing interfaces\n• The task requires conducting usability testing\n• The task involves improving accessibility or user satisfaction",
+  "exclusion_rules": "• The task involves only implementing designs created by others\n• The user makes arbitrary visual choices without user research\n• The task requires no consideration of end-user needs\n• The user is only doing graphic decoration without UX intent",
+  "insufficient_context_rule": "Return insufficient_context=true when the task implements someone else's design or decorates without user research or usability intent.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-04",
+      "confusable_skill_name": "Creative thinking",
+      "boundary_rule": "Design applies creativity to user problems. Creative thinking is broader idea generation.",
+      "example_task": "Design a creative yet usable interface for the new app.",
+      "expected_labels": "Creative thinking; Design and user experience"
+    },
+    {
+      "confusable_skill_id": "WEF-20",
+      "confusable_skill_name": "Marketing and media",
+      "boundary_rule": "Design is about user experience. Marketing is about promotion and reach.",
+      "example_task": "Create a landing page that is both visually appealing and converts visitors.",
+      "expected_labels": "Design and user experience; Marketing and media"
+    },
+    {
+      "confusable_skill_id": "WEF-23",
+      "confusable_skill_name": "Programming",
+      "boundary_rule": "Design defines the user interface. Programming implements it.",
+      "example_task": "Design the checkout flow and then work with developers to build it.",
+      "expected_labels": "Design and user experience; Programming"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-137",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Redesign the clinic appointment booking page to reduce confusion for elderly users.",
+      "evidence": "reduce confusion for elderly users",
+      "reason": "Requires user-centred design for usability."
+    },
+    {
+      "example_id": "AE-138",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Prototype a mobile checkout flow and test it with five customers.",
+      "evidence": "Prototype a mobile checkout flow",
+      "reason": "Requires prototyping and usability testing."
+    },
+    {
+      "example_id": "AE-142",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Implement a UI exactly as provided by the designer.",
+      "evidence": "exactly as provided",
+      "reason": "Implementation without design or UX work."
+    }
+  ]
+}

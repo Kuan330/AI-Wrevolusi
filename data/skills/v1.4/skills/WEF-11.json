@@ -1,0 +1,89 @@
+{
+  "skill_id": "WEF-11",
+  "wef_skill_id": 11,
+  "name_en": "AI and big data",
+  "name_ms": "AI dan data raya",
+  "skill_group": "Technology skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to work with artificial intelligence tools, machine learning concepts, and large-scale data analytics to derive insights and automate processes.",
+  "definition_ms": "Keupayaan untuk bekerja dengan alatan kecerdasan buatan, konsep pembelajaran mesin dan analitik data berskala besar bagi memperoleh cerapan serta mengautomasikan proses.",
+  "typical_tasks_en": "• Use a machine learning model to predict next month's demand for childcare slots.\n• Analyse customer behaviour data from the loyalty app to identify churn signals.\n• Fine-tune a chatbot's responses using conversation logs.",
+  "typical_tasks_ms": "• Gunakan model pembelajaran mesin untuk meramal permintaan slot taska bulan depan.\n• Analisis data tingkah laku pelanggan daripada aplikasi kesetiaan untuk mengenal pasti isyarat churn.\n• Perhalusi respons chatbot menggunakan log perbualan.",
+  "aliases_en": [
+    "machine learning",
+    "data science",
+    "artificial intelligence",
+    "predictive analytics",
+    "deep learning",
+    "generative AI",
+    "large-scale analytics"
+  ],
+  "aliases_ms": [
+    "pembelajaran mesin",
+    "sains data",
+    "kecerdasan buatan",
+    "analitik ramalan",
+    "pembelajaran mendalam",
+    "analitik berskala besar"
+  ],
+  "manglish_aliases": [
+    "Guna AI tool",
+    "analyse big data",
+    "train machine learning model"
+  ],
+  "inclusion_rules": "• The task requires using AI tools or machine learning models\n• The task involves analysing large datasets using advanced analytics\n• The task requires understanding AI capabilities and limitations\n• The task involves training, tuning, or deploying AI systems\n• The task requires deriving insights from complex or unstructured data",
+  "exclusion_rules": "• The task involves only basic data entry or simple spreadsheet work\n• The user uses standard software without any AI or analytics component\n• The task requires no understanding of data science or AI concepts\n• The user performs routine reporting without advanced analysis",
+  "insufficient_context_rule": "Return insufficient_context=true when the task involves basic data handling or routine reporting with no AI, model, or advanced analytics component.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-23",
+      "confusable_skill_name": "Programming",
+      "boundary_rule": "AI focuses on data-driven models. Programming is general code writing.",
+      "example_task": "Train a model to predict customer churn.",
+      "expected_labels": "AI and big data; Programming"
+    },
+    {
+      "confusable_skill_id": "WEF-01",
+      "confusable_skill_name": "Analytical thinking",
+      "boundary_rule": "AI uses algorithms on large data. Analytical thinking is human reasoning with evidence.",
+      "example_task": "Use a machine learning model to segment customers and then interpret the segments.",
+      "expected_labels": "AI and big data; Analytical thinking"
+    },
+    {
+      "confusable_skill_id": "WEF-06",
+      "confusable_skill_name": "Technological literacy",
+      "boundary_rule": "AI is advanced analytics. Technological literacy is general tool usage.",
+      "example_task": "Build a predictive dashboard using AI features in the CRM.",
+      "expected_labels": "AI and big data; Technological literacy"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-081",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Use a machine learning model to predict next month's demand for childcare slots.",
+      "evidence": "predict next month's demand",
+      "reason": "Requires AI/ML for prediction."
+    },
+    {
+      "example_id": "AE-082",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Use a machine-learning churn model on large-scale loyalty-app behaviour data to identify customers at risk of leaving.",
+      "evidence": "machine-learning churn model",
+      "reason": "Explicitly applies a machine-learning model to large-scale behavioural data."
+    },
+    {
+      "example_id": "AE-086",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Export the monthly report from the CRM.",
+      "evidence": "Export the monthly report",
+      "reason": "Basic data retrieval, not AI or advanced analytics."
+    }
+  ]
+}

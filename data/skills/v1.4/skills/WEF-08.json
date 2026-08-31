@@ -1,0 +1,89 @@
+{
+  "skill_id": "WEF-08",
+  "wef_skill_id": 8,
+  "name_en": "Curiosity and lifelong learning",
+  "name_ms": "Rasa ingin tahu dan pembelajaran sepanjang hayat",
+  "skill_group": "Self-efficacy",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability and willingness to continuously seek new knowledge, acquire new skills, and adapt one's understanding in response to changing contexts.",
+  "definition_ms": "Keupayaan dan kesediaan untuk terus mencari ilmu baharu, mempelajari kemahiran baharu, serta menyesuaikan pemahaman mengikut perubahan keadaan.",
+  "typical_tasks_en": "• Spend a weekend learning the new data visualisation tool before the training session.\n• Ask follow-up questions in the workshop to understand how AI could help the team.\n• Research Malaysian labour law updates and share findings with HR.",
+  "typical_tasks_ms": "• Luangkan hujung minggu mempelajari alat visualisasi data baharu sebelum sesi latihan.\n• Tanya soalan susulan dalam bengkel untuk memahami bagaimana AI boleh membantu pasukan.\n• Kaji kemas kini undang-undang buruh Malaysia dan kongsi penemuan dengan HR.",
+  "aliases_en": [
+    "continuous learning",
+    "learning agility",
+    "inquisitiveness",
+    "self-development",
+    "knowledge seeking",
+    "intellectual curiosity",
+    "upskilling"
+  ],
+  "aliases_ms": [
+    "pembelajaran berterusan",
+    "ketangkasan belajar",
+    "sifat ingin tahu",
+    "pembangunan kendiri",
+    "mencari ilmu",
+    "peningkatan kemahiran"
+  ],
+  "manglish_aliases": [
+    "Saya nak learn benda baru",
+    "update my skill",
+    "kena upskill"
+  ],
+  "inclusion_rules": "• The task requires learning new concepts, tools, or methods\n• The task involves actively seeking information beyond what is required\n• The task requires updating existing knowledge or skills\n• The task involves exploring unfamiliar topics or domains\n• The task requires asking questions and pursuing deeper understanding",
+  "exclusion_rules": "• The task relies entirely on existing knowledge with no new learning\n• The user performs repetitive work without seeking improvement\n• The task involves no exploration or inquiry beyond immediate requirements\n• The user is resistant to updating methods or acquiring new skills",
+  "insufficient_context_rule": "Return insufficient_context=true when the task uses existing knowledge only, with no learning, exploration, or inquiry.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-06",
+      "confusable_skill_name": "Technological literacy",
+      "boundary_rule": "Curiosity drives learning. Technological literacy is the resulting competence with tools.",
+      "example_task": "Explore new productivity apps and learn to use the most promising one.",
+      "expected_labels": "Curiosity and lifelong learning; Technological literacy"
+    },
+    {
+      "confusable_skill_id": "WEF-02",
+      "confusable_skill_name": "Resilience, flexibility and agility",
+      "boundary_rule": "Curiosity is about seeking knowledge. Resilience is about adapting to change.",
+      "example_task": "Learn about a new market trend to prepare for potential industry shifts.",
+      "expected_labels": "Curiosity and lifelong learning; Resilience, flexibility and agility"
+    },
+    {
+      "confusable_skill_id": "WEF-05",
+      "confusable_skill_name": "Motivation and self-awareness",
+      "boundary_rule": "Curiosity is outward-looking inquiry. Motivation is inward-looking drive.",
+      "example_task": "I am motivated to improve, so I ask questions about best practices.",
+      "expected_labels": "Curiosity and lifelong learning; Motivation and self-awareness"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-057",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Spend a weekend learning the new data visualisation tool before the training session.",
+      "evidence": "Spend a weekend learning the new data visualisation tool",
+      "reason": "Proactive learning beyond requirements."
+    },
+    {
+      "example_id": "AE-058",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Ask follow-up questions in the workshop to understand how AI could help the team.",
+      "evidence": "Ask follow-up questions",
+      "reason": "Requires pursuing deeper understanding."
+    },
+    {
+      "example_id": "AE-062",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Use the same Excel formula every month because it still works.",
+      "evidence": "because it still works",
+      "reason": "No new learning or exploration."
+    }
+  ]
+}

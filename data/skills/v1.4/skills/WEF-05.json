@@ -1,0 +1,89 @@
+{
+  "skill_id": "WEF-05",
+  "wef_skill_id": 5,
+  "name_en": "Motivation and self-awareness",
+  "name_ms": "Motivasi dan kesedaran kendiri",
+  "skill_group": "Self-efficacy",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to understand one's own strengths and weaknesses, manage one's emotions and behaviour, and maintain drive and commitment toward goals.",
+  "definition_ms": "Keupayaan untuk memahami kekuatan dan kelemahan diri, mengurus emosi dan tingkah laku, serta mengekalkan dorongan dan komitmen terhadap matlamat.",
+  "typical_tasks_en": "• Reflect on last quarter's feedback and set three personal improvement goals.\n• Recognise that delegation is a weakness and ask the supervisor for coaching.\n• Stay focused on a repetitive data-cleaning task for three hours to meet the audit deadline.",
+  "typical_tasks_ms": "• Renungkan maklum balas suku lalu dan tetapkan tiga matlamat peningkatan diri.\n• Sedari bahawa delegasi adalah kelemahan dan minta penyelia memberi bimbingan.\n• Kekal fokus pada tugasan pembersihan data berulang selama tiga jam untuk memenuhi tarikh akhir audit.",
+  "aliases_en": [
+    "self-reflection",
+    "emotional self-management",
+    "drive",
+    "personal development",
+    "self-regulation",
+    "intrinsic motivation",
+    "knowing oneself"
+  ],
+  "aliases_ms": [
+    "refleksi kendiri",
+    "pengurusan emosi",
+    "dorongan diri",
+    "pembangunan diri",
+    "regulasi kendiri",
+    "motivasi intrinsik"
+  ],
+  "manglish_aliases": [
+    "Saya reflect on my performance",
+    "need to improve myself",
+    "kena manage my emotion"
+  ],
+  "inclusion_rules": "• The task requires self-reflection or evaluating one's own performance\n• The task involves managing personal emotions in a work context\n• The task requires setting and pursuing personal development goals\n• The task involves recognising one's own limitations and seeking improvement\n• The task requires sustaining effort and commitment over time",
+  "exclusion_rules": "• The task is externally mandated with no personal initiative required\n• The user performs tasks without any need for self-assessment\n• The task involves no emotional or interpersonal dimension\n• The user is simply following orders without internal engagement",
+  "insufficient_context_rule": "Return insufficient_context=true when the task is externally mandated with no sign of self-reflection, emotion management, or personal drive.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-08",
+      "confusable_skill_name": "Curiosity and lifelong learning",
+      "boundary_rule": "Motivation is about internal drive and self-knowledge. Curiosity is about the desire to learn new things.",
+      "example_task": "I feel bored in my role, so I will explore new skills to stay engaged.",
+      "expected_labels": "Motivation and self-awareness; Curiosity and lifelong learning"
+    },
+    {
+      "confusable_skill_id": "WEF-02",
+      "confusable_skill_name": "Resilience, flexibility and agility",
+      "boundary_rule": "Motivation is internal drive. Resilience is recovering from external setbacks.",
+      "example_task": "After failing to meet a target, motivate myself to try a different approach.",
+      "expected_labels": "Motivation and self-awareness; Resilience, flexibility and agility"
+    },
+    {
+      "confusable_skill_id": "WEF-07",
+      "confusable_skill_name": "Empathy and active listening",
+      "boundary_rule": "Self-awareness is understanding oneself. Empathy is understanding others.",
+      "example_task": "Recognise that my frustration is affecting how I listen to my colleague.",
+      "expected_labels": "Motivation and self-awareness; Empathy and active listening"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-033",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Reflect on last quarter's feedback and set three personal improvement goals.",
+      "evidence": "Reflect on last quarter's feedback",
+      "reason": "Requires self-reflection and goal setting."
+    },
+    {
+      "example_id": "AE-034",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Recognise that delegation is a weakness and ask the supervisor for coaching.",
+      "evidence": "Recognise that delegation is a weakness",
+      "reason": "Requires awareness of personal limitations."
+    },
+    {
+      "example_id": "AE-038",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Complete the assigned data entry because the manager told me to.",
+      "evidence": "because the manager told me to",
+      "reason": "External compliance without internal drive or self-reflection."
+    }
+  ]
+}

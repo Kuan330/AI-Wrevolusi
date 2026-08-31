@@ -1,0 +1,91 @@
+{
+  "skill_id": "WEF-21",
+  "wef_skill_id": 21,
+  "name_en": "Reading, writing and mathematics",
+  "name_ms": "Membaca, menulis dan matematik",
+  "skill_group": "Cognitive skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to comprehend written information, communicate clearly through writing, and apply mathematical reasoning to solve problems.",
+  "definition_ms": "Keupayaan untuk memahami maklumat bertulis, berkomunikasi dengan jelas melalui penulisan, serta menggunakan penaakulan matematik bagi menyelesaikan masalah.",
+  "typical_tasks_en": "• Summarise the key points from a 20-page contract for the manager.\n• Write a clear incident report after a workplace accident.\n• Calculate the discount and final price for a bulk order.",
+  "typical_tasks_ms": "• Ringkaskan perkara utama daripada kontrak 20 halaman untuk pengurus.\n• Tulis laporan insiden yang jelas selepas kemalangan di tempat kerja.\n• Kira diskaun dan harga akhir untuk pesanan pukal.",
+  "aliases_en": [
+    "literacy",
+    "numeracy",
+    "written communication",
+    "comprehension",
+    "basic maths",
+    "reading comprehension",
+    "written expression",
+    "arithmetic reasoning"
+  ],
+  "aliases_ms": [
+    "literasi",
+    "numerasi",
+    "komunikasi bertulis",
+    "kefahaman",
+    "matematik asas",
+    "kefahaman bacaan",
+    "ungkapan bertulis"
+  ],
+  "manglish_aliases": [
+    "Tulis report",
+    "kira numbers",
+    "read and understand document"
+  ],
+  "inclusion_rules": "• The task requires comprehending complex written documents\n• The task involves producing clear, structured written communication\n• The task requires performing calculations or mathematical reasoning\n• The task involves interpreting numerical data or statistics\n• The task requires using literacy or numeracy for decision-making",
+  "exclusion_rules": "• The task involves only copying text without comprehension\n• The user performs simple arithmetic with a calculator without reasoning\n• The task requires no reading, writing, or calculation\n• The user is only filling in templates without original composition",
+  "insufficient_context_rule": "Return insufficient_context=true when the task copies text or enters numbers without comprehension, composition, or reasoning.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-01",
+      "confusable_skill_name": "Analytical thinking",
+      "boundary_rule": "Reading/writing/math are foundational skills. Analytical thinking is higher-level reasoning.",
+      "example_task": "Read the report, calculate the variance, and explain what it means.",
+      "expected_labels": "Reading, writing and mathematics; Analytical thinking"
+    },
+    {
+      "confusable_skill_id": "WEF-19",
+      "confusable_skill_name": "Multi-lingualism",
+      "boundary_rule": "Reading/writing is about literacy. Multi-lingualism is about multiple languages.",
+      "example_task": "Write a clear memo in English.",
+      "expected_labels": "Reading, writing and mathematics"
+    },
+    {
+      "confusable_skill_id": "WEF-06",
+      "confusable_skill_name": "Technological literacy",
+      "boundary_rule": "Reading/writing are cognitive. Technological literacy is digital.",
+      "example_task": "Type the meeting minutes using the word processor.",
+      "expected_labels": "Reading, writing and mathematics; Technological literacy"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-161",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Summarise the key points from a 20-page contract for the manager.",
+      "evidence": "Summarise the key points",
+      "reason": "Requires comprehending written documents."
+    },
+    {
+      "example_id": "AE-162",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Write a clear incident report after a workplace accident.",
+      "evidence": "Write a clear incident report",
+      "reason": "Requires structured written communication."
+    },
+    {
+      "example_id": "AE-166",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Copy text from one document to another.",
+      "evidence": "Copy text",
+      "reason": "Copying without comprehension."
+    }
+  ]
+}

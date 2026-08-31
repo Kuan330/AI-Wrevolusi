@@ -1,0 +1,90 @@
+{
+  "skill_id": "WEF-25",
+  "wef_skill_id": 25,
+  "name_en": "Global citizenship",
+  "name_ms": "Kewarganegaraan global",
+  "skill_group": "Ethics",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to understand and act on responsibilities toward broader society, including ethical behaviour, diversity and inclusion, and awareness of global interdependencies.",
+  "definition_ms": "Keupayaan untuk memahami dan bertindak atas tanggungjawab terhadap masyarakat luas, termasuk tingkah laku beretika, kepelbagaian dan keterangkuman, serta kesedaran tentang saling kebergantungan global.",
+  "typical_tasks_en": "• Review a supplier contract for ethical labour practices.\n• Advocate for a more inclusive hiring process for women returning to work.\n• Adapt a campaign for audiences across Malaysia, Indonesia, and Singapore.",
+  "typical_tasks_ms": "• Semak kontrak pembekal untuk amalan buruh beretika.\n• Advokasi proses pengambilan pekerja yang lebih inklusif untuk wanita kembali bekerja.\n• Sesuaikan kempen untuk audiens merentasi Malaysia, Indonesia dan Singapura.",
+  "aliases_en": [
+    "social responsibility",
+    "ethics",
+    "diversity and inclusion",
+    "civic awareness",
+    "ethical reasoning",
+    "cultural awareness",
+    "responsible citizenship"
+  ],
+  "aliases_ms": [
+    "tanggungjawab sosial",
+    "etika",
+    "kepelbagaian dan keterangkuman",
+    "kesedaran sivik",
+    "penaakulan etika",
+    "kesedaran budaya"
+  ],
+  "manglish_aliases": [
+    "Ethics",
+    "diversity and inclusion",
+    "social responsibility",
+    "global mindset"
+  ],
+  "inclusion_rules": "• The task requires considering ethical implications of decisions\n• The task involves promoting diversity, equity, or inclusion\n• The task requires understanding global or cultural contexts\n• The task involves social responsibility or community engagement\n• The task requires navigating ethical dilemmas or conflicts of interest",
+  "exclusion_rules": "• The task involves purely technical execution with no ethical dimension\n• The user performs work without considering broader social impact\n• The task requires no awareness of diversity or global context\n• The user is following orders without questioning ethical implications",
+  "insufficient_context_rule": "Return insufficient_context=true when the task is purely technical or administrative with no ethical, diversity, or social dimension.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-22",
+      "confusable_skill_name": "Environmental stewardship",
+      "boundary_rule": "Global citizenship is broad social/ethical responsibility. Environmental stewardship is specifically environmental.",
+      "example_task": "Promote both recycling and fair labour practices across the supply chain.",
+      "expected_labels": "Global citizenship; Environmental stewardship"
+    },
+    {
+      "confusable_skill_id": "WEF-07",
+      "confusable_skill_name": "Empathy and active listening",
+      "boundary_rule": "Global citizenship involves ethical action. Empathy is interpersonal understanding.",
+      "example_task": "Understand diverse employee backgrounds and advocate for inclusive policies.",
+      "expected_labels": "Global citizenship; Empathy and active listening"
+    },
+    {
+      "confusable_skill_id": "WEF-03",
+      "confusable_skill_name": "Leadership and social influence",
+      "boundary_rule": "Global citizenship is about values. Leadership is about direction.",
+      "example_task": "Lead the team to adopt ethical sourcing practices.",
+      "expected_labels": "Leadership and social influence; Global citizenship"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-193",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Review a supplier contract for ethical labour practices.",
+      "evidence": "ethical labour practices",
+      "reason": "Requires considering ethical implications."
+    },
+    {
+      "example_id": "AE-194",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Advocate for a more inclusive hiring process for women returning to work.",
+      "evidence": "inclusive hiring process",
+      "reason": "Requires promoting diversity and inclusion."
+    },
+    {
+      "example_id": "AE-198",
+      "type": "negative",
+      "language": "en",
+      "task_text": "File expense reports on time.",
+      "evidence": "File expense reports",
+      "reason": "Administrative compliance without ethical dimension."
+    }
+  ]
+}

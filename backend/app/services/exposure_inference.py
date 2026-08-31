@@ -28,6 +28,7 @@ class ExposureInferenceService:
                     client_task_id=task.client_task_id,
                     score_2025=estimate.score_2025,
                     band=estimate.band,
+                    potential25=estimate.potential25,
                     match_layer=estimate.match_layer,
                     score_source=estimate.score_source,
                     reject_reason=estimate.reject_reason,

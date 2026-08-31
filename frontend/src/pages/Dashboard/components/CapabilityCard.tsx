@@ -6,19 +6,18 @@ import {
   ILO_OCCUPATION_EXPOSURE_OPEN_DATA,
   ILO_OCCUPATION_EXPOSURE_SOURCE,
 } from "@/pages/Dashboard/lib/dataSources";
-import { occupationBandFromPotential } from "@/pages/Dashboard/lib/occupationBands";
+import { bandFromScore, taskBandMeta } from "@/pages/Dashboard/lib/taskBands";
 
 type CapabilityCardProps = {
   title: string;
   path: string[];
-  potential25: string | null;
-  meanScore2025: number | null;
+  occupationScore: number | null;
 };
 
-const CapabilityCard = ({ title, path, potential25, meanScore2025 }: CapabilityCardProps) => {
-  const band = occupationBandFromPotential(potential25);
-  const hasScore = typeof meanScore2025 === "number" && !Number.isNaN(meanScore2025);
-  const score = hasScore ? Math.min(1, Math.max(0, meanScore2025)) : null;
+const CapabilityCard = ({ title, path, occupationScore }: CapabilityCardProps) => {
+  const hasScore = typeof occupationScore === "number" && !Number.isNaN(occupationScore);
+  const score = hasScore ? Math.min(1, Math.max(0, occupationScore)) : null;
+  const band = taskBandMeta(bandFromScore(score));
   const labelColor = band?.ink ?? "#2F5F80";
   const percent = score == null ? null : Math.round(score * 100);
 
@@ -36,9 +35,6 @@ const CapabilityCard = ({ title, path, potential25, meanScore2025 }: CapabilityC
             <p className="text-sm font-semibold leading-snug" style={{ color: labelColor }}>
               {band?.label ?? "Exposure not scored"}
             </p>
-            {band?.description ? (
-              <p className="mt-1 text-xs leading-relaxed text-[#574a55]">{band.description}</p>
-            ) : null}
           </div>
           {score != null ? (
             <p className="shrink-0 text-right">

@@ -14,7 +14,7 @@ export type ConfirmedAnalysis = {
   occupationTitle: string;
   occupationPath: string[];
   occupationCode: string;
-  potential25: string | null;
+  occupationScore: number | null;
   meanScore2025: number | null;
   tasks: ProfileTask[];
 };
@@ -70,7 +70,12 @@ export const readUserProfile = (): UserProfile => {
     occupation,
     tasks: analysis?.tasks ?? [],
     tasksOccupationCode: analysis?.occupationCode ?? occupation?.unit.occupation_code ?? null,
-    analysis,
+    analysis: analysis
+      ? {
+          ...analysis,
+          occupationScore: analysis.occupationScore ?? analysis.meanScore2025 ?? null,
+        }
+      : null,
   };
   if (occupation || analysis) {
     localStorage.setItem(PROFILE_KEY, JSON.stringify(migrated));
@@ -91,13 +96,16 @@ export const writeUserProfile = (patch: Partial<UserProfile>): UserProfile => {
 };
 
 export const saveSelectedOccupation = (occupation: SelectedOccupation) => {
-  const prev = readUserProfile();
-  const same = prev.occupation?.unit.occupation_code === occupation.unit.occupation_code;
+  writeUserProfile({ occupation });
+};
+
+/** Entering tasks from occupation selection: discard draft tasks and prior analysis. */
+export const resetTaskSessionForOccupation = (occupation: SelectedOccupation) => {
   writeUserProfile({
     occupation,
-    tasks: same ? prev.tasks : [],
-    tasksOccupationCode: same ? prev.tasksOccupationCode : null,
-    analysis: same ? prev.analysis : null,
+    tasks: [],
+    tasksOccupationCode: null,
+    analysis: null,
   });
 };
 

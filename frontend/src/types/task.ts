@@ -4,7 +4,7 @@ export type ExposureState =
   | "human_led"
   | "ai_assisted"
   | "partly_automated"
-  | "reshaped"
+  | "automated"
   | "insufficient_data";
 
 export interface TaskContext {

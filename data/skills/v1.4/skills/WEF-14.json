@@ -1,0 +1,91 @@
+{
+  "skill_id": "WEF-14",
+  "wef_skill_id": 14,
+  "name_en": "Dependability and attention to detail",
+  "name_ms": "Kebolehharapan dan perhatian terhadap butiran",
+  "skill_group": "Self-efficacy",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to be reliable, consistent, and thorough in completing tasks, ensuring accuracy and meeting commitments without close supervision.",
+  "definition_ms": "Keupayaan untuk menjadi boleh diharap, konsisten dan teliti dalam menyiapkan tugasan, memastikan ketepatan serta menunaikan komitmen tanpa pengawasan rapi.",
+  "typical_tasks_en": "• Double-check every passport application form for missing signatures before submission.\n• Submit the weekly payroll report on time for six consecutive months.\n• Spot a mismatch between invoice amounts and purchase orders before payment.",
+  "typical_tasks_ms": "• Semak semula setiap borang permohonan pasport untuk tandatangan yang hilang sebelum dihantar.\n• Hantar laporan gaji mingguan tepat pada masanya selama enam bulan berturut-turut.\n• Kesan ketidakpadanan antara jumlah invois dan pesanan pembelian sebelum pembayaran.",
+  "aliases_en": [
+    "reliability",
+    "thoroughness",
+    "accuracy",
+    "meticulousness",
+    "consistency",
+    "meeting deadlines",
+    "careful execution",
+    "precision in work"
+  ],
+  "aliases_ms": [
+    "kebolehpercayaan",
+    "ketelitian",
+    "ketepatan",
+    "kecermatan",
+    "konsistensi",
+    "menepati tarikh akhir",
+    "pelaksanaan berhati-hati"
+  ],
+  "manglish_aliases": [
+    "Double check",
+    "kena accurate",
+    "meet deadline"
+  ],
+  "inclusion_rules": "• The task requires high accuracy and careful checking of work\n• The task involves meeting deadlines and keeping commitments reliably\n• The task requires following precise instructions or specifications\n• The task involves detecting errors, omissions, or inconsistencies\n• The task requires maintaining standards over repetitive work",
+  "exclusion_rules": "• The task allows for approximate or rough completion\n• The user performs work without any need for verification or checking\n• The task involves creative or exploratory work where precision is not required\n• The user is intentionally prototyping or drafting rather than finalising",
+  "insufficient_context_rule": "Return insufficient_context=true when the task allows rough output, or is exploratory drafting where precision is not expected.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-15",
+      "confusable_skill_name": "Quality control",
+      "boundary_rule": "Dependability is personal reliability. Quality control is checking outputs against standards.",
+      "example_task": "Carefully verify that every product meets the size specification.",
+      "expected_labels": "Quality control; Dependability and attention to detail"
+    },
+    {
+      "confusable_skill_id": "WEF-23",
+      "confusable_skill_name": "Programming",
+      "boundary_rule": "Programming often requires precision, but it is a technology skill.",
+      "example_task": "Write error-free code for the registration module.",
+      "expected_labels": "Programming"
+    },
+    {
+      "confusable_skill_id": "WEF-01",
+      "confusable_skill_name": "Analytical thinking",
+      "boundary_rule": "Dependability ensures accuracy. Analytical thinking interprets meaning.",
+      "example_task": "Accurately compile monthly figures before analysing trends.",
+      "expected_labels": "Dependability and attention to detail; Analytical thinking"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-105",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Double-check every passport application form for missing signatures before submission.",
+      "evidence": "Double-check every passport application form",
+      "reason": "Requires careful verification."
+    },
+    {
+      "example_id": "AE-106",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Submit the weekly payroll report on time for six consecutive months.",
+      "evidence": "Submit the weekly payroll report on time",
+      "reason": "Requires reliability and meeting commitments."
+    },
+    {
+      "example_id": "AE-110",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Estimate quantities because exact numbers do not matter.",
+      "evidence": "Estimate quantities",
+      "reason": "Approximation, not attention to detail."
+    }
+  ]
+}

@@ -1,0 +1,802 @@
+[
+  {
+    "task_id": "TASK-001",
+    "split": "POC",
+    "language": "en",
+    "task_title": "Review complaint trends",
+    "task_description": "Review three months of customer complaint records, compare complaint categories, and identify the recurring causes behind late-delivery complaints.",
+    "occupation": "Customer Service Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-002",
+    "split": "POC",
+    "language": "ms",
+    "task_title": "Siasat penurunan jualan",
+    "task_description": "Bandingkan jualan cawangan Johor untuk tiga bulan dan siasat punca penurunan selepas promosi tamat.",
+    "occupation": "Sales Operations Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-003",
+    "split": "POC",
+    "language": "mixed",
+    "task_title": "Explain unusual dashboard change",
+    "task_description": "Saya compare sales dashboard antara branch dan explain kenapa conversion rate tiba-tiba drop minggu ni.",
+    "occupation": "Retail Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-004",
+    "split": "POC",
+    "language": "en",
+    "task_title": "Check compliance fields",
+    "task_description": "Check every submitted form against the compliance checklist and reject any form with a required field missing.",
+    "occupation": "Operations Assistant",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-005",
+    "split": "POC",
+    "language": "ms",
+    "task_title": "Kemas kini laporan",
+    "task_description": "Kemas kini angka jualan dalam laporan bulanan.",
+    "occupation": "Sales Administrator",
+    "country": "MY",
+    "final_insufficient_context": true
+  },
+  {
+    "task_id": "TASK-006",
+    "split": "POC",
+    "language": "local",
+    "task_title": "Check report je",
+    "task_description": "Saya check sales report je, tengok semua column wajib ada sebelum submit.",
+    "occupation": "Branch Administrator",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-007",
+    "split": "POC",
+    "language": "en",
+    "task_title": "Select project software",
+    "task_description": "Compare two project-management applications and choose the one that best fits the remote team's access, collaboration, and reporting needs.",
+    "occupation": "Project Coordinator",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-008",
+    "split": "POC",
+    "language": "ms",
+    "task_title": "Konfigurasi sistem CRM",
+    "task_description": "Konfigurasikan medan dan paparan dalam CRM supaya pasukan jualan boleh merekod lawatan pelanggan dengan lebih konsisten.",
+    "occupation": "Sales Operations Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-009",
+    "split": "POC",
+    "language": "mixed",
+    "task_title": "Choose BI tool",
+    "task_description": "Saya evaluate Power BI dengan Looker dan pilih tool yang sesuai dengan access level dan reporting needs team.",
+    "occupation": "Business Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-010",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Automate report by coding",
+    "task_description": "Saya write Python script untuk pull CSV files dan automate monthly report generation.",
+    "occupation": "Data Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-011",
+    "split": "POC",
+    "language": "mixed",
+    "task_title": "Use AI FAQ assistant",
+    "task_description": "Saya configure no-code AI assistant untuk summarise FAQ dan test output sebelum team guna.",
+    "occupation": "Customer Experience Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-012",
+    "split": "POC",
+    "language": "ms",
+    "task_title": "Ikut templat Excel",
+    "task_description": "Masukkan nombor ke dalam templat Excel yang sama setiap hari mengikut langkah latihan.",
+    "occupation": "Accounts Clerk",
+    "country": "MY",
+    "final_insufficient_context": true
+  },
+  {
+    "task_id": "TASK-013",
+    "split": "POC",
+    "language": "en",
+    "task_title": "Train churn model",
+    "task_description": "Train a machine-learning churn model using millions of loyalty transactions and validate its predictions on a holdout dataset.",
+    "occupation": "Data Scientist",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-014",
+    "split": "POC",
+    "language": "ms",
+    "task_title": "Ramalkan permintaan dengan ML",
+    "task_description": "Gunakan model pembelajaran mesin untuk meramal permintaan penghantaran minggu depan berdasarkan data pesanan sejarah.",
+    "occupation": "Demand Planning Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-015",
+    "split": "POC",
+    "language": "mixed",
+    "task_title": "Cluster feedback with AI",
+    "task_description": "Saya guna AI tool untuk cluster ribuan customer comments dan summarise theme utama untuk management.",
+    "occupation": "Customer Insights Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-016",
+    "split": "POC",
+    "language": "en",
+    "task_title": "Sort survey spreadsheet",
+    "task_description": "Sort the survey spreadsheet by submission date and export it as a CSV file.",
+    "occupation": "Research Assistant",
+    "country": "MY",
+    "final_insufficient_context": true
+  },
+  {
+    "task_id": "TASK-017",
+    "split": "POC",
+    "language": "mixed",
+    "task_title": "Use autocorrect",
+    "task_description": "Saya guna autocorrect masa type customer email.",
+    "occupation": "Administrative Assistant",
+    "country": "MY",
+    "final_insufficient_context": true
+  },
+  {
+    "task_id": "TASK-018",
+    "split": "POC",
+    "language": "local",
+    "task_title": "Dashboard biasa je",
+    "task_description": "Saya buat dashboard sales dari 200 rows Excel je, no ML no AI.",
+    "occupation": "Sales Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-019",
+    "split": "POC",
+    "language": "en",
+    "task_title": "Map operational interactions",
+    "task_description": "Map how stock shortages, staff availability, and delivery delays interact to affect customer waiting time across the branch.",
+    "occupation": "Operations Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-020",
+    "split": "POC",
+    "language": "ms",
+    "task_title": "Analisis pergantungan operasi",
+    "task_description": "Petakan bagaimana kelewatan pembekal mempengaruhi inventori, jadual pengeluaran dan penghantaran kepada pelanggan.",
+    "occupation": "Supply Chain Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-021",
+    "split": "POC",
+    "language": "mixed",
+    "task_title": "Policy impact across functions",
+    "task_description": "Saya tengok macam mana satu policy change affect HR, payroll, scheduling dan workload team sekali.",
+    "occupation": "HR Operations Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-022",
+    "split": "POC",
+    "language": "en",
+    "task_title": "Compare monthly sales",
+    "task_description": "Compare this month's sales with last month's sales and explain the largest variance.",
+    "occupation": "Sales Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-023",
+    "split": "POC",
+    "language": "mixed",
+    "task_title": "Troubleshoot one printer",
+    "task_description": "Printer office rosak, saya troubleshoot device tu sahaja sampai boleh print balik.",
+    "occupation": "Office Administrator",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-024",
+    "split": "Pilot",
+    "language": "local",
+    "task_title": "Shift cukup tak",
+    "task_description": "Saya check roster je, cukup orang tak untuk shift malam.",
+    "occupation": "Store Supervisor",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-025",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Inspect garments",
+    "task_description": "Inspect finished garments against the approved stitching, measurement, and defect standards before packing.",
+    "occupation": "Quality Inspector",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-026",
+    "split": "POC",
+    "language": "ms",
+    "task_title": "Semak standard keselamatan makanan",
+    "task_description": "Semak sampel makanan mengikut standard suhu dan kebersihan sebelum produk dibenarkan keluar.",
+    "occupation": "Quality Assurance Assistant",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-027",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Check entries against SOP",
+    "task_description": "Saya double check data entry ikut SOP sebelum submit, make sure format dan field semua betul.",
+    "occupation": "Operations Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-028",
+    "split": "POC",
+    "language": "en",
+    "task_title": "Investigate defect increase",
+    "task_description": "Analyse why the defect rate increased over the last quarter and identify the main contributing causes.",
+    "occupation": "Process Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-029",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Design new QC checklist",
+    "task_description": "Saya design QC checklist baru sebab current checklist tak cover packaging issue.",
+    "occupation": "Quality Improvement Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-030",
+    "split": "POC",
+    "language": "mixed",
+    "task_title": "Vague product check",
+    "task_description": "Saya check barang ni okay ke tak sebelum hantar.",
+    "occupation": "Warehouse Assistant",
+    "country": "MY",
+    "final_insufficient_context": true
+  },
+  {
+    "task_id": "TASK-031",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Recover from supplier cancellation",
+    "task_description": "When the main supplier cancelled the morning delivery, switch to a backup supplier, re-sequence the day's work, and still meet the customer deadline. Compare the backup options by lead time and cost before choosing one.",
+    "occupation": "Procurement Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-032",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Sesuaikan pelan acara",
+    "task_description": "Apabila lokasi acara dibatalkan pada saat akhir, ubah susun atur, jadual dan tugas pasukan untuk memastikan acara diteruskan. Bahagikan semula tanggungjawab pasukan dan dapatkan persetujuan mereka tentang pelan baharu.",
+    "occupation": "Event Coordinator",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-033",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Align team on new timeline",
+    "task_description": "Saya lead cross-functional meeting dan convince semua owner agree dengan revised project timeline.",
+    "occupation": "Project Manager",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-034",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Resolve ownership conflict",
+    "task_description": "Mediate a disagreement between two team leads and secure agreement on who owns each deliverable.",
+    "occupation": "Programme Lead",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-035",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Cipta format orientasi baharu",
+    "task_description": "Cipta tiga format orientasi baharu untuk pekerja jarak jauh dan pilih idea yang paling praktikal untuk diuji.",
+    "occupation": "HR Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-036",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Brainstorm campaign concept",
+    "task_description": "Kita brainstorm concept baru untuk Ramadan campaign, combine customer story dengan interactive content.",
+    "occupation": "Marketing Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-037",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Reflect on performance feedback",
+    "task_description": "Review my quarterly feedback, identify where my own behaviour affected results, and set two personal improvement goals.",
+    "occupation": "Account Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-038",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Set self-improvement goal",
+    "task_description": "Saya reflect balik feedback dari manager dan set goal sendiri untuk improve cara saya handle deadline.",
+    "occupation": "Operations Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-039",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Dengar pelanggan marah",
+    "task_description": "Dengar pelanggan yang marah sampai selesai, ulang semula kebimbangannya untuk memastikan saya faham, kemudian bincangkan pilihan penyelesaian.",
+    "occupation": "Customer Service Officer",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-040",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Understand staff concern",
+    "task_description": "Team member cakap dia overwhelmed, saya dengar dulu, clarify apa issue sebenar dan acknowledge concern dia.",
+    "occupation": "Team Leader",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-041",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Learn new visualisation tool",
+    "task_description": "Explore a new data-visualisation platform, follow tutorials, and build a small practice dashboard before the company training.",
+    "occupation": "Reporting Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-042",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Belajar sistem baharu sendiri",
+    "task_description": "Terokai sistem tempahan baharu, baca panduan dan cuba fungsi utama sebelum sesi latihan rasmi. Kenal pasti fungsi yang saya sendiri belum faham sebelum mula belajar.",
+    "occupation": "Reservations Officer",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-043",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Identify team skill gaps",
+    "task_description": "Saya review team competency, identify skill gap dan propose development plan untuk staff yang nak move ke senior role.",
+    "occupation": "HR Business Partner",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-044",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Interview for capability fit",
+    "task_description": "Interview shortlisted candidates, assess their skills against the role requirements, and recommend who should join the team.",
+    "occupation": "Talent Acquisition Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-045",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Bantu pelanggan pilih pelan",
+    "task_description": "Tanya keperluan pelanggan, terangkan pilihan pelan dan bantu mereka memilih pakej yang paling sesuai. Bandingkan tiga pakej mengikut bajet dan keperluan sebelum mencadangkan pilihan.",
+    "occupation": "Customer Service Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-046",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Resolve billing issue",
+    "task_description": "Saya layan customer punya billing issue, check apa dia perlukan dan explain solution sampai dia faham.",
+    "occupation": "Contact Centre Agent",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-047",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Plan peak-hour staffing",
+    "task_description": "Schedule staff across three retail shifts to cover forecast peak hours without exceeding the weekly labour budget.",
+    "occupation": "Store Operations Manager",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-048",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Rancang penggunaan kenderaan",
+    "task_description": "Susun penggunaan kenderaan penghantaran dan pemandu untuk memenuhi semua tempahan hari ini dengan masa perjalanan minimum. Bandingkan masa perjalanan setiap pilihan dan kira kapasiti kenderaan yang diperlukan.",
+    "occupation": "Logistics Coordinator",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-049",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Double-check application pack",
+    "task_description": "Saya double check setiap application pack, nama, IC field dan signature sebelum submit ke supervisor.",
+    "occupation": "Administrative Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-050",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Reconcile invoice details",
+    "task_description": "Reconcile invoice numbers, quantities, and payment references before releasing the monthly payment batch.",
+    "occupation": "Accounts Payable Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-051",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Latih juruwang baharu",
+    "task_description": "Tunjukkan juruwang baharu cara memproses pemulangan, kemudian perhatikan dia mencuba dan beri maklum balas. Tetapkan jangkaan kerja pada awal latihan dan kenal pasti kemahiran yang masih perlu dibangunkan.",
+    "occupation": "Retail Supervisor",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-052",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Coach junior staff",
+    "task_description": "Saya ajar junior cara prepare monthly report, tengok dia buat sendiri dan coach bila dia stuck.",
+    "occupation": "Senior Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-053",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Configure firewall rules",
+    "task_description": "Configure office firewall rules to block unauthorised inbound traffic and review the logs for suspicious connection attempts.",
+    "occupation": "IT Security Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-054",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Respond to phishing alert",
+    "task_description": "Saya investigate phishing alert, check email header dan isolate affected account sebelum reset access.",
+    "occupation": "Cybersecurity Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-055",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Reka semula halaman tempahan",
+    "task_description": "Reka semula halaman tempahan klinik berdasarkan ujian pengguna supaya langkah tempahan lebih jelas untuk pengguna warga emas.",
+    "occupation": "UX Designer",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-056",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Simplify onboarding flow",
+    "task_description": "Prototype two onboarding flows, test them with five users, and revise the layout based on where users become confused.",
+    "occupation": "Product Designer",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-057",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Translate client guide",
+    "task_description": "Saya translate onboarding guide dari English ke Malay dan adjust wording supaya natural untuk local users.",
+    "occupation": "Content Specialist",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-058",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Interpret bilingual meeting",
+    "task_description": "Interpret between English and Malay during a supplier meeting so both sides can negotiate terms accurately.",
+    "occupation": "Bilingual Operations Coordinator",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-059",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Rancang kempen media sosial",
+    "task_description": "Rancang kempen media sosial untuk mempromosikan program latihan dan tentukan mesej utama bagi segmen audiens yang berbeza. Bandingkan prestasi kempen lepas bagi setiap segmen dan cipta dua idea mesej baharu sebelum memilih konsep akhir.",
+    "occupation": "Marketing Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-060",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Optimise campaign message",
+    "task_description": "Saya review ad performance dan adjust campaign message untuk audience yang conversion rendah. Create dua versi mesej baharu dan pilih yang paling sesuai berdasarkan data.",
+    "occupation": "Digital Marketing Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-061",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Prepare budget variance note",
+    "task_description": "Calculate the monthly budget variance and write a short explanation of the two largest differences.",
+    "occupation": "Finance Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-062",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Tulis ringkasan prestasi",
+    "task_description": "Kira kadar pertumbuhan jualan dan tulis ringkasan prestasi suku tahunan untuk pengurus cawangan. Bandingkan perubahan antara cawangan dan semak semula semua angka sebelum dihantar.",
+    "occupation": "Business Support Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-063",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Reduce packaging waste",
+    "task_description": "Kita redesign packing process untuk kurangkan plastic waste dan track berapa kg material kita save setiap bulan.",
+    "occupation": "Sustainability Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-064",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Assess supplier environmental practice",
+    "task_description": "Review supplier waste and energy data before recommending which supplier best meets the company's environmental criteria. Also consider whether supplier practices create wider social or community impacts before the final recommendation.",
+    "occupation": "Procurement Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-065",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Tulis skrip automasi",
+    "task_description": "Tulis skrip Python untuk menggabungkan fail CSV harian dan menghasilkan laporan secara automatik.",
+    "occupation": "Data Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-066",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Build API integration",
+    "task_description": "Saya code integration untuk tarik order data dari API dan save ke database setiap malam.",
+    "occupation": "Software Developer",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-067",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Assemble small components",
+    "task_description": "Assemble small electrical connectors by hand for several hours while keeping each pin aligned to the required tolerance.",
+    "occupation": "Assembly Technician",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-068",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Precision repair work",
+    "task_description": "Saya repair small watch parts guna tweezer, kena tangan steady dan precise sebab component sangat kecil.",
+    "occupation": "Repair Technician",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-069",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Semak amalan buruh pembekal",
+    "task_description": "Semak laporan pembekal untuk memastikan amalan buruh dan layanan pekerja mematuhi prinsip etika syarikat. Bandingkan bukti antara pembekal dan semak setiap keperluan etika satu per satu sebelum membuat kesimpulan.",
+    "occupation": "Responsible Sourcing Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-070",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Evaluate social impact",
+    "task_description": "Evaluate whether a new sourcing policy could disadvantage vulnerable communities and recommend safeguards before approval.",
+    "occupation": "ESG Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-071",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Detect colour variation",
+    "task_description": "Saya inspect fabric batch dan boleh detect colour tone beza sikit sebelum production approve. Saya semak setiap batch dengan teliti sebelum production approve.",
+    "occupation": "Textile Quality Technician",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-072",
+    "split": "Pilot",
+    "language": "local",
+    "task_title": "Bunyi mesin lain sikit",
+    "task_description": "Mesin ni bunyi lain sikit dari biasa, saya detect awal and flag sebelum line continue.",
+    "occupation": "Machine Operator",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-073",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "Lead and coach new staff",
+    "task_description": "Saya lead onboarding session, set expectation team dan coach dua staff baru sampai mereka boleh handle task sendiri.",
+    "occupation": "Team Supervisor",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-074",
+    "split": "Pilot",
+    "language": "en",
+    "task_title": "Listen and resolve complaint",
+    "task_description": "Listen to an angry customer, confirm what went wrong, and arrange a replacement that addresses the customer's stated concern.",
+    "occupation": "Customer Service Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-075",
+    "split": "Pilot",
+    "language": "mixed",
+    "task_title": "User-centred new idea",
+    "task_description": "Kita brainstorm feature baru untuk booking app, prototype dua option dan test mana lagi senang user faham.",
+    "occupation": "Product Designer",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-076",
+    "split": "Pilot",
+    "language": "ms",
+    "task_title": "Susun stok dengan teliti",
+    "task_description": "Rancang pengagihan stok antara tiga cawangan dan semak setiap kuantiti sebelum arahan pemindahan dihantar. Bandingkan permintaan setiap cawangan sebelum tentukan jumlah pemindahan.",
+    "occupation": "Inventory Planner",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-077",
+    "split": "Pilot",
+    "language": "local",
+    "task_title": "AI tool untuk FAQ",
+    "task_description": "Saya setup AI FAQ bot utk team, test answer dia satu-satu and pilih config yang paling sesuai.",
+    "occupation": "Customer Operations Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-078",
+    "split": "Pilot",
+    "language": "local",
+    "task_title": "Explore tool sendiri",
+    "task_description": "Boss belum bagi training lagi, tapi saya try sendiri new dashboard tool, tengok tutorial n test feature penting.",
+    "occupation": "Operations Analyst",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-079",
+    "split": "Pilot",
+    "language": "local",
+    "task_title": "Promo bilingual",
+    "task_description": "Saya buat BM + English social post utk promo career event, adjust wording ikut audience local.",
+    "occupation": "Communications Executive",
+    "country": "MY",
+    "final_insufficient_context": false
+  },
+  {
+    "task_id": "TASK-080",
+    "split": "Pilot",
+    "language": "local",
+    "task_title": "Handle customer stuff",
+    "task_description": "Saya handle customer stuff hari-hari.",
+    "occupation": "Frontline Assistant",
+    "country": "MY",
+    "final_insufficient_context": true
+  }
+]

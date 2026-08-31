@@ -1,0 +1,93 @@
+{
+  "skill_id": "WEF-15",
+  "wef_skill_id": 15,
+  "name_en": "Quality control",
+  "name_ms": "Kawalan kualiti",
+  "skill_group": "Management skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to inspect, test, and verify that outputs, processes, or services meet defined standards, specifications, and customer requirements.",
+  "definition_ms": "Keupayaan untuk memeriksa, menguji dan mengesahkan bahawa hasil, proses atau perkhidmatan memenuhi piawaian, spesifikasi dan keperluan pelanggan yang ditetapkan.",
+  "typical_tasks_en": "• Inspect finished garments against size and stitching standards.\n• Test each batch of baked goods for temperature and texture before display.\n• Audit patient records to ensure compliance with privacy regulations.",
+  "typical_tasks_ms": "• Periksa pakaian siap mengikut piawaian saiz dan jahitan.\n• Uji setiap kelompok produk bakeri untuk suhu dan tekstur sebelum dipamerkan.\n• Audit rekod pesakit untuk memastikan pematuhan peraturan privasi.",
+  "aliases_en": [
+    "quality assurance",
+    "QA",
+    "inspection",
+    "compliance checking",
+    "defect detection",
+    "standards verification",
+    "testing",
+    "audit"
+  ],
+  "aliases_ms": [
+    "jaminan kualiti",
+    "QA",
+    "pemeriksaan",
+    "semakan pematuhan",
+    "pengesanan kecacatan",
+    "pengesahan piawaian",
+    "pengujian",
+    "audit"
+  ],
+  "manglish_aliases": [
+    "Check quality",
+    "inspect barang",
+    "follow SOP",
+    "buat QC"
+  ],
+  "inclusion_rules": "• The task requires checking outputs against standards or specifications\n• The task involves testing products, services, or processes for defects\n• The task requires identifying deviations from quality requirements\n• The task involves conducting audits or compliance checks\n• The task requires documenting and reporting quality issues",
+  "exclusion_rules": "• The task involves creating or designing outputs without inspecting them\n• The user performs work without any verification or testing step\n• The task requires only subjective opinion without defined standards\n• The user is analysing trends rather than checking specific outputs",
+  "insufficient_context_rule": "Return insufficient_context=true when the task creates or analyses outputs without any inspection, testing, or standards comparison.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-14",
+      "confusable_skill_name": "Dependability and attention to detail",
+      "boundary_rule": "Quality control checks against external standards. Dependability is a personal trait of reliability.",
+      "example_task": "Check all outgoing packages against the shipping checklist.",
+      "expected_labels": "Quality control; Dependability and attention to detail"
+    },
+    {
+      "confusable_skill_id": "WEF-01",
+      "confusable_skill_name": "Analytical thinking",
+      "boundary_rule": "Quality control verifies standards. Analytical thinking diagnoses causes.",
+      "example_task": "Analyse the defect data to find the root cause.",
+      "expected_labels": "Analytical thinking"
+    },
+    {
+      "confusable_skill_id": "WEF-26",
+      "confusable_skill_name": "Sensory-processing abilities",
+      "boundary_rule": "Quality control may use senses, but it is about standards compliance.",
+      "example_task": "Smell dairy products to check freshness against safety standards.",
+      "expected_labels": "Quality control; Sensory-processing abilities"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-113",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Inspect finished garments against size and stitching standards.",
+      "evidence": "Inspect finished garments against size and stitching standards",
+      "reason": "Requires checking against defined standards."
+    },
+    {
+      "example_id": "AE-114",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Test each batch of baked goods for temperature and texture before display.",
+      "evidence": "Test each batch",
+      "reason": "Requires testing outputs against specifications."
+    },
+    {
+      "example_id": "AE-118",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Analyse why defect rates increased over the past quarter.",
+      "evidence": "Analyse why defect rates increased",
+      "reason": "This is analytical diagnosis, not checking standards."
+    }
+  ]
+}

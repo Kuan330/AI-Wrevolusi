@@ -1,0 +1,90 @@
+{
+  "skill_id": "WEF-22",
+  "wef_skill_id": 22,
+  "name_en": "Environmental stewardship",
+  "name_ms": "Penjagaan alam sekitar",
+  "skill_group": "Ethics",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to understand environmental impacts, promote sustainable practices, and make decisions that minimise harm to the natural environment.",
+  "definition_ms": "Keupayaan untuk memahami kesan terhadap alam sekitar, mengamalkan kelestarian, dan membuat keputusan yang mengurangkan kemudaratan kepada alam semula jadi.",
+  "typical_tasks_en": "• Assess the carbon footprint of the company's courier choices.\n• Switch the office to reusable catering supplies for meetings.\n• Ensure the new packaging complies with local recycling regulations.",
+  "typical_tasks_ms": "• Nilai jejak karbon pilihan kurier syarikat.\n• Tukar pejabat kepada bekalan katering boleh guna semula untuk mesyuarat.\n• Pastikan pembungkusan baharu mematuhi peraturan kitar semula tempatan.",
+  "aliases_en": [
+    "sustainability",
+    "environmental awareness",
+    "green practices",
+    "eco-friendly",
+    "environmental compliance",
+    "conservation",
+    "environmental responsibility"
+  ],
+  "aliases_ms": [
+    "kelestarian",
+    "kesedaran alam sekitar",
+    "amalan hijau",
+    "mesra alam",
+    "pematuhan alam sekitar",
+    "pemuliharaan",
+    "tanggungjawab alam sekitar"
+  ],
+  "manglish_aliases": [
+    "Go green",
+    "sustainability",
+    "kurangkan waste"
+  ],
+  "inclusion_rules": "• The task requires assessing environmental impact or sustainability\n• The task involves implementing green or eco-friendly practices\n• The task requires compliance with environmental regulations\n• The task involves reducing waste, emissions, or resource consumption\n• The task requires educating others about environmental responsibility",
+  "exclusion_rules": "• The task involves standard operations with no environmental consideration\n• The user performs work without any sustainability awareness\n• The task requires no knowledge of environmental issues\n• The user is only following procedures that happen to be green",
+  "insufficient_context_rule": "Return insufficient_context=true when the task has no environmental consideration, even if the activity happens to be low-impact.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-25",
+      "confusable_skill_name": "Global citizenship",
+      "boundary_rule": "Environmental stewardship focuses on nature. Global citizenship is broader social responsibility.",
+      "example_task": "Choose suppliers who minimise packaging waste and treat workers fairly.",
+      "expected_labels": "Environmental stewardship; Global citizenship"
+    },
+    {
+      "confusable_skill_id": "WEF-13",
+      "confusable_skill_name": "Resource management and operations",
+      "boundary_rule": "Environmental stewardship may reduce resource use, but it is motivated by sustainability.",
+      "example_task": "Reduce paper use in the office for environmental reasons.",
+      "expected_labels": "Environmental stewardship; Resource management and operations"
+    },
+    {
+      "confusable_skill_id": "WEF-12",
+      "confusable_skill_name": "Systems thinking",
+      "boundary_rule": "Systems thinking can model environmental systems, but stewardship is an ethical commitment.",
+      "example_task": "Assess how switching to renewable energy affects cost and carbon footprint.",
+      "expected_labels": "Systems thinking; Environmental stewardship"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-169",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Assess the carbon footprint of the company's courier choices.",
+      "evidence": "Assess the carbon footprint",
+      "reason": "Requires assessing environmental impact."
+    },
+    {
+      "example_id": "AE-170",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Switch the office to reusable catering supplies for meetings.",
+      "evidence": "Switch the office to reusable catering supplies",
+      "reason": "Requires implementing green practices."
+    },
+    {
+      "example_id": "AE-174",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Order office supplies from the cheapest vendor.",
+      "evidence": "cheapest vendor",
+      "reason": "Cost-only decision without environmental consideration."
+    }
+  ]
+}

@@ -1,19 +1,37 @@
 import { Badge } from "@/components/ui/badge";
 import { GradientBar } from "@/components/ui/gradient-bar";
 import EmptyState from "@/components/common/EmptyState";
-import { bandFromScore, taskBandMeta, type TaskBandId } from "@/pages/Dashboard/lib/taskBands";
+import { resolveTaskBand, taskBandMeta, type TaskBandId } from "@/pages/Dashboard/lib/taskBands";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
+import type { WefSkill } from "@/types/reference";
 
 type TaskListProps = {
   tasks: ProfileTask[];
+  skills: WefSkill[];
   activeBand: TaskBandId | null;
   highlightedIds: string[];
+  selectedSkillId?: number | null;
+  onSelectSkill?: (skillId: number | null) => void;
 };
 
 const exposureScore = (task: ProfileTask) =>
   typeof task.score2025 === "number" ? task.score2025 : -1;
 
-const TaskList = ({ tasks, activeBand, highlightedIds }: TaskListProps) => {
+const skillConfidenceLabel = (task: ProfileTask, skillId: number | null | undefined) => {
+  if (!skillId) return null;
+  const prediction = task.skillPredictions?.find((item) => item.wefSkillId === skillId);
+  if (!prediction) return null;
+  return prediction.confidence === "identified" ? "Identified" : "Possible";
+};
+
+const TaskList = ({
+  tasks,
+  skills,
+  activeBand,
+  highlightedIds,
+  selectedSkillId,
+  onSelectSkill,
+}: TaskListProps) => {
   if (tasks.length === 0) {
     return (
       <EmptyState title="No tasks yet" message="Add tasks in your profile to see them here." />
@@ -23,7 +41,7 @@ const TaskList = ({ tasks, activeBand, highlightedIds }: TaskListProps) => {
   const visible = tasks
     .filter((task) => {
       if (!activeBand) return true;
-      return bandFromScore(task.score2025) === activeBand;
+      return resolveTaskBand(task) === activeBand;
     })
     .sort((a, b) => exposureScore(b) - exposureScore(a));
 
@@ -35,11 +53,16 @@ const TaskList = ({ tasks, activeBand, highlightedIds }: TaskListProps) => {
     );
   }
 
+  const skillName = (wefSkillId: number) =>
+    skills.find((skill) => skill.wef_skill_id === wefSkillId)?.core_skill ?? `Skill ${wefSkillId}`;
+
   return (
     <div className="space-y-2.5">
       {visible.map((task) => {
-        const band = taskBandMeta(bandFromScore(task.score2025));
+        const band = taskBandMeta(resolveTaskBand(task));
         const highlighted = highlightedIds.includes(task.id);
+        const skillLabel = skillConfidenceLabel(task, selectedSkillId);
+        const predictions = task.skillPredictions ?? [];
 
         return (
           <article
@@ -66,6 +89,9 @@ const TaskList = ({ tasks, activeBand, highlightedIds }: TaskListProps) => {
                       {task.scoreSource === "estimated" ? (
                         <span className="text-[11px] text-[#7f7280]">Estimated</span>
                       ) : null}
+                      {skillLabel ? (
+                        <span className="text-[11px] font-medium text-[#4f91ba]">{skillLabel}</span>
+                      ) : null}
                     </span>
                   ) : (
                     <span className="shrink-0 text-[11px] text-[#7f7280]">Not scored yet</span>
@@ -77,6 +103,32 @@ const TaskList = ({ tasks, activeBand, highlightedIds }: TaskListProps) => {
                     <span className="w-10 text-right text-xs tabular-nums text-[#7f7280]">
                       {task.score2025.toFixed(2)}
                     </span>
+                  </div>
+                ) : null}
+                {predictions.length > 0 ? (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {predictions.map((prediction) => {
+                      const selected = selectedSkillId === prediction.wefSkillId;
+                      return (
+                        <button
+                          key={`${task.id}-${prediction.skillId}`}
+                          type="button"
+                          className={`rounded-full border px-2 py-0.5 text-[11px] font-medium transition-colors ${
+                            selected
+                              ? "border-[#4f91ba] bg-[#4f91ba]/10 text-[#2f5f80]"
+                              : "border-white/80 bg-white/70 text-[#574a55] hover:border-[#4f91ba]/40"
+                          }`}
+                          onClick={() =>
+                            onSelectSkill?.(selected ? null : prediction.wefSkillId)
+                          }
+                        >
+                          {skillName(prediction.wefSkillId)}
+                          <span className="ml-1 text-[#7f7280]">
+                            · {prediction.confidence === "identified" ? "Identified" : "Possible"}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 ) : null}
               </div>

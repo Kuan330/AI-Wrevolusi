@@ -38,6 +38,7 @@ class ExposureEstimateItem(BaseModel):
     client_task_id: str
     score_2025: Optional[float]
     band: str
+    potential25: Optional[str] = None
     match_layer: str
     score_source: str
     reject_reason: Optional[str] = None
