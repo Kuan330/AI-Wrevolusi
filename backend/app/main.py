@@ -15,39 +15,43 @@ from app.routers import (
     users,
 )
 
-app = FastAPI(
-    title=settings.app_name,
-    version=settings.api_version,
-    docs_url='/docs',
-    redoc_url='/redoc',
-)
+def create_app(api_root: str = '/api') -> FastAPI:
+    application = FastAPI(
+        title=settings.app_name,
+        version=settings.api_version,
+        docs_url='/docs',
+        redoc_url='/redoc',
+    )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.cors_origins,
-    allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
-)
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=['*'],
+        allow_headers=['*'],
+    )
 
-api_prefix = f'/api/{settings.api_version}'
-app.include_router(auth.router, prefix=api_prefix)
-app.include_router(users.router, prefix=api_prefix)
-app.include_router(occupations.router, prefix=api_prefix)
-app.include_router(tasks.router, prefix=api_prefix)
-app.include_router(exposure.router, prefix=api_prefix)
-app.include_router(capabilities.router, prefix=api_prefix)
-app.include_router(preparation.router, prefix=api_prefix)
-app.include_router(schedule.router, prefix=api_prefix)
-app.include_router(reference.router, prefix=api_prefix)
+    api_prefix = f"{api_root.rstrip('/')}/{settings.api_version}"
+    application.include_router(auth.router, prefix=api_prefix)
+    application.include_router(users.router, prefix=api_prefix)
+    application.include_router(occupations.router, prefix=api_prefix)
+    application.include_router(tasks.router, prefix=api_prefix)
+    application.include_router(exposure.router, prefix=api_prefix)
+    application.include_router(capabilities.router, prefix=api_prefix)
+    application.include_router(preparation.router, prefix=api_prefix)
+    application.include_router(schedule.router, prefix=api_prefix)
+    application.include_router(reference.router, prefix=api_prefix)
+
+    @application.on_event('startup')
+    async def startup_event() -> None:
+        if settings.auto_create_tables:
+            await init_models()
+
+    @application.get('/healthz', tags=['System'])
+    async def health_check() -> dict[str, str]:
+        return {'status': 'ok'}
+
+    return application
 
 
-@app.on_event('startup')
-async def startup_event() -> None:
-    if settings.auto_create_tables:
-        await init_models()
-
-
-@app.get('/healthz', tags=['System'])
-async def health_check() -> dict[str, str]:
-    return {'status': 'ok'}
+app = create_app()
