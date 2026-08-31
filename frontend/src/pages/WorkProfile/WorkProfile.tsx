@@ -158,13 +158,15 @@ const WorkProfile = () => {
           <p className="text-sm text-muted-foreground">
             {confirmedUnit ? `Selected: ${confirmedUnit.title}` : "No occupation selected yet."}
           </p>
-          <Button
-            className="profile-primary-btn mt-3 h-11 w-full rounded-xl"
-            disabled={!confirmedUnit}
-            onClick={handleContinue}
-          >
-            Confirm and continue
-          </Button>
+          <div className="mt-3 flex justify-end">
+            <Button
+              className="profile-blue-btn h-10 whitespace-nowrap rounded-full px-5"
+              disabled={!confirmedUnit}
+              onClick={handleContinue}
+            >
+              Confirm and continue
+            </Button>
+          </div>
         </div>
       </section>
     </div>
