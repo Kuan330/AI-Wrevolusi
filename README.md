@@ -48,8 +48,10 @@ Frontend will run at:
 If backend URL changes, set in `frontend/.env`:
 
 ```env
-VITE_API_BASE_URL=http://127.0.0.1:8000/api/v1
+VITE_API_BASE_URL=/api/v1
 ```
+
+Vite proxies `/api` to the local FastAPI server during development.
 
 ## Start Order
 
@@ -74,3 +76,28 @@ python3 db/seed_reference.py --init
 ```
 
 See `docs/iteration1_data_management.md` before promoting reference data.
+
+## Deploy to Vercel
+
+The repository deploys as one Vercel Services project:
+
+- `/` serves the Vite frontend.
+- `/api` mounts the FastAPI service.
+- Neon remains the external PostgreSQL database.
+
+In Vercel, import this repository with the project root unchanged and select
+**Services** as the Framework Preset. Add these environment variables for
+Preview and Production without committing their values:
+
+```env
+DATABASE_URL=<Neon connection string>
+JWT_SECRET_KEY=<strong random secret>
+DEBUG=false
+AUTO_CREATE_TABLES=false
+COOKIE_SECURE=true
+COOKIE_SAMESITE=lax
+VITE_API_BASE_URL=/api/v1
+```
+
+Deploy a preview first, then verify `/api/healthz`, authentication, database
+access, and direct navigation to frontend routes before promoting it.

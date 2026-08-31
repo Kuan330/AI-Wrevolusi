@@ -6,6 +6,9 @@ frontend/.env
 venv/
 __pycache__/
 *.pyc
+*.egg-info/
+backend/build/
+.vercel/
 .DS_Store
 .cursor/
 db/_dev_seed_statements.json
