@@ -15,6 +15,7 @@ from app.routers import (
     users,
 )
 
+
 def create_app(api_root: str = '/api') -> FastAPI:
     application = FastAPI(
         title=settings.app_name,
@@ -31,7 +32,8 @@ def create_app(api_root: str = '/api') -> FastAPI:
         allow_headers=['*'],
     )
 
-    api_prefix = f"{api_root.rstrip('/')}/{settings.api_version}"
+    api_root = api_root.rstrip('/')
+    api_prefix = f'{api_root}/{settings.api_version}'
     application.include_router(auth.router, prefix=api_prefix)
     application.include_router(users.router, prefix=api_prefix)
     application.include_router(occupations.router, prefix=api_prefix)
@@ -47,7 +49,7 @@ def create_app(api_root: str = '/api') -> FastAPI:
         if settings.auto_create_tables:
             await init_models()
 
-    @application.get('/healthz', tags=['System'])
+    @application.get(f'{api_root}/healthz', tags=['System'])
     async def health_check() -> dict[str, str]:
         return {'status': 'ok'}
 
