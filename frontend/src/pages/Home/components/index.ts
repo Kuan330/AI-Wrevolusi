@@ -1,4 +1,5 @@
 export { default as LandingNav } from "./LandingNav";
+export { default as HeroCarousel } from "./HeroCarousel";
 export { default as HeroSection } from "./HeroSection";
 export { default as TrustBar } from "./TrustBar";
 export { default as StepsSection } from "./StepsSection";
