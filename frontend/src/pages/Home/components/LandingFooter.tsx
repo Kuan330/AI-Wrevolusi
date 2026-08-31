@@ -7,7 +7,7 @@ const LandingFooter = () => {
       <div className="footer-strip">
         <div className="container footer-main">
           <div className="footer-brand">
-            <Logo />
+            <Logo imageClassName="h-14" />
             <p>{FOOTER_CONTACT.note}</p>
             <div className="footer-team-badge">
               {FOOTER_CONTACT.teamMeta} - {FOOTER_CONTACT.teamName}

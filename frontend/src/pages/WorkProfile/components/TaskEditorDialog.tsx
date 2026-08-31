@@ -127,8 +127,7 @@ const TaskEditorDialog = ({
         <DialogFooter className="mt-2 gap-2 sm:space-x-0">
           <Button
             type="button"
-            variant="outline"
-            className="profile-outline-btn h-10 rounded-full px-5"
+            className="profile-dialog-cancel-btn h-10 rounded-full px-5 font-normal"
             disabled={saving}
             onClick={onClose}
           >
@@ -136,7 +135,7 @@ const TaskEditorDialog = ({
           </Button>
           <Button
             type="button"
-            className="profile-primary-btn h-10 rounded-full px-5"
+            className="profile-dialog-btn h-10 rounded-full px-5 font-normal"
             disabled={saving}
             onClick={() => void handleSave()}
           >

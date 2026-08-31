@@ -1,5 +1,5 @@
-import { Plus } from "lucide-react";
-import { useState } from "react";
+import { ChevronDown, Plus, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import BatchDeleteTaskDialog from "@/pages/WorkProfile/components/BatchDeleteTaskDialog";
@@ -44,6 +44,34 @@ const ProfileTaskList = ({
   const [batchMode, setBatchMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollHint, setScrollHint] = useState({ canScroll: false, atBottom: true });
+
+  const updateScrollHint = useCallback(() => {
+    const element = scrollRef.current;
+    if (!element) return;
+    const canScroll = element.scrollHeight > element.clientHeight + 1;
+    const atBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 8;
+    setScrollHint({ canScroll, atBottom });
+  }, []);
+
+  useEffect(() => {
+    updateScrollHint();
+    const element = scrollRef.current;
+    if (!element) return undefined;
+
+    const observer = new ResizeObserver(updateScrollHint);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [tasks.length, loading, error, batchMode, updateScrollHint]);
+
+  const showScrollHint = scrollHint.canScroll && !scrollHint.atBottom;
+
+  const scrollTowardBottom = () => {
+    const element = scrollRef.current;
+    if (!element) return;
+    element.scrollBy({ top: Math.max(120, element.clientHeight * 0.65), behavior: "smooth" });
+  };
 
   const exitBatchMode = () => {
     setBatchMode(false);
@@ -68,8 +96,8 @@ const ProfileTaskList = ({
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-end gap-2">
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
         {batchMode ? (
           <>
             <Button
@@ -82,39 +110,48 @@ const ProfileTaskList = ({
             </Button>
             <Button
               type="button"
-              className="profile-batch-btn h-10 rounded-full px-4"
+              className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal"
               disabled={selectedIds.size === 0}
               onClick={() => setBatchDeleteOpen(true)}
             >
-              <img src="/images/icons/icon-delete-black.svg" alt="" className="h-5 w-5" />
+              <Trash2 className="h-4 w-4" aria-hidden />
               Delete selected ({selectedIds.size})
             </Button>
           </>
         ) : (
           <Button
             type="button"
-            className="profile-batch-btn h-10 rounded-full px-4"
+            className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal"
             disabled={tasks.length === 0}
             onClick={() => setBatchMode(true)}
           >
-            <img src="/images/icons/icon-delete-black.svg" alt="" className="h-5 w-5" />
+            <Trash2 className="h-4 w-4" aria-hidden />
             Batch delete
           </Button>
         )}
-        <Button className="profile-gradient-btn h-10 rounded-full px-4" onClick={onAdd}>
+        <Button className="profile-blue-btn inline-flex h-10 items-center gap-2 rounded-full px-4 font-normal" onClick={onAdd}>
           <Plus className="h-4 w-4" />
           Add a task
         </Button>
       </div>
 
-      {batchMode ? <p className="text-sm text-[#7f7280]">Select the tasks you want to remove.</p> : null}
+      {batchMode ? (
+        <p className="shrink-0 text-sm text-[#7f7280]">Select the tasks you want to remove.</p>
+      ) : null}
 
       {error ? (
-        <div className="rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
+        <div className="shrink-0 rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
           {error}
         </div>
       ) : null}
 
+      <div className="relative min-h-0 flex-1">
+        <div
+          ref={scrollRef}
+          className="profile-task-list-scroll h-full min-h-0 overflow-y-auto overscroll-contain"
+          onScroll={updateScrollHint}
+        >
+          <div className="space-y-3 pr-1 pb-10">
       {loading ? (
         <div className="space-y-3">
           {[0, 1, 2].map((item) => (
@@ -163,11 +200,11 @@ const ProfileTaskList = ({
                     </button>
                     <button
                       type="button"
-                      className="profile-icon-btn"
+                      className="profile-icon-btn profile-icon-btn--delete"
                       aria-label="Delete task"
                       onClick={() => setDeleteTarget(task)}
                     >
-                      <img src="/images/icons/icon-delete.svg" alt="" />
+                      <Trash2 className="h-4 w-4" aria-hidden />
                     </button>
                   </div>
                 ) : null}
@@ -182,6 +219,20 @@ const ProfileTaskList = ({
           );
         })
       )}
+        </div>
+        </div>
+
+        {showScrollHint ? (
+          <button
+            type="button"
+            className="profile-task-scroll-hint"
+            aria-label="Scroll to see more tasks"
+            onClick={scrollTowardBottom}
+          >
+            <ChevronDown className="h-4 w-4" aria-hidden />
+          </button>
+        ) : null}
+      </div>
 
       <DeleteTaskDialog
         open={Boolean(deleteTarget)}
