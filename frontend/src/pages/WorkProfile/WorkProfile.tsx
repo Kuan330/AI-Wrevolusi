@@ -11,7 +11,11 @@ import {
   useOccupationFilters,
   type OccupationSearchResult,
 } from "@/pages/WorkProfile/hooks/useOccupationFilters";
-import { readSelectedOccupation, saveSelectedOccupation } from "@/pages/WorkProfile/occupationSession";
+import {
+  readSelectedOccupation,
+  resetTaskSessionForOccupation,
+  saveSelectedOccupation,
+} from "@/pages/WorkProfile/occupationSession";
 import type { ReferenceOccupation } from "@/types/reference";
 
 type WorkProfileMode = "search" | "filters";
@@ -43,8 +47,9 @@ const WorkProfile = () => {
   }, [hydrated, occupation.loading, occupation.options.major.length]);
 
   const goToTasks = (unit: ReferenceOccupation, path: ReferenceOccupation[]) => {
-    persistOccupation(unit, path);
-    navigate(ROUTES.task);
+    resetTaskSessionForOccupation({ unit, path });
+    setSavedOccupation({ unit, path });
+    navigate(ROUTES.task, { state: { taskEntry: "occupation" } });
   };
 
   const activeUnit = mode === "search" ? selectedFromSearch?.unit ?? null : occupation.selectedUnit;

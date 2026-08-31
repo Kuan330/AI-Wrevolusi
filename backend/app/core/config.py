@@ -52,6 +52,16 @@ class Settings(BaseSettings):
     nlp_exposure_minor_min_sim: float = 0.58
     nlp_exposure_global_min_sim: float = 0.78
 
+    skill_data_dir: Path = REPO_DIR / 'data' / 'skills' / 'v1.4'
+    skill_llm_api_key: str = ''
+    skill_llm_base_url: str = 'https://openrouter.ai/api/v1'
+    skill_llm_model: str = 'minimax/minimax-m3:free'
+    skill_llm_app_url: str = 'http://localhost:5173'
+    skill_llm_app_name: str = 'AI-Wrevolusi'
+    skill_prompt_version: str = 'skill-inference-prompt-v1'
+    skill_request_timeout_s: int = 60
+    skill_max_retries: int = 2
+
     @field_validator('cors_origins', mode='before')
     @classmethod
     def parse_cors_origins(cls, value: str | list[str]) -> list[str]:

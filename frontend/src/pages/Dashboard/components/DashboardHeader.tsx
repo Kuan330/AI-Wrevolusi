@@ -14,7 +14,7 @@ const DashboardHeader = () => {
           <Link to={ROUTES.workProfile}>Change occupation</Link>
         </Button>
         <Button asChild className="profile-gradient-btn inline-flex h-9 items-center whitespace-nowrap rounded-full px-3.5 text-sm">
-          <Link to={ROUTES.task} className="inline-flex items-center gap-2">
+          <Link to={ROUTES.task} state={{ taskEntry: "dashboard" }} className="inline-flex items-center gap-2">
             <img src="/images/icons/icon-edit.svg" alt="" className="h-4 w-4" />
             Edit tasks
           </Link>

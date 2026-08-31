@@ -1,0 +1,88 @@
+{
+  "skill_id": "WEF-03",
+  "wef_skill_id": 3,
+  "name_en": "Leadership and social influence",
+  "name_ms": "Kepimpinan dan pengaruh sosial",
+  "skill_group": "Working with others",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to guide, motivate, and inspire others, build consensus, and influence stakeholders to achieve shared goals.",
+  "definition_ms": "Keupayaan untuk membimbing, memotivasi dan memberi inspirasi kepada orang lain, membina kata sepakat, serta mempengaruhi pihak berkepentingan bagi mencapai matlamat bersama.",
+  "typical_tasks_en": "• Convince the cross-functional team to adopt a shared project timeline.\n• Rally the customer service team to meet the month-end target after a slow start.\n• Mediate a disagreement between two team members over task ownership.",
+  "typical_tasks_ms": "• Pujuk pasukan merentas fungsi untuk menerima pakai garis masa projek yang sama.\n• Galakkan pasukan khidmat pelanggan mencapai sasaran akhir bulan selepas permulaan yang perlahan.\n• Mediasi perselisihan antara dua ahli pasukan mengenai pemilikan tugasan.",
+  "aliases_en": [
+    "leading teams",
+    "influencing others",
+    "guiding people",
+    "stakeholder management",
+    "people leadership",
+    "team direction",
+    "inspiring others"
+  ],
+  "aliases_ms": [
+    "memimpin pasukan",
+    "mempengaruhi orang",
+    "pengurusan pihak berkepentingan",
+    "memberi inspirasi",
+    "halatuju pasukan"
+  ],
+  "manglish_aliases": [
+    "Saya lead the team",
+    "need to convince boss",
+    "kena influence stakeholder"
+  ],
+  "inclusion_rules": "• The task requires guiding, directing, or coordinating a team\n• The task involves persuading or influencing stakeholders\n• The task requires motivating others toward a common goal\n• The task involves making decisions that affect a group\n• The task requires building consensus or resolving group conflicts",
+  "exclusion_rules": "• The task is performed entirely independently with no team interaction\n• The user only reports information upward without influencing decisions\n• The task involves following someone else's direction without leading\n• The user provides input but has no role in shaping group outcomes",
+  "insufficient_context_rule": "Return insufficient_context=true when the task mentions a team but does not say the person directs, influences, or aligns others.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-16",
+      "confusable_skill_name": "Teaching and mentoring",
+      "boundary_rule": "Leadership is about direction and influence. Teaching is about developing individual skills.",
+      "example_task": "Guide a junior colleague through a difficult client negotiation while building their confidence.",
+      "expected_labels": "Leadership and social influence; Teaching and mentoring"
+    },
+    {
+      "confusable_skill_id": "WEF-09",
+      "confusable_skill_name": "Talent management",
+      "boundary_rule": "Leadership focuses on guiding the current team. Talent management focuses on attracting, retaining, and developing workforce capacity.",
+      "example_task": "Persuade senior management to invest in leadership training for high-potential staff.",
+      "expected_labels": "Leadership and social influence; Talent management"
+    },
+    {
+      "confusable_skill_id": "WEF-07",
+      "confusable_skill_name": "Empathy and active listening",
+      "boundary_rule": "Leadership uses empathy as a tool but is ultimately about direction and influence. Empathy is about understanding others' feelings.",
+      "example_task": "Listen to team concerns and then decide how to restructure the shift rosters.",
+      "expected_labels": "Leadership and social influence; Empathy and active listening"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-017",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Convince the cross-functional team to adopt a shared project timeline.",
+      "evidence": "Convince the cross-functional team",
+      "reason": "Requires persuading and aligning stakeholders."
+    },
+    {
+      "example_id": "AE-018",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Rally the customer service team to meet the month-end target after a slow start.",
+      "evidence": "Rally the customer service team",
+      "reason": "Requires motivating others toward a common goal."
+    },
+    {
+      "example_id": "AE-022",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Submit my individual weekly timesheet to HR.",
+      "evidence": "Submit my individual weekly timesheet",
+      "reason": "Personal task with no leadership or influence."
+    }
+  ]
+}

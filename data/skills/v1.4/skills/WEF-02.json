@@ -1,0 +1,89 @@
+{
+  "skill_id": "WEF-02",
+  "wef_skill_id": 2,
+  "name_en": "Resilience, flexibility and agility",
+  "name_ms": "Ketahanan, fleksibiliti dan kelincahan",
+  "skill_group": "Self-efficacy",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to adapt to changing circumstances, recover from setbacks, and adjust approaches in response to new challenges, uncertainty, or stress.",
+  "definition_ms": "Keupayaan untuk menyesuaikan diri dengan perubahan, bangkit semula daripada kegagalan, dan menyesuaikan pendekatan apabila menghadapi cabaran, ketidakpastian atau tekanan.",
+  "typical_tasks_en": "• Switch to a backup vendor within 24 hours after the main supplier missed the deadline.\n• Continue serving customers calmly during a prolonged system outage and keep the team updated.\n• Take on a colleague's client accounts when they went on emergency leave without handing over properly.",
+  "typical_tasks_ms": "• Bertukar kepada pembekal ganti dalam masa 24 jam selepas pembekal utama gagal menghantar.\n• Terus berkhidmat kepada pelanggan dengan tenang semasa gangguan sistem berpanjangan dan pastikan pasukan dimaklumkan.\n• Ambil alih akaun pelanggan rakan sekerja apabila mereka bercuti kecemasan tanpa menyerahkan tugas dengan betul.",
+  "aliases_en": [
+    "adaptability",
+    "coping with change",
+    "bouncing back",
+    "stress tolerance",
+    "pivoting",
+    "mental toughness",
+    "dealing with ambiguity"
+  ],
+  "aliases_ms": [
+    "kebolehsuaian",
+    "menangani perubahan",
+    "bangkit semula",
+    "tahan tekanan",
+    "kelincahan",
+    "mental kental"
+  ],
+  "manglish_aliases": [
+    "Kena adapt cepat",
+    "boleh pivot tak",
+    "sudah biasa dengan change"
+  ],
+  "inclusion_rules": "• The task requires adapting to unexpected changes or disruptions\n• The task involves working under uncertainty or ambiguity\n• The task requires recovering from failures or setbacks\n• The task demands switching between different priorities or methods\n• The task involves working in volatile or high-pressure environments",
+  "exclusion_rules": "• The task follows a completely predictable and stable routine\n• The user only executes tasks with clear, unchanging instructions\n• The task involves no exposure to change, pressure, or uncertainty\n• The user is performing work in a fully controlled environment",
+  "insufficient_context_rule": "Return insufficient_context=true when the task says work is busy or challenging without describing actual change, pressure, or recovery.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-05",
+      "confusable_skill_name": "Motivation and self-awareness",
+      "boundary_rule": "Resilience is about adapting to external change and recovering. Motivation is about internal drive and self-understanding.",
+      "example_task": "Reflect on my stress response after a difficult week and set a self-care goal.",
+      "expected_labels": "Motivation and self-awareness"
+    },
+    {
+      "confusable_skill_id": "WEF-14",
+      "confusable_skill_name": "Dependability and attention to detail",
+      "boundary_rule": "Resilience requires adapting under pressure. Dependability is about consistent, accurate execution regardless of pressure.",
+      "example_task": "Keep producing accurate reports despite last-minute requirement changes.",
+      "expected_labels": "Resilience, flexibility and agility; Dependability and attention to detail"
+    },
+    {
+      "confusable_skill_id": "WEF-03",
+      "confusable_skill_name": "Leadership and social influence",
+      "boundary_rule": "Resilience is personal adaptation. Leadership involves guiding and influencing others through change.",
+      "example_task": "Reorganise the team's priorities after a key member resigns.",
+      "expected_labels": "Leadership and social influence; Resilience, flexibility and agility"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-009",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Switch to a backup vendor within 24 hours after the main supplier missed the deadline.",
+      "evidence": "Switch to a backup vendor",
+      "reason": "Requires adapting plans quickly when circumstances change."
+    },
+    {
+      "example_id": "AE-010",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Continue serving customers calmly during a prolonged system outage and keep the team updated.",
+      "evidence": "Continue serving customers calmly during a prolonged system outage",
+      "reason": "Requires working under pressure and recovering from disruption."
+    },
+    {
+      "example_id": "AE-014",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Process passport applications using the same checklist every weekday.",
+      "evidence": "same checklist every weekday",
+      "reason": "Stable, predictable routine with no need for adaptation."
+    }
+  ]
+}

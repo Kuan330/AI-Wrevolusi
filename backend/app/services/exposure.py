@@ -10,7 +10,7 @@ def infer_exposure_state(task_text: str) -> tuple[ExposureType, float, str]:
 
     if any(keyword in normalized for keyword in reshaped_keywords):
         return (
-            ExposureType.reshaped,
+            ExposureType.automated,
             0.72,
             'Task likely shifts toward judgement and orchestration with AI co-work.',
         )

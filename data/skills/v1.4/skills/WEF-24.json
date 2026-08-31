@@ -1,0 +1,92 @@
+{
+  "skill_id": "WEF-24",
+  "wef_skill_id": 24,
+  "name_en": "Manual dexterity, endurance and precision",
+  "name_ms": "Ketangkasan manual, ketahanan dan ketepatan",
+  "skill_group": "Physical abilities",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to perform physical tasks requiring fine motor control, sustained physical effort, and accurate hand-eye coordination.",
+  "definition_ms": "Keupayaan untuk melakukan tugasan fizikal yang memerlukan kawalan motor halus, tenaga berterusan, dan koordinasi mata-tangan yang tepat.",
+  "typical_tasks_en": "• Assemble delicate jewellery pieces using small tools for eight hours.\n• Sew intricate embroidery patterns on traditional garments.\n• Perform repetitive quality checks on assembled circuit boards for a full shift.",
+  "typical_tasks_ms": "• Pasang barang kemas halus menggunakan alatan kecil selama lapan jam.\n• Jahit corak sulaman rumit pada pakaian tradisional.\n• Lakukan pemeriksaan kualiti berulang pada papan litar terpasang sepanjang syif.",
+  "aliases_en": [
+    "fine motor skills",
+    "hand-eye coordination",
+    "physical stamina",
+    "precision work",
+    "craftsmanship",
+    "physical accuracy",
+    "dexterity",
+    "endurance"
+  ],
+  "aliases_ms": [
+    "kemahiran motor halus",
+    "koordinasi mata-tangan",
+    "stamina fizikal",
+    "kerja ketepatan",
+    "ketukangan",
+    "ketangkasan",
+    "daya tahan"
+  ],
+  "manglish_aliases": [
+    "Guna tangan",
+    "manual work",
+    "precision",
+    "assembly"
+  ],
+  "inclusion_rules": "• The task requires fine motor skills or hand-eye coordination\n• The task involves sustained physical effort or stamina\n• The task requires precise physical manipulation of tools or materials\n• The task involves physical assembly, crafting, or repair work\n• The task requires maintaining physical accuracy over repetitive actions",
+  "exclusion_rules": "• The task is entirely mental or digital with no physical component\n• The user operates machines that perform the physical work\n• The task requires only gross motor movement without precision\n• The user is supervising physical work without doing it",
+  "insufficient_context_rule": "Return insufficient_context=true when the task is digital, machine-operated, or only gross motor movement.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-26",
+      "confusable_skill_name": "Sensory-processing abilities",
+      "boundary_rule": "Manual dexterity is physical execution. Sensory-processing is perception.",
+      "example_task": "Thread a needle and sew a fine seam while feeling the fabric tension.",
+      "expected_labels": "Manual dexterity, endurance and precision; Sensory-processing abilities"
+    },
+    {
+      "confusable_skill_id": "WEF-15",
+      "confusable_skill_name": "Quality control",
+      "boundary_rule": "Manual dexterity may be used in inspection, but quality control is about standards.",
+      "example_task": "Use steady hands to check delicate components for defects.",
+      "expected_labels": "Quality control; Manual dexterity, endurance and precision"
+    },
+    {
+      "confusable_skill_id": "WEF-14",
+      "confusable_skill_name": "Dependability and attention to detail",
+      "boundary_rule": "Manual dexterity is physical. Dependability is a behavioural trait.",
+      "example_task": "Assemble products accurately for a full shift.",
+      "expected_labels": "Manual dexterity, endurance and precision; Dependability and attention to detail"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-185",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Assemble delicate jewellery pieces using small tools for eight hours.",
+      "evidence": "Assemble delicate jewellery pieces",
+      "reason": "Requires fine motor skills and stamina."
+    },
+    {
+      "example_id": "AE-186",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Sew intricate embroidery patterns on traditional garments.",
+      "evidence": "Sew intricate embroidery patterns",
+      "reason": "Requires precise hand-eye coordination."
+    },
+    {
+      "example_id": "AE-190",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Type data into a spreadsheet.",
+      "evidence": "Type data",
+      "reason": "Digital task without physical dexterity."
+    }
+  ]
+}

@@ -24,6 +24,7 @@ def load_ilo_task_catalog(csv_path: Path) -> list[CatalogItem]:
                 continue
             isco = str(row.get("isco_08") or "").strip().zfill(4)
             task_id = str(row.get("task_id") or "").strip()
+            potential25 = (row.get("potential25") or "").strip() or None
             items.append(
                 CatalogItem(
                     catalog=ILO_CATALOG,
@@ -34,6 +35,7 @@ def load_ilo_task_catalog(csv_path: Path) -> list[CatalogItem]:
                         "task_id": task_id,
                         "title": row.get("title") or "",
                         "score_2025": score,
+                        "potential25": potential25,
                         "match_key": normalize_for_match(text),
                     },
                 )

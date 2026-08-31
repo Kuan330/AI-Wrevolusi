@@ -1,0 +1,89 @@
+{
+  "skill_id": "WEF-09",
+  "wef_skill_id": 9,
+  "name_en": "Talent management",
+  "name_ms": "Pengurusan bakat",
+  "skill_group": "Management skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to attract, develop, retain, and deploy people with the right skills to meet organisational needs.",
+  "definition_ms": "Keupayaan untuk menarik, membangun, mengekalkan dan menempatkan orang yang mempunyai kemahiran yang sesuai bagi memenuhi keperluan organisasi.",
+  "typical_tasks_en": "• Interview candidates for the new customer service associate positions.\n• Identify skill gaps in the marketing team and recommend a training plan.\n• Create a succession plan for the store supervisor role.",
+  "typical_tasks_ms": "• Temu duga calon untuk jawatan eksekutif khidmat pelanggan baharu.\n• Kenal pasti jurang kemahiran dalam pasukan pemasaran dan cadangkan pelan latihan.\n• Cipta pelan penggantian untuk peranan penyelia kedai.",
+  "aliases_en": [
+    "recruiting",
+    "workforce development",
+    "people development",
+    "succession planning",
+    "talent acquisition",
+    "HR management",
+    "employee growth"
+  ],
+  "aliases_ms": [
+    "pengambilan pekerja",
+    "pembangunan tenaga kerja",
+    "pembangunan orang",
+    "perancangan penggantian",
+    "pemerolehan bakat",
+    "pengurusan HR"
+  ],
+  "manglish_aliases": [
+    "Handle recruitment",
+    "develop staff",
+    "kena plan untuk team growth"
+  ],
+  "inclusion_rules": "• The task involves recruiting, hiring, or onboarding staff\n• The task requires identifying skill gaps and development needs\n• The task involves succession planning or career pathing\n• The task requires coaching or developing team members' capabilities\n• The task involves workforce planning or talent allocation",
+  "exclusion_rules": "• The task involves managing projects or resources without people focus\n• The user only performs their own individual work\n• The task requires no decisions about other people's careers or growth\n• The user coordinates tasks but does not develop people",
+  "insufficient_context_rule": "Return insufficient_context=true when the task coordinates people's work but involves no hiring, skill-gap, retention, or career decision.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-03",
+      "confusable_skill_name": "Leadership and social influence",
+      "boundary_rule": "Talent management develops workforce capacity. Leadership guides people day-to-day.",
+      "example_task": "Identify future team leaders and create a development path for them.",
+      "expected_labels": "Talent management; Leadership and social influence"
+    },
+    {
+      "confusable_skill_id": "WEF-16",
+      "confusable_skill_name": "Teaching and mentoring",
+      "boundary_rule": "Talent management plans development at organisational level. Teaching is direct skill transfer.",
+      "example_task": "Design a company-wide mentorship programme for new graduates.",
+      "expected_labels": "Talent management; Teaching and mentoring"
+    },
+    {
+      "confusable_skill_id": "WEF-13",
+      "confusable_skill_name": "Resource management and operations",
+      "boundary_rule": "Talent management allocates people for development. Resource management allocates resources for operational efficiency.",
+      "example_task": "Plan staffing levels for the next quarter while developing junior staff.",
+      "expected_labels": "Talent management; Resource management and operations"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-065",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Interview candidates for the new customer service associate positions.",
+      "evidence": "Interview candidates",
+      "reason": "Requires attracting and selecting people with right skills."
+    },
+    {
+      "example_id": "AE-066",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Identify skill gaps in the marketing team and recommend a training plan.",
+      "evidence": "Identify skill gaps",
+      "reason": "Requires workforce development planning."
+    },
+    {
+      "example_id": "AE-070",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Assign tasks to team members based only on current workload.",
+      "evidence": "based only on current workload",
+      "reason": "No development or skill-gap consideration."
+    }
+  ]
+}

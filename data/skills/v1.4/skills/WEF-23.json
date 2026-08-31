@@ -1,0 +1,92 @@
+{
+  "skill_id": "WEF-23",
+  "wef_skill_id": 23,
+  "name_en": "Programming",
+  "name_ms": "Pengaturcaraan",
+  "skill_group": "Technology skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to write, debug, and maintain code in programming languages to build software, automate tasks, or solve computational problems.",
+  "definition_ms": "Keupayaan untuk menulis, menyahpepijat dan menyelenggara kod dalam bahasa pengaturcaraan bagi membina perisian, mengautomasikan tugasan atau menyelesaikan masalah pengiraan.",
+  "typical_tasks_en": "• Write a Python script to automate monthly invoice generation.\n• Debug why the online form validation is failing for mobile users.\n• Build a small internal tool to track employee training hours.",
+  "typical_tasks_ms": "• Tulis skrip Python untuk mengautomasikan penjanaan invois bulanan.\n• Nyahpepijat mengapa pengesahan borang dalam talian gagal untuk pengguna mudah alih.\n• Bina alat dalaman kecil untuk menjejak jam latihan pekerja.",
+  "aliases_en": [
+    "coding",
+    "software development",
+    "scripting",
+    "software engineering",
+    "writing code",
+    "development",
+    "computer programming",
+    "algorithm design"
+  ],
+  "aliases_ms": [
+    "pengekodan",
+    "pembangunan perisian",
+    "penskripan",
+    "kejuruteraan perisian",
+    "menulis kod",
+    "pembangunan",
+    "reka bentuk algoritma"
+  ],
+  "manglish_aliases": [
+    "Write code",
+    "coding",
+    "debug program",
+    "programming"
+  ],
+  "inclusion_rules": "• The task requires writing or modifying code in any programming language\n• The task involves debugging or testing software\n• The task requires automating tasks through scripts or programs\n• The task involves developing algorithms or data structures\n• The task requires maintaining or refactoring existing codebases",
+  "exclusion_rules": "• The task involves only using software without writing code\n• The user configures tools through graphical interfaces only\n• The task requires no understanding of programming logic\n• The user is copying code without comprehension of how it works",
+  "insufficient_context_rule": "Return insufficient_context=true when the task uses software, no-code tools, or copies code without understanding.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-11",
+      "confusable_skill_name": "AI and big data",
+      "boundary_rule": "Programming is general coding. AI is a specialised application.",
+      "example_task": "Write code to train a recommendation model.",
+      "expected_labels": "Programming; AI and big data"
+    },
+    {
+      "confusable_skill_id": "WEF-06",
+      "confusable_skill_name": "Technological literacy",
+      "boundary_rule": "Programming creates software. Technological literacy uses existing tools.",
+      "example_task": "Build a custom plugin for the CRM.",
+      "expected_labels": "Programming; Technological literacy"
+    },
+    {
+      "confusable_skill_id": "WEF-18",
+      "confusable_skill_name": "Design and user experience",
+      "boundary_rule": "Programming implements designs. Design defines user experience.",
+      "example_task": "Code the interactive prototype designed by the UX team.",
+      "expected_labels": "Programming; Design and user experience"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-177",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Write a Python script to automate monthly invoice generation.",
+      "evidence": "Write a Python script",
+      "reason": "Requires writing code to automate tasks."
+    },
+    {
+      "example_id": "AE-178",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Debug why the online form validation is failing for mobile users.",
+      "evidence": "Debug why the online form validation is failing",
+      "reason": "Requires debugging software."
+    },
+    {
+      "example_id": "AE-182",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Use Excel formulas to calculate monthly totals.",
+      "evidence": "Excel formulas",
+      "reason": "Using existing software, not programming."
+    }
+  ]
+}

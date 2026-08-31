@@ -1,0 +1,88 @@
+{
+  "skill_id": "WEF-01",
+  "wef_skill_id": 1,
+  "name_en": "Analytical thinking",
+  "name_ms": "Pemikiran analitikal",
+  "skill_group": "Cognitive skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to examine information, identify patterns or problems, compare alternatives, investigate causes, and draw conclusions based on evidence.",
+  "definition_ms": "Keupayaan untuk meneliti maklumat, mengenal pasti corak atau masalah, membandingkan alternatif, menyiasat punca, dan membuat kesimpulan berdasarkan bukti.",
+  "typical_tasks_en": "• Compare monthly sales performance and explain unusual changes.\n• Analyse customer complaint data to identify recurring service issues.\n• Evaluate three suppliers based on cost, quality, and delivery performance.",
+  "typical_tasks_ms": "• Bandingkan prestasi jualan bulanan dan terangkan perubahan yang luar biasa.\n• Analisis data aduan pelanggan untuk mengenal pasti isu perkhidmatan berulang.\n• Nilai tiga pembekal berdasarkan kos, kualiti dan prestasi penghantaran.",
+  "aliases_en": [
+    "analysis",
+    "critical analysis",
+    "evaluate evidence",
+    "identify patterns",
+    "investigate causes",
+    "interpret data"
+  ],
+  "aliases_ms": [
+    "analisis",
+    "analisis kritikal",
+    "menilai bukti",
+    "mengenal pasti corak",
+    "menyiasat punca",
+    "mentafsir data"
+  ],
+  "manglish_aliases": [
+    "Saya kena analyse data",
+    "tolong check pattern",
+    "need to compare n explain"
+  ],
+  "inclusion_rules": "• Compare data, options, or outcomes\n• Identify patterns, trends, or anomalies\n• Investigate causes of a problem\n• Evaluate evidence before making a decision\n• Interpret information rather than only collect it",
+  "exclusion_rules": "• Copying or entering data without interpretation\n• Following a fixed checklist without judgment\n• Formatting an existing report without analysing its content\n• Sending or collecting information only",
+  "insufficient_context_rule": "Return insufficient_context=true when the task mentions data or reports but no analysis verb (compare, investigate, evaluate, interpret). Do not infer analysis from the word 'report' alone.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-12",
+      "confusable_skill_name": "Systems thinking",
+      "boundary_rule": "Use Analytical thinking for evidence, patterns, comparisons, and causes. Use Systems thinking when the focus is how multiple parts of a system interact.",
+      "example_task": "Assess how staffing levels, delivery delays, and inventory shortages together affect customer satisfaction.",
+      "expected_labels": "Analytical thinking; Systems thinking"
+    },
+    {
+      "confusable_skill_id": "WEF-15",
+      "confusable_skill_name": "Quality control",
+      "boundary_rule": "Use Analytical thinking to interpret evidence or diagnose causes. Use Quality control to check work against a defined standard.",
+      "example_task": "Check completed reports against the compliance checklist.",
+      "expected_labels": "Quality control"
+    },
+    {
+      "confusable_skill_id": "WEF-04",
+      "confusable_skill_name": "Creative thinking",
+      "boundary_rule": "Use Analytical thinking to understand an existing problem. Use Creative thinking to generate novel ideas or solutions.",
+      "example_task": "Analyse why customers abandon checkout and design three new solutions.",
+      "expected_labels": "Analytical thinking; Creative thinking"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-001",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Compare monthly sales performance and explain unusual changes.",
+      "evidence": "Compare monthly sales performance and explain unusual changes",
+      "reason": "Requires comparison, anomaly detection, and evidence-based explanation."
+    },
+    {
+      "example_id": "AE-002",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Analyse customer complaint data to identify recurring service issues.",
+      "evidence": "identify recurring service issues",
+      "reason": "Requires pattern identification across complaint data."
+    },
+    {
+      "example_id": "AE-006",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Copy daily sales figures into the reporting template.",
+      "evidence": "Copy daily sales figures",
+      "reason": "Data entry without interpretation or judgment."
+    }
+  ]
+}

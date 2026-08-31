@@ -1,0 +1,90 @@
+{
+  "skill_id": "WEF-13",
+  "wef_skill_id": 13,
+  "name_en": "Resource management and operations",
+  "name_ms": "Pengurusan sumber dan operasi",
+  "skill_group": "Management skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to plan, allocate, and optimise resources—including time, money, materials, and people—to achieve operational efficiency and organisational goals.",
+  "definition_ms": "Keupayaan untuk merancang, memperuntukkan dan mengoptimumkan sumber — masa, wang, bahan dan manusia — bagi mencapai kecekapan operasi dan matlamat organisasi.",
+  "typical_tasks_en": "• Schedule staff shifts for the retail store to cover peak hours without exceeding budget.\n• Reorder stock based on predicted demand and warehouse capacity.\n• Balance the event budget across venue, catering, and marketing.",
+  "typical_tasks_ms": "• Jadualkan syif kakitangan untuk kedai runcit bagi menampung waktu puncak tanpa melebihi bajet.\n• Pesan semula stok berdasarkan permintaan diramal dan kapasiti gudang.\n• Seimbangkan bajet acara merentasi venue, katering dan pemasaran.",
+  "aliases_en": [
+    "operations management",
+    "resource allocation",
+    "budgeting",
+    "logistics",
+    "supply chain",
+    "capacity planning",
+    "process optimisation"
+  ],
+  "aliases_ms": [
+    "pengurusan operasi",
+    "peruntukan sumber",
+    "belanjawan",
+    "logistik",
+    "rantaian bekalan",
+    "perancangan kapasiti",
+    "pengoptimuman proses"
+  ],
+  "manglish_aliases": [
+    "Manage budget",
+    "schedule staff",
+    "optimise operation"
+  ],
+  "inclusion_rules": "• The task requires budgeting, scheduling, or allocating resources\n• The task involves optimising processes for efficiency\n• The task requires managing supply chains or logistics\n• The task involves capacity planning or workload balancing\n• The task requires tracking and controlling operational costs",
+  "exclusion_rules": "• The task involves only executing work without planning resources\n• The user performs tasks without any allocation or scheduling responsibility\n• The task requires no consideration of cost, time, or material constraints\n• The user follows a pre-set plan without managing the resources behind it",
+  "insufficient_context_rule": "Return insufficient_context=true when the person executes work but makes no scheduling, budgeting, or allocation decision.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-15",
+      "confusable_skill_name": "Quality control",
+      "boundary_rule": "Resource management allocates resources. Quality control checks outputs against standards.",
+      "example_task": "Allocate budget for additional quality inspectors.",
+      "expected_labels": "Resource management and operations; Quality control"
+    },
+    {
+      "confusable_skill_id": "WEF-09",
+      "confusable_skill_name": "Talent management",
+      "boundary_rule": "Resource management allocates people as resources. Talent management develops them.",
+      "example_task": "Schedule staff across shifts while planning their training.",
+      "expected_labels": "Resource management and operations; Talent management"
+    },
+    {
+      "confusable_skill_id": "WEF-12",
+      "confusable_skill_name": "Systems thinking",
+      "boundary_rule": "Resource management optimises allocation. Systems thinking sees broader interdependencies.",
+      "example_task": "Balance staff, budget, and inventory to meet seasonal demand.",
+      "expected_labels": "Resource management and operations; Systems thinking"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-097",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Schedule staff shifts for the retail store to cover peak hours without exceeding budget.",
+      "evidence": "Schedule staff shifts",
+      "reason": "Requires allocating people and cost constraints."
+    },
+    {
+      "example_id": "AE-098",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Reorder stock based on predicted demand and warehouse capacity.",
+      "evidence": "Reorder stock based on predicted demand",
+      "reason": "Requires managing materials and capacity."
+    },
+    {
+      "example_id": "AE-102",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Serve customers at the counter during my assigned shift.",
+      "evidence": "Serve customers at the counter",
+      "reason": "Executing role without resource allocation."
+    }
+  ]
+}

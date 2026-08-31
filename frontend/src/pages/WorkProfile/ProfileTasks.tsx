@@ -1,20 +1,21 @@
 import { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { saveConfirmedAnalysis } from "@/pages/Dashboard/analysisSession";
-import MatchIssueDialog from "@/pages/WorkProfile/components/MatchIssueDialog";
+import MatchIssueDialog, { type MatchIssueKind } from "@/pages/WorkProfile/components/MatchIssueDialog";
 import ProfileTaskList from "@/pages/WorkProfile/components/ProfileTaskList";
 import TaskEditorDialog from "@/pages/WorkProfile/components/TaskEditorDialog";
 import { useProfileTasks } from "@/pages/WorkProfile/hooks/useProfileTasks";
 import { readSelectedOccupation } from "@/pages/WorkProfile/occupationSession";
-import {
-  hasExposureScore,
-  needsExposureEstimate,
-  type ProfileTask,
-  type TaskEditorValues,
-} from "@/pages/WorkProfile/types";
+import type { TaskEntryLocationState } from "@/pages/WorkProfile/taskEntry";
+import { findTaskConflict, hasDuplicateTasks } from "@/pages/WorkProfile/taskSimilarity";
+import type { ExposureEstimateItem } from "@/services/exposureService";
+import { resolveExposureBand } from "@/pages/Dashboard/lib/taskBands";
+import type { ExposureBand, ProfileTask, TaskEditorValues } from "@/pages/WorkProfile/types";
+import { hasExposureScore, needsExposureEstimate } from "@/pages/WorkProfile/types";
+import { attachSkillPredictions } from "@/lib/skillPredictions";
 import { exposureService } from "@/services/exposureService";
 
 const emptyEditorValues = (): TaskEditorValues => ({
@@ -22,6 +23,37 @@ const emptyEditorValues = (): TaskEditorValues => ({
   timeSpent: "",
   responsibility: "",
 });
+
+const toExposureBand = (band: string | null | undefined): ExposureBand | undefined => {
+  if (!band || band === "insufficient_data") return undefined;
+  return band as ExposureBand;
+};
+
+const applyExposureFields = (task: ProfileTask, estimate: ExposureEstimateItem): ProfileTask => ({
+  ...task,
+  score2025: estimate.score_2025 ?? task.score2025,
+  scoreSource: "estimated",
+  band: toExposureBand(estimate.band) ?? task.band,
+  potential25: estimate.potential25 ?? task.potential25,
+});
+
+const finalizeTaskBands = (tasks: ProfileTask[]): ProfileTask[] =>
+  tasks.map((task) => {
+    const band = resolveExposureBand({
+      band: task.band,
+      potential25: task.potential25,
+      score2025: task.score2025,
+    });
+    return band ? { ...task, band } : task;
+  });
+
+const averageTaskScore = (tasks: ProfileTask[]) => {
+  const scored = tasks
+    .map((task) => task.score2025)
+    .filter((score): score is number => typeof score === "number" && !Number.isNaN(score));
+  if (scored.length === 0) return null;
+  return scored.reduce((sum, score) => sum + score, 0) / scored.length;
+};
 
 const valuesFromTask = (task: ProfileTask): TaskEditorValues => ({
   wording: task.wording,
@@ -31,8 +63,10 @@ const valuesFromTask = (task: ProfileTask): TaskEditorValues => ({
 
 const ProfileTasks = () => {
   const selected = readSelectedOccupation();
+  const location = useLocation();
   const navigate = useNavigate();
-  const profileTasks = useProfileTasks(selected?.unit.occupation_code);
+  const taskEntry = (location.state as TaskEntryLocationState | null)?.taskEntry;
+  const profileTasks = useProfileTasks(selected?.unit.occupation_code, taskEntry);
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<"add" | "edit">("add");
@@ -40,8 +74,10 @@ const ProfileTasks = () => {
   const [editorValues, setEditorValues] = useState<TaskEditorValues>(emptyEditorValues);
   const [saving, setSaving] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [confirmPhase, setConfirmPhase] = useState<"exposure" | "skills" | null>(null);
   const [confirmError, setConfirmError] = useState<string | null>(null);
-  const [matchIssue, setMatchIssue] = useState<"not_a_task" | "service" | null>(null);
+  const [matchIssue, setMatchIssue] = useState<MatchIssueKind | null>(null);
+  const [existingTaskWording, setExistingTaskWording] = useState<string | null>(null);
   const [pendingValues, setPendingValues] = useState<TaskEditorValues | null>(null);
 
   if (!selected) {
@@ -53,6 +89,7 @@ const ProfileTasks = () => {
     setEditingTaskId(null);
     setEditorValues(emptyEditorValues());
     setMatchIssue(null);
+    setExistingTaskWording(null);
     setEditorOpen(true);
   };
 
@@ -61,6 +98,7 @@ const ProfileTasks = () => {
     setEditingTaskId(task.id);
     setEditorValues(valuesFromTask(task));
     setMatchIssue(null);
+    setExistingTaskWording(null);
     setEditorOpen(true);
   };
 
@@ -69,6 +107,7 @@ const ProfileTasks = () => {
     setEditorOpen(false);
     setEditingTaskId(null);
     setMatchIssue(null);
+    setExistingTaskWording(null);
     setPendingValues(null);
   };
 
@@ -83,14 +122,64 @@ const ProfileTasks = () => {
     return { nlpReady: response.nlp_ready, estimate: response.results[0] };
   };
 
-  const commitScoredTask = (values: TaskEditorValues, score2025: number) => {
+  const commitScoredTask = (values: TaskEditorValues, estimate: ExposureEstimateItem) => {
+    const extras = {
+      score2025: estimate.score_2025 ?? undefined,
+      scoreSource: "estimated" as const,
+      band: toExposureBand(estimate.band),
+      potential25: estimate.potential25 ?? undefined,
+    };
     if (editorMode === "edit" && editingTaskId) {
-      profileTasks.updateTask(editingTaskId, values, {
-        score2025,
-        scoreSource: "estimated",
-      });
+      profileTasks.updateTask(editingTaskId, values, extras);
     } else {
-      profileTasks.addTask(values, { score2025, scoreSource: "estimated" });
+      profileTasks.addTask(values, extras);
+    }
+  };
+
+  const scoreAndSave = async (
+    values: TaskEditorValues,
+    options?: { ignoreSimilar?: boolean; editing?: ProfileTask },
+  ): Promise<boolean> => {
+    const editing = options?.editing;
+
+    if (!options?.ignoreSimilar) {
+      const conflict = findTaskConflict(values.wording, profileTasks.tasks, editing?.id);
+      if (conflict) {
+        setPendingValues(values);
+        setExistingTaskWording(conflict.task.wording);
+        setMatchIssue(conflict.kind);
+        setEditorOpen(false);
+        return false;
+      }
+    }
+
+    setSaving(true);
+    setPendingValues(values);
+    try {
+      const { nlpReady, estimate } = await scoreWording(values, editing?.originalWording);
+      if (!nlpReady || estimate?.reject_reason === "service_unavailable") {
+        setMatchIssue("service");
+        setExistingTaskWording(null);
+        setEditorOpen(false);
+        return false;
+      }
+      if (typeof estimate?.score_2025 !== "number") {
+        setMatchIssue("not_a_task");
+        setExistingTaskWording(null);
+        setEditorOpen(false);
+        return false;
+      }
+      commitScoredTask(values, estimate);
+      setPendingValues(null);
+      setExistingTaskWording(null);
+      return true;
+    } catch {
+      setMatchIssue("service");
+      setExistingTaskWording(null);
+      setEditorOpen(false);
+      return false;
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -103,49 +192,47 @@ const ProfileTasks = () => {
       return true;
     }
 
-    setSaving(true);
-    setPendingValues(values);
-    try {
-      const { nlpReady, estimate } = await scoreWording(values, editing?.originalWording);
-      if (!nlpReady || estimate?.reject_reason === "service_unavailable") {
-        setMatchIssue("service");
-        setEditorOpen(false);
-        return false;
-      }
-      if (typeof estimate?.score_2025 !== "number") {
-        setMatchIssue("not_a_task");
-        setEditorOpen(false);
-        return false;
-      }
-      commitScoredTask(values, estimate.score_2025);
-      setPendingValues(null);
-      return true;
-    } catch {
-      setMatchIssue("service");
-      setEditorOpen(false);
-      return false;
-    } finally {
-      setSaving(false);
-    }
+    return scoreAndSave(values, { editing });
   };
 
   const rewriteUnmatched = () => {
     setMatchIssue(null);
+    setExistingTaskWording(null);
     if (pendingValues) setEditorValues(pendingValues);
     setEditorOpen(true);
   };
 
   const discardUnmatched = () => {
     setMatchIssue(null);
+    setExistingTaskWording(null);
     setPendingValues(null);
     setEditorOpen(false);
     setEditingTaskId(null);
   };
 
+  const addSimilarAnyway = () => {
+    if (!pendingValues) return;
+    setMatchIssue(null);
+    setExistingTaskWording(null);
+    void scoreAndSave(pendingValues, { ignoreSimilar: true });
+  };
+
+  const confirmLabel = confirming
+    ? confirmPhase === "skills"
+      ? "Matching skills…"
+      : "Checking scores…"
+    : "Explore AI impact";
+
   const confirmTasks = async () => {
     setConfirming(true);
+    setConfirmPhase("exposure");
     setConfirmError(null);
     try {
+      if (hasDuplicateTasks(profileTasks.tasks)) {
+        setConfirmError("Remove duplicate tasks before continuing. Two tasks have the same wording.");
+        return;
+      }
+
       let nextTasks = profileTasks.tasks.map((task) =>
         needsExposureEstimate(task) ? task : { ...task, scoreSource: "official" as const },
       );
@@ -168,7 +255,7 @@ const ProfileTasks = () => {
           nextTasks = nextTasks.map((task) => {
             const estimate = byId.get(task.id);
             if (!estimate || typeof estimate.score_2025 !== "number") return task;
-            return { ...task, score2025: estimate.score_2025, scoreSource: "estimated" as const };
+            return applyExposureFields(task, estimate);
           });
         } catch {
           setConfirmError("Scoring is unavailable. Try again in a moment.");
@@ -186,17 +273,30 @@ const ProfileTasks = () => {
         return;
       }
 
+      nextTasks = finalizeTaskBands(nextTasks);
+
+      setConfirmPhase("skills");
+      try {
+        nextTasks = await attachSkillPredictions(nextTasks, selected.unit.title);
+      } catch {
+        setConfirmError("Skill inference is unavailable. Try again in a moment.");
+        return;
+      }
+
       saveConfirmedAnalysis({
         occupationTitle: selected.unit.title,
         occupationPath: selected.path.map((item) => item.title),
         occupationCode: selected.unit.occupation_code,
-        potential25: profileTasks.occupationPotential25,
-        meanScore2025: profileTasks.occupationMeanScore2025,
+        occupationScore:
+          profileTasks.occupationMeanScore2025 ?? averageTaskScore(nextTasks),
+        meanScore2025:
+          profileTasks.occupationMeanScore2025 ?? averageTaskScore(nextTasks),
         tasks: nextTasks,
       });
       navigate(`${ROUTES.dashboard}#exposure`);
     } finally {
       setConfirming(false);
+      setConfirmPhase(null);
     }
   };
 
@@ -215,7 +315,7 @@ const ProfileTasks = () => {
               disabled={profileTasks.tasks.length === 0 || confirming || saving}
               onClick={() => void confirmTasks()}
             >
-              {confirming ? "Checking scores…" : "Explore AI impact"}
+              {confirmLabel}
             </Button>
           </div>
         </div>
@@ -244,7 +344,7 @@ const ProfileTasks = () => {
             disabled={profileTasks.tasks.length === 0 || confirming || saving}
             onClick={() => void confirmTasks()}
           >
-            {confirming ? "Checking scores…" : "Explore AI impact"}
+            {confirmLabel}
           </Button>
         </div>
       </section>
@@ -260,8 +360,10 @@ const ProfileTasks = () => {
       <MatchIssueDialog
         open={matchIssue !== null}
         kind={matchIssue ?? "not_a_task"}
+        existingTaskWording={existingTaskWording}
         onRewrite={rewriteUnmatched}
         onDiscard={discardUnmatched}
+        onAddAnyway={matchIssue === "similar" ? addSimilarAnyway : undefined}
       />
     </div>
   );

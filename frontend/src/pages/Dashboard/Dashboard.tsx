@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { readConfirmedAnalysis } from "@/pages/Dashboard/analysisSession";
+import { readConfirmedAnalysis, saveConfirmedAnalysis } from "@/pages/Dashboard/analysisSession";
 import CapabilityCard from "@/pages/Dashboard/components/CapabilityCard";
 import DashboardHeader from "@/pages/Dashboard/components/DashboardHeader";
 import SkillMapCard from "@/pages/Dashboard/components/SkillMapCard";
@@ -14,7 +14,9 @@ import {
   USE_TRENDS,
   useTrendFromNetIncrease,
 } from "@/pages/Dashboard/lib/skillAxes";
-import { bandFromScore, TASK_BANDS, type TaskBandId } from "@/pages/Dashboard/lib/taskBands";
+import { resolveTaskBand, TASK_BANDS, type TaskBandId } from "@/pages/Dashboard/lib/taskBands";
+import type { ConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
+import { attachSkillPredictions, taskNeedsSkillPredictions } from "@/lib/skillPredictions";
 import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
 import "@/pages/Dashboard/dashboard.css";
@@ -29,20 +31,47 @@ const emptyCounts = () =>
   );
 
 const Dashboard = () => {
-  const analysis = readConfirmedAnalysis();
+  const [analysis, setAnalysis] = useState<ConfirmedAnalysis | null>(() => readConfirmedAnalysis());
   const [skills, setSkills] = useState<WefSkill[]>([]);
   const [activeBand, setActiveBand] = useState<TaskBandId | null>(null);
   const [selectedSkillId, setSelectedSkillId] = useState<number | null>(null);
+  const [skillsLoading, setSkillsLoading] = useState(false);
+  const [skillsError, setSkillsError] = useState<string | null>(null);
+  const backfillStarted = useRef(false);
 
   useEffect(() => {
     void referenceService.wefSkills().then(setSkills).catch(() => setSkills([]));
   }, []);
 
+  useEffect(() => {
+    if (!analysis || backfillStarted.current) return;
+    const needsSkills = analysis.tasks.some(taskNeedsSkillPredictions);
+    if (!needsSkills) return;
+
+    backfillStarted.current = true;
+    setSkillsLoading(true);
+    setSkillsError(null);
+
+    void attachSkillPredictions(analysis.tasks, analysis.occupationTitle)
+      .then((tasks) => {
+        const next = { ...analysis, tasks };
+        saveConfirmedAnalysis(next);
+        setAnalysis(next);
+      })
+      .catch(() => {
+        setSkillsError("Skill matching is unavailable. Try again in a moment.");
+        backfillStarted.current = false;
+      })
+      .finally(() => {
+        setSkillsLoading(false);
+      });
+  }, [analysis]);
+
   const { litSkillIds, tasksBySkill } = useMemo(() => {
     if (!analysis) return { litSkillIds: [] as number[], tasksBySkill: {} as Record<number, never[]> };
     const linked: Record<number, typeof analysis.tasks> = {};
     for (const task of analysis.tasks) {
-      for (const skill of skillsForTask(task.wording, skills)) {
+      for (const skill of skillsForTask(task, skills)) {
         linked[skill.wef_skill_id] = [...(linked[skill.wef_skill_id] ?? []), task];
       }
     }
@@ -56,7 +85,7 @@ const Dashboard = () => {
     const next = emptyCounts();
     if (!analysis) return next;
     for (const task of analysis.tasks) {
-      const band = bandFromScore(task.score2025);
+      const band = resolveTaskBand(task);
       if (band) next[band] += 1;
     }
     return next;
@@ -96,22 +125,27 @@ const Dashboard = () => {
       )?.label
     : null;
 
-  const listHint = selected
-    ? [trendLabel, capacityLabel, `${skillTaskIds.length} linked tasks`].filter(Boolean).join(" · ")
-    : activeMeta
-      ? "Click the slice again to show all."
-      : "Click a pie slice or skill bubble to filter.";
+  const listHint = skillsLoading
+    ? "Matching skills to your tasks…"
+    : selected
+      ? [trendLabel, capacityLabel, `${skillTaskIds.length} linked tasks`].filter(Boolean).join(" · ")
+      : activeMeta
+        ? "Click the slice again to show all."
+        : "Click a pie slice or skill bubble to filter.";
 
   return (
     <div className="dashboard-page">
       <DashboardHeader />
 
+      {skillsError ? (
+        <p className="mb-3 text-sm text-destructive">{skillsError}</p>
+      ) : null}
+
       <div id="exposure" className="dashboard-overview__grid">
         <CapabilityCard
           title={analysis.occupationTitle}
           path={analysis.occupationPath}
-          potential25={analysis.potential25}
-          meanScore2025={analysis.meanScore2025}
+          occupationScore={analysis.occupationScore ?? analysis.meanScore2025}
         />
 
         <TaskMixCard
@@ -137,8 +171,11 @@ const Dashboard = () => {
               ? analysis.tasks.filter((task) => skillTaskIds.includes(task.id))
               : analysis.tasks
           }
+          skills={skills}
           activeBand={selected ? null : activeBand}
           highlightedIds={skillTaskIds}
+          selectedSkillId={selectedSkillId}
+          onSelectSkill={selectSkill}
           onClear={selected || activeBand ? () => {
             selectSkill(null);
             selectBand(null);
@@ -150,6 +187,7 @@ const Dashboard = () => {
           litSkillIds={litSkillIds}
           tasksBySkill={tasksBySkill}
           selectedSkillId={selectedSkillId}
+          skillsLoading={skillsLoading}
           onSelectSkill={selectSkill}
         />
       </div>

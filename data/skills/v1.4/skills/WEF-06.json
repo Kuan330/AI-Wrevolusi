@@ -1,0 +1,89 @@
+{
+  "skill_id": "WEF-06",
+  "wef_skill_id": 6,
+  "name_en": "Technological literacy",
+  "name_ms": "Literasi teknologi",
+  "skill_group": "Technology skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to understand, select, and use digital tools, software, and technologies effectively to accomplish work tasks.",
+  "definition_ms": "Keupayaan untuk memahami, memilih dan menggunakan alatan digital, perisian serta teknologi dengan berkesan bagi menyelesaikan tugasan kerja.",
+  "typical_tasks_en": "• Choose between two project management apps for the team's remote collaboration.\n• Troubleshoot why the shared printer keeps disconnecting from the network.\n• Set up automated email filters to prioritise customer complaints.",
+  "typical_tasks_ms": "• Pilih antara dua aplikasi pengurusan projek untuk kerjasama jarak jauh pasukan.\n• Selesaikan masalah mengapa pencetak kongsi terus terputus daripada rangkaian.\n• Sediakan penapis e-mel automatik untuk mengutamakan aduan pelanggan.",
+  "aliases_en": [
+    "digital literacy",
+    "tech-savviness",
+    "using software",
+    "digital fluency",
+    "technology competence",
+    "IT skills",
+    "digital tools"
+  ],
+  "aliases_ms": [
+    "literasi digital",
+    "celik teknologi",
+    "menggunakan perisian",
+    "kefasihan digital",
+    "kompetensi teknologi",
+    "kemahiran IT"
+  ],
+  "manglish_aliases": [
+    "Boleh guna software ni tak",
+    "saya familiar dengan system",
+    "need to troubleshoot"
+  ],
+  "inclusion_rules": "• The task requires using digital tools or software platforms\n• The task involves selecting appropriate technology for a given purpose\n• The task requires understanding how digital systems work\n• The task involves troubleshooting basic technology issues\n• The task requires staying current with relevant digital tools",
+  "exclusion_rules": "• The task involves only manual or analog methods with no technology\n• The user operates technology by rote without understanding it\n• The task requires no selection or judgment about which tools to use\n• The user is following technology instructions without comprehension",
+  "insufficient_context_rule": "Return insufficient_context=true when the task only names a software without describing selection, understanding, or troubleshooting.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-23",
+      "confusable_skill_name": "Programming",
+      "boundary_rule": "Technological literacy is using and selecting digital tools. Programming is writing code.",
+      "example_task": "Decide whether to build a custom tool or buy existing software.",
+      "expected_labels": "Technological literacy; Programming"
+    },
+    {
+      "confusable_skill_id": "WEF-11",
+      "confusable_skill_name": "AI and big data",
+      "boundary_rule": "Technological literacy is general tool competence. AI and big data involves advanced analytics and machine learning.",
+      "example_task": "Use a no-code AI tool to summarise customer feedback.",
+      "expected_labels": "Technological literacy; AI and big data"
+    },
+    {
+      "confusable_skill_id": "WEF-17",
+      "confusable_skill_name": "Networks and cybersecurity",
+      "boundary_rule": "Technological literacy includes basic security awareness. Networks and cybersecurity is specialised infrastructure protection.",
+      "example_task": "Set up a secure shared folder for the team.",
+      "expected_labels": "Technological literacy; Networks and cybersecurity"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-041",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Choose between two project management apps for the team's remote collaboration.",
+      "evidence": "Choose between two project management apps",
+      "reason": "Requires selecting appropriate technology."
+    },
+    {
+      "example_id": "AE-042",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Troubleshoot why the shared printer keeps disconnecting from the network.",
+      "evidence": "Troubleshoot why the shared printer keeps disconnecting",
+      "reason": "Requires understanding and fixing digital system issues."
+    },
+    {
+      "example_id": "AE-046",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Type meeting notes into a word processor.",
+      "evidence": "Type meeting notes into a word processor",
+      "reason": "Basic tool use without selection or troubleshooting."
+    }
+  ]
+}

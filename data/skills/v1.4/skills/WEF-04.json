@@ -1,0 +1,90 @@
+{
+  "skill_id": "WEF-04",
+  "wef_skill_id": 4,
+  "name_en": "Creative thinking",
+  "name_ms": "Pemikiran kreatif",
+  "skill_group": "Cognitive skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to generate novel ideas, approaches, or solutions, and to apply imagination and originality to solve problems or create value.",
+  "definition_ms": "Keupayaan untuk menghasilkan idea, pendekatan atau penyelesaian baharu, serta menggunakan imaginasi dan keaslian bagi menyelesaikan masalah.",
+  "typical_tasks_en": "• Design three alternative onboarding formats for remote interns.\n• Come up with a low-cost campaign idea to promote the new organic product line.\n• Propose a new layout for the customer queue system to reduce waiting time.",
+  "typical_tasks_ms": "• Reka tiga format orientasi alternatif untuk pelatih jarak jauh.\n• Hasilkan idea kempen kos rendah untuk mempromosikan barisan produk organik baharu.\n• Cadangkan susun atur baharu untuk sistem giliran pelanggan bagi mengurangkan masa menunggu.",
+  "aliases_en": [
+    "innovation",
+    "ideation",
+    "originality",
+    "imagination",
+    "brainstorming",
+    "novel solutions",
+    "out-of-the-box thinking"
+  ],
+  "aliases_ms": [
+    "inovasi",
+    "penjanaan idea",
+    "keaslian",
+    "imaginasi",
+    "sumbang saran",
+    "penyelesaian baharu",
+    "pemikiran luar kotak"
+  ],
+  "manglish_aliases": [
+    "Kita brainstorm idea baru",
+    "come out with something creative",
+    "think outside the box sikit"
+  ],
+  "inclusion_rules": "• The task requires generating new ideas or solutions\n• The task involves designing something that does not yet exist\n• The task requires finding unconventional approaches to a problem\n• The task involves brainstorming or ideation\n• The task requires combining existing concepts in new ways",
+  "exclusion_rules": "• The task involves only applying established procedures or templates\n• The user is reproducing existing designs without modification\n• The task requires strict compliance with fixed specifications\n• The user is copying or replicating work without original input",
+  "insufficient_context_rule": "Return insufficient_context=true when the task asks for output but gives no signal of originality, ideation, or new approach.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-18",
+      "confusable_skill_name": "Design and user experience",
+      "boundary_rule": "Creative thinking is broad idea generation. Design applies creative ideas to solve specific user problems with usability constraints.",
+      "example_task": "Invent a new way for elderly patients to book appointments online.",
+      "expected_labels": "Creative thinking; Design and user experience"
+    },
+    {
+      "confusable_skill_id": "WEF-20",
+      "confusable_skill_name": "Marketing and media",
+      "boundary_rule": "Creative thinking generates ideas. Marketing applies those ideas to promote and reach audiences.",
+      "example_task": "Come up with a creative concept for the holiday social media campaign.",
+      "expected_labels": "Creative thinking; Marketing and media"
+    },
+    {
+      "confusable_skill_id": "WEF-01",
+      "confusable_skill_name": "Analytical thinking",
+      "boundary_rule": "Creative thinking generates new ideas. Analytical thinking evaluates evidence and existing information.",
+      "example_task": "Analyse sales data and then brainstorm new product ideas from the findings.",
+      "expected_labels": "Analytical thinking; Creative thinking"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-025",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Design three alternative onboarding formats for remote interns.",
+      "evidence": "Design three alternative onboarding formats",
+      "reason": "Requires generating novel solutions for a process."
+    },
+    {
+      "example_id": "AE-026",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Come up with a low-cost campaign idea to promote the new organic product line.",
+      "evidence": "Come up with a low-cost campaign idea",
+      "reason": "Requires original ideation for promotion."
+    },
+    {
+      "example_id": "AE-030",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Apply the company's standard invoice template to this month's billing.",
+      "evidence": "standard invoice template",
+      "reason": "Using an established template without original creation."
+    }
+  ]
+}

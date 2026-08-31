@@ -1,0 +1,91 @@
+{
+  "skill_id": "WEF-16",
+  "wef_skill_id": 16,
+  "name_en": "Teaching and mentoring",
+  "name_ms": "Pengajaran dan bimbingan",
+  "skill_group": "Working with others",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to help others learn, develop skills, and grow professionally through instruction, guidance, feedback, and coaching.",
+  "definition_ms": "Keupayaan untuk membantu orang lain belajar, membangunkan kemahiran dan berkembang secara profesional melalui pengajaran, bimbingan, maklum balas dan latihan.",
+  "typical_tasks_en": "• Show a new cashier how to handle returns and watch them practise.\n• Coach an intern on how to structure a client email.\n• Create a step-by-step guide for using the inventory scanner.",
+  "typical_tasks_ms": "• Tunjukkan juruwang baharu cara mengendalikan pemulangan dan perhatikan dia berlatih.\n• Bimbing pelatih tentang cara menyusun e-mel pelanggan.\n• Cipta panduan langkah demi langkah untuk menggunakan pengimbas inventori.",
+  "aliases_en": [
+    "training",
+    "coaching",
+    "skill transfer",
+    "knowledge sharing",
+    "developing others",
+    "instructing",
+    "tutoring",
+    "onboarding support"
+  ],
+  "aliases_ms": [
+    "latihan",
+    "bimbingan",
+    "pemindahan kemahiran",
+    "perkongsian ilmu",
+    "membangunkan orang lain",
+    "pengajaran",
+    "tunjuk ajar"
+  ],
+  "manglish_aliases": [
+    "Train new staff",
+    "ajar dia",
+    "mentor budak baru"
+  ],
+  "inclusion_rules": "• The task involves training or instructing others in a skill\n• The task requires providing feedback to help someone improve\n• The task involves coaching or guiding a less experienced colleague\n• The task requires designing learning materials or training sessions\n• The task involves sharing expertise to develop others' capabilities",
+  "exclusion_rules": "• The task involves only managing people's work without developing them\n• The user delivers information once without follow-up or feedback\n• The task requires no adaptation to the learner's needs or level\n• The user is simply delegating tasks without teaching how to do them",
+  "insufficient_context_rule": "Return insufficient_context=true when the task assigns or informs others without developing their skills or checking understanding.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-10",
+      "confusable_skill_name": "Service orientation and customer service",
+      "boundary_rule": "Teaching develops skills. Service orientation helps customers.",
+      "example_task": "Show a customer how to use the mobile app step by step.",
+      "expected_labels": "Teaching and mentoring; Service orientation and customer service"
+    },
+    {
+      "confusable_skill_id": "WEF-09",
+      "confusable_skill_name": "Talent management",
+      "boundary_rule": "Teaching transfers skills to individuals. Talent management plans workforce development.",
+      "example_task": "Coach a high-potential employee for a leadership role.",
+      "expected_labels": "Teaching and mentoring; Talent management"
+    },
+    {
+      "confusable_skill_id": "WEF-03",
+      "confusable_skill_name": "Leadership and social influence",
+      "boundary_rule": "Teaching develops capability. Leadership provides direction.",
+      "example_task": "Lead a team meeting and then mentor a junior member on presentation skills.",
+      "expected_labels": "Leadership and social influence; Teaching and mentoring"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-121",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Show a new cashier how to handle returns and watch them practise.",
+      "evidence": "Show a new cashier how to handle returns",
+      "reason": "Requires direct skill instruction with feedback."
+    },
+    {
+      "example_id": "AE-122",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Coach an intern on how to structure a client email.",
+      "evidence": "Coach an intern on how to structure a client email",
+      "reason": "Requires coaching for skill development."
+    },
+    {
+      "example_id": "AE-126",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Tell a new employee their daily to-do list.",
+      "evidence": "Tell a new employee their daily to-do list",
+      "reason": "Task assignment without skill development."
+    }
+  ]
+}

@@ -1,5 +1,22 @@
 export type ProfileTaskSource = "ilo" | "user";
 export type ScoreSource = "official" | "estimated";
+export type SkillConfidenceBand = "identified" | "possible";
+
+export interface TaskSkillPrediction {
+  skillId: string;
+  wefSkillId: number;
+  confidence: SkillConfidenceBand;
+  evidence: string;
+  reason: string;
+  matchLayer: string;
+}
+
+export type ExposureBand =
+  | "human_led"
+  | "ai_assisted"
+  | "partly_automated"
+  | "automated"
+  | "insufficient_data";
 
 export interface ProfileTask {
   id: string;
@@ -14,6 +31,9 @@ export interface ProfileTask {
   scoreSource?: ScoreSource;
   potential25?: string | null;
   meanScore2025?: number | null;
+  band?: ExposureBand | null;
+  skillPredictions?: TaskSkillPrediction[];
+  insufficientSkillContext?: boolean;
 }
 
 export interface TaskEditorValues {

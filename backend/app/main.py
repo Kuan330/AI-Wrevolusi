@@ -7,6 +7,7 @@ from app.routers import (
     auth,
     capabilities,
     exposure,
+    skills,
     occupations,
     preparation,
     reference,
@@ -36,6 +37,7 @@ app.include_router(users.router, prefix=api_prefix)
 app.include_router(occupations.router, prefix=api_prefix)
 app.include_router(tasks.router, prefix=api_prefix)
 app.include_router(exposure.router, prefix=api_prefix)
+app.include_router(skills.router, prefix=api_prefix)
 app.include_router(capabilities.router, prefix=api_prefix)
 app.include_router(preparation.router, prefix=api_prefix)
 app.include_router(schedule.router, prefix=api_prefix)

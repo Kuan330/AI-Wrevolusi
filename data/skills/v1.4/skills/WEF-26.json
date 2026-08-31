@@ -1,0 +1,89 @@
+{
+  "skill_id": "WEF-26",
+  "wef_skill_id": 26,
+  "name_en": "Sensory-processing abilities",
+  "name_ms": "Keupayaan pemprosesan deria",
+  "skill_group": "Physical abilities",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to perceive, interpret, and respond to sensory information such as visual, auditory, tactile, or olfactory stimuli in the work environment.",
+  "definition_ms": "Keupayaan untuk mengesan, mentafsir dan bertindak balas terhadap maklumat deria seperti rangsangan visual, auditori, sentuhan atau bau dalam persekitaran kerja.",
+  "typical_tasks_en": "• Detect colour variations in fabric dye lots before production approval.\n• Identify abnormal sounds from a production machine during routine checks.\n• Feel for surface defects on ceramic tiles during inspection.",
+  "typical_tasks_ms": "• Kesan variasi warna dalam lot pewarna fabrik sebelum kelulusan pengeluaran.\n• Kenal pasti bunyi tidak normal daripada mesin pengeluaran semasa pemeriksaan rutin.\n• Rasa kecacatan permukaan pada jubin seramik semasa pemeriksaan.",
+  "aliases_en": [
+    "sensory perception",
+    "visual acuity",
+    "auditory discrimination",
+    "tactile sensitivity",
+    "observing details",
+    "sensory awareness",
+    "perceiving stimuli"
+  ],
+  "aliases_ms": [
+    "persepsi deria",
+    "ketajaman penglihatan",
+    "diskriminasi auditori",
+    "kepekaan sentuhan",
+    "memerhati butiran",
+    "kesedaran deria"
+  ],
+  "manglish_aliases": [
+    "Nampak colour difference",
+    "dengar bunyi pelik",
+    "rasa texture"
+  ],
+  "inclusion_rules": "• The task requires detecting visual details or colour differences\n• The task involves distinguishing sounds, tones, or auditory cues\n• The task requires sensing tactile differences in materials or surfaces\n• The task involves perceiving smells or tastes for quality or safety\n• The task requires integrating multiple sensory inputs for decision-making",
+  "exclusion_rules": "• The task relies entirely on instruments or sensors instead of human senses\n• The user performs work where sensory input is irrelevant\n• The task involves only data or abstract reasoning\n• The user is operating equipment that automates sensory detection",
+  "insufficient_context_rule": "Return insufficient_context=true when detection is done by instruments or sensors rather than human senses.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-24",
+      "confusable_skill_name": "Manual dexterity, endurance and precision",
+      "boundary_rule": "Sensory-processing is perceiving stimuli. Manual dexterity is acting on them.",
+      "example_task": "Feel for fabric texture differences while cutting patterns accurately.",
+      "expected_labels": "Sensory-processing abilities; Manual dexterity, endurance and precision"
+    },
+    {
+      "confusable_skill_id": "WEF-15",
+      "confusable_skill_name": "Quality control",
+      "boundary_rule": "Sensory-processing can aid inspection, but quality control is standards-based.",
+      "example_task": "Detect off-smells in food products during quality checks.",
+      "expected_labels": "Quality control; Sensory-processing abilities"
+    },
+    {
+      "confusable_skill_id": "WEF-14",
+      "confusable_skill_name": "Dependability and attention to detail",
+      "boundary_rule": "Sensory-processing is a perceptual ability. Dependability is a work trait.",
+      "example_task": "Notice subtle colour changes in product samples and record them carefully.",
+      "expected_labels": "Sensory-processing abilities; Dependability and attention to detail"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-201",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Detect colour variations in fabric dye lots before production approval.",
+      "evidence": "Detect colour variations",
+      "reason": "Requires detecting visual details."
+    },
+    {
+      "example_id": "AE-202",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Identify abnormal sounds from a production machine during routine checks.",
+      "evidence": "Identify abnormal sounds",
+      "reason": "Requires distinguishing auditory cues."
+    },
+    {
+      "example_id": "AE-206",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Use a digital scanner to check product barcodes.",
+      "evidence": "digital scanner",
+      "reason": "Instrument-based detection, not human senses."
+    }
+  ]
+}

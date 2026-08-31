@@ -5,5 +5,5 @@ class ExposureType(str, Enum):
     human_led = 'human_led'
     ai_assisted = 'ai_assisted'
     partly_automated = 'partly_automated'
-    reshaped = 'reshaped'
+    automated = 'automated'
     insufficient_data = 'insufficient_data'

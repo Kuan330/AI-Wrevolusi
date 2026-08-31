@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from app.constants.exposure_types import ExposureType
 from app.nlp.catalogs import IloTaskCatalog
+from app.nlp.exposure_bands import band_from_catalog_metadata, band_from_score, potential25_from_metadata
 from app.nlp.retrieve import Retriever
 from app.nlp.text import is_kept_ilo_edit, is_work_task, normalize_for_match, normalize_text
 from app.nlp.types import CatalogItem, Hit
@@ -22,28 +22,18 @@ class Neighbor:
 class ExposureEstimate:
     score_2025: float | None
     band: str
+    potential25: str | None
     match_layer: str
     score_source: str
     neighbors: list[Neighbor] = field(default_factory=list)
     reject_reason: str | None = None
 
 
-def band_from_score(score: float | None) -> str:
-    if score is None:
-        return ExposureType.insufficient_data.value
-    if score < 0.25:
-        return ExposureType.human_led.value
-    if score < 0.40:
-        return ExposureType.ai_assisted.value
-    if score < 0.55:
-        return ExposureType.partly_automated.value
-    return ExposureType.reshaped.value
-
-
 def unscored(*, reject_reason: str | None = None) -> ExposureEstimate:
     return ExposureEstimate(
         score_2025=None,
-        band=ExposureType.insufficient_data.value,
+        band=band_from_score(None),
+        potential25=None,
         match_layer="insufficient_data",
         score_source="unscored",
         neighbors=[],
@@ -104,7 +94,8 @@ class ExposurePolicy:
                 item = original_hits[0]
                 return ExposureEstimate(
                     score_2025=round(float(item.metadata["score_2025"]), 4),
-                    band=band_from_score(float(item.metadata["score_2025"])),
+                    band=band_from_catalog_metadata(item.metadata),
+                    potential25=potential25_from_metadata(item.metadata),
                     match_layer="nlp",
                     score_source="estimated",
                     neighbors=[_neighbor(item, 1.0)],
@@ -116,7 +107,8 @@ class ExposurePolicy:
             same_sentence = normalize_for_match(text) == str(item.metadata.get("match_key") or "")
             return ExposureEstimate(
                 score_2025=round(float(item.metadata["score_2025"]), 4),
-                band=band_from_score(float(item.metadata["score_2025"])),
+                band=band_from_catalog_metadata(item.metadata),
+                potential25=potential25_from_metadata(item.metadata),
                 match_layer="exact" if same_sentence else "nlp",
                 score_source="estimated",
                 neighbors=[_neighbor(item, 1.0)],
@@ -150,10 +142,12 @@ class ExposurePolicy:
         return unscored(reject_reason="insufficient_data")
 
     def _from_neighbors(self, hits: list[Hit]) -> ExposureEstimate:
+        hit = hits[0]
         score, neighbors = _nearest_score(hits)
         return ExposureEstimate(
             score_2025=score,
-            band=band_from_score(score),
+            band=band_from_catalog_metadata(hit.item.metadata),
+            potential25=potential25_from_metadata(hit.item.metadata),
             match_layer="nlp",
             score_source="estimated",
             neighbors=neighbors,

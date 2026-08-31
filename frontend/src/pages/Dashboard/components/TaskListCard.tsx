@@ -6,6 +6,7 @@ import DashboardCard, { type TitleTone } from "@/pages/Dashboard/components/Dash
 import TaskList from "@/pages/Dashboard/components/TaskList";
 import type { TaskBandId } from "@/pages/Dashboard/lib/taskBands";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
+import type { WefSkill } from "@/types/reference";
 
 type TaskListCardProps = {
   eyebrow: string;
@@ -13,8 +14,11 @@ type TaskListCardProps = {
   description: string;
   titleTone?: TitleTone | null;
   tasks: ProfileTask[];
+  skills: WefSkill[];
   activeBand: TaskBandId | null;
   highlightedIds: string[];
+  selectedSkillId?: number | null;
+  onSelectSkill?: (skillId: number | null) => void;
   onClear?: () => void;
 };
 
@@ -24,8 +28,11 @@ const TaskListCard = ({
   description,
   titleTone,
   tasks,
+  skills,
   activeBand,
   highlightedIds,
+  selectedSkillId,
+  onSelectSkill,
   onClear,
 }: TaskListCardProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -85,7 +92,14 @@ const TaskListCard = ({
           onScroll={updateScrollHint}
         >
           <div className="pb-10">
-            <TaskList tasks={tasks} activeBand={activeBand} highlightedIds={highlightedIds} />
+            <TaskList
+              tasks={tasks}
+              skills={skills}
+              activeBand={activeBand}
+              highlightedIds={highlightedIds}
+              selectedSkillId={selectedSkillId}
+              onSelectSkill={onSelectSkill}
+            />
           </div>
         </div>
 

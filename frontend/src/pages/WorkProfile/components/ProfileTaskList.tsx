@@ -25,12 +25,6 @@ const taskMeta = (task: ProfileTask) => {
   return [time, responsibility].filter(Boolean).join(" · ");
 };
 
-const scoreMeta = (task: ProfileTask) => {
-  if (typeof task.score2025 !== "number") return null;
-  const source = task.scoreSource === "official" ? "Official" : "Estimated";
-  return `${source} score ${task.score2025.toFixed(3)}`;
-};
-
 const ProfileTaskList = ({
   tasks,
   loading,
@@ -211,9 +205,6 @@ const ProfileTaskList = ({
               </div>
               {taskMeta(task) ? (
                 <p className={`mt-2 text-xs text-[#7f7280] ${batchMode ? "pl-[52px]" : ""}`}>{taskMeta(task)}</p>
-              ) : null}
-              {scoreMeta(task) ? (
-                <p className={`mt-1 text-xs text-[#7f7280] ${batchMode ? "pl-[52px]" : ""}`}>{scoreMeta(task)}</p>
               ) : null}
             </div>
           );

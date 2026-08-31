@@ -1,0 +1,89 @@
+{
+  "skill_id": "WEF-12",
+  "wef_skill_id": 12,
+  "name_en": "Systems thinking",
+  "name_ms": "Pemikiran sistem",
+  "skill_group": "Cognitive skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to understand how different parts of a system interact, identify feedback loops, and recognise how changes in one area affect the whole.",
+  "definition_ms": "Keupayaan untuk memahami bagaimana bahagian-bahagian dalam sesuatu sistem saling berinteraksi, mengenal pasti gelung maklum balas, dan menyedari kesan perubahan terhadap keseluruhan sistem.",
+  "typical_tasks_en": "• Map how delayed supplier payments affect inventory, staffing, and customer satisfaction.\n• Model the flow of patients from registration to discharge to find bottlenecks.\n• Predict how a price change in one product category might impact overall store traffic.",
+  "typical_tasks_ms": "• Petakan bagaimana kelewatan bayaran pembekal menjejaskan inventori, kakitangan dan kepuasan pelanggan.\n• Model aliran pesakit daripada pendaftaran hingga discaj untuk mencari kesesakan.\n• Ramalkan bagaimana perubahan harga dalam satu kategori produk mungkin menjejaskan trafik kedai keseluruhan.",
+  "aliases_en": [
+    "holistic thinking",
+    "seeing the big picture",
+    "understanding interdependencies",
+    "systems analysis",
+    "feedback loops",
+    "interconnectedness",
+    "complex problem solving"
+  ],
+  "aliases_ms": [
+    "pemikiran holistik",
+    "melihat gambaran besar",
+    "kebergantungan bersama",
+    "analisis sistem",
+    "gelung maklum balas",
+    "penyelesaian masalah kompleks"
+  ],
+  "manglish_aliases": [
+    "See the big picture",
+    "kena faham how things connect",
+    "system punya flow"
+  ],
+  "inclusion_rules": "• The task requires understanding interactions between multiple components\n• The task involves identifying feedback loops or cascading effects\n• The task requires seeing the big picture rather than isolated parts\n• The task involves mapping or modelling complex processes\n• The task requires predicting unintended consequences of changes",
+  "exclusion_rules": "• The task involves only a single, isolated step or component\n• The user executes tasks without understanding broader context\n• The task requires no consideration of interdependencies\n• The user follows a linear procedure without seeing systemic connections",
+  "insufficient_context_rule": "Return insufficient_context=true when the task involves a single isolated step with no interdependency or cascading effect described.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-01",
+      "confusable_skill_name": "Analytical thinking",
+      "boundary_rule": "Systems thinking sees interconnections. Analytical thinking breaks down evidence.",
+      "example_task": "Analyse why delays in procurement cascade into missed deliveries.",
+      "expected_labels": "Systems thinking; Analytical thinking"
+    },
+    {
+      "confusable_skill_id": "WEF-13",
+      "confusable_skill_name": "Resource management and operations",
+      "boundary_rule": "Systems thinking understands interactions. Resource management allocates specific resources.",
+      "example_task": "Redesign the patient flow to reduce waiting time across departments.",
+      "expected_labels": "Systems thinking; Resource management and operations"
+    },
+    {
+      "confusable_skill_id": "WEF-22",
+      "confusable_skill_name": "Environmental stewardship",
+      "boundary_rule": "Systems thinking can model environmental systems, but environmental stewardship is specifically about sustainability responsibility.",
+      "example_task": "Map how packaging choices affect waste, cost, and brand reputation.",
+      "expected_labels": "Systems thinking; Environmental stewardship"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-089",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Map how delayed supplier payments affect inventory, staffing, and customer satisfaction.",
+      "evidence": "Map how delayed supplier payments affect inventory, staffing, and customer satisfaction",
+      "reason": "Requires understanding interactions between system parts."
+    },
+    {
+      "example_id": "AE-090",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Model the flow of patients from registration to discharge to find bottlenecks.",
+      "evidence": "Model the flow of patients",
+      "reason": "Requires mapping complex processes."
+    },
+    {
+      "example_id": "AE-094",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Compare this month's sales to last month's sales.",
+      "evidence": "Compare this month's sales to last month's sales",
+      "reason": "Isolated comparison, not systemic interaction."
+    }
+  ]
+}

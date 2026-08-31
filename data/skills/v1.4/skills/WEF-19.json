@@ -1,0 +1,91 @@
+{
+  "skill_id": "WEF-19",
+  "wef_skill_id": 19,
+  "name_en": "Multi-lingualism",
+  "name_ms": "Pelbagai bahasa",
+  "skill_group": "Cognitive skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to communicate effectively in multiple languages, adapting content and tone for different linguistic and cultural contexts.",
+  "definition_ms": "Keupayaan untuk berkomunikasi dengan berkesan dalam pelbagai bahasa, serta menyesuaikan kandungan dan nada mengikut konteks bahasa dan budaya.",
+  "typical_tasks_en": "• Translate the patient intake form into Mandarin and Malay for the local community.\n• Interpret between the Korean supplier and the English-speaking procurement team.\n• Adapt the marketing email tone for Malay-speaking audiences in East Malaysia.",
+  "typical_tasks_ms": "• Terjemahkan borang pengambilan pesakit ke bahasa Mandarin dan Melayu untuk komuniti setempat.\n• Tafsir antara pembekal Korea dan pasukan perolehan yang berbahasa Inggeris.\n• Sesuaikan nada e-mel pemasaran untuk audiens berbahasa Melayu di Malaysia Timur.",
+  "aliases_en": [
+    "multilingual",
+    "bilingual",
+    "language skills",
+    "translation",
+    "localisation",
+    "cross-cultural communication",
+    "interpreting",
+    "language fluency"
+  ],
+  "aliases_ms": [
+    "multilingual",
+    "dwibahasa",
+    "kemahiran bahasa",
+    "terjemahan",
+    "penyesuaian setempat",
+    "komunikasi rentas budaya",
+    "jurubahasa"
+  ],
+  "manglish_aliases": [
+    "Boleh cakap Melayu, English, Mandarin",
+    "tolong translate",
+    "multilingual"
+  ],
+  "inclusion_rules": "• The task requires communicating in more than one language\n• The task involves translating or localising content\n• The task requires interpreting spoken or written language\n• The task involves working across different cultural or linguistic contexts\n• The task requires adapting messaging for multilingual audiences",
+  "exclusion_rules": "• The task is performed entirely in a single language\n• The user uses automated translation without human adaptation\n• The task requires no cultural or linguistic sensitivity\n• The user is simply copying text without language skills",
+  "insufficient_context_rule": "Return insufficient_context=true when the task is single-language, or uses machine translation without human adaptation.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-20",
+      "confusable_skill_name": "Marketing and media",
+      "boundary_rule": "Multi-lingualism is language ability. Marketing is messaging strategy.",
+      "example_task": "Translate marketing copy so it resonates in Malay and Mandarin.",
+      "expected_labels": "Multi-lingualism; Marketing and media"
+    },
+    {
+      "confusable_skill_id": "WEF-10",
+      "confusable_skill_name": "Service orientation and customer service",
+      "boundary_rule": "Multi-lingualism enables service in multiple languages, but service is about help.",
+      "example_task": "Help a Mandarin-speaking customer in her native language.",
+      "expected_labels": "Multi-lingualism; Service orientation and customer service"
+    },
+    {
+      "confusable_skill_id": "WEF-21",
+      "confusable_skill_name": "Reading, writing and mathematics",
+      "boundary_rule": "Multi-lingualism is about multiple languages. Reading/writing is about literacy in general.",
+      "example_task": "Write a bilingual report in English and Malay.",
+      "expected_labels": "Multi-lingualism; Reading, writing and mathematics"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-145",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Translate the patient intake form into Mandarin and Malay for the local community.",
+      "evidence": "Translate the patient intake form",
+      "reason": "Requires translating content across languages."
+    },
+    {
+      "example_id": "AE-146",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Interpret between the Korean supplier and the English-speaking procurement team.",
+      "evidence": "Interpret between the Korean supplier",
+      "reason": "Requires interpreting spoken language."
+    },
+    {
+      "example_id": "AE-150",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Use Google Translate to convert a memo without checking it.",
+      "evidence": "Google Translate",
+      "reason": "Automated translation without human adaptation."
+    }
+  ]
+}

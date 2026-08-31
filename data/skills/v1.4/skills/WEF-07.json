@@ -1,0 +1,89 @@
+{
+  "skill_id": "WEF-07",
+  "wef_skill_id": 7,
+  "name_en": "Empathy and active listening",
+  "name_ms": "Empati dan pendengaran aktif",
+  "skill_group": "Working with others",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to understand others' perspectives, emotions, and needs, and to listen attentively and respond appropriately in interpersonal interactions.",
+  "definition_ms": "Keupayaan untuk memahami perspektif, emosi dan keperluan orang lain, serta mendengar dengan penuh perhatian dan memberi respons yang sesuai.",
+  "typical_tasks_en": "• Listen to an upset customer, acknowledge her frustration, and propose a fair resolution.\n• Notice that a teammate seems overwhelmed and offer to redistribute tasks.\n• Repeat back a client's requirements to confirm understanding before taking action.",
+  "typical_tasks_ms": "• Dengar pelanggan yang kecewa, akui kekecewaannya, dan cadangkan penyelesaian yang adil.\n• Perhatikan rakan sepasukan kelihatan terbeban dan tawarkan untuk mengagihkan semula tugasan.\n• Ulang semula keperluan pelanggan untuk mengesahkan pemahaman sebelum mengambil tindakan.",
+  "aliases_en": [
+    "emotional intelligence",
+    "understanding others",
+    "compassionate communication",
+    "listening skills",
+    "customer empathy",
+    "people sensitivity",
+    "rapport building"
+  ],
+  "aliases_ms": [
+    "kecerdasan emosi",
+    "memahami orang lain",
+    "komunikasi penuh empati",
+    "kemahiran mendengar",
+    "empati pelanggan",
+    "membina hubungan"
+  ],
+  "manglish_aliases": [
+    "Saya dengar customer punya complaint",
+    "need to understand their feeling",
+    "kena listen properly"
+  ],
+  "inclusion_rules": "• The task requires understanding a customer's or colleague's feelings\n• The task involves listening carefully to others' concerns or needs\n• The task requires responding compassionately to interpersonal situations\n• The task involves building trust through genuine understanding\n• The task requires recognising non-verbal cues and emotional states",
+  "exclusion_rules": "• The task involves only transactional exchanges without emotional engagement\n• The user delivers scripted responses without adapting to the listener\n• The task requires no understanding of the other person's perspective\n• The user is simply relaying information without interpersonal sensitivity",
+  "insufficient_context_rule": "Return insufficient_context=true when the task involves people but shows no listening, perspective-taking, or emotional response.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-10",
+      "confusable_skill_name": "Service orientation and customer service",
+      "boundary_rule": "Empathy is understanding emotions. Service orientation is about delivering helpful service.",
+      "example_task": "Listen to an angry customer and then resolve her billing issue.",
+      "expected_labels": "Empathy and active listening; Service orientation and customer service"
+    },
+    {
+      "confusable_skill_id": "WEF-16",
+      "confusable_skill_name": "Teaching and mentoring",
+      "boundary_rule": "Empathy helps teaching, but teaching also requires structured skill transfer.",
+      "example_task": "Understand a struggling trainee's anxiety and adapt the training pace.",
+      "expected_labels": "Empathy and active listening; Teaching and mentoring"
+    },
+    {
+      "confusable_skill_id": "WEF-03",
+      "confusable_skill_name": "Leadership and social influence",
+      "boundary_rule": "Empathy supports leadership, but leadership requires direction and influence, not just understanding.",
+      "example_task": "Empathise with team members while still pushing them to meet the deadline.",
+      "expected_labels": "Empathy and active listening; Leadership and social influence"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-049",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Listen to an upset customer, acknowledge her frustration, and propose a fair resolution.",
+      "evidence": "acknowledge her frustration",
+      "reason": "Requires understanding and responding to emotions."
+    },
+    {
+      "example_id": "AE-050",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Notice that a teammate seems overwhelmed and offer to redistribute tasks.",
+      "evidence": "Notice that a teammate seems overwhelmed",
+      "reason": "Requires recognising others' emotional states."
+    },
+    {
+      "example_id": "AE-054",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Read the customer complaint aloud from a script.",
+      "evidence": "from a script",
+      "reason": "Scripted response without genuine listening or adaptation."
+    }
+  ]
+}

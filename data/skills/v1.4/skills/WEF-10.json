@@ -1,0 +1,89 @@
+{
+  "skill_id": "WEF-10",
+  "wef_skill_id": 10,
+  "name_en": "Service orientation and customer service",
+  "name_ms": "Orientasi perkhidmatan dan khidmat pelanggan",
+  "skill_group": "Engagement skills",
+  "taxonomy_version": "1.0",
+  "profile_version": "1.2",
+  "enabled": true,
+  "status": "active",
+  "definition_en": "The ability to understand customer needs, provide helpful and responsive support, and ensure positive experiences for clients or users.",
+  "definition_ms": "Keupayaan untuk memahami keperluan pelanggan, memberi sokongan yang membantu dan responsif, serta memastikan pengalaman positif untuk pelanggan atau pengguna.",
+  "typical_tasks_en": "• Greet walk-in customers warmly and guide them to the right counter.\n• Anticipate that a regular client might need early check-in and arrange it in advance.\n• Resolve a guest's complaint about room cleanliness by offering a prompt solution.",
+  "typical_tasks_ms": "• Sapa pelanggan yang masuk dengan mesra dan tunjukkan mereka ke kaunter yang betul.\n• Jangka bahawa pelanggan tetap mungkin memerlukan daftar masuk awal dan aturkan terlebih dahulu.\n• Selesaikan aduan tetamu tentang kebersihan bilik dengan menawarkan penyelesaian segera.",
+  "aliases_en": [
+    "customer support",
+    "client service",
+    "helping customers",
+    "customer care",
+    "client relations",
+    "user support",
+    "service excellence"
+  ],
+  "aliases_ms": [
+    "sokongan pelanggan",
+    "khidmat klien",
+    "membantu pelanggan",
+    "penjagaan pelanggan",
+    "hubungan klien",
+    "sokongan pengguna"
+  ],
+  "manglish_aliases": [
+    "Layan customer",
+    "handle customer complaint",
+    "bagi servis yang bagus"
+  ],
+  "inclusion_rules": "• The task involves directly assisting customers or clients\n• The task requires anticipating customer needs and proactively helping\n• The task involves resolving customer complaints or issues\n• The task requires maintaining positive customer relationships\n• The task involves gathering customer feedback to improve service",
+  "exclusion_rules": "• The task involves internal operations with no customer interaction\n• The user performs back-end work invisible to customers\n• The task requires no understanding of customer needs or satisfaction\n• The user only processes requests mechanically without service mindset",
+  "insufficient_context_rule": "Return insufficient_context=true when the task is internal or back-end with no customer interaction or service intent.",
+  "confusions": [
+    {
+      "confusable_skill_id": "WEF-07",
+      "confusable_skill_name": "Empathy and active listening",
+      "boundary_rule": "Service orientation is about helpful action. Empathy is emotional understanding.",
+      "example_task": "Understand a customer's frustration and proactively offer a solution.",
+      "expected_labels": "Service orientation and customer service; Empathy and active listening"
+    },
+    {
+      "confusable_skill_id": "WEF-20",
+      "confusable_skill_name": "Marketing and media",
+      "boundary_rule": "Service supports existing customers. Marketing attracts new customers.",
+      "example_task": "Follow up with satisfied customers to encourage referrals.",
+      "expected_labels": "Service orientation and customer service; Marketing and media"
+    },
+    {
+      "confusable_skill_id": "WEF-16",
+      "confusable_skill_name": "Teaching and mentoring",
+      "boundary_rule": "Service may involve explaining, but teaching is structured skill development.",
+      "example_task": "Teach a customer how to use the self-service portal.",
+      "expected_labels": "Teaching and mentoring; Service orientation and customer service"
+    }
+  ],
+  "examples": [
+    {
+      "example_id": "AE-073",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Greet walk-in customers warmly and guide them to the right counter.",
+      "evidence": "guide them to the right counter",
+      "reason": "Requires proactive helpful service."
+    },
+    {
+      "example_id": "AE-074",
+      "type": "positive",
+      "language": "en",
+      "task_text": "Anticipate that a regular client might need early check-in and arrange it in advance.",
+      "evidence": "Anticipate that a regular client might need early check-in",
+      "reason": "Requires anticipating customer needs."
+    },
+    {
+      "example_id": "AE-078",
+      "type": "negative",
+      "language": "en",
+      "task_text": "Hand a customer the form without explaining how to fill it.",
+      "evidence": "without explaining how to fill it",
+      "reason": "Transactional, not service-oriented."
+    }
+  ]
+}

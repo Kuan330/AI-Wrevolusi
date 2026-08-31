@@ -4,7 +4,7 @@ import numpy as np
 
 from app.nlp.catalogs import IloTaskCatalog
 from app.nlp.index import MemoryIndex
-from app.nlp.policies.exposure import ExposurePolicy, band_from_score
+from app.nlp.policies.exposure import ExposurePolicy
 from app.nlp.retrieve import Retriever
 from app.nlp.text import is_kept_ilo_edit, is_work_task, normalize_for_match
 from app.nlp.types import CatalogItem
@@ -37,26 +37,36 @@ def _vec(*values: float) -> np.ndarray:
     return array / np.linalg.norm(array)
 
 
-def _item(isco: str, task_id: str, text: str, score: float) -> CatalogItem:
+def _item(
+    isco: str,
+    task_id: str,
+    text: str,
+    score: float,
+    *,
+    potential25: str | None = None,
+) -> CatalogItem:
+    metadata = {
+        "isco_08": isco,
+        "task_id": task_id,
+        "score_2025": score,
+        "match_key": normalize_for_match(text),
+    }
+    if potential25:
+        metadata["potential25"] = potential25
     return CatalogItem(
         catalog="ilo_tasks",
         item_id=f"{isco}:{task_id}",
         text=text,
-        metadata={
-            "isco_08": isco,
-            "task_id": task_id,
-            "score_2025": score,
-            "match_key": normalize_for_match(text),
-        },
+        metadata=metadata,
     )
 
 
 def _policy() -> ExposurePolicy:
     items = [
-        _item("5221", "7", INVENTORY_5221, 0.3525),
-        _item("5222", "6", INVENTORY_5222, 0.33),
-        _item("5223", "5", STACKING, 0.1575),
-        _item("5221", "4", PRICING, 0.39),
+        _item("5221", "7", INVENTORY_5221, 0.3525, potential25="Exposed: Gradient 2"),
+        _item("5222", "6", INVENTORY_5222, 0.33, potential25="Minimal Exposure"),
+        _item("5223", "5", STACKING, 0.1575, potential25="Exposed: Gradient 1"),
+        _item("5221", "4", PRICING, 0.39, potential25="Exposed: Gradient 2"),
     ]
     catalog = IloTaskCatalog(items)
     table = {
@@ -107,7 +117,7 @@ def test_inventory_rewrite_stays_in_original_band() -> None:
     assert estimate.match_layer == "nlp"
     assert estimate.score_2025 is not None
     assert abs(estimate.score_2025 - 0.3525) < 0.02
-    assert band_from_score(estimate.score_2025) == "ai_assisted"
+    assert estimate.band == "ai_assisted"
     assert estimate.neighbors[0].isco_08 == "5221"
 
 
@@ -115,7 +125,7 @@ def test_stacking_rewrite_does_not_match_pricing_display() -> None:
     estimate = _policy().estimate(REWRITE_STACKING, "5223")
     assert estimate.score_2025 is not None
     assert estimate.neighbors[0].task_text == STACKING
-    assert estimate.band == "human_led"
+    assert estimate.band == "ai_assisted"
     assert estimate.score_2025 < 0.25
 
 
@@ -146,8 +156,8 @@ def test_kept_ilo_edit_detects_deleted_clause() -> None:
 
 def test_deleted_ilo_clause_keeps_catalog_score() -> None:
     items = [
-        _item("5222", "1", SCHEDULE, 0.525),
-        _item("5222", "8", "Ensuring that safety procedures are enforced.", 0.1575),
+        _item("5222", "1", SCHEDULE, 0.525, potential25="Minimal Exposure"),
+        _item("5222", "8", "Ensuring that safety procedures are enforced.", 0.1575, potential25="Not Exposed"),
     ]
     catalog = IloTaskCatalog(items)
     encoder = StubEncoder(
@@ -161,7 +171,7 @@ def test_deleted_ilo_clause_keeps_catalog_score() -> None:
     assert estimate.match_layer == "nlp"
     assert estimate.score_source == "estimated"
     assert estimate.score_2025 == 0.525
-    assert estimate.band == "partly_automated"
+    assert estimate.band == "human_led"
     assert estimate.neighbors[0].task_text == SCHEDULE
 
     via_original = policy.estimate(SCHEDULE_SHORT, "5222", original_task_text=SCHEDULE)
