@@ -147,12 +147,14 @@
 .work-profile-page .dashboard-skill-bubble {
   position: absolute;
   z-index: 1;
-  border: 2px solid #fff;
+  border: 1.5px solid #fff;
   border-radius: 999px;
   background: var(--bubble-color);
   outline: none;
   transform: translate(-50%, -50%);
   transition: transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, border-width 0.2s ease;
+  min-width: 0;
+  min-height: 0;
 }
 
 .work-profile-page .dashboard-skill-bubble:focus,

@@ -76,6 +76,19 @@
   transform: translateY(-1px);
 }
 
+.work-profile-page .profile-icon-btn--delete,
+.profile-icon-btn--delete {
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--wp-text-muted);
+}
+
+.work-profile-page .profile-icon-btn--delete:hover,
+.profile-icon-btn--delete:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #6f6470;
+}
+
 .work-profile-page .profile-icon-actions {
   display: flex;
   flex-shrink: 0;
@@ -87,17 +100,18 @@
 .work-profile-page .profile-batch-btn,
 .profile-batch-btn {
   background: #fff !important;
-  color: var(--wp-text) !important;
+  color: var(--wp-text-muted) !important;
   border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4px 12px rgba(61, 43, 54, 0.08);
+  box-shadow: 0 2px 10px rgba(61, 43, 54, 0.08);
+  font-weight: 400;
 }
 
 .work-profile-page .profile-batch-btn:hover:not(:disabled),
 .profile-batch-btn:hover:not(:disabled) {
   background: #fff !important;
-  color: var(--wp-text) !important;
+  color: #6f6470 !important;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(61, 43, 54, 0.1);
+  box-shadow: 0 4px 14px rgba(61, 43, 54, 0.1);
 }
 
 .work-profile-page .profile-batch-btn:disabled,
@@ -177,6 +191,41 @@
 .profile-blue-btn:hover {
   background: #3f7da3 !important;
   color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.36);
+}
+
+.work-profile-page .profile-dialog-btn,
+.profile-dialog-btn {
+  background: var(--wp-blue) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(79, 145, 186, 0.28);
+  font-weight: 400;
+}
+
+.work-profile-page .profile-dialog-btn:hover,
+.profile-dialog-btn:hover {
+  background: #3f7da3 !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.36);
+}
+
+.work-profile-page .profile-dialog-cancel-btn,
+.profile-dialog-cancel-btn {
+  border: 1px solid rgba(79, 145, 186, 0.28) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  color: var(--wp-blue) !important;
+  box-shadow: none;
+  font-weight: 400;
+}
+
+.work-profile-page .profile-dialog-cancel-btn:hover,
+.profile-dialog-cancel-btn:hover {
+  background: var(--wp-blue) !important;
+  color: #fff !important;
+  border-color: var(--wp-blue) !important;
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(79, 145, 186, 0.36);
 }

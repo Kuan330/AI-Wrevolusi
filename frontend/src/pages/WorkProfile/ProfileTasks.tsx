@@ -90,7 +90,7 @@ const ProfileTasks = () => {
             </Button>
             <Button
               type="button"
-              className="profile-blue-btn h-10 whitespace-nowrap rounded-full px-5"
+              className="profile-gradient-btn h-10 whitespace-nowrap rounded-full px-5 font-normal"
               disabled={profileTasks.tasks.length === 0}
               onClick={confirmTasks}
             >
@@ -118,7 +118,7 @@ const ProfileTasks = () => {
         <div className="flex justify-end pt-1">
           <Button
             type="button"
-            className="profile-blue-btn h-10 shrink-0 whitespace-nowrap rounded-full px-5"
+            className="profile-gradient-btn h-10 shrink-0 whitespace-nowrap rounded-full px-5 font-normal"
             disabled={profileTasks.tasks.length === 0}
             onClick={confirmTasks}
           >
