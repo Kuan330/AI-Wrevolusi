@@ -24,6 +24,45 @@ type SkillBubbleChartProps = {
   selectedSkillId: number | null;
 };
 
+type BubbleItem = {
+  skill: WefSkill;
+  count: number;
+  size: number;
+  left: number;
+  top: number;
+  color: string;
+  capacityIndex: number;
+  trendIndex: number;
+};
+
+const cellOffsets = (count: number) => {
+  if (count <= 1) return [{ dx: 0, dy: 0 }];
+  if (count === 2) {
+    return [
+      { dx: -0.34, dy: 0 },
+      { dx: 0.34, dy: 0 },
+    ];
+  }
+  if (count === 3) {
+    return [
+      { dx: 0, dy: -0.3 },
+      { dx: -0.32, dy: 0.24 },
+      { dx: 0.32, dy: 0.24 },
+    ];
+  }
+
+  const cols = Math.ceil(Math.sqrt(count));
+  const rows = Math.ceil(count / cols);
+  return Array.from({ length: count }, (_, index) => {
+    const row = Math.floor(index / cols);
+    const col = index % cols;
+    return {
+      dx: ((col + 0.5) / cols - 0.5) * 0.72,
+      dy: ((row + 0.5) / rows - 0.5) * 0.72,
+    };
+  });
+};
+
 const SkillBubbleChart = ({
   skills,
   litSkillIds,
@@ -34,28 +73,58 @@ const SkillBubbleChart = ({
   const bubbles = useMemo(() => {
     const counts = litSkillIds.map((id) => tasksBySkill[id]?.length ?? 0);
     const max = Math.max(...counts, 1);
+    const colWidth = 100 / AI_CAPACITIES.length;
+    const rowHeight = 100 / USE_TRENDS.length;
 
-    return litSkillIds
+    const draft = litSkillIds
       .map((id) => skills.find((skill) => skill.wef_skill_id === id))
       .filter((skill): skill is WefSkill => Boolean(skill))
-      .flatMap((skill) => {
+      .map((skill) => {
         const capacity = aiCapacityFromCategory(skill.genai_substitution_capacity_category);
-        if (!capacity) return [];
+        if (!capacity) return null;
         const trend = useTrendFromNetIncrease(skill.future_net_increase_2025_2030);
         const count = tasksBySkill[skill.wef_skill_id]?.length ?? 0;
         const capacityIndex = AI_CAPACITIES.findIndex((item) => item.id === capacity);
         const trendIndex = USE_TRENDS.findIndex((item) => item.id === trend);
-        return [
-          {
-            skill,
-            count,
-            size: 28 + (count / max) * 22,
-            left: ((capacityIndex + 0.5) / AI_CAPACITIES.length) * 100,
-            top: ((trendIndex + 0.5) / USE_TRENDS.length) * 100,
-            color: colorForSkillId(skill.wef_skill_id),
-          },
-        ];
+        return {
+          skill,
+          count,
+          size: 14 + (count / max) * 10,
+          capacityIndex,
+          trendIndex,
+          color: colorForSkillId(skill.wef_skill_id),
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => Boolean(item))
+      .sort((a, b) => a.skill.wef_skill_id - b.skill.wef_skill_id);
+
+    const grouped = new Map<string, typeof draft>();
+    for (const item of draft) {
+      const key = `${item.capacityIndex}-${item.trendIndex}`;
+      const bucket = grouped.get(key) ?? [];
+      bucket.push(item);
+      grouped.set(key, bucket);
+    }
+
+    const positioned: BubbleItem[] = [];
+    for (const group of grouped.values()) {
+      const offsets = cellOffsets(group.length);
+      group.forEach((item, index) => {
+        const offset = offsets[index] ?? { dx: 0, dy: 0 };
+        positioned.push({
+          skill: item.skill,
+          count: item.count,
+          size: item.size,
+          color: item.color,
+          capacityIndex: item.capacityIndex,
+          trendIndex: item.trendIndex,
+          left: (item.capacityIndex + 0.5) * colWidth + offset.dx * colWidth,
+          top: (item.trendIndex + 0.5) * rowHeight + offset.dy * rowHeight,
+        });
       });
+    }
+
+    return positioned;
   }, [litSkillIds, skills, tasksBySkill]);
 
   const presentLegend = useMemo(() => {
