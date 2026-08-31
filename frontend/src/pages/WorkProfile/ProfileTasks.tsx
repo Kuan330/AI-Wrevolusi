@@ -115,10 +115,10 @@ const ProfileTasks = () => {
           onDelete={profileTasks.removeTask}
           onBatchDelete={profileTasks.removeTasks}
         />
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-1">
           <Button
             type="button"
-            className="profile-blue-btn h-10 whitespace-nowrap rounded-full px-5"
+            className="profile-blue-btn h-10 shrink-0 whitespace-nowrap rounded-full px-5"
             disabled={profileTasks.tasks.length === 0}
             onClick={confirmTasks}
           >

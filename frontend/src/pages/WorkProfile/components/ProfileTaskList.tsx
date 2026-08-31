@@ -76,22 +76,24 @@ const ProfileTaskList = ({
               </Button>
               <Button
                 type="button"
-                className="profile-batch-btn h-10 rounded-full px-4"
+                variant="outline"
+                className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-semibold shadow-sm"
                 disabled={selectedIds.size === 0}
                 onClick={() => setBatchDeleteOpen(true)}
               >
-                <img src="/images/icons/icon-delete-black.svg" alt="" className="h-5 w-5" />
+                <img src="/images/icons/icon-delete-black.svg" alt="" className="h-4 w-4" />
                 Delete selected ({selectedIds.size})
               </Button>
             </>
           ) : (
             <Button
               type="button"
-              className="profile-batch-btn h-10 rounded-full px-4"
+              variant="outline"
+              className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-semibold shadow-sm"
               disabled={tasks.length === 0}
               onClick={() => setBatchMode(true)}
             >
-              <img src="/images/icons/icon-delete-black.svg" alt="" className="h-5 w-5" />
+              <img src="/images/icons/icon-delete-black.svg" alt="" className="h-4 w-4" />
               Batch delete
             </Button>
           )}

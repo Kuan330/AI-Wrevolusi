@@ -86,16 +86,18 @@
 
 .work-profile-page .profile-batch-btn,
 .profile-batch-btn {
-  background: #e8e8e8 !important;
-  color: #1a1a1a !important;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: none;
+  background: #fff !important;
+  color: var(--wp-text) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(61, 43, 54, 0.08);
 }
 
 .work-profile-page .profile-batch-btn:hover:not(:disabled),
 .profile-batch-btn:hover:not(:disabled) {
-  background: #dcdcdc !important;
-  color: #1a1a1a !important;
+  background: #fff !important;
+  color: var(--wp-text) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(61, 43, 54, 0.1);
 }
 
 .work-profile-page .profile-batch-btn:disabled,
