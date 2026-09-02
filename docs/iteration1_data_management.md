@@ -80,8 +80,8 @@ User drills MASCO tree (major → sub-major → minor → unit)
   → confirm 4-digit unit (e.g. 5222)
   → load ILO starter tasks (encoding join: unit code = isco_08)
   → user confirms / edits / adds tasks (add may use speech-to-text)
-  → ILO-linked task: exposure from the ILO row (match_layer = exact)
-     user-added/edited task: NLP then LLM
+  → unchanged ILO-linked task: exposure from the ILO row (match_layer = exact)
+     user-added/edited task: TF-IDF NLP matching, then insufficient_data below the calibrated threshold
   → each confirmed task → WEF 26 core skills (NLP then LLM; no 4-digit join)
   → E4 confirm / correct
 ```
@@ -129,7 +129,7 @@ Empty until a user runs the product: `users`, `work_profiles`, `profile_tasks`, 
 
 `masco_occupation_raw.unit_code` = `ilo_task_score_raw.isco_08` = `ref_occupations.occupation_code` where `level = unit` = `ref_ilo_tasks.isco_08`.
 
-Task **texts** are not the same in MASCO and ILO. There is no checked task-to-task map. Matching user-edited text uses `exact` → `nlp` → `llm` → `insufficient_data` in the app, not this ETL.
+Task **texts** are not the same in MASCO and ILO. There is no checked task-to-task map. The current pilot matches user-edited text using `exact` → `nlp` → `insufficient_data` in the app, not this ETL. An LLM fallback is deliberately deferred until labelled evaluation shows that TF-IDF coverage is insufficient.
 
 **Does not join by occupation code:** WEF skills. E3 attaches skills after NLP/LLM.
 

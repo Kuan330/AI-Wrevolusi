@@ -77,7 +77,7 @@ const TaskMixPie = ({ counts, active, onSelect }: TaskMixPieProps) => {
           </ResponsiveContainer>
         ) : (
           <div className="flex h-full items-center justify-center text-xs text-[#7f7280]">
-            No scored tasks
+            No assessed tasks
           </div>
         )}
       </div>

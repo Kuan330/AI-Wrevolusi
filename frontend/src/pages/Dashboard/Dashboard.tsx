@@ -11,13 +11,16 @@ import { toneForSkillId, toneForTaskBand } from "@/pages/Dashboard/lib/palette";
 import {
   AI_CAPACITIES,
   aiCapacityFromCategory,
+  classifySkillUseTrendFromNetIncreasePercentage,
   USE_TRENDS,
-  useTrendFromNetIncrease,
 } from "@/pages/Dashboard/lib/skillAxes";
-import { bandFromScore, TASK_BANDS, type TaskBandId } from "@/pages/Dashboard/lib/taskBands";
+import { TASK_BANDS, type TaskBandId } from "@/pages/Dashboard/lib/taskBands";
 import { referenceService } from "@/services/referenceService";
+import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 import type { WefSkill } from "@/types/reference";
 import "@/pages/Dashboard/dashboard.css";
+
+const EMPTY_CONFIRMED_TASK_EXPOSURE_ASSESSMENTS: ConfirmedTaskExposureAssessment[] = [];
 
 const emptyCounts = () =>
   TASK_BANDS.reduce(
@@ -29,10 +32,12 @@ const emptyCounts = () =>
   );
 
 const Dashboard = () => {
-  const analysis = readConfirmedAnalysis();
+  const [analysis] = useState(readConfirmedAnalysis);
   const [skills, setSkills] = useState<WefSkill[]>([]);
   const [activeBand, setActiveBand] = useState<TaskBandId | null>(null);
   const [selectedSkillId, setSelectedSkillId] = useState<number | null>(null);
+  const taskExposureAssessments =
+    analysis?.taskExposureAssessments ?? EMPTY_CONFIRMED_TASK_EXPOSURE_ASSESSMENTS;
 
   useEffect(() => {
     void referenceService.wefSkills().then(setSkills).catch(() => setSkills([]));
@@ -54,13 +59,11 @@ const Dashboard = () => {
 
   const counts = useMemo(() => {
     const next = emptyCounts();
-    if (!analysis) return next;
-    for (const task of analysis.tasks) {
-      const band = bandFromScore(task.score2025);
-      if (band) next[band] += 1;
+    for (const taskExposureAssessment of taskExposureAssessments) {
+      next[taskExposureAssessment.suggested_state] += 1;
     }
     return next;
-  }, [analysis]);
+  }, [taskExposureAssessments]);
 
   if (!analysis) {
     return null;
@@ -87,7 +90,13 @@ const Dashboard = () => {
       : "All tasks";
 
   const trendLabel = selected
-    ? USE_TRENDS.find((item) => item.id === useTrendFromNetIncrease(selected.future_net_increase_2025_2030))
+    ? USE_TRENDS.find(
+        (item) =>
+          item.id ===
+          classifySkillUseTrendFromNetIncreasePercentage(
+            selected.future_net_increase_2025_2030,
+          ),
+      )
         ?.label
     : null;
   const capacityLabel = selected
@@ -137,6 +146,7 @@ const Dashboard = () => {
               ? analysis.tasks.filter((task) => skillTaskIds.includes(task.id))
               : analysis.tasks
           }
+          taskExposureAssessments={taskExposureAssessments}
           activeBand={selected ? null : activeBand}
           highlightedIds={skillTaskIds}
           onClear={selected || activeBand ? () => {
