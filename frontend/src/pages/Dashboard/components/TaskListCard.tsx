@@ -6,6 +6,7 @@ import DashboardCard, { type TitleTone } from "@/pages/Dashboard/components/Dash
 import TaskList from "@/pages/Dashboard/components/TaskList";
 import type { TaskBandId } from "@/pages/Dashboard/lib/taskBands";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
+import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 
 type TaskListCardProps = {
   eyebrow: string;
@@ -13,6 +14,7 @@ type TaskListCardProps = {
   description: string;
   titleTone?: TitleTone | null;
   tasks: ProfileTask[];
+  taskExposureAssessments: ConfirmedTaskExposureAssessment[];
   activeBand: TaskBandId | null;
   highlightedIds: string[];
   onClear?: () => void;
@@ -24,6 +26,7 @@ const TaskListCard = ({
   description,
   titleTone,
   tasks,
+  taskExposureAssessments,
   activeBand,
   highlightedIds,
   onClear,
@@ -47,7 +50,7 @@ const TaskListCard = ({
     const observer = new ResizeObserver(updateScrollHint);
     observer.observe(element);
     return () => observer.disconnect();
-  }, [tasks.length, activeBand, highlightedIds.length, updateScrollHint]);
+  }, [tasks.length, taskExposureAssessments.length, activeBand, highlightedIds.length, updateScrollHint]);
 
   const showScrollHint = scrollHint.canScroll && !scrollHint.atBottom;
 
@@ -85,7 +88,12 @@ const TaskListCard = ({
           onScroll={updateScrollHint}
         >
           <div className="pb-10">
-            <TaskList tasks={tasks} activeBand={activeBand} highlightedIds={highlightedIds} />
+            <TaskList
+              tasks={tasks}
+              taskExposureAssessments={taskExposureAssessments}
+              activeBand={activeBand}
+              highlightedIds={highlightedIds}
+            />
           </div>
         </div>
 

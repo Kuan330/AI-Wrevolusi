@@ -1,4 +1,5 @@
 import type { ProfileTask } from "@/pages/WorkProfile/types";
+import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 import type { ReferenceOccupation } from "@/types/reference";
 
 const PROFILE_KEY = "aiwrevolusi.userProfile";
@@ -17,6 +18,7 @@ export type ConfirmedAnalysis = {
   potential25: string | null;
   meanScore2025: number | null;
   tasks: ProfileTask[];
+  taskExposureAssessments: ConfirmedTaskExposureAssessment[];
 };
 
 export type UserProfile = {
@@ -86,6 +88,8 @@ export const writeUserProfile = (patch: Partial<UserProfile>): UserProfile => {
   }
   if (next.analysis) {
     localStorage.setItem(ANALYSIS_KEY, JSON.stringify(next.analysis));
+  } else {
+    localStorage.removeItem(ANALYSIS_KEY);
   }
   return next;
 };
@@ -105,7 +109,7 @@ export const readSelectedOccupation = (): SelectedOccupation | null =>
   readUserProfile().occupation ?? readLegacyOccupation();
 
 export const saveProfileTasks = (occupationCode: string, tasks: ProfileTask[]) => {
-  writeUserProfile({ tasks, tasksOccupationCode: occupationCode });
+  writeUserProfile({ tasks, tasksOccupationCode: occupationCode, analysis: null });
 };
 
 export const readProfileTasks = (occupationCode: string): ProfileTask[] | null => {
@@ -123,7 +127,7 @@ export const saveConfirmedAnalysis = (analysis: ConfirmedAnalysis) => {
 };
 
 export const readConfirmedAnalysis = (): ConfirmedAnalysis | null =>
-  readUserProfile().analysis ?? readLegacyAnalysis();
+  readUserProfile().analysis;
 
 export const hasConfirmedAnalysis = (): boolean => {
   const analysis = readConfirmedAnalysis();

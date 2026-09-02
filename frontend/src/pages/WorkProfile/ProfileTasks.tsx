@@ -9,18 +9,37 @@ import TaskEditorDialog from "@/pages/WorkProfile/components/TaskEditorDialog";
 import { useProfileTasks } from "@/pages/WorkProfile/hooks/useProfileTasks";
 import { readSelectedOccupation } from "@/pages/WorkProfile/occupationSession";
 import type { ProfileTask, TaskEditorValues } from "@/pages/WorkProfile/types";
+import { exposureService, type TaskAssessmentContextLevel } from "@/services/exposureService";
 
 const emptyEditorValues = (): TaskEditorValues => ({
   wording: "",
   timeSpent: "",
   responsibility: "",
+  routineProcessingLevel: "",
+  informationUseLevel: "",
+  humanInteractionLevel: "",
+  judgementLevel: "",
 });
 
 const valuesFromTask = (task: ProfileTask): TaskEditorValues => ({
   wording: task.wording,
   timeSpent: task.timeSpent,
   responsibility: task.responsibility,
+  routineProcessingLevel: task.routineProcessingLevel ?? "",
+  informationUseLevel: task.informationUseLevel ?? "",
+  humanInteractionLevel: task.humanInteractionLevel ?? "",
+  judgementLevel: task.judgementLevel ?? "",
 });
+
+const normalizeOptionalTaskAssessmentContextLevel = (
+  value: string | undefined,
+): TaskAssessmentContextLevel | null =>
+  value === "low" || value === "medium" || value === "high" ? value : null;
+
+const normalizeOptionalResponsibilityLevel = (
+  value: string,
+): "individual" | "shared" | "lead" | null =>
+  value === "individual" || value === "shared" || value === "lead" ? value : null;
 
 const ProfileTasks = () => {
   const selected = readSelectedOccupation();
@@ -31,6 +50,8 @@ const ProfileTasks = () => {
   const [editorMode, setEditorMode] = useState<"add" | "edit">("add");
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editorValues, setEditorValues] = useState<TaskEditorValues>(emptyEditorValues);
+  const [taskAssessmentRequestInProgress, setTaskAssessmentRequestInProgress] = useState(false);
+  const [taskAssessmentRequestError, setTaskAssessmentRequestError] = useState<string | null>(null);
 
   if (!selected) {
     return <Navigate to={ROUTES.workProfile} replace />;
@@ -63,17 +84,52 @@ const ProfileTasks = () => {
     profileTasks.addTask(values);
   };
 
-  const confirmTasks = () => {
-    const scored = profileTasks.tasks.find((task) => task.potential25 || typeof task.meanScore2025 === "number");
-    saveConfirmedAnalysis({
-      occupationTitle: selected.unit.title,
-      occupationPath: selected.path.map((item) => item.title),
-      occupationCode: selected.unit.occupation_code,
-      potential25: scored?.potential25 ?? null,
-      meanScore2025: scored?.meanScore2025 ?? null,
-      tasks: profileTasks.tasks,
-    });
-    navigate(`${ROUTES.dashboard}#exposure`);
+  const assessConfirmedTasksAndOpenDashboard = async () => {
+    setTaskAssessmentRequestInProgress(true);
+    setTaskAssessmentRequestError(null);
+    try {
+      const assessmentResponse = await exposureService.assessConfirmedTasksAgainstIloReferences({
+        occupation_code: selected.unit.occupation_code,
+        confirmed_tasks: profileTasks.tasks.map((task) => ({
+          task_id: task.id,
+          task_text: task.wording,
+          ilo_task_id: task.iloTaskId,
+          context: {
+            routine_processing_level: normalizeOptionalTaskAssessmentContextLevel(
+              task.routineProcessingLevel,
+            ),
+            information_use_level: normalizeOptionalTaskAssessmentContextLevel(
+              task.informationUseLevel,
+            ),
+            human_interaction_level: normalizeOptionalTaskAssessmentContextLevel(
+              task.humanInteractionLevel,
+            ),
+            judgement_level: normalizeOptionalTaskAssessmentContextLevel(task.judgementLevel),
+            responsibility_level: normalizeOptionalResponsibilityLevel(task.responsibility),
+            time_spent: task.timeSpent || null,
+          },
+        })),
+      });
+      const scored = profileTasks.tasks.find(
+        (task) => task.potential25 || typeof task.meanScore2025 === "number",
+      );
+      saveConfirmedAnalysis({
+        occupationTitle: selected.unit.title,
+        occupationPath: selected.path.map((item) => item.title),
+        occupationCode: selected.unit.occupation_code,
+        potential25: scored?.potential25 ?? null,
+        meanScore2025: scored?.meanScore2025 ?? null,
+        tasks: profileTasks.tasks,
+        taskExposureAssessments: assessmentResponse.assessments,
+      });
+      navigate(`${ROUTES.dashboard}#exposure`);
+    } catch {
+      setTaskAssessmentRequestError(
+        "The task assessment could not be completed. Your confirmed tasks are still saved; please try again.",
+      );
+    } finally {
+      setTaskAssessmentRequestInProgress(false);
+    }
   };
 
   return (
@@ -91,10 +147,10 @@ const ProfileTasks = () => {
             <Button
               type="button"
               className="profile-gradient-btn h-10 whitespace-nowrap rounded-full px-5 font-normal"
-              disabled={profileTasks.tasks.length === 0}
-              onClick={confirmTasks}
+              disabled={profileTasks.tasks.length === 0 || taskAssessmentRequestInProgress}
+              onClick={() => void assessConfirmedTasksAndOpenDashboard()}
             >
-              Explore AI impact
+              {taskAssessmentRequestInProgress ? "Assessing tasks…" : "Explore AI impact"}
             </Button>
           </div>
         </div>
@@ -115,14 +171,19 @@ const ProfileTasks = () => {
           onDelete={profileTasks.removeTask}
           onBatchDelete={profileTasks.removeTasks}
         />
+        {taskAssessmentRequestError ? (
+          <p className="rounded-xl border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
+            {taskAssessmentRequestError}
+          </p>
+        ) : null}
         <div className="flex shrink-0 justify-end pt-1">
           <Button
             type="button"
             className="profile-gradient-btn h-10 shrink-0 whitespace-nowrap rounded-full px-5 font-normal"
-            disabled={profileTasks.tasks.length === 0}
-            onClick={confirmTasks}
+            disabled={profileTasks.tasks.length === 0 || taskAssessmentRequestInProgress}
+            onClick={() => void assessConfirmedTasksAndOpenDashboard()}
           >
-            Explore AI impact
+            {taskAssessmentRequestInProgress ? "Assessing tasks…" : "Explore AI impact"}
           </Button>
         </div>
       </section>
