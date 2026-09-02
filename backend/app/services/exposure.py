@@ -1,12 +1,14 @@
-import math
 import re
-from collections import Counter
 from dataclasses import dataclass
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.constants.exposure_types import ExposureType
+from app.ml.task_exposure_score_model import (
+    calculate_reference_task_cosine_similarities_with_trained_vectorizer,
+    predict_task_exposure_score_with_trained_text_model,
+)
 from app.schemas.exposure import (
     ConfirmedTaskAssessmentContextInput,
     ConfirmedTaskExposureAssessment,
@@ -26,25 +28,6 @@ ILO_EXPOSURE_SOURCE_URL = (
 # labelled-user calibration before expanding beyond the three pilot occupations.
 MINIMUM_RELIABLE_TASK_TEXT_SIMILARITY = 0.18
 MAXIMUM_MATCHED_REFERENCE_TASKS = 3
-TASK_MATCHING_STOP_WORDS = {
-    'a',
-    'an',
-    'and',
-    'are',
-    'at',
-    'for',
-    'from',
-    'in',
-    'is',
-    'of',
-    'on',
-    'or',
-    'that',
-    'the',
-    'this',
-    'to',
-    'with',
-}
 
 
 @dataclass(frozen=True)
@@ -59,64 +42,6 @@ def normalize_task_text_for_matching(task_text: str) -> str:
     return ' '.join(re.findall(r'[a-z0-9]+', task_text.lower()))
 
 
-def tokenize_task_text_for_term_frequency_inverse_document_frequency(
-    task_text: str,
-) -> list[str]:
-    words = [
-        word
-        for word in normalize_task_text_for_matching(task_text).split()
-        if word not in TASK_MATCHING_STOP_WORDS
-    ]
-    adjacent_word_pairs = [f'{first}__{second}' for first, second in zip(words, words[1:])]
-    return [*words, *adjacent_word_pairs]
-
-
-def build_inverse_document_frequency_by_term(reference_task_texts: list[str]) -> dict[str, float]:
-    token_sets = [
-        set(tokenize_task_text_for_term_frequency_inverse_document_frequency(task_text))
-        for task_text in reference_task_texts
-    ]
-    document_count = len(token_sets)
-    document_frequency_by_term: Counter[str] = Counter(
-        term for token_set in token_sets for term in token_set
-    )
-    return {
-        term: math.log((1 + document_count) / (1 + document_frequency)) + 1
-        for term, document_frequency in document_frequency_by_term.items()
-    }
-
-
-def build_sparse_term_frequency_inverse_document_frequency_vector(
-    task_text: str,
-    inverse_document_frequency_by_term: dict[str, float],
-) -> dict[str, float]:
-    tokens = tokenize_task_text_for_term_frequency_inverse_document_frequency(task_text)
-    if not tokens:
-        return {}
-    term_counts = Counter(tokens)
-    token_count = len(tokens)
-    return {
-        term: (count / token_count) * inverse_document_frequency_by_term[term]
-        for term, count in term_counts.items()
-        if term in inverse_document_frequency_by_term
-    }
-
-
-def calculate_cosine_similarity_between_sparse_vectors(
-    first_vector: dict[str, float],
-    second_vector: dict[str, float],
-) -> float:
-    if not first_vector or not second_vector:
-        return 0.0
-    shared_terms = first_vector.keys() & second_vector.keys()
-    dot_product = sum(first_vector[term] * second_vector[term] for term in shared_terms)
-    first_magnitude = math.sqrt(sum(value * value for value in first_vector.values()))
-    second_magnitude = math.sqrt(sum(value * value for value in second_vector.values()))
-    if first_magnitude == 0 or second_magnitude == 0:
-        return 0.0
-    return dot_product / (first_magnitude * second_magnitude)
-
-
 def rank_ilo_reference_tasks_by_semantic_similarity(
     task_text: str,
     ilo_reference_tasks: list[IloTaskExposureReference],
@@ -128,26 +53,13 @@ def rank_ilo_reference_tasks_by_semantic_similarity(
     ]
     if not scorable_reference_tasks:
         return []
-    inverse_document_frequency_by_term = build_inverse_document_frequency_by_term(
-        [reference_task.task_text for reference_task in scorable_reference_tasks]
-    )
-    task_vector = build_sparse_term_frequency_inverse_document_frequency_vector(
-        task_text,
-        inverse_document_frequency_by_term,
-    )
-    ranked_reference_tasks = [
-        (
-            reference_task,
-            calculate_cosine_similarity_between_sparse_vectors(
-                task_vector,
-                build_sparse_term_frequency_inverse_document_frequency_vector(
-                    reference_task.task_text,
-                    inverse_document_frequency_by_term,
-                ),
-            ),
+    reference_task_similarities = (
+        calculate_reference_task_cosine_similarities_with_trained_vectorizer(
+            task_text,
+            [reference_task.task_text for reference_task in scorable_reference_tasks],
         )
-        for reference_task in scorable_reference_tasks
-    ]
+    )
+    ranked_reference_tasks = list(zip(scorable_reference_tasks, reference_task_similarities))
     return sorted(ranked_reference_tasks, key=lambda item: item[1], reverse=True)
 
 
@@ -207,6 +119,8 @@ def create_insufficient_data_task_exposure_assessment(
         baseline_score=None,
         adjusted_score=None,
         confidence=0.0,
+        model_version='not_applied',
+        model_type='insufficient_data_abstention',
         source_name=ILO_EXPOSURE_SOURCE_NAME,
         source_year=ILO_EXPOSURE_SOURCE_YEAR,
         source_url=ILO_EXPOSURE_SOURCE_URL,
@@ -229,7 +143,8 @@ def assess_confirmed_task_against_ilo_references(
         return create_insufficient_data_task_exposure_assessment(
             confirmed_task,
             'missing_reference_tasks',
-            'No ILO reference tasks are available for the confirmed occupation.',
+            'No checked MASCO-to-ISCO correspondence or ILO task evidence is available '
+            'for the confirmed occupation.',
         )
 
     reference_task_by_id = {
@@ -251,6 +166,8 @@ def assess_confirmed_task_against_ilo_references(
         baseline_score = float(exact_reference_task.score_2025)
         match_layer = 'exact'
         confidence = 0.95
+        model_version = 'official-ilo-score-2025'
+        model_type = 'exact_ilo_task_evidence'
     else:
         ranked_reference_tasks = rank_ilo_reference_tasks_by_semantic_similarity(
             confirmed_task.task_text,
@@ -266,14 +183,14 @@ def assess_confirmed_task_against_ilo_references(
                 'The confirmed task wording was not sufficiently similar to the available ILO task evidence.',
             )
         matched_reference_tasks = ranked_reference_tasks[:MAXIMUM_MATCHED_REFERENCE_TASKS]
-        similarity_total = sum(similarity for _, similarity in matched_reference_tasks)
-        baseline_score = sum(
-            float(reference_task.score_2025) * similarity
-            for reference_task, similarity in matched_reference_tasks
-            if reference_task.score_2025 is not None
-        ) / similarity_total
+        trained_score_prediction = predict_task_exposure_score_with_trained_text_model(
+            confirmed_task.task_text
+        )
+        baseline_score = trained_score_prediction.predicted_score_2025
         match_layer = 'nlp'
         confidence = min(0.9, matched_reference_tasks[0][1])
+        model_version = trained_score_prediction.model_version
+        model_type = trained_score_prediction.model_type
 
     context_adjustment, described_context_factors, has_missing_context = (
         calculate_transparent_context_score_adjustment(confirmed_task.context)
@@ -287,7 +204,8 @@ def assess_confirmed_task_against_ilo_references(
         else 'no optional workplace context was provided'
     )
     reasoning = (
-        f'The {match_layer} match used ILO task evidence beginning "'
+        f'The {match_layer} assessment used {model_type} ({model_version}) and ILO task '
+        f'evidence beginning "'
         f'{strongest_reference_task.task_text[:120]}" with similarity '
         f'{strongest_similarity:.2f}. The baseline score {baseline_score:.2f} was adjusted '
         f'to {adjusted_score:.2f} using {context_summary}.'
@@ -307,6 +225,8 @@ def assess_confirmed_task_against_ilo_references(
         baseline_score=round(baseline_score, 4),
         adjusted_score=round(adjusted_score, 4),
         confidence=round(confidence, 4),
+        model_version=model_version,
+        model_type=model_type,
         source_name=ILO_EXPOSURE_SOURCE_NAME,
         source_year=ILO_EXPOSURE_SOURCE_YEAR,
         source_url=ILO_EXPOSURE_SOURCE_URL,
@@ -370,42 +290,20 @@ async def assess_confirmed_tasks_against_ilo_references(
 
 
 def infer_exposure_state(task_text: str) -> tuple[ExposureType, float, str]:
-    normalized = task_text.lower()
-
-    reshaped_keywords = ['strategy', 'planning', 'cross-team', 'coach']
-    automated_keywords = ['report', 'data entry', 'spreadsheet', 'email sorting']
-    assisted_keywords = ['draft', 'review', 'summarise', 'support']
-
-    if any(keyword in normalized for keyword in reshaped_keywords):
-        return (
-            ExposureType.reshaped,
-            0.72,
-            'Task likely shifts toward judgement and orchestration with AI co-work.',
-        )
-
-    if any(keyword in normalized for keyword in automated_keywords):
-        return (
-            ExposureType.partly_automated,
-            0.78,
-            'Task includes routine steps that can be automated, while validation stays human-led.',
-        )
-
-    if any(keyword in normalized for keyword in assisted_keywords):
-        return (
-            ExposureType.ai_assisted,
-            0.64,
-            'Task can be accelerated by AI suggestions but still needs human review.',
-        )
-
-    if len(normalized.strip()) < 8:
+    if len(normalize_task_text_for_matching(task_text).split()) < 3:
         return (
             ExposureType.insufficient_data,
-            0.2,
+            0.0,
             'Not enough task context to infer exposure reliably.',
         )
-
+    trained_score_prediction = predict_task_exposure_score_with_trained_text_model(task_text)
+    predicted_state = map_adjusted_exposure_score_to_suggested_state(
+        trained_score_prediction.predicted_score_2025
+    )
     return (
-        ExposureType.human_led,
-        0.58,
-        'Task appears to rely on context-heavy interpersonal judgement.',
+        predicted_state,
+        0.5,
+        f'The {trained_score_prediction.model_type} model '
+        f'({trained_score_prediction.model_version}) predicted exposure score '
+        f'{trained_score_prediction.predicted_score_2025:.2f}.',
     )

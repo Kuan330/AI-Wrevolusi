@@ -107,6 +107,11 @@ const TaskList = ({
                         <strong>Evidence method:</strong>{" "}
                         {formatTaskAssessmentMatchLayer(taskExposureAssessment.match_layer)}
                       </p>
+                      <p>
+                        <strong>Model:</strong>{" "}
+                        {taskExposureAssessment.model_type?.replaceAll("_", " ") ?? "legacy scoring method"}{" "}
+                        ({taskExposureAssessment.model_version ?? "legacy"})
+                      </p>
                       <p><strong>Reasoning:</strong> {taskExposureAssessment.reasoning}</p>
                       <p><strong>Uncertainty:</strong> {taskExposureAssessment.uncertainty}</p>
                       <p><strong>Limitations:</strong> {taskExposureAssessment.limitations}</p>

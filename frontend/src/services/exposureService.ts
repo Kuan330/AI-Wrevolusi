@@ -46,6 +46,8 @@ export interface ConfirmedTaskExposureAssessment {
   baseline_score: number | null;
   adjusted_score: number | null;
   confidence: number;
+  model_version?: string;
+  model_type?: string;
   source_name: string;
   source_year: string;
   source_url: string;

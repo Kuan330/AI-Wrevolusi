@@ -64,6 +64,8 @@ class ConfirmedTaskExposureAssessment(BaseModel):
     baseline_score: float | None
     adjusted_score: float | None
     confidence: float
+    model_version: str
+    model_type: str
     source_name: str
     source_year: str
     source_url: str

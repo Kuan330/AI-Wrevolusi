@@ -1,8 +1,16 @@
+import hashlib
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
 from app.constants.exposure_types import ExposureType
 from app.db.session import get_db
 from app.main import create_app
+from app.ml.task_exposure_score_model import (
+    TASK_EXPOSURE_MODEL_ARTIFACT_VERSION,
+    load_trusted_task_exposure_model_artifact,
+    predict_task_exposure_score_with_trained_text_model,
+)
 from app.schemas.exposure import (
     ConfirmedTaskAssessmentContextInput,
     ConfirmedTaskExposureAssessmentRequestItem,
@@ -91,6 +99,7 @@ def test_batch_task_exposure_assessment_endpoint_returns_explainable_result() ->
     assessment = response.json()['assessments'][0]
     assert assessment['task_id'] == 'task-api-1'
     assert assessment['match_layer'] == 'exact'
+    assert assessment['model_version'] == 'official-ilo-score-2025'
     assert assessment['reasoning']
     assert assessment['uncertainty']
     assert assessment['limitations']
@@ -103,10 +112,43 @@ def test_adjusted_exposure_score_boundaries_map_to_the_four_supported_states() -
     assert map_adjusted_exposure_score_to_suggested_state(0.55) == ExposureType.reshaped
 
 
-def test_infer_exposure_for_reporting_task() -> None:
-    exposure, confidence, _ = infer_exposure_state('Prepare weekly sales report')
-    assert exposure == ExposureType.partly_automated
-    assert confidence > 0.5
+def test_legacy_task_inference_uses_the_trained_model_instead_of_keywords() -> None:
+    exposure, confidence, reasoning = infer_exposure_state('Prepare weekly sales report')
+    assert exposure in {
+        ExposureType.human_led,
+        ExposureType.ai_assisted,
+        ExposureType.partly_automated,
+        ExposureType.reshaped,
+    }
+    assert confidence == 0.5
+    assert TASK_EXPOSURE_MODEL_ARTIFACT_VERSION in reasoning
+
+
+def test_trained_model_artifact_records_reproducible_evaluation_evidence() -> None:
+    artifact = load_trusted_task_exposure_model_artifact()
+    metrics = artifact['training_metrics']
+    training_dataset_path = (
+        Path(__file__).resolve().parents[2] / 'data' / 'raw' / 'ilo_task_score_raw.csv'
+    )
+    assert artifact['artifact_version'] == TASK_EXPOSURE_MODEL_ARTIFACT_VERSION
+    assert artifact['training_row_count'] == 3265
+    assert artifact['training_occupation_group_count'] == 427
+    assert artifact['dataset_sha256'] == hashlib.sha256(training_dataset_path.read_bytes()).hexdigest()
+    assert metrics['grouped_cross_validation_mean_absolute_error'] < metrics[
+        'mean_score_baseline_mean_absolute_error'
+    ]
+    assert metrics['grouped_cross_validation_macro_f1'] >= 0.45
+    assert artifact['robustness_and_bias_probe_metrics'][
+        'gender_wording_max_absolute_score_difference'
+    ] <= 0.02
+
+
+def test_trained_task_exposure_score_prediction_is_bounded_and_versioned() -> None:
+    prediction = predict_task_exposure_score_with_trained_text_model(
+        'Coach sales staff through difficult customer cases'
+    )
+    assert 0.0 <= prediction.predicted_score_2025 <= 1.0
+    assert prediction.model_version == TASK_EXPOSURE_MODEL_ARTIFACT_VERSION
 
 
 def test_exact_ilo_task_uses_exact_match_layer_and_source_score() -> None:
@@ -137,6 +179,7 @@ def test_edited_task_uses_nlp_similarity_instead_of_stale_exact_score() -> None:
 
     assert assessment.match_layer == 'nlp'
     assert assessment.confidence >= 0.18
+    assert assessment.model_version == TASK_EXPOSURE_MODEL_ARTIFACT_VERSION
     assert assessment.matched_reference_tasks[0].ilo_task_id == '1'
 
 
@@ -152,6 +195,20 @@ def test_unrelated_task_returns_insufficient_data_instead_of_forced_classificati
     assert assessment.suggested_state == ExposureType.insufficient_data
     assert assessment.match_layer == 'insufficient_data'
     assert assessment.missing_data_status == 'no_reliable_match'
+
+
+def test_missing_occupation_reference_states_the_masco_to_isco_gap() -> None:
+    assessment = assess_confirmed_task_against_ilo_references(
+        ConfirmedTaskExposureAssessmentRequestItem(
+            task_id='task-missing-reference',
+            task_text='Prepare staff work schedules',
+        ),
+        [],
+    )
+
+    assert assessment.missing_data_status == 'missing_reference_tasks'
+    assert assessment.suggested_state == ExposureType.insufficient_data
+    assert 'MASCO-to-ISCO' in assessment.reasoning
 
 
 def test_workplace_context_changes_the_exposure_score_transparently() -> None:

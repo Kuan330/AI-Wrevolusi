@@ -1,0 +1,27 @@
+{
+  "artifact_version": "epic2-tfidf-ridge-v1",
+  "model_type": "scikit_learn_tfidf_ridge_regression",
+  "trained_at_utc": "2026-09-02T17:13:10.449479+00:00",
+  "training_dataset": "data/raw/ilo_task_score_raw.csv",
+  "dataset_sha256": "46940a80d525ff4635389e9480c8fcdcd53180a9548434ac398dd806a73f6f72",
+  "training_row_count": 3265,
+  "training_occupation_group_count": 427,
+  "training_metrics": {
+    "grouped_cross_validation_mean_absolute_error": 0.06917042580514128,
+    "grouped_cross_validation_root_mean_squared_error": 0.09262725862406841,
+    "grouped_cross_validation_r2": 0.6882398471428659,
+    "grouped_cross_validation_macro_f1": 0.5384873340105982,
+    "mean_score_baseline_mean_absolute_error": 0.13951361725479527,
+    "mean_score_baseline_root_mean_squared_error": 0.16589317079271604
+  },
+  "robustness_and_bias_probe_metrics": {
+    "formatting_variant_max_absolute_score_difference": 0.0,
+    "gender_wording_max_absolute_score_difference": 0.0
+  },
+  "training_library": "scikit-learn 1.9.0",
+  "training_configuration": {
+    "vectorizer": "TfidfVectorizer(ngram_range=(1, 2), min_df=2, max_df=0.98)",
+    "regressor": "Ridge(alpha=1.0)",
+    "cross_validation": "GroupKFold(n_splits=5, groups=isco_08)"
+  }
+}

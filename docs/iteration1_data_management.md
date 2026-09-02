@@ -81,7 +81,8 @@ User drills MASCO tree (major → sub-major → minor → unit)
   → load ILO starter tasks (encoding join: unit code = isco_08)
   → user confirms / edits / adds tasks (add may use speech-to-text)
   → unchanged ILO-linked task: exposure from the ILO row (match_layer = exact)
-     user-added/edited task: TF-IDF NLP matching, then insufficient_data below the calibrated threshold
+     user-added/edited task: trained scikit-learn TF-IDF + Ridge score prediction,
+       nearest-task evidence, then insufficient_data below the calibrated similarity threshold
   → each confirmed task → WEF 26 core skills (NLP then LLM; no 4-digit join)
   → E4 confirm / correct
 ```
@@ -129,7 +130,7 @@ Empty until a user runs the product: `users`, `work_profiles`, `profile_tasks`, 
 
 `masco_occupation_raw.unit_code` = `ilo_task_score_raw.isco_08` = `ref_occupations.occupation_code` where `level = unit` = `ref_ilo_tasks.isco_08`.
 
-Task **texts** are not the same in MASCO and ILO. There is no checked task-to-task map. The current pilot matches user-edited text using `exact` → `nlp` → `insufficient_data` in the app, not this ETL. An LLM fallback is deliberately deferred until labelled evaluation shows that TF-IDF coverage is insufficient.
+Task **texts** are not the same in MASCO and ILO. There is no checked task-to-task map. The current pilot matches user-edited text using `exact` → trained `nlp` → `insufficient_data` in the app, not this ETL. The trained score model uses grouped ISCO cross-validation and is documented in `docs/model_cards/epic2_task_exposure_tfidf_ridge_v1.md`. An LLM fallback is deliberately deferred until evaluation shows that the trained baseline is insufficient.
 
 **Does not join by occupation code:** WEF skills. E3 attaches skills after NLP/LLM.
 
@@ -243,7 +244,7 @@ After a clean seed, lookup tables should contain:
 - ILO GPT justifications stay in raw (and the Excel), not in `ref_ilo_tasks`.
 - Default upsert keeps orphan lookup rows if a key disappears or is renamed; use `--replace` or delete by hand.
 - `data/business/*.csv` are header sketches; live rows are in Neon.
-- E2/E3 NLP/LLM matchers are application logic, not this pipeline.
+- The E2 trained NLP model and E3 NLP/LLM matchers are application logic, not this ETL.
 
 ---
 
