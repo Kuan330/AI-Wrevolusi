@@ -13,6 +13,13 @@ export const RESPONSIBILITY_OPTIONS = [
   { value: "lead", label: "I lead others" },
 ] as const;
 
+export const TASK_ASSESSMENT_CONTEXT_LEVEL_OPTIONS = [
+  { value: "", label: "Skip" },
+  { value: "low", label: "Low" },
+  { value: "medium", label: "Medium" },
+  { value: "high", label: "High" },
+] as const;
+
 export const createTaskId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()

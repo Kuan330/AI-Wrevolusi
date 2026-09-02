@@ -41,6 +41,14 @@ export const TASK_BANDS = [
     color: TASK_BAND_COLOR[TaskBandId.Reshaped],
     ink: TASK_BAND_INK[TaskBandId.Reshaped],
   },
+  {
+    id: TaskBandId.InsufficientData,
+    label: "Insufficient data",
+    min: Number.POSITIVE_INFINITY,
+    max: Number.POSITIVE_INFINITY,
+    color: TASK_BAND_COLOR[TaskBandId.InsufficientData],
+    ink: TASK_BAND_INK[TaskBandId.InsufficientData],
+  },
 ] as const;
 
 export const bandFromScore = (score: number | null | undefined): TaskBandId | null => {

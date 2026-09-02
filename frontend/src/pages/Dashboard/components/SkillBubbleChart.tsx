@@ -3,8 +3,8 @@ import { useMemo, type CSSProperties } from "react";
 import {
   AI_CAPACITIES,
   aiCapacityFromCategory,
+  classifySkillUseTrendFromNetIncreasePercentage,
   USE_TRENDS,
-  useTrendFromNetIncrease,
 } from "@/pages/Dashboard/lib/skillAxes";
 import { GradientPill } from "@/components/ui/gradient-pill";
 import {
@@ -82,7 +82,9 @@ const SkillBubbleChart = ({
       .map((skill) => {
         const capacity = aiCapacityFromCategory(skill.genai_substitution_capacity_category);
         if (!capacity) return null;
-        const trend = useTrendFromNetIncrease(skill.future_net_increase_2025_2030);
+        const trend = classifySkillUseTrendFromNetIncreasePercentage(
+          skill.future_net_increase_2025_2030,
+        );
         const count = tasksBySkill[skill.wef_skill_id]?.length ?? 0;
         const capacityIndex = AI_CAPACITIES.findIndex((item) => item.id === capacity);
         const trendIndex = USE_TRENDS.findIndex((item) => item.id === trend);

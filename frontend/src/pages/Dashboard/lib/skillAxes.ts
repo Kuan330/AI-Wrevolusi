@@ -22,9 +22,13 @@ export const AI_CAPACITIES = [
   { id: AiCapacityId.High, label: "High capacity", color: AI_CAPACITY_COLOR[AiCapacityId.High] },
 ] as const;
 
-export const useTrendFromNetIncrease = (net: number | null | undefined): UseTrendId => {
-  if (typeof net !== "number" || net < 0) return UseTrendId.Decreasing;
-  if (net <= 20) return UseTrendId.Stable;
+export const classifySkillUseTrendFromNetIncreasePercentage = (
+  netIncreasePercentage: number | null | undefined,
+): UseTrendId => {
+  if (typeof netIncreasePercentage !== "number" || netIncreasePercentage < 0) {
+    return UseTrendId.Decreasing;
+  }
+  if (netIncreasePercentage <= 20) return UseTrendId.Stable;
   return UseTrendId.Increasing;
 };
 

@@ -189,6 +189,7 @@ export const TaskBandId = {
   AiAssisted: "ai_assisted",
   PartlyAutomated: "partly_automated",
   Reshaped: "reshaped",
+  InsufficientData: "insufficient_data",
 } as const;
 export type TaskBandId = (typeof TaskBandId)[keyof typeof TaskBandId];
 
@@ -197,6 +198,7 @@ export const TaskBandColor = {
   AiAssisted: "#F0DE56",
   PartlyAutomated: "#F7C9D4",
   Reshaped: "#A8D4F5",
+  InsufficientData: "#D8D2D7",
 } as const;
 export type TaskBandColor = (typeof TaskBandColor)[keyof typeof TaskBandColor];
 
@@ -205,6 +207,7 @@ export const TASK_BAND_COLOR: Record<TaskBandId, TaskBandColor> = {
   [TaskBandId.AiAssisted]: TaskBandColor.AiAssisted,
   [TaskBandId.PartlyAutomated]: TaskBandColor.PartlyAutomated,
   [TaskBandId.Reshaped]: TaskBandColor.Reshaped,
+  [TaskBandId.InsufficientData]: TaskBandColor.InsufficientData,
 };
 
 export const TaskBandInk = {
@@ -212,6 +215,7 @@ export const TaskBandInk = {
   AiAssisted: "#7A6512",
   PartlyAutomated: "#9A4A5C",
   Reshaped: "#2F5F80",
+  InsufficientData: "#625A60",
 } as const;
 export type TaskBandInk = (typeof TaskBandInk)[keyof typeof TaskBandInk];
 
@@ -220,6 +224,7 @@ export const TASK_BAND_INK: Record<TaskBandId, TaskBandInk> = {
   [TaskBandId.AiAssisted]: TaskBandInk.AiAssisted,
   [TaskBandId.PartlyAutomated]: TaskBandInk.PartlyAutomated,
   [TaskBandId.Reshaped]: TaskBandInk.Reshaped,
+  [TaskBandId.InsufficientData]: TaskBandInk.InsufficientData,
 };
 
 export type TaskBandTone = {
@@ -248,6 +253,11 @@ export const TASK_BAND_TONE: Record<TaskBandId, TaskBandTone> = {
     fill: TaskBandColor.Reshaped,
     background: TaskBandColor.Reshaped,
     color: TaskBandInk.Reshaped,
+  },
+  [TaskBandId.InsufficientData]: {
+    fill: TaskBandColor.InsufficientData,
+    background: TaskBandColor.InsufficientData,
+    color: TaskBandInk.InsufficientData,
   },
 };
 

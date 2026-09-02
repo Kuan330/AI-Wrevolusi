@@ -9,19 +9,43 @@ export const toProfileTask = (
   wording: string,
   source: ProfileTask["source"],
   extras?: Partial<
-    Pick<ProfileTask, "iloTaskId" | "timeSpent" | "responsibility" | "score2025" | "potential25" | "meanScore2025">
+    Pick<
+      ProfileTask,
+      | "iloTaskId"
+      | "timeSpent"
+      | "responsibility"
+      | "routineProcessingLevel"
+      | "informationUseLevel"
+      | "humanInteractionLevel"
+      | "judgementLevel"
+      | "score2025"
+      | "potential25"
+      | "meanScore2025"
+    >
   >,
 ): ProfileTask => ({
   id: createTaskId(),
   wording,
   timeSpent: extras?.timeSpent ?? "",
   responsibility: extras?.responsibility ?? "",
+  routineProcessingLevel: extras?.routineProcessingLevel ?? "",
+  informationUseLevel: extras?.informationUseLevel ?? "",
+  humanInteractionLevel: extras?.humanInteractionLevel ?? "",
+  judgementLevel: extras?.judgementLevel ?? "",
   source,
   iloTaskId: extras?.iloTaskId,
   originalWording: source === "ilo" ? wording : undefined,
   score2025: extras?.score2025,
   potential25: extras?.potential25,
   meanScore2025: extras?.meanScore2025,
+});
+
+const normalizePersistedProfileTaskAssessmentContext = (task: ProfileTask): ProfileTask => ({
+  ...task,
+  routineProcessingLevel: task.routineProcessingLevel ?? "",
+  informationUseLevel: task.informationUseLevel ?? "",
+  humanInteractionLevel: task.humanInteractionLevel ?? "",
+  judgementLevel: task.judgementLevel ?? "",
 });
 
 export const useProfileTasks = (occupationCode?: string) => {
@@ -65,7 +89,8 @@ export const useProfileTasks = (occupationCode?: string) => {
     if (!occupationCode) return;
     const saved = readProfileTasks(occupationCode);
     if (saved) {
-      setTasks(saved);
+      const normalizedSavedTasks = saved.map(normalizePersistedProfileTaskAssessmentContext);
+      setTasks(normalizedSavedTasks);
       setError(saved.length === 0 ? "No starter tasks are available for this occupation yet. You can add your own." : null);
       return;
     }
@@ -78,6 +103,10 @@ export const useProfileTasks = (occupationCode?: string) => {
         toProfileTask(values.wording.trim(), "user", {
           timeSpent: values.timeSpent,
           responsibility: values.responsibility,
+          routineProcessingLevel: values.routineProcessingLevel,
+          informationUseLevel: values.informationUseLevel,
+          humanInteractionLevel: values.humanInteractionLevel,
+          judgementLevel: values.judgementLevel,
         }),
         ...current,
       ];
@@ -97,6 +126,10 @@ export const useProfileTasks = (occupationCode?: string) => {
           wording,
           timeSpent: values.timeSpent,
           responsibility: values.responsibility,
+          routineProcessingLevel: values.routineProcessingLevel,
+          informationUseLevel: values.informationUseLevel,
+          humanInteractionLevel: values.humanInteractionLevel,
+          judgementLevel: values.judgementLevel,
           score2025: edited ? null : task.score2025,
           potential25: edited ? null : task.potential25,
         };

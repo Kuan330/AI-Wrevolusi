@@ -7,7 +7,7 @@ MASCO occupation (4-digit)
   → ILO tasks (unit_code = isco_08)          encoding join
   → user confirms / edits / adds tasks       add may use speech-to-text
   → ILO-linked task: exposure from ILO row   exact
-     user-added task: NLP then AI exposure
+     user-added or edited task: TF-IDF NLP matching, then insufficient_data when no reliable match exists
   → each confirmed task → WEF core skills    NLP then AI (no encoding join)
   → E4 confirm / correct
 ```
@@ -174,7 +174,7 @@ erDiagram
 
 `profile_wef_skills.wef_core_skill` is a **logical** reference to `wef_skill_master_raw.core_skill`. User-added skills may be free text with `is_user_added = true`.
 
-`wef_skill_task_links` is written **after** NLP/AI. Empty `ilo_task_id` means a user-added task (no official ILO exposure row).
+`wef_skill_task_links` is written **after** NLP/AI. Empty `ilo_task_id` means a user-added task (no official ILO exposure row). The E2 pilot does not use an LLM fallback; it exposes low-confidence text matches as `insufficient_data` instead.
 
 ### Status and matching values
 
