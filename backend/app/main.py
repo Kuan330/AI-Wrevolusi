@@ -48,6 +48,6 @@ async def startup_event() -> None:
         await init_models()
 
 
-@app.get('/healthz', tags=['System'])
+@app.get('/api/healthz', tags=['System'])
 async def health_check() -> dict[str, str]:
     return {'status': 'ok'}
