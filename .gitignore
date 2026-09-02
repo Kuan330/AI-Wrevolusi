@@ -11,6 +11,7 @@ backend/build/
 .vercel/
 .DS_Store
 .cursor/
+.codegraph/
 db/_dev_seed_statements.json
 node_modules/
 frontend/dist/
