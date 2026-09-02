@@ -46,7 +46,7 @@
   min-height: 0;
   display: grid;
   grid-template-columns: minmax(280px, 1.25fr) minmax(240px, 0.95fr) minmax(300px, 1fr);
-  grid-template-rows: minmax(0, 0.5fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   grid-template-areas:
     "capability pie list"
     "bubble     bubble list";
@@ -55,6 +55,11 @@
 
 .work-profile-page .dashboard-overview__capability {
   grid-area: capability;
+  min-height: 0;
+}
+
+.work-profile-page .dashboard-overview__capability .dashboard-card__content {
+  overflow-y: auto;
 }
 
 .work-profile-page .dashboard-overview__pie {

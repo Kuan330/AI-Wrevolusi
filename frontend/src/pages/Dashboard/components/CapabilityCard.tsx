@@ -30,7 +30,7 @@ const CapabilityCard = ({ title, path, potential25, meanScore2025 }: CapabilityC
       title={title}
       description={path.length > 0 ? path.join(" → ") : undefined}
     >
-      <div className="mt-auto space-y-3 pt-3">
+      <div className="space-y-3 pt-1">
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold leading-snug" style={{ color: labelColor }}>

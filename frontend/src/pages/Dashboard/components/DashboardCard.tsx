@@ -72,7 +72,12 @@ const DashboardCard = ({
           ) : null}
         </CardHeader>
       ) : null}
-      <CardContent className={cn("flex min-h-0 flex-1 flex-col p-4 pt-2", contentClassName)}>
+      <CardContent
+        className={cn(
+          "dashboard-card__content flex min-h-0 flex-1 flex-col p-4 pt-2",
+          contentClassName,
+        )}
+      >
         {children}
       </CardContent>
     </Card>
