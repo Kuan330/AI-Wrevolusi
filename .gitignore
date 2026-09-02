@@ -1,4 +1,5 @@
 .env
+.env.local
 backend/.env
 frontend/.env
 .venv/
@@ -8,6 +9,8 @@ __pycache__/
 *.pyc
 .DS_Store
 .cursor/
+.codegraph/
+.vercel/
 db/_dev_seed_statements.json
 node_modules/
 frontend/dist/
