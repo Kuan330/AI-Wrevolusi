@@ -25,6 +25,8 @@ export type UserProfile = {
   occupation: SelectedOccupation | null;
   tasks: ProfileTask[];
   tasksOccupationCode: string | null;
+  referenceDataVersion: string | null;
+  removedReferenceTaskIds: string[];
   analysis: ConfirmedAnalysis | null;
 };
 
@@ -32,6 +34,8 @@ const emptyProfile = (): UserProfile => ({
   occupation: null,
   tasks: [],
   tasksOccupationCode: null,
+  referenceDataVersion: null,
+  removedReferenceTaskIds: [],
   analysis: null,
 });
 
@@ -72,6 +76,8 @@ export const readUserProfile = (): UserProfile => {
     occupation,
     tasks: analysis?.tasks ?? [],
     tasksOccupationCode: analysis?.occupationCode ?? occupation?.unit.occupation_code ?? null,
+    referenceDataVersion: null,
+    removedReferenceTaskIds: [],
     analysis,
   };
   if (occupation || analysis) {
@@ -101,6 +107,8 @@ export const saveSelectedOccupation = (occupation: SelectedOccupation) => {
     occupation,
     tasks: same ? prev.tasks : [],
     tasksOccupationCode: same ? prev.tasksOccupationCode : null,
+    referenceDataVersion: same ? prev.referenceDataVersion : null,
+    removedReferenceTaskIds: same ? prev.removedReferenceTaskIds : [],
     analysis: same ? prev.analysis : null,
   });
 };
@@ -108,14 +116,29 @@ export const saveSelectedOccupation = (occupation: SelectedOccupation) => {
 export const readSelectedOccupation = (): SelectedOccupation | null =>
   readUserProfile().occupation ?? readLegacyOccupation();
 
-export const saveProfileTasks = (occupationCode: string, tasks: ProfileTask[]) => {
-  writeUserProfile({ tasks, tasksOccupationCode: occupationCode, analysis: null });
+type ProfileTaskCacheMetadata = Pick<
+  UserProfile,
+  "referenceDataVersion" | "removedReferenceTaskIds"
+>;
+
+export const saveProfileTasks = (
+  occupationCode: string,
+  tasks: ProfileTask[],
+  metadata: Partial<ProfileTaskCacheMetadata> = {},
+) => {
+  writeUserProfile({ tasks, tasksOccupationCode: occupationCode, analysis: null, ...metadata });
 };
 
-export const readProfileTasks = (occupationCode: string): ProfileTask[] | null => {
+export const readProfileTaskCache = (
+  occupationCode: string,
+): ({ tasks: ProfileTask[] } & ProfileTaskCacheMetadata) | null => {
   const profile = readUserProfile();
   if (profile.tasksOccupationCode !== occupationCode) return null;
-  return profile.tasks;
+  return {
+    tasks: profile.tasks,
+    referenceDataVersion: profile.referenceDataVersion,
+    removedReferenceTaskIds: profile.removedReferenceTaskIds,
+  };
 };
 
 export const saveConfirmedAnalysis = (analysis: ConfirmedAnalysis) => {

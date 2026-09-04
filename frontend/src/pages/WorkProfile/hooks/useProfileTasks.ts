@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 
 import { createTaskId } from "@/pages/WorkProfile/taskOptions";
 import type { ProfileTask, TaskEditorValues } from "@/pages/WorkProfile/types";
-import { readProfileTasks, saveProfileTasks } from "@/pages/WorkProfile/userProfile";
+import { readProfileTaskCache, saveProfileTasks } from "@/pages/WorkProfile/userProfile";
 import { referenceService } from "@/services/referenceService";
+import type { ReferenceTask } from "@/types/reference";
 
 export const toProfileTask = (
   wording: string,
@@ -48,31 +49,77 @@ const normalizePersistedProfileTaskAssessmentContext = (task: ProfileTask): Prof
   judgementLevel: task.judgementLevel ?? "",
 });
 
+const mergeRefreshedReferenceTasks = (
+  savedTasks: ProfileTask[],
+  referenceTasks: ReferenceTask[],
+  removedReferenceTaskIds: string[],
+): ProfileTask[] => {
+  const savedByReferenceId = new Map(
+    savedTasks
+      .filter((task): task is ProfileTask & { iloTaskId: string } => Boolean(task.iloTaskId))
+      .map((task) => [task.iloTaskId, task]),
+  );
+  const currentReferenceIds = new Set(referenceTasks.map((task) => task.task_id));
+  const removedIds = new Set(removedReferenceTaskIds);
+  const preservedTasks = savedTasks.filter(
+    (task) =>
+      task.source === "user" ||
+      !task.iloTaskId ||
+      (!currentReferenceIds.has(task.iloTaskId) &&
+        task.wording !== (task.originalWording ?? task.wording)),
+  );
+  const refreshedTasks = referenceTasks
+    .filter((task) => !removedIds.has(task.task_id))
+    .map((task) => {
+      const saved = savedByReferenceId.get(task.task_id);
+      if (!saved) {
+        return toProfileTask(task.task_text, "ilo", {
+          iloTaskId: task.task_id,
+          score2025: task.score_2025,
+          potential25: task.potential25,
+          meanScore2025: task.mean_score_2025,
+        });
+      }
+      const editedWording = saved.wording !== (saved.originalWording ?? saved.wording);
+      return {
+        ...saved,
+        wording: editedWording ? saved.wording : task.task_text,
+        originalWording: task.task_text,
+        score2025: editedWording ? null : task.score_2025,
+        potential25: editedWording ? null : task.potential25,
+        meanScore2025: editedWording ? null : task.mean_score_2025,
+      };
+    });
+  return [...preservedTasks, ...refreshedTasks];
+};
+
 export const useProfileTasks = (occupationCode?: string) => {
   const [tasks, setTasks] = useState<ProfileTask[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [removedReferenceTaskIds, setRemovedReferenceTaskIds] = useState<string[]>([]);
 
   const persist = (next: ProfileTask[]) => {
     if (!occupationCode) return;
     saveProfileTasks(occupationCode, next);
   };
 
-  const loadStarterTasks = async (code: string) => {
+  const loadStarterTasks = async (
+    code: string,
+    referenceDataVersion?: string,
+    savedTasks: ProfileTask[] = [],
+    removedIds: string[] = removedReferenceTaskIds,
+  ) => {
     setLoading(true);
     setError(null);
     try {
       const rows = await referenceService.tasks(code);
-      const next = rows.map((task) =>
-        toProfileTask(task.task_text, "ilo", {
-          iloTaskId: task.task_id,
-          score2025: task.score_2025,
-          potential25: task.potential25,
-          meanScore2025: task.mean_score_2025,
-        }),
-      );
+      const next = mergeRefreshedReferenceTasks(savedTasks, rows, removedIds);
       setTasks(next);
-      saveProfileTasks(code, next);
+      saveProfileTasks(code, next, {
+        ...(referenceDataVersion === undefined ? {} : { referenceDataVersion }),
+        removedReferenceTaskIds: removedIds,
+      });
       if (rows.length === 0) {
         setError("No starter tasks are available for this occupation yet. You can add your own.");
       }
@@ -87,14 +134,42 @@ export const useProfileTasks = (occupationCode?: string) => {
 
   useEffect(() => {
     if (!occupationCode) return;
-    const saved = readProfileTasks(occupationCode);
-    if (saved) {
-      const normalizedSavedTasks = saved.map(normalizePersistedProfileTaskAssessmentContext);
+    const cached = readProfileTaskCache(occupationCode);
+    const normalizedSavedTasks = cached?.tasks.map(
+      normalizePersistedProfileTaskAssessmentContext,
+    );
+    if (cached && normalizedSavedTasks) {
       setTasks(normalizedSavedTasks);
-      setError(saved.length === 0 ? "No starter tasks are available for this occupation yet. You can add your own." : null);
-      return;
+      setRemovedReferenceTaskIds(cached.removedReferenceTaskIds);
+      setError(
+        normalizedSavedTasks.length === 0
+          ? "No starter tasks are available for this occupation yet. You can add your own."
+          : null,
+      );
     }
-    void loadStarterTasks(occupationCode);
+
+    const refreshWhenReferenceDataChanges = async () => {
+      try {
+        const { version } = await referenceService.version();
+        if (cached && cached.referenceDataVersion === null) {
+          saveProfileTasks(occupationCode, normalizedSavedTasks ?? [], {
+            referenceDataVersion: version,
+          });
+          return;
+        }
+        if (cached?.referenceDataVersion === version) return;
+        await loadStarterTasks(
+          occupationCode,
+          version,
+          normalizedSavedTasks ?? [],
+          cached?.removedReferenceTaskIds ?? [],
+        );
+      } catch {
+        if (!cached) await loadStarterTasks(occupationCode, undefined, [], []);
+      }
+    };
+
+    void refreshWhenReferenceDataChanges();
   }, [occupationCode]);
 
   const addTask = (values: TaskEditorValues) => {
@@ -141,8 +216,17 @@ export const useProfileTasks = (occupationCode?: string) => {
 
   const removeTask = (taskId: string) => {
     setTasks((current) => {
+      const removedReferenceId = current.find((task) => task.id === taskId)?.iloTaskId;
       const next = current.filter((task) => task.id !== taskId);
-      persist(next);
+      const nextRemovedIds = removedReferenceId
+        ? [...new Set([...removedReferenceTaskIds, removedReferenceId])]
+        : removedReferenceTaskIds;
+      setRemovedReferenceTaskIds(nextRemovedIds);
+      if (occupationCode) {
+        saveProfileTasks(occupationCode, next, {
+          removedReferenceTaskIds: nextRemovedIds,
+        });
+      }
       return next;
     });
   };
@@ -150,8 +234,17 @@ export const useProfileTasks = (occupationCode?: string) => {
   const removeTasks = (taskIds: string[]) => {
     const idSet = new Set(taskIds);
     setTasks((current) => {
+      const removedIds = current
+        .filter((task) => idSet.has(task.id))
+        .flatMap((task) => (task.iloTaskId ? [task.iloTaskId] : []));
       const next = current.filter((task) => !idSet.has(task.id));
-      persist(next);
+      const nextRemovedIds = [...new Set([...removedReferenceTaskIds, ...removedIds])];
+      setRemovedReferenceTaskIds(nextRemovedIds);
+      if (occupationCode) {
+        saveProfileTasks(occupationCode, next, {
+          removedReferenceTaskIds: nextRemovedIds,
+        });
+      }
       return next;
     });
   };

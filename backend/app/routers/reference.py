@@ -8,6 +8,34 @@ router = APIRouter(prefix='/reference', tags=['Reference Data'])
 
 OCCUPATION_COLUMNS = 'occupation_code, level, parent_code, title, description'
 
+REFERENCE_DATA_VERSION_QUERY = '''
+SELECT md5(
+    COALESCE(
+        (SELECT jsonb_agg(to_jsonb(occupation) ORDER BY occupation.occupation_code)::text
+         FROM ref_occupations AS occupation),
+        '[]'
+    ) || '|' ||
+    COALESCE(
+        (SELECT jsonb_agg(to_jsonb(task) ORDER BY task.isco_08, task.task_id)::text
+         FROM ref_ilo_tasks AS task),
+        '[]'
+    ) || '|' ||
+    COALESCE(
+        (SELECT jsonb_agg(to_jsonb(skill) ORDER BY skill.wef_skill_id)::text
+         FROM ref_wef_skills AS skill),
+        '[]'
+    )
+) AS version
+'''
+
+
+@router.get('/version')
+async def get_reference_data_version(db: AsyncSession = Depends(get_db)) -> dict[str, str]:
+    # ponytail: hash the small reference catalog on profile load; replace this
+    # with a stored version row if catalog size makes the query measurably slow.
+    result = await db.execute(text(REFERENCE_DATA_VERSION_QUERY))
+    return {'version': str(result.scalar_one())}
+
 
 @router.get('/occupations')
 async def list_reference_occupations(
