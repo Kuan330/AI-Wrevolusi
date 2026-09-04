@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { readConfirmedAnalysis } from "@/pages/Dashboard/analysisSession";
+import {
+  readConfirmedAnalysis,
+  saveConfirmedCapabilityProfile,
+} from "@/pages/Dashboard/analysisSession";
 import CapabilityCard from "@/pages/Dashboard/components/CapabilityCard";
 import DashboardHeader from "@/pages/Dashboard/components/DashboardHeader";
 import SkillMapCard from "@/pages/Dashboard/components/SkillMapCard";
@@ -15,8 +18,13 @@ import {
   USE_TRENDS,
 } from "@/pages/Dashboard/lib/skillAxes";
 import { TASK_BANDS, type TaskBandId } from "@/pages/Dashboard/lib/taskBands";
+import { capabilityService } from "@/services/capabilityService";
 import { referenceService } from "@/services/referenceService";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
+import type {
+  ConfirmedCapabilityProfile,
+  ConfirmedTaskCapabilityRecognitionBatchResponse,
+} from "@/types/capability";
 import type { WefSkill } from "@/types/reference";
 import "@/pages/Dashboard/dashboard.css";
 
@@ -34,6 +42,12 @@ const emptyCounts = () =>
 const Dashboard = () => {
   const [analysis] = useState(readConfirmedAnalysis);
   const [skills, setSkills] = useState<WefSkill[]>([]);
+  const [capabilityRecognition, setCapabilityRecognition] =
+    useState<ConfirmedTaskCapabilityRecognitionBatchResponse | null>(null);
+  const [capabilityRecognitionStatus, setCapabilityRecognitionStatus] =
+    useState<"loading" | "model" | "fallback">(analysis ? "loading" : "fallback");
+  const [confirmedCapabilityProfile, setConfirmedCapabilityProfile] =
+    useState<ConfirmedCapabilityProfile | null>(() => analysis?.capabilityProfile ?? null);
   const [activeBand, setActiveBand] = useState<TaskBandId | null>(null);
   const [selectedSkillId, setSelectedSkillId] = useState<number | null>(null);
   const taskExposureAssessments =
@@ -43,9 +57,61 @@ const Dashboard = () => {
     void referenceService.wefSkills().then(setSkills).catch(() => setSkills([]));
   }, []);
 
+  useEffect(() => {
+    if (!analysis) return;
+    let shouldApplyResponse = true;
+    const exposureStateByTaskId = new Map(
+      taskExposureAssessments.map((assessment) => [assessment.task_id, assessment.suggested_state]),
+    );
+    void capabilityService
+      .recognizeConfirmedTasks({
+        confirmed_tasks: analysis.tasks.map((task) => ({
+          task_id: task.id,
+          task_text: task.wording,
+          exposure_state: exposureStateByTaskId.get(task.id) ?? null,
+        })),
+      })
+      .then((response) => {
+        if (shouldApplyResponse) {
+          setCapabilityRecognition(response);
+          setCapabilityRecognitionStatus("model");
+        }
+      })
+      .catch(() => {
+        if (shouldApplyResponse) {
+          setCapabilityRecognition(null);
+          setCapabilityRecognitionStatus("fallback");
+        }
+      });
+    return () => {
+      shouldApplyResponse = false;
+    };
+  }, [analysis, taskExposureAssessments]);
+
   const { litSkillIds, tasksBySkill } = useMemo(() => {
     if (!analysis) return { litSkillIds: [] as number[], tasksBySkill: {} as Record<number, never[]> };
     const linked: Record<number, typeof analysis.tasks> = {};
+    if (confirmedCapabilityProfile) {
+      for (const capability of confirmedCapabilityProfile.capabilities) {
+        if (capability.wefSkillId === null) continue;
+        const linkedTaskIds = new Set(capability.linkedTaskIds);
+        linked[capability.wefSkillId] = analysis.tasks.filter((task) => linkedTaskIds.has(task.id));
+      }
+      return {
+        litSkillIds: Object.keys(linked).map(Number),
+        tasksBySkill: linked,
+      };
+    }
+    if (capabilityRecognition) {
+      for (const capability of capabilityRecognition.capabilities) {
+        const linkedTaskIds = new Set(capability.task_evidence.map((evidence) => evidence.task_id));
+        linked[capability.wef_skill_id] = analysis.tasks.filter((task) => linkedTaskIds.has(task.id));
+      }
+      return {
+        litSkillIds: Object.keys(linked).map(Number),
+        tasksBySkill: linked,
+      };
+    }
     for (const task of analysis.tasks) {
       for (const skill of skillsForTask(task.wording, skills)) {
         linked[skill.wef_skill_id] = [...(linked[skill.wef_skill_id] ?? []), task];
@@ -55,7 +121,7 @@ const Dashboard = () => {
       litSkillIds: Object.keys(linked).map(Number),
       tasksBySkill: linked,
     };
-  }, [analysis, skills]);
+  }, [analysis, capabilityRecognition, confirmedCapabilityProfile, skills]);
 
   const counts = useMemo(() => {
     const next = emptyCounts();
@@ -161,6 +227,16 @@ const Dashboard = () => {
           tasksBySkill={tasksBySkill}
           selectedSkillId={selectedSkillId}
           onSelectSkill={selectSkill}
+          tasks={analysis.tasks}
+          recognition={capabilityRecognition}
+          recognitionStatus={capabilityRecognitionStatus}
+          confirmedProfile={confirmedCapabilityProfile}
+          onSaveConfirmedProfile={(profile) => {
+            if (saveConfirmedCapabilityProfile(profile)) {
+              setConfirmedCapabilityProfile(profile);
+              setSelectedSkillId(null);
+            }
+          }}
         />
       </div>
     </div>

@@ -1,5 +1,6 @@
 import type { ProfileTask } from "@/pages/WorkProfile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
+import type { ConfirmedCapabilityProfile } from "@/types/capability";
 import type { ReferenceOccupation } from "@/types/reference";
 
 const PROFILE_KEY = "aiwrevolusi.userProfile";
@@ -19,6 +20,7 @@ export type ConfirmedAnalysis = {
   meanScore2025: number | null;
   tasks: ProfileTask[];
   taskExposureAssessments: ConfirmedTaskExposureAssessment[];
+  capabilityProfile?: ConfirmedCapabilityProfile | null;
 };
 
 export type UserProfile = {
@@ -151,6 +153,18 @@ export const saveConfirmedAnalysis = (analysis: ConfirmedAnalysis) => {
 
 export const readConfirmedAnalysis = (): ConfirmedAnalysis | null =>
   readUserProfile().analysis;
+
+export const readConfirmedCapabilityProfile = (): ConfirmedCapabilityProfile | null =>
+  readConfirmedAnalysis()?.capabilityProfile ?? null;
+
+export const saveConfirmedCapabilityProfile = (
+  capabilityProfile: ConfirmedCapabilityProfile,
+): ConfirmedCapabilityProfile | null => {
+  const analysis = readConfirmedAnalysis();
+  if (!analysis) return null;
+  saveConfirmedAnalysis({ ...analysis, capabilityProfile });
+  return capabilityProfile;
+};
 
 export const hasConfirmedAnalysis = (): boolean => {
   const analysis = readConfirmedAnalysis();
