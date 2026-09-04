@@ -10,4 +10,5 @@ export const ROUTES = {
   preparation: "/preparation",
   flexibility: "/flexibility",
   taskEfficiency: "/task-efficiency",
+  systemDesign: "/system-design",
 } as const;

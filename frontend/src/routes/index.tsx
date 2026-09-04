@@ -10,6 +10,7 @@ import Home from "@/pages/Home/Home";
 import Interpretation from "@/pages/Interpretation/Interpretation";
 import Preparation from "@/pages/Preparation/Preparation";
 import Priorities from "@/pages/Priorities/Priorities";
+import SystemDesign from "@/pages/SystemDesign/SystemDesign";
 import TaskEfficiency from "@/pages/TaskEfficiency/TaskEfficiency";
 import WorkProfile from "@/pages/WorkProfile/WorkProfile";
 import ProfileTasks from "@/pages/WorkProfile/ProfileTasks";
@@ -19,6 +20,7 @@ const AppRoutes = () => {
     <BrowserRouter>
       <Routes>
         <Route path={ROUTES.home} element={<Home />} />
+        <Route path={ROUTES.systemDesign} element={<SystemDesign />} />
         <Route element={<ProfileLayout />}>
           <Route path={ROUTES.workProfile} element={<WorkProfile />} />
           <Route path={ROUTES.task} element={<ProfileTasks />} />

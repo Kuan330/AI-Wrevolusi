@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI-Wrevolusi detailed production architecture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 40px; color: #2f2430; background: #fbf7f8; font-family: "Geist", sans-serif; }
+      main { width: min(1280px, 100%); margin: 0 auto; }
+      .eyebrow { margin: 0 0 8px; color: #7f7280; font: 500 8px/1 "Geist Mono", monospace; letter-spacing: 0.18em; text-transform: uppercase; }
+      h1 { margin: 0 0 8px; font: 400 32px/1.1 "Instrument Serif", serif; }
+      p { margin: 0 0 24px; color: #574a55; font-size: 12px; }
+      svg { display: block; width: 100%; height: auto; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Current production / faithful detail</p>
+      <h1>AI-Wrevolusi production architecture</h1>
+      <p>The deployed request path, its supporting components and its verified data boundary.</p>
+
+      <svg width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="aiw-production-architecture-title aiw-production-architecture-desc">
+        <title id="aiw-production-architecture-title">Detailed AI-Wrevolusi production architecture</title>
+        <desc id="aiw-production-architecture-desc">Detailed architecture showing React routes and browser state, Vercel frontend and API routing, FastAPI validation and explainable NLP services, plus async data access and PostgreSQL tables populated from curated MASCO, ILO and WEF sources.</desc>
+        <defs>
+          <style>
+            .zone-label { fill: #7f7280; font: 500 8px 'Geist Mono', monospace; letter-spacing: 1.2px; }
+            .tag { fill: #7f7280; font: 500 8px 'Geist Mono', monospace; }
+            .name { fill: #2f2430; font: 600 14px 'Geist', sans-serif; }
+            .sub { fill: #574a55; font: 400 9px 'Geist Mono', monospace; }
+            .flow-label { fill: #4f91ba; font: 500 8px 'Geist Mono', monospace; letter-spacing: 0.5px; }
+          </style>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0 0, 8 4, 0 8" fill="#7f7280" /></marker>
+          <marker id="arrow-link" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0 0, 8 4, 0 8" fill="#4f91ba" /></marker>
+        </defs>
+
+        <rect width="1280" height="720" fill="#fbf7f8" />
+        <text x="40" y="44" class="zone-label">SYSTEM DESIGN · CURRENT PRODUCTION</text>
+        <text x="40" y="80" fill="#2f2430" font-family="'Instrument Serif', serif" font-size="40">Detailed runtime and data boundaries</text>
+
+        <rect x="40" y="104" width="320" height="516" rx="8" fill="rgba(199,149,139,0.04)" stroke="rgba(47,36,48,0.12)" />
+        <rect x="392" y="104" width="500" height="516" rx="8" fill="rgba(79,145,186,0.04)" stroke="rgba(47,36,48,0.12)" />
+        <rect x="924" y="104" width="316" height="516" rx="8" fill="rgba(79,145,186,0.04)" stroke="rgba(47,36,48,0.12)" />
+        <rect x="56" y="108" width="120" height="16" rx="4" fill="#fbf7f8" /><text x="64" y="120" class="zone-label">BROWSER LAYER</text>
+        <rect x="408" y="108" width="120" height="16" rx="4" fill="#fbf7f8" /><text x="416" y="120" class="zone-label">SERVICE LAYER</text>
+        <rect x="940" y="108" width="104" height="16" rx="4" fill="#fbf7f8" /><text x="948" y="120" class="zone-label">DATA LAYER</text>
+
+        <!-- Primary and supporting flows, painted before nodes. -->
+        <line x1="128" y1="248" x2="128" y2="272" stroke="#7f7280" stroke-width="1.2" marker-end="url(#arrow)" />
+        <line x1="272" y1="248" x2="272" y2="272" stroke="#7f7280" stroke-width="1.2" marker-end="url(#arrow)" />
+        <line x1="336" y1="320" x2="416" y2="320" stroke="#4f91ba" stroke-width="1.2" marker-end="url(#arrow-link)" />
+        <line x1="548" y1="320" x2="560" y2="320" stroke="#4f91ba" stroke-width="1.2" marker-end="url(#arrow-link)" />
+        <line x1="692" y1="320" x2="704" y2="320" stroke="#4f91ba" stroke-width="1.2" marker-end="url(#arrow-link)" />
+        <line x1="868" y1="320" x2="948" y2="320" stroke="#4f91ba" stroke-width="1.2" marker-end="url(#arrow-link)" />
+        <line x1="1080" y1="320" x2="1092" y2="320" stroke="#7f7280" stroke-width="1.2" marker-end="url(#arrow)" />
+        <line x1="548" y1="188" x2="336" y2="188" stroke="#7f7280" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrow)" />
+        <line x1="626" y1="224" x2="626" y2="272" stroke="#7f7280" stroke-width="1" marker-end="url(#arrow)" />
+        <path d="M 744 368 V 380 Q 744 388 736 388 H 530 Q 522 388 522 396 V 416" fill="none" stroke="#7f7280" stroke-width="1" marker-end="url(#arrow)" />
+        <path d="M 824 368 V 396 Q 824 404 816 404 H 770 Q 762 404 762 412 V 416" fill="none" stroke="#7f7280" stroke-width="1" marker-end="url(#arrow)" />
+        <line x1="1080" y1="188" x2="1092" y2="188" stroke="#a88d9c" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrow)" />
+        <line x1="1156" y1="224" x2="1156" y2="272" stroke="#a88d9c" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrow)" />
+
+        <rect x="344" y="288" width="64" height="12" rx="2" fill="#fbf7f8" /><text x="376" y="297" class="flow-label" text-anchor="middle">HTTPS /API</text>
+        <rect x="884" y="288" width="56" height="12" rx="2" fill="#fbf7f8" /><text x="912" y="297" class="flow-label" text-anchor="middle">ASYNC SQL</text>
+        <rect x="360" y="160" width="48" height="12" rx="2" fill="#fbf7f8" /><text x="384" y="169" class="tag" text-anchor="middle">DELIVER SPA</text>
+
+        <g><rect x="64" y="152" width="272" height="96" rx="8" fill="#fff" stroke="#a88d9c" /><rect x="76" y="164" width="56" height="16" rx="4" fill="#f9e0e4" /><text x="104" y="176" class="tag" text-anchor="middle">REACT UI</text><text x="200" y="196" class="name" text-anchor="middle">Product routes</text><text x="200" y="216" class="sub" text-anchor="middle">Home · Work Profile · Task Confirmation</text><text x="200" y="232" class="sub" text-anchor="middle">Dashboard · supporting journey pages</text></g>
+        <g><rect x="64" y="272" width="128" height="96" rx="8" fill="#f8f1f3" stroke="#a88d9c" /><text x="128" y="312" class="name" text-anchor="middle">Client state</text><text x="128" y="332" class="sub" text-anchor="middle">occupation</text><text x="128" y="348" class="sub" text-anchor="middle">confirmed analysis</text></g>
+        <g><rect x="208" y="272" width="128" height="96" rx="8" fill="#fff" stroke="#574a55" /><text x="272" y="312" class="name" text-anchor="middle">API adapters</text><text x="272" y="332" class="sub" text-anchor="middle">typed fetch</text><text x="272" y="348" class="sub" text-anchor="middle">4s timeout · fallback</text></g>
+
+        <g><rect x="416" y="152" width="132" height="72" rx="8" fill="#fff" stroke="#574a55" /><text x="482" y="184" class="name" text-anchor="middle">Vercel frontend</text><text x="482" y="204" class="sub" text-anchor="middle">Vite · SPA fallback</text></g>
+        <g><rect x="560" y="152" width="132" height="72" rx="8" fill="#fff" stroke="#574a55" /><text x="626" y="184" class="name" text-anchor="middle">Pydantic</text><text x="626" y="204" class="sub" text-anchor="middle">request contracts</text></g>
+        <g><rect x="704" y="152" width="164" height="72" rx="8" fill="#fff" stroke="#574a55" /><text x="786" y="184" class="name" text-anchor="middle">System health</text><text x="786" y="204" class="sub" text-anchor="middle">GET /api/healthz</text></g>
+        <g><rect x="416" y="272" width="132" height="96" rx="8" fill="#fff" stroke="#574a55" /><text x="482" y="312" class="name" text-anchor="middle">Vercel router</text><text x="482" y="332" class="sub" text-anchor="middle">/api/* → backend</text><text x="482" y="348" class="sub" text-anchor="middle">/* → frontend</text></g>
+        <g><rect x="560" y="272" width="132" height="96" rx="8" fill="#fff" stroke="#574a55" /><text x="626" y="312" class="name" text-anchor="middle">FastAPI routers</text><text x="626" y="332" class="sub" text-anchor="middle">/api/v1</text><text x="626" y="348" class="sub" text-anchor="middle">auth · tasks · reference</text></g>
+        <g><rect x="704" y="272" width="164" height="96" rx="8" fill="#eef6fb" stroke="#4f91ba" stroke-width="1.2" /><text x="786" y="312" class="name" text-anchor="middle">Application services</text><text x="786" y="332" class="sub" text-anchor="middle">exposure · capability</text><text x="786" y="348" class="sub" text-anchor="middle">preparation · schedule</text></g>
+        <g><rect x="416" y="416" width="212" height="104" rx="8" fill="#eef6fb" stroke="#4f91ba" stroke-width="1.2" /><text x="522" y="452" class="name" text-anchor="middle">Explainable NLP exposure</text><text x="522" y="472" class="sub" text-anchor="middle">exact ILO match · TF-IDF</text><text x="522" y="488" class="sub" text-anchor="middle">cosine similarity · context adjustment</text><text x="522" y="504" class="sub" text-anchor="middle">source · uncertainty · limitations</text></g>
+        <g><rect x="656" y="416" width="212" height="104" rx="8" fill="#fff" stroke="#574a55" /><text x="762" y="452" class="name" text-anchor="middle">Domain services</text><text x="762" y="472" class="sub" text-anchor="middle">auth · users · occupations</text><text x="762" y="488" class="sub" text-anchor="middle">tasks · capabilities</text><text x="762" y="504" class="sub" text-anchor="middle">preparation · schedules</text></g>
+
+        <g><rect x="948" y="152" width="132" height="72" rx="8" fill="#f8f1f3" stroke="#a88d9c" stroke-dasharray="4 4" /><text x="1014" y="184" class="name" text-anchor="middle">Source datasets</text><text x="1014" y="204" class="sub" text-anchor="middle">MASCO · ILO · WEF</text></g>
+        <g><rect x="1092" y="152" width="124" height="72" rx="8" fill="#f8f1f3" stroke="#a88d9c" stroke-dasharray="4 4" /><text x="1154" y="184" class="name" text-anchor="middle">Seed pipeline</text><text x="1154" y="204" class="sub" text-anchor="middle">validate · upsert</text></g>
+        <g><rect x="948" y="272" width="132" height="96" rx="8" fill="#fff" stroke="#574a55" /><text x="1014" y="312" class="name" text-anchor="middle">Data access</text><text x="1014" y="332" class="sub" text-anchor="middle">SQLAlchemy 2.x</text><text x="1014" y="348" class="sub" text-anchor="middle">AsyncSession · asyncpg</text></g>
+        <g><rect x="1092" y="272" width="124" height="96" rx="8" fill="#eef6fb" stroke="#4f91ba" stroke-width="1.2" /><text x="1154" y="312" class="name" text-anchor="middle">Neon</text><text x="1154" y="332" class="name" text-anchor="middle">PostgreSQL</text><text x="1154" y="352" class="sub" text-anchor="middle">managed database</text></g>
+        <g><rect x="948" y="416" width="132" height="104" rx="8" fill="#fff" stroke="#574a55" /><text x="1014" y="452" class="name" text-anchor="middle">Reference tables</text><text x="1014" y="472" class="sub" text-anchor="middle">ref_occupations</text><text x="1014" y="488" class="sub" text-anchor="middle">ref_ilo_tasks</text><text x="1014" y="504" class="sub" text-anchor="middle">ref_wef_skills</text></g>
+        <g><rect x="1092" y="416" width="124" height="104" rx="8" fill="#fff" stroke="#574a55" /><text x="1154" y="452" class="name" text-anchor="middle">App tables</text><text x="1154" y="472" class="sub" text-anchor="middle">users · tasks</text><text x="1154" y="488" class="sub" text-anchor="middle">capabilities</text><text x="1154" y="504" class="sub" text-anchor="middle">plans · schedules</text></g>
+
+        <line x1="40" y1="644" x2="1240" y2="644" stroke="rgba(47,36,48,0.12)" />
+        <text x="40" y="668" class="zone-label">LEGEND</text>
+        <rect x="136" y="656" width="16" height="16" rx="4" fill="#fff" stroke="#574a55" /><text x="164" y="668" fill="#574a55" font-family="'Geist', sans-serif" font-size="12">deployed component</text>
+        <rect x="360" y="656" width="16" height="16" rx="4" fill="#eef6fb" stroke="#4f91ba" /><text x="388" y="668" fill="#574a55" font-family="'Geist', sans-serif" font-size="12">focal processing / storage</text>
+        <line x1="660" y1="664" x2="700" y2="664" stroke="#a88d9c" stroke-dasharray="4 4" marker-end="url(#arrow)" /><text x="716" y="668" fill="#574a55" font-family="'Geist', sans-serif" font-size="12">offline import or delivery</text>
+      </svg>
+    </main>
+  </body>
+</html>

@@ -21,7 +21,13 @@ const LandingFooter = () => {
                 <ul>
                   {group.links.map((link) => (
                     <li key={link.label}>
-                      <span className="footer-text-only">{link.label}</span>
+                      {link.href ? (
+                        <a className="footer-text-only footer-link" href={link.href}>
+                          {link.label}
+                        </a>
+                      ) : (
+                        <span className="footer-text-only">{link.label}</span>
+                      )}
                     </li>
                   ))}
                 </ul>
