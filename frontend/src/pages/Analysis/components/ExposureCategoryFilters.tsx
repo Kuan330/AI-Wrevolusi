@@ -9,6 +9,7 @@ type ExposureCategoryFiltersProps = {
   counts: Record<OccupationBandId, number>;
   activeCategory: OccupationBandId | null;
   onSelect: (category: OccupationBandId | null) => void;
+  totalCount?: number;
   compact?: boolean;
 };
 
@@ -16,6 +17,7 @@ const ExposureCategoryFilters = ({
   counts,
   activeCategory,
   onSelect,
+  totalCount,
   compact = false,
 }: ExposureCategoryFiltersProps) => {
   return (
@@ -42,7 +44,7 @@ const ExposureCategoryFilters = ({
           {!compact ? <span className="block text-[11px] font-normal opacity-75">Show every assessed task</span> : null}
         </span>
         <span className="rounded-full bg-white/80 px-2 py-0.5 text-xs tabular-nums">
-          {Object.values(counts).reduce((total, count) => total + count, 0)}
+          {totalCount ?? Object.values(counts).reduce((total, count) => total + count, 0)}
         </span>
       </Button>
 

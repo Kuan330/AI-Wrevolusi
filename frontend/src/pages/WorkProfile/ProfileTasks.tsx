@@ -1,15 +1,20 @@
-import { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
-import { saveConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
+import {
+  readSelectedOccupation,
+  readTaskWorkspace,
+  saveConfirmedAnalysis,
+  type SelectedOccupation,
+} from "@/pages/WorkProfile/userProfile";
 import ProfileTaskList from "@/pages/WorkProfile/components/ProfileTaskList";
 import TaskEditorDialog from "@/pages/WorkProfile/components/TaskEditorDialog";
 import { useProfileTasks } from "@/pages/WorkProfile/hooks/useProfileTasks";
-import { readSelectedOccupation } from "@/pages/WorkProfile/occupationSession";
 import type { ProfileTask, TaskEditorValues } from "@/pages/WorkProfile/types";
 import { exposureService, type TaskAssessmentContextLevel } from "@/services/exposureService";
+import { referenceService } from "@/services/referenceService";
 
 const emptyEditorValues = (): TaskEditorValues => ({
   wording: "",
@@ -41,9 +46,33 @@ const normalizeOptionalResponsibilityLevel = (
 ): "individual" | "shared" | "lead" | null =>
   value === "individual" || value === "shared" || value === "lead" ? value : null;
 
+const loadOccupationWithPath = async (occupationCode: string): Promise<SelectedOccupation> => {
+  const unit = await referenceService.getOccupation(occupationCode);
+  const path = [unit];
+  const seen = new Set([unit.occupation_code]);
+  let parentCode = unit.parent_code;
+
+  while (parentCode && !seen.has(parentCode)) {
+    const parent = await referenceService.getOccupation(parentCode);
+    path.unshift(parent);
+    seen.add(parent.occupation_code);
+    parentCode = parent.parent_code;
+  }
+
+  return { unit, path };
+};
+
 const ProfileTasks = () => {
-  const selected = readSelectedOccupation();
+  const initialSelectedOccupation = readSelectedOccupation();
+  const initialTaskWorkspace = readTaskWorkspace();
+  const [selected, setSelected] = useState<SelectedOccupation | null>(initialSelectedOccupation);
+  const [occupationLoading, setOccupationLoading] = useState(
+    !initialSelectedOccupation && Boolean(initialTaskWorkspace?.tasksOccupationCode),
+  );
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const shouldAutoAnalyze = searchParams.get("reanalyze") === "1";
+  const autoAnalyzeStartedRef = useRef(false);
   const profileTasks = useProfileTasks(selected?.unit.occupation_code);
 
   const [editorOpen, setEditorOpen] = useState(false);
@@ -53,38 +82,30 @@ const ProfileTasks = () => {
   const [taskAssessmentRequestInProgress, setTaskAssessmentRequestInProgress] = useState(false);
   const [taskAssessmentRequestError, setTaskAssessmentRequestError] = useState<string | null>(null);
 
-  if (!selected) {
-    return <Navigate to={ROUTES.workProfile} replace />;
-  }
-
-  const openAddDialog = () => {
-    setEditorMode("add");
-    setEditingTaskId(null);
-    setEditorValues(emptyEditorValues());
-    setEditorOpen(true);
-  };
-
-  const openEditDialog = (task: ProfileTask) => {
-    setEditorMode("edit");
-    setEditingTaskId(task.id);
-    setEditorValues(valuesFromTask(task));
-    setEditorOpen(true);
-  };
-
-  const closeEditor = () => {
-    setEditorOpen(false);
-    setEditingTaskId(null);
-  };
-
-  const saveTask = (values: TaskEditorValues) => {
-    if (editorMode === "edit" && editingTaskId) {
-      profileTasks.updateTask(editingTaskId, values);
+  useEffect(() => {
+    const occupationCode = initialTaskWorkspace?.tasksOccupationCode;
+    if (selected || !occupationCode) {
       return;
     }
-    profileTasks.addTask(values);
-  };
 
-  const assessConfirmedTasksAndOpenExposure = async () => {
+    let cancelled = false;
+    void loadOccupationWithPath(occupationCode)
+      .then((restored) => {
+        if (!cancelled) setSelected(restored);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!cancelled) setOccupationLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [initialTaskWorkspace?.tasksOccupationCode, selected]);
+
+  const assessConfirmedTasksAndOpenExposure = useCallback(async () => {
+    if (!selected || profileTasks.tasks.length === 0) return;
+
     setTaskAssessmentRequestInProgress(true);
     setTaskAssessmentRequestError(null);
     try {
@@ -130,6 +151,68 @@ const ProfileTasks = () => {
     } finally {
       setTaskAssessmentRequestInProgress(false);
     }
+  }, [navigate, profileTasks.tasks, selected]);
+
+  useEffect(() => {
+    if (
+      !shouldAutoAnalyze ||
+      autoAnalyzeStartedRef.current ||
+      occupationLoading ||
+      profileTasks.loading ||
+      !selected ||
+      profileTasks.tasks.length === 0
+    ) {
+      return;
+    }
+
+    autoAnalyzeStartedRef.current = true;
+    void assessConfirmedTasksAndOpenExposure();
+  }, [
+    assessConfirmedTasksAndOpenExposure,
+    occupationLoading,
+    profileTasks.loading,
+    profileTasks.tasks.length,
+    selected,
+    shouldAutoAnalyze,
+  ]);
+
+  if (occupationLoading) {
+    return (
+      <div className="profile-glass-card flex min-h-48 items-center justify-center p-6 text-sm text-[#7f7280]">
+        Loading your saved tasks…
+      </div>
+    );
+  }
+
+  if (!selected) {
+    return <Navigate to={ROUTES.workProfile} replace />;
+  }
+
+  const openAddDialog = () => {
+    setEditorMode("add");
+    setEditingTaskId(null);
+    setEditorValues(emptyEditorValues());
+    setEditorOpen(true);
+  };
+
+  const openEditDialog = (task: ProfileTask) => {
+    setEditorMode("edit");
+    setEditingTaskId(task.id);
+    setEditorValues(valuesFromTask(task));
+    setEditorOpen(true);
+  };
+
+  const closeEditor = () => {
+    setEditorOpen(false);
+    setEditingTaskId(null);
+  };
+
+  const saveTask = (values: TaskEditorValues) => {
+    if (editorMode === "edit" && editingTaskId) {
+      profileTasks.updateTask(editingTaskId, values);
+      return;
+    }
+    profileTasks.addTask(values);
   };
 
   return (

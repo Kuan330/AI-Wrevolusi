@@ -83,16 +83,16 @@ const TaskList = ({
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-sm leading-6 text-[#2f2430]">{task.wording}</p>
                   <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
-                    {taskState ? (
+                    {databaseCategory ? (
                       <Badge
                         variant="outline"
                         className="rounded-full border-0 px-2 py-0.5 text-[11px] font-medium"
-                        style={{ background: `${taskState.color}55`, color: taskState.ink }}
+                        style={{ background: `${databaseCategory.color}55`, color: databaseCategory.ink }}
                       >
-                        {taskState.label}
+                        {databaseCategory.label}
                       </Badge>
                     ) : null}
-                    {!taskState && !databaseCategory ? (
+                    {!databaseCategory ? (
                       <span className="text-[11px] text-[#7f7280]">No database category</span>
                     ) : null}
                   </div>
@@ -102,6 +102,7 @@ const TaskList = ({
                     <GradientBar value={taskExposureAssessment.adjusted_score * 100} className="h-1.5" />
                     <span className="w-20 text-right text-xs tabular-nums text-[#7f7280]">
                       Task score {taskExposureAssessment.adjusted_score.toFixed(2)}
+                      {taskState ? ` · ${taskState.label}` : ""}
                     </span>
                   </div>
                 ) : null}

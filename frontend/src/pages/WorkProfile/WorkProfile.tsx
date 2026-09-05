@@ -11,7 +11,10 @@ import {
   useOccupationFilters,
   type OccupationSearchResult,
 } from "@/pages/WorkProfile/hooks/useOccupationFilters";
-import { readSelectedOccupation, saveSelectedOccupation } from "@/pages/WorkProfile/occupationSession";
+import {
+  clearSelectedOccupation,
+  saveSelectedOccupation,
+} from "@/pages/WorkProfile/userProfile";
 import type { ReferenceOccupation } from "@/types/reference";
 
 type WorkProfileMode = "search" | "filters";
@@ -21,26 +24,17 @@ const WorkProfile = () => {
   const occupation = useOccupationFilters();
   const [mode, setModeState] = useState<WorkProfileMode>("search");
   const [selectedFromSearch, setSelectedFromSearch] = useState<OccupationSearchResult | null>(null);
-  const [savedOccupation, setSavedOccupation] = useState(() => readSelectedOccupation());
-  const [hydrated, setHydrated] = useState(false);
-
-  const persistOccupation = (unit: ReferenceOccupation, path: ReferenceOccupation[]) => {
-    const next = { unit, path };
-    saveSelectedOccupation(next);
-    setSavedOccupation(next);
-  };
 
   useEffect(() => {
-    if (hydrated || occupation.loading || occupation.options.major.length === 0) return;
-    const saved = readSelectedOccupation();
-    if (!saved?.path.length) {
-      setHydrated(true);
-      return;
-    }
-    void occupation.hydrateFromPath(saved.path).finally(() => setHydrated(true));
-    // Restore saved occupation once majors are ready (Change occupation).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated, occupation.loading, occupation.options.major.length]);
+    // Occupations are selected for the current flow only. The task workspace
+    // remains available separately so returning to the task list is possible
+    // without persisting the full occupation hierarchy in user data.
+    clearSelectedOccupation();
+  }, []);
+
+  const persistOccupation = (unit: ReferenceOccupation, path: ReferenceOccupation[]) => {
+    saveSelectedOccupation({ unit, path });
+  };
 
   const goToTasks = (unit: ReferenceOccupation, path: ReferenceOccupation[]) => {
     persistOccupation(unit, path);
@@ -49,8 +43,8 @@ const WorkProfile = () => {
 
   const activeUnit = mode === "search" ? selectedFromSearch?.unit ?? null : occupation.selectedUnit;
   const activePath = mode === "search" ? selectedFromSearch?.path ?? [] : occupation.selectedPath;
-  const confirmedUnit = activeUnit ?? savedOccupation?.unit ?? null;
-  const confirmedPath = activeUnit ? activePath : savedOccupation?.path ?? [];
+  const confirmedUnit = activeUnit;
+  const confirmedPath = activePath;
 
   useEffect(() => {
     if (!activeUnit) return;
@@ -150,7 +144,7 @@ const WorkProfile = () => {
               searching={occupation.searching}
               hasSearched={occupation.hasSearched}
               results={occupation.searchResults}
-              selectedCode={selectedFromSearch?.unit.occupation_code ?? savedOccupation?.unit.occupation_code ?? null}
+              selectedCode={selectedFromSearch?.unit.occupation_code ?? null}
               onQueryChange={handleQueryChange}
               onChoose={handleSearchChoice}
             />

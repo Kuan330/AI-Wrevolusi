@@ -130,6 +130,7 @@ const AIExposure = () => {
           taskExposureAssessments={assessments}
           activeCategory={activeCategory}
           categoryCounts={categoryCounts}
+          totalCount={analysis.tasks.length}
           onSelectCategory={setActiveCategory}
           highlightedIds={[]}
           onClear={activeCategory ? () => setActiveCategory(null) : undefined}
@@ -146,6 +147,9 @@ const AIExposure = () => {
             {priorityTasks.map((task: ProfileTask, index) => {
               const assessment = assessmentByTaskId.get(task.id);
               const taskState = taskBandFromAssessment(assessment);
+              const databaseCategory = occupationBandFromPotential(
+                assessment?.potential25 ?? task.potential25,
+              );
               return (
                 <div key={task.id} className="rounded-xl border border-white/80 bg-white/65 p-3">
                   <div className="flex items-start gap-3">
@@ -153,8 +157,21 @@ const AIExposure = () => {
                     <div className="min-w-0">
                       <p className="text-sm leading-5 text-[#2f2430]">{task.wording}</p>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
-                        {taskState ? <Badge variant="outline" className="rounded-full border-0" style={{ background: `${taskState.color}55`, color: taskState.ink }}>{taskState.label}</Badge> : null}
-                        {typeof assessment?.adjusted_score === "number" ? <span className="text-xs tabular-nums text-[#7f7280]">Task score {assessment.adjusted_score.toFixed(2)} / 1.0</span> : null}
+                        {databaseCategory ? (
+                          <Badge
+                            variant="outline"
+                            className="rounded-full border-0"
+                            style={{ background: `${databaseCategory.color}55`, color: databaseCategory.ink }}
+                          >
+                            {databaseCategory.label}
+                          </Badge>
+                        ) : null}
+                        {typeof assessment?.adjusted_score === "number" ? (
+                          <span className="text-xs tabular-nums text-[#7f7280]">
+                            Task score {assessment.adjusted_score.toFixed(2)} / 1.0
+                            {taskState ? ` · ${taskState.label}` : ""}
+                          </span>
+                        ) : null}
                       </div>
                     </div>
                   </div>

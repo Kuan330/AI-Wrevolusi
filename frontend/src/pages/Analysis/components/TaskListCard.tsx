@@ -20,6 +20,7 @@ type TaskListCardProps = {
   taskExposureAssessments: ConfirmedTaskExposureAssessment[];
   activeCategory: OccupationBandId | null;
   categoryCounts: Record<OccupationBandId, number>;
+  totalCount?: number;
   onSelectCategory: (category: OccupationBandId | null) => void;
   highlightedIds: string[];
   onClear?: () => void;
@@ -35,6 +36,7 @@ const TaskListCard = ({
   taskExposureAssessments,
   activeCategory,
   categoryCounts,
+  totalCount,
   onSelectCategory,
   highlightedIds,
   onClear,
@@ -82,6 +84,7 @@ const TaskListCard = ({
           <ExposureCategoryFilters
             counts={categoryCounts}
             activeCategory={activeCategory}
+            totalCount={totalCount}
             onSelect={onSelectCategory}
             compact
           />

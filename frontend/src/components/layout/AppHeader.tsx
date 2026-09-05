@@ -1,18 +1,20 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { User } from "lucide-react";
 
 import Logo from "@/components/common/Logo";
 import { ROUTES } from "@/constants/routes";
-import { hasConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
 import { cn } from "@/lib/utils";
 
 const AppHeader = () => {
-  const showAiImpact = hasConfirmedAnalysis();
+  const { pathname } = useLocation();
+  const isOccupationSelection = pathname === ROUTES.workProfile;
 
-  const navItems = [
-    { to: ROUTES.task, label: "Your tasks" },
-    ...(showAiImpact ? [{ to: ROUTES.aiExposure, label: "AI exposure" }] : []),
-  ];
+  const navItems = isOccupationSelection
+    ? []
+    : [
+        { to: ROUTES.task, label: "Your tasks" },
+        { to: ROUTES.aiExposure, label: "AI exposure" },
+      ];
 
   return (
     <header className="app-header sticky top-0 z-30 shrink-0 border-b border-white/70 bg-white/45 backdrop-blur-xl">
