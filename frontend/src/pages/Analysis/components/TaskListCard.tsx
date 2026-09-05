@@ -79,7 +79,7 @@ const TaskListCard = ({
       headerContent={
         <div className="space-y-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f7280]">
-            Filter by database category
+            Filter by ILO reference occupation category
           </p>
           <ExposureCategoryFilters
             counts={categoryCounts}

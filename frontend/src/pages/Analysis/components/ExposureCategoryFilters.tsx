@@ -24,7 +24,7 @@ const ExposureCategoryFilters = ({
     <div
       className={cn(compact ? "flex flex-wrap gap-2" : "grid gap-2 sm:grid-cols-2")}
       role="group"
-      aria-label="Filter by AI exposure category"
+      aria-label="Filter by ILO reference occupation category"
     >
       <Button
         type="button"
@@ -62,16 +62,16 @@ const ExposureCategoryFilters = ({
             )}
             style={
               selected
-                ? { borderColor: `${category.color}99`, background: `${category.color}35`, color: category.ink }
+                ? { borderColor: "#4f91ba73", background: "#eaf3fb", color: "#2f5f80" }
                 : undefined
             }
             aria-pressed={selected}
-            title={category.value}
+            title={category.description}
             onClick={() => onSelect(selected ? null : category.value)}
           >
             <span className="min-w-0">
               <span className={cn("block truncate font-semibold", compact ? "text-xs" : "text-sm")}>{category.label}</span>
-              {!compact ? <span className="block truncate text-[11px] font-normal opacity-75">{category.value}</span> : null}
+              {!compact ? <span className="block truncate text-[11px] font-normal opacity-75">{category.description}</span> : null}
             </span>
             <span className="rounded-full bg-white/80 px-2 py-0.5 text-xs tabular-nums">
               {counts[category.value]}

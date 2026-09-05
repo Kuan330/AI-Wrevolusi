@@ -1,3 +1,5 @@
+import { IloOccupationExposure } from "@/pages/Analysis/lib/iloExposure";
+
 /** Shared design colors. Const maps stand in for enums (`erasableSyntaxOnly`). */
 
 export const Palette = {
@@ -184,93 +186,7 @@ export const colorForSkillId = (skillId: number): string =>
 export const toneForSkillId = (skillId: number): SkillTone =>
   SKILL_TONE[colorForSkillId(skillId) as SkillSwatch] ?? SKILL_TONE[SkillSwatch.SkyBlue];
 
-export const TaskBandId = {
-  HumanLed: "human_led",
-  AiAssisted: "ai_assisted",
-  PartlyAutomated: "partly_automated",
-  Reshaped: "reshaped",
-  InsufficientData: "insufficient_data",
-} as const;
-export type TaskBandId = (typeof TaskBandId)[keyof typeof TaskBandId];
-
-export const TaskBandColor = {
-  HumanLed: "#A2DCCF",
-  AiAssisted: "#F0DE56",
-  PartlyAutomated: "#F7C9D4",
-  Reshaped: "#A8D4F5",
-  InsufficientData: "#D8D2D7",
-} as const;
-export type TaskBandColor = (typeof TaskBandColor)[keyof typeof TaskBandColor];
-
-export const TASK_BAND_COLOR: Record<TaskBandId, TaskBandColor> = {
-  [TaskBandId.HumanLed]: TaskBandColor.HumanLed,
-  [TaskBandId.AiAssisted]: TaskBandColor.AiAssisted,
-  [TaskBandId.PartlyAutomated]: TaskBandColor.PartlyAutomated,
-  [TaskBandId.Reshaped]: TaskBandColor.Reshaped,
-  [TaskBandId.InsufficientData]: TaskBandColor.InsufficientData,
-};
-
-export const TaskBandInk = {
-  HumanLed: "#2F6F64",
-  AiAssisted: "#7A6512",
-  PartlyAutomated: "#9A4A5C",
-  Reshaped: "#2F5F80",
-  InsufficientData: "#625A60",
-} as const;
-export type TaskBandInk = (typeof TaskBandInk)[keyof typeof TaskBandInk];
-
-export const TASK_BAND_INK: Record<TaskBandId, TaskBandInk> = {
-  [TaskBandId.HumanLed]: TaskBandInk.HumanLed,
-  [TaskBandId.AiAssisted]: TaskBandInk.AiAssisted,
-  [TaskBandId.PartlyAutomated]: TaskBandInk.PartlyAutomated,
-  [TaskBandId.Reshaped]: TaskBandInk.Reshaped,
-  [TaskBandId.InsufficientData]: TaskBandInk.InsufficientData,
-};
-
-export type TaskBandTone = {
-  fill: TaskBandColor;
-  background: TaskBandColor;
-  color: TaskBandInk;
-};
-
-export const TASK_BAND_TONE: Record<TaskBandId, TaskBandTone> = {
-  [TaskBandId.HumanLed]: {
-    fill: TaskBandColor.HumanLed,
-    background: TaskBandColor.HumanLed,
-    color: TaskBandInk.HumanLed,
-  },
-  [TaskBandId.AiAssisted]: {
-    fill: TaskBandColor.AiAssisted,
-    background: TaskBandColor.AiAssisted,
-    color: TaskBandInk.AiAssisted,
-  },
-  [TaskBandId.PartlyAutomated]: {
-    fill: TaskBandColor.PartlyAutomated,
-    background: TaskBandColor.PartlyAutomated,
-    color: TaskBandInk.PartlyAutomated,
-  },
-  [TaskBandId.Reshaped]: {
-    fill: TaskBandColor.Reshaped,
-    background: TaskBandColor.Reshaped,
-    color: TaskBandInk.Reshaped,
-  },
-  [TaskBandId.InsufficientData]: {
-    fill: TaskBandColor.InsufficientData,
-    background: TaskBandColor.InsufficientData,
-    color: TaskBandInk.InsufficientData,
-  },
-};
-
-export const toneForTaskBand = (id: TaskBandId): TaskBandTone => TASK_BAND_TONE[id];
-
-export const OccupationBandId = {
-  NotExposed: "Not Exposed",
-  MinimalExposure: "Minimal Exposure",
-  Gradient1: "Exposed: Gradient 1",
-  Gradient2: "Exposed: Gradient 2",
-  Gradient3: "Exposed: Gradient 3",
-  Gradient4: "Exposed: Gradient 4",
-} as const;
+export const OccupationBandId = IloOccupationExposure;
 export type OccupationBandId = (typeof OccupationBandId)[keyof typeof OccupationBandId];
 
 export const OccupationBandColor = {

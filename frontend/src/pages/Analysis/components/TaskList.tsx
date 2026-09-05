@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { GradientBar } from "@/components/ui/gradient-bar";
 import EmptyState from "@/components/common/EmptyState";
 import { occupationBandFromPotential, type OccupationBandId } from "@/pages/Analysis/lib/occupationBands";
-import { taskBandFromAssessment } from "@/pages/Analysis/lib/taskBands";
+import { referenceOccupationCategory } from "@/pages/Analysis/lib/iloExposure";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 
@@ -43,7 +43,7 @@ const TaskList = ({
     .filter((task) => {
       if (!activeCategory) return true;
       const assessment = taskExposureAssessmentByTaskId.get(task.id);
-      return occupationBandFromPotential(assessment?.potential25 ?? task.potential25)?.value === activeCategory;
+      return referenceOccupationCategory(task, assessment) === activeCategory;
     })
     .sort(
       (firstTask, secondTask) =>
@@ -64,9 +64,8 @@ const TaskList = ({
       {visible.map((task) => {
         const taskExposureAssessment = taskExposureAssessmentByTaskId.get(task.id);
         const databaseCategory = occupationBandFromPotential(
-          taskExposureAssessment?.potential25 ?? task.potential25,
+          referenceOccupationCategory(task, taskExposureAssessment),
         );
-        const taskState = taskBandFromAssessment(taskExposureAssessment);
         const highlighted = highlightedIds.includes(task.id);
 
         return (
@@ -77,23 +76,24 @@ const TaskList = ({
             <div className="flex gap-3">
               <span
                 className="w-1 shrink-0 rounded-full"
-                style={{ background: taskState?.color ?? databaseCategory?.color ?? "#C9C2C7" }}
+                style={{ background: databaseCategory?.color ?? "#C9C2C7" }}
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-sm leading-6 text-[#2f2430]">{task.wording}</p>
-                  <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
+                  <div className="flex max-w-[45%] shrink-0 flex-col items-end gap-1.5">
+                    <span className="text-[10px] text-[#7f7280]">Reference occupation</span>
                     {databaseCategory ? (
                       <Badge
                         variant="outline"
-                        className="rounded-full border-0 px-2 py-0.5 text-[11px] font-medium"
+                        className="whitespace-normal rounded-full border-0 px-2 py-0.5 text-right text-[11px] font-medium"
                         style={{ background: `${databaseCategory.color}55`, color: databaseCategory.ink }}
                       >
                         {databaseCategory.label}
                       </Badge>
                     ) : null}
                     {!databaseCategory ? (
-                      <span className="text-[11px] text-[#7f7280]">No database category</span>
+                      <span className="text-[11px] text-[#7f7280]">Occupation category unavailable</span>
                     ) : null}
                   </div>
                 </div>
@@ -102,7 +102,6 @@ const TaskList = ({
                     <GradientBar value={taskExposureAssessment.adjusted_score * 100} className="h-1.5" />
                     <span className="w-20 text-right text-xs tabular-nums text-[#7f7280]">
                       Task score {taskExposureAssessment.adjusted_score.toFixed(2)}
-                      {taskState ? ` · ${taskState.label}` : ""}
                     </span>
                   </div>
                 ) : null}
@@ -116,9 +115,8 @@ const TaskList = ({
                         <strong>Evidence method:</strong>{" "}
                         {formatTaskAssessmentMatchLayer(taskExposureAssessment.match_layer)}
                       </p>
-                      {taskState ? <p><strong>Score classification:</strong> {taskState.label}</p> : null}
                       {databaseCategory ? (
-                        <p><strong>Database occupation category:</strong> {databaseCategory.label} ({databaseCategory.value})</p>
+                        <p><strong>ILO reference occupation category:</strong> {databaseCategory.label}. This category uses the occupation’s task-score distribution, not this individual task score.</p>
                       ) : null}
                       <p><strong>Reasoning:</strong> {taskExposureAssessment.reasoning}</p>
                       <p><strong>Uncertainty:</strong> {taskExposureAssessment.uncertainty}</p>
