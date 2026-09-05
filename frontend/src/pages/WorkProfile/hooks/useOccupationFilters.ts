@@ -182,6 +182,7 @@ export const useOccupationFilters = () => {
   }, [cacheOccupations, getOccupationByCode]);
 
   useEffect(() => {
+    const requestId = ++activeSearchRequestRef.current;
     const trimmed = query.trim();
     if (trimmed.length < 2) {
       setHasSearched(false);
@@ -190,9 +191,9 @@ export const useOccupationFilters = () => {
       return;
     }
 
-    const requestId = activeSearchRequestRef.current + 1;
-    activeSearchRequestRef.current = requestId;
     setSearching(true);
+    setSearchResults([]);
+    setHasSearched(false);
     setError(null);
 
     const timer = setTimeout(() => {
@@ -222,7 +223,7 @@ export const useOccupationFilters = () => {
           if (activeSearchRequestRef.current !== requestId) return;
           setError("Search is temporarily unavailable.");
           setSearchResults([]);
-          setHasSearched(true);
+          setHasSearched(false);
         } finally {
           if (activeSearchRequestRef.current === requestId) {
             setSearching(false);
@@ -231,7 +232,10 @@ export const useOccupationFilters = () => {
       })();
     }, 220);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      activeSearchRequestRef.current += 1;
+    };
   }, [cacheOccupations, pathForUnit, query]);
 
   return {

@@ -1,7 +1,7 @@
 import { MenuIcon } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,15 +10,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { SIDEBAR_MENU } from "@/constants/menu";
-import { ROUTES } from "@/constants/routes";
+import { cn } from "@/lib/utils";
 
 const itemIsActive = (path: string, pathname: string, hash: string) => {
   const [base, itemHash] = path.split("#");
   if (itemHash) {
     return pathname === base && hash === `#${itemHash}`;
-  }
-  if (path === ROUTES.dashboard) {
-    return pathname === ROUTES.dashboard && hash === "";
   }
   return pathname === path;
 };
@@ -28,10 +25,14 @@ const MobileMenu = () => {
 
   return (
     <Dialog>
-      <DialogTrigger>
-        <Button variant="outline" size="icon" className="lg:hidden" aria-label="Open menu">
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          className={cn(buttonVariants({ variant: "outline", size: "icon" }), "lg:hidden")}
+          aria-label="Open menu"
+        >
           <MenuIcon className="size-4" />
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent className="max-w-sm">
         <DialogHeader>

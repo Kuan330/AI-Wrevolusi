@@ -79,7 +79,7 @@ export const useProfileTasks = (occupationCode?: string) => {
     } catch {
       setError("Occupation selected, but its reference tasks could not be loaded.");
       setTasks([]);
-      saveProfileTasks(code, []);
+
     } finally {
       setLoading(false);
     }

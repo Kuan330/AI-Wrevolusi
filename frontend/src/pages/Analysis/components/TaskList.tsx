@@ -1,14 +1,15 @@
 import { Badge } from "@/components/ui/badge";
 import { GradientBar } from "@/components/ui/gradient-bar";
 import EmptyState from "@/components/common/EmptyState";
-import { taskBandMeta, type TaskBandId } from "@/pages/Dashboard/lib/taskBands";
+import { occupationBandFromPotential, type OccupationBandId } from "@/pages/Analysis/lib/occupationBands";
+import { taskBandFromAssessment } from "@/pages/Analysis/lib/taskBands";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 
 type TaskListProps = {
   tasks: ProfileTask[];
   taskExposureAssessments: ConfirmedTaskExposureAssessment[];
-  activeBand: TaskBandId | null;
+  activeCategory: OccupationBandId | null;
   highlightedIds: string[];
 };
 
@@ -23,7 +24,7 @@ const formatTaskAssessmentMatchLayer = (
 const TaskList = ({
   tasks,
   taskExposureAssessments,
-  activeBand,
+  activeCategory,
   highlightedIds,
 }: TaskListProps) => {
   if (tasks.length === 0) {
@@ -40,8 +41,9 @@ const TaskList = ({
   );
   const visible = [...tasks]
     .filter((task) => {
-      if (!activeBand) return true;
-      return taskExposureAssessmentByTaskId.get(task.id)?.suggested_state === activeBand;
+      if (!activeCategory) return true;
+      const assessment = taskExposureAssessmentByTaskId.get(task.id);
+      return occupationBandFromPotential(assessment?.potential25 ?? task.potential25)?.value === activeCategory;
     })
     .sort(
       (firstTask, secondTask) =>
@@ -61,39 +63,45 @@ const TaskList = ({
     <div className="space-y-2.5">
       {visible.map((task) => {
         const taskExposureAssessment = taskExposureAssessmentByTaskId.get(task.id);
-        const band = taskBandMeta(taskExposureAssessment?.suggested_state ?? null);
+        const databaseCategory = occupationBandFromPotential(
+          taskExposureAssessment?.potential25 ?? task.potential25,
+        );
+        const taskState = taskBandFromAssessment(taskExposureAssessment);
         const highlighted = highlightedIds.includes(task.id);
 
         return (
           <article
             key={task.id}
-            className={`dashboard-task-item ${highlighted ? "is-highlighted" : ""}`}
+            className={`analysis-task-item ${highlighted ? "is-highlighted" : ""}`}
           >
             <div className="flex gap-3">
               <span
                 className="w-1 shrink-0 rounded-full"
-                style={{ background: band?.color ?? "#C9C2C7" }}
+                style={{ background: taskState?.color ?? databaseCategory?.color ?? "#C9C2C7" }}
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-sm leading-6 text-[#2f2430]">{task.wording}</p>
-                  {band ? (
-                    <Badge
-                      variant="outline"
-                      className="shrink-0 rounded-full border-0 px-2 py-0.5 text-[11px] font-medium"
-                      style={{ background: `${band.color}55`, color: band.ink }}
-                    >
-                      {band.label}
-                    </Badge>
-                  ) : (
-                    <span className="shrink-0 text-[11px] text-[#7f7280]">Not scored yet</span>
-                  )}
+                  <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
+                    {taskState ? (
+                      <Badge
+                        variant="outline"
+                        className="rounded-full border-0 px-2 py-0.5 text-[11px] font-medium"
+                        style={{ background: `${taskState.color}55`, color: taskState.ink }}
+                      >
+                        {taskState.label}
+                      </Badge>
+                    ) : null}
+                    {!taskState && !databaseCategory ? (
+                      <span className="text-[11px] text-[#7f7280]">No database category</span>
+                    ) : null}
+                  </div>
                 </div>
                 {typeof taskExposureAssessment?.adjusted_score === "number" ? (
                   <div className="mt-2 flex items-center gap-2">
                     <GradientBar value={taskExposureAssessment.adjusted_score * 100} className="h-1.5" />
-                    <span className="w-10 text-right text-xs tabular-nums text-[#7f7280]">
-                      {taskExposureAssessment.adjusted_score.toFixed(2)}
+                    <span className="w-20 text-right text-xs tabular-nums text-[#7f7280]">
+                      Task score {taskExposureAssessment.adjusted_score.toFixed(2)}
                     </span>
                   </div>
                 ) : null}
@@ -107,6 +115,10 @@ const TaskList = ({
                         <strong>Evidence method:</strong>{" "}
                         {formatTaskAssessmentMatchLayer(taskExposureAssessment.match_layer)}
                       </p>
+                      {taskState ? <p><strong>Score classification:</strong> {taskState.label}</p> : null}
+                      {databaseCategory ? (
+                        <p><strong>Database occupation category:</strong> {databaseCategory.label} ({databaseCategory.value})</p>
+                      ) : null}
                       <p><strong>Reasoning:</strong> {taskExposureAssessment.reasoning}</p>
                       <p><strong>Uncertainty:</strong> {taskExposureAssessment.uncertainty}</p>
                       <p><strong>Limitations:</strong> {taskExposureAssessment.limitations}</p>

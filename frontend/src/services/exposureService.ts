@@ -42,6 +42,7 @@ export interface MatchedIloTaskExposureEvidence {
 export interface ConfirmedTaskExposureAssessment {
   task_id: string;
   suggested_state: ExposureState;
+  potential25: string | null;
   match_layer: "exact" | "nlp" | "insufficient_data";
   baseline_score: number | null;
   adjusted_score: number | null;

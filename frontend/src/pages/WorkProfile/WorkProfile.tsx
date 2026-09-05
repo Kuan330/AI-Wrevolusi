@@ -19,7 +19,7 @@ type WorkProfileMode = "search" | "filters";
 const WorkProfile = () => {
   const navigate = useNavigate();
   const occupation = useOccupationFilters();
-  const [mode, setModeState] = useState<WorkProfileMode>("filters");
+  const [mode, setModeState] = useState<WorkProfileMode>("search");
   const [selectedFromSearch, setSelectedFromSearch] = useState<OccupationSearchResult | null>(null);
   const [savedOccupation, setSavedOccupation] = useState(() => readSelectedOccupation());
   const [hydrated, setHydrated] = useState(false);
@@ -94,12 +94,15 @@ const WorkProfile = () => {
     <div className="space-y-5">
       <PageHeader
         title="Find the occupation that matches your work"
-        description="Choose your field first, then narrow down to the occupation that matches your work."
+        description="Search by job title or occupation code, or browse by field of work."
       />
 
       {occupation.error ? (
         <div className="rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
           {occupation.error}
+          <button type="button" className="ml-3 underline" onClick={() => window.location.reload()}>
+            Retry
+          </button>
         </div>
       ) : null}
 
@@ -113,7 +116,7 @@ const WorkProfile = () => {
                   Choose from the form fields to narrow down your exact occupation.
                 </p>
               </div>
-              <GradientPill asChild className="shrink-0 transition hover:brightness-[0.97]">
+              <GradientPill asChild className="shrink-0 transition">
                 <button type="button" onClick={() => setMode("search")}>
                   Search by job title instead
                 </button>
@@ -136,7 +139,7 @@ const WorkProfile = () => {
                   Type and see matching occupations instantly.
                 </p>
               </div>
-              <GradientPill asChild className="shrink-0 transition hover:brightness-[0.97]">
+              <GradientPill asChild className="shrink-0 transition">
                 <button type="button" onClick={() => setMode("filters")}>
                   Back to category filters
                 </button>

@@ -4,7 +4,7 @@ import {
   OccupationBandInk,
   OCCUPATION_BAND_COLOR,
   OCCUPATION_BAND_INK,
-} from "@/pages/Dashboard/lib/palette";
+} from "@/pages/Analysis/lib/palette";
 
 export { OccupationBandId, OccupationBandColor, OccupationBandInk, OCCUPATION_BAND_COLOR, OCCUPATION_BAND_INK };
 
@@ -53,5 +53,5 @@ export const OCCUPATION_BANDS = [
   },
 ] as const;
 
-export const occupationBandFromPotential = (potential25: string | null) =>
+export const occupationBandFromPotential = (potential25: string | null | undefined) =>
   OCCUPATION_BANDS.find((band) => band.value === potential25) ?? null;

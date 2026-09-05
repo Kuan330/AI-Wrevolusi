@@ -53,6 +53,7 @@ class IloTaskExposureReference:
     task_text: str
     score_2025: float | None
     source_method: str | None
+    potential25: str | None = None
 
 
 def normalize_task_text_for_matching(task_text: str) -> str:
@@ -203,6 +204,7 @@ def create_insufficient_data_task_exposure_assessment(
     return ConfirmedTaskExposureAssessment(
         task_id=confirmed_task.task_id,
         suggested_state=ExposureType.insufficient_data,
+        potential25=None,
         match_layer='insufficient_data',
         baseline_score=None,
         adjusted_score=None,
@@ -303,6 +305,7 @@ def assess_confirmed_task_against_ilo_references(
     return ConfirmedTaskExposureAssessment(
         task_id=confirmed_task.task_id,
         suggested_state=suggested_state,
+        potential25=strongest_reference_task.potential25,
         match_layer=match_layer,
         baseline_score=round(baseline_score, 4),
         adjusted_score=round(adjusted_score, 4),
@@ -337,7 +340,7 @@ async def load_ilo_task_exposure_references_for_occupation(
 ) -> list[IloTaskExposureReference]:
     result = await db.execute(
         text(
-            'SELECT task_id, task_text, score_2025, source '
+            'SELECT task_id, task_text, score_2025, potential25, source '
             'FROM ref_ilo_tasks WHERE isco_08 = :occupation_code ORDER BY task_id'
         ),
         {'occupation_code': occupation_code},
@@ -348,6 +351,7 @@ async def load_ilo_task_exposure_references_for_occupation(
             task_text=row['task_text'],
             score_2025=row['score_2025'],
             source_method=row['source'],
+            potential25=row.get('potential25'),
         )
         for row in result.mappings().all()
     ]

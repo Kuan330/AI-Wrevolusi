@@ -2,32 +2,40 @@ import { ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import DashboardCard, { type TitleTone } from "@/pages/Dashboard/components/DashboardCard";
-import TaskList from "@/pages/Dashboard/components/TaskList";
-import type { TaskBandId } from "@/pages/Dashboard/lib/taskBands";
+import { cn } from "@/lib/utils";
+import AnalysisCard, { type TitleTone } from "@/pages/Analysis/components/AnalysisCard";
+import ExposureCategoryFilters from "@/pages/Analysis/components/ExposureCategoryFilters";
+import TaskList from "@/pages/Analysis/components/TaskList";
+import type { OccupationBandId } from "@/pages/Analysis/lib/occupationBands";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 
 type TaskListCardProps = {
+  className?: string;
   eyebrow: string;
   title: string;
   description: string;
   titleTone?: TitleTone | null;
   tasks: ProfileTask[];
   taskExposureAssessments: ConfirmedTaskExposureAssessment[];
-  activeBand: TaskBandId | null;
+  activeCategory: OccupationBandId | null;
+  categoryCounts: Record<OccupationBandId, number>;
+  onSelectCategory: (category: OccupationBandId | null) => void;
   highlightedIds: string[];
   onClear?: () => void;
 };
 
 const TaskListCard = ({
+  className,
   eyebrow,
   title,
   description,
   titleTone,
   tasks,
   taskExposureAssessments,
-  activeBand,
+  activeCategory,
+  categoryCounts,
+  onSelectCategory,
   highlightedIds,
   onClear,
 }: TaskListCardProps) => {
@@ -50,7 +58,7 @@ const TaskListCard = ({
     const observer = new ResizeObserver(updateScrollHint);
     observer.observe(element);
     return () => observer.disconnect();
-  }, [tasks.length, taskExposureAssessments.length, activeBand, highlightedIds.length, updateScrollHint]);
+  }, [tasks.length, taskExposureAssessments.length, activeCategory, highlightedIds.length, updateScrollHint]);
 
   const showScrollHint = scrollHint.canScroll && !scrollHint.atBottom;
 
@@ -61,11 +69,24 @@ const TaskListCard = ({
   };
 
   return (
-    <DashboardCard
-      className="dashboard-overview__list"
+    <AnalysisCard
+    className={cn("analysis-overview__list", className)}
       eyebrow={eyebrow}
       title={title}
       description={description}
+      headerContent={
+        <div className="space-y-2">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f7280]">
+            Filter by database category
+          </p>
+          <ExposureCategoryFilters
+            counts={categoryCounts}
+            activeCategory={activeCategory}
+            onSelect={onSelectCategory}
+            compact
+          />
+        </div>
+      }
       titleTone={titleTone}
       action={
         onClear ? (
@@ -84,14 +105,14 @@ const TaskListCard = ({
       <div className="relative min-h-0 flex-1">
         <div
           ref={scrollRef}
-          className="dashboard-list-scroll h-full min-h-0"
+          className="analysis-list-scroll h-full min-h-0"
           onScroll={updateScrollHint}
         >
           <div className="pb-10">
             <TaskList
               tasks={tasks}
               taskExposureAssessments={taskExposureAssessments}
-              activeBand={activeBand}
+              activeCategory={activeCategory}
               highlightedIds={highlightedIds}
             />
           </div>
@@ -100,7 +121,7 @@ const TaskListCard = ({
         {showScrollHint ? (
           <button
             type="button"
-            className="dashboard-list-scroll-hint"
+            className="analysis-list-scroll-hint"
             aria-label="Scroll to see more tasks"
             onClick={scrollTowardBottom}
           >
@@ -108,7 +129,7 @@ const TaskListCard = ({
           </button>
         ) : null}
       </div>
-    </DashboardCard>
+    </AnalysisCard>
   );
 };
 

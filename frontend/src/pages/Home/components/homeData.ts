@@ -136,16 +136,16 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Start free analysis" },
       { label: "Work profile (E1)" },
       { label: "AI exposure (E2)" },
-      { label: "Capabilities (E3)" },
+      { label: "Skills (E3)" },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "Interpretation (E4)" },
-      { label: "Priorities (E6)" },
-      { label: "Preparation (E7)" },
-      { label: "Task efficiency" },
+      { label: "Evidence sources" },
+      { label: "Task priorities" },
+      { label: "Future iterations" },
+      { label: "Project methodology" },
     ],
   },
   {
@@ -153,8 +153,8 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     links: [
       { label: "How it works" },
       { label: "Sample report" },
-      { label: "Flexibility plan (E8)" },
-      { label: "Dashboard" },
+      { label: "Read your results" },
+      { label: "Review task evidence" },
     ],
   },
   {

@@ -3,7 +3,7 @@ import { User } from "lucide-react";
 
 import Logo from "@/components/common/Logo";
 import { ROUTES } from "@/constants/routes";
-import { hasConfirmedAnalysis } from "@/pages/Dashboard/analysisSession";
+import { hasConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
 import { cn } from "@/lib/utils";
 
 const AppHeader = () => {
@@ -11,7 +11,7 @@ const AppHeader = () => {
 
   const navItems = [
     { to: ROUTES.task, label: "Your tasks" },
-    ...(showAiImpact ? [{ to: ROUTES.dashboard, label: "AI impact" }] : []),
+    ...(showAiImpact ? [{ to: ROUTES.aiExposure, label: "AI exposure" }] : []),
   ];
 
   return (

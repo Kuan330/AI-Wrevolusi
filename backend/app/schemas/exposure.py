@@ -60,6 +60,7 @@ class MatchedIloTaskExposureEvidence(BaseModel):
 class ConfirmedTaskExposureAssessment(BaseModel):
     task_id: str
     suggested_state: ExposureType
+    potential25: str | None
     match_layer: TaskAssessmentMatchLayer
     baseline_score: float | None
     adjusted_score: float | None

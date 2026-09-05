@@ -3,7 +3,7 @@
   --wp-bg-mid: #f5f3f8;
   --wp-bg-end: #f8ecef;
   --wp-brown: #c99589;
-  --wp-brown-hover: #b98579;
+  --wp-hover: #d6eaf7;
   --wp-blue: #4f91ba;
   --wp-text-secondary: #574a55;
 }
@@ -32,14 +32,9 @@
 
 .app-header-nav__link:hover,
 .app-header-nav__link.is-active {
-  background: linear-gradient(
-    90deg,
-    var(--wp-bg-start) 0%,
-    var(--wp-bg-mid) 48%,
-    var(--wp-bg-end) 100%
-  );
+  background: var(--wp-hover);
   color: var(--wp-blue);
-  box-shadow: 0 4px 12px rgba(61, 43, 54, 0.06);
+  box-shadow: 0 4px 12px rgba(79, 145, 186, 0.14);
 }
 
 .work-profile-page {
@@ -50,7 +45,7 @@
   --wp-text-secondary: #574a55;
   --wp-text-muted: #7f7280;
   --wp-brown: #c99589;
-  --wp-brown-hover: #b98579;
+  --wp-hover: #d6eaf7;
   --wp-blue: #4f91ba;
   --wp-glass-bg: rgba(255, 255, 255, 0.7);
   --wp-glass-border: rgba(255, 255, 255, 0.76);
@@ -150,7 +145,8 @@
 }
 
 .work-profile-page .profile-icon-btn:hover {
-  background: rgba(255, 255, 255, 1);
+  background: var(--wp-hover);
+  color: var(--wp-blue);
   transform: translateY(-1px);
 }
 
@@ -163,8 +159,8 @@
 
 .work-profile-page .profile-icon-btn--delete:hover,
 .profile-icon-btn--delete:hover {
-  background: rgba(255, 255, 255, 1);
-  color: #6f6470;
+  background: var(--wp-hover);
+  color: var(--wp-blue);
 }
 
 .work-profile-page .profile-icon-actions {
@@ -186,8 +182,9 @@
 
 .work-profile-page .profile-batch-btn:hover:not(:disabled),
 .profile-batch-btn:hover:not(:disabled) {
-  background: #fff !important;
-  color: #6f6470 !important;
+  background: var(--wp-hover) !important;
+  color: var(--wp-blue) !important;
+  border-color: rgba(79, 145, 186, 0.28);
   transform: translateY(-1px);
   box-shadow: 0 4px 14px rgba(61, 43, 54, 0.1);
 }
@@ -220,10 +217,10 @@
 
 .work-profile-page .profile-primary-btn:hover,
 .profile-primary-btn:hover {
-  background: var(--wp-brown-hover) !important;
-  color: #fff !important;
+  background: var(--wp-hover) !important;
+  color: var(--wp-blue) !important;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(201, 149, 137, 0.36);
+  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.24);
 }
 
 .work-profile-page .profile-gradient-btn,
@@ -241,7 +238,8 @@
 
 .work-profile-page .profile-gradient-btn:hover,
 .profile-gradient-btn:hover {
-  filter: brightness(0.97);
+  background: var(--wp-hover) !important;
+  filter: none;
   color: var(--wp-blue) !important;
 }
 
@@ -254,7 +252,8 @@
 
 .work-profile-page .profile-outline-btn:hover,
 .profile-outline-btn:hover {
-  background: #fff;
+  background: var(--wp-hover);
+  color: var(--wp-blue);
 }
 
 .work-profile-page .profile-blue-btn,
@@ -267,10 +266,10 @@
 
 .work-profile-page .profile-blue-btn:hover,
 .profile-blue-btn:hover {
-  background: #3f7da3 !important;
-  color: #fff !important;
+  background: var(--wp-hover) !important;
+  color: var(--wp-blue) !important;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.36);
+  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.24);
 }
 
 .work-profile-page .profile-dialog-btn,
@@ -284,10 +283,10 @@
 
 .work-profile-page .profile-dialog-btn:hover,
 .profile-dialog-btn:hover {
-  background: #3f7da3 !important;
-  color: #fff !important;
+  background: var(--wp-hover) !important;
+  color: var(--wp-blue) !important;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.36);
+  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.24);
 }
 
 .work-profile-page .profile-dialog-cancel-btn,
@@ -301,9 +300,9 @@
 
 .work-profile-page .profile-dialog-cancel-btn:hover,
 .profile-dialog-cancel-btn:hover {
-  background: var(--wp-blue) !important;
-  color: #fff !important;
-  border-color: var(--wp-blue) !important;
+  background: var(--wp-hover) !important;
+  color: var(--wp-blue) !important;
+  border-color: rgba(79, 145, 186, 0.28) !important;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.36);
+  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.24);
 }

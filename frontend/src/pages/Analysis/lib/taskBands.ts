@@ -4,7 +4,7 @@ import {
   TASK_BAND_COLOR,
   TASK_BAND_INK,
   TASK_BAND_TONE,
-} from "@/pages/Dashboard/lib/palette";
+} from "@/pages/Analysis/lib/palette";
 
 export { TaskBandId };
 
@@ -57,7 +57,16 @@ export const bandFromScore = (score: number | null | undefined): TaskBandId | nu
   return match?.id ?? TaskBandId.Reshaped;
 };
 
-export const taskBandMeta = (id: TaskBandId | null) =>
+export const taskBandMeta = (id: TaskBandId | null | undefined) =>
   TASK_BANDS.find((band) => band.id === id) ?? null;
+
+export const taskBandFromAssessment = (assessment: {
+  adjusted_score: number | null;
+  suggested_state: TaskBandId;
+} | null | undefined) => {
+  if (!assessment) return null;
+  const scoreBand = bandFromScore(assessment.adjusted_score);
+  return taskBandMeta(scoreBand ?? assessment.suggested_state);
+};
 
 export { TaskBandColor, TASK_BAND_COLOR, TASK_BAND_INK, TASK_BAND_TONE };

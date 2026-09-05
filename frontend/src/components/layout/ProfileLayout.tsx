@@ -6,9 +6,8 @@ import "@/pages/WorkProfile/workProfile.css";
 
 const ProfileLayout = () => {
   const { pathname } = useLocation();
-  const isDashboardPage = pathname === ROUTES.dashboard;
   const isTasksPage = pathname === ROUTES.task;
-  const lockViewport = isTasksPage || isDashboardPage;
+  const lockViewport = isTasksPage;
 
   return (
     <div
@@ -22,9 +21,7 @@ const ProfileLayout = () => {
       <AppHeader />
       <main
         className={`mx-auto flex w-full min-h-0 flex-1 flex-col px-4 lg:px-6 ${
-          isDashboardPage
-            ? "max-w-[1440px] py-2"
-            : isTasksPage
+          isTasksPage
               ? "max-w-2xl py-4 lg:px-0 lg:py-5"
               : "max-w-2xl py-6 lg:px-0 lg:py-10"
         }`}

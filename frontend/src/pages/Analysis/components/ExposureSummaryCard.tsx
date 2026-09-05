@@ -1,21 +1,21 @@
 import { ExternalLink } from "lucide-react";
 
 import { GradientBar } from "@/components/ui/gradient-bar";
-import DashboardCard from "@/pages/Dashboard/components/DashboardCard";
+import AnalysisCard from "@/pages/Analysis/components/AnalysisCard";
 import {
   ILO_OCCUPATION_EXPOSURE_OPEN_DATA,
   ILO_OCCUPATION_EXPOSURE_SOURCE,
-} from "@/pages/Dashboard/lib/dataSources";
-import { occupationBandFromPotential } from "@/pages/Dashboard/lib/occupationBands";
+} from "@/pages/Analysis/lib/dataSources";
+import { occupationBandFromPotential } from "@/pages/Analysis/lib/occupationBands";
 
-type CapabilityCardProps = {
+type ExposureSummaryCardProps = {
   title: string;
   path: string[];
   potential25: string | null;
   meanScore2025: number | null;
 };
 
-const CapabilityCard = ({ title, path, potential25, meanScore2025 }: CapabilityCardProps) => {
+const ExposureSummaryCard = ({ title, path, potential25, meanScore2025 }: ExposureSummaryCardProps) => {
   const band = occupationBandFromPotential(potential25);
   const hasScore = typeof meanScore2025 === "number" && !Number.isNaN(meanScore2025);
   const score = hasScore ? Math.min(1, Math.max(0, meanScore2025)) : null;
@@ -23,9 +23,9 @@ const CapabilityCard = ({ title, path, potential25, meanScore2025 }: CapabilityC
   const percent = score == null ? null : Math.round(score * 100);
 
   return (
-    <DashboardCard
+    <AnalysisCard
       id="occupation"
-      className="dashboard-overview__capability"
+      className="analysis-overview__summary"
       eyebrow="Occupational AI exposure"
       title={title}
       description={path.length > 0 ? path.join(" → ") : undefined}
@@ -81,8 +81,8 @@ const CapabilityCard = ({ title, path, potential25, meanScore2025 }: CapabilityC
           </a>
         </p>
       </div>
-    </DashboardCard>
+    </AnalysisCard>
   );
 };
 
-export default CapabilityCard;
+export default ExposureSummaryCard;

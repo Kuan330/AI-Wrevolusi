@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 import { ROUTES } from "@/constants/routes";
-import { hasConfirmedAnalysis } from "@/pages/Dashboard/analysisSession";
+import { hasConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
 import { readSelectedOccupation } from "@/pages/WorkProfile/occupationSession";
 
 const RequireConfirmedAnalysis = () => {

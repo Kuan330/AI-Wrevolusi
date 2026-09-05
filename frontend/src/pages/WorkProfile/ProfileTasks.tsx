@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
-import { saveConfirmedAnalysis } from "@/pages/Dashboard/analysisSession";
+import { saveConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
 import ProfileTaskList from "@/pages/WorkProfile/components/ProfileTaskList";
 import TaskEditorDialog from "@/pages/WorkProfile/components/TaskEditorDialog";
 import { useProfileTasks } from "@/pages/WorkProfile/hooks/useProfileTasks";
@@ -84,7 +84,7 @@ const ProfileTasks = () => {
     profileTasks.addTask(values);
   };
 
-  const assessConfirmedTasksAndOpenDashboard = async () => {
+  const assessConfirmedTasksAndOpenExposure = async () => {
     setTaskAssessmentRequestInProgress(true);
     setTaskAssessmentRequestError(null);
     try {
@@ -122,7 +122,7 @@ const ProfileTasks = () => {
         tasks: profileTasks.tasks,
         taskExposureAssessments: assessmentResponse.assessments,
       });
-      navigate(`${ROUTES.dashboard}#exposure`);
+      navigate(ROUTES.aiExposure);
     } catch {
       setTaskAssessmentRequestError(
         "The task assessment could not be completed. Your confirmed tasks are still saved; please try again.",
@@ -148,7 +148,7 @@ const ProfileTasks = () => {
               type="button"
               className="profile-gradient-btn h-10 whitespace-nowrap rounded-full px-5 font-normal"
               disabled={profileTasks.tasks.length === 0 || taskAssessmentRequestInProgress}
-              onClick={() => void assessConfirmedTasksAndOpenDashboard()}
+              onClick={() => void assessConfirmedTasksAndOpenExposure()}
             >
               {taskAssessmentRequestInProgress ? "Assessing tasks…" : "Explore AI impact"}
             </Button>
@@ -181,7 +181,7 @@ const ProfileTasks = () => {
             type="button"
             className="profile-gradient-btn h-10 shrink-0 whitespace-nowrap rounded-full px-5 font-normal"
             disabled={profileTasks.tasks.length === 0 || taskAssessmentRequestInProgress}
-            onClick={() => void assessConfirmedTasksAndOpenDashboard()}
+            onClick={() => void assessConfirmedTasksAndOpenExposure()}
           >
             {taskAssessmentRequestInProgress ? "Assessing tasks…" : "Explore AI impact"}
           </Button>

@@ -8,30 +8,32 @@ export type TitleTone = {
   color: string;
 };
 
-type DashboardCardProps = HTMLAttributes<HTMLDivElement> & {
+type AnalysisCardProps = HTMLAttributes<HTMLDivElement> & {
   eyebrow?: string;
   title?: ReactNode;
   description?: ReactNode;
   action?: ReactNode;
+  headerContent?: ReactNode;
   titleTone?: TitleTone | null;
   contentClassName?: string;
 };
 
-const DashboardCard = ({
+const AnalysisCard = ({
   eyebrow,
   title,
   description,
   action,
+  headerContent,
   titleTone,
   className,
   contentClassName,
   children,
   ...props
-}: DashboardCardProps) => {
+}: AnalysisCardProps) => {
   return (
     <Card
       className={cn(
-        "dashboard-card flex min-h-0 flex-col overflow-hidden border-white/80 bg-white/75 shadow-[0_14px_34px_rgba(61,43,54,0.1)] backdrop-blur-xl",
+        "analysis-card flex min-h-0 flex-col overflow-hidden border-white/80 bg-white/75 shadow-[0_14px_34px_rgba(61,43,54,0.1)] backdrop-blur-xl",
         className,
       )}
       {...props}
@@ -70,11 +72,12 @@ const DashboardCard = ({
               {description}
             </CardDescription>
           ) : null}
+          {headerContent ? <div className="pt-2">{headerContent}</div> : null}
         </CardHeader>
       ) : null}
       <CardContent
         className={cn(
-          "dashboard-card__content flex min-h-0 flex-1 flex-col p-4 pt-2",
+          "analysis-card__content flex min-h-0 flex-1 flex-col p-4 pt-2",
           contentClassName,
         )}
       >
@@ -84,4 +87,4 @@ const DashboardCard = ({
   );
 };
 
-export default DashboardCard;
+export default AnalysisCard;

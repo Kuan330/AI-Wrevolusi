@@ -8,6 +8,7 @@
   --c-bg-mid: #f5f3f8;
   --c-bg-end: #f8ecef;
   --c-deep-blue: #4f91ba;
+  --c-hover: #d6eaf7;
   --c-text: #2f2430;
   --c-text-secondary: #574a55;
   --c-text-muted: #7f7280;
@@ -217,9 +218,10 @@
 }
 
 .landing-page .btn-primary:hover {
-  background: #b98579;
+  background: var(--c-hover);
+  color: var(--c-deep-blue);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(201, 149, 137, 0.36);
+  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.24);
 }
 
 .landing-page .btn-warm {
@@ -229,9 +231,10 @@
 }
 
 .landing-page .btn-warm:hover {
-  background: #b58378;
+  background: var(--c-hover);
+  color: var(--c-deep-blue);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(199, 149, 139, 0.38);
+  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.24);
 }
 
 .landing-page .btn-sm {
