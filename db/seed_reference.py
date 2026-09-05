@@ -9,7 +9,7 @@ Full rebuild of lookup tables: python db/seed_reference.py --replace
 
 Create tables first: python db/seed_reference.py --init
 
-Does not write users, work_profiles, or other business tables.
+Does not create or write application business tables.
 """
 
 from __future__ import annotations

@@ -1,7 +1,8 @@
--- Iteration 1 schema for Neon / Postgres.
+-- Iteration 1 reference schema for Neon / Postgres.
 -- Apply: python3 db/seed_reference.py --init
 -- Reference tables are seeded from data/reference/*.csv.
--- Business tables stay empty until the app writes them.
+-- Application business tables are owned by backend/app/models and are not
+-- duplicated here. Existing legacy business tables are not dropped.
 
 -- ---------------------------------------------------------------------------
 -- Reference (lookup)
@@ -53,87 +54,4 @@ CREATE TABLE IF NOT EXISTS ref_wef_skills (
     source TEXT,
     source_year TEXT,
     source_figures TEXT
-);
-
--- ---------------------------------------------------------------------------
--- Business (app writes these; seed script does not)
--- ---------------------------------------------------------------------------
-
-CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY,
-    display_name TEXT,
-    created_at TIMESTAMPTZ
-);
-
-CREATE TABLE IF NOT EXISTS work_profiles (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL REFERENCES users (id),
-    occupation_code TEXT,
-    confirmation_status TEXT,
-    confirmed_at TIMESTAMPTZ
-);
-
-CREATE TABLE IF NOT EXISTS profile_tasks (
-    id TEXT PRIMARY KEY,
-    work_profile_id TEXT NOT NULL REFERENCES work_profiles (id),
-    ilo_isco_08 TEXT,
-    ilo_task_id TEXT,
-    task_text TEXT,
-    status TEXT,
-    input_method TEXT,
-    time_spent TEXT,
-    responsibility_level TEXT,
-    is_user_added BOOLEAN
-);
-
-CREATE TABLE IF NOT EXISTS task_assessments (
-    id TEXT PRIMARY KEY,
-    profile_task_id TEXT NOT NULL REFERENCES profile_tasks (id),
-    suggested_state TEXT,
-    match_layer TEXT,
-    source TEXT,
-    reasoning TEXT,
-    uncertainty TEXT,
-    limitations TEXT,
-    missing_data_status TEXT,
-    confirmation_status TEXT
-);
-
-CREATE TABLE IF NOT EXISTS profile_wef_skills (
-    id TEXT PRIMARY KEY,
-    work_profile_id TEXT NOT NULL REFERENCES work_profiles (id),
-    wef_skill_id INTEGER,
-    wef_core_skill TEXT,
-    interpretation TEXT,
-    match_layer TEXT,
-    source TEXT,
-    reasoning TEXT,
-    uncertainty TEXT,
-    limitations TEXT,
-    missing_data_status TEXT,
-    confirmation_status TEXT,
-    is_user_added BOOLEAN
-);
-
-CREATE TABLE IF NOT EXISTS wef_skill_task_links (
-    profile_wef_skill_id TEXT NOT NULL REFERENCES profile_wef_skills (id),
-    profile_task_id TEXT NOT NULL REFERENCES profile_tasks (id),
-    PRIMARY KEY (profile_wef_skill_id, profile_task_id)
-);
-
-CREATE TABLE IF NOT EXISTS skill_examples (
-    id TEXT PRIMARY KEY,
-    profile_wef_skill_id TEXT NOT NULL REFERENCES profile_wef_skills (id),
-    example_text TEXT
-);
-
-CREATE TABLE IF NOT EXISTS review_events (
-    id TEXT PRIMARY KEY,
-    work_profile_id TEXT NOT NULL REFERENCES work_profiles (id),
-    entity_type TEXT,
-    entity_id TEXT,
-    action TEXT,
-    previous_value TEXT,
-    new_value TEXT,
-    created_at TIMESTAMPTZ
 );

@@ -25,8 +25,9 @@ SQL Editor: branch **dev**, database **neondb**, paste:
 
 All rows should show ok = true.
 
-Match then insert (same keys as import_from_raw.py). Does not write
-users, work_profiles, or other business tables.
+Match then insert (same keys as import_from_raw.py). db/schema.sql and the
+seed command only manage ref_* tables. Application business tables are owned
+by backend/app/models.
 
 Rebuild lookup tables from CSV (does not truncate business tables):
 

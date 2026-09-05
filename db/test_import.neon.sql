@@ -80,22 +80,5 @@ FROM (
     SELECT 'WEF ids 1-26', 26, COUNT(*)::int
     FROM public.ref_wef_skills
     WHERE wef_skill_id BETWEEN 1 AND 26
-
-    UNION ALL
-    SELECT 'users empty', 0, COUNT(*)::int FROM public.users
-    UNION ALL
-    SELECT 'work_profiles empty', 0, COUNT(*)::int FROM public.work_profiles
-    UNION ALL
-    SELECT 'profile_tasks empty', 0, COUNT(*)::int FROM public.profile_tasks
-    UNION ALL
-    SELECT 'task_assessments empty', 0, COUNT(*)::int FROM public.task_assessments
-    UNION ALL
-    SELECT 'profile_wef_skills empty', 0, COUNT(*)::int FROM public.profile_wef_skills
-    UNION ALL
-    SELECT 'wef_skill_task_links empty', 0, COUNT(*)::int FROM public.wef_skill_task_links
-    UNION ALL
-    SELECT 'skill_examples empty', 0, COUNT(*)::int FROM public.skill_examples
-    UNION ALL
-    SELECT 'review_events empty', 0, COUNT(*)::int FROM public.review_events
 ) checks
 ORDER BY check_name;

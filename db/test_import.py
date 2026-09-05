@@ -2,7 +2,7 @@
 """Check that Neon lookup tables match data/reference CSV files.
 
 Compares row keys and field values. Extra DB rows (upsert keep) are reported
-as warnings unless --strict. Business tables must stay empty.
+as warnings unless --strict. Application business tables are outside this test.
 
 Run:
   python3 db/test_import.py
@@ -31,17 +31,6 @@ from seed_reference import (  # noqa: E402
     load_occupations,
     load_wef_skills,
 )
-
-BUSINESS_TABLES = [
-    "users",
-    "work_profiles",
-    "profile_tasks",
-    "task_assessments",
-    "profile_wef_skills",
-    "wef_skill_task_links",
-    "skill_examples",
-    "review_events",
-]
 
 
 def norm(value):
@@ -80,12 +69,6 @@ def fetch_table(conn: psycopg.Connection, table: str, columns: list[str]) -> lis
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(f"SELECT {col_sql} FROM {table}")
         return list(cur.fetchall())
-
-
-def count_rows(conn: psycopg.Connection, table: str) -> int:
-    with conn.cursor() as cur:
-        cur.execute(f"SELECT COUNT(*) FROM {table}")
-        return int(cur.fetchone()[0])
 
 
 def row_key(row: dict, keys: list[str]) -> tuple:
@@ -224,13 +207,6 @@ def main() -> None:
                 args.strict,
             )
         )
-        for table in BUSINESS_TABLES:
-            n = count_rows(conn, table)
-            status = "ok empty" if n == 0 else f"FAIL {n} rows (seed must not write this table)"
-            print(f"{table}: {status}")
-            if n:
-                errors.append(f"{table}: expected 0 rows, found {n}")
-
     errors.extend(check_tree(occupations))
     errors.extend(check_ilo_units(occupations, ilo_tasks))
 

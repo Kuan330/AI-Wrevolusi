@@ -13,15 +13,15 @@ MASCO occupation (4-digit)
   → E4 confirm / correct
 ```
 
-Three layers:
+Four layers:
 
 - **Raw** (`data/raw/`): source row tables. Do not overwrite in the product.
 - **Reference** (`data/reference/`): lookup tables imported from raw (`import_from_raw.py`). Refresh when raw changes.
-- **Business** (`data/business/`): user profile and **match results**.  
-  Speech-to-text is an input method (`profile_tasks.input_method`), not a table.
+- **Current user state**: occupation, edited tasks, and confirmed analysis are stored as browser JSON under `aiwrevolusi.userProfile`.
+- **Backend business** (`backend/app/models/`): authenticated account, generic task, capability, preparation, and schedule tables in Neon.
 
 WEF does **not** join to MASCO/ILO by 4-digit code.  
-`wef_skill_task_links` stores matcher output, not a source crosswalk.
+The current app does not persist WEF matcher output in a Neon crosswalk table.
 
 ESCO is out. E5–E8 are not modelled. Pilot units: `5221`, `5222`, `5223`.
 
@@ -80,117 +80,107 @@ MASCO `task_text` is kept for later alignment. **E1 starter tasks come from ILO.
 
 ---
 
-## Business tables
+## Current backend business tables
 
 ```mermaid
 erDiagram
-    users {
-        string id PK
-        string display_name
+    app_users {
+        uuid id PK
+        string email UK
+        string full_name
+        boolean is_active
+        uuid occupation_id FK
         datetime created_at
+        datetime updated_at
     }
 
-    work_profiles {
-        string id PK
-        string user_id FK
-        string occupation_code
-        string confirmation_status
-        datetime confirmed_at
+    occupations {
+        uuid id PK
+        string masco_code UK
+        string title
+        string industry
+        string description
     }
 
-    profile_tasks {
-        string id PK
-        string work_profile_id FK
-        string ilo_isco_08
-        int ilo_task_id
-        string task_text
+    tasks {
+        uuid id PK
+        uuid user_id FK
+        uuid occupation_id FK
+        string title
+        string description
         string status
-        string input_method
-        string time_spent
-        string responsibility_level
-        boolean is_user_added
+        string exposure_type
+        json context
     }
 
-    task_assessments {
-        string id PK
-        string profile_task_id FK
-        string suggested_state
-        string match_layer
-        string source
-        string reasoning
-        string uncertainty
-        string limitations
-        string missing_data_status
-        string confirmation_status
+    capabilities {
+        uuid id PK
+        uuid user_id FK
+        string name
+        string description
+        string evolution
+        json evidence
     }
 
-    profile_wef_skills {
-        string id PK
-        string work_profile_id FK
-        string wef_core_skill
-        string interpretation
-        string match_layer
-        string source
-        string reasoning
-        string uncertainty
-        string limitations
-        string missing_data_status
-        string confirmation_status
-        boolean is_user_added
+    task_capability_link {
+        uuid task_id PK,FK
+        uuid capability_id PK,FK
     }
 
-    wef_skill_task_links {
-        string profile_wef_skill_id PK
-        string profile_task_id PK
+    preparations {
+        uuid id PK
+        uuid user_id FK
+        string title
+        string rationale
+        int effort_level
+        string priority
     }
 
-    skill_examples {
-        string id PK
-        string profile_wef_skill_id FK
-        string example_text
+    schedules {
+        uuid id PK
+        uuid user_id FK
+        uuid preparation_id FK
+        date planned_for
+        boolean is_done
+        string note
     }
 
-    review_events {
-        string id PK
-        string work_profile_id FK
-        string entity_type
-        string entity_id
-        string action
-        string previous_value
-        string new_value
-        datetime created_at
+    refresh_tokens {
+        uuid id PK
+        uuid user_id FK
+        string token_jti UK
+        datetime expires_at
+        datetime revoked_at
     }
 
-    users ||--o{ work_profiles : has
-    work_profiles ||--o{ profile_tasks : contains
-    work_profiles ||--o{ profile_wef_skills : contains
-    work_profiles ||--o{ review_events : records
-    profile_tasks ||--o| task_assessments : assessed_as
-    profile_tasks ||--o{ wef_skill_task_links : "match result"
-    profile_wef_skills ||--o{ wef_skill_task_links : "match result"
-    profile_wef_skills ||--o{ skill_examples : has
+    occupations ||--o{ app_users : selected_by
+    occupations ||--o{ tasks : categorises
+    app_users ||--o{ tasks : owns
+    app_users ||--o{ capabilities : owns
+    app_users ||--o{ preparations : owns
+    app_users ||--o{ schedules : owns
+    app_users ||--o{ refresh_tokens : authenticates
+    tasks ||--o{ task_capability_link : maps
+    capabilities ||--o{ task_capability_link : maps
+    preparations ||--o{ schedules : plans
 ```
 
-`work_profiles.occupation_code` is the MASCO/ILO 4-digit unit (e.g. `5222`). It is a **logical** reference to raw tables, not a database FK file.
+`occupations` and `ref_occupations` are separate. The former is an ORM table using UUID keys; the latter is the Iteration 1 MASCO lookup using 4-digit codes. There is no automatic synchronization between them.
 
-`profile_wef_skills.wef_core_skill` is a **logical** reference to `wef_skill_master_raw.core_skill`. User-added skills may be free text with `is_user_added = true`.
+The Iteration 1 work-profile screens currently save the selected `ref_occupations.occupation_code`, edited tasks, and E2 results to browser `localStorage`, not to the backend business tables above. The older `users`, `work_profiles`, `profile_tasks`, `task_assessments`, `profile_wef_skills`, `wef_skill_task_links`, `skill_examples`, and `review_events` CSV/SQL definitions are legacy design sketches and are not used by current code.
 
-`wef_skill_task_links` is written **after** NLP/AI. Empty `ilo_task_id` means a user-added task (no official ILO exposure row). The E2 pilot uses a versioned scikit-learn TF-IDF + Ridge artifact for edited/user-added task scores and does not use an LLM fallback; it exposes low-confidence text matches as `insufficient_data` instead.
+The E2 pilot uses a versioned scikit-learn TF-IDF + Ridge artifact for edited/user-added task scores and does not use an LLM fallback; it exposes low-confidence text matches as `insufficient_data` instead.
 
 ### Status and matching values
 
-| Field | Allowed values |
+| Current ORM field | Allowed values |
 |---|---|
-| `work_profiles.confirmation_status` | `suggested` / `confirmed` / `corrected` |
-| `profile_tasks.status` | `suggested` / `confirmed` / `edited` / `removed` |
-| `profile_tasks.input_method` | `typed` / `speech` |
-| `task_assessments.suggested_state` | `ai_assisted` / `partly_automated` / `reshaped` / `human_led` / `insufficient_data` |
-| `match_layer` | `exact` / `nlp` / `llm` / `insufficient_data` |
-| `profile_wef_skills.interpretation` | `continue_useful` / `need_strengthening` / `need_updating` |
-| `review_events.entity_type` | `occupation` / `task` / `assessment` / `wef_skill` |
-| `review_events.action` | `confirm` / `correct` / `remove` / `add` |
+| `tasks.status` | `needs_review` / `confirmed` / `optional_context_missing` |
+| `tasks.exposure_type` | `human_led` / `ai_assisted` / `partly_automated` / `reshaped` / `insufficient_data` |
+| `capabilities.evolution` | `continue_to_be_useful` / `needs_strengthening` / `needs_updating` |
+| `preparations.priority` | `high` / `medium` / `low` |
 
-Unconfirmed tasks must not go to E2/E3. Later stages read **confirmed** values.
+The richer E1 confirmation and review-event values remain browser-side until a reviewed Neon persistence model is implemented.
 
 ---
 
@@ -206,5 +196,7 @@ Unconfirmed tasks must not go to E2/E3. Later stages read **confirmed** values.
 | Reference | `data/reference/ref_wef_skills.csv` |
 | Database | `db/schema.sql` |
 | Database | `db/seed_reference.py` |
+| Backend business schema | `backend/app/models/*.py` |
+| Current E1 user state | `frontend/src/pages/WorkProfile/userProfile.ts` (`localStorage`) |
 | Process | `docs/iteration1_data_management.md` |
-| Business CSV sketches | `data/business/*.csv` |
+| Legacy business sketches | `data/business/*.csv` |
