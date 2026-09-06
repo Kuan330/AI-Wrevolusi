@@ -15,6 +15,7 @@ class Settings(BaseSettings):
         env_file=(REPO_DIR / '.env', BACKEND_DIR / '.env'),
         env_file_encoding='utf-8',
         case_sensitive=False,
+        extra='ignore',
     )
 
     app_name: str = 'AI-Wrevolusi API'

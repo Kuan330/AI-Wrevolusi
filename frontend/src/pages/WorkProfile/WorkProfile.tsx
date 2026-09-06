@@ -7,6 +7,7 @@ import { GradientPill } from "@/components/ui/gradient-pill";
 import { ROUTES } from "@/constants/routes";
 import OccupationFilters from "@/pages/WorkProfile/components/OccupationFilters";
 import OccupationSearch from "@/pages/WorkProfile/components/OccupationSearch";
+import SelectedOccupationSummary from "@/pages/WorkProfile/components/SelectedOccupationSummary";
 import {
   useOccupationFilters,
   type OccupationSearchResult,
@@ -22,7 +23,7 @@ type WorkProfileMode = "search" | "filters";
 const WorkProfile = () => {
   const navigate = useNavigate();
   const occupation = useOccupationFilters();
-  const [mode, setModeState] = useState<WorkProfileMode>("search");
+  const [mode, setModeState] = useState<WorkProfileMode>("filters");
   const [selectedFromSearch, setSelectedFromSearch] = useState<OccupationSearchResult | null>(null);
 
   useEffect(() => {
@@ -88,7 +89,7 @@ const WorkProfile = () => {
     <div className="space-y-5">
       <PageHeader
         title="Find the occupation that matches your work"
-        description="Search by job title or occupation code, or browse by field of work."
+        description="Search by job title, or browse by field of work."
       />
 
       {occupation.error ? (
@@ -152,9 +153,7 @@ const WorkProfile = () => {
         )}
 
         <div className="mt-4 border-t border-white/70 pt-4">
-          <p className="text-sm text-muted-foreground">
-            {confirmedUnit ? `Selected: ${confirmedUnit.title}` : "No occupation selected yet."}
-          </p>
+          <SelectedOccupationSummary occupation={confirmedUnit} />
           <div className="mt-3 flex justify-end">
             <Button
               className="profile-blue-btn h-10 whitespace-nowrap rounded-full px-5"

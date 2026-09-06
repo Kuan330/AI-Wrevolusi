@@ -42,8 +42,8 @@ const OccupationSearch = ({
               onQueryChange(event.target.value);
               setIsOpen(true);
             }}
-            aria-label="Search occupations by job title or code"
-            placeholder="Search by job title or occupation code"
+            aria-label="Search occupations by job title"
+            placeholder="Search by job title"
             className="h-12 w-full rounded-xl border border-white/80 bg-white/95 pl-10 pr-4 text-sm outline-none shadow-sm transition focus:border-primary focus:ring-4 focus:ring-primary/10"
           />
         </div>
