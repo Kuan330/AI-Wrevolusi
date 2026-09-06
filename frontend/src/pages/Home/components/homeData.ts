@@ -6,9 +6,12 @@ export interface HomeNavLink {
 export interface StepItem {
   title: string;
   description: string;
-  callout: string;
-  source: string;
-  icon: string;
+  accent: "warm" | "blue";
+}
+
+export interface StepEvidenceItem {
+  label: string;
+  detail: string;
 }
 
 export interface TestimonialItem {
@@ -68,44 +71,44 @@ export const TRUST_ITEMS = [
 
 export const STEPS: StepItem[] = [
   {
-    title: "Record your real work, and get a profile that fits you.",
-    description:
-      "Start with what you actually do. Choose the closest occupation, then adjust the tasks to match your working day.",
-    callout: "An honest picture of your work is the starting point for every next step.",
-    source: "Built on MASCO · Malaysia's official occupation classification",
-    icon: "/images/icons/icon-work-profile.svg",
+    title: "Record your real work.",
+    description: "Choose an occupation and adjust its tasks to match your working day.",
+    accent: "warm",
   },
   {
-    title: "Check your tasks against AI, and see where it helps or changes.",
-    description:
-      "Review each confirmed task with ILO evidence to see where AI may assist, reshape or leave the work human-led.",
-    callout: "Task-level evidence, not a prediction that your job will disappear.",
-    source: "ILO Working Paper 140 · Generative AI and jobs",
-    icon: "/images/icons/icon-ai-exposure.svg",
+    title: "See where AI may change tasks.",
+    description: "Review task-level evidence for AI assistance, reshaping or human-led work.",
+    accent: "blue",
   },
   {
-    title: "Uncover the skills already in your work, and see how their value may change.",
-    description:
-      "Connect your tasks to WEF skills and see which strengths are growing, stable or changing.",
-    callout: "Your daily work already contains evidence of valuable skills.",
-    source: "WEF Future of Jobs Report 2025",
-    icon: "/images/icons/icon-skills.svg",
+    title: "Make your skills visible.",
+    description: "Connect your work to skills whose value can grow, stay steady or shift.",
+    accent: "warm",
   },
   {
-    title: "Explore where those skills could take you, without starting from zero.",
-    description:
-      "Find related occupations where your current strengths can transfer and open new options.",
-    callout: "Your skills can create more possibilities across kinds of work.",
-    source: "Explore related occupations from your strengths",
-    icon: "/images/icons/icon-occupations.svg",
+    title: "Explore your next options.",
+    description: "Find occupations where your current strengths can transfer.",
+    accent: "blue",
   },
   {
-    title: "Turn your choices into a learning plan that fits your real life.",
-    description:
-      "Build practical next steps around your time, responsibilities and career stage.",
-    callout: "A useful plan has to fit the life you actually have.",
-    source: "Time, schedule and responsibilities are part of the plan",
-    icon: "/images/icons/icon-learning-plan.svg",
+    title: "Build a plan that fits your life.",
+    description: "Turn your choices into practical learning steps around your real constraints.",
+    accent: "warm",
+  },
+];
+
+export const STEP_EVIDENCE: StepEvidenceItem[] = [
+  {
+    label: "MASCO",
+    detail: "Malaysia's official occupation classification helps anchor your work profile.",
+  },
+  {
+    label: "ILO",
+    detail: "Task-level evidence shows where generative AI may change work.",
+  },
+  {
+    label: "WEF",
+    detail: "Future of Jobs 2025 informs the skills and opportunity view.",
   },
 ];
 

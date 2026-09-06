@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import SectionHeader from "@/components/ui/section-header";
-import { STEPS } from "./homeData";
+import { STEP_EVIDENCE, STEPS } from "./homeData";
 
 const StepsSection = () => {
   return (
@@ -13,18 +13,12 @@ const StepsSection = () => {
         <div className="steps-grid">
           {STEPS.map((step, index) => (
             <div className="step-flow-item" key={step.title}>
-              <article className="step-card glass">
+              <article className={`step-card glass step-card-${step.accent}`}>
                 <div className="step-card-top">
                   <div className="step-num">{String(index + 1).padStart(2, "0")}</div>
-                  <div className="step-icon" aria-hidden="true">
-                    <img src={step.icon} alt="" />
-                  </div>
                 </div>
                 <h3>{step.title}</h3>
                 <p className="step-description">{step.description}</p>
-                <div className="step-divider" aria-hidden="true" />
-                <p className="step-callout">{step.callout}</p>
-                <p className="step-source">{step.source}</p>
               </article>
               {index < STEPS.length - 1 && (
                 <div
@@ -32,15 +26,25 @@ const StepsSection = () => {
                   aria-hidden="true"
                   style={{ "--step-delay": `${index * 160}ms` } as CSSProperties}
                 >
-                  <img
-                    className="step-connector-icon"
-                    src="/images/icons/icon-step-arrow.svg"
-                    alt=""
-                  />
+                  <span className="step-connector-icon">›</span>
                 </div>
               )}
             </div>
           ))}
+        </div>
+        <div className="steps-evidence glass">
+          <div className="steps-evidence-heading">
+            <span className="steps-evidence-kicker">Evidence behind the flow</span>
+            <p>Three references keep the journey grounded in your work and current research.</p>
+          </div>
+          <div className="steps-evidence-list">
+            {STEP_EVIDENCE.map((item) => (
+              <div className="steps-evidence-item" key={item.label}>
+                <strong>{item.label}</strong>
+                <span>{item.detail}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
