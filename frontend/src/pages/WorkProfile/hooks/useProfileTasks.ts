@@ -131,7 +131,11 @@ export const useProfileTasks = (occupationCode?: string) => {
           humanInteractionLevel: values.humanInteractionLevel,
           judgementLevel: values.judgementLevel,
           score2025: edited ? null : task.score2025,
-          potential25: edited ? null : task.potential25,
+          // `potential25` and `meanScore2025` describe the selected reference
+          // occupation. Editing one task invalidates only that task's source
+          // score; it must not erase the occupation-level average/category.
+          potential25: task.potential25,
+          meanScore2025: task.meanScore2025,
         };
       });
       persist(next);

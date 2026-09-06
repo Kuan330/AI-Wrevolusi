@@ -1,0 +1,43 @@
+/* Page composition */
+.exposure-page { display: grid; gap: 1.25rem; }
+.exposure-page__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; }
+.exposure-page__button { border-radius: 999px; }
+.exposure-page__grid { display: grid; align-items: start; gap: 1.25rem; }
+.exposure-page__insights { display: grid; min-width: 0; gap: 1.25rem; }
+.exposure-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #7f7280; }
+.exposure-title { margin: .25rem 0 .5rem; font-size: 1.15rem; font-weight: 600; color: #2f2430; }
+.exposure-caption { font-size: .8rem; line-height: 1.6; color: #7f7280; }
+.personal-overview, .priority-tasks { padding: 1.25rem; }
+.personal-overview__metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; margin: 1rem 0; }
+.personal-overview__metrics > div { border-radius: 12px; padding: .75rem; background: linear-gradient(135deg, #eaf5fc, #faf0f4); }
+.personal-overview__metrics dt { font-size: .7rem; color: #574a55; }
+.personal-overview__metrics dd { margin-top: .4rem; font-size: 1.65rem; font-weight: 600; font-variant-numeric: tabular-nums; color: #2f5f80; }
+.personal-overview__metrics small { font-size: .7rem; font-weight: 400; }
+.personal-overview__note { margin-top: .75rem; padding-top: .75rem; border-top: 1px solid #eadde4; font-size: .75rem; line-height: 1.6; color: #7f7280; }
+.priority-tasks__list { margin-top: 1rem; display: grid; gap: .85rem; }
+.priority-tasks__item { display: flex; align-items: flex-start; gap: .75rem; padding-bottom: .85rem; border-bottom: 1px solid #eadde4; }
+.priority-tasks__item:last-child { border: 0; padding-bottom: 0; }
+.priority-tasks__rank { display: grid; place-items: center; flex-shrink: 0; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: #e8f3fa; color: #2f5f80; font-size: .75rem; font-weight: 600; }
+.priority-tasks__content { min-width: 0; flex: 1; }
+.priority-tasks__content h3 { font-size: .85rem; line-height: 1.5; font-weight: 500; }
+.priority-tasks__reason { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-top: .35rem; font-size: .75rem; line-height: 1.5; color: #7f7280; }
+.priority-tasks__actions { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .5rem; }
+.priority-tasks__score { font-weight: 600; font-variant-numeric: tabular-nums; color: #2f5f80; }
+.priority-tasks__score small { font-weight: 400; font-size: .7rem; }
+/* Occupation path is also available to keyboard users. */
+.occupation-name { display: inline-flex; align-items: center; gap: .25rem; }
+.occupation-name__details { position: relative; display: inline-flex; }
+.occupation-name__button { display: grid; place-items: center; width: 1.25rem; height: 1.25rem; border: 1px solid #c9dfef; border-radius: 50%; background: #ffffffbf; color: #4f91ba; }
+.occupation-name__button svg { width: .75rem; height: .75rem; }
+.occupation-name__tooltip { position: absolute; left: 0; top: 100%; z-index: 40; width: 20rem; max-width: calc(100vw - 3rem); margin-top: .5rem; padding: .75rem; border: 1px solid #c9dfef; border-radius: .75rem; background: white; color: #574a55; font-size: .75rem; font-weight: 400; line-height: 1.6; box-shadow: 0 12px 28px #3d2b3629; visibility: hidden; }
+.occupation-name__details:hover .occupation-name__tooltip, .occupation-name__details:focus-within .occupation-name__tooltip { visibility: visible; }
+@media (min-width: 1280px) {
+  .exposure-page__grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+  .exposure-page__grid > .analysis-overview__list { position: sticky; top: 5rem; }
+}
+@media (max-width: 480px) {
+  .personal-overview__metrics { gap: .35rem; }
+  .personal-overview__metrics > div { padding: .5rem; }
+  .personal-overview__metrics dd { font-size: 1.25rem; }
+  .occupation-name__tooltip { left: auto; right: 0; }
+}

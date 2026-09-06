@@ -40,3 +40,17 @@
   background: rgba(255, 255, 255, 0.72);
   padding: 0.75rem 0.875rem;
 }
+
+/* Named task-list and shared card styles. */
+.task-list__empty { @apply rounded-xl border border-dashed border-white/80 p-4 text-sm text-[#7f7280]; }
+.task-list__row { @apply flex items-start gap-3; }
+.task-list__dot { @apply mt-1.5 size-2 shrink-0 rounded-full bg-[#9ec9e4]; }
+.task-list__name { @apply min-w-0 flex-1 text-sm leading-6 text-[#2f2430]; }
+.task-details-button { @apply h-8 shrink-0 rounded-full border-[#c9dfef] bg-white/75 px-3 text-xs text-[#2f5f80] hover:bg-[#d6eaf7] hover:text-[#2f5f80]; }
+.analysis-overview__list { @apply h-[36rem] xl:h-[calc(100vh-10rem)] xl:max-h-none; }
+.task-list__reset { @apply h-7 px-2 text-xs font-medium text-[#4f91ba] hover:bg-[#d6eaf7] hover:text-[#2f5f80]; }
+.task-list__viewport { @apply relative min-h-0 flex-1; }
+.analysis-card--layout { @apply flex min-h-0 flex-col overflow-hidden border-white/80 bg-white/75 shadow-[0_14px_34px_rgba(61,43,54,0.1)] backdrop-blur-xl; }
+.analysis-card__header { @apply shrink-0 space-y-1 p-4 pb-2; }
+.analysis-card__eyebrow { @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7f7280]; }
+.analysis-card__content { @apply flex min-h-0 flex-1 flex-col p-4 pt-2; }

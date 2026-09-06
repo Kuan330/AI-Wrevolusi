@@ -1,0 +1,8 @@
+.score-range__panel { @apply rounded-2xl border border-[#d8e8f3] bg-[#f5faff] p-3.5; }
+.score-range__header { @apply flex items-start justify-between gap-4; }
+.score-range__label { @apply text-xs font-semibold uppercase tracking-[0.12em] text-[#3d5f7a]; }
+.score-range__description { @apply mt-1 text-xs text-[#7f7280]; }
+.score-range__value { @apply shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-semibold tabular-nums text-[#2f5f80] shadow-sm; }
+.score-range__control { @apply mt-4; }
+.score-range__endpoints { @apply mt-2 flex justify-between text-[11px] text-[#7f7280]; }
+.score-range__endpoint-value { @apply text-[#3d5f7a]; }
