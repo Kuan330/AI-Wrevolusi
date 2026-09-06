@@ -1,48 +1,54 @@
 import { ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import ScoreRangeSlider from "@/components/ui/score-range-slider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import AnalysisCard, { type TitleTone } from "@/pages/Analysis/components/AnalysisCard";
-import ExposureCategoryFilters from "@/pages/Analysis/components/ExposureCategoryFilters";
 import TaskList from "@/pages/Analysis/components/TaskList";
-import type { OccupationBandId } from "@/pages/Analysis/lib/occupationBands";
+import { taskIsWithinScoreRange, taskScore, type TaskScoreRange } from "@/pages/Analysis/lib/taskScore";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 
 type TaskListCardProps = {
   className?: string;
+  scoreRange?: TaskScoreRange;
+  onScoreRangeChange?: (range: TaskScoreRange) => void;
   eyebrow: string;
   title: string;
   description: string;
   titleTone?: TitleTone | null;
   tasks: ProfileTask[];
   taskExposureAssessments: ConfirmedTaskExposureAssessment[];
-  activeCategory: OccupationBandId | null;
-  categoryCounts: Record<OccupationBandId, number>;
-  totalCount?: number;
-  onSelectCategory: (category: OccupationBandId | null) => void;
   highlightedIds: string[];
-  onClear?: () => void;
 };
 
 const TaskListCard = ({
   className,
+  scoreRange: controlledRange,
+  onScoreRangeChange,
   eyebrow,
   title,
   description,
   titleTone,
   tasks,
   taskExposureAssessments,
-  activeCategory,
-  categoryCounts,
-  totalCount,
-  onSelectCategory,
   highlightedIds,
-  onClear,
 }: TaskListCardProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [localRange, setLocalRange] = useState<TaskScoreRange>([0, 1]);
+  const scoreRange = controlledRange ?? localRange;
+  const setScoreRange = onScoreRangeChange ?? setLocalRange;
   const [scrollHint, setScrollHint] = useState({ canScroll: false, atBottom: true });
+  const taskExposureAssessmentByTaskId = new Map(
+    taskExposureAssessments.map((assessment) => [assessment.task_id, assessment]),
+  );
+  const hasFullScoreRange = scoreRange[0] <= 0 && scoreRange[1] >= 1;
+  const visibleCount = tasks.filter((task) => {
+    const score = taskScore(task, taskExposureAssessmentByTaskId.get(task.id));
+    return score == null ? hasFullScoreRange : taskIsWithinScoreRange(score, scoreRange);
+  }).length;
+  const hasActiveScoreFilter = scoreRange[0] > 0 || scoreRange[1] < 1;
 
   const updateScrollHint = useCallback(() => {
     const element = scrollRef.current;
@@ -60,52 +66,41 @@ const TaskListCard = ({
     const observer = new ResizeObserver(updateScrollHint);
     observer.observe(element);
     return () => observer.disconnect();
-  }, [tasks.length, taskExposureAssessments.length, activeCategory, highlightedIds.length, updateScrollHint]);
+  }, [tasks.length, taskExposureAssessments.length, scoreRange, highlightedIds.length, updateScrollHint]);
 
   const showScrollHint = scrollHint.canScroll && !scrollHint.atBottom;
 
   const scrollTowardBottom = () => {
     const element = scrollRef.current;
     if (!element) return;
-    element.scrollBy({ top: Math.max(120, element.clientHeight * 0.65), behavior: "smooth" });
+    element.scrollBy({ top: Math.max(160, element.clientHeight * 0.65), behavior: "smooth" });
   };
 
   return (
     <AnalysisCard
-    className={cn("analysis-overview__list", className)}
+      className={cn("analysis-overview__list", className)}
       eyebrow={eyebrow}
       title={title}
-      description={description}
+      description={`${description} Showing ${visibleCount} of ${tasks.length} tasks.`}
       headerContent={
-        <div className="space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7f7280]">
-            Filter by ILO reference occupation category
-          </p>
-          <ExposureCategoryFilters
-            counts={categoryCounts}
-            activeCategory={activeCategory}
-            totalCount={totalCount}
-            onSelect={onSelectCategory}
-            compact
-          />
-        </div>
+        <ScoreRangeSlider value={scoreRange} onValueChange={setScoreRange} />
       }
       titleTone={titleTone}
       action={
-        onClear ? (
+        hasActiveScoreFilter ? (
           <Button
             type="button"
             variant="ghost"
-            className="h-7 px-2 text-xs font-medium text-[#4f91ba]"
-            onClick={onClear}
+            className="task-list__reset"
+            onClick={() => setScoreRange([0, 1])}
           >
-            Clear
+            Reset
           </Button>
         ) : null
       }
       contentClassName="pt-1"
     >
-      <div className="relative min-h-0 flex-1">
+      <div className="task-list__viewport">
         <div
           ref={scrollRef}
           className="analysis-list-scroll h-full min-h-0"
@@ -115,7 +110,7 @@ const TaskListCard = ({
             <TaskList
               tasks={tasks}
               taskExposureAssessments={taskExposureAssessments}
-              activeCategory={activeCategory}
+              scoreRange={scoreRange}
               highlightedIds={highlightedIds}
             />
           </div>

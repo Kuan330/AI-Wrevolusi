@@ -22,7 +22,7 @@ type WorkProfileMode = "search" | "filters";
 const WorkProfile = () => {
   const navigate = useNavigate();
   const occupation = useOccupationFilters();
-  const [mode, setModeState] = useState<WorkProfileMode>("search");
+  const [mode, setModeState] = useState<WorkProfileMode>("filters");
   const [selectedFromSearch, setSelectedFromSearch] = useState<OccupationSearchResult | null>(null);
 
   useEffect(() => {

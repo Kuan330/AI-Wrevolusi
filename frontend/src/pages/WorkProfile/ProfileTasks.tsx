@@ -131,14 +131,22 @@ const ProfileTasks = () => {
           },
         })),
       });
-      const scored = profileTasks.tasks.find(
-        (task) => task.potential25 || typeof task.meanScore2025 === "number",
-      );
+      const scored =
+        profileTasks.tasks.find(
+          (task) => task.potential25 && typeof task.meanScore2025 === "number",
+        ) ??
+        profileTasks.tasks.find(
+          (task) => task.potential25 || typeof task.meanScore2025 === "number",
+        );
+      const referenceOccupationCategory =
+        scored?.potential25 ??
+        assessmentResponse.assessments.find((assessment) => assessment.potential25)?.potential25 ??
+        null;
       saveConfirmedAnalysis({
         occupationTitle: selected.unit.title,
         occupationPath: selected.path.map((item) => item.title),
         occupationCode: selected.unit.occupation_code,
-        potential25: scored?.potential25 ?? null,
+        potential25: referenceOccupationCategory,
         meanScore2025: scored?.meanScore2025 ?? null,
         tasks: profileTasks.tasks,
         taskExposureAssessments: assessmentResponse.assessments,

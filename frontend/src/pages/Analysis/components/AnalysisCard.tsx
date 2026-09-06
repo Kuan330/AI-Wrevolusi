@@ -8,7 +8,7 @@ export type TitleTone = {
   color: string;
 };
 
-type AnalysisCardProps = HTMLAttributes<HTMLDivElement> & {
+type AnalysisCardProps = Omit<HTMLAttributes<HTMLDivElement>, "title"> & {
   eyebrow?: string;
   title?: ReactNode;
   description?: ReactNode;
@@ -33,15 +33,15 @@ const AnalysisCard = ({
   return (
     <Card
       className={cn(
-        "analysis-card flex min-h-0 flex-col overflow-hidden border-white/80 bg-white/75 shadow-[0_14px_34px_rgba(61,43,54,0.1)] backdrop-blur-xl",
+        "analysis-card analysis-card--layout",
         className,
       )}
       {...props}
     >
       {eyebrow || title || description || action ? (
-        <CardHeader className="shrink-0 space-y-1 p-4 pb-2">
+        <CardHeader className="analysis-card__header">
           {eyebrow ? (
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7f7280]">
+            <p className="analysis-card__eyebrow">
               {eyebrow}
             </p>
           ) : null}
@@ -77,7 +77,7 @@ const AnalysisCard = ({
       ) : null}
       <CardContent
         className={cn(
-          "analysis-card__content flex min-h-0 flex-1 flex-col p-4 pt-2",
+          "analysis-card__content",
           contentClassName,
         )}
       >
