@@ -50,7 +50,7 @@ const AnalysisCard = ({
               {title ? (
                 <CardTitle
                   className={cn(
-                    "text-base font-semibold leading-snug",
+                    "min-w-0 text-base font-semibold leading-snug",
                     titleTone ? "w-fit rounded-md px-2 py-0.5" : "text-[#2f2430]",
                   )}
                   style={

@@ -31,10 +31,12 @@ const ScoreRangeSlider = ({ value, onValueChange, onReset, className }: ScoreRan
           </p>
         </div>
         <div className="score-range__value-row">
-          {canReset ? (
+          {onReset ? (
             <button
               type="button"
-              className="score-range__reset"
+              className={cn("score-range__reset", !canReset && "invisible")}
+              disabled={!canReset}
+              aria-hidden={!canReset}
               aria-label="Reset"
               title="Reset"
               onClick={onReset}
@@ -65,12 +67,10 @@ const ScoreRangeSlider = ({ value, onValueChange, onReset, className }: ScoreRan
       />
       <div className="score-range__endpoints">
         <span>
-          <strong className="score-range__endpoint-value">0</strong> · task basically cannot be
-          automated by GenAI
+          <strong className="score-range__endpoint-value">0</strong> · No GenAI automation potential
         </span>
         <span>
-          <strong className="score-range__endpoint-value">1</strong> · task theoretically can be
-          fully automated by GenAI
+          <strong className="score-range__endpoint-value">1</strong> · Full GenAI automation potential
         </span>
       </div>
     </div>

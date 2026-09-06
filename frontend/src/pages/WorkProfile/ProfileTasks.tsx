@@ -13,40 +13,23 @@ import ProfileTaskList from "@/pages/WorkProfile/components/ProfileTaskList";
 import TaskEditorDialog from "@/pages/WorkProfile/components/TaskEditorDialog";
 import { useProfileTasks } from "@/pages/WorkProfile/hooks/useProfileTasks";
 import type { ProfileTask, TaskEditorValues } from "@/pages/WorkProfile/types";
-import { exposureService, type TaskAssessmentContextLevel } from "@/services/exposureService";
+import { exposureService } from "@/services/exposureService";
 import { referenceService } from "@/services/referenceService";
 
 const emptyEditorValues = (): TaskEditorValues => ({
   wording: "",
   timeSpent: "",
-  responsibility: "",
-  routineProcessingLevel: "",
-  informationUseLevel: "",
-  humanInteractionLevel: "",
-  judgementLevel: "",
+  notes: "",
 });
-
 const valuesFromTask = (task: ProfileTask): TaskEditorValues => ({
   wording: task.wording,
   timeSpent: task.timeSpent,
-  responsibility: task.responsibility,
-  routineProcessingLevel: task.routineProcessingLevel ?? "",
-  informationUseLevel: task.informationUseLevel ?? "",
-  humanInteractionLevel: task.humanInteractionLevel ?? "",
-  judgementLevel: task.judgementLevel ?? "",
+  notes: task.notes ?? "",
 });
 
-const normalizeOptionalTaskAssessmentContextLevel = (
-  value: string | undefined,
-): TaskAssessmentContextLevel | null =>
-  value === "low" || value === "medium" || value === "high" ? value : null;
-
-const normalizeOptionalResponsibilityLevel = (
-  value: string,
-): "individual" | "shared" | "lead" | null =>
-  value === "individual" || value === "shared" || value === "lead" ? value : null;
-
-const loadOccupationWithPath = async (occupationCode: string): Promise<SelectedOccupation> => {
+const loadOccupationWithPath = async (
+  occupationCode: string,
+): Promise<SelectedOccupation> => {
   const unit = await referenceService.getOccupation(occupationCode);
   const path = [unit];
   const seen = new Set([unit.occupation_code]);
@@ -65,9 +48,12 @@ const loadOccupationWithPath = async (occupationCode: string): Promise<SelectedO
 const ProfileTasks = () => {
   const initialSelectedOccupation = readSelectedOccupation();
   const initialTaskWorkspace = readTaskWorkspace();
-  const [selected, setSelected] = useState<SelectedOccupation | null>(initialSelectedOccupation);
+  const [selected, setSelected] = useState<SelectedOccupation | null>(
+    initialSelectedOccupation,
+  );
   const [occupationLoading, setOccupationLoading] = useState(
-    !initialSelectedOccupation && Boolean(initialTaskWorkspace?.tasksOccupationCode),
+    !initialSelectedOccupation &&
+      Boolean(initialTaskWorkspace?.tasksOccupationCode),
   );
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -78,9 +64,13 @@ const ProfileTasks = () => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<"add" | "edit">("add");
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
-  const [editorValues, setEditorValues] = useState<TaskEditorValues>(emptyEditorValues);
-  const [taskAssessmentRequestInProgress, setTaskAssessmentRequestInProgress] = useState(false);
-  const [taskAssessmentRequestError, setTaskAssessmentRequestError] = useState<string | null>(null);
+  const [editorValues, setEditorValues] =
+    useState<TaskEditorValues>(emptyEditorValues);
+  const [taskAssessmentRequestInProgress, setTaskAssessmentRequestInProgress] =
+    useState(false);
+  const [taskAssessmentRequestError, setTaskAssessmentRequestError] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     const occupationCode = initialTaskWorkspace?.tasksOccupationCode;
@@ -109,28 +99,24 @@ const ProfileTasks = () => {
     setTaskAssessmentRequestInProgress(true);
     setTaskAssessmentRequestError(null);
     try {
-      const assessmentResponse = await exposureService.assessConfirmedTasksAgainstIloReferences({
-        occupation_code: selected.unit.occupation_code,
-        confirmed_tasks: profileTasks.tasks.map((task) => ({
-          task_id: task.id,
-          task_text: task.wording,
-          ilo_task_id: task.iloTaskId,
-          context: {
-            routine_processing_level: normalizeOptionalTaskAssessmentContextLevel(
-              task.routineProcessingLevel,
-            ),
-            information_use_level: normalizeOptionalTaskAssessmentContextLevel(
-              task.informationUseLevel,
-            ),
-            human_interaction_level: normalizeOptionalTaskAssessmentContextLevel(
-              task.humanInteractionLevel,
-            ),
-            judgement_level: normalizeOptionalTaskAssessmentContextLevel(task.judgementLevel),
-            responsibility_level: normalizeOptionalResponsibilityLevel(task.responsibility),
-            time_spent: task.timeSpent || null,
-          },
-        })),
-      });
+      const assessmentResponse =
+        await exposureService.assessConfirmedTasksAgainstIloReferences({
+          occupation_code: selected.unit.occupation_code,
+          confirmed_tasks: profileTasks.tasks.map((task) => ({
+            task_id: task.id,
+            task_text: task.wording,
+            ilo_task_id: task.iloTaskId,
+            // The simplified editor no longer collects subjective score adjustments.
+            context: {
+              time_spent: task.timeSpent || null,
+              routine_processing_level: null,
+              information_use_level: null,
+              human_interaction_level: null,
+              judgement_level: null,
+              responsibility_level: null,
+            },
+          })),
+        });
       const scored =
         profileTasks.tasks.find(
           (task) => task.potential25 && typeof task.meanScore2025 === "number",
@@ -140,7 +126,9 @@ const ProfileTasks = () => {
         );
       const referenceOccupationCategory =
         scored?.potential25 ??
-        assessmentResponse.assessments.find((assessment) => assessment.potential25)?.potential25 ??
+        assessmentResponse.assessments.find(
+          (assessment) => assessment.potential25,
+        )?.potential25 ??
         null;
       saveConfirmedAnalysis({
         occupationTitle: selected.unit.title,
@@ -238,10 +226,15 @@ const ProfileTasks = () => {
             <Button
               type="button"
               className="profile-gradient-btn h-10 whitespace-nowrap rounded-full px-5 font-normal"
-              disabled={profileTasks.tasks.length === 0 || taskAssessmentRequestInProgress}
+              disabled={
+                profileTasks.tasks.length === 0 ||
+                taskAssessmentRequestInProgress
+              }
               onClick={() => void assessConfirmedTasksAndOpenExposure()}
             >
-              {taskAssessmentRequestInProgress ? "Assessing tasks…" : "Explore AI impact"}
+              {taskAssessmentRequestInProgress
+                ? "Assessing tasks…"
+                : "Explore AI impact"}
             </Button>
           </div>
         </div>
@@ -271,21 +264,27 @@ const ProfileTasks = () => {
           <Button
             type="button"
             className="profile-gradient-btn h-10 shrink-0 whitespace-nowrap rounded-full px-5 font-normal"
-            disabled={profileTasks.tasks.length === 0 || taskAssessmentRequestInProgress}
+            disabled={
+              profileTasks.tasks.length === 0 || taskAssessmentRequestInProgress
+            }
             onClick={() => void assessConfirmedTasksAndOpenExposure()}
           >
-            {taskAssessmentRequestInProgress ? "Assessing tasks…" : "Explore AI impact"}
+            {taskAssessmentRequestInProgress
+              ? "Assessing tasks…"
+              : "Explore AI impact"}
           </Button>
         </div>
       </section>
 
-      <TaskEditorDialog
-        open={editorOpen}
-        mode={editorMode}
-        initialValues={editorValues}
-        onClose={closeEditor}
-        onSave={saveTask}
-      />
+      {editorOpen && (
+        <TaskEditorDialog
+          open={editorOpen}
+          mode={editorMode}
+          initialValues={editorValues}
+          onClose={closeEditor}
+          onSave={saveTask}
+        />
+      )}
     </div>
   );
 };

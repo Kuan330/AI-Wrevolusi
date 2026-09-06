@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 
 import { createTaskId } from "@/pages/WorkProfile/taskOptions";
 import type { ProfileTask, TaskEditorValues } from "@/pages/WorkProfile/types";
-import { readProfileTasks, saveProfileTasks } from "@/pages/WorkProfile/userProfile";
+import {
+  readProfileTasks,
+  saveProfileTasks,
+} from "@/pages/WorkProfile/userProfile";
 import { referenceService } from "@/services/referenceService";
 
 export const toProfileTask = (
@@ -13,6 +16,7 @@ export const toProfileTask = (
       ProfileTask,
       | "iloTaskId"
       | "timeSpent"
+      | "notes"
       | "responsibility"
       | "routineProcessingLevel"
       | "informationUseLevel"
@@ -27,6 +31,7 @@ export const toProfileTask = (
   id: createTaskId(),
   wording,
   timeSpent: extras?.timeSpent ?? "",
+  notes: extras?.notes ?? "",
   responsibility: extras?.responsibility ?? "",
   routineProcessingLevel: extras?.routineProcessingLevel ?? "",
   informationUseLevel: extras?.informationUseLevel ?? "",
@@ -40,7 +45,9 @@ export const toProfileTask = (
   meanScore2025: extras?.meanScore2025,
 });
 
-const normalizePersistedProfileTaskAssessmentContext = (task: ProfileTask): ProfileTask => ({
+const normalizePersistedProfileTaskAssessmentContext = (
+  task: ProfileTask,
+): ProfileTask => ({
   ...task,
   routineProcessingLevel: task.routineProcessingLevel ?? "",
   informationUseLevel: task.informationUseLevel ?? "",
@@ -74,12 +81,15 @@ export const useProfileTasks = (occupationCode?: string) => {
       setTasks(next);
       saveProfileTasks(code, next);
       if (rows.length === 0) {
-        setError("No starter tasks are available for this occupation yet. You can add your own.");
+        setError(
+          "No starter tasks are available for this occupation yet. You can add your own.",
+        );
       }
     } catch {
-      setError("Occupation selected, but its reference tasks could not be loaded.");
+      setError(
+        "Occupation selected, but its reference tasks could not be loaded.",
+      );
       setTasks([]);
-
     } finally {
       setLoading(false);
     }
@@ -89,58 +99,51 @@ export const useProfileTasks = (occupationCode?: string) => {
     if (!occupationCode) return;
     const saved = readProfileTasks(occupationCode);
     if (saved) {
-      const normalizedSavedTasks = saved.map(normalizePersistedProfileTaskAssessmentContext);
+      const normalizedSavedTasks = saved.map(
+        normalizePersistedProfileTaskAssessmentContext,
+      );
       setTasks(normalizedSavedTasks);
-      setError(saved.length === 0 ? "No starter tasks are available for this occupation yet. You can add your own." : null);
+      setError(
+        saved.length === 0
+          ? "No starter tasks are available for this occupation yet. You can add your own."
+          : null,
+      );
       return;
     }
     void loadStarterTasks(occupationCode);
   }, [occupationCode]);
 
   const addTask = (values: TaskEditorValues) => {
-    setTasks((current) => {
-      const next = [
-        toProfileTask(values.wording.trim(), "user", {
-          timeSpent: values.timeSpent,
-          responsibility: values.responsibility,
-          routineProcessingLevel: values.routineProcessingLevel,
-          informationUseLevel: values.informationUseLevel,
-          humanInteractionLevel: values.humanInteractionLevel,
-          judgementLevel: values.judgementLevel,
-        }),
-        ...current,
-      ];
-      persist(next);
-      return next;
-    });
+    const next = [
+      toProfileTask(values.wording.trim(), "user", {
+        timeSpent: values.timeSpent,
+        notes: values.notes,
+      }),
+      ...tasks,
+    ];
+    persist(next);
+    setTasks(next);
   };
 
   const updateTask = (taskId: string, values: TaskEditorValues) => {
-    setTasks((current) => {
-      const next = current.map((task) => {
-        if (task.id !== taskId) return task;
-        const wording = values.wording.trim();
-        const edited = task.source === "ilo" && wording !== (task.originalWording ?? task.wording);
-        return {
-          ...task,
-          wording,
-          timeSpent: values.timeSpent,
-          responsibility: values.responsibility,
-          routineProcessingLevel: values.routineProcessingLevel,
-          informationUseLevel: values.informationUseLevel,
-          humanInteractionLevel: values.humanInteractionLevel,
-          judgementLevel: values.judgementLevel,
-          score2025: edited ? null : task.score2025,
-          // `potential25` and `meanScore2025` describe the selected reference
-          // occupation. Editing one task invalidates only that task's source
-          // score; it must not erase the occupation-level average/category.
-          potential25: task.potential25,
-          meanScore2025: task.meanScore2025,
-        };
-      });
-      persist(next);
-      return next;
+    const next = tasks.map((task) => {
+      if (task.id !== taskId) return task;
+      const wording = values.wording.trim();
+      const edited =
+        task.source === "ilo" &&
+        wording !== (task.originalWording ?? task.wording);
+      return {
+        ...task,
+        wording,
+        timeSpent: values.timeSpent,
+        notes: values.notes,
+        score2025: edited ? null : task.score2025,
+        // Keep occupational evidence and historical trials when wording changes.
+        // Practice baselines are matched against their original wording separately.
+      };
     });
+    persist(next);
+    setTasks(next);
   };
 
   const removeTask = (taskId: string) => {

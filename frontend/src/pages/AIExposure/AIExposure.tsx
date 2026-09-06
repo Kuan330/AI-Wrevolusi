@@ -1,35 +1,43 @@
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
-import TaskListCard from "@/pages/Analysis/components/TaskListCard";
 import type { TaskScoreRange } from "@/pages/Analysis/lib/taskScore";
-import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
+import {
+  readConfirmedAnalysis,
+  saveTaskPractice,
+} from "@/pages/WorkProfile/userProfile";
 import ExposureScoreOverview from "./components/ExposureScoreOverview";
+import ExposureTaskList from "./components/ExposureTaskList";
+import TaskGuide from "./components/TaskGuide";
 import OccupationName from "./components/OccupationName";
-import PriorityTasks from "./components/PriorityTasks";
 import { taskOverview } from "./lib/taskOverview";
 import "@/pages/Analysis/analysis.css";
 import "./exposure.css";
 
 export default function AIExposure() {
-  const analysis = readConfirmedAnalysis();
+  const [analysis, setAnalysis] = useState(readConfirmedAnalysis);
   const [scoreRange, setScoreRange] = useState<TaskScoreRange>([0, 1]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
   if (!analysis) return <Navigate to={ROUTES.workProfile} replace />;
   const assessments = analysis.taskExposureAssessments ?? [];
   const overview = taskOverview(analysis.tasks, assessments, scoreRange);
-
+  const task = analysis.tasks.find((item) => item.id === selectedId) ?? null;
   return (
     <div className="analysis-page exposure-page mx-auto w-full max-w-[1180px] pb-10">
       <PageHeader
-        title="AI exposure"
+        className="flex-col items-start sm:flex-row sm:items-center"
+        title="How AI may change your work"
         description={
           <>
-            Understand how AI may change the tasks in{" "}
-            <OccupationName title={analysis.occupationTitle} path={analysis.occupationPath} />.
-            This is task-level evidence, not a job-loss prediction.
+            Explore your tasks in{" "}
+            <OccupationName
+              title={analysis.occupationTitle}
+              path={analysis.occupationPath}
+            />
+            , try practical assistance and record what works for you.
           </>
         }
         actions={
@@ -43,22 +51,43 @@ export default function AIExposure() {
           </div>
         }
       />
-
       <ExposureScoreOverview overview={overview} range={scoreRange} />
-
-      <div className="exposure-tasks-module">
-        <TaskListCard
-          className="exposure-tasks-module__list"
-          eyebrow="Task list"
-          title="All assessed tasks"
-          description="Tasks are ordered by score. Use the range slider to focus your review."
+      <div className="exposure-workspace">
+        <ExposureTaskList
           tasks={analysis.tasks}
-          taskExposureAssessments={assessments}
-          highlightedIds={[]}
-          scoreRange={scoreRange}
-          onScoreRangeChange={setScoreRange}
+          assessments={assessments}
+          selectedId={selectedId}
+          viewedIds={viewedIds}
+          onSelect={(id) => {
+            setSelectedId(id);
+            setViewedIds((current) => new Set([...current, id]));
+            if (window.matchMedia("(max-width: 1023px)").matches)
+              requestAnimationFrame(() =>
+                document
+                  .getElementById("task-guide")
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+              );
+          }}
+          range={scoreRange}
+          onRangeChange={setScoreRange}
         />
-        <PriorityTasks className="exposure-tasks-module__priority" tasks={overview.priorities} />
+        <TaskGuide
+          key={selectedId ?? "welcome"}
+          task={task}
+          assessment={assessments.find((item) => item.task_id === selectedId)}
+          onClear={() => setSelectedId(null)}
+          onSave={(update) => {
+            if (task)
+              setAnalysis(
+                saveTaskPractice(
+                  analysis.occupationCode,
+                  task.id,
+                  task.wording,
+                  update,
+                ),
+              );
+          }}
+        />
       </div>
     </div>
   );

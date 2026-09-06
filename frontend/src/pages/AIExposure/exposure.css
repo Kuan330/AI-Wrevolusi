@@ -63,8 +63,16 @@
   justify-content: center;
   padding: 1.5rem;
   background:
-    radial-gradient(circle at 50% 42%, rgba(199, 160, 200, 0.14), transparent 38%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.58), rgba(234, 243, 251, 0.42));
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(199, 160, 200, 0.14),
+      transparent 38%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.58),
+      rgba(234, 243, 251, 0.42)
+    );
 }
 
 .exposure-score-overview__metrics {
@@ -302,5 +310,212 @@
   .occupation-name__tooltip {
     left: auto;
     right: 0;
+  }
+}
+
+/* The task list and guide share the application's AnalysisCard and form controls. */
+.exposure-workspace {
+  display: grid;
+  align-items: start;
+  gap: 1.25rem;
+  min-width: 0;
+}
+.exposure-workspace > * {
+  min-width: 0;
+}
+.exposure-score-intro {
+  display: grid;
+  gap: 1.5rem;
+}
+.exposure-task {
+  cursor: pointer;
+  border: 1px solid #e2d9e6;
+  border-radius: 16px;
+  background: #ffffffa6;
+  padding: 1rem;
+  color: #2f2430;
+  overflow-wrap: anywhere;
+}
+.exposure-task:hover,
+.exposure-task:focus-within {
+  border-color: #74a9c9;
+}
+.exposure-task.is-selected {
+  border-color: #74a9c9;
+  background: #edf6fc;
+}
+.task-guide {
+  scroll-margin-top: 6rem;
+}
+.task-guide .analysis-card__header {
+  overflow-wrap: anywhere;
+}
+.guide-section {
+  border-top: 1px solid #eadde4;
+  padding-top: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: #574a55;
+  overflow-wrap: anywhere;
+}
+.guide-section h3 {
+  color: #3d5f7a;
+  font-weight: 600;
+  margin-bottom: 0.65rem;
+}
+.guide-disclosure {
+  color: #574a55;
+  font-size: 0.875rem;
+}
+.guide-disclosure > summary {
+  color: #326889;
+  cursor: pointer;
+  font-weight: 500;
+}
+.guide-disclosure > summary:focus-visible {
+  outline: 2px solid #4f91ba;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.practice-comparison {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.practice-comparison dt {
+  font-size: 0.75rem;
+  color: #7f7280;
+}
+.practice-comparison dd {
+  margin-top: 0.3rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #326889;
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 1024px) {
+  .exposure-workspace {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 1.5rem;
+  }
+  .exposure-score-intro {
+    grid-template-columns: 1.2fr 1fr;
+    gap: 2.5rem;
+  }
+}
+
+.exposure-task-scroll {
+  /* Keep a consistent window (roughly five compact cards) after filtering. */
+  max-height: 44rem;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  overscroll-behavior-y: contain;
+  flex: none;
+}
+.exposure-task-scroll:focus-visible {
+  outline: 2px solid #4f91ba;
+  outline-offset: 3px;
+  border-radius: 16px;
+}
+
+.guide-record-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 1px solid #d5ddec;
+  border-radius: 16px;
+  padding: 1rem;
+}
+.guide-record-banner > div {
+  flex: 1 1 11rem;
+}
+.task-guide .guide-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  height: auto;
+  gap: 0.25rem;
+  padding: 0.3rem;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eaf3fb, #f8ecef);
+}
+.task-guide .guide-tabs [role="tab"] {
+  padding: 0.55rem 0.5rem;
+  border-radius: 9px;
+  color: #7f7280;
+}
+.task-guide .guide-tabs [role="tab"][data-state="active"] {
+  background: #fffdfd;
+  color: #3d5f7a;
+  box-shadow: 0 2px 6px #3d5f7a14;
+}
+.guide-subtitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #3d5f7a;
+  margin-bottom: 0.5rem;
+}
+.guide-steps {
+  padding: 0 0.75rem;
+  border-radius: 14px;
+  background: linear-gradient(120deg, #eaf3fb99, #f8ecef88);
+}
+.guide-step-number {
+  display: inline-flex;
+  width: 1.75rem;
+  height: 1.75rem;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background: #ffffffd9;
+  color: #4f91ba;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+.guide-tools {
+  display: grid;
+  gap: 0.85rem;
+  padding: 0.9rem;
+  border: 1px solid #e8dce6;
+  border-radius: 14px;
+  background: #fffafd;
+}
+.guide-extras > div {
+  border-color: #e8dce6;
+}
+.guide-extras {
+  color: #3d5f7a;
+}
+
+@media (min-width: 1024px) {
+  .exposure-workspace {
+    align-items: start;
+  }
+  .exposure-workspace > .analysis-card {
+    height: auto;
+    max-height: 960px;
+    min-height: 0;
+  }
+  .exposure-workspace .analysis-card__header {
+    flex-shrink: 0;
+  }
+  .exposure-task-list > .analysis-card__content > :not(.exposure-task-scroll) {
+    flex-shrink: 0;
+  }
+  .exposure-task-list .exposure-task-scroll {
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: 29rem;
+  }
+
+  .task-guide > .analysis-card__content {
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    overscroll-behavior-y: contain;
+  }
+  .task-guide > .analysis-card__content > * {
+    flex-shrink: 0;
   }
 }
