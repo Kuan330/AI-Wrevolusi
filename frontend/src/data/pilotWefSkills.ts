@@ -1,6 +1,11 @@
 import type { WefSkill } from "@/types/reference";
 
-export const PILOT_WEF_SKILLS: WefSkill[] = [
+const PILOT_WEF_SKILL_IMPORTANCE = [
+  69, 67, 61, 57, 52, 51, 50, 50, 47, 47, 45, 42, 41, 37, 35, 26, 25, 25, 23, 21,
+  21, 20, 17, 14, 13, 6,
+];
+
+const PILOT_WEF_SKILL_BASE: WefSkill[] = [
   { wef_skill_id: 1, core_skill: "Analytical thinking", wef_skill_group: "Cognitive skills", future_trend_category: "High Growth", future_net_increase_2025_2030: 55, genai_substitution_capacity_category: "Low" },
   { wef_skill_id: 2, core_skill: "Resilience, flexibility and agility", wef_skill_group: "Self-efficacy", future_trend_category: "Very High Growth", future_net_increase_2025_2030: 66, genai_substitution_capacity_category: "Very Low-Low" },
   { wef_skill_id: 3, core_skill: "Leadership and social influence", wef_skill_group: "Working with others", future_trend_category: "High Growth", future_net_increase_2025_2030: 58, genai_substitution_capacity_category: "Low" },
@@ -28,3 +33,8 @@ export const PILOT_WEF_SKILLS: WefSkill[] = [
   { wef_skill_id: 25, core_skill: "Global citizenship", wef_skill_group: "Ethics", future_trend_category: "Slight Growth", future_net_increase_2025_2030: 19, genai_substitution_capacity_category: "Low" },
   { wef_skill_id: 26, core_skill: "Sensory-processing abilities", wef_skill_group: "Physical abilities", future_trend_category: "Slight Growth", future_net_increase_2025_2030: 13, genai_substitution_capacity_category: "Very Low-Low" },
 ];
+
+export const PILOT_WEF_SKILLS: WefSkill[] = PILOT_WEF_SKILL_BASE.map((skill, index) => ({
+  ...skill,
+  core_skill_importance_2025_pct: PILOT_WEF_SKILL_IMPORTANCE[index] ?? null,
+}));

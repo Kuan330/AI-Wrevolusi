@@ -41,6 +41,15 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = ['http://localhost:5173', 'http://127.0.0.1:5173']
 
+    skill_llm_base_url: str = 'https://openrouter.ai/api/v1'
+    skill_llm_api_key: str | None = None
+    skill_llm_model: str = 'openai/gpt-5-mini'
+    skill_llm_app_name: str = 'AI-Wrevolusi'
+    skill_llm_app_url: str | None = None
+    skill_request_timeout_s: float = Field(default=60, gt=0, le=180)
+    skill_max_retries: int = Field(default=2, ge=0, le=5)
+    skill_prompt_version: str = 'skill-directions-v1'
+
     @field_validator('cors_origins', mode='before')
     @classmethod
     def parse_cors_origins(cls, value: str | list[str]) -> list[str]:

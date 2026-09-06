@@ -6,6 +6,7 @@ dependencies = [
     "asyncpg",
     "email-validator",
     "fastapi",
+    "httpx",
     "pwdlib[argon2]",
     "pydantic",
     "pydantic-settings",

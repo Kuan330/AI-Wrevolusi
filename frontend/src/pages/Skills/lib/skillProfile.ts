@@ -36,7 +36,7 @@ export const buildSkillEvidence = (
     );
 };
 
-export const signedPercentage = (value: number | null): string => {
+export const signedPoints = (value: number | null): string => {
   if (typeof value !== "number") return "Not available";
-  return `${value > 0 ? "+" : ""}${value}%`;
+  return `${value > 0 ? "+" : ""}${value} pts`;
 };

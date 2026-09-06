@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import SkillDetailWorkspace from "@/pages/Skills/components/SkillDetailWorkspace";
-import SkillFutureSummary from "@/pages/Skills/components/SkillFutureSummary";
+import SkillDirectionBoard from "@/pages/Skills/components/SkillDirectionBoard";
 import SkillMapOverview from "@/pages/Skills/components/SkillMapOverview";
 import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
 import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
@@ -85,10 +85,10 @@ const Skills = () => {
         actions={
           <div className="flex flex-wrap justify-end gap-2">
             <Button asChild variant="outline" className="profile-outline-btn rounded-full">
-              <Link to={ROUTES.aiExposure}>AI exposure</Link>
-            </Button>
-            <Button asChild className="profile-blue-btn rounded-full">
               <Link to={ROUTES.task}>Edit tasks</Link>
+            </Button>
+            <Button asChild className="profile-gradient-btn rounded-full font-normal">
+              <Link to={ROUTES.aiExposure}>AI exposure</Link>
             </Button>
           </div>
         }
@@ -128,7 +128,11 @@ const Skills = () => {
             onSelectSkill={setSelectedSkillId}
           />
 
-          <SkillFutureSummary evidence={evidence} />
+          <SkillDirectionBoard
+            evidence={evidence}
+            occupationTitle={analysis.occupationTitle}
+          />
+
         </>
       )}
 

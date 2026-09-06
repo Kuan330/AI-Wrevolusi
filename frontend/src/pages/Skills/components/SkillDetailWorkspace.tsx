@@ -1,14 +1,13 @@
-import { Check, ChevronRight, Sparkles, TrendingUp } from "lucide-react";
+import { Check, ChevronRight, Sparkles, TrendingUp, Users } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
   AI_CAPACITIES,
   aiCapacityFromCategory,
-  classifySkillUseTrendFromNetIncreasePercentage,
-  USE_TRENDS,
 } from "@/pages/Analysis/lib/skillAxes";
 import type { SkillEvidence } from "@/pages/Skills/lib/skillProfile";
-import { signedPercentage } from "@/pages/Skills/lib/skillProfile";
+import { signedPoints } from "@/pages/Skills/lib/skillProfile";
+import SkillOutlookInfo from "@/pages/Skills/components/SkillOutlookInfo";
 
 type SkillDetailWorkspaceProps = {
   evidence: SkillEvidence[];
@@ -18,13 +17,13 @@ type SkillDetailWorkspaceProps = {
 
 const capacityExplanation = (category: string | null): string => {
   if (category === "Very Low-Low" || category === "Low") {
-    return "GenAI is expected to have limited capacity to substitute the core parts of this skill group.";
+    return "Research indicates limited GenAI capacity to substitute the central activities associated with this skill.";
   }
   if (category === "Low-Moderate" || category === "Moderate") {
     return "GenAI may support some routine parts, while context, judgement and responsibility still matter.";
   }
   if (category === "Moderate-High") {
-    return "GenAI may support more of the routine work in this skill group, making effective use alongside AI increasingly relevant.";
+    return "GenAI may support more of the routine activities associated with this skill, making effective use alongside AI increasingly relevant.";
   }
   return "The WEF reference does not show a GenAI capacity category for this skill.";
 };
@@ -33,13 +32,50 @@ const trendExplanation = (change: number | null): string => {
   if (typeof change !== "number") {
     return "There is not enough reference data to describe how use of this skill may change.";
   }
-  if (change > 20) {
-    return "Employers expect use of this skill to increase, so it may be worth keeping visible and developing further.";
+  if (change > 0) {
+    return "More employers expect use of this skill to increase than decrease by 2030.";
   }
-  if (change >= 0) {
-    return "This skill is expected to remain a useful foundation as work changes.";
+  if (change === 0) {
+    return "Employer expectations for increasing and decreasing use of this skill are balanced.";
   }
-  return "How this skill is used may change, so combining it with growing or digital skills may be useful.";
+  return "More employers expect use of this skill to decrease than increase by 2030.";
+};
+
+const skillPosition = (importance: number | null | undefined, change: number | null) => {
+  if (typeof importance !== "number" || typeof change !== "number") {
+    return {
+      label: "Position not available",
+      explanation: "More reference data is needed to position this skill.",
+    };
+  }
+
+  const widelyValued = importance >= 50;
+  const growing = change > 20;
+
+  if (widelyValued && growing) {
+    return {
+      label: "Established and growing",
+      explanation: "This skill is already widely valued and expected to grow towards 2030.",
+    };
+  }
+  if (growing) {
+    return {
+      label: "Emerging opportunity",
+      explanation:
+        "This skill is less widely considered core today, but employers expect its use to grow.",
+    };
+  }
+  if (widelyValued) {
+    return {
+      label: "Established and evolving",
+      explanation: "This skill is widely valued today, while its future use may be changing.",
+    };
+  }
+  return {
+    label: "Context dependent",
+    explanation:
+      "Its value may depend more on your role, industry and how it combines with other skills.",
+  };
 };
 
 const SkillDetailWorkspace = ({
@@ -55,26 +91,20 @@ const SkillDetailWorkspace = ({
       <section className="skills-glass-card p-6 text-center sm:p-10">
         <h2 className="text-xl font-semibold text-[#2f2430]">No skills identified yet</h2>
         <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#7f7280]">
-          None of the current task wording matched the available skill rules. You can return
-          to your tasks, add more detail, and analyse them again.
+          No skills are connected to the current confirmed tasks yet. You can return to your
+          tasks, add more detail, and analyse them again.
         </p>
       </section>
     );
   }
 
   const { skill, tasks } = selected;
-  const trend =
-    typeof skill.future_net_increase_2025_2030 === "number"
-      ? USE_TRENDS.find(
-          ({ id }) =>
-            id ===
-            classifySkillUseTrendFromNetIncreasePercentage(
-              skill.future_net_increase_2025_2030,
-            ),
-        )
-      : null;
   const capacity = AI_CAPACITIES.find(
     ({ id }) => id === aiCapacityFromCategory(skill.genai_substitution_capacity_category),
+  );
+  const position = skillPosition(
+    skill.core_skill_importance_2025_pct,
+    skill.future_net_increase_2025_2030,
   );
 
   return (
@@ -83,16 +113,16 @@ const SkillDetailWorkspace = ({
         <p className="skills-kicker">Evidence from your work</p>
         <h2 className="mt-1 text-2xl font-semibold text-[#2f2430]">Your identified skills</h2>
         <p className="mt-1 max-w-2xl text-sm leading-6 text-[#7f7280]">
-          Choose a skill to see which tasks support it and what the reference data may mean
-          for its future value.
+          Choose a skill to see the tasks connected to it, then explore what external
+          research suggests about its future use.
         </p>
       </div>
 
       <div className="skills-workspace">
         <aside className="skills-glass-card skills-navigation p-3" aria-label="Identified skills">
           <p className="px-3 pb-2 pt-1 text-xs leading-5 text-[#7f7280]">
-            <strong className="text-[#3d5f7a]">{evidence.length} skills</strong> · ordered by
-            how often they appear across your tasks
+            <strong className="text-[#3d5f7a]">{evidence.length} skills</strong> reflected
+            across your confirmed tasks
           </p>
           <div className="skills-navigation-list">
             {evidence.map((item) => {
@@ -110,7 +140,8 @@ const SkillDetailWorkspace = ({
                       {item.skill.core_skill}
                     </span>
                     <span className="mt-1 block text-xs text-[#7f7280]">
-                      {item.tasks.length} supporting {item.tasks.length === 1 ? "task" : "tasks"}
+                      Found in {item.tasks.length} confirmed{" "}
+                      {item.tasks.length === 1 ? "task" : "tasks"}
                     </span>
                   </span>
                   <ChevronRight className="mt-1 size-4 shrink-0 text-[#7f7280]" aria-hidden />
@@ -121,24 +152,21 @@ const SkillDetailWorkspace = ({
         </aside>
 
         <article className="skills-glass-card p-5 sm:p-6 lg:p-7" aria-live="polite">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="skills-kicker">Selected skill</p>
-              <h3 className="mt-1 text-2xl font-semibold leading-tight text-[#2f2430]">
-                {skill.core_skill}
-              </h3>
-              <p className="mt-1 text-xs text-[#7f7280]">
-                {skill.wef_skill_group ?? "WEF core skill"} · identified from {tasks.length}{" "}
-                {tasks.length === 1 ? "task" : "tasks"}
-              </p>
-            </div>
-            <span className="skills-trend-badge">{trend?.label ?? "Not classified"}</span>
+          <div>
+            <p className="skills-kicker">Selected skill</p>
+            <h3 className="mt-1 text-2xl font-semibold leading-tight text-[#2f2430]">
+              {skill.core_skill}
+            </h3>
+            <p className="mt-1 text-xs text-[#7f7280]">
+              {skill.wef_skill_group ?? "WEF core skill"} · identified from {tasks.length}{" "}
+              {tasks.length === 1 ? "task" : "tasks"}
+            </p>
           </div>
 
           <div className="skills-evidence-panel mt-6">
-            <p className="text-sm font-medium text-[#2f2430]">Why this skill appears</p>
+            <p className="text-sm font-medium text-[#2f2430]">Tasks connected to this skill</p>
             <p className="mt-1 text-xs leading-5 text-[#7f7280]">
-              These confirmed tasks contain the evidence used for this match.
+              These are the confirmed tasks currently linked to this result.
             </p>
             <ul className="mt-3 space-y-2">
               {tasks.map((task) => (
@@ -150,17 +178,52 @@ const SkillDetailWorkspace = ({
             </ul>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <div className="skills-outlook-heading">
+            <div>
+              <p className="skills-kicker">External outlook</p>
+              <h4 className="mt-1 text-base font-semibold text-[#2f2430]">
+                What external research suggests
+              </h4>
+            </div>
+            <SkillOutlookInfo />
+          </div>
+
+          <div className="skills-position-callout">
+            <div>
+              <span>{position.label}</span>
+              <p>{position.explanation}</p>
+            </div>
+            <small>Position based on current importance and future outlook.</small>
+          </div>
+
+          <div className="skills-outlook-grid">
+            <div className="skills-insight-card">
+              <Users className="size-5 text-[#4f91ba]" aria-hidden />
+              <div className="min-w-0 flex-1">
+                <p className="skills-insight-card__label">Valued today</p>
+                <p className="skills-insight-card__value">
+                  {typeof skill.core_skill_importance_2025_pct === "number"
+                    ? `${skill.core_skill_importance_2025_pct}%`
+                    : "Not available"}
+                </p>
+                <p className="skills-insight-card__meta">of surveyed employers</p>
+                <p className="skills-insight-card__description">
+                  Consider this a core skill for their workforce in 2025.
+                </p>
+              </div>
+            </div>
+
             <div className="skills-insight-card">
               <TrendingUp className="size-5 text-[#4f91ba]" aria-hidden />
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#7f7280]">
-                  Future use, 2025–2030
+              <div className="min-w-0 flex-1">
+                <p className="skills-insight-card__label">Future use by 2030</p>
+                <p className="skills-insight-card__value">
+                  {signedPoints(skill.future_net_increase_2025_2030)}
                 </p>
-                <p className="mt-1 text-xl font-semibold text-[#3d5f7a]">
-                  {signedPercentage(skill.future_net_increase_2025_2030)}
+                <p className="skills-insight-card__meta">
+                  {skill.future_trend_category ?? "Not classified"} · net employer outlook
                 </p>
-                <p className="mt-1 text-xs leading-5 text-[#574a55]">
+                <p className="skills-insight-card__description">
                   {trendExplanation(skill.future_net_increase_2025_2030)}
                 </p>
               </div>
@@ -168,25 +231,18 @@ const SkillDetailWorkspace = ({
 
             <div className="skills-insight-card">
               <Sparkles className="size-5 text-[#c99589]" aria-hidden />
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#7f7280]">
-                  GenAI substitution capacity
-                </p>
-                <p className="mt-1 text-base font-semibold text-[#3d5f7a]">
+              <div className="min-w-0 flex-1">
+                <p className="skills-insight-card__label">Working with GenAI</p>
+                <p className="skills-insight-card__value skills-insight-card__value--text">
                   {capacity?.label ?? skill.genai_substitution_capacity_category ?? "Not shown"}
                 </p>
-                <p className="mt-1 text-xs leading-5 text-[#574a55]">
+                <p className="skills-insight-card__meta">substitution capacity</p>
+                <p className="skills-insight-card__description">
                   {capacityExplanation(skill.genai_substitution_capacity_category)}
                 </p>
               </div>
             </div>
           </div>
-
-          <p className="mt-4 text-xs leading-5 text-[#7f7280]">
-            These figures describe global employer expectations and skill-group patterns.
-            They do not measure your personal proficiency or predict whether your job will be
-            replaced.
-          </p>
         </article>
       </div>
     </section>

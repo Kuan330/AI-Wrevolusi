@@ -6,6 +6,7 @@ import RequireConfirmedAnalysis from "@/components/layout/RequireConfirmedAnalys
 import { ROUTES } from "@/constants/routes";
 import AIExposure from "@/pages/AIExposure/AIExposure";
 import Home from "@/pages/Home/Home";
+import LearningCentre from "@/pages/LearningCentre/LearningCentre";
 import Skills from "@/pages/Skills/Skills";
 import WorkProfile from "@/pages/WorkProfile/WorkProfile";
 import ProfileTasks from "@/pages/WorkProfile/ProfileTasks";
@@ -24,6 +25,7 @@ const AppRoutes = () => {
           <Route element={<RequireConfirmedAnalysis />}>
             <Route path={ROUTES.aiExposure} element={<AIExposure />} />
             <Route path={ROUTES.skills} element={<Skills />} />
+            <Route path={ROUTES.learningCentre} element={<LearningCentre />} />
           </Route>
         </Route>
       </Routes>
