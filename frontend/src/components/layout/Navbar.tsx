@@ -16,7 +16,7 @@ const Navbar = () => {
         <div className="flex min-w-0 items-center gap-3 lg:gap-8">
           <MobileMenu />
           <Logo showWordmark />
-          <nav className="app-header-nav" aria-label="Primary">
+          <nav className="app-header-nav hidden lg:flex" aria-label="Primary">
             {PRIMARY_NAV_MENU.map((item) => (
               <NavLink
                 key={item.key}

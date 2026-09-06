@@ -1,4 +1,5 @@
 import "./score-range-slider.css";
+import { RotateCcw } from "lucide-react";
 import { useId } from "react";
 
 import { Slider } from "@/components/ui/slider";
@@ -8,13 +9,15 @@ import { EXPOSURE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
 type ScoreRangeSliderProps = {
   value: readonly [number, number];
   onValueChange: (value: [number, number]) => void;
+  onReset?: () => void;
   className?: string;
 };
 
 /** Shared score range control for task-level GenAI exposure scores. */
-const ScoreRangeSlider = ({ value, onValueChange, className }: ScoreRangeSliderProps) => {
+const ScoreRangeSlider = ({ value, onValueChange, onReset, className }: ScoreRangeSliderProps) => {
   const labelId = useId();
   const [minimum, maximum] = value;
+  const canReset = Boolean(onReset) && (minimum > 0 || maximum < 1);
 
   return (
     <div className={cn("score-range__panel", className)}>
@@ -23,11 +26,27 @@ const ScoreRangeSlider = ({ value, onValueChange, className }: ScoreRangeSliderP
           <p id={labelId} className="score-range__label">
             Filter by task score
           </p>
-          <p className="score-range__description">Show scores from {minimum.toFixed(2)} to {maximum.toFixed(2)}</p>
+          <p className="score-range__description">
+            Show scores from {minimum.toFixed(2)} to {maximum.toFixed(2)}
+          </p>
         </div>
-        <span className="score-range__value">
-          {minimum.toFixed(2)}–{maximum.toFixed(2)}
-        </span>
+        <div className="score-range__value-row">
+          {canReset ? (
+            <button
+              type="button"
+              className="score-range__reset"
+              aria-label="Reset"
+              title="Reset"
+              onClick={onReset}
+            >
+              <RotateCcw className="score-range__reset-icon" aria-hidden="true" />
+              <span className="score-range__reset-tooltip">Reset</span>
+            </button>
+          ) : null}
+          <span className="score-range__value">
+            {minimum.toFixed(2)}–{maximum.toFixed(2)}
+          </span>
+        </div>
       </div>
       <Slider
         rangeStyle={{ background: EXPOSURE_GRADIENT_CSS }}
@@ -45,8 +64,14 @@ const ScoreRangeSlider = ({ value, onValueChange, className }: ScoreRangeSliderP
         className="score-range__control"
       />
       <div className="score-range__endpoints">
-        <span><strong className="score-range__endpoint-value">0</strong> · task basically cannot be automated by GenAI</span>
-        <span><strong className="score-range__endpoint-value">1</strong> · task theoretically can be fully automated by GenAI</span>
+        <span>
+          <strong className="score-range__endpoint-value">0</strong> · task basically cannot be
+          automated by GenAI
+        </span>
+        <span>
+          <strong className="score-range__endpoint-value">1</strong> · task theoretically can be
+          fully automated by GenAI
+        </span>
       </div>
     </div>
   );

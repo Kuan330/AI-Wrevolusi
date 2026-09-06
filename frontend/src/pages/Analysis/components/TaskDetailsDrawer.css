@@ -1,10 +1,5 @@
 .task-details__eyebrow { @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7f7280]; }
-.task-details__score-panel { @apply mb-4 space-y-3 rounded-2xl border border-[#eadde4] bg-white/70 p-4; }
-.task-details__score-heading { @apply flex items-center justify-between gap-3; }
 .task-details__score-title { @apply text-sm font-semibold text-[#3d5f7a]; }
-.task-details__score-value { @apply tabular-nums text-[#7f7280]; }
-.task-details__score-number { @apply text-2xl font-semibold text-[#2f2430]; }
-.task-details__score-scale { @apply ml-1 text-xs; }
 .task-details__explanation { @apply space-y-4 rounded-2xl border border-[#eadde4] bg-white/70 p-4; }
 .task-details__reason { @apply mt-2 text-sm leading-6 text-[#574a55]; }
 .task-details__evidence { @apply space-y-3 border-t border-[#eadde4] pt-3 text-sm leading-6 text-[#574a55]; }

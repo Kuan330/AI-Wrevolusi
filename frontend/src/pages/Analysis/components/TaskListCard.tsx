@@ -2,7 +2,6 @@ import { ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import ScoreRangeSlider from "@/components/ui/score-range-slider";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import AnalysisCard, { type TitleTone } from "@/pages/Analysis/components/AnalysisCard";
 import TaskList from "@/pages/Analysis/components/TaskList";
@@ -48,7 +47,6 @@ const TaskListCard = ({
     const score = taskScore(task, taskExposureAssessmentByTaskId.get(task.id));
     return score == null ? hasFullScoreRange : taskIsWithinScoreRange(score, scoreRange);
   }).length;
-  const hasActiveScoreFilter = scoreRange[0] > 0 || scoreRange[1] < 1;
 
   const updateScrollHint = useCallback(() => {
     const element = scrollRef.current;
@@ -83,21 +81,13 @@ const TaskListCard = ({
       title={title}
       description={`${description} Showing ${visibleCount} of ${tasks.length} tasks.`}
       headerContent={
-        <ScoreRangeSlider value={scoreRange} onValueChange={setScoreRange} />
+        <ScoreRangeSlider
+          value={scoreRange}
+          onValueChange={setScoreRange}
+          onReset={() => setScoreRange([0, 1])}
+        />
       }
       titleTone={titleTone}
-      action={
-        hasActiveScoreFilter ? (
-          <Button
-            type="button"
-            variant="ghost"
-            className="task-list__reset"
-            onClick={() => setScoreRange([0, 1])}
-          >
-            Reset
-          </Button>
-        ) : null
-      }
       contentClassName="pt-1"
     >
       <div className="task-list__viewport">

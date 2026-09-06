@@ -9,9 +9,14 @@
 }
 
 .app-header-nav {
-  display: flex;
   align-items: center;
   gap: 28px;
+}
+
+@media (min-width: 1024px) {
+  .app-header-nav {
+    display: flex;
+  }
 }
 
 .app-header-nav__link {

@@ -9,8 +9,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { SIDEBAR_MENU } from "@/constants/menu";
+import { PRIMARY_NAV_MENU } from "@/constants/menu";
 import { cn } from "@/lib/utils";
+import type { NavigationItem } from "@/types/navigation";
 
 const itemIsActive = (path: string, pathname: string, hash: string) => {
   const [base, itemHash] = path.split("#");
@@ -20,7 +21,11 @@ const itemIsActive = (path: string, pathname: string, hash: string) => {
   return pathname === path;
 };
 
-const MobileMenu = () => {
+type MobileMenuProps = {
+  items?: NavigationItem[];
+};
+
+const MobileMenu = ({ items = PRIMARY_NAV_MENU }: MobileMenuProps) => {
   const { pathname, hash } = useLocation();
 
   return (
@@ -39,7 +44,7 @@ const MobileMenu = () => {
           <DialogTitle>Navigation</DialogTitle>
         </DialogHeader>
         <div className="space-y-2">
-          {SIDEBAR_MENU.map((item) => (
+          {items.map((item) => (
             <NavLink
               key={item.key}
               to={item.path}
