@@ -9,9 +9,12 @@ import { cn } from "@/lib/utils";
 
 const AppHeader = () => {
   const isOccupationPage = useMatch({ path: ROUTES.workProfile, end: true });
+  const isTasksPage = useMatch({ path: ROUTES.task, end: true });
   const navigationItems = PRIMARY_NAV_MENU.filter((item) => {
-    if (!isOccupationPage) return true;
-    return item.path === ROUTES.workProfile;
+    if (isOccupationPage) return item.path === ROUTES.workProfile;
+    if (isTasksPage)
+      return item.path === ROUTES.workProfile || item.path === ROUTES.task;
+    return true;
   });
   return (
     <header className="app-header sticky top-0 z-30 shrink-0 border-b border-white/70 bg-white/45 backdrop-blur-xl">
