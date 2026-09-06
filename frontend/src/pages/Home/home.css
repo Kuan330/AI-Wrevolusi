@@ -415,7 +415,7 @@
 
 .landing-page .section-title {
   text-align: center;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 600;
   color: var(--c-text);
   margin-bottom: 8px;
@@ -424,83 +424,152 @@
 .landing-page .section-subtitle {
   text-align: center;
   font-size: 14px;
+  line-height: 1.65;
   color: var(--c-text-muted);
-  margin-bottom: 28px;
+  max-width: 760px;
+  margin: 0 auto 28px;
 }
 
 .landing-page .steps-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.landing-page .step-flow-item {
+  display: contents;
 }
 
 .landing-page .step-card {
-  padding: 28px;
-  text-align: center;
-}
-
-.landing-page .step-num {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 16px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #fff;
-}
-
-.landing-page .step-card:nth-child(1) .step-num {
-  background: var(--c-brown);
-}
-
-.landing-page .step-card:nth-child(2) .step-num {
-  background: var(--c-deep-blue);
-}
-
-.landing-page .step-card:nth-child(3) .step-num {
-  background: linear-gradient(135deg, var(--c-brown), var(--c-deep-blue));
-}
-
-.landing-page .step-card h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--c-text);
-  margin-bottom: 8px;
-}
-
-.landing-page .step-card p {
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--c-text-secondary);
-}
-
-.landing-page .step-bar {
-  margin-top: 18px;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(0, 0, 0, 0.04);
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  padding: 22px 18px 18px;
+  border-radius: 20px;
   overflow: hidden;
 }
 
-.landing-page .step-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  width: 60%;
-}
-
-.landing-page .step-card:nth-child(1) .step-bar-fill {
-  background: var(--c-brown);
-}
-
-.landing-page .step-card:nth-child(2) .step-bar-fill {
-  background: var(--c-deep-blue);
-}
-
-.landing-page .step-card:nth-child(3) .step-bar-fill {
+.landing-page .step-card::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 0;
+  height: 4px;
+  border-radius: 4px 4px 0 0;
   background: linear-gradient(90deg, var(--c-brown), var(--c-deep-blue));
+  opacity: 0.9;
+}
+
+.landing-page .step-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.landing-page .step-num {
+  display: flex;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(79, 145, 186, 0.2);
+  border-radius: 12px;
+  background: rgba(234, 243, 251, 0.82);
+  color: var(--c-deep-blue);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.landing-page .step-icon {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(234, 243, 251, 0.68);
+}
+
+.landing-page .step-icon img {
+  width: 34px;
+  height: 34px;
+}
+
+.landing-page .step-card h3 {
+  min-height: 66px;
+  font-size: 15px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--c-text);
+  margin-bottom: 10px;
+}
+
+.landing-page .step-card p {
+  color: var(--c-text-secondary);
+}
+
+.landing-page .step-description {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.62;
+}
+
+.landing-page .step-divider {
+  margin: 16px 0 12px;
+  border-top: 1px dashed rgba(127, 114, 128, 0.28);
+}
+
+.landing-page .step-callout {
+  padding: 10px 11px;
+  border-radius: 12px;
+  background: rgba(234, 243, 251, 0.76);
+  color: var(--c-deep-blue) !important;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.landing-page .step-source {
+  margin-top: 11px;
+  color: var(--c-text-muted) !important;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.landing-page .step-connector {
+  display: flex;
+  width: 22px;
+  flex: 0 0 22px;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-page .step-connector-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--c-deep-blue);
+  opacity: 0.7;
+  animation: step-arrow-flow 1.8s ease-in-out infinite;
+  animation-delay: var(--step-delay, 0ms);
+}
+
+@keyframes step-arrow-flow {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: translateX(-3px);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(4px);
+  }
 }
 
 .landing-page .report-section {
@@ -848,7 +917,6 @@
 
 @media (max-width: 860px) {
   .landing-page .hero-grid,
-  .landing-page .steps-grid,
   .landing-page .report-grid,
   .landing-page .testimonials-grid,
   .landing-page .footer-columns {
@@ -898,6 +966,24 @@
     margin-bottom: 22px;
   }
 
+  .landing-page .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .landing-page .step-flow-item {
+    display: block;
+  }
+
+  .landing-page .step-connector {
+    display: none;
+  }
+
+  .landing-page .step-card h3 {
+    min-height: 0;
+  }
+
   .landing-page .cta-bottom {
     margin-top: 18px;
     padding: 36px 18px;
@@ -931,6 +1017,12 @@
   }
 }
 
+@media (max-width: 560px) {
+  .landing-page .steps-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-page .scroll-reveal,
   .landing-page .scroll-reveal.is-visible {
@@ -938,5 +1030,9 @@
     transform: none;
     filter: none;
     transition: none;
+  }
+
+  .landing-page .step-connector-icon {
+    animation: none;
   }
 }

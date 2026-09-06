@@ -6,6 +6,9 @@ export interface HomeNavLink {
 export interface StepItem {
   title: string;
   description: string;
+  callout: string;
+  source: string;
+  icon: string;
 }
 
 export interface TestimonialItem {
@@ -65,19 +68,44 @@ export const TRUST_ITEMS = [
 
 export const STEPS: StepItem[] = [
   {
-    title: "Which tasks are changing?",
+    title: "Record your real work, and get a profile that fits you.",
     description:
-      "Separate AI-assisted work, tasks that may be redesigned, and work that still needs you.",
+      "Start with what you actually do. Choose the closest occupation, then adjust the tasks to match your working day.",
+    callout: "An honest picture of your work is the starting point for every next step.",
+    source: "Built on MASCO · Malaysia's official occupation classification",
+    icon: "/images/icons/icon-work-profile.svg",
   },
   {
-    title: "What makes you more valuable?",
+    title: "Check your tasks against AI, and see where it helps or changes.",
     description:
-      "Surface judgement, communication, creativity, and domain experience you already use.",
+      "Review each confirmed task with ILO evidence to see where AI may assist, reshape or leave the work human-led.",
+    callout: "Task-level evidence, not a prediction that your job will disappear.",
+    source: "ILO Working Paper 140 · Generative AI and jobs",
+    icon: "/images/icons/icon-ai-exposure.svg",
   },
   {
-    title: "What should you do next?",
+    title: "Uncover the skills already in your work, and see how their value may change.",
     description:
-      "Get a 90-day learning and action path that fits your time and career stage.",
+      "Connect your tasks to WEF skills and see which strengths are growing, stable or changing.",
+    callout: "Your daily work already contains evidence of valuable skills.",
+    source: "WEF Future of Jobs Report 2025",
+    icon: "/images/icons/icon-skills.svg",
+  },
+  {
+    title: "Explore where those skills could take you, without starting from zero.",
+    description:
+      "Find related occupations where your current strengths can transfer and open new options.",
+    callout: "Your skills can create more possibilities across kinds of work.",
+    source: "Explore related occupations from your strengths",
+    icon: "/images/icons/icon-occupations.svg",
+  },
+  {
+    title: "Turn your choices into a learning plan that fits your real life.",
+    description:
+      "Build practical next steps around your time, responsibilities and career stage.",
+    callout: "A useful plan has to fit the life you actually have.",
+    source: "Time, schedule and responsibilities are part of the plan",
+    icon: "/images/icons/icon-learning-plan.svg",
   },
 ];
 
