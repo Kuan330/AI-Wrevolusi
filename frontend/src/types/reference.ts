@@ -6,6 +6,10 @@ export interface ReferenceOccupation {
   description: string | null;
 }
 
+export interface ReferenceDataVersion {
+  version: string;
+}
+
 export interface ReferenceTask {
   isco_08: string;
   task_id: string;

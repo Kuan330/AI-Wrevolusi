@@ -1,6 +1,11 @@
 import { PILOT_WEF_SKILLS } from "@/data/pilotWefSkills";
 import { api } from "@/services/api";
-import type { ReferenceOccupation, ReferenceTask, WefSkill } from "@/types/reference";
+import type {
+  ReferenceDataVersion,
+  ReferenceOccupation,
+  ReferenceTask,
+  WefSkill,
+} from "@/types/reference";
 
 const withPilotFallback = async <T>(request: () => Promise<T>, fallback: () => T): Promise<T> => {
   try {
@@ -13,6 +18,7 @@ const withPilotFallback = async <T>(request: () => Promise<T>, fallback: () => T
 const onlyUnits = (rows: ReferenceOccupation[]) => rows.filter((item) => item.level === "unit");
 
 export const referenceService = {
+  version: () => api.get<ReferenceDataVersion>("/reference/version"),
   occupations: (parent?: string) =>
     api.get<ReferenceOccupation[]>(
       parent
@@ -35,4 +41,3 @@ export const referenceService = {
       () => PILOT_WEF_SKILLS,
     ),
 };
-

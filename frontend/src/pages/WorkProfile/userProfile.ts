@@ -28,6 +28,8 @@ export type ConfirmedAnalysis = {
 export type UserProfile = {
   tasks: ProfileTask[];
   tasksOccupationCode: string | null;
+  referenceDataVersion: string | null;
+  removedReferenceTaskIds: string[];
   analysis: ConfirmedAnalysis | null;
 };
 
@@ -54,6 +56,10 @@ export const readUserProfile = (): UserProfile => {
     const cleaned: UserProfile = {
       tasks: Array.isArray(stored.tasks) ? stored.tasks : [],
       tasksOccupationCode: stored.tasksOccupationCode ?? null,
+      referenceDataVersion: stored.referenceDataVersion ?? null,
+      removedReferenceTaskIds: Array.isArray(stored.removedReferenceTaskIds)
+        ? stored.removedReferenceTaskIds
+        : [],
       analysis: stored.analysis ?? null,
     };
     localStorage.removeItem(OCCUPATION_KEY);
@@ -65,6 +71,8 @@ export const readUserProfile = (): UserProfile => {
   const migrated: UserProfile = {
     tasks: analysis?.tasks ?? [],
     tasksOccupationCode: analysis?.occupationCode ?? null,
+    referenceDataVersion: null,
+    removedReferenceTaskIds: [],
     analysis,
   };
   if (analysis) {
@@ -98,23 +106,29 @@ export const clearSelectedOccupation = () => {
   localStorage.removeItem(OCCUPATION_KEY);
 };
 
+type ProfileTaskCacheMetadata = Pick<
+  UserProfile,
+  "referenceDataVersion" | "removedReferenceTaskIds"
+>;
+
 export const saveProfileTasks = (
   occupationCode: string,
   tasks: ProfileTask[],
+  metadata: Partial<ProfileTaskCacheMetadata> = {},
 ) => {
-  writeUserProfile({
-    tasks,
-    tasksOccupationCode: occupationCode,
-    analysis: null,
-  });
+  writeUserProfile({ tasks, tasksOccupationCode: occupationCode, analysis: null, ...metadata });
 };
 
-export const readProfileTasks = (
+export const readProfileTaskCache = (
   occupationCode: string,
-): ProfileTask[] | null => {
+): ({ tasks: ProfileTask[] } & ProfileTaskCacheMetadata) | null => {
   const profile = readUserProfile();
   if (profile.tasksOccupationCode !== occupationCode) return null;
-  return profile.tasks;
+  return {
+    tasks: profile.tasks,
+    referenceDataVersion: profile.referenceDataVersion,
+    removedReferenceTaskIds: profile.removedReferenceTaskIds,
+  };
 };
 
 export const readTaskWorkspace = (): Pick<
