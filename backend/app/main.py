@@ -11,6 +11,7 @@ from app.routers import (
     preparation,
     reference,
     schedule,
+    skill_directions,
     tasks,
     users,
 )
@@ -43,6 +44,7 @@ def create_app(api_root: str = '/api') -> FastAPI:
     application.include_router(preparation.router, prefix=api_prefix)
     application.include_router(schedule.router, prefix=api_prefix)
     application.include_router(reference.router, prefix=api_prefix)
+    application.include_router(skill_directions.router, prefix=api_prefix)
 
     @application.on_event('startup')
     async def startup_event() -> None:

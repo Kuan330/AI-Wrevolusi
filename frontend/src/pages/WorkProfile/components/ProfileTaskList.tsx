@@ -4,7 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import BatchDeleteTaskDialog from "@/pages/WorkProfile/components/BatchDeleteTaskDialog";
 import DeleteTaskDialog from "@/pages/WorkProfile/components/DeleteTaskDialog";
-import { optionLabel, RESPONSIBILITY_OPTIONS, TIME_SPENT_OPTIONS } from "@/pages/WorkProfile/taskOptions";
+import {
+  optionLabel,
+  TIME_SPENT_OPTIONS,
+} from "@/pages/WorkProfile/taskOptions";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
 
 type ProfileTaskListProps = {
@@ -18,11 +21,16 @@ type ProfileTaskListProps = {
 };
 
 const taskMeta = (task: ProfileTask) => {
-  const time = task.timeSpent ? optionLabel(TIME_SPENT_OPTIONS, task.timeSpent) : "";
-  const responsibility = task.responsibility
-    ? optionLabel(RESPONSIBILITY_OPTIONS, task.responsibility)
+  const time = task.timeSpent
+    ? optionLabel(TIME_SPENT_OPTIONS, task.timeSpent)
     : "";
-  return [time, responsibility].filter(Boolean).join(" · ");
+  const count = task.practice?.trials.length ?? 0;
+  return [
+    time,
+    count ? `${count} AI ${count === 1 ? "trial" : "trials"} recorded` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
 };
 
 const ProfileTaskList = ({
@@ -39,13 +47,17 @@ const ProfileTaskList = ({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [scrollHint, setScrollHint] = useState({ canScroll: false, atBottom: true });
+  const [scrollHint, setScrollHint] = useState({
+    canScroll: false,
+    atBottom: true,
+  });
 
   const updateScrollHint = useCallback(() => {
     const element = scrollRef.current;
     if (!element) return;
     const canScroll = element.scrollHeight > element.clientHeight + 1;
-    const atBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 8;
+    const atBottom =
+      element.scrollTop + element.clientHeight >= element.scrollHeight - 8;
     setScrollHint({ canScroll, atBottom });
   }, []);
 
@@ -64,7 +76,10 @@ const ProfileTaskList = ({
   const scrollTowardBottom = () => {
     const element = scrollRef.current;
     if (!element) return;
-    element.scrollBy({ top: Math.max(120, element.clientHeight * 0.65), behavior: "smooth" });
+    element.scrollBy({
+      top: Math.max(120, element.clientHeight * 0.65),
+      behavior: "smooth",
+    });
   };
 
   const exitBatchMode = () => {
@@ -92,45 +107,50 @@ const ProfileTaskList = ({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
-          {batchMode ? (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                className="profile-outline-btn h-10 rounded-full px-4"
-                onClick={exitBatchMode}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal"
-                disabled={selectedIds.size === 0}
-                onClick={() => setBatchDeleteOpen(true)}
-              >
-                <Trash2 className="h-4 w-4" aria-hidden />
-                Delete selected ({selectedIds.size})
-              </Button>
-            </>
-          ) : (
+        {batchMode ? (
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              className="profile-outline-btn h-10 rounded-full px-4"
+              onClick={exitBatchMode}
+            >
+              Cancel
+            </Button>
             <Button
               type="button"
               className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal"
-              disabled={tasks.length === 0}
-              onClick={() => setBatchMode(true)}
+              disabled={selectedIds.size === 0}
+              onClick={() => setBatchDeleteOpen(true)}
             >
               <Trash2 className="h-4 w-4" aria-hidden />
-              Batch delete
+              Delete selected ({selectedIds.size})
             </Button>
-          )}
-          <Button className="profile-blue-btn inline-flex h-10 items-center gap-2 rounded-full px-4 font-normal" onClick={onAdd}>
-            <Plus className="h-4 w-4" />
-            Add a task
+          </>
+        ) : (
+          <Button
+            type="button"
+            className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal"
+            disabled={tasks.length === 0}
+            onClick={() => setBatchMode(true)}
+          >
+            <Trash2 className="h-4 w-4" aria-hidden />
+            Batch delete
           </Button>
+        )}
+        <Button
+          className="profile-blue-btn inline-flex h-10 items-center gap-2 rounded-full px-4 font-normal"
+          onClick={onAdd}
+        >
+          <Plus className="h-4 w-4" />
+          Add a task
+        </Button>
       </div>
 
       {batchMode ? (
-        <p className="shrink-0 text-sm text-[#7f7280]">Select the tasks you want to remove.</p>
+        <p className="shrink-0 text-sm text-[#7f7280]">
+          Select the tasks you want to remove.
+        </p>
       ) : null}
 
       {error ? (
@@ -146,73 +166,83 @@ const ProfileTaskList = ({
           onScroll={updateScrollHint}
         >
           <div className="space-y-3 pr-1 pb-10">
-      {loading ? (
-        <div className="space-y-3">
-          {[0, 1, 2].map((item) => (
-            <div key={item} className="h-20 animate-pulse rounded-2xl bg-white/50" />
-          ))}
-        </div>
-      ) : tasks.length === 0 ? (
-        <div className="profile-task-card border border-dashed p-6 text-sm text-[#7f7280]">
-          No tasks in your profile yet. Add one that matches your day-to-day work.
-        </div>
-      ) : (
-        tasks.map((task) => {
-          const isSelected = selectedIds.has(task.id);
-
-          return (
-            <div key={task.id} className="profile-task-card p-4">
-              <div className="flex items-center gap-3">
-                {batchMode ? (
-                  <button
-                    type="button"
-                    className="profile-task-checkbox"
-                    aria-label={isSelected ? "Deselect task" : "Select task"}
-                    onClick={() => toggleSelection(task.id)}
-                  >
-                    <img
-                      src={
-                        isSelected
-                          ? "/images/icons/icon-checkbox-checked.svg"
-                          : "/images/icons/icon-checkbox-unchecked.svg"
-                      }
-                      alt=""
-                      className="block h-[22px] w-[22px] object-contain"
-                    />
-                  </button>
-                ) : null}
-                <p className="min-w-0 flex-1 text-sm leading-6 text-[#2f2430]">{task.wording}</p>
-                {!batchMode ? (
-                  <div className="profile-icon-actions">
-                    <button
-                      type="button"
-                      className="profile-icon-btn"
-                      aria-label="Edit task"
-                      onClick={() => onEdit(task)}
-                    >
-                      <img src="/images/icons/icon-edit.svg" alt="" />
-                    </button>
-                    <button
-                      type="button"
-                      className="profile-icon-btn profile-icon-btn--delete"
-                      aria-label="Delete task"
-                      onClick={() => setDeleteTarget(task)}
-                    >
-                      <Trash2 className="h-4 w-4" aria-hidden />
-                    </button>
-                  </div>
-                ) : null}
+            {loading ? (
+              <div className="space-y-3">
+                {[0, 1, 2].map((item) => (
+                  <div
+                    key={item}
+                    className="h-20 animate-pulse rounded-2xl bg-white/50"
+                  />
+                ))}
               </div>
-              {taskMeta(task) ? (
-                <p className={`mt-2 text-xs text-[#7f7280] ${batchMode ? "pl-[52px]" : ""}`}>
-                  {taskMeta(task)}
-                </p>
-              ) : null}
-            </div>
-          );
-        })
-      )}
-        </div>
+            ) : tasks.length === 0 ? (
+              <div className="profile-task-card border border-dashed p-6 text-sm text-[#7f7280]">
+                No tasks in your profile yet. Add one that matches your
+                day-to-day work.
+              </div>
+            ) : (
+              tasks.map((task) => {
+                const isSelected = selectedIds.has(task.id);
+
+                return (
+                  <div key={task.id} className="profile-task-card p-4">
+                    <div className="flex items-center gap-3">
+                      {batchMode ? (
+                        <button
+                          type="button"
+                          className="profile-task-checkbox"
+                          aria-label={
+                            isSelected ? "Deselect task" : "Select task"
+                          }
+                          onClick={() => toggleSelection(task.id)}
+                        >
+                          <img
+                            src={
+                              isSelected
+                                ? "/images/icons/icon-checkbox-checked.svg"
+                                : "/images/icons/icon-checkbox-unchecked.svg"
+                            }
+                            alt=""
+                            className="block h-[22px] w-[22px] object-contain"
+                          />
+                        </button>
+                      ) : null}
+                      <p className="min-w-0 flex-1 text-sm leading-6 text-[#2f2430]">
+                        {task.wording}
+                      </p>
+                      {!batchMode ? (
+                        <div className="profile-icon-actions">
+                          <button
+                            type="button"
+                            className="profile-icon-btn"
+                            aria-label="Edit task"
+                            onClick={() => onEdit(task)}
+                          >
+                            <img src="/images/icons/icon-edit.svg" alt="" />
+                          </button>
+                          <button
+                            type="button"
+                            className="profile-icon-btn profile-icon-btn--delete"
+                            aria-label="Delete task"
+                            onClick={() => setDeleteTarget(task)}
+                          >
+                            <Trash2 className="h-4 w-4" aria-hidden />
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                    {taskMeta(task) ? (
+                      <p
+                        className={`mt-2 text-xs text-[#7f7280] ${batchMode ? "pl-[52px]" : ""}`}
+                      >
+                        {taskMeta(task)}
+                      </p>
+                    ) : null}
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
 
         {showScrollHint ? (

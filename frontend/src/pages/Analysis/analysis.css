@@ -1,0 +1,56 @@
+.analysis-page .analysis-card {
+  border-color: rgba(255, 255, 255, 0.84);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 14px 34px rgba(61, 43, 54, 0.1);
+  backdrop-filter: blur(18px);
+}
+
+.analysis-page .analysis-list-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.analysis-page .analysis-list-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.analysis-page .analysis-list-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(79, 145, 186, 0.35);
+}
+
+.analysis-page .analysis-list-scroll-hint {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  border: 0;
+  padding: 1.1rem 0 0.35rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.92));
+  color: #4f91ba;
+  cursor: pointer;
+}
+
+.analysis-page .analysis-task-item {
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.75rem 0.875rem;
+}
+
+/* Named task-list and shared card styles. */
+.task-list__empty { @apply rounded-xl border border-dashed border-white/80 p-4 text-sm text-[#7f7280]; }
+.task-list__row { @apply flex items-start gap-3; }
+.task-list__dot { @apply mt-1.5 size-2 shrink-0 rounded-full bg-[#9ec9e4]; }
+.task-list__name { @apply min-w-0 flex-1 text-sm leading-6 text-[#2f2430]; }
+.task-details-button { @apply h-8 shrink-0 rounded-full border-[#c9dfef] bg-white/75 px-3 text-xs text-[#2f5f80] hover:bg-[#d6eaf7] hover:text-[#2f5f80]; }
+.analysis-overview__list { @apply h-[36rem] xl:h-[calc(100vh-10rem)] xl:max-h-none; }
+.task-list__reset { @apply h-7 px-2 text-xs font-medium text-[#4f91ba] hover:bg-[#d6eaf7] hover:text-[#2f5f80]; }
+.task-list__viewport { @apply relative min-h-0 flex-1; }
+.analysis-card--layout { @apply flex min-h-0 flex-col overflow-hidden border-white/80 bg-white/75 shadow-[0_14px_34px_rgba(61,43,54,0.1)] backdrop-blur-xl; }
+.analysis-card__header { @apply shrink-0 space-y-1 p-4 pb-2; }
+.analysis-card__eyebrow { @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7f7280]; }
+.analysis-card__content { @apply flex min-h-0 flex-1 flex-col p-4 pt-2; }

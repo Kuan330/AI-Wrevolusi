@@ -14,10 +14,10 @@
     --primary-foreground: 0 0% 100%;
     --secondary: 207 48% 90%;
     --secondary-foreground: 323 17% 20%;
-    --muted: 2 40% 92%;
+    --muted: 207 48% 94%;
     --muted-foreground: 327 10% 40%;
-    --accent: 10 35% 66%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 207 48% 90%;
+    --accent-foreground: 203 44% 30%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
     --border: 207 30% 84%;
@@ -76,5 +76,11 @@
     @apply bg-background text-foreground;
     font-family: "Inter", "Outfit", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+  }
+
+  .gradient-pill:hover {
+    background: #d6eaf7 !important;
+    color: #4f91ba !important;
+    filter: none !important;
   }
 }

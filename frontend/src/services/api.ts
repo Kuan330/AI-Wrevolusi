@@ -25,9 +25,13 @@ const parseResponseBody = async (response: Response): Promise<unknown> => {
   return response.text();
 };
 
-const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
+const request = async <T>(
+  path: string,
+  init?: RequestInit,
+  timeoutMs = 4000,
+): Promise<T> => {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 4000);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -65,11 +69,11 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
 
 export const api = {
   get: <T>(path: string) => request<T>(path, { method: "GET" }),
-  post: <T, TBody = unknown>(path: string, payload?: TBody) =>
+  post: <T, TBody = unknown>(path: string, payload?: TBody, timeoutMs?: number) =>
     request<T>(path, {
       method: "POST",
       body: payload ? JSON.stringify(payload) : undefined,
-    }),
+    }, timeoutMs),
   patch: <T, TBody = unknown>(path: string, payload?: TBody) =>
     request<T>(path, {
       method: "PATCH",

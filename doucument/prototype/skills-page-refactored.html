@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your skills — prototype</title>
+<style>
+  :root {
+    --bg: #FAF9F6;
+    --surface: #FFFFFF;
+    --text: #2C2C2A;
+    --text-2: #5F5E5A;
+    --text-3: #888780;
+    --border: #E8E6DF;
+    --teal-600: #0F6E56;
+    --teal-500: #1D9E75;
+    --teal-100: #E1F5EE;
+    --teal-50: #F0FAF6;
+    --pink-600: #993556;
+    --pink-500: #D4537E;
+    --pink-100: #FBEAF0;
+    --amber-100: #FAEEDA;
+    --amber-800: #633806;
+    --amber-600: #854F0B;
+    --purple-100: #EEEDFE;
+    --purple-800: #3C3489;
+    --purple-600: #534AB7;
+    --gray-100: #F1EFE8;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.65;
+    padding-bottom: 80px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- section scaffolding ---------- */
+  section { margin-top: 56px; }
+  .kicker {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--teal-600); font-weight: 500; margin-bottom: 6px;
+  }
+  h2 { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+  .lede { color: var(--text-2); max-width: 62ch; margin-bottom: 20px; }
+
+  /* ---------- header ---------- */
+  header { padding: 48px 0 8px; }
+  .brandline { font-size: 13px; color: var(--text-3); margin-bottom: 14px; }
+  .hero-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px;
+  }
+  .hero-card h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+  .hero-stats { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+  .stat {
+    background: var(--teal-50); border: 1px solid var(--teal-100);
+    border-radius: var(--radius); padding: 12px 18px; min-width: 130px;
+  }
+  .stat b { display: block; font-size: 22px; font-weight: 600; color: var(--teal-600); }
+  .stat span { font-size: 12px; color: var(--text-2); }
+  .reassure {
+    margin-top: 20px; padding: 16px 18px; border-radius: var(--radius);
+    background: var(--purple-100); color: var(--purple-800);
+    font-size: 13.5px;
+  }
+  .reassure b { font-weight: 600; }
+
+  /* ---------- nav chips ---------- */
+  .chips { position: sticky; top: 0; z-index: 50; background: var(--bg);
+    padding: 14px 0; border-bottom: 1px solid var(--border); margin-top: 32px; }
+  .chips-inner { display: flex; gap: 8px; overflow-x: auto; }
+  .chips a {
+    flex: none; font-size: 12.5px; color: var(--text-2); text-decoration: none;
+    border: 1px solid var(--border); background: var(--surface);
+    padding: 5px 12px; border-radius: 999px;
+  }
+  .chips a:hover { border-color: var(--teal-500); color: var(--teal-600); }
+
+  /* ---------- why 26 ---------- */
+  .collapse { border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface); overflow: hidden; }
+  .collapse + .collapse { margin-top: 10px; }
+  .collapse summary {
+    cursor: pointer; padding: 14px 18px; font-weight: 500; font-size: 14px;
+    list-style: none; display: flex; align-items: center; gap: 10px;
+  }
+  .collapse summary::-webkit-details-marker { display: none; }
+  .collapse summary::before {
+    content: "+"; color: var(--teal-600); font-weight: 600; font-size: 16px;
+  }
+  .collapse[open] summary::before { content: "–"; }
+  .collapse .body { padding: 0 18px 16px; color: var(--text-2); font-size: 13.5px; }
+  .collapse .body p + p { margin-top: 10px; }
+  .collapse .body strong { color: var(--text); }
+  .group-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .group-tags span {
+    font-size: 12px; background: var(--gray-100); color: var(--text-2);
+    padding: 3px 10px; border-radius: 999px;
+  }
+
+  /* ---------- skill cards ---------- */
+  .skill-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; margin-bottom: 14px;
+  }
+  .skill-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+  .skill-head h3 { font-size: 16px; font-weight: 600; }
+  .skill-group { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge { font-size: 11.5px; padding: 3px 10px; border-radius: 999px; font-weight: 500; }
+  .b-grow { background: var(--teal-100); color: var(--teal-600); }
+  .b-stable { background: var(--gray-100); color: var(--text-2); }
+  .b-decline { background: #FCEBEB; color: #A32D2D; }
+
+  .evidence { margin-top: 14px; }
+  .evidence .label { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
+  .task-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .task-chip {
+    font-size: 12.5px; background: var(--pink-100); color: var(--pink-600);
+    padding: 4px 12px; border-radius: 999px;
+  }
+
+  .mini-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+  .mini { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+  .mini .k { font-size: 11px; color: var(--text-3); }
+  .mini .v { font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .mini .n { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+  .ai-split { margin-top: 14px; }
+  .ai-split summary { cursor: pointer; font-size: 13px; color: var(--purple-600); font-weight: 500; }
+  .ai-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .ai-col { border-radius: 8px; padding: 12px 14px; font-size: 13px; }
+  .ai-col h4 { font-size: 12.5px; font-weight: 600; margin-bottom: 6px; }
+  .ai-help { background: var(--purple-100); color: var(--purple-800); }
+  .ai-you { background: var(--teal-50); color: var(--teal-600); }
+  .ai-col ul { list-style: none; }
+  .ai-col li { padding-left: 14px; position: relative; margin-top: 4px; color: var(--text-2); }
+  .ai-col li::before { content: "·"; position: absolute; left: 2px; font-weight: 700; }
+
+  /* ---------- chart ---------- */
+  .chart-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px;
+  }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0 4px; font-size: 12.5px; color: var(--text-2); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+  #scatter { width: 100%; height: auto; display: block; }
+  .quad-label { font-size: 11.5px; fill: var(--text-3); font-weight: 500; }
+  .axis-label { font-size: 12px; fill: var(--text-2); }
+  .dot { cursor: pointer; }
+  .dot-yours { stroke: var(--pink-500); stroke-width: 2; }
+  #tooltip {
+    position: fixed; pointer-events: none; background: #2C2C2A; color: #fff;
+    padding: 8px 12px; border-radius: 8px; font-size: 12.5px; max-width: 240px;
+    opacity: 0; transition: opacity 0.12s; z-index: 99; line-height: 1.5;
+  }
+
+  /* ---------- next steps ---------- */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .step { border-radius: var(--radius); padding: 18px; border: 1px solid var(--border); background: var(--surface); }
+  .step h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .step .who { font-size: 12px; color: var(--text-3); margin-bottom: 10px; min-height: 48px; }
+  .step .say { font-size: 13px; color: var(--text-2); font-style: italic; margin-bottom: 12px; }
+  .step .list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .step .list span { font-size: 12px; padding: 3px 10px; border-radius: 999px; }
+  .s-keep .list span { background: var(--teal-100); color: var(--teal-600); }
+  .s-strong .list span { background: var(--pink-100); color: var(--pink-600); }
+  .s-ai .list span { background: var(--purple-100); color: var(--purple-800); }
+  .step.s-keep { border-top: 3px solid var(--teal-500); }
+  .step.s-strong { border-top: 3px solid var(--pink-500); }
+  .step.s-ai { border-top: 3px solid var(--purple-600); }
+
+  .combo {
+    margin-top: 18px; background: var(--amber-100); border-radius: var(--radius);
+    padding: 18px 20px; color: var(--amber-800);
+  }
+  .combo b { font-weight: 600; }
+  .combo .pair { font-size: 13px; margin-top: 8px; background: rgba(255,255,255,0.6); display: inline-block; padding: 6px 14px; border-radius: 8px; }
+
+  /* ---------- malaysia ---------- */
+  .my-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .my-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 16px; }
+  .my-num { background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: 8px; padding: 12px; text-align: center; }
+  .my-num b { display: block; font-size: 20px; font-weight: 600; color: var(--teal-600); }
+  .my-num span { font-size: 11px; color: var(--text-2); display: block; margin-top: 4px; }
+  .my-note { font-size: 12px; color: var(--text-3); margin-top: 14px; }
+
+  /* ---------- method ---------- */
+  .method { border-top: 1px solid var(--border); padding-top: 24px; color: var(--text-3); font-size: 12.5px; }
+  .method h2 { font-size: 15px; color: var(--text-2); }
+  .method ul { margin: 10px 0 0 18px; }
+  .method li { margin-top: 4px; }
+
+
+
+  /* ---------- skill map overview (added above the existing page) ---------- */
+  .skill-map-overview {
+    width: min(1180px, calc(100vw - 48px));
+    margin: 28px 0 12px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: minmax(260px, 0.72fr) minmax(520px, 1.55fr);
+    gap: 26px;
+    align-items: stretch;
+  }
+  .skill-map-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 26px 2px;
+  }
+  .skill-map-copy .map-kicker {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--purple-600);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .skill-map-copy h1 {
+    font-size: clamp(34px, 4vw, 54px);
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+    font-weight: 650;
+    margin-bottom: 18px;
+    max-width: 10ch;
+  }
+  .skill-map-copy p {
+    color: var(--text-2);
+    font-size: 15px;
+    line-height: 1.75;
+    max-width: 42ch;
+  }
+  .map-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 22px;
+  }
+  .map-stat-pill {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 7px 12px;
+    color: var(--text-2);
+    font-size: 12.5px;
+    display: inline-flex;
+    gap: 7px;
+    align-items: center;
+  }
+  .map-stat-pill strong { color: var(--text); }
+  .map-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6F61F6;
+    box-shadow: 0 0 0 4px var(--purple-100);
+    flex: none;
+  }
+  .skill-cloud-panel {
+    min-height: 430px;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(111,97,246,.08), transparent 35%),
+      var(--surface);
+    position: relative;
+    overflow: hidden;
+    padding: 58px 34px 32px;
+  }
+  .skill-cloud-panel::after {
+    content: "";
+    position: absolute;
+    inset: 52px 24px 28px;
+    border: 1px dashed rgba(111,97,246,.16);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .skill-cloud-legend {
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--text-3);
+    font-size: 12.5px;
+  }
+  .skill-cloud {
+    position: relative;
+    z-index: 2;
+    min-height: 320px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    gap: 12px 10px;
+  }
+  .skill-bubble {
+    --float: 5px;
+    --delay: 0s;
+    border: 1px solid #E7E4F2;
+    background: rgba(255,255,255,.93);
+    color: #777783;
+    border-radius: 999px;
+    padding: 8px 13px;
+    max-width: 175px;
+    min-height: 34px;
+    font-size: 12px;
+    line-height: 1.25;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 7px 20px rgba(44,44,42,.05);
+    animation: skillFloat 4.8s ease-in-out infinite alternate;
+    animation-delay: var(--delay);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, opacity .18s ease;
+  }
+  .skill-bubble.is-matched {
+    cursor: pointer;
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(135deg, #6256F3, #8A7CFF);
+    box-shadow: 0 10px 26px rgba(98,86,243,.24);
+  }
+  .skill-bubble.is-matched:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 13px 30px rgba(98,86,243,.30);
+  }
+  .skill-bubble:not(.is-matched) {
+    cursor: default;
+    opacity: .78;
+  }
+  .skill-bubble.size-lg { font-size: 13px; padding: 10px 16px; }
+  .skill-bubble.size-sm { font-size: 11px; padding: 7px 11px; }
+  @keyframes skillFloat {
+    from { translate: 0 calc(var(--float) * -0.45); }
+    to { translate: 0 var(--float); }
+  }
+  .skill-card.skill-focus { animation: cardFocus 1.1s ease; }
+  @keyframes cardFocus {
+    0% { box-shadow: 0 0 0 0 rgba(98,86,243,.34); }
+    45% { box-shadow: 0 0 0 7px rgba(98,86,243,.10); border-color: #BEB8FF; }
+    100% { box-shadow: none; }
+  }
+
+  /* Keep the existing card design; only arrange matched cards in two columns. */
+  #skill-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  #skill-list .skill-card { margin-bottom: 0; }
+
+
+  @media (max-width: 900px) {
+    .skill-map-overview { grid-template-columns: 1fr; }
+    .skill-map-copy { padding-bottom: 4px; }
+    .skill-map-copy h1 { max-width: 14ch; }
+    .skill-cloud-panel { min-height: 390px; }
+  }
+
+  @media (max-width: 640px) {
+    .mini-stats, .ai-cols, .steps, .my-grid, #skill-list { grid-template-columns: 1fr; }
+    .skill-map-overview { width: calc(100vw - 28px); }
+    .skill-map-copy h1 { font-size: 38px; }
+    .skill-cloud-panel { padding: 56px 16px 24px; min-height: 420px; border-radius: 18px; }
+    .skill-cloud { gap: 9px 7px; }
+    .skill-bubble { max-width: 145px; font-size: 10.5px; padding: 7px 10px; }
+    .step .who { min-height: 0; }
+  }
+
+  /* ---------- refactored page structure ---------- */
+  body {
+    background:
+      radial-gradient(circle at 8% 4%, rgba(96, 146, 194, .14), transparent 28%),
+      radial-gradient(circle at 94% 2%, rgba(222, 143, 173, .12), transparent 25%),
+      var(--bg);
+  }
+  .wrap { max-width: 1180px; }
+  .page-context {
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    padding: 24px 0 4px;
+  }
+  .breadcrumb { color: var(--text-3); font-size: 12.5px; }
+  .breadcrumb strong { color: var(--text); font-weight: 600; }
+  .edit-link {
+    flex: none; border: 1px solid #d8d5ef; background: rgba(255,255,255,.82);
+    color: var(--purple-600); padding: 8px 15px; border-radius: 999px;
+    text-decoration: none; font-size: 12.5px; font-weight: 650;
+  }
+  .skill-map-overview {
+    width: 100%; margin: 18px 0 0; transform: none;
+    grid-template-columns: minmax(300px, .84fr) minmax(540px, 1.35fr);
+    gap: 20px;
+  }
+  .skill-map-copy {
+    justify-content: flex-start; padding: 30px;
+    border: 1px solid var(--border); border-radius: 24px;
+    background: rgba(255,255,255,.78); backdrop-filter: blur(12px);
+  }
+  .skill-map-copy h1 { font-size: clamp(36px, 4vw, 52px); max-width: 12ch; }
+  .framework-source {
+    display: flex; align-items: flex-start; gap: 10px; margin-top: 20px;
+    padding: 14px; border-radius: 14px; background: var(--purple-100);
+    color: var(--purple-800); font-size: 12.5px; line-height: 1.55;
+  }
+  .framework-source b { display: block; margin-bottom: 2px; }
+  .framework-icon {
+    display: grid; place-items: center; flex: 0 0 30px; height: 30px;
+    border-radius: 10px; background: #fff; font-weight: 800;
+  }
+  .map-stats { display: grid; grid-template-columns: 1fr 1fr; }
+  .map-stat-pill { border-radius: 14px; padding: 12px 13px; align-items: flex-start; }
+  .map-stat-pill strong { display: block; font-size: 22px; line-height: 1; margin-bottom: 4px; }
+  .map-stat-copy { display: block; }
+  .map-stat-copy small { display: block; color: var(--text-3); font-size: 11px; margin-top: 4px; }
+  .map-caveat { margin-top: 16px; color: var(--text-3); font-size: 11.5px; line-height: 1.55; }
+  .skill-cloud-panel { min-height: 540px; padding: 64px 28px 26px; }
+  .skill-cloud-panel::after { display: none; }
+  .skill-cloud-legend { right: 22px; justify-content: space-between; }
+  .cloud-legend-items { display: flex; gap: 14px; flex-wrap: wrap; }
+  .cloud-legend-item { display: inline-flex; align-items: center; gap: 7px; }
+  .cloud-legend-item .neutral-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #d8d6df;
+  }
+  .skill-cloud { min-height: 430px; gap: 10px 8px; }
+  .skill-bubble {
+    animation: none; min-height: 35px; max-width: 182px; padding: 8px 13px;
+    font-size: 11.5px; font-weight: 600;
+  }
+  .skill-bubble:not(.is-matched) { opacity: .72; }
+  .skill-bubble.is-matched::before { content: "✓"; margin-right: 6px; font-size: 10px; }
+
+  .section-heading-row {
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 18px;
+    margin-bottom: 18px;
+  }
+  .section-heading-row .lede { margin-bottom: 0; }
+  .skills-workspace {
+    display: grid; grid-template-columns: minmax(250px, .72fr) minmax(0, 1.55fr);
+    gap: 16px; align-items: start;
+  }
+  .skill-nav-panel, .skill-detail-panel {
+    background: rgba(255,255,255,.88); border: 1px solid var(--border);
+    border-radius: 18px; box-shadow: 0 12px 34px rgba(44,44,42,.04);
+  }
+  .skill-nav-panel { padding: 10px; position: sticky; top: 16px; }
+  .skill-nav-intro { padding: 10px 10px 12px; color: var(--text-3); font-size: 11.5px; }
+  .skill-nav-list { display: grid; gap: 5px; }
+  .skill-nav-item {
+    width: 100%; border: 0; background: transparent; border-radius: 12px;
+    padding: 11px 12px; text-align: left; color: var(--text);
+    cursor: pointer; transition: background .16s ease, transform .16s ease;
+  }
+  .skill-nav-item:hover { background: var(--gray-100); }
+  .skill-nav-item.is-active { background: var(--purple-100); }
+  .skill-nav-title { display: block; font-size: 13px; font-weight: 650; line-height: 1.35; }
+  .skill-nav-meta {
+    display: flex; justify-content: space-between; gap: 8px; margin-top: 5px;
+    color: var(--text-3); font-size: 10.5px;
+  }
+  .skill-nav-item.is-active .skill-nav-meta { color: var(--purple-600); }
+  .skill-detail-panel { padding: 26px; min-height: 560px; }
+  .detail-eyebrow { color: var(--purple-600); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .detail-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-top: 5px; }
+  .detail-title-row h3 { font-size: 23px; line-height: 1.25; }
+  .detail-group { color: var(--text-3); font-size: 12px; margin-top: 5px; }
+  .evidence-card { margin-top: 22px; padding: 18px; border-radius: 14px; background: #fff8fb; border: 1px solid #f3d9e3; }
+  .evidence-card h4, .detail-block h4 { font-size: 13px; font-weight: 700; }
+  .evidence-card > p { margin-top: 3px; color: var(--text-3); font-size: 11.5px; }
+  .evidence-list { display: grid; gap: 8px; margin-top: 13px; list-style: none; }
+  .evidence-list li {
+    display: flex; gap: 9px; align-items: flex-start; background: rgba(255,255,255,.8);
+    border-radius: 10px; padding: 9px 11px; color: var(--text-2); font-size: 12.5px;
+  }
+  .evidence-list li::before { content: "✓"; color: var(--pink-600); font-weight: 800; }
+  .detail-block { margin-top: 22px; }
+  .detail-block .mini-stats { margin-top: 10px; }
+  .detail-block .mini { background: #fff; }
+  .ai-split { border-top: 1px solid var(--border); padding-top: 18px; }
+  .ai-split summary { list-style: none; display: flex; justify-content: space-between; }
+  .ai-split summary::after { content: "+"; }
+  .ai-split[open] summary::after { content: "–"; }
+  .detail-source { color: var(--text-3); font-size: 11px; margin-top: 14px; }
+
+  #now-next, #next-steps { margin-top: 48px; }
+  .chart-card { overflow-x: auto; }
+  .steps { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .step .who { min-height: 0; }
+  .page-notes {
+    margin-top: 48px; border-top: 1px solid var(--border); padding-top: 22px;
+    display: grid; gap: 10px;
+  }
+  .page-notes .collapse { background: rgba(255,255,255,.72); }
+  .note-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .note-box { background: var(--bg); border-radius: 10px; padding: 13px; }
+  .note-box b { display: block; margin-bottom: 4px; }
+
+  @media (max-width: 900px) {
+    .skill-map-overview { grid-template-columns: 1fr; }
+    .skills-workspace { grid-template-columns: 1fr; }
+    .skill-nav-panel { position: static; }
+    .skill-nav-list { display: flex; overflow-x: auto; padding-bottom: 2px; }
+    .skill-nav-item { min-width: 210px; }
+  }
+  @media (max-width: 640px) {
+    .wrap { padding: 0 14px; }
+    .page-context { align-items: flex-start; }
+    .skill-map-copy { padding: 22px; }
+    .skill-map-copy h1 { font-size: 35px; }
+    .map-stats { grid-template-columns: 1fr; }
+    .skill-cloud-panel { min-height: 520px; padding: 72px 14px 20px; }
+    .skill-cloud { min-height: 430px; }
+    .skill-bubble { max-width: 145px; font-size: 10px; padding: 7px 10px; }
+    .section-heading-row { display: block; }
+    .skill-detail-panel { padding: 19px; }
+    .detail-title-row { display: block; }
+    .detail-title-row .badges { margin-top: 10px; }
+    .note-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="tooltip"></div>
+
+<div class="wrap">
+
+  <div class="page-context">
+    <div>
+      <div class="breadcrumb">Work profile &nbsp;›&nbsp; Tasks &nbsp;›&nbsp; <strong>Skills</strong></div>
+      <div class="brandline" style="margin:5px 0 0">Retail shop supervisor · based on 5 confirmed tasks</div>
+    </div>
+    <a class="edit-link" href="#">Edit tasks</a>
+  </div>
+
+  <!-- ================= 1. WHY 26 + PERSONAL POSITION ================= -->
+  <section class="skill-map-overview" aria-labelledby="skill-map-title">
+    <div class="skill-map-copy">
+      <div class="map-kicker">Your skill map</div>
+      <h1 id="skill-map-title">See where your work sits across 26 future skills.</h1>
+      <p>
+        The 26 skills come from the World Economic Forum's Future of Jobs framework. We use
+        this shared framework to translate the tasks you perform into skills employers use
+        when discussing work, hiring and learning.
+      </p>
+
+      <div class="framework-source">
+        <span class="framework-icon">26</span>
+        <span><b>Why this framework?</b>It covers cognitive, technology, people, management,
+        self-efficacy and other ways people contribute at work.</span>
+      </div>
+
+      <div class="map-stats">
+        <div class="map-stat-pill">
+          <span class="map-dot"></span>
+          <span class="map-stat-copy"><strong><span id="map-match-count">0</span> of 26</strong>skills identified<small>from your confirmed tasks</small></span>
+        </div>
+        <div class="map-stat-pill">
+          <span class="map-stat-copy"><strong>5</strong>tasks analysed<small>your evidence for this map</small></span>
+        </div>
+      </div>
+
+      <p class="map-caveat">
+        This is not a test or a measure of proficiency. A skill that is not highlighted may
+        simply not have appeared in the tasks you entered.
+      </p>
+    </div>
+
+    <div class="skill-cloud-panel">
+      <div class="skill-cloud-legend">
+        <div class="cloud-legend-items">
+          <span class="cloud-legend-item"><span class="map-dot"></span>Identified from your tasks</span>
+          <span class="cloud-legend-item"><span class="neutral-dot"></span>Other framework skills</span>
+        </div>
+      </div>
+      <div id="skill-cloud" class="skill-cloud" aria-label="All 26 WEF skills, with the user's identified skills highlighted"></div>
+    </div>
+  </section>
+
+  <!-- ================= 2. USER SKILLS WORKSPACE ================= -->
+  <section id="yours">
+    <div class="section-heading-row">
+      <div>
+        <div class="kicker">Evidence from your work</div>
+        <h2>Your identified skills</h2>
+        <p class="lede">Choose a highlighted skill to see which tasks support it and what its future outlook may mean.</p>
+      </div>
+    </div>
+
+    <div class="skills-workspace">
+      <aside class="skill-nav-panel" aria-label="Your identified skills">
+        <p class="skill-nav-intro"><strong id="skill-nav-count">0 skills</strong> identified · ordered by how often they appear across your tasks</p>
+        <div id="skill-nav-list" class="skill-nav-list"></div>
+      </aside>
+      <article id="skill-detail" class="skill-detail-panel" aria-live="polite"></article>
+    </div>
+  </section>
+
+  <!-- ================= 3. FUTURE OUTLOOK ================= -->
+  <section id="now-next">
+    <div class="kicker">Your wider future picture</div>
+    <h2>How your skills sit in the 26-skill framework</h2>
+    <p class="lede">
+      Horizontal: how many employers consider the skill core today. Vertical: how the need
+      for it is expected to change by 2030. Your seven skills are highlighted — the rest of
+      the 26 are shown in grey so you can see the whole picture.
+    </p>
+    <div class="chart-card">
+      <div class="legend">
+        <span><i style="background:var(--pink-500)"></i>Your skills</span>
+        <span><i style="background:#B4B2A9"></i>Other skills in the WEF list</span>
+      </div>
+      <svg id="scatter" viewBox="0 0 860 480" role="img" aria-label="Scatter chart of current employer importance versus expected change by 2030"></svg>
+      <p style="font-size:12px;color:var(--text-3);margin-top:10px">
+        Source: WEF Future of Jobs Report 2025 (Figures 3.3, 3.4, B3.1). Global employer
+        expectations — not a measurement of your ability, and not Malaysia job openings.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 4. NEXT STEPS ================= -->
+  <section id="next-steps">
+    <div class="kicker">Your choice, not a verdict</div>
+    <h2>What you could consider next</h2>
+    <p class="lede">
+      Based on which skills are strong today, growing by 2030, and how AI can support
+      them — three directions, and you can be in more than one.
+    </p>
+
+    <div class="steps">
+      <div class="step s-keep">
+        <h3>Keep building</h3>
+        <div class="who">Already important today · stable or growing by 2030 · hard for AI to replace</div>
+        <div class="say">"Keep using this skill and look for ways to make it more visible in your work."</div>
+        <div class="list">
+          <span>Empathy and active listening</span>
+          <span>Service orientation</span>
+          <span>Dependability and attention to detail</span>
+        </div>
+      </div>
+
+      <div class="step s-strong">
+        <h3>Strengthen</h3>
+        <div class="who">Growing by 2030 · you already have task evidence · built on judgement, communication, coordination</div>
+        <div class="say">"This may be worth developing further as your responsibilities grow."</div>
+        <div class="list">
+          <span>Teaching and mentoring</span>
+          <span>Resource management and operations</span>
+          <span>Leadership and social influence — explore</span>
+        </div>
+      </div>
+
+      <div class="step s-ai">
+        <h3>Use with AI</h3>
+        <div class="who">Growing by 2030 · AI can support the routine parts · involves information, text, numbers</div>
+        <div class="say">"Explore how AI can support the routine parts, while you keep the judgement and responsibility."</div>
+        <div class="list">
+          <span>Analytical thinking</span>
+          <span>Multi-lingualism</span>
+          <span>AI and big data — explore</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="combo">
+      <b>Skills that work well together</b> — future value often comes from combining what
+      you already have with something new, not from starting over.
+      <div class="pair">Service orientation&nbsp; + &nbsp;Technological literacy</div>
+      <div class="pair">Teaching and mentoring&nbsp; + &nbsp;AI and big data</div>
+    </div>
+  </section>
+
+  <!-- ================= 5. CONTEXT + METHOD ================= -->
+  <section class="page-notes" aria-label="Context, method and limitations">
+    <details class="collapse">
+      <summary>Why we start from your tasks, not your job title</summary>
+      <div class="body">
+        <p>A job title tells us where you work, but tasks show what you actually do. Starting
+        from confirmed tasks makes every identified skill traceable to concrete evidence.</p>
+      </div>
+    </details>
+
+    <details class="collapse">
+      <summary>Malaysia context</summary>
+      <div class="body">
+        <div class="note-grid">
+          <div class="note-box"><b>79% digital access</b>of Malaysian employers expect expanding digital access to transform their business.</div>
+          <div class="note-box"><b>Practical learning signals</b>Short courses, online certificates and learning alongside work may become increasingly useful.</div>
+        </div>
+        <p style="margin-top:10px">Background signals from the WEF report; they are not Malaysia job, salary or hiring forecasts.</p>
+      </div>
+    </details>
+
+    <details class="collapse" id="method">
+      <summary>Method, source and limitations</summary>
+      <div class="body">
+        <p><b>How this prototype works:</b> confirmed task wording is mapped to the WEF Future
+        of Jobs 2025 core skills list using transparent matching rules. A skill appears only
+        when at least one task supports it.</p>
+        <p>Employer percentages are global reference data, not a personal proficiency score.
+        GenAI capacity describes parts of a skill group that may be supported by AI; it does
+        not mean that a person or occupation will be replaced.</p>
+      </div>
+    </details>
+  </section>
+
+</div>
+
+<script>
+/* ---------------- data ---------------- */
+const SKILLS = [
+  ["Analytical thinking","Cognitive",69,55,"High Growth","Low-Moderate",true],
+  ["Resilience, flexibility and agility","Self-efficacy",67,66,"Very High Growth","Very Low-Low",false],
+  ["Leadership and social influence","Working with others",61,58,"High Growth","Low",false],
+  ["Creative thinking","Cognitive",57,66,"Very High Growth","Low",false],
+  ["Motivation and self-awareness","Self-efficacy",52,47,"High Growth","Not shown",false],
+  ["Technological literacy","Technology",51,68,"Very High Growth","Low-Moderate",false],
+  ["Empathy and active listening","Working with others",50,46,"High Growth","Very Low-Low",true],
+  ["Curiosity and lifelong learning","Self-efficacy",50,61,"Very High Growth","Low-Moderate",false],
+  ["Talent management","Management",47,58,"High Growth","Low",false],
+  ["Service orientation and customer service","Engagement",47,41,"High Growth","Low",true],
+  ["AI and big data","Technology",45,87,"Very High Growth","Moderate-High",false],
+  ["Systems thinking","Cognitive",42,51,"High Growth","Moderate",false],
+  ["Resource management and operations","Working with others",41,24,"Moderate Growth","Low-Moderate",true],
+  ["Dependability and attention to detail","Self-efficacy",37,12,"Slight Growth","Low-Moderate",true],
+  ["Quality control","Management",35,20,"Moderate Growth","Low-Moderate",false],
+  ["Teaching and mentoring","Working with others",26,30,"Moderate Growth","Low",true],
+  ["Networks and cybersecurity","Technology",25,70,"Very High Growth","Low-Moderate",false],
+  ["Design and user experience","Technology",25,45,"High Growth","Low-Moderate",false],
+  ["Multi-lingualism","Cognitive",23,16,"Slight Growth","Moderate",true],
+  ["Marketing and media","Engagement",21,25,"Moderate Growth","Moderate",false],
+  ["Reading, writing and mathematics","Cognitive",21,-4,"Declining","Moderate-High",false],
+  ["Environmental stewardship","Ethics",20,53,"High Growth","Low",false],
+  ["Programming","Technology",17,27,"Moderate Growth","Moderate",false],
+  ["Manual dexterity, endurance and precision","Physical",14,-24,"Declining","Very Low-Low",false],
+  ["Global citizenship","Ethics",13,19,"Slight Growth","Low",false],
+  ["Sensory-processing abilities","Physical",6,13,"Slight Growth","Very Low-Low",false]
+ ];
+
+/* ---------------- skill map overview ---------------- */
+(function renderSkillCloud() {
+  const cloud = document.getElementById("skill-cloud");
+  if (!cloud) return;
+
+  const matched = SKILLS.filter(s => s[6]);
+  const count = document.getElementById("map-match-count");
+  if (count) count.textContent = matched.length;
+
+  SKILLS.forEach((skill, i) => {
+    const [name,,,,,, isMine] = skill;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "skill-bubble" + (isMine ? " is-matched" : "");
+    b.textContent = name;
+    b.title = isMine ? "View the evidence for this skill" : "Not identified from your current tasks";
+
+    if (isMine) {
+      b.addEventListener("click", () => {
+        selectSkill(name);
+        document.getElementById("yours")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    } else {
+      b.setAttribute("aria-disabled", "true");
+    }
+    cloud.appendChild(b);
+  });
+})();
+
+const USER_SKILLS = {
+  "Analytical thinking": {
+    tasks: ["Tracked daily sales in a spreadsheet", "Compared vendor costs each quarter", "Prepared a weekly sales summary for the manager"],
+    ai: {
+      help: ["Summarising the numbers", "Spotting patterns in data", "Preparing first-draft reports"],
+      you: ["Deciding what the numbers mean for your shop", "Asking the right question in the first place", "Acting on the conclusion and owning it"]
+    }
+  },
+  "Empathy and active listening": {
+    tasks: ["Handled customer complaints and refunds", "De-escalated an angry walk-in customer"],
+    ai: {
+      help: ["Summarising what a customer wrote", "Suggesting reply drafts", "Grouping similar feedback"],
+      you: ["Reading the person in front of you","Judging what the customer really needs","Taking responsibility for the outcome"]
+    }
+  },
+  "Service orientation and customer service": {
+    tasks: ["Handled customer complaints and refunds", "Followed up with repeat customers on WhatsApp", "Recommended alternatives when an item was unavailable"],
+    ai: {
+      help: ["Drafting standard replies","Tracking open requests","Reminding you to follow up"],
+      you: ["Deciding what a fair solution is","Building the relationship","Handling exceptions with judgement"]
+    }
+  },
+  "Dependability and attention to detail": {
+    tasks: ["Checked daily cash-out and stock records","Prepared the monthly order without errors"],
+    ai: ["Flagging unusual numbers","Cross-checking lists"],
+    you: ["Knowing what \"unusual\" means here","Owning the result when it matters"]
+  },
+  "Resource management and operations": {
+    tasks: ["Planned delivery schedules with 3 vendors","Rearranged staffing when 2 called in sick"],
+    ai: ["Comparing schedule options","Organising the information"],
+    you: ["Negotiating with vendors","Choosing between imperfect trade-offs","Keeping everyone informed"]
+  },
+  "Teaching and mentoring": {
+    tasks: ["Trained 4 new part-time staff","Wrote the onboarding checklist"],
+    ai: ["Preparing training materials","Explaining procedures in simple steps"],
+    you: ["Noticing when someone is struggling","Adapting to how each person learns","Encouraging them"]
+  },
+  "Multi-lingualism": {
+    tasks: ["Served customers in Malay, English and Mandarin","Translated menu updates for the boss"],
+    ai: ["Drafting translations","Checking phrasing"],
+    you: ["Switching naturally between customers","Reading cultural context","Getting the tone right"]
+  }
+};
+
+/* normalise user skill detail: some entries are arrays only */
+for (const k in USER_SKILLS) {
+  if (Array.isArray(USER_SKILLS[k].ai)) USER_SKILLS[k].ai = { help: USER_SKILLS[k].ai, you: ["Judgement, context and responsibility"] };
+}
+
+/* ---------------- render skill workspace ---------------- */
+function trendBadge(t) {
+  if (t.includes("Declining")) return '<span class="badge b-decline">Declining</span>';
+  if (t.includes("Slight")) return '<span class="badge b-stable">Slight growth</span>';
+  if (t.includes("Moderate")) return '<span class="badge b-stable">Moderate growth</span>';
+  if (t.includes("Very High")) return '<span class="badge b-grow">Very high growth</span>';
+  return '<span class="badge b-grow">High growth</span>';
+}
+
+const mine = SKILLS
+  .filter(skill => skill[6])
+  .sort((a, b) => (USER_SKILLS[b[0]]?.tasks.length || 0) - (USER_SKILLS[a[0]]?.tasks.length || 0));
+let selectedSkillName = mine[0]?.[0] || null;
+
+const navListEl = document.getElementById("skill-nav-list");
+const detailEl = document.getElementById("skill-detail");
+const navCountEl = document.getElementById("skill-nav-count");
+if (navCountEl) navCountEl.textContent = `${mine.length} skills`;
+
+function renderSkillNavigation() {
+  if (!navListEl) return;
+  navListEl.innerHTML = mine.map(([name, , , , trend]) => {
+    const count = USER_SKILLS[name]?.tasks.length || 0;
+    return `
+      <button type="button" class="skill-nav-item${name === selectedSkillName ? " is-active" : ""}" data-skill="${name}">
+        <span class="skill-nav-title">${name}</span>
+        <span class="skill-nav-meta"><span>${count} supporting task${count === 1 ? "" : "s"}</span><span>${trend.replace("Very High", "Very high").replace("Growth", "growth")}</span></span>
+      </button>`;
+  }).join("");
+
+  navListEl.querySelectorAll("[data-skill]").forEach(button => {
+    button.addEventListener("click", () => selectSkill(button.dataset.skill));
+  });
+}
+
+function renderSkillDetail() {
+  if (!detailEl || !selectedSkillName) return;
+  const skill = mine.find(item => item[0] === selectedSkillName);
+  if (!skill) return;
+  const [name, group, imp, growth, trend, genai] = skill;
+  const d = USER_SKILLS[name] || { tasks: [], ai: { help: [], you: [] } };
+  const taskItems = d.tasks.map(task => `<li>${task}</li>`).join("");
+
+  detailEl.innerHTML = `
+    <div class="detail-eyebrow">Selected skill</div>
+    <div class="detail-title-row">
+      <div>
+        <h3>${name}</h3>
+        <div class="detail-group">${group} skills · identified from ${d.tasks.length} task${d.tasks.length === 1 ? "" : "s"}</div>
+      </div>
+      <div class="badges">${trendBadge(trend)}</div>
+    </div>
+
+    <div class="evidence-card">
+      <h4>Why this skill appears in your results</h4>
+      <p>These confirmed tasks contain evidence of this skill.</p>
+      <ul class="evidence-list">${taskItems}</ul>
+    </div>
+
+    <div class="detail-block">
+      <h4>What the future-of-work data says</h4>
+      <div class="mini-stats">
+        <div class="mini">
+          <div class="k">Important today</div>
+          <div class="v">${imp}%</div>
+          <div class="n">of surveyed employers consider it a core skill in 2025</div>
+        </div>
+        <div class="mini">
+          <div class="k">Expected change by 2030</div>
+          <div class="v" style="color:${growth >= 0 ? "var(--teal-600)" : "#A32D2D"}">${growth >= 0 ? "+" : ""}${growth}%</div>
+          <div class="n">change in employers naming this skill</div>
+        </div>
+        <div class="mini">
+          <div class="k">GenAI capacity</div>
+          <div class="v" style="font-size:13px">${genai}</div>
+          <div class="n">skill-group reference, not your proficiency</div>
+        </div>
+      </div>
+    </div>
+
+    <details class="ai-split" open>
+      <summary>How AI may work with this skill</summary>
+      <div class="ai-cols">
+        <div class="ai-col ai-help">
+          <h4>AI may help with</h4>
+          <ul>${d.ai.help.map(item => `<li>${item}</li>`).join("")}</ul>
+        </div>
+        <div class="ai-col ai-you">
+          <h4>Your contribution remains important for</h4>
+          <ul>${d.ai.you.map(item => `<li>${item}</li>`).join("")}</ul>
+        </div>
+      </div>
+    </details>
+
+    <p class="detail-source">WEF figures describe global employer expectations. They are not a measurement of your personal ability.</p>`;
+}
+
+function selectSkill(name) {
+  if (!name || !mine.some(item => item[0] === name)) return;
+  selectedSkillName = name;
+  renderSkillNavigation();
+  renderSkillDetail();
+}
+
+renderSkillNavigation();
+renderSkillDetail();
+
+/* ---------------- scatter ---------------- */
+(function () {
+  const W = 860, H = 480;
+  const padL = 64, padR = 24, padT = 20, padB = 56;
+  const xMax = 75, xMin = 0, yMax = 90, yMin = -30;
+  const X = v => padL + (v - xMin) / (xMax - xMin) * (W - padL - padR);
+  const Y = v => H - padB - (v - yMin) / (yMax - yMin) * (H - padB - padT);
+  const xT = 35, yT = 30;
+
+  const svg = document.getElementById("scatter");
+  let s = `<defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5"/></marker></defs>`;
+
+  /* quadrant fills */
+  s += `<rect x="${padL}" y="${padT}" width="${X(xT)-padL}" height="${Y(yT)-padT}" fill="#F6F4ED" rx="4"/>`;
+  s += `<rect x="${X(xT)}" y="${padT}" width="${W-padR-X(xT)}" height="${Y(yT)-padT}" fill="#EAF5F0" rx="4"/>`;
+
+  /* quadrant divider lines */
+  s += `<line x1="${X(xT)}" y1="${padT}" x2="${X(xT)}" y2="${H-padB}" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4 4"/>`;
+  s += `<line x1="${padL}" y1="${Y(yT)}" x2="${W-padR}" y2="${Y(yT)}" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4 4"/>`;
+
+  /* quadrant labels */
+  s += `<text class="quad-label" x="${W-padR-8}" y="${padT+16}" text-anchor="end">Growing core skill</text>`;
+  s += `<text class="quad-label" x="${padL+8}" y="${padT+16}">Emerging opportunity</text>`;
+  s += `<text class="quad-label" x="${W-padR-8}" y="${Y(yT)-8}" text-anchor="end">Stable foundation</text>`;
+  s += `<text class="quad-label" x="${padL+8}" y="${Y(yT)-8}">Watch and explore</text>`;
+
+  /* axes */
+  s += `<line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#888780" stroke-width="1" marker-end="url(#ar)"/>`;
+  s += `<line x1="${padL}" y1="${H-padB}" x2="${padL}" y2="${padT}" stroke="#888780" stroke-width="1" marker-end="url(#ar)"/>`;
+  [0, 15, 30, 45, 60, 75].forEach(v => {
+    s += `<text class="axis-label" x="${X(v)}" y="${H-padB+20}" text-anchor="middle">${v}%</text>`;
+  });
+  [-25, 0, 25, 50, 75].forEach(v => {
+    s += `<text class="axis-label" x="${padL-8}" y="${Y(v)+4}" text-anchor="end">${v>0?"+":""}${v}%</text>`;
+  });
+  s += `<text class="axis-label" x="${(padL+W-padR)/2}" y="${H-14}" text-anchor="middle" font-weight="500">Employers considering it a core skill today →</text>`;
+  s += `<text class="axis-label" x="16" y="${(padT+H-padB)/2}" text-anchor="middle" font-weight="500" transform="rotate(-90 16 ${(padT+H-padB)/2})">Expected change by 2030 →</text>`;
+
+  /* dots: others first, yours on top */
+  const tip = document.getElementById("tooltip");
+  function bind(el, sk) {
+    el.addEventListener("mousemove", e => {
+      tip.innerHTML = `<b>${sk[0]}</b><br>${sk[2]}% of employers · ${sk[3] >= 0 ? "+" : ""}${sk[3]}% by 2030<br>${sk[4]} · GenAI capacity: ${sk[5]}${sk[6] ? "<br><b style='color:#F4C0D1'>One of your skills</b>" : ""}`;
+      tip.style.opacity = 1;
+      tip.style.left = Math.min(e.clientX + 14, window.innerWidth - 260) + "px";
+      tip.style.top = (e.clientY + 14) + "px";
+    });
+    el.addEventListener("mouseleave", () => tip.style.opacity = 0);
+  }
+  function addDot(sk) {
+    const yours = sk[6];
+    const c = yours ? "var(--pink-500)" : "#B4B2A9";
+    const r = yours ? 8 : 5.5;
+    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g.setAttribute("class", "dot");
+    if (yours) g.setAttribute("class", "dot dot-yours");
+    const c1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    c1.setAttribute("cx", X(sk[2])); c1.setAttribute("cy", Y(sk[3])); c1.setAttribute("r", r);
+    c1.setAttribute("fill", c);
+    if (yours) { c1.setAttribute("stroke", "var(--pink-500)"); c1.setAttribute("stroke-width", "2"); c1.setAttribute("fill", "#FBEAF0"); }
+    g.appendChild(c1);
+    if (yours) {
+      const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t.setAttribute("x", X(sk[2])); t.setAttribute("y", Y(sk[3]) - 14);
+      t.setAttribute("text-anchor", "middle");
+      t.setAttribute("style", "font-size:11.5px;fill:var(--pink-600);font-weight:500");
+      const short = { "Analytical thinking": "Analytical thinking", "Empathy and active listening": "Empathy", "Service orientation and customer service": "Service orientation", "Dependability and attention to detail": "Dependability", "Resource management and operations": "Resource mgmt", "Teaching and mentoring": "Teaching", "Multi-lingualism": "Multi-lingual" }[sk[0]] || sk[0];
+      t.textContent = short;
+      g.appendChild(t);
+    }
+    bind(g, sk);
+    svg.appendChild(g);
+  }
+  svg.innerHTML = s;
+  SKILLS.filter(sk => !sk[6]).forEach(addDot);
+  SKILLS.filter(sk => sk[6]).forEach(addDot);
+})();
+</script>
+</body>
+</html>

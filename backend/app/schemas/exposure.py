@@ -60,6 +60,13 @@ class MatchedIloTaskExposureEvidence(BaseModel):
 class ConfirmedTaskExposureAssessment(BaseModel):
     task_id: str
     suggested_state: ExposureType
+    potential25: str | None = Field(
+        default=None,
+        description=(
+            'The matched task\'s raw potential25 category from '
+            'Final Scores ISCO08 (Gmyrek et al., 2025).'
+        ),
+    )
     match_layer: TaskAssessmentMatchLayer
     baseline_score: float | None
     adjusted_score: float | None

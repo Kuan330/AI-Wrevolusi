@@ -19,7 +19,7 @@ async def list_reference_occupations(
         result = await db.execute(
             text(
                 f'SELECT {OCCUPATION_COLUMNS} FROM ref_occupations '
-                'WHERE (title ILIKE :query OR description ILIKE :query) '
+                'WHERE (title ILIKE :query OR description ILIKE :query OR occupation_code ILIKE :query) '
                 "AND level = 'unit' "
                 'ORDER BY occupation_code'
             ),
@@ -74,7 +74,8 @@ async def list_reference_tasks(code: str, db: AsyncSession = Depends(get_db)) ->
 async def list_reference_wef_skills(db: AsyncSession = Depends(get_db)) -> list[dict]:
     result = await db.execute(
         text(
-            'SELECT wef_skill_id, core_skill, wef_skill_group, future_trend_category, '
+            'SELECT wef_skill_id, core_skill, wef_skill_group, core_skill_importance_2025_pct, '
+            'future_trend_category, '
             'future_net_increase_2025_2030, genai_substitution_capacity_category '
             'FROM ref_wef_skills ORDER BY wef_skill_id'
         )

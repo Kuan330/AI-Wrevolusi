@@ -1,7 +1,7 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import { EXPOSURE_GRADIENT_CSS } from "@/pages/Dashboard/lib/palette"
+import { EXPOSURE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette"
 
 type GradientBarProps = React.HTMLAttributes<HTMLDivElement> & {
   value: number

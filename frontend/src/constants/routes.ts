@@ -1,13 +1,8 @@
 export const ROUTES = {
   home: "/",
-  dashboard: "/dashboard",
   workProfile: "/profile",
   task: "/profile/tasks",
   aiExposure: "/ai-exposure",
-  capabilities: "/capabilities",
-  interpretation: "/interpretation",
-  priorities: "/priorities",
-  preparation: "/preparation",
-  flexibility: "/flexibility",
-  taskEfficiency: "/task-efficiency",
+  skills: "/skills",
+  learningCentre: "/learning-centre",
 } as const;

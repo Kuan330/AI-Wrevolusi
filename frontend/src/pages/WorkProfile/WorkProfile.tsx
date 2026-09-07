@@ -7,11 +7,15 @@ import { GradientPill } from "@/components/ui/gradient-pill";
 import { ROUTES } from "@/constants/routes";
 import OccupationFilters from "@/pages/WorkProfile/components/OccupationFilters";
 import OccupationSearch from "@/pages/WorkProfile/components/OccupationSearch";
+import SelectedOccupationSummary from "@/pages/WorkProfile/components/SelectedOccupationSummary";
 import {
   useOccupationFilters,
   type OccupationSearchResult,
 } from "@/pages/WorkProfile/hooks/useOccupationFilters";
-import { readSelectedOccupation, saveSelectedOccupation } from "@/pages/WorkProfile/occupationSession";
+import {
+  clearSelectedOccupation,
+  saveSelectedOccupation,
+} from "@/pages/WorkProfile/userProfile";
 import type { ReferenceOccupation } from "@/types/reference";
 
 type WorkProfileMode = "search" | "filters";
@@ -21,26 +25,17 @@ const WorkProfile = () => {
   const occupation = useOccupationFilters();
   const [mode, setModeState] = useState<WorkProfileMode>("filters");
   const [selectedFromSearch, setSelectedFromSearch] = useState<OccupationSearchResult | null>(null);
-  const [savedOccupation, setSavedOccupation] = useState(() => readSelectedOccupation());
-  const [hydrated, setHydrated] = useState(false);
-
-  const persistOccupation = (unit: ReferenceOccupation, path: ReferenceOccupation[]) => {
-    const next = { unit, path };
-    saveSelectedOccupation(next);
-    setSavedOccupation(next);
-  };
 
   useEffect(() => {
-    if (hydrated || occupation.loading || occupation.options.major.length === 0) return;
-    const saved = readSelectedOccupation();
-    if (!saved?.path.length) {
-      setHydrated(true);
-      return;
-    }
-    void occupation.hydrateFromPath(saved.path).finally(() => setHydrated(true));
-    // Restore saved occupation once majors are ready (Change occupation).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated, occupation.loading, occupation.options.major.length]);
+    // Occupations are selected for the current flow only. The task workspace
+    // remains available separately so returning to the task list is possible
+    // without persisting the full occupation hierarchy in user data.
+    clearSelectedOccupation();
+  }, []);
+
+  const persistOccupation = (unit: ReferenceOccupation, path: ReferenceOccupation[]) => {
+    saveSelectedOccupation({ unit, path });
+  };
 
   const goToTasks = (unit: ReferenceOccupation, path: ReferenceOccupation[]) => {
     persistOccupation(unit, path);
@@ -49,8 +44,8 @@ const WorkProfile = () => {
 
   const activeUnit = mode === "search" ? selectedFromSearch?.unit ?? null : occupation.selectedUnit;
   const activePath = mode === "search" ? selectedFromSearch?.path ?? [] : occupation.selectedPath;
-  const confirmedUnit = activeUnit ?? savedOccupation?.unit ?? null;
-  const confirmedPath = activeUnit ? activePath : savedOccupation?.path ?? [];
+  const confirmedUnit = activeUnit;
+  const confirmedPath = activePath;
 
   useEffect(() => {
     if (!activeUnit) return;
@@ -94,12 +89,15 @@ const WorkProfile = () => {
     <div className="space-y-5">
       <PageHeader
         title="Find the occupation that matches your work"
-        description="Choose your field first, then narrow down to the occupation that matches your work."
+        description="Search by job title, or browse by field of work."
       />
 
       {occupation.error ? (
         <div className="rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
           {occupation.error}
+          <button type="button" className="ml-3 underline" onClick={() => window.location.reload()}>
+            Retry
+          </button>
         </div>
       ) : null}
 
@@ -113,7 +111,7 @@ const WorkProfile = () => {
                   Choose from the form fields to narrow down your exact occupation.
                 </p>
               </div>
-              <GradientPill asChild className="shrink-0 transition hover:brightness-[0.97]">
+              <GradientPill asChild className="shrink-0 transition">
                 <button type="button" onClick={() => setMode("search")}>
                   Search by job title instead
                 </button>
@@ -136,7 +134,7 @@ const WorkProfile = () => {
                   Type and see matching occupations instantly.
                 </p>
               </div>
-              <GradientPill asChild className="shrink-0 transition hover:brightness-[0.97]">
+              <GradientPill asChild className="shrink-0 transition">
                 <button type="button" onClick={() => setMode("filters")}>
                   Back to category filters
                 </button>
@@ -147,7 +145,7 @@ const WorkProfile = () => {
               searching={occupation.searching}
               hasSearched={occupation.hasSearched}
               results={occupation.searchResults}
-              selectedCode={selectedFromSearch?.unit.occupation_code ?? savedOccupation?.unit.occupation_code ?? null}
+              selectedCode={selectedFromSearch?.unit.occupation_code ?? null}
               onQueryChange={handleQueryChange}
               onChoose={handleSearchChoice}
             />
@@ -155,9 +153,7 @@ const WorkProfile = () => {
         )}
 
         <div className="mt-4 border-t border-white/70 pt-4">
-          <p className="text-sm text-muted-foreground">
-            {confirmedUnit ? `Selected: ${confirmedUnit.title}` : "No occupation selected yet."}
-          </p>
+          <SelectedOccupationSummary occupation={confirmedUnit} />
           <div className="mt-3 flex justify-end">
             <Button
               className="profile-blue-btn h-10 whitespace-nowrap rounded-full px-5"

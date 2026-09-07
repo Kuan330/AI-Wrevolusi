@@ -42,6 +42,7 @@ const OccupationSearch = ({
               onQueryChange(event.target.value);
               setIsOpen(true);
             }}
+            aria-label="Search occupations by job title"
             placeholder="Search by job title"
             className="h-12 w-full rounded-xl border border-white/80 bg-white/95 pl-10 pr-4 text-sm outline-none shadow-sm transition focus:border-primary focus:ring-4 focus:ring-primary/10"
           />
@@ -53,7 +54,7 @@ const OccupationSearch = ({
             ) : null}
             {!searching && hasSearched && results.length === 0 ? (
               <p className="px-3 py-2 text-sm text-muted-foreground">
-                No specific occupations match that title.
+                No matching occupations found. Try another title or browse by category.
               </p>
             ) : null}
             {!searching && results.length > 0 ? (

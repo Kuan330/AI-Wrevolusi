@@ -1,0 +1,23 @@
+.exposure-score-panel {
+  @apply space-y-3 rounded-2xl border border-[#eadde4] bg-white/70 p-4;
+}
+
+.exposure-score-panel__heading {
+  @apply flex items-center justify-between gap-3;
+}
+
+.exposure-score-panel__title {
+  @apply text-sm font-semibold text-[#3d5f7a];
+}
+
+.exposure-score-panel__value {
+  @apply tabular-nums text-[#7f7280];
+}
+
+.exposure-score-panel__number {
+  @apply text-2xl font-semibold text-[#2f2430];
+}
+
+.exposure-score-panel__scale {
+  @apply ml-1 text-xs;
+}
