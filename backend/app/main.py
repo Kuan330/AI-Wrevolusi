@@ -5,6 +5,7 @@ from app.core.config import settings
 from app.db.session import init_models
 from app.routers import (
     accounts,
+    ai,
     auth,
     capabilities,
     exposure,
@@ -36,6 +37,7 @@ def create_app(api_root: str = '/api') -> FastAPI:
 
     api_root = api_root.rstrip('/')
     api_prefix = f'{api_root}/{settings.api_version}'
+    application.include_router(ai.router, prefix=api_prefix)
     application.include_router(auth.router, prefix=api_prefix)
     application.include_router(accounts.router, prefix=api_prefix)
     application.include_router(users.router, prefix=api_prefix)
