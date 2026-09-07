@@ -1,3 +1,4 @@
+import { buildLearningThemeTemplates } from "@/pages/Skills/lib/learningThemeTemplates";
 import { api } from "@/services/api";
 import type { LearningTheme, SkillDirection } from "@/pages/Skills/skillDirections";
 
@@ -15,9 +16,13 @@ type SkillDirectionAnalysisResponse = {
   themes: LearningTheme[];
 };
 
+export const useLocalLearningTemplates = import.meta.env.VITE_SKILL_ANALYSIS_MODE !== "backend";
+
 export const skillDirectionService = {
   analyse: (occupationTitle: string, skills: SkillDirectionAnalysisItem[]) =>
-    api.post<SkillDirectionAnalysisResponse>(
+    useLocalLearningTemplates
+      ? Promise.resolve<SkillDirectionAnalysisResponse>({ themes: buildLearningThemeTemplates(skills) })
+      : api.post<SkillDirectionAnalysisResponse>(
       "/skill-directions/analyse",
       { occupation_title: occupationTitle, skills },
       65000,

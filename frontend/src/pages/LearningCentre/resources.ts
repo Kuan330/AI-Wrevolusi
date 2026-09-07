@@ -1,3 +1,4 @@
+import { accountStorage } from "@/services/accountStorage";
 import type { LearningCentreItem } from '@/pages/Skills/skillDirections';
 
 export type Resource = {
@@ -20,7 +21,7 @@ export type Selection = { resourceId: string; themeTitle: string; skillName: str
 const KEY = 'aiwrevolusi.learningResourceSelections.v1';
 export function readSelections(): Selection[] {
   try {
-    const value: unknown = JSON.parse(localStorage.getItem(KEY) || '[]');
+    const value: unknown = JSON.parse(accountStorage.getItem(KEY) || '[]');
     if (!Array.isArray(value)) return [];
     return value.filter((item): item is Selection => !!item && typeof item === 'object' &&
       typeof item.resourceId === 'string' && resources.some(r => r.id === item.resourceId) &&
@@ -28,4 +29,4 @@ export function readSelections(): Selection[] {
       .filter((item, index, all) => all.findIndex(other => other.resourceId === item.resourceId) === index);
   } catch { return []; }
 }
-export function saveSelections(items: Selection[]) { localStorage.setItem(KEY, JSON.stringify(items)); }
+export function saveSelections(items: Selection[]) { accountStorage.setItem(KEY, JSON.stringify(items)); }

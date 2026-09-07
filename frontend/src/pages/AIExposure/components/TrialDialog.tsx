@@ -1,3 +1,4 @@
+import { useAccount } from "@/components/account/useAccount";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +37,7 @@ export default function TrialDialog({
   onClose,
   onSave,
 }: Props) {
+  const { user } = useAccount();
   const baseline = task.practice?.baseline;
   const latest = task.practice?.trials.find(
     (trial) => trial.taskWording === task.wording,
@@ -236,7 +238,7 @@ export default function TrialDialog({
             )}
           </div>
           <p className="text-xs text-[#7f7280]">
-            Saved in this browser with your task profile.
+            {user ? "Saved with your account’s task profile." : "Saved in this browser with your task profile."}
           </p>
           {error && (
             <p role="alert" className="text-sm text-destructive">

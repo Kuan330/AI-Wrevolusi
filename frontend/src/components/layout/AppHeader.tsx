@@ -1,5 +1,10 @@
-import { NavLink, useMatch } from "react-router-dom";
-import { User } from "lucide-react";
+import { NavLink, useLocation, useMatch } from "react-router-dom";
+import AccountMenu from "@/components/account/AccountMenu";
+import { useAccount } from "@/components/account/useAccount";
+import {
+  hasConfirmedAnalysis,
+  readTaskWorkspace,
+} from "@/pages/WorkProfile/userProfile";
 
 import Logo from "@/components/common/Logo";
 import MobileMenu from "@/components/layout/MobileMenu";
@@ -8,10 +13,19 @@ import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
 
 const AppHeader = () => {
+  const location = useLocation();
   const isOccupationPage = useMatch({ path: ROUTES.workProfile, end: true });
+  const isTasksPage = useMatch({ path: ROUTES.task, end: true });
+  const { user } = useAccount();
+  const confirmed = hasConfirmedAnalysis();
+  const hasTasks = Boolean(readTaskWorkspace()?.tasksOccupationCode);
   const navigationItems = PRIMARY_NAV_MENU.filter((item) => {
-    if (!isOccupationPage) return true;
-    return item.path === ROUTES.workProfile;
+    const setup = item.path === ROUTES.workProfile || item.path === ROUTES.task;
+    if (isOccupationPage) return item.path === ROUTES.workProfile;
+    if (isTasksPage || (user && !confirmed && hasTasks)) return setup;
+    if (user && !confirmed) return item.path === ROUTES.workProfile;
+    if (user && confirmed) return !setup;
+    return true;
   });
   return (
     <header className="app-header sticky top-0 z-30 shrink-0 border-b border-white/70 bg-white/45 backdrop-blur-xl">
@@ -24,6 +38,7 @@ const AppHeader = () => {
               <NavLink
                 key={item.key}
                 to={item.path}
+                state={item.path === ROUTES.workProfile && location.pathname !== ROUTES.workProfile ? { returnTo: location.pathname + location.search } : location.state}
                 end={item.path === ROUTES.workProfile}
                 className={({ isActive }) =>
                   cn("app-header-nav__link", isActive && "is-active")
@@ -35,13 +50,7 @@ const AppHeader = () => {
           </nav>
         </div>
 
-        <button
-          type="button"
-          aria-label="Account"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/80 bg-white/70 text-[#7f7280]"
-        >
-          <User className="h-4 w-4" aria-hidden />
-        </button>
+        <AccountMenu />
       </div>
     </header>
   );

@@ -1,3 +1,4 @@
+import { accountStorage } from "@/services/accountStorage";
 import { api } from './api';
 import { demoPlan, validateEvent, type PlanState } from '@/pages/Plan/planModel';
 export interface PlanRepository {
@@ -16,8 +17,9 @@ export const remotePlanRepository: PlanRepository = {
     save: async (state, expectedRevision) => checked(await api.patch<PlanState>('/planner/state', { ...state, expectedRevision })),
 };
 export function localPlanRepository(demo = false): PlanRepository {
+    const storage = demo ? localStorage : accountStorage;
     const key = demo ? 'aiwrevolusi.planner.demo.v1' : 'aiwrevolusi.planner.v1';
-    const read = () => { const raw = localStorage.getItem(key); return raw ? checked(JSON.parse(raw)) : demo ? demoPlan() : { version: 1 as const, revision: 0, events: [] }; };
+    const read = () => { const raw = storage.getItem(key); return raw ? checked(JSON.parse(raw)) : demo ? demoPlan() : { version: 1 as const, revision: 0, events: [] }; };
     return { load: async () => read(), save: async (state, expectedRevision) => { const current = read(); if (current.revision !== expectedRevision)
-            throw new Error('Your plan changed in another tab. Reload before saving.'); const next = checked({ ...state, revision: expectedRevision + 1 }); localStorage.setItem(key, JSON.stringify(next)); return next; } };
+            throw new Error('Your plan changed in another tab. Reload before saving.'); const next = checked({ ...state, revision: expectedRevision + 1 }); storage.setItem(key, JSON.stringify(next)); return next; } };
 }

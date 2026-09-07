@@ -26,7 +26,7 @@ type MobileMenuProps = {
 };
 
 const MobileMenu = ({ items = PRIMARY_NAV_MENU }: MobileMenuProps) => {
-  const { pathname, hash } = useLocation();
+  const { pathname, hash, search, state } = useLocation();
 
   return (
     <Dialog>
@@ -48,6 +48,7 @@ const MobileMenu = ({ items = PRIMARY_NAV_MENU }: MobileMenuProps) => {
             <NavLink
               key={item.key}
               to={item.path}
+              state={item.path === "/profile" && pathname !== "/profile" ? { returnTo: pathname + search } : state}
               className={`block rounded-md border border-border p-3 text-sm hover:bg-muted ${
                 itemIsActive(item.path, pathname, hash) ? "border-primary/30 bg-primary/10" : ""
               }`}

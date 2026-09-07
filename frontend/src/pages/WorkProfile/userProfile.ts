@@ -1,3 +1,4 @@
+import { accountStorage } from "../../services/accountStorage.ts";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 import type { ReferenceOccupation } from "@/types/reference";
@@ -40,22 +41,22 @@ const parseJson = <T>(raw: string | null): T | null => {
 
 const readLegacyAnalysis = (): ConfirmedAnalysis | null => {
   const parsed =
-    parseJson<ConfirmedAnalysis>(localStorage.getItem(ANALYSIS_KEY)) ??
-    parseJson<ConfirmedAnalysis>(sessionStorage.getItem(ANALYSIS_KEY));
+    parseJson<ConfirmedAnalysis>(accountStorage.getItem(ANALYSIS_KEY)) ??
+    null;
   if (!parsed?.occupationTitle || !Array.isArray(parsed.tasks)) return null;
   return parsed;
 };
 
 export const readUserProfile = (): UserProfile => {
-  const stored = parseJson<UserProfile>(localStorage.getItem(PROFILE_KEY));
+  const stored = parseJson<UserProfile>(accountStorage.getItem(PROFILE_KEY));
   if (stored) {
     const cleaned: UserProfile = {
       tasks: Array.isArray(stored.tasks) ? stored.tasks : [],
       tasksOccupationCode: stored.tasksOccupationCode ?? null,
       analysis: stored.analysis ?? null,
     };
-    localStorage.removeItem(OCCUPATION_KEY);
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(cleaned));
+    accountStorage.removeItem(OCCUPATION_KEY);
+
     return cleaned;
   }
 
@@ -65,21 +66,18 @@ export const readUserProfile = (): UserProfile => {
     tasksOccupationCode: analysis?.occupationCode ?? null,
     analysis,
   };
-  if (analysis) {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(migrated));
-  }
-  localStorage.removeItem(OCCUPATION_KEY);
+  accountStorage.removeItem(OCCUPATION_KEY);
   return migrated;
 };
 
 export const writeUserProfile = (patch: Partial<UserProfile>): UserProfile => {
   const next = { ...readUserProfile(), ...patch };
-  localStorage.setItem(PROFILE_KEY, JSON.stringify(next));
-  localStorage.removeItem(OCCUPATION_KEY);
+  accountStorage.setItem(PROFILE_KEY, JSON.stringify(next));
+  accountStorage.removeItem(OCCUPATION_KEY);
   if (next.analysis) {
-    localStorage.setItem(ANALYSIS_KEY, JSON.stringify(next.analysis));
+    accountStorage.setItem(ANALYSIS_KEY, JSON.stringify(next.analysis));
   } else {
-    localStorage.removeItem(ANALYSIS_KEY);
+    accountStorage.removeItem(ANALYSIS_KEY);
   }
   return next;
 };
@@ -93,7 +91,7 @@ export const readSelectedOccupation = (): SelectedOccupation | null =>
 
 export const clearSelectedOccupation = () => {
   transientSelectedOccupation = null;
-  localStorage.removeItem(OCCUPATION_KEY);
+  accountStorage.removeItem(OCCUPATION_KEY);
 };
 
 export const saveProfileTasks = (

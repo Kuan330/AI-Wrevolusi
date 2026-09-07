@@ -1,3 +1,5 @@
+import AccountGate from "@/components/account/AccountGate";
+import { AccountProvider } from "@/components/account/AccountProvider";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import MainLayout from "@/components/layout/MainLayout";
@@ -16,23 +18,49 @@ import ProfileTasks from "@/pages/WorkProfile/ProfileTasks";
 const AppRoutes = () => {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path={ROUTES.home} element={<Home />} />
-        <Route element={<ProfileLayout />}>
-          <Route path={ROUTES.workProfile} element={<WorkProfile />} />
-          <Route path={ROUTES.task} element={<ProfileTasks />} />
-        </Route>
-        <Route path="/work-profile" element={<Navigate to={ROUTES.workProfile} replace />} />
-        <Route element={<MainLayout />}>
-          <Route element={<RequireConfirmedAnalysis />}>
-            <Route path={ROUTES.aiExposure} element={<AIExposure />} />
-            <Route path={ROUTES.skills} element={<Skills />} />
-            <Route path={ROUTES.possibilities} element={<Possibilities />} />
-            <Route path={ROUTES.plan} element={<Plan />} />
-            <Route path={ROUTES.learningCentre} element={<LearningCentre />} />
+      <AccountProvider>
+        <Routes>
+          <Route path={ROUTES.home} element={<Home />} />
+          <Route element={<ProfileLayout />}>
+            <Route path={ROUTES.workProfile} element={<WorkProfile />} />
+            <Route path={ROUTES.task} element={<ProfileTasks />} />
           </Route>
-        </Route>
-      </Routes>
+          <Route
+            path="/work-profile"
+            element={<Navigate to={ROUTES.workProfile} replace />}
+          />
+          <Route element={<MainLayout />}>
+            <Route element={<RequireConfirmedAnalysis />}>
+              <Route path={ROUTES.aiExposure} element={<AIExposure />} />
+              <Route path={ROUTES.skills} element={<Skills />} />
+            </Route>
+            <Route
+              path={ROUTES.learningCentre}
+              element={
+                <AccountGate kind="resources">
+                  <LearningCentre />
+                </AccountGate>
+              }
+            />
+            <Route
+              path={ROUTES.plan}
+              element={
+                <AccountGate kind="plan">
+                  <Plan />
+                </AccountGate>
+              }
+            />
+            <Route
+              path={ROUTES.possibilities}
+              element={
+                <AccountGate kind="possibilities">
+                  <Possibilities />
+                </AccountGate>
+              }
+            />
+          </Route>
+        </Routes>
+      </AccountProvider>
     </BrowserRouter>
   );
 };

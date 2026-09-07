@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api/v1";
+const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL ?? "/api/v1";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -29,6 +29,7 @@ const request = async <T>(
   path: string,
   init?: RequestInit,
   timeoutMs = 4000,
+  retrySession = true,
 ): Promise<T> => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -44,6 +45,10 @@ const request = async <T>(
       signal: controller.signal,
     });
 
+    if (response.status === 401 && path === "/account/workspace" && retrySession) {
+      await request("/auth/refresh", { method: "POST" }, timeoutMs, false);
+      return request<T>(path, init, timeoutMs, false);
+    }
     const body = await parseResponseBody(response);
     if (!response.ok) {
       const detail =

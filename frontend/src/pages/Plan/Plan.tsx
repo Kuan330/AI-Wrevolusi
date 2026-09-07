@@ -1,3 +1,4 @@
+import JourneyIntro from "@/components/account/JourneyIntro";
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { AlertTriangle, ArrowRight, BookOpen, CalendarDays, Check, ChevronLeft, ChevronRight, Clock3, Copy, MessageCircle, Plus, Trash2, X } from 'lucide-react';
@@ -13,9 +14,8 @@ const labels = { learning: 'Learning', work: 'Work', care: 'Family & care', pers
 const readable = (date: string) => new Date(`${date}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 export default function Plan() {
   const [params] = useSearchParams();
-  // Dev default: show example plan so the page can be previewed without a confirmed analysis.
-  // Use ?demo=0 to exit into the real (localStorage) plan.
-  const demo = import.meta.env.DEV && params.get('demo') !== '0';
+  // Example content is opt-in only.
+  const demo = import.meta.env.DEV && params.get('demo') === '1';
   return <PlanContent key={String(demo)} demo={demo}/>;
 }
 function PlanContent({ demo }: {
@@ -48,7 +48,7 @@ function PlanContent({ demo }: {
     async function commit(events: PlanEvent[]) { setBusy(true); setError(''); try {
         const next = await repository.save({ ...state, events }, state.revision);
         setState(next);
-        setNotice('Plan saved on this browser.');
+        setNotice('Plan saved. Account sync runs automatically.');
         return true;
     }
     catch (e) {
@@ -95,6 +95,7 @@ function PlanContent({ demo }: {
         setNotice('Copy unavailable. Select and copy the message text below.');
     } }
     const busyOrLoading = busy || loading;
+    if (!demo && !loading && !error && !state.events.length && !shortlist.length) return <JourneyIntro kind="plan"/>;
     return <div className="pl-page"><PageHeader title="My Plan" description="Make room for learning, everyday life and the people who matter." actions={<button className="pl-primary" disabled={busyOrLoading || !!error} onClick={() => newEvent()}><Plus size={16}/> Add an activity</button>}/>
     {demo && <div className="pl-demo"><span><strong>Demo plan</strong> · Example activities and conflicts. Changes are saved separately from your own plan.</span><Link to={`${ROUTES.plan}?demo=0`}>Exit demo</Link></div>}
     <div className="pl-summary"><div><BookOpen /><span><strong>{learning.reduce((n, e) => n + duration(e), 0)} min</strong>learning planned</span></div><div><Check /><span><strong>{learning.filter(e => e.completed).reduce((n, e) => n + duration(e), 0)} min</strong>completed this week</span></div><div className={pairs.length ? 'pl-warning' : ''}><AlertTriangle /><span><strong>{pairs.length} {pairs.length === 1 ? 'conflict' : 'conflicts'}</strong>need your attention</span></div><div><MessageCircle /><span><strong>{state.events.filter(e => e.assistance?.status === 'pending').length} requests</strong>waiting for a reply</span></div></div>
@@ -112,7 +113,7 @@ function PlanContent({ demo }: {
             } }}>{readable(slot.date)} · {slot.start}–{slot.end}<ArrowRight size={13}/></button>)}{!suggestions(selected, state.events).length && <p>No available suggestion in the next seven days. Edit the activity to choose another date.</p>}</section>}
     {selected.shareable && <section className="pl-help"><MessageCircle size={21}/><h3>Ask family for a hand</h3><p>Your family can reply in WhatsApp. They do not need an account here.</p>{!selected.assistance ? <button className="pl-primary" disabled={busyOrLoading} onClick={openRequest}>Prepare a request</button> : <><div className={`pl-request-status ${selected.assistance.status}`}><strong>{selected.assistance.name}</strong><span>{({ draft: 'Draft · not sent', pending: 'Waiting for a reply', accepted: 'Accepted · recorded by you', declined: 'Unable to help · recorded by you' })[selected.assistance.status]}</span></div><p className="pl-message">{selected.assistance.message}</p>{selected.assistance.status === 'draft' && <><a className="pl-whatsapp" href={whatsappLink(selected.assistance.message)} target="_blank" rel="noopener noreferrer">Open WhatsApp <ArrowRight size={14}/></a><p>Choose the intended person and send in WhatsApp. Opening it does not send or confirm this request.</p><button disabled={busyOrLoading} onClick={() => status('pending')}>I sent the request</button><button disabled={busyOrLoading} onClick={openRequest}>Edit draft</button></>}{selected.assistance.status === 'pending' && <><p>After reading their reply, record the result below. You remain responsible until they accept.</p><button disabled={busyOrLoading} className="pl-primary" onClick={() => status('accepted')}>They accepted</button><button disabled={busyOrLoading} onClick={() => status('declined')}>They cannot help</button></>}{selected.assistance.status === 'declined' && <button disabled={busyOrLoading} onClick={openRequest}>Prepare another request</button>}{selected.assistance.status === 'accepted' && <p>Check any handover details with {selected.assistance.name}. Their calendar is not connected.</p>}<button onClick={() => copy(selected.assistance!.message)}><Copy size={13}/> Copy message</button><button disabled={busyOrLoading} onClick={() => commit(state.events.map(e => e.id === selected.id ? { ...e, assistance: undefined } : e))}>Clear request / take responsibility back</button></>}</section>}
     <button className="pl-delete" disabled={busyOrLoading} onClick={() => setDeleteOpen(true)}><Trash2 size={14}/> Delete activity</button></> : <div className="pl-empty"><CalendarDays /><h3>A little space to organise</h3><p>Select an activity to edit its time, review a conflict or ask for help.</p></div>}</aside></div>}
-    <p className="pl-footer">{demo ? 'Demo data' : 'Your plan'} is saved in this browser only. WhatsApp delivery and replies are not tracked automatically.</p>
+    <p className="pl-footer">{demo ? 'Demo data stays in this browser.' : 'Your plan is saved to your account.'} WhatsApp delivery and replies are not tracked automatically.</p>
     <Dialog open={!!editor} onOpenChange={open => { if (!open && !busy)
         setEditor(null); }}><DialogContent className="pl-modal"><DialogTitle>{state.events.some(e => e.id === editor?.id) ? 'Edit activity' : 'Add an activity'}</DialogTitle><DialogDescription>Choose a time for learning or everyday life. Overlaps are allowed and will be highlighted.</DialogDescription>{editor && <form onSubmit={e => { e.preventDefault(); void saveEvent(); }}><label>Activity title<input required maxLength={160} value={editor.title} onChange={e => setEditor({ ...editor, title: e.target.value })}/></label><label>Category<select value={editor.kind} onChange={e => setEditor({ ...editor, kind: e.target.value as PlanEvent['kind'], shareable: false, assistance: undefined, resourceId: undefined })}>{Object.entries(labels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label><label>Date<input required type="date" value={editor.date} onChange={e => setEditor({ ...editor, date: e.target.value })}/></label><div className="pl-form-row"><label>Start<input required type="time" value={editor.start} onChange={e => setEditor({ ...editor, start: e.target.value })}/></label><label>End<input required type="time" value={editor.end} onChange={e => setEditor({ ...editor, end: e.target.value })}/></label></div><label className="pl-check"><input type="checkbox" checked={editor.flexible} onChange={e => setEditor({ ...editor, flexible: e.target.checked })}/> Time can be adjusted</label>{editor.kind === 'care' && <label className="pl-check"><input type="checkbox" checked={editor.shareable} onChange={e => setEditor({ ...editor, shareable: e.target.checked })}/> I can ask someone to share this responsibility</label>}{!state.events.some(e => e.id === editor.id) && <label className="pl-check"><input type="checkbox" checked={repeat} onChange={e => setRepeat(e.target.checked)}/> Repeat weekly for 4 weeks (independent activities)</label>}{editor.assistance && <p>Changing the title, time or sharing setting clears this request. Tell your helper about any changes.</p>}{formError && <p role="alert" className="pl-error">{formError}</p>}<button className="pl-primary" disabled={busy} type="submit">{busy ? 'Saving…' : 'Save activity'}</button></form>}</DialogContent></Dialog>
     <Dialog open={requestOpen} onOpenChange={open => { if (!busy)

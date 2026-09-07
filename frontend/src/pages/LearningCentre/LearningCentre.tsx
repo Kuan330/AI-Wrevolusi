@@ -1,25 +1,29 @@
-import { useState } from 'react';
-import { ArrowLeft, ArrowUpRight, BookOpen, Bookmark, Check, Clock3, Download, Globe2, Plus, Search, SlidersHorizontal, Sparkles, Trash2 } from 'lucide-react';
+import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerBody } from "@/components/ui/drawer";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { FormSelect } from "@/components/ui/form-field";
+import { AppButton } from "@/components/ui/app-button";
+import JourneyIntro from "@/components/account/JourneyIntro";
+import { useEffect, useState } from 'react';
+import { ArrowLeft, ArrowUpRight, ChevronRight, BookOpen, Bookmark, Check, Clock3, Download, Globe2, Plus, Search, SlidersHorizontal, Trash2 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import PageHeader from '@/components/common/PageHeader';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ROUTES } from '@/constants/routes';
-import { readLearningCentreItems } from '@/pages/Skills/skillDirections';
+import { readLearningCentreItems, removeLearningCentreItem } from '@/pages/Skills/skillDirections';
 import { resources as catalogue, matches, readSelections, saveSelections, type Resource } from './resources';
 import './learning-resources.css';
 import { demoThemes, demoResources, demoSelections } from './demoData';
 
 export default function LearningCentre() {
   const [params] = useSearchParams();
-  // Dev default: show fictional demo content so the page can be previewed without Skills themes.
-  // Use ?demo=0 to exit into the real (localStorage / curated) mode.
-  const demo = import.meta.env.DEV && params.get('demo') !== '0';
+  // Example content is opt-in only.
+  const demo = import.meta.env.DEV && params.get('demo') === '1';
   return <LearningResourcesContent key={String(demo)} demo={demo}/>;
 }
 
 function LearningResourcesContent({ demo }: { demo: boolean }) {
   const resources = demo ? demoResources : catalogue;
-  const [themes] = useState(() => demo ? demoThemes : readLearningCentreItems());
+  const [themes, setThemes] = useState(() => demo ? demoThemes : readLearningCentreItems());
   const [activeId, setActiveId] = useState(themes[0]?.theme_id ?? '');
   const [selected, setSelected] = useState(() => demo ? demoSelections : readSelections());
   const [query, setQuery] = useState('');
@@ -27,11 +31,31 @@ function LearningResourcesContent({ demo }: { demo: boolean }) {
   const [provider, setProvider] = useState('All providers');
   const [detail, setDetail] = useState<Resource | null>(null);
   const [notice, setNotice] = useState('');
+  useEffect(() => {
+    if (!notice || notice.includes('could not')) return;
+    const timer = window.setTimeout(() => setNotice(''), 4000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
   const theme = themes.find(t => t.theme_id === activeId);
   const matching = theme ? resources.filter(r => matches(r, theme)) : [];
   const filtered = matching.filter(r => (format === 'All formats' || r.format === format) &&
     (provider === 'All providers' || r.provider === provider) &&
     `${r.title} ${r.summary}`.toLowerCase().includes(query.trim().toLowerCase()));
+  function chooseTheme(id: string) {
+    setActiveId(id); setQuery(''); setFormat('All formats'); setProvider('All providers');
+  }
+  function removeTheme() {
+    if (!theme) return;
+    try {
+      const index = themes.findIndex(item => item.theme_id === theme.theme_id);
+      const next = demo ? themes.filter(item => item.theme_id !== theme.theme_id) : removeLearningCentreItem(theme.theme_id);
+      setThemes(next);
+      chooseTheme(next[Math.min(index, next.length - 1)]?.theme_id ?? '');
+      setNotice('Theme removed. Your saved resources and plan are unchanged.');
+    } catch {
+      setNotice('This theme could not be removed. Please try again.');
+    }
+  }
   function toggle(resource: Resource) {
     const exists = selected.some(s => s.resourceId === resource.id);
     if (!exists && !theme) return;
@@ -40,7 +64,7 @@ function LearningResourcesContent({ demo }: { demo: boolean }) {
     }];
     setSelected(next);
     try { if (!demo) saveSelections(next); setNotice(exists ? 'Resource removed from your shortlist.' : 'Resource saved to your shortlist.'); }
-    catch { setNotice('Your selection is available this session, but could not be saved on this browser.'); }
+    catch { setNotice('Your selection could not be saved. Please try again.'); }
   }
   function exportList() {
     const body = [demo ? 'DEMO LEARNING SHORTLIST — FICTIONAL RESOURCES' : 'MY LEARNING SHORTLIST', '', ...selected.flatMap(s => {
@@ -51,34 +75,58 @@ function LearningResourcesContent({ demo }: { demo: boolean }) {
     const a = document.createElement('a'); a.href = url; a.download = 'my-learning-shortlist.txt'; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  return <div className="lr-page">
-    <PageHeader title="Learning Resources" description="Find your next learning step. Make room for it when you’re ready." actions={<Link className="lr-back" to={ROUTES.skills}><ArrowLeft size={16}/> Back to skills</Link>}/>
+  if (!themes.length) return <JourneyIntro kind="resources"/>;
+  return <Drawer><div className="lr-page">
+    <PageHeader title="Learning Resources" description="Find your next learning step. Make room for it when you’re ready." actions={<div className="lr-header-actions"><DrawerTrigger asChild><AppButton tone="gradient"><Bookmark size={16}/> My shortlist · {selected.length}</AppButton></DrawerTrigger><AppButton tone="gradient" asChild><Link to={ROUTES.skills}><ArrowLeft size={16}/> Back to skills</Link></AppButton></div>}/>
     {demo && <div className="lr-demo-banner"><div><strong>Demo preview</strong><span> Sample themes, fictional resources and example study times. Your own selections are unchanged.</span></div><Link to={`${ROUTES.learningCentre}?demo=0`}>Exit demo ↗</Link></div>}
-    <div className="lr-journey"><span><Check size={13}/> Choose your skills</span><i/><strong>02 · Find resources</strong><i/><span>03 · Make a plan</span></div>
-    <section className="lr-topics" aria-labelledby="topics-title">
-      <div className="lr-section-heading"><div><p className="lr-eyebrow">CHOSEN BY YOU</p><h2 id="topics-title">Your learning themes</h2></div><Link to={ROUTES.skills}>Edit themes <ArrowUpRight size={15}/></Link></div>
-      {themes.length ? <div className="lr-theme-tabs" aria-label="Learning themes">{themes.map(t => <button key={t.theme_id} aria-pressed={activeId === t.theme_id} onClick={() => {setActiveId(t.theme_id); setQuery(''); setFormat('All formats'); setProvider('All providers');}}>{t.title}</button>)}</div> : <div className="lr-empty"><BookOpen/><h3>Start with a skill you want to develop</h3><p>Choose a learning theme on the Skills page to find relevant resources here.</p><Link className="lr-primary" to={ROUTES.skills}>Choose learning themes <ArrowUpRight size={16}/></Link></div>}
-    </section>
-    <div className="lr-layout"><div className="lr-main">
+    <div className="lr-theme-workspace">
+      <section className="lr-topics" aria-labelledby="topics-title">
+        <p className="lr-eyebrow">CHOSEN BY YOU</p>
+        <h2 id="topics-title">Your learning themes</h2>
+        <p className="lr-theme-hint">Choose a theme to explore its resources.</p>
+        <div className="lr-mobile-theme"><FormSelect label="Learning theme" placeholder="Choose a theme" value={activeId} onValueChange={chooseTheme} options={themes.map(t => ({value:t.theme_id,label:t.title}))}/></div>
+        <div className="lr-theme-list" aria-label="Learning themes">
+          {themes.map(t => <button type="button" key={t.theme_id} className="lr-theme-choice" aria-pressed={activeId === t.theme_id} onClick={() => chooseTheme(t.theme_id)}>
+            <span><strong>{t.title}</strong><small>{t.skill_name}</small></span><ChevronRight size={18} aria-hidden="true"/>
+          </button>)}
+        </div>
+        <AppButton tone="gradient" asChild className="lr-edit-themes"><Link to={`${ROUTES.skills}#skill-directions`}>Edit themes <ArrowUpRight size={15}/></Link></AppButton>
+      </section>
+      <div className="lr-main">
       {theme && <>
-        <section className="lr-context"><div className="lr-context-icon"><Sparkles size={22}/></div><div><p className="lr-eyebrow">YOUR NEXT CHAPTER</p><h2>{theme.title}</h2><p>{theme.description}</p><span className="lr-skill">{theme.skill_name}</span>{theme.why_relevant && <p className="lr-relevance">{theme.why_relevant}</p>}</div></section>
+        <section className="lr-context" aria-labelledby="active-theme-title">
+          <div><div className="lr-context-heading"><p className="lr-eyebrow">YOUR NEXT CHAPTER</p><AppButton tone="gradient" onClick={removeTheme}><Trash2 size={15}/> Remove theme</AppButton></div>
+            <h2 id="active-theme-title">{theme.title}</h2>
+            <p>Explore resources to develop {theme.skill_name} in your work.</p>
+            <div className="lr-theme-meta"><span className="lr-skill">{theme.skill_name}</span>{theme.source === "template" && <span className="lr-template-label">Template suggestion</span>}</div>
+            <Accordion key={activeId} type="single" collapsible><AccordionItem value="about" className="border-0"><AccordionTrigger>About this theme</AccordionTrigger><AccordionContent><p>{theme.description}</p>{theme.why_relevant && <p className="lr-relevance">{theme.why_relevant}</p>}</AccordionContent></AccordionItem></Accordion>
+          </div>
+        </section>
         <div className="lr-section-heading lr-results-heading"><div><h2>Resources for this theme</h2><p>A small selection of free learning content from established providers.</p></div><span className="lr-count">{filtered.length} found</span></div>
-        <div className="lr-filters"><label className="lr-search"><Search size={16}/><input aria-label="Search resources" placeholder="Search within this theme" value={query} onChange={e => setQuery(e.target.value)}/></label><label><span className="sr-only">Resource format</span><select value={format} onChange={e => setFormat(e.target.value)}><option>All formats</option><option>Module</option><option>Course</option></select></label><label><span className="sr-only">Provider</span><select value={provider} onChange={e => setProvider(e.target.value)}><option>All providers</option>{Array.from(new Set(resources.map(r => r.provider))).map(p => <option key={p}>{p}</option>)}</select></label></div>
+        <div className="lr-filters"><label className="lr-search"><Search size={16}/><input aria-label="Search resources" placeholder="Search within this theme" value={query} onChange={e => setQuery(e.target.value)}/></label><FormSelect label="Resource format" placeholder="All formats" value={format} onValueChange={setFormat} options={['All formats', 'Module', 'Course'].map(value => ({value, label: value}))}/><FormSelect label="Provider" placeholder="All providers" value={provider} onValueChange={setProvider} options={['All providers', ...Array.from(new Set(resources.map(r => r.provider)))].map(value => ({value, label: value}))}/></div>
         <div className="lr-source-note"><Check size={14}/> {demo ? 'Demo content · English · Example data for layout preview' : 'Free content · English · Curated links checked 7 Sep 2026'}</div>
         <div className="lr-cards">{filtered.map(r => {
           const added = selected.some(s => s.resourceId === r.id);
-          return <article className="lr-card" key={r.id}><div className="lr-card-top"><span className={`lr-provider-icon ${r.provider === 'OpenLearn' ? 'lr-ou' : ''}`}><BookOpen size={21}/></span><div><p className="lr-provider">{r.provider}</p><span className="lr-type">{r.format}</span></div><span className="lr-free">Free content</span></div><h3>{r.title}</h3><p className="lr-summary">{r.summary}</p><div className="lr-meta"><span><Globe2 size={14}/> English</span><span><Clock3 size={14}/> {r.minutes ? `${r.minutes} min · example` : 'See source for duration'}</span></div><div className="lr-match"><Sparkles size={15}/><span>Related to your selected skill: <strong>{theme.skill_name}</strong></span></div><div className="lr-card-actions"><button className="lr-text-button" onClick={() => setDetail(r)}>View details <ArrowUpRight size={15}/></button><button className={added ? 'lr-added' : 'lr-primary'} onClick={() => toggle(r)}>{added ? <Check size={16}/> : <Plus size={16}/>} {added ? 'Added to shortlist' : 'Add to shortlist'}</button></div></article>;
+          return <article className="lr-card" key={r.id}><div className="lr-card-top"><span className={`lr-provider-icon ${r.provider === 'OpenLearn' ? 'lr-ou' : ''}`}><BookOpen size={21}/></span><div><p className="lr-provider">{r.provider}</p><span className="lr-type">{r.format}</span></div><span className="lr-free">Free content</span></div><h3>{r.title}</h3><p className="lr-summary">{r.summary}</p><div className="lr-meta"><span><Globe2 size={14}/> English</span>{r.minutes && <span><Clock3 size={14}/> {r.minutes} min · example</span>}</div><div className="lr-card-actions"><AppButton tone="gradient"  onClick={() => setDetail(r)}>View details <ArrowUpRight size={15}/></AppButton><AppButton tone="gradient" aria-pressed={added} onClick={() => toggle(r)}>{added ? <Check size={16}/> : <Plus size={16}/>} {added ? 'Added to shortlist' : 'Add to shortlist'}</AppButton></div></article>;
         })}</div>
-        {!filtered.length && <div className="lr-empty lr-card"><SlidersHorizontal/><h3>{matching.length ? 'No resources match these filters' : 'We’re still finding resources for this theme'}</h3><p>{matching.length ? 'Try another format, provider or search term.' : 'Our starter collection does not cover every skill yet. Try another chosen theme.'}</p>{matching.length > 0 && <button className="lr-text-button" onClick={() => {setQuery(''); setFormat('All formats'); setProvider('All providers');}}>Clear filters</button>}</div>}
+        {!filtered.length && <div className="lr-empty lr-card"><SlidersHorizontal/><h3>{matching.length ? 'No resources match these filters' : 'We’re still finding resources for this theme'}</h3><p>{matching.length ? 'Try another format, provider or search term.' : 'Our starter collection does not cover every skill yet. Try another chosen theme.'}</p>{matching.length > 0 && <AppButton tone="gradient"  onClick={() => {setQuery(''); setFormat('All formats'); setProvider('All providers');}}>Clear filters</AppButton>}</div>}
         <p className="lr-footnote">Learning takes place on the provider’s website. Check prerequisites and access conditions before starting.</p>
       </>}
-    </div><aside className="lr-shortlist" aria-labelledby="shortlist-title"><div className="lr-shortlist-head"><span className="lr-bookmark"><Bookmark size={20}/></span><span className="lr-count">{selected.length} selected</span></div><h2 id="shortlist-title">My learning shortlist</h2><p>One small step is a good place to start.</p>
-      <div aria-live="polite" className="sr-only">{notice}</div>
-      {!selected.length ? <div className="lr-shortlist-empty"><BookOpen size={28}/><h3>Your next step starts here</h3><p>Add a resource that interests you. Your choices stay here as you explore other themes.</p></div> : <ul>{selected.map(s => { const r = resources.find(r => r.id === s.resourceId)!; return <li key={s.resourceId}><div><span>{s.skillName}</span><a href={r.url || undefined} onClick={e => {if (!r.url) {e.preventDefault(); setDetail(r);}}} role={!r.url ? "button" : undefined} tabIndex={0} onKeyDown={e => {if (!r.url && (e.key === "Enter" || e.key === " ")) {e.preventDefault(); setDetail(r);}}} target="_blank" rel="noopener noreferrer">{r.title} <ArrowUpRight size={13}/></a><small>{r.provider}</small></div><button aria-label={`Remove ${r.title}`} onClick={() => toggle(r)}><Trash2 size={16}/></button></li>; })}</ul>}
+    </div></div>
+    <p className="lr-notice" role="status">{notice}</p>
+    <DrawerContent className="lr-shortlist-drawer">
+      <DrawerHeader><DrawerTitle>My learning shortlist · {selected.length}</DrawerTitle><DrawerDescription>Save resources here, then make room for learning in My Plan.</DrawerDescription></DrawerHeader>
+      <DrawerBody className="lr-shortlist">
+      {!selected.length ? <div className="lr-shortlist-empty"><BookOpen size={28}/><h3>Your next step starts here</h3><p>Add a resource that interests you. Your choices stay here as you explore other themes.</p></div> : <ul>{selected.map(s => { const r = resources.find(r => r.id === s.resourceId)!; return <li key={s.resourceId}><div><span>{s.skillName}</span><a href={r.url || undefined} onClick={e => {if (!r.url) {e.preventDefault(); setDetail(r);}}} role={!r.url ? "button" : undefined} tabIndex={0} onKeyDown={e => {if (!r.url && (e.key === "Enter" || e.key === " ")) {e.preventDefault(); setDetail(r);}}} target="_blank" rel="noopener noreferrer">{r.title} <ArrowUpRight size={13}/></a><small>{r.provider}</small></div><AppButton tone="gradient" size="icon" className="lr-remove" aria-label={`Remove ${r.title}`} onClick={() => toggle(r)}><Trash2 size={16}/></AppButton></li>; })}</ul>}
       {selected.length > 0 && <p className="lr-duration"><Clock3 size={16}/> {demo ? `${selected.reduce((total, s) => total + (resources.find(r => r.id === s.resourceId)?.minutes || 0), 0)} min total · example estimate` : 'Confirm study time with each provider.'}</p>}
-      <button className="lr-primary lr-export" disabled={!selected.length} onClick={exportList}><Download size={16}/> Export my shortlist</button><p className="lr-save-note">{demo ? 'Demo selections reset on refresh. Export a copy to keep.' : 'Saved on this browser. Export a copy to keep.'}</p><div className="lr-next">{selected.length > 0 && <Link className="lr-primary" to={`${ROUTES.plan}${demo ? "" : "?demo=0"}`} state={{shortlist:selected}}>Arrange my learning <ArrowUpRight size={16}/></Link>}<p className="lr-eyebrow">NEXT · PLAN</p><h3>Make learning fit your day</h3><p>Bring your shortlist into My Plan to arrange study sessions alongside your daily activities.</p></div>
-      {notice.includes('could not') && <p role="alert">{notice}</p>}
-    </aside></div>
-    <Dialog open={!!detail} onOpenChange={open => {if (!open) setDetail(null);}}><DialogContent className="lr-detail">{detail && <><p className="lr-eyebrow">{detail.provider} · {detail.format}</p><DialogTitle>{detail.title}</DialogTitle><DialogDescription>{detail.summary}</DialogDescription><div className="lr-detail-info"><h3>Before you begin</h3><p>{detail.access}</p><p>Language: English. Check the source for duration, level and prerequisites.</p><h3>Why it appears here</h3><p>This resource shares topic keywords with your selected learning theme. Review the outline to decide whether it fits your goal.</p></div>{detail.url && <a className="lr-primary" href={detail.url} target="_blank" rel="noopener noreferrer">Open provider website <ArrowUpRight size={16}/></a>}<button className="lr-text-button" onClick={() => toggle(detail)}>{selected.some(s => s.resourceId === detail.id) ? 'Remove from shortlist' : 'Add to my shortlist'}</button></>}</DialogContent></Dialog>
-  </div>;
+      </DrawerBody>
+      <div className="lr-drawer-footer">
+        {selected.length > 0 && <AppButton tone="gradient" asChild className="lr-plan-action"><Link to={`${ROUTES.plan}${demo ? "" : "?demo=0"}`} state={{shortlist:selected}}>Go to My Plan <ArrowUpRight size={16}/></Link></AppButton>}
+        <AppButton tone="gradient" className="lr-export" disabled={!selected.length} onClick={exportList}><Download size={16}/> Export shortlist</AppButton>
+        <p className="lr-save-note">{demo ? 'Demo selections reset on refresh.' : 'Saved to your account. You can also export a copy.'}</p>
+        <p role="status">{notice}</p>
+      </div>
+    </DrawerContent>
+    <Dialog open={!!detail} onOpenChange={open => {if (!open) setDetail(null);}}><DialogContent className="lr-detail">{detail && <><p className="lr-eyebrow">{detail.provider} · {detail.format}</p><DialogTitle>{detail.title}</DialogTitle><DialogDescription>{detail.summary}</DialogDescription><div className="lr-detail-info"><h3>Before you begin</h3><p>{detail.access}</p><p>Language: English. Check the source for duration, level and prerequisites.</p><h3>Why it appears here</h3><p>This resource shares topic keywords with your selected learning theme. Review the outline to decide whether it fits your goal.</p></div>{detail.url && <AppButton tone="gradient" asChild><a href={detail.url} target="_blank" rel="noopener noreferrer">Open provider website <ArrowUpRight size={16}/></a></AppButton>}<AppButton tone="gradient"  onClick={() => toggle(detail)}>{selected.some(s => s.resourceId === detail.id) ? 'Remove from shortlist' : 'Add to my shortlist'}</AppButton></>}</DialogContent></Dialog>
+  </div></Drawer>;
 }

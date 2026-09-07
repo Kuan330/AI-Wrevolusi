@@ -1,49 +1,211 @@
-import { useRef, useState, type CSSProperties } from 'react';
-import { ArrowDown, ArrowRight, Bookmark, Brain, CalendarDays, Check, CheckCheck, Compass, Heart, List, MessageCircle, Pause, Play, Sparkles, TrendingUp, X } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { careers, skills, skillById, readSaved, type Career } from './demo';
-import './possibilities.css';
-const icons = { calendar: CalendarDays, message: MessageCircle, brain: Brain, check: CheckCheck, sparkles: Sparkles, chart: TrendingUp };
+import { useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowRight, Check } from "lucide-react";
+import PageHeader from "@/components/common/PageHeader";
+import { Card, CardContent } from "@/components/ui/card";
+import { AppButton } from "@/components/ui/app-button";
+import { Button } from "@/components/ui/button";
+import JourneyIntro from "@/components/account/JourneyIntro";
+import {
+  readConfirmedAnalysis,
+  readTaskWorkspace,
+} from "@/pages/WorkProfile/userProfile";
+import { readLearningCentreItems } from "@/pages/Skills/skillDirections";
+import { accountStorage } from "@/services/accountStorage";
+import { ROUTES } from "@/constants/routes";
+import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
+import PossibilitiesDemo from "./PossibilitiesDemo";
+const options = [
+  {
+    id: "grow",
+    title: "Grow in my current role",
+    description:
+      "Build on your experience and explore a skill you can use in your current work.",
+    steps: [
+      "Choose one recurring task you want to improve.",
+      "Review its related skills and pick a learning theme.",
+      "Try what you learn on a small task and record the result.",
+    ],
+  },
+  {
+    id: "related",
+    title: "Explore related roles",
+    description:
+      "Identify transferable skills and investigate roles where they could be useful.",
+    steps: [
+      "Review the skills reflected in your confirmed tasks.",
+      "Choose a related role that interests you and read its actual requirements.",
+      "Compare those requirements with your experience and choose one skill to develop.",
+    ],
+  },
+  {
+    id: "new",
+    title: "Consider a new direction",
+    description:
+      "Start with your interests and gather evidence before deciding on a change.",
+    steps: [
+      "Write down the kind of work you would like to explore.",
+      "Look at real role descriptions and note the experience or qualifications they require.",
+      "Choose a small learning activity to test your interest.",
+    ],
+  },
+];
+const key = "aiwrevolusi.possibilities.intent";
 export default function Possibilities() {
-    const [active, setActive] = useState('organisation');
-    const [paused, setPaused] = useState(false);
-    const [allOpen, setAllOpen] = useState(false);
-    const [includeLearning, setIncludeLearning] = useState(false);
-    const [scope, setScope] = useState('all');
-    const [saved, setSaved] = useState(readSaved);
-    const [detail, setDetail] = useState<Career | null>(null);
-    const [notice, setNotice] = useState('');
-    const [showAll, setShowAll] = useState(false);
-    const resultsRef = useRef<HTMLElement>(null);
-    const savedRef = useRef<HTMLElement>(null);
-    const activeSkill = skillById(active);
-    const ActiveIcon = icons[activeSkill.icon as keyof typeof icons];
-    const relevantSkills = skills.filter(s => includeLearning || !s.learning).map(s => s.id);
-    const eligible = careers.filter(c => scope === 'all' ? c.skillIds.some(id => relevantSkills.includes(id)) : c.skillIds.includes(scope)).sort((a, b) => b.skillIds.filter(id => relevantSkills.includes(id)).length - a.skillIds.filter(id => relevantSkills.includes(id)).length);
-    const shown = showAll ? eligible : eligible.slice(0, 3);
-    function choose(id: string) { setActive(id); setPaused(true); }
-    function explore(id: string) { setScope(id); if (skillById(id).learning)
-        setIncludeLearning(true); setShowAll(false); resultsRef.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); }
-    function toggleSave(id: string) { const next = saved.includes(id) ? saved.filter(s => s !== id) : [...saved, id]; setSaved(next); try {
-        localStorage.setItem('aiwrevolusi.possibilities.demo.saved', JSON.stringify(next));
-        setNotice(next.includes(id) ? 'Direction saved to your possibilities.' : 'Direction removed from your saved possibilities.');
+  const [params] = useSearchParams();
+  const [intent, setIntent] = useState(() => {
+    try {
+      return JSON.parse(accountStorage.getItem(key) ?? "null") as string | null;
+    } catch {
+      return null;
     }
-    catch {
-        setNotice('Saved for this visit only. Browser storage is unavailable.');
-    } }
-    return <div className="xp-page"><div className="xp-heading"><div><p className="xp-eyebrow">YOUR NEXT HORIZON</p><h1>Explore your possibilities<span>.</span></h1><p>Your skills can open doors in places you might not have considered.</p></div><button className="xp-saved-link" onClick={() => savedRef.current?.scrollIntoView({ behavior: 'smooth' })}><Bookmark size={16}/> My possibilities <span>{saved.length}</span></button></div>
-    <div className="xp-demo"><Sparkles size={14}/><span><strong>Example profile</strong> · All skills, experiences and role connections below are demo data, not a personal assessment or live vacancies.</span></div>
-    <section className="xp-hero" aria-label="Example skill profile"><div className="xp-universe"><div className="xp-universe-top"><div><p className="xp-eyebrow">A CONSTELLATION OF STRENGTHS</p><h2>More than a job title</h2></div><span>Example · Administrative work</span></div>
-      <div className={`xp-orbits ${paused ? 'is-paused' : ''}`}><div className="xp-orbit-ring outer"/><div className="xp-orbit-ring inner"/><div className="xp-halo"/><div className="xp-avatar"><img src="/images/possibilities-avatar.png" alt="Illustrative 3D-style woman representing the example profile"/><div className="xp-avatar-label">Your skills. Your possibilities.</div></div>
-        {skills.map((s, i) => { const Icon = icons[s.icon as keyof typeof icons]; return <div className={`xp-orbit-item orbit-${i} ${s.learning ? 'outer-item' : ''}`} key={s.id} style={{ '--phase': `${-(i < 4 ? i * 15 : (i - 4) * 30 + 8)}s`, '--x': `${[19, 77, 82, 21, 49, 51][i]}%`, '--y': `${[25, 22, 68, 72, 9, 87][i]}%` } as CSSProperties}><button className={`xp-skill ${s.learning ? 'learning' : ''} ${active === s.id ? 'active' : ''}`} aria-pressed={active === s.id} onClick={() => choose(s.id)}><Icon size={15}/><span>{s.name}{s.learning && <small>Learning</small>}</span></button></div>; })}
-      </div><div className="xp-universe-bottom"><div className="xp-state-legend"><span><i />4 confirmed in example</span><span><i />2 learning</span></div><div><button aria-label={paused ? 'Resume skill animation' : 'Pause skill animation'} onClick={() => setPaused(!paused)}>{paused ? <Play size={13}/> : <Pause size={13}/>}<span>{paused ? 'Resume' : 'Pause'}</span></button><button onClick={() => setAllOpen(true)}><List size={14}/> All skills</button></div></div></div>
-      <aside className="xp-insight" aria-live="polite"><div className="xp-insight-icon"><ActiveIcon size={24}/></div><p className="xp-eyebrow">{activeSkill.learning ? 'A SKILL YOU’RE EXPLORING' : 'A STRENGTH TO BUILD ON'}</p><h2>{activeSkill.name}</h2><span className={`xp-status ${activeSkill.learning ? 'learning' : ''}`}>{activeSkill.learning ? 'Learning · example' : 'Confirmed · example'}</span><p className="xp-description">{activeSkill.description}</p><h3>{activeSkill.learning ? 'What you’re working towards' : 'Where you’ve used it'}</h3><ul>{activeSkill.evidence.map(e => <li key={e}><Check size={13}/>{e}</li>)}</ul><h3>Where else it could help</h3><ul>{activeSkill.contexts.map(e => <li key={e}><ArrowRight size={13}/>{e}</li>)}</ul><button className="xp-primary" onClick={() => explore(active)}>Explore related directions <ArrowDown size={15}/></button></aside></section>
-    <section className="xp-results" ref={resultsRef}><div className="xp-section-heading"><div><p className="xp-eyebrow">FOLLOW YOUR CURIOSITY</p><h2>Where could your skills take you?</h2><p>Discover connections. Get curious. There’s no need to decide today.</p></div><Compass size={30}/></div><div className="xp-controls"><div className="xp-tabs"><button aria-pressed={scope === 'all'} onClick={() => { setScope('all'); setShowAll(false); }}>My skills together</button><button aria-pressed={scope !== 'all'} onClick={() => explore(active)}>One skill in focus</button></div><label><input type="checkbox" checked={includeLearning} onChange={e => { setIncludeLearning(e.target.checked); if (!e.target.checked && scope !== 'all' && skillById(scope).learning)
-        setScope('all'); setShowAll(false); }}/> Include skills I’m learning</label></div><div className="xp-results-note"><span>{scope === 'all' ? 'Exploring your combination of skills' : `Focusing on ${skillById(scope).name}`} · {eligible.length} example directions</span>{scope !== 'all' && <button onClick={() => setScope('all')}>Clear focus <X size={12}/></button>}</div>
-      <div className="xp-careers">{shown.map((c, i) => <article className="xp-career" key={c.id}><div className="xp-career-top"><span className={`xp-career-symbol symbol-${i % 3}`}><Compass size={23}/></span><button className={saved.includes(c.id) ? 'is-saved' : ''} aria-label={`${saved.includes(c.id) ? 'Unsave' : 'Save'} ${c.title}`} aria-pressed={saved.includes(c.id)} onClick={() => toggleSave(c.id)}><Heart size={19} fill={saved.includes(c.id) ? 'currentColor' : 'none'}/></button></div><p className="xp-eyebrow">{c.area}</p><h3>{c.title}</h3><p className="xp-career-intro">{c.intro}</p><div className="xp-connection"><span>THE CONNECTION</span><p>{c.reason}</p></div><div className="xp-skill-tags">{c.skillIds.filter(id => relevantSkills.includes(id)).map(id => <span className={skillById(id).learning ? 'learning' : ''} key={id}>{skillById(id).name}{skillById(id).learning ? ' · learning' : ''}</span>)}</div><div className="xp-learn"><span>Something to explore</span><p>{c.learn}</p></div><button className="xp-career-open" onClick={() => setDetail(c)}>Get to know this direction <ArrowRight size={15}/></button></article>)}</div>{eligible.length > 3 && <button className="xp-more" onClick={() => setShowAll(!showAll)}>{showAll ? 'Show fewer directions' : `Explore ${eligible.length - 3} more directions`} <ArrowDown size={14}/></button>}<p className="xp-disclaimer">Example connections illustrate transferable skills. They do not establish job readiness, eligibility or hiring prospects.</p></section>
-    <section className="xp-saved" ref={savedRef}><div className="xp-section-heading"><div><p className="xp-eyebrow">ROOM FOR WHAT’S NEXT</p><h2>My saved possibilities</h2><p>Keep a direction that sparks your interest. Come back whenever you’re ready.</p></div><Bookmark size={24}/></div>{saved.length ? <div className="xp-saved-grid">{saved.map(id => { const c = careers.find(c => c.id === id)!; return <div key={id}><button onClick={() => setDetail(c)}>{c.title}<ArrowRight size={15}/></button><button aria-label={`Remove saved ${c.title}`} onClick={() => toggleSave(id)}><X size={15}/></button></div>; })}</div> : <p className="xp-save-empty"><Heart size={18}/> Tap the heart on a direction to keep it here.</p>}<small>Demo favourites are saved on this browser.</small></section><p className="xp-live" role="status">{notice}</p>
-    <Dialog open={allOpen} onOpenChange={setAllOpen}><DialogContent className="xp-modal"><DialogTitle>Your example skills</DialogTitle><DialogDescription>Four confirmed example strengths and two skills in development. Learning is not treated as proof of mastery.</DialogDescription><div className="xp-all-skills">{skills.map(s => <button key={s.id} onClick={() => { choose(s.id); setAllOpen(false); }}><span>{s.name}</span><small>{s.learning ? 'Learning' : 'Confirmed in example'}</small><ArrowRight size={14}/></button>)}</div></DialogContent></Dialog>
-    <Dialog open={!!detail} onOpenChange={open => { if (!open)
-        setDetail(null); }}><DialogContent className="xp-modal xp-role-modal">{detail && <><p className="xp-eyebrow">EXAMPLE DIRECTION · {detail.area}</p><DialogTitle>{detail.title}</DialogTitle><DialogDescription>{detail.intro} This is an illustrative role profile, not a vacancy.</DialogDescription><h3>What the work might involve</h3><ul>{detail.tasks.map(t => <li key={t}>{t}</li>)}</ul><h3>Your example connections</h3>{detail.skillIds.map(id => { const s = skillById(id); return <div className="xp-detail-skill" key={id}><strong>{s.name} <small>{s.learning ? 'Learning · not yet confirmed' : 'Confirmed in example'}</small></strong><p>{s.evidence[0]}</p></div>; })}<h3>What to investigate further</h3><p>{detail.learn}. Actual experience and qualification requirements vary by employer and should be checked separately.</p><div className="xp-small-step"><Sparkles size={18}/><h3>Try a small exploration</h3><p>{detail.tryIt}</p></div><button className="xp-primary" onClick={() => toggleSave(detail.id)}><Heart size={16}/>{saved.includes(detail.id) ? 'Remove from my possibilities' : 'Save this possibility'}</button></>}</DialogContent></Dialog>
-  </div>;
+  });
+  const [error, setError] = useState("");
+  if (
+    params.get("example") === "1" ||
+    (import.meta.env.DEV && params.get("demo") === "1")
+  )
+    return (
+      <>
+        <div className="mx-auto mb-4 max-w-[1180px]">
+          <Button variant="link" asChild>
+            <Link to={ROUTES.possibilities}>← Back to my direction</Link>
+          </Button>
+        </div>
+        <PossibilitiesDemo />
+      </>
+    );
+  const analysis = readConfirmedAnalysis();
+  if (!analysis)
+    return (
+      <JourneyIntro kind="possibilities">
+        <AppButton tone="gradient" asChild>
+          <Link
+            to={
+              readTaskWorkspace()?.tasksOccupationCode
+                ? ROUTES.task
+                : ROUTES.workProfile
+            }
+          >
+            {readTaskWorkspace()?.tasksOccupationCode
+              ? "Analyse your updated tasks"
+              : "Build your work profile"}
+            <ArrowRight className="size-4" />
+          </Link>
+        </AppButton>
+      </JourneyIntro>
+    );
+  const chosen = options.find((option) => option.id === intent);
+  const themes = readLearningCentreItems();
+  return (
+    <div className="mx-auto max-w-[1180px] pb-10">
+      <PageHeader
+        title="Explore your possibilities"
+        description={`Start with your experience in ${analysis.occupationTitle}. Choose what you would like to explore next.`}
+      />
+      <Card className="rounded-3xl border-white/80 bg-white/80">
+        <CardContent className="p-6 sm:p-8">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[#4f91ba]">
+            Choose your direction
+          </p>
+          <h2 className="text-2xl font-semibold">
+            What would you like to explore?
+          </h2>
+          <p className="mt-2 text-sm text-[#7f7280]">
+            You can change this at any time. These are exploration steps, not a
+            job suitability assessment.
+          </p>
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            {options.map((option) => (
+              <Button
+                key={option.id}
+                variant="outline"
+                aria-pressed={intent === option.id}
+                className="h-auto min-w-0 flex-col items-start whitespace-normal rounded-2xl p-5 text-left"
+                style={
+                  intent === option.id
+                    ? { background: PAGE_GRADIENT_CSS, borderColor: "#4f91ba" }
+                    : undefined
+                }
+                onClick={() => {
+                  try {
+                    accountStorage.setItem(key, JSON.stringify(option.id));
+                    setIntent(option.id);
+                    setError("");
+                  } catch {
+                    setError(
+                      "Could not save your direction. Please try again.",
+                    );
+                  }
+                }}
+              >
+                <span className="font-semibold">
+                  {option.title}
+                  {intent === option.id && (
+                    <Check className="ml-2 inline size-4" />
+                  )}
+                </span>
+                <span className="mt-3 text-sm font-normal leading-6 text-[#7f7280]">
+                  {option.description}
+                </span>
+              </Button>
+            ))}
+          </div>
+          {error && <p role="alert">{error}</p>}
+        </CardContent>
+      </Card>
+      {chosen && (
+        <Card className="mt-6 rounded-3xl border-white/80 bg-white/80">
+          <CardContent className="grid gap-6 p-6 sm:p-8 lg:grid-cols-2">
+            <section>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#4f91ba]">
+                Your saved intention
+              </p>
+              <h2 className="mt-3 text-2xl font-semibold">{chosen.title}</h2>
+              <ol className="mt-5 space-y-4">
+                {chosen.steps.map((step, index) => (
+                  <li className="flex gap-3 text-sm leading-6" key={step}>
+                    <span className="text-[#4f91ba]">0{index + 1}</span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </section>
+            <section
+              className="rounded-2xl p-5"
+              style={{ background: PAGE_GRADIENT_CSS }}
+            >
+              <h3 className="font-semibold">A learning step you can choose</h3>
+              <p className="mt-3 text-sm leading-6 text-[#7f7280]">
+                {themes.length
+                  ? `You have ${themes.length} saved learning themes. Revisit them and decide which supports this direction.`
+                  : "Review your skill map and choose a learning theme that supports your intention."}
+              </p>
+              <AppButton tone="gradient" asChild className="mt-5">
+                <Link
+                  to={themes.length ? ROUTES.learningCentre : ROUTES.skills}
+                >
+                  {themes.length ? "Explore my resources" : "Review my skills"}
+                  <ArrowRight className="size-4" />
+                </Link>
+              </AppButton>
+              <p className="mt-4 text-xs leading-5 text-[#7f7280]">
+                Want to see how role connections could look? This preview uses
+                an illustrative profile.
+              </p>
+              <Button
+                variant="link"
+                asChild
+                className="mt-1 h-auto whitespace-normal p-0 text-left"
+              >
+                <Link to={`${ROUTES.possibilities}?example=1`}>
+                  View example career connections →
+                </Link>
+              </Button>
+            </section>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
 }

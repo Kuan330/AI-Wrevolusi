@@ -42,10 +42,10 @@ export default function AIExposure() {
         }
         actions={
           <div className="exposure-page__actions">
-            <Button asChild variant="outline" className="exposure-page__button">
+            <Button asChild variant="outline" className="profile-outline-btn rounded-full">
               <Link to={ROUTES.task}>Edit tasks</Link>
             </Button>
-            <Button asChild className="profile-blue-btn exposure-page__button">
+            <Button asChild className="profile-gradient-btn rounded-full font-normal">
               <Link to={ROUTES.skills}>View skills</Link>
             </Button>
           </div>
