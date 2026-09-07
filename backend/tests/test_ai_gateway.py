@@ -326,3 +326,41 @@ def test_occupation_provider_failure_uses_the_deterministic_local_result() -> No
     payload = response.json()
     assert payload['status'] == 'suggestions'
     assert payload['candidates'][0]['occupation_code'] == '2512'
+
+
+def test_occupation_recommendation_provider_failure_uses_the_deterministic_local_result() -> None:
+    class BrokenProvider:
+        name = 'broken-provider'
+
+        def complete_json(self, **_kwargs: Any) -> Any:
+            raise TimeoutError('provider unavailable')
+
+    application = create_app('/api')
+    application.dependency_overrides[get_ai_gateway] = lambda: AIGateway(
+        provider=BrokenProvider()
+    )
+    try:
+        with TestClient(application) as client:
+            response = client.post(
+                '/api/v1/ai/occupation-recommendations',
+                json={
+                    'selected_occupation': {
+                        'occupation_code': '2512',
+                        'title': 'Software developers',
+                    },
+                    'candidates': [
+                        {
+                            'code': '2511',
+                            'title': 'Computer systems analysts',
+                            'why_similar': 'Both analyse software systems and technology requirements.',
+                        }
+                    ],
+                },
+            )
+    finally:
+        application.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload['status'] == 'suggestions'
+    assert payload['candidates'][0]['occupation_code'] == '2511'

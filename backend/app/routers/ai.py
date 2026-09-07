@@ -128,6 +128,7 @@ def occupation_recommendations(
         candidates=request.candidates,
         candidate_key='code',
         local=lambda: deterministic_recommend_occupations(request),
+        prefer_local_on_provider_failure=True,
         fallback=lambda: OccupationRecommendationsResponse(
             status='clarifying',
             candidates=[],
