@@ -22,6 +22,7 @@ export interface TestimonialItem {
 }
 
 export interface FooterLinkItem {
+  href?: string;
   label: string;
 }
 
@@ -191,6 +192,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: "Evidence",
     links: [
+      { href: "/system-design", label: "System design" },
       { label: "IMF Malaysia Article IV (2025)" },
       { label: "ILO Working Paper 140" },
       { label: "ISIS Malaysia + World Bank" },

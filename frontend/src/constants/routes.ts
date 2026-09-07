@@ -5,4 +5,5 @@ export const ROUTES = {
   aiExposure: "/ai-exposure",
   skills: "/skills",
   learningCentre: "/learning-centre",
+  systemDesign: "/system-design",
 } as const;

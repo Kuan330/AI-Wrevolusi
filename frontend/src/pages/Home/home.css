@@ -920,6 +920,14 @@
   line-height: 1.6;
 }
 
+.landing-page .footer-column .footer-link {
+  text-decoration: none;
+}
+
+.landing-page .footer-column .footer-link:hover {
+  color: var(--c-text);
+}
+
 .landing-page .footer-bottom-line {
   margin-top: 4px;
   padding: 12px 0 18px;

@@ -8,6 +8,7 @@ import AIExposure from "@/pages/AIExposure/AIExposure";
 import Home from "@/pages/Home/Home";
 import LearningCentre from "@/pages/LearningCentre/LearningCentre";
 import Skills from "@/pages/Skills/Skills";
+import SystemDesign from "@/pages/SystemDesign/SystemDesign";
 import WorkProfile from "@/pages/WorkProfile/WorkProfile";
 import ProfileTasks from "@/pages/WorkProfile/ProfileTasks";
 
@@ -16,6 +17,7 @@ const AppRoutes = () => {
     <BrowserRouter>
       <Routes>
         <Route path={ROUTES.home} element={<Home />} />
+        <Route path={ROUTES.systemDesign} element={<SystemDesign />} />
         <Route element={<ProfileLayout />}>
           <Route path={ROUTES.workProfile} element={<WorkProfile />} />
           <Route path={ROUTES.task} element={<ProfileTasks />} />
