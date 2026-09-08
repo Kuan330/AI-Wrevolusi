@@ -1,4 +1,5 @@
-import { ChevronDown, Plus, Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ChevronDown, ListChecks, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -99,8 +100,11 @@ const ProfileTaskList = ({
     });
   };
 
+  const selectedTaskIds = tasks.filter(task => selectedIds.has(task.id)).map(task => task.id);
+  const allSelected = tasks.length > 0 && selectedTaskIds.length === tasks.length;
+
   const handleBatchDeleteConfirm = () => {
-    onBatchDelete(Array.from(selectedIds));
+    onBatchDelete(selectedTaskIds);
     exitBatchMode();
   };
 
@@ -109,6 +113,11 @@ const ProfileTaskList = ({
       <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
         {batchMode ? (
           <>
+            <label className="mr-auto flex items-center gap-2 text-sm text-[#574a55]">
+              <Checkbox aria-label="Select all tasks" checked={allSelected ? true : selectedTaskIds.length ? "indeterminate" : false} onCheckedChange={() => setSelectedIds(allSelected ? new Set() : new Set(tasks.map(task => task.id)))} />
+              Select all
+              <span className="ml-2 text-[#7f7280]" role="status">{selectedTaskIds.length} of {tasks.length} selected</span>
+            </label>
             <Button
               type="button"
               variant="outline"
@@ -120,36 +129,36 @@ const ProfileTaskList = ({
             <Button
               type="button"
               className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal"
-              disabled={selectedIds.size === 0}
+              disabled={selectedTaskIds.length === 0}
               onClick={() => setBatchDeleteOpen(true)}
             >
               <Trash2 className="h-4 w-4" aria-hidden />
-              Delete selected ({selectedIds.size})
+              Delete selected ({selectedTaskIds.length})
             </Button>
           </>
         ) : (
           <Button
             type="button"
             className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal"
-            disabled={tasks.length === 0}
+            disabled={loading || tasks.length === 0}
             onClick={() => setBatchMode(true)}
           >
-            <Trash2 className="h-4 w-4" aria-hidden />
-            Batch delete
+            <ListChecks className="h-4 w-4" aria-hidden />
+            Select tasks
           </Button>
         )}
-        <Button
+        {!batchMode && <Button
           className="profile-blue-btn inline-flex h-10 items-center gap-2 rounded-full px-4 font-normal"
           onClick={onAdd}
         >
           <Plus className="h-4 w-4" />
           Add a task
-        </Button>
+        </Button>}
       </div>
 
       {batchMode ? (
         <p className="shrink-0 text-sm text-[#7f7280]">
-          Select the tasks you want to remove.
+          Select tasks below, or select all tasks including those further down the list.
         </p>
       ) : null}
 
@@ -185,30 +194,18 @@ const ProfileTaskList = ({
                 const isSelected = selectedIds.has(task.id);
 
                 return (
-                  <div key={task.id} className="profile-task-card p-4">
+                  <div key={task.id} className={`profile-task-card p-4 ${batchMode && isSelected ? "ring-1 ring-[#8dbbd6] bg-[#eaf4fb]" : ""}`}>
                     <div className="flex items-center gap-3">
                       {batchMode ? (
-                        <button
-                          type="button"
-                          className="profile-task-checkbox"
-                          aria-label={
-                            isSelected ? "Deselect task" : "Select task"
-                          }
-                          onClick={() => toggleSelection(task.id)}
-                        >
-                          <img
-                            src={
-                              isSelected
-                                ? "/images/icons/icon-checkbox-checked.svg"
-                                : "/images/icons/icon-checkbox-unchecked.svg"
-                            }
-                            alt=""
-                            className="block h-[22px] w-[22px] object-contain"
-                          />
-                        </button>
+                        <Checkbox
+                          id={`select-task-${task.id}`}
+                          aria-label={`Select task: ${task.wording}`}
+                          checked={isSelected}
+                          onCheckedChange={() => toggleSelection(task.id)}
+                        />
                       ) : null}
                       <p className="min-w-0 flex-1 text-sm leading-6 text-[#2f2430]">
-                        {task.wording}
+                        {batchMode ? <label htmlFor={`select-task-${task.id}`} className="block cursor-pointer">{task.wording}</label> : task.wording}
                       </p>
                       {!batchMode ? (
                         <div className="profile-icon-actions">
@@ -268,7 +265,7 @@ const ProfileTaskList = ({
 
       <BatchDeleteTaskDialog
         open={batchDeleteOpen}
-        count={selectedIds.size}
+        count={selectedTaskIds.length}
         onClose={() => setBatchDeleteOpen(false)}
         onConfirm={handleBatchDeleteConfirm}
       />

@@ -1,15 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 
-import { ExternalLink } from "lucide-react";
 
 import PageHeader from "@/components/common/PageHeader";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import SkillDetailWorkspace from "@/pages/Skills/components/SkillDetailWorkspace";
@@ -21,9 +14,9 @@ import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
 import "@/pages/Skills/skills.css";
 
-const WEF_SOURCE = "https://www.weforum.org/publications/the-future-of-jobs-report-2025/";
 
 const Skills = () => {
+  const { hash } = useLocation();
   const analysis = readConfirmedAnalysis();
   const [skills, setSkills] = useState<WefSkill[]>([]);
   const [selectedSkillId, setSelectedSkillId] = useState<number | null>(null);
@@ -52,6 +45,16 @@ const Skills = () => {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (loading || loadError || hash !== "#skill-directions") return;
+    const frame = requestAnimationFrame(() => {
+      const section = document.getElementById("skill-directions") ?? document.getElementById("identified-skills");
+      section?.scrollIntoView({ behavior: "instant", block: "start" });
+      section?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [hash, loading, loadError]);
 
   const evidence = useMemo(
     () => buildSkillEvidence(analysis?.tasks ?? [], skills),
@@ -136,51 +139,7 @@ const Skills = () => {
         </>
       )}
 
-      <Accordion type="single" collapsible className="skills-notes">
-        <AccordionItem value="tasks" className="border-white/70">
-          <AccordionTrigger className="text-[#3d5f7a] hover:no-underline">
-            Why we start from your tasks, not your job title
-          </AccordionTrigger>
-          <AccordionContent className="max-w-3xl text-sm leading-6 text-[#574a55]">
-            Job titles describe where someone works, but tasks show what they actually do.
-            Starting from your confirmed tasks makes each identified skill traceable to work
-            you recognise.
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="method" className="border-white/70">
-          <AccordionTrigger className="text-[#3d5f7a] hover:no-underline">
-            Method and limitations
-          </AccordionTrigger>
-          <AccordionContent className="max-w-3xl space-y-2 text-sm leading-6 text-[#574a55]">
-            <p>
-              Confirmed task wording is connected to the WEF skill list using transparent
-              matching rules. A skill appears in your profile only when at least one task
-              supports it.
-            </p>
-            <p>
-              Future-use percentages and GenAI capacity describe global employer expectations
-              and skill-group patterns. They are not personal scores, Malaysia-specific job
-              forecasts, or predictions that your work will be replaced.
-            </p>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="source" className="border-0">
-          <AccordionTrigger className="text-[#3d5f7a] hover:no-underline">
-            Source
-          </AccordionTrigger>
-          <AccordionContent className="text-sm leading-6 text-[#574a55]">
-            <a
-              href={WEF_SOURCE}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-[#3d5f7a] underline underline-offset-2"
-            >
-              World Economic Forum, Future of Jobs Report 2025
-              <ExternalLink className="size-3.5" aria-hidden />
-            </a>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+
     </div>
   );
 };

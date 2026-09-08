@@ -15,7 +15,7 @@ import {
   type SkillDirection,
 } from "@/pages/Skills/skillDirections";
 import { ApiError } from "@/services/api";
-import { skillDirectionService } from "@/services/skillDirectionService";
+import { skillDirectionService, useLocalLearningTemplates } from "@/services/skillDirectionService";
 
 type SkillDirectionBoardProps = {
   evidence: SkillEvidence[];
@@ -139,7 +139,7 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
   };
 
   return (
-    <section className="skills-direction-section" aria-labelledby="skill-directions-heading">
+    <section id="skill-directions" tabIndex={-1} className="skills-direction-section scroll-mt-24" aria-labelledby="skill-directions-heading">
       <div className="skills-direction-heading">
         <div>
           <p className="skills-kicker">Plan your next skill move</p>
@@ -254,8 +254,9 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
 
       <div className="skills-direction-confirm">
         <p>
-          When you confirm, your chosen directions and supporting task text are sent to the
-          model to create broad learning themes.
+          {useLocalLearningTemplates
+            ? "Confirm your directions to see starter learning themes. These suggestions use templates based on your selected skills and directions."
+            : "When you confirm, your chosen directions and supporting task text are sent to the model to create broad learning themes."}
         </p>
         <Button
           type="button"
@@ -283,8 +284,9 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
               Choose what you want to explore
             </h3>
             <p className="mt-1 text-sm leading-6 text-[#7f7280]">
+              {useLocalLearningTemplates ? "Template suggestions · " : ""}
               These are broad learning themes, not course recommendations. Select the ones
-              you want the Learning Centre to use for course matching.
+              you want Learning Resources to use for course matching.
             </p>
           </div>
 

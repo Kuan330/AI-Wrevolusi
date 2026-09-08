@@ -1,4 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { useAccount } from "@/components/account/useAccount";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import PageHeader from "@/components/common/PageHeader";
@@ -14,6 +16,8 @@ import {
 } from "@/pages/WorkProfile/hooks/useOccupationFilters";
 import {
   clearSelectedOccupation,
+  readTaskWorkspace,
+  hasConfirmedAnalysis,
   saveSelectedOccupation,
 } from "@/pages/WorkProfile/userProfile";
 import type { ReferenceOccupation } from "@/types/reference";
@@ -22,6 +26,14 @@ type WorkProfileMode = "search" | "filters";
 
 const WorkProfile = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAccount();
+  const hasWorkspace = Boolean(readTaskWorkspace()?.tasksOccupationCode);
+  const requestedReturn = location.state?.returnTo;
+  const validReturn = typeof requestedReturn === "string" &&
+    [ROUTES.task, ROUTES.aiExposure, ROUTES.skills, ROUTES.learningCentre, ROUTES.plan, ROUTES.possibilities].some(path => requestedReturn.split("?")[0] === path);
+  const returnTo = validReturn ? requestedReturn : hasConfirmedAnalysis() ? ROUTES.aiExposure : ROUTES.task;
+
   const occupation = useOccupationFilters();
   const [mode, setModeState] = useState<WorkProfileMode>("filters");
   const [selectedFromSearch, setSelectedFromSearch] = useState<OccupationSearchResult | null>(null);
@@ -47,12 +59,6 @@ const WorkProfile = () => {
   const confirmedUnit = activeUnit;
   const confirmedPath = activePath;
 
-  useEffect(() => {
-    if (!activeUnit) return;
-    persistOccupation(activeUnit, activePath);
-    // Persist when the chosen occupation code changes, not on every path array identity.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeUnit?.occupation_code]);
 
   const setMode = (nextMode: WorkProfileMode) => {
     if (nextMode === mode) return;
@@ -75,7 +81,6 @@ const WorkProfile = () => {
   const handleSearchChoice = (result: OccupationSearchResult) => {
     setSelectedFromSearch(result);
     occupation.setQuery(result.unit.title);
-    persistOccupation(result.unit, result.path);
   };
 
   const handleQueryChange = (value: string) => {
@@ -90,6 +95,12 @@ const WorkProfile = () => {
       <PageHeader
         title="Find the occupation that matches your work"
         description="Search by job title, or browse by field of work."
+        actions={user && hasWorkspace ? (
+          <Button variant="outline" className="shrink-0 rounded-full" onClick={() => {
+            clearSelectedOccupation();
+            navigate(returnTo);
+          }}><ArrowLeft className="size-4"/> Back to previous page</Button>
+        ) : undefined}
       />
 
       {occupation.error ? (

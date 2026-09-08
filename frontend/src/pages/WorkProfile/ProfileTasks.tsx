@@ -221,7 +221,7 @@ const ProfileTasks = () => {
               asChild
               className="profile-primary-btn h-10 whitespace-nowrap rounded-full px-5"
             >
-              <Link to={ROUTES.workProfile}>Change occupation</Link>
+              <Link to={ROUTES.workProfile} state={{ returnTo: ROUTES.task }}>Change occupation</Link>
             </Button>
             <Button
               type="button"

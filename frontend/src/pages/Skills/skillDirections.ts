@@ -1,3 +1,4 @@
+import { accountStorage } from "@/services/accountStorage";
 import type { SkillEvidence } from "@/pages/Skills/lib/skillProfile";
 
 export const SKILL_DIRECTIONS = ["keep_building", "strengthen", "use_with_ai"] as const;
@@ -6,6 +7,7 @@ export type SkillDirection = (typeof SKILL_DIRECTIONS)[number];
 export type SkillDirectionAssignments = Record<number, SkillDirection>;
 
 export type LearningTheme = {
+  source?: "template" | "backend";
   theme_id: string;
   skill_id: number;
   skill_name: string;
@@ -50,7 +52,7 @@ export const buildRecommendedDirections = (
 
 export const readLearningCentreItems = (): LearningCentreItem[] => {
   try {
-    const parsed = JSON.parse(localStorage.getItem(LEARNING_CENTRE_KEY) ?? "[]") as unknown;
+    const parsed = JSON.parse(accountStorage.getItem(LEARNING_CENTRE_KEY) ?? "[]") as unknown;
     return Array.isArray(parsed) ? (parsed as LearningCentreItem[]) : [];
   } catch {
     return [];
@@ -67,12 +69,12 @@ export const addLearningCentreItems = (themes: LearningTheme[]): LearningCentreI
     byTopic.set(topicKey(theme), { ...theme, added_at: addedAt }),
   );
   const next = [...byTopic.values()];
-  localStorage.setItem(LEARNING_CENTRE_KEY, JSON.stringify(next));
+  accountStorage.setItem(LEARNING_CENTRE_KEY, JSON.stringify(next));
   return next;
 };
 
 export const removeLearningCentreItem = (themeId: string): LearningCentreItem[] => {
   const next = readLearningCentreItems().filter((item) => item.theme_id !== themeId);
-  localStorage.setItem(LEARNING_CENTRE_KEY, JSON.stringify(next));
+  accountStorage.setItem(LEARNING_CENTRE_KEY, JSON.stringify(next));
   return next;
 };

@@ -130,7 +130,7 @@ export default function TaskPractice({
           </details>
         )}
         <p className="text-xs text-[#7f7280]">
-          Self-reported timings, saved in this browser. These records do not
+          Self-reported timings, saved with your task profile. These records do not
           change your ILO exposure score.
         </p>
         {dialog && (
