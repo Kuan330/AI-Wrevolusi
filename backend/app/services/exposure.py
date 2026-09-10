@@ -224,14 +224,19 @@ def build_exposure_score_explanation(
     adjusted_score: float,
     baseline_score: float,
     context_summary: str,
+    *,
+    has_context: bool = False,
 ) -> str:
     """Explain the value so the number is not read as a timeline or outcome."""
     band = describe_adjusted_exposure_score_band(adjusted_score)
+    if has_context:
+        context_clause = f'and applies your optional workplace context ({context_summary})'
+    else:
+        context_clause = 'with no optional workplace context applied'
     return (
         f'How to read this value: {adjusted_score:.2f}/1.0 is a task-level exposure index '
-        f'(band: {band}). It is the matched ILO task score {baseline_score:.2f} adjusted by '
-        f'the workplace context you provided ({context_summary}). It describes possible '
-        f'task-level change, not a date or a job outcome.'
+        f'(band: {band}). It starts from the matched ILO task score {baseline_score:.2f} '
+        f'{context_clause}. It describes possible task-level change, not a date or a job outcome.'
     )
 
 
@@ -411,7 +416,7 @@ def assess_confirmed_task_against_ilo_references(
             f'An optional language-model review of the supplied ILO task candidates selected '
             f'the closest task "{strongest_reference_task.task_text[:120]}" with confidence '
             f'{strongest_similarity:.2f}. The official ILO task score {baseline_score:.2f} was '
-            f'adjusted to {adjusted_score:.2f} using {context_summary}.'
+            f'adjusted to {adjusted_score:.2f} ({context_summary}).'
         )
         uncertainty = (
             'Moderate uncertainty because the match was confirmed by a language-model review '
@@ -422,7 +427,7 @@ def assess_confirmed_task_against_ilo_references(
             f'The {match_layer} match used ILO task evidence beginning "'
             f'{strongest_reference_task.task_text[:120]}" with similarity '
             f'{strongest_similarity:.2f}. The baseline score {baseline_score:.2f} was adjusted '
-            f'to {adjusted_score:.2f} using {context_summary}.'
+            f'to {adjusted_score:.2f} ({context_summary}).'
         )
         uncertainty = (
             'Low source-matching uncertainty; workplace variation can still change how the task is performed.'
@@ -436,6 +441,7 @@ def assess_confirmed_task_against_ilo_references(
         adjusted_score,
         baseline_score,
         context_summary,
+        has_context=bool(described_context_factors),
     )
 
     return ConfirmedTaskExposureAssessment(

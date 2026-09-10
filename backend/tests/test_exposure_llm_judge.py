@@ -248,7 +248,12 @@ def test_score_band_boundaries_are_stable() -> None:
 
 
 def test_score_explanation_states_source_calculation_and_non_prediction() -> None:
-    explanation = build_exposure_score_explanation(0.43, 0.38, 'routine processing: high')
+    explanation = build_exposure_score_explanation(
+        0.43,
+        0.38,
+        'routine processing: high',
+        has_context=True,
+    )
 
     assert explanation.startswith('How to read this value')
     assert 'band: moderate' in explanation
