@@ -178,18 +178,21 @@ def test_ai_request_and_response_schemas_expose_the_contract_fields() -> None:
             'unmatched_concepts',
             'reason',
             'clarifying_question',
+            'needs_user_confirmation',
         },
         '/api/v1/ai/occupation-suggestions': {
             'status',
             'candidates',
             'clarifying_questions',
+            'needs_user_confirmation',
         },
         '/api/v1/ai/occupation-recommendations': {
             'status',
             'candidates',
             'clarifying_questions',
+            'needs_user_confirmation',
         },
-        '/api/v1/ai/skill-match': {'skills'},
+        '/api/v1/ai/skill-match': {'skills', 'needs_user_confirmation'},
     }
 
     for path in ENDPOINTS:
@@ -381,3 +384,15 @@ def test_task_match_malformed_provider_output_cannot_invent_a_candidate() -> Non
     assert payload['candidate_id'] == ''
     assert payload['confidence'] == 0.0
     assert payload['clarifying_question']
+
+
+def test_every_ai_response_requires_user_confirmation_before_persistence() -> None:
+    application = _make_app()
+    requests = _valid_requests()
+
+    with TestClient(application) as client:
+        for path, request in requests.items():
+            response = client.post(path, json=request)
+            assert response.status_code == 200, (path, response.text)
+            payload = _json_response(response)
+            assert payload['needs_user_confirmation'] is True, path

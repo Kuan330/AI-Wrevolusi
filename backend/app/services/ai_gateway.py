@@ -1,14 +1,22 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import logging
+import threading
+import time
+from collections import OrderedDict, deque
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Callable, Generic, Protocol, TypeVar
 
+import httpx
 from pydantic import BaseModel, ValidationError
 
 
 ModelT = TypeVar('ModelT', bound=BaseModel)
+
+_LOGGER = logging.getLogger('app.services.ai_gateway')
 
 
 class AIGatewayProvider(Protocol):
@@ -284,18 +292,346 @@ class AIGateway:
         return f'{operation}:{encoded}'
 
 
-_default_gateway = AIGateway()
+class AIProviderError(RuntimeError):
+    """Raised when the configured HTTP provider cannot return usable JSON."""
+
+
+# Transient upstream failures worth one more attempt: throttling, timeouts
+# surfaced as status codes, and 5xx responses.
+_RETRYABLE_PROVIDER_STATUS_CODES = frozenset({408, 409, 425, 429, 500, 502, 503, 504})
+
+_SYSTEM_PROMPT_TEMPLATE = (
+    'You are a candidate-constrained matching assistant inside a career analysis tool. '
+    'Follow these rules exactly:\n'
+    '1. Return one JSON object and nothing else. No markdown, no prose outside the JSON.\n'
+    '2. Only use identifiers that appear in the supplied candidates. Never invent, edit, '
+    'translate, or guess identifiers, scores, source links, or definitions.\n'
+    '3. Never predict job loss, replacement timelines, unemployment, or personal skill gaps.\n'
+    '4. If no supplied candidate is a reliable fit, return an empty selection and a '
+    'clarifying question instead of forcing a match.\n'
+    'The JSON object must validate against this JSON Schema:\n{schema}'
+)
+
+
+class _BoundedLruCache:
+    """Small thread-safe LRU cache for raw provider responses."""
+
+    def __init__(self, max_size: int) -> None:
+        self._max_size = max_size
+        self._entries: OrderedDict[str, Any] = OrderedDict()
+        self._lock = threading.Lock()
+
+    def get(self, key: str) -> Any | None:
+        if self._max_size <= 0:
+            return None
+        with self._lock:
+            if key not in self._entries:
+                return None
+            value = self._entries.pop(key)
+            self._entries[key] = value
+            return value
+
+    def put(self, key: str, value: Any) -> None:
+        if self._max_size <= 0:
+            return
+        with self._lock:
+            self._entries.pop(key, None)
+            self._entries[key] = value
+            while len(self._entries) > self._max_size:
+                self._entries.popitem(last=False)
+
+
+class OpenAICompatibleProvider:
+    """Structured-JSON adapter for OpenAI-compatible chat completion APIs.
+
+    The adapter is deliberately thin: it retries transient failures with
+    exponential backoff, caches raw responses, applies a local requests-per-
+    minute guard, and only returns content that already satisfies the target
+    response model.  Every breach raises :class:`AIProviderError`; the caller
+    (:class:`AIGateway`) decides how to degrade, and the gateway's candidate
+    constraint layer remains the only component allowed to shape what an
+    endpoint returns.
+    """
+
+    name = 'openai-compatible'
+
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        model: str,
+        base_url: str = 'https://api.openai.com/v1',
+        timeout_s: float = 20.0,
+        max_retries: int = 2,
+        backoff_base_s: float = 0.5,
+        rpm_limit: int = 60,
+        cache_size: int = 128,
+        max_tokens: int | None = None,
+        client: httpx.Client | None = None,
+        sleep: Callable[[float], None] = time.sleep,
+        clock: Callable[[], float] = time.monotonic,
+    ) -> None:
+        cleaned_key = (api_key or '').strip()
+        if not cleaned_key:
+            raise ValueError('api_key must contain non-whitespace characters')
+        if not (model or '').strip():
+            raise ValueError('model must contain non-whitespace characters')
+        if max_retries < 0:
+            raise ValueError('max_retries must not be negative')
+        if rpm_limit < 1:
+            raise ValueError('rpm_limit must be at least 1')
+
+        self.model = model.strip()
+        self._endpoint = f"{base_url.rstrip('/')}/chat/completions"
+        self._headers = {
+            'Authorization': f'Bearer {cleaned_key}',
+            'Content-Type': 'application/json',
+        }
+        self.max_retries = int(max_retries)
+        self._backoff_base_s = max(0.0, float(backoff_base_s))
+        self._rpm_limit = int(rpm_limit)
+        self._max_tokens = max_tokens
+        self._client = client or httpx.Client(timeout=httpx.Timeout(float(timeout_s)))
+        self._owns_client = client is None
+        self._sleep = sleep
+        self._clock = clock
+        self._cache = _BoundedLruCache(max(0, int(cache_size)))
+        self._request_times: deque[float] = deque()
+        self._lock = threading.Lock()
+
+    def close(self) -> None:
+        if self._owns_client:
+            self._client.close()
+
+    def complete_json(
+        self,
+        *,
+        operation: str,
+        payload: Any,
+        response_model: type[ModelT],
+    ) -> Any:
+        """Return parsed JSON that satisfies ``response_model`` or raise."""
+        cache_key = self._cache_key(operation, payload)
+        cached = self._cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+        body = self._build_request_body(operation, payload, response_model)
+        last_error: Exception | None = None
+        for attempt in range(self.max_retries + 1):
+            if attempt > 0:
+                self._sleep(self._backoff_base_s * (2 ** (attempt - 1)))
+            try:
+                self._consume_rate_limit_slot()
+                response = self._client.post(
+                    self._endpoint,
+                    headers=self._headers,
+                    json=body,
+                )
+            except httpx.HTTPError as error:  # timeouts and transport failures
+                last_error = error
+                _LOGGER.warning(
+                    'AI provider attempt %s/%s failed: %s',
+                    attempt + 1,
+                    self.max_retries + 1,
+                    type(error).__name__,
+                )
+                continue
+
+            if response.status_code in _RETRYABLE_PROVIDER_STATUS_CODES:
+                last_error = AIProviderError(
+                    f'provider returned retryable status {response.status_code}'
+                )
+                _LOGGER.warning(
+                    'AI provider attempt %s/%s failed with status %s',
+                    attempt + 1,
+                    self.max_retries + 1,
+                    response.status_code,
+                )
+                continue
+            if response.status_code >= 400:
+                raise AIProviderError(
+                    f'provider rejected the request with status {response.status_code}'
+                )
+
+            try:
+                parsed = self._parse_completion_payload(response)
+            except AIProviderError as error:
+                last_error = error
+                _LOGGER.warning(
+                    'AI provider attempt %s/%s returned unusable content: %s',
+                    attempt + 1,
+                    self.max_retries + 1,
+                    error,
+                )
+                continue
+            if AIGateway.validate(parsed, response_model) is None:
+                last_error = AIProviderError(
+                    'provider output did not satisfy the response schema'
+                )
+                _LOGGER.warning(
+                    'AI provider attempt %s/%s returned schema-invalid output',
+                    attempt + 1,
+                    self.max_retries + 1,
+                )
+                continue
+
+            self._cache.put(cache_key, parsed)
+            return parsed
+
+        raise AIProviderError(
+            f'provider request failed after {self.max_retries + 1} attempt(s): {last_error}'
+        )
+
+    def _build_request_body(
+        self,
+        operation: str,
+        payload: Any,
+        response_model: type[ModelT],
+    ) -> dict[str, Any]:
+        try:
+            schema = response_model.model_json_schema()
+        except Exception:  # noqa: BLE001 - the schema is prompt guidance only
+            schema = {}
+        system_prompt = _SYSTEM_PROMPT_TEMPLATE.format(
+            schema=json.dumps(schema, sort_keys=True, default=str),
+        )
+        body: dict[str, Any] = {
+            'model': self.model,
+            'messages': [
+                {'role': 'system', 'content': system_prompt},
+                {
+                    'role': 'user',
+                    'content': json.dumps(
+                        {'operation': operation, 'request': payload},
+                        sort_keys=True,
+                        default=str,
+                    ),
+                },
+            ],
+            'response_format': {'type': 'json_object'},
+            'temperature': 0,
+        }
+        if self._max_tokens is not None:
+            body['max_tokens'] = self._max_tokens
+        return body
+
+    @staticmethod
+    def _parse_completion_payload(response: httpx.Response) -> Any:
+        try:
+            data = response.json()
+            content = data['choices'][0]['message']['content']
+        except (ValueError, KeyError, IndexError, TypeError) as error:
+            raise AIProviderError(
+                'provider response did not include a chat completion message'
+            ) from error
+
+        if isinstance(content, str):
+            text = content.strip()
+            if text.startswith('```'):
+                text = text[3:]
+                first_newline = text.find('\n')
+                if first_newline != -1:
+                    text = text[first_newline + 1:]
+                stripped = text.rstrip()
+                if stripped.endswith('```'):
+                    text = stripped[:-3]
+                text = text.strip()
+            try:
+                return json.loads(text)
+            except ValueError as error:
+                raise AIProviderError(
+                    'provider message content was not valid JSON'
+                ) from error
+        if isinstance(content, (dict, list)):
+            return content
+        raise AIProviderError('provider message content had an unsupported type')
+
+    def _consume_rate_limit_slot(self) -> None:
+        """Refuse to send when the local per-minute budget is exhausted.
+
+        The guard fails fast instead of sleeping: a burst request degrades to
+        the deterministic path rather than blocking an API worker thread.
+        """
+        now = self._clock()
+        with self._lock:
+            while self._request_times and now - self._request_times[0] >= 60.0:
+                self._request_times.popleft()
+            if len(self._request_times) >= self._rpm_limit:
+                raise AIProviderError('local rate limit reached; request was not sent')
+            self._request_times.append(now)
+
+    def _cache_key(self, operation: str, payload: Any) -> str:
+        try:
+            encoded = json.dumps(
+                {'model': self.model, 'operation': operation, 'payload': payload},
+                sort_keys=True,
+                default=str,
+                separators=(',', ':'),
+            )
+        except (TypeError, ValueError):
+            encoded = f'{self.model}:{operation}:{payload!r}'
+        return hashlib.sha256(encoded.encode('utf-8')).hexdigest()
+
+
+def build_provider_from_settings(settings_obj: Any | None = None) -> OpenAICompatibleProvider | None:
+    """Build the optional provider from settings; return None without a key."""
+    if settings_obj is None:
+        from app.core.config import get_settings
+
+        settings_obj = get_settings()
+
+    api_key = getattr(settings_obj, 'ai_api_key', None)
+    if not api_key or not str(api_key).strip():
+        _LOGGER.warning(
+            'AI provider is not configured (AI_API_KEY is empty); '
+            'AI endpoints run on deterministic logic only.'
+        )
+        return None
+
+    return OpenAICompatibleProvider(
+        api_key=str(api_key),
+        model=str(getattr(settings_obj, 'ai_model', 'gpt-4o-mini')),
+        base_url=str(getattr(settings_obj, 'ai_base_url', 'https://api.openai.com/v1')),
+        timeout_s=float(getattr(settings_obj, 'ai_timeout_seconds', 20.0)),
+        max_retries=int(getattr(settings_obj, 'ai_max_retries', 2)),
+        rpm_limit=int(getattr(settings_obj, 'ai_rpm_limit', 60)),
+        cache_size=int(getattr(settings_obj, 'ai_cache_size', 128)),
+    )
+
+
+_default_gateway: AIGateway | None = None
 
 
 def default_ai_gateway() -> AIGateway:
-    """Return the process-local credential-free gateway."""
+    """Return the process-local gateway, configured from the environment.
+
+    Without an ``AI_API_KEY`` this stays credential-free and every endpoint
+    keeps its deterministic behaviour.
+    """
+    global _default_gateway
+    if _default_gateway is None:
+        _default_gateway = AIGateway(
+            provider=build_provider_from_settings(),
+            max_attempts=1,
+        )
     return _default_gateway
 
 
+def reset_default_ai_gateway() -> None:
+    """Rebuild the process-local gateway on next use (tests and hot reloads)."""
+    global _default_gateway
+    _default_gateway = None
+
+
 __all__ = [
+    'AIProviderError',
     'AIGateway',
     'AIGatewayProvider',
     'GatewayMetadata',
     'GatewayResult',
+    'OpenAICompatibleProvider',
+    'build_provider_from_settings',
     'default_ai_gateway',
+    'reset_default_ai_gateway',
 ]

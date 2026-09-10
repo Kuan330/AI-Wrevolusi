@@ -50,6 +50,17 @@ class Settings(BaseSettings):
     skill_max_retries: int = Field(default=2, ge=0, le=5)
     skill_prompt_version: str = 'skill-directions-v1'
 
+    # Optional OpenAI-compatible provider for the candidate-constrained AI
+    # endpoints. When ai_api_key is empty the endpoints keep running on the
+    # deterministic local logic and no network call is attempted.
+    ai_api_key: str | None = None
+    ai_base_url: str = 'https://api.openai.com/v1'
+    ai_model: str = 'gpt-4o-mini'
+    ai_timeout_seconds: float = Field(default=20, gt=0, le=180)
+    ai_max_retries: int = Field(default=2, ge=0, le=5)
+    ai_rpm_limit: int = Field(default=60, gt=0, le=6000)
+    ai_cache_size: int = Field(default=128, ge=0, le=4096)
+
     @field_validator('cors_origins', mode='before')
     @classmethod
     def parse_cors_origins(cls, value: str | list[str]) -> list[str]:

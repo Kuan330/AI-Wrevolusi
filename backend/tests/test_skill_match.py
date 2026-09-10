@@ -63,7 +63,8 @@ def test_skill_match_route_returns_the_compatible_response_shape() -> None:
         )
 
     assert response.status_code == 200
-    assert set(response.json()) == {"skills"}
+    assert set(response.json()) == {"skills", "needs_user_confirmation"}
+    assert response.json()["needs_user_confirmation"] is True
     parsed = SkillMatchResponse.model_validate(response.json())
     assert len(parsed.skills) <= 2
     assert all(

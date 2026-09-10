@@ -56,6 +56,13 @@ class TaskMatchResponse(BaseModel):
     unmatched_concepts: list[str] = Field(default_factory=list, max_length=50)
     reason: str = Field(min_length=1, max_length=2000)
     clarifying_question: str | None = Field(default=None, max_length=1000)
+    needs_user_confirmation: bool = Field(
+        default=True,
+        description=(
+            'Always true: the result is a suggestion that the user must review '
+            'and confirm before it is treated as part of their confirmed profile.'
+        ),
+    )
 
 
 # Explicit aliases keep the contract convenient for callers that distinguish

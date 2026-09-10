@@ -110,12 +110,26 @@ class OccupationSuggestionsResponse(OccupationAISchema):
     status: Literal['suggestions', 'clarifying']
     candidates: list[OccupationResultItem] = Field(default_factory=list, max_length=5)
     clarifying_questions: list[str] = Field(default_factory=list)
+    needs_user_confirmation: bool = Field(
+        default=True,
+        description=(
+            'Always true: the result is a suggestion that the user must review '
+            'and confirm before it is treated as part of their confirmed profile.'
+        ),
+    )
 
 
 class OccupationRecommendationsResponse(OccupationAISchema):
     status: Literal['suggestions', 'clarifying']
     candidates: list[OccupationResultItem] = Field(default_factory=list, max_length=5)
     clarifying_questions: list[str] = Field(default_factory=list)
+    needs_user_confirmation: bool = Field(
+        default=True,
+        description=(
+            'Always true: the result is a suggestion that the user must review '
+            'and confirm before it is treated as part of their confirmed profile.'
+        ),
+    )
 
 
 # Short aliases keep the domain vocabulary convenient for service consumers.

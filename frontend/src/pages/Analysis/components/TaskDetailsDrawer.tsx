@@ -11,6 +11,7 @@ const formatTaskAssessmentMatchLayer = (
 ) => {
   if (matchLayer === "exact") return "Exact ILO task evidence";
   if (matchLayer === "nlp") return "NLP task-text match";
+  if (matchLayer === "llm") return "LLM-reviewed task match";
   return "No reliable evidence match";
 };
 

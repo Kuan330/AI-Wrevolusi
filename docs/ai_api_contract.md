@@ -18,6 +18,11 @@ Status: implementation contract for the four JSON endpoints under `/api/v1/ai`.
 - Provider/database failures must produce a safe schema-valid fallback, never an
   invented candidate. The integration suite uses caller-supplied fixtures and
   does not assert external database availability.
+- Provider unavailability (missing key, timeout, 429/5xx, malformed or
+  schema-invalid output, local rate limit) never changes the HTTP status: the
+  endpoint returns its deterministic result in the same response shape.
+- Every response carries `needs_user_confirmation: true`. Results are
+  suggestions for the user to review and are never persisted automatically.
 
 ## Endpoints
 

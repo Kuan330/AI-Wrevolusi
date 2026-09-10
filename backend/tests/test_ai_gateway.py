@@ -290,7 +290,9 @@ def test_skill_provider_evidence_must_be_an_exact_task_substring() -> None:
         application.dependency_overrides.clear()
 
     assert response.status_code == 200
-    assert response.json() == {'skills': []}
+    payload = response.json()
+    assert payload['skills'] == []
+    assert payload['needs_user_confirmation'] is True
 
 
 def test_occupation_provider_failure_uses_the_deterministic_local_result() -> None:

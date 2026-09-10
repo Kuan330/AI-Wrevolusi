@@ -10,6 +10,8 @@ from app.schemas.exposure import (
     ConfirmedTaskExposureAssessmentBatchResponse,
     ExposureResult,
 )
+from app.services.ai_gateway import default_ai_gateway
+from app.services.ai_task_judge import LLMTaskMatchJudge
 from app.services.exposure import (
     assess_confirmed_tasks_against_ilo_references,
     infer_exposure_state,
@@ -18,12 +20,27 @@ from app.services.exposure import (
 router = APIRouter(prefix='/exposure', tags=['Exposure'])
 
 
+def get_exposure_llm_judge() -> LLMTaskMatchJudge:
+    """Dependency seam for the optional LLM judging layer.
+
+    Without a configured provider the judge reports ``available=False`` and
+    the deterministic matching result is returned unchanged.
+    """
+
+    return LLMTaskMatchJudge(default_ai_gateway())
+
+
 @router.post('/assessments', response_model=ConfirmedTaskExposureAssessmentBatchResponse)
 async def assess_confirmed_tasks_for_possible_ai_transformation(
     request: ConfirmedTaskExposureAssessmentBatchRequest,
     db: AsyncSession = Depends(get_db),
+    llm_judge: LLMTaskMatchJudge = Depends(get_exposure_llm_judge),
 ) -> ConfirmedTaskExposureAssessmentBatchResponse:
-    return await assess_confirmed_tasks_against_ilo_references(db, request)
+    return await assess_confirmed_tasks_against_ilo_references(
+        db,
+        request,
+        llm_judge=llm_judge,
+    )
 
 
 @router.get('/tasks/{task_id}', response_model=ExposureResult)

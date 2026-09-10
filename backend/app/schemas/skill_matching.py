@@ -62,6 +62,13 @@ class SkillMatchResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     skills: list[SkillMatchItem] = Field(default_factory=list, max_length=2)
+    needs_user_confirmation: bool = Field(
+        default=True,
+        description=(
+            'Always true: the result is a suggestion that the user must review '
+            'and confirm before it is treated as part of their confirmed profile.'
+        ),
+    )
 
 
 # Accept the common dictionary shape at the service seam while keeping the API
