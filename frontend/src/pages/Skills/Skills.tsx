@@ -6,7 +6,7 @@ import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import SkillDetailWorkspace from "@/pages/Skills/components/SkillDetailWorkspace";
-import SkillDirectionBoard from "@/pages/Skills/components/SkillDirectionBoard";
+import LearningSkillPicker from "@/pages/Skills/components/LearningSkillPicker";
 import SkillMapOverview from "@/pages/Skills/components/SkillMapOverview";
 import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
 import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
@@ -155,11 +155,10 @@ const Skills = () => {
             } satisfies Partial<ComponentProps<typeof SkillDetailWorkspace>>)}
           />
 
-          <SkillDirectionBoard
+          <LearningSkillPicker
             {...({
               evidence: evidence,
-              occupationTitle: analysis.occupationTitle,
-            } satisfies Partial<ComponentProps<typeof SkillDirectionBoard>>)}
+            } satisfies Partial<ComponentProps<typeof LearningSkillPicker>>)}
           />
         </>
       )}

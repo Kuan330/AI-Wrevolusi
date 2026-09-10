@@ -1,3 +1,4 @@
+import { learningSession } from "@/pages/LearningCentre/lib/learningSession";
 import type { ComponentProps } from "react";
 import JourneyIntro from "@/components/account/JourneyIntro";
 import { useEffect, useMemo, useState } from "react";
@@ -105,6 +106,22 @@ function PlanContent(props: { demo: boolean }) {
         if (active) {
           setState(data);
           setSelectedId(data.events.find((e) => e.kind === "care")?.id || "");
+          const requestedId = new URLSearchParams(location.search).get("resource");
+          const selection = shortlist.find(item => item.resourceId === requestedId);
+          const resource = catalogue.find(item => item.id === requestedId);
+          if (selection && resource) {
+            const existing = data.events.find(event => event.resourceId === resource.id);
+            if (existing) {
+              setWeek(monday(existing.date));
+              setSelectedId(existing.id);
+              setNotice("This course already has scheduled sessions. Review them before adding more.");
+            } else {
+              const draft = learningSession(resource, selection, dateKey(new Date()));
+              setWeek(monday(draft.date));
+              setEditor(draft);
+              setNotice("Review your preferred date and session length. Choose an exact time before saving.");
+            }
+          }
         }
       })
       .catch((e) => {
@@ -116,7 +133,7 @@ function PlanContent(props: { demo: boolean }) {
     return () => {
       active = false;
     };
-  }, [repository]);
+  }, [repository, location.search, shortlist, catalogue]);
   async function commit(events: PlanEvent[]) {
     setBusy(true);
     setError("");
@@ -146,18 +163,7 @@ function PlanContent(props: { demo: boolean }) {
     const resource = catalogue.find((r) => r.id === resourceId);
     setFormError("");
     setRepeat(false);
-    setEditor({
-      id: crypto.randomUUID(),
-      title: resource?.title || "",
-      kind: resource ? "learning" : "personal",
-      date: week < dateKey(new Date()) ? dateKey(new Date()) : week,
-      start: "18:30",
-      end: "19:00",
-      flexible: !!resource,
-      shareable: false,
-      resourceId,
-      completed: false,
-    });
+    setEditor(learningSession(resource, shortlist.find(item => item.resourceId === resourceId), week < dateKey(new Date()) ? dateKey(new Date()) : week));
   }
   async function saveEvent() {
     if (!editor) return;
@@ -380,6 +386,32 @@ function PlanContent(props: { demo: boolean }) {
                         ? `${r.minutes} min · example duration`
                         : "Confirm duration with provider"}
                     </p>
+                    {s.chapterNames?.length ? (
+                      <details>
+                        <summary>
+                          {s.chapterNames.length} selected chapters
+                        </summary>
+                        <ul>
+                          {s.chapterNames.map((name) => (
+                            <li key={name}>{name}</li>
+                          ))}
+                        </ul>
+                      </details>
+                    ) : null}
+                    {s.scheduleMode === "routine" && s.startDate ? <p>Preferred start: {s.startDate}</p> : null}
+                    {s.weekdays?.length && s.minutesPerDay ? (
+                      <p>
+                        {s.weekdays
+                          .map(
+                            (day) =>
+                              ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][
+                                day
+                              ],
+                          )
+                          .join(", ")}{" "}
+                        · {s.minutesPerDay} min/day preferred
+                      </p>
+                    ) : null}
                     {scheduled > 0 && (
                       <p>{scheduled} min scheduled across your plan</p>
                     )}

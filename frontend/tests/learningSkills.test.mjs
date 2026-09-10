@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import ts from 'typescript';
+const source=readFileSync(new URL('../src/pages/Skills/learningSkills.ts',import.meta.url),'utf8').replace('import { accountStorage } from "@/services/accountStorage";', 'const accountStorage = {getItem: () => globalThis.skillData ?? null, setItem: (_key, value) => {globalThis.skillData = value}};');
+const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
+const m=await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
+test('confirmed skills preserve priority order and deduplicate',()=>{const skills=[m.growingSkills[3],m.growingSkills[0]];m.saveLearningSkills([...skills,skills[0]]);assert.deepEqual(m.readLearningSkills(),skills)});
+test('missing course association stays empty',()=>{assert.deepEqual(m.coursesForSkill('environmental-stewardship'),[])});
+test('invalid saved selection is not silently overwritten',()=>{globalThis.skillData='{"invalid":true}';assert.throws(()=>m.readLearningSkills());assert.equal(globalThis.skillData,'{"invalid":true}')});
