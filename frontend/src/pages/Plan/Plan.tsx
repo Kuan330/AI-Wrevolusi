@@ -1,3 +1,4 @@
+import { Drawer, DrawerContent, DrawerTitle, DrawerDescription, DrawerBody } from "@/components/ui/drawer";
 import PlanCourseDrawer from "./PlanCourseDrawer";
 import { courses } from "@/pages/LearningCentre/catalogue";
 import { AppButton } from "@/components/ui/app-button";
@@ -22,7 +23,6 @@ import {
   MessageCircle,
   Plus,
   Trash2,
-  X,
 } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
 import {
@@ -243,6 +243,7 @@ function PlanContent(props: { demo: boolean }) {
   }
   function openRequest() {
     if (!selected) return;
+    setCourseOpen(false);
     const name = selected.assistance?.name || "";
     setHelper(name);
     setMessage(
@@ -577,22 +578,18 @@ function PlanContent(props: { demo: boolean }) {
               setEditor({ id: crypto.randomUUID(), title: '', kind: 'personal', date, start, end: hour === 23 ? '23:59' : `${String(hour + 1).padStart(2, '0')}:00`, flexible: false, shareable: false, completed: false });
             }} />
           </main>
-          <aside className="pl-detail pl-panel" hidden={!!selected?.resourceId?.startsWith("epic5-")}>
+          <Drawer open={courseOpen && !!selected && !courses.some(course => `epic5-${course.id}` === selected.resourceId)} onOpenChange={open => setCourseOpen(open)}>
+          <DrawerContent className="activity-drawer sm:max-w-xl"><DrawerBody className="pl-detail">
             <p className="pl-kicker">ACTIVITY & SUPPORT</p>
             {selected ? (
               <>
                 <div className="pl-detail-heading">
-                  <h2>{selected.title}</h2>
-                  <button
-                    aria-label="Close activity"
-                    onClick={() => setSelectedId("")}
-                  >
-                    <X size={16} />
-                  </button>
+                  <DrawerTitle>{selected.title}</DrawerTitle>
+
                 </div>
-                <p className="pl-detail-date">
-                  {readable(selected.date)} · {selected.start}–{selected.end}
-                </p>
+                <DrawerDescription className="pl-detail-date">
+                  {selected.date} · {selected.start}–{selected.end}
+                </DrawerDescription>
                 <div className="pl-tags">
                   <span>{labels[selected.kind]}</span>
                   <span>
@@ -637,6 +634,7 @@ function PlanContent(props: { demo: boolean }) {
                   <button
                     disabled={busyOrLoading}
                     onClick={() => {
+                      setCourseOpen(false);
                       setEditor({ ...selected });
                       setRepeat(false);
                       setFormError("");
@@ -644,7 +642,7 @@ function PlanContent(props: { demo: boolean }) {
                   >
                     Edit activity
                   </button>
-                  {selected.kind === "learning" && (
+                  {selected && (
                     <button
                       disabled={busyOrLoading}
                       onClick={() =>
@@ -829,7 +827,7 @@ function PlanContent(props: { demo: boolean }) {
                 <button
                   className="pl-delete"
                   disabled={busyOrLoading}
-                  onClick={() => setDeleteOpen(true)}
+                  onClick={() => { setCourseOpen(false); setDeleteOpen(true); }}
                 >
                   <Trash2 size={14} /> Delete activity
                 </button>
@@ -844,7 +842,7 @@ function PlanContent(props: { demo: boolean }) {
                 </p>
               </div>
             )}
-          </aside>
+          </DrawerBody></DrawerContent></Drawer>
         </div>
       )}
       <p className="pl-footer">
@@ -853,7 +851,7 @@ function PlanContent(props: { demo: boolean }) {
           : "Your plan is saved to your account."}{" "}
         WhatsApp delivery and replies are not tracked automatically.
       </p>
-      {courseOpen && selected && courses.some(course => `epic5-${course.id}` === selected.resourceId) && <PlanCourseDrawer course={courses.find(course => `epic5-${course.id}` === selected.resourceId)!} events={state.events.filter(event => event.resourceId === selected.resourceId)} onClose={() => setCourseOpen(false)} onEdit={event => { setCourseOpen(false); setFormError(''); setRepeat(false); setEditor({ ...event }); }} />}
+      {courseOpen && selected && courses.some(course => `epic5-${course.id}` === selected.resourceId) && <PlanCourseDrawer selectedEvent={selected} busy={busyOrLoading} onComplete={event => commit(state.events.map(item => item.id === event.id ? { ...item, completed: !item.completed } : item))} course={courses.find(course => `epic5-${course.id}` === selected.resourceId)!} events={state.events.filter(event => event.resourceId === selected.resourceId)} onClose={() => setCourseOpen(false)} onEdit={event => { setCourseOpen(false); setFormError(''); setRepeat(false); setEditor({ ...event }); }} />}
       <Dialog open={workOpen} onOpenChange={setWorkOpen}><DialogContent className="pl-modal"><DialogTitle>Set work hours</DialogTitle><DialogDescription>Choose weekdays and the date range for your recurring work schedule.</DialogDescription>
         <div className="pl-work-days">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day,index) => <button key={day} aria-pressed={workDays.includes(index)} onClick={() => setWorkDays(workDays.includes(index) ? workDays.filter(item => item !== index) : [...workDays,index])}>{day}</button>)}</div>
         <div className="pl-form-row"><label>From<TimePicker value={workStart} onChange={value => setWorkStart(value)} /></label><label>To<TimePicker value={workEnd} onChange={value => setWorkEnd(value)} /></label></div>

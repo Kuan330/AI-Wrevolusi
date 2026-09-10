@@ -23,3 +23,19 @@
 .pl-page{max-width:1180px;margin-left:auto;margin-right:auto;width:100%}
 .pl-time-scroll{max-height:clamp(360px,65dvh,650px)}
 .pl-detail[hidden]{display:none}
+.plan-course-drawer{gap:16px}
+.plan-course-drawer [role=tabpanel]{font-size:14px;line-height:1.75;color:#615564}
+.plan-course-drawer [role=tabpanel] h3{font-size:15px}
+.plan-course-drawer button:disabled{opacity:.55;cursor:wait}
+.activity-drawer .pl-detail{padding:4px 0;background:transparent;border:0;box-shadow:none}
+.activity-drawer .pl-detail-heading{padding-right:32px}
+.activity-drawer .pl-detail-date{font-size:14px;margin:16px 0}
+.activity-drawer .pl-tags span{font-size:12px;padding:6px 12px;border-radius:999px;background:#eaf3fb;color:#3d5f7a}
+.activity-drawer .pl-owner{font-size:14px}
+.activity-drawer .pl-detail-actions{gap:10px;margin:20px 0}
+.activity-drawer .pl-detail-actions button{border-radius:999px;padding:10px 18px;font-size:14px;color:#4f91ba;background:linear-gradient(110deg,#eaf3fb,#f8ecef);border-color:#cddfea}
+.activity-drawer .pl-detail-actions button+button{background:#c995a5;border-color:transparent;color:white}
+.activity-drawer .pl-suggestions h3,.activity-drawer .pl-help h3{font-size:15px}
+.activity-drawer .pl-suggestions p,.activity-drawer .pl-help p{font-size:13px}
+.activity-drawer .pl-suggestions button{font-size:13px;padding:12px;border-radius:12px}
+.activity-drawer .pl-delete{font-size:13px;padding:12px 0}
