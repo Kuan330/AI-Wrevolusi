@@ -1,7 +1,14 @@
+import type { ComponentProps } from "react";
 import { useAccount } from "@/components/account/useAccount";
 import AccountGate from "@/components/account/AccountGate";
 import { AccountProvider } from "@/components/account/AccountProvider";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 
 import MainLayout from "@/components/layout/MainLayout";
 import ProfileLayout from "@/components/layout/ProfileLayout";
@@ -19,12 +26,22 @@ import ProfileTasks from "@/pages/WorkProfile/ProfileTasks";
 const HomeRoute = () => {
   const { user } = useAccount();
   const location = useLocation();
-  return user && !location.state?.showHome
-    ? <Navigate to={ROUTES.aiExposure} replace />
-    : <Home />;
+  return user && !location.state?.showHome ? (
+    <Navigate
+      {...({ to: ROUTES.aiExposure, replace: true } satisfies Partial<
+        ComponentProps<typeof Navigate>
+      >)}
+    />
+  ) : (
+    <Home />
+  );
 };
 
 const AppRoutes = () => {
+  const navigateProps1 = {
+    to: ROUTES.workProfile,
+    replace: true,
+  } satisfies Partial<ComponentProps<typeof Navigate>>;
   return (
     <BrowserRouter>
       <AccountProvider>
@@ -36,7 +53,7 @@ const AppRoutes = () => {
           </Route>
           <Route
             path="/work-profile"
-            element={<Navigate to={ROUTES.workProfile} replace />}
+            element={<Navigate {...navigateProps1} />}
           />
           <Route element={<MainLayout />}>
             <Route element={<RequireConfirmedAnalysis />}>

@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { AccountContext as Context, type Account } from "./useAccount";
 import { clearSelectedOccupation } from "@/pages/WorkProfile/userProfile";
 import { useEffect, useState, type ReactNode } from "react";
@@ -13,7 +14,8 @@ import {
 } from "@/services/accountStorage";
 import { Button } from "@/components/ui/button";
 
-export function AccountProvider({ children }: { children: ReactNode }) {
+export function AccountProvider(props: { children: ReactNode }) {
+  const { children } = props;
   const [user, setUser] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -134,31 +136,35 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         >
           {syncError}{" "}
           <Button
-            variant="link"
-            onClick={() => void flushWorkspace().catch(() => {})}
+            {...({
+              variant: "link",
+              onClick: () => void flushWorkspace().catch(() => {}),
+            } satisfies Partial<ComponentProps<typeof Button>>)}
           >
             Retry saving
           </Button>
           <Button
-            variant="link"
-            onClick={() => {
-              const key = `aiwrevolusi.account.${user.id}`;
-              const copy = localStorage.getItem(key);
-              if (copy) {
-                const url = URL.createObjectURL(
-                  new Blob([copy], { type: "application/json" }),
-                );
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = "unsynced-workspace.json";
-                link.click();
-                setTimeout(() => URL.revokeObjectURL(url), 1000);
-              }
-              localStorage.removeItem(key);
-              setLoading(true);
-              setError("");
-              setAttempt((v) => v + 1);
-            }}
+            {...({
+              variant: "link",
+              onClick: () => {
+                const key = `aiwrevolusi.account.${user.id}`;
+                const copy = localStorage.getItem(key);
+                if (copy) {
+                  const url = URL.createObjectURL(
+                    new Blob([copy], { type: "application/json" }),
+                  );
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.download = "unsynced-workspace.json";
+                  link.click();
+                  setTimeout(() => URL.revokeObjectURL(url), 1000);
+                }
+                localStorage.removeItem(key);
+                setLoading(true);
+                setError("");
+                setAttempt((v) => v + 1);
+              },
+            } satisfies Partial<ComponentProps<typeof Button>>)}
           >
             Export local changes and reload saved account
           </Button>

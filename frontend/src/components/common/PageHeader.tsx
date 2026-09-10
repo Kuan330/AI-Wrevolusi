@@ -9,7 +9,8 @@ type PageHeaderProps = {
   className?: string;
 };
 
-const PageHeader = ({ title, description, actions, className }: PageHeaderProps) => {
+const PageHeader = (props: PageHeaderProps) => {
+  const { title, description, actions, className } = props;
   return (
     <div
       className={cn(
@@ -21,9 +22,13 @@ const PageHeader = ({ title, description, actions, className }: PageHeaderProps)
         <h1 className="m-0 flex min-h-10 items-center text-2xl font-semibold leading-[1.2] text-[#2f2430]">
           {title}
         </h1>
-        {description ? <div className="mt-1 text-sm text-[#7f7280]">{description}</div> : null}
+        {description ? (
+          <div className="mt-1 text-sm text-[#7f7280]">{description}</div>
+        ) : null}
       </div>
-      {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+      {actions ? (
+        <div className="flex shrink-0 items-center gap-2">{actions}</div>
+      ) : null}
     </div>
   );
 };

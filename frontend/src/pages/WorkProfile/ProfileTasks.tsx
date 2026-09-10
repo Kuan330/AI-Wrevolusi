@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -181,7 +182,11 @@ const ProfileTasks = () => {
   }
 
   if (!selected) {
-    return <Navigate to={ROUTES.workProfile} replace />;
+    const navigateProps1 = {
+      to: ROUTES.workProfile,
+      replace: true,
+    } satisfies Partial<ComponentProps<typeof Navigate>>;
+    return <Navigate {...navigateProps1} />;
   }
 
   const openAddDialog = () => {
@@ -211,27 +216,49 @@ const ProfileTasks = () => {
     profileTasks.addTask(values);
   };
 
+  const buttonProps2 = {
+    asChild: true,
+    className: "profile-primary-btn h-10 whitespace-nowrap rounded-full px-5",
+  } satisfies Partial<ComponentProps<typeof Button>>;
+  const linkProps3 = {
+    to: ROUTES.workProfile,
+    state: { returnTo: ROUTES.task },
+  } satisfies Partial<ComponentProps<typeof Link>>;
+  const buttonProps4 = {
+    type: "button",
+    className:
+      "profile-gradient-btn h-10 whitespace-nowrap rounded-full px-5 font-normal",
+    disabled:
+      profileTasks.tasks.length === 0 || taskAssessmentRequestInProgress,
+    onClick: () => void assessConfirmedTasksAndOpenExposure(),
+  } satisfies Partial<ComponentProps<typeof Button>>;
+  const profileTaskListProps5 = {
+    tasks: profileTasks.tasks,
+    loading: profileTasks.loading,
+    error: profileTasks.error,
+    onAdd: openAddDialog,
+    onEdit: openEditDialog,
+    onDelete: profileTasks.removeTask,
+    onBatchDelete: profileTasks.removeTasks,
+  } satisfies Partial<ComponentProps<typeof ProfileTaskList>>;
+  const buttonProps6 = {
+    type: "button",
+    className:
+      "profile-gradient-btn h-10 shrink-0 whitespace-nowrap rounded-full px-5 font-normal",
+    disabled:
+      profileTasks.tasks.length === 0 || taskAssessmentRequestInProgress,
+    onClick: () => void assessConfirmedTasksAndOpenExposure(),
+  } satisfies Partial<ComponentProps<typeof Button>>;
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <header className="shrink-0 space-y-3 border-b border-white/70 pb-4">
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-2xl font-semibold text-[#2f2430]">Your tasks</h1>
           <div className="flex shrink-0 items-center gap-2">
-            <Button
-              asChild
-              className="profile-primary-btn h-10 whitespace-nowrap rounded-full px-5"
-            >
-              <Link to={ROUTES.workProfile} state={{ returnTo: ROUTES.task }}>Change occupation</Link>
+            <Button {...buttonProps2}>
+              <Link {...linkProps3}>Change occupation</Link>
             </Button>
-            <Button
-              type="button"
-              className="profile-gradient-btn h-10 whitespace-nowrap rounded-full px-5 font-normal"
-              disabled={
-                profileTasks.tasks.length === 0 ||
-                taskAssessmentRequestInProgress
-              }
-              onClick={() => void assessConfirmedTasksAndOpenExposure()}
-            >
+            <Button {...buttonProps4}>
               {taskAssessmentRequestInProgress
                 ? "Assessing tasks…"
                 : "Explore AI impact"}
@@ -246,29 +273,14 @@ const ProfileTasks = () => {
       </header>
 
       <section className="profile-glass-card flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-5">
-        <ProfileTaskList
-          tasks={profileTasks.tasks}
-          loading={profileTasks.loading}
-          error={profileTasks.error}
-          onAdd={openAddDialog}
-          onEdit={openEditDialog}
-          onDelete={profileTasks.removeTask}
-          onBatchDelete={profileTasks.removeTasks}
-        />
+        <ProfileTaskList {...profileTaskListProps5} />
         {taskAssessmentRequestError ? (
           <p className="rounded-xl border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
             {taskAssessmentRequestError}
           </p>
         ) : null}
         <div className="flex shrink-0 justify-end pt-1">
-          <Button
-            type="button"
-            className="profile-gradient-btn h-10 shrink-0 whitespace-nowrap rounded-full px-5 font-normal"
-            disabled={
-              profileTasks.tasks.length === 0 || taskAssessmentRequestInProgress
-            }
-            onClick={() => void assessConfirmedTasksAndOpenExposure()}
-          >
+          <Button {...buttonProps6}>
             {taskAssessmentRequestInProgress
               ? "Assessing tasks…"
               : "Explore AI impact"}
@@ -278,11 +290,13 @@ const ProfileTasks = () => {
 
       {editorOpen && (
         <TaskEditorDialog
-          open={editorOpen}
-          mode={editorMode}
-          initialValues={editorValues}
-          onClose={closeEditor}
-          onSave={saveTask}
+          {...({
+            open: editorOpen,
+            mode: editorMode,
+            initialValues: editorValues,
+            onClose: closeEditor,
+            onSave: saveTask,
+          } satisfies Partial<ComponentProps<typeof TaskEditorDialog>>)}
         />
       )}
     </div>

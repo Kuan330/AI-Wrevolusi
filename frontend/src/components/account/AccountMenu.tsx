@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { User } from "lucide-react";
@@ -6,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { useAccount } from "./useAccount";
 import { AuthDialog } from "./AuthDialog";
-export default function AccountMenu({ iconOnly = false }: { iconOnly?: boolean }) {
+export default function AccountMenu(props: { iconOnly?: boolean }) {
+  const { iconOnly = false } = props;
   const { user, logout } = useAccount();
   const [authOpen, setAuthOpen] = useState(false);
   const [open, setOpen] = useState(false);
@@ -18,16 +20,56 @@ export default function AccountMenu({ iconOnly = false }: { iconOnly?: boolean }
     return (
       <>
         <Button
-          aria-label="Log in or create an account"
-          variant="outline"
-          className="shrink-0 rounded-full"
-          onClick={() => setAuthOpen(true)}
+          {...({
+            "aria-label": "Log in or create an account",
+            variant: "outline",
+            className: "shrink-0 rounded-full",
+            onClick: () => setAuthOpen(true),
+          } satisfies Partial<ComponentProps<typeof Button>>)}
         >
-          {iconOnly ? <User className="size-4" aria-hidden="true" /> : "Log in"}
+          {iconOnly ? (
+            <User
+              {...({
+                className: "size-4",
+                "aria-hidden": "true",
+              } satisfies Partial<ComponentProps<typeof User>>)}
+            />
+          ) : (
+            "Log in"
+          )}
         </Button>
-        {authOpen && <AuthDialog open onClose={() => setAuthOpen(false)} />}
+        {authOpen && (
+          <AuthDialog
+            {...({
+              open: true,
+              onClose: () => setAuthOpen(false),
+            } satisfies Partial<ComponentProps<typeof AuthDialog>>)}
+          />
+        )}
       </>
     );
+  const buttonProps1 = {
+    variant: "ghost",
+    disabled: busy,
+    className: "mt-2 w-full justify-start border-t",
+    onClick: async () => {
+      setBusy(true);
+      setError("");
+      try {
+        await logout();
+        setOpen(false);
+        navigate(ROUTES.home, { replace: true });
+      } catch (e) {
+        setError(
+          e instanceof Error
+            ? e.message
+            : "Could not log out. Please try again.",
+        );
+      } finally {
+        setBusy(false);
+      }
+    },
+  } satisfies Partial<ComponentProps<typeof Button>>;
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger
@@ -54,38 +96,22 @@ export default function AccountMenu({ iconOnly = false }: { iconOnly?: boolean }
             ].map(([path, label]) => (
               <Link
                 key={label}
-                to={path}
-                state={path === ROUTES.workProfile && location.pathname !== ROUTES.workProfile ? { returnTo: location.pathname + location.search } : location.state}
-                onClick={() => setOpen(false)}
-                className="block rounded-lg px-3 py-2 text-sm hover:bg-[#eaf3fb]"
+                {...({
+                  to: path,
+                  state:
+                    path === ROUTES.workProfile &&
+                    location.pathname !== ROUTES.workProfile
+                      ? { returnTo: location.pathname + location.search }
+                      : location.state,
+                  onClick: () => setOpen(false),
+                  className:
+                    "block rounded-lg px-3 py-2 text-sm hover:bg-[#eaf3fb]",
+                } satisfies Partial<ComponentProps<typeof Link>>)}
               >
                 {label}
               </Link>
             ))}
-            <Button
-              variant="ghost"
-              disabled={busy}
-              className="mt-2 w-full justify-start border-t"
-              onClick={async () => {
-                setBusy(true);
-                setError("");
-                try {
-                  await logout();
-                  setOpen(false);
-                  navigate(ROUTES.home, { replace: true });
-                } catch (e) {
-                  setError(
-                    e instanceof Error
-                      ? e.message
-                      : "Could not log out. Please try again.",
-                  );
-                } finally {
-                  setBusy(false);
-                }
-              }}
-            >
-              Log out
-            </Button>
+            <Button {...buttonProps1}>Log out</Button>
             {error && (
               <p role="alert" className="text-xs text-destructive">
                 {error}

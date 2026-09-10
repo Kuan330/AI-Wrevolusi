@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useAccount } from "@/components/account/useAccount";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -30,13 +31,26 @@ const WorkProfile = () => {
   const { user } = useAccount();
   const hasWorkspace = Boolean(readTaskWorkspace()?.tasksOccupationCode);
   const requestedReturn = location.state?.returnTo;
-  const validReturn = typeof requestedReturn === "string" &&
-    [ROUTES.task, ROUTES.aiExposure, ROUTES.skills, ROUTES.learningCentre, ROUTES.plan, ROUTES.possibilities].some(path => requestedReturn.split("?")[0] === path);
-  const returnTo = validReturn ? requestedReturn : hasConfirmedAnalysis() ? ROUTES.aiExposure : ROUTES.task;
+  const validReturn =
+    typeof requestedReturn === "string" &&
+    [
+      ROUTES.task,
+      ROUTES.aiExposure,
+      ROUTES.skills,
+      ROUTES.learningCentre,
+      ROUTES.plan,
+      ROUTES.possibilities,
+    ].some((path) => requestedReturn.split("?")[0] === path);
+  const returnTo = validReturn
+    ? requestedReturn
+    : hasConfirmedAnalysis()
+      ? ROUTES.aiExposure
+      : ROUTES.task;
 
   const occupation = useOccupationFilters();
   const [mode, setModeState] = useState<WorkProfileMode>("filters");
-  const [selectedFromSearch, setSelectedFromSearch] = useState<OccupationSearchResult | null>(null);
+  const [selectedFromSearch, setSelectedFromSearch] =
+    useState<OccupationSearchResult | null>(null);
 
   useEffect(() => {
     // Occupations are selected for the current flow only. The task workspace
@@ -45,20 +59,31 @@ const WorkProfile = () => {
     clearSelectedOccupation();
   }, []);
 
-  const persistOccupation = (unit: ReferenceOccupation, path: ReferenceOccupation[]) => {
+  const persistOccupation = (
+    unit: ReferenceOccupation,
+    path: ReferenceOccupation[],
+  ) => {
     saveSelectedOccupation({ unit, path });
   };
 
-  const goToTasks = (unit: ReferenceOccupation, path: ReferenceOccupation[]) => {
+  const goToTasks = (
+    unit: ReferenceOccupation,
+    path: ReferenceOccupation[],
+  ) => {
     persistOccupation(unit, path);
     navigate(ROUTES.task);
   };
 
-  const activeUnit = mode === "search" ? selectedFromSearch?.unit ?? null : occupation.selectedUnit;
-  const activePath = mode === "search" ? selectedFromSearch?.path ?? [] : occupation.selectedPath;
+  const activeUnit =
+    mode === "search"
+      ? (selectedFromSearch?.unit ?? null)
+      : occupation.selectedUnit;
+  const activePath =
+    mode === "search"
+      ? (selectedFromSearch?.path ?? [])
+      : occupation.selectedPath;
   const confirmedUnit = activeUnit;
   const confirmedPath = activePath;
-
 
   const setMode = (nextMode: WorkProfileMode) => {
     if (nextMode === mode) return;
@@ -90,23 +115,42 @@ const WorkProfile = () => {
     }
   };
 
+  const buttonProps1 = {
+    className: "profile-blue-btn h-10 whitespace-nowrap rounded-full px-5",
+    disabled: !confirmedUnit,
+    onClick: handleContinue,
+  } satisfies Partial<ComponentProps<typeof Button>>;
   return (
     <div className="space-y-5">
       <PageHeader
         title="Find the occupation that matches your work"
         description="Search by job title, or browse by field of work."
-        actions={user && hasWorkspace ? (
-          <Button variant="outline" className="shrink-0 rounded-full" onClick={() => {
-            clearSelectedOccupation();
-            navigate(returnTo);
-          }}><ArrowLeft className="size-4"/> Back to previous page</Button>
-        ) : undefined}
+        actions={
+          user && hasWorkspace ? (
+            <Button
+              {...({
+                variant: "outline",
+                className: "shrink-0 rounded-full",
+                onClick: () => {
+                  clearSelectedOccupation();
+                  navigate(returnTo);
+                },
+              } satisfies Partial<ComponentProps<typeof Button>>)}
+            >
+              <ArrowLeft className="size-4" /> Back to previous page
+            </Button>
+          ) : undefined
+        }
       />
 
       {occupation.error ? (
         <div className="rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
           {occupation.error}
-          <button type="button" className="ml-3 underline" onClick={() => window.location.reload()}>
+          <button
+            type="button"
+            className="ml-3 underline"
+            onClick={() => window.location.reload()}
+          >
             Retry
           </button>
         </div>
@@ -117,48 +161,67 @@ const WorkProfile = () => {
           <>
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-foreground">Filter by category</p>
+                <p className="text-sm font-medium text-foreground">
+                  Filter by category
+                </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Choose from the form fields to narrow down your exact occupation.
+                  Choose from the form fields to narrow down your exact
+                  occupation.
                 </p>
               </div>
-              <GradientPill asChild className="shrink-0 transition">
+              <GradientPill
+                {...({
+                  asChild: true,
+                  className: "shrink-0 transition",
+                } satisfies Partial<ComponentProps<typeof GradientPill>>)}
+              >
                 <button type="button" onClick={() => setMode("search")}>
                   Search by job title instead
                 </button>
               </GradientPill>
             </div>
             <OccupationFilters
-              options={occupation.options}
-              selections={occupation.selections}
-              onSelect={(key, code) => {
-                void occupation.selectFilter(key, code);
-              }}
+              {...({
+                options: occupation.options,
+                selections: occupation.selections,
+                onSelect: (key, code) => {
+                  void occupation.selectFilter(key, code);
+                },
+              } satisfies Partial<ComponentProps<typeof OccupationFilters>>)}
             />
           </>
         ) : (
           <>
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-foreground">Search by job title</p>
+                <p className="text-sm font-medium text-foreground">
+                  Search by job title
+                </p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Type and see matching occupations instantly.
                 </p>
               </div>
-              <GradientPill asChild className="shrink-0 transition">
+              <GradientPill
+                {...({
+                  asChild: true,
+                  className: "shrink-0 transition",
+                } satisfies Partial<ComponentProps<typeof GradientPill>>)}
+              >
                 <button type="button" onClick={() => setMode("filters")}>
                   Back to category filters
                 </button>
               </GradientPill>
             </div>
             <OccupationSearch
-              query={occupation.query}
-              searching={occupation.searching}
-              hasSearched={occupation.hasSearched}
-              results={occupation.searchResults}
-              selectedCode={selectedFromSearch?.unit.occupation_code ?? null}
-              onQueryChange={handleQueryChange}
-              onChoose={handleSearchChoice}
+              {...({
+                query: occupation.query,
+                searching: occupation.searching,
+                hasSearched: occupation.hasSearched,
+                results: occupation.searchResults,
+                selectedCode: selectedFromSearch?.unit.occupation_code ?? null,
+                onQueryChange: handleQueryChange,
+                onChoose: handleSearchChoice,
+              } satisfies Partial<ComponentProps<typeof OccupationSearch>>)}
             />
           </>
         )}
@@ -166,13 +229,7 @@ const WorkProfile = () => {
         <div className="mt-4 border-t border-white/70 pt-4">
           <SelectedOccupationSummary occupation={confirmedUnit} />
           <div className="mt-3 flex justify-end">
-            <Button
-              className="profile-blue-btn h-10 whitespace-nowrap rounded-full px-5"
-              disabled={!confirmedUnit}
-              onClick={handleContinue}
-            >
-              Confirm and continue
-            </Button>
+            <Button {...buttonProps1}>Confirm and continue</Button>
           </div>
         </div>
       </section>

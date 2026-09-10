@@ -1,5 +1,14 @@
+import type { ComponentProps } from "react";
 import { useMemo, useState } from "react";
-import { ArrowRight, BookOpen, GripVertical, RotateCcw, Sparkles, Sprout, TrendingUp } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  GripVertical,
+  RotateCcw,
+  Sparkles,
+  Sprout,
+  TrendingUp,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -15,7 +24,10 @@ import {
   type SkillDirection,
 } from "@/pages/Skills/skillDirections";
 import { ApiError } from "@/services/api";
-import { skillDirectionService, useLocalLearningTemplates } from "@/services/skillDirectionService";
+import {
+  skillDirectionService,
+  useLocalLearningTemplates,
+} from "@/services/skillDirectionService";
 
 type SkillDirectionBoardProps = {
   evidence: SkillEvidence[];
@@ -33,32 +45,41 @@ const DIRECTION_DETAILS: Record<
 > = {
   keep_building: {
     title: "Keep building",
-    description: "Keep using these strengths and make them more visible in your work.",
+    description:
+      "Keep using these strengths and make them more visible in your work.",
     className: "is-keep-building",
     icon: Sprout,
   },
   strengthen: {
     title: "Strengthen",
-    description: "Develop these skills further as work and responsibilities change.",
+    description:
+      "Develop these skills further as work and responsibilities change.",
     className: "is-strengthen",
     icon: TrendingUp,
   },
   use_with_ai: {
     title: "Use with AI",
-    description: "Learn where AI can support the routine parts while you retain judgement.",
+    description:
+      "Learn where AI can support the routine parts while you retain judgement.",
     className: "is-use-with-ai",
     icon: Sparkles,
   },
 };
 
-const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardProps) => {
-  const recommended = useMemo(() => buildRecommendedDirections(evidence), [evidence]);
+const SkillDirectionBoard = (props: SkillDirectionBoardProps) => {
+  const { evidence, occupationTitle } = props;
+  const recommended = useMemo(
+    () => buildRecommendedDirections(evidence),
+    [evidence],
+  );
   const [assignments, setAssignments] = useState(recommended);
   const [draggedSkillId, setDraggedSkillId] = useState<number | null>(null);
   const [dropTarget, setDropTarget] = useState<SkillDirection | null>(null);
   const [generating, setGenerating] = useState(false);
   const [themes, setThemes] = useState<LearningTheme[]>([]);
-  const [selectedThemeIds, setSelectedThemeIds] = useState<Set<string>>(new Set());
+  const [selectedThemeIds, setSelectedThemeIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [error, setError] = useState<string | null>(null);
   const [addedCount, setAddedCount] = useState(0);
 
@@ -77,7 +98,11 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
     invalidateAnalysis();
   };
 
-  const moveWithKeyboard = (skillId: number, direction: SkillDirection, key: string) => {
+  const moveWithKeyboard = (
+    skillId: number,
+    direction: SkillDirection,
+    key: string,
+  ) => {
     const currentIndex = SKILL_DIRECTIONS.indexOf(direction);
     if (key === "ArrowLeft" && currentIndex > 0) {
       moveSkill(skillId, SKILL_DIRECTIONS[currentIndex - 1]);
@@ -133,45 +158,69 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
   };
 
   const addSelectedThemes = () => {
-    const selected = themes.filter((theme) => selectedThemeIds.has(theme.theme_id));
+    const selected = themes.filter((theme) =>
+      selectedThemeIds.has(theme.theme_id),
+    );
     addLearningCentreItems(selected);
     setAddedCount(selected.length);
   };
 
+  const buttonProps1 = {
+    type: "button",
+    variant: "ghost",
+    size: "sm",
+    className: "rounded-full text-[#3d5f7a]",
+    onClick: () => {
+      setAssignments(recommended);
+      invalidateAnalysis();
+    },
+  } satisfies Partial<ComponentProps<typeof Button>>;
+  const buttonProps2 = {
+    type: "button",
+    className: "profile-gradient-btn rounded-full px-6 font-normal",
+    disabled: generating,
+    onClick: () => void confirmDirections(),
+  } satisfies Partial<ComponentProps<typeof Button>>;
   return (
-    <section id="skill-directions" tabIndex={-1} className="skills-direction-section scroll-mt-24" aria-labelledby="skill-directions-heading">
+    <section
+      id="skill-directions"
+      tabIndex={-1}
+      className="skills-direction-section scroll-mt-24"
+      aria-labelledby="skill-directions-heading"
+    >
       <div className="skills-direction-heading">
         <div>
           <p className="skills-kicker">Plan your next skill move</p>
-          <h2 id="skill-directions-heading" className="mt-1 text-2xl font-semibold text-[#2f2430]">
+          <h2
+            id="skill-directions-heading"
+            className="mt-1 text-2xl font-semibold text-[#2f2430]"
+          >
             Choose your skill directions
           </h2>
           <p className="mt-1 max-w-3xl text-sm leading-6 text-[#7f7280]">
-            We have placed each identified skill in a suggested starting direction. Drag any
-            skill to reflect what matters to you, then confirm to generate learning themes.
+            We have placed each identified skill in a suggested starting
+            direction. Drag any skill to reflect what matters to you, then
+            confirm to generate learning themes.
           </p>
         </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="rounded-full text-[#3d5f7a]"
-          onClick={() => {
-            setAssignments(recommended);
-            invalidateAnalysis();
-          }}
-        >
+        <Button {...buttonProps1}>
           <RotateCcw aria-hidden />
           Reset suggestions
         </Button>
       </div>
 
       <div className="skills-direction-guide" aria-label="How this works">
-        <span><strong>01</strong> Arrange your skills</span>
+        <span>
+          <strong>01</strong> Arrange your skills
+        </span>
         <ArrowRight aria-hidden />
-        <span><strong>02</strong> Confirm your directions</span>
+        <span>
+          <strong>02</strong> Confirm your directions
+        </span>
         <ArrowRight aria-hidden />
-        <span><strong>03</strong> Choose learning themes</span>
+        <span>
+          <strong>03</strong> Choose learning themes
+        </span>
       </div>
 
       <div className="skills-direction-board">
@@ -194,30 +243,39 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
                 setDropTarget(direction);
               }}
               onDragLeave={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+                if (
+                  !event.currentTarget.contains(event.relatedTarget as Node)
+                ) {
                   setDropTarget(null);
                 }
               }}
               onDrop={(event) => {
                 event.preventDefault();
-                const skillId = Number(event.dataTransfer.getData("text/skill-id"));
+                const skillId = Number(
+                  event.dataTransfer.getData("text/skill-id"),
+                );
                 if (skillId) moveSkill(skillId, direction);
                 setDraggedSkillId(null);
                 setDropTarget(null);
               }}
             >
               <div className="skills-direction-column__header">
-                <span className="skills-direction-column__icon"><Icon aria-hidden /></span>
+                <span className="skills-direction-column__icon">
+                  <Icon aria-hidden />
+                </span>
                 <div>
                   <h3>{details.title}</h3>
                   <p>{details.description}</p>
                 </div>
-                <span className="skills-direction-column__count">{items.length}</span>
+                <span className="skills-direction-column__count">
+                  {items.length}
+                </span>
               </div>
 
               <div className="skills-direction-column__items">
                 {items.map(({ skill }) => {
-                  const adjusted = recommended[skill.wef_skill_id] !== direction;
+                  const adjusted =
+                    recommended[skill.wef_skill_id] !== direction;
                   return (
                     <article
                       key={skill.wef_skill_id}
@@ -228,10 +286,19 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
                         draggedSkillId === skill.wef_skill_id && "is-dragging",
                       )}
                       aria-label={`${skill.core_skill}. ${adjusted ? "Your adjusted choice" : "Suggested direction"}. Use left and right arrow keys to move.`}
-                      onKeyDown={(event) => moveWithKeyboard(skill.wef_skill_id, direction, event.key)}
+                      onKeyDown={(event) =>
+                        moveWithKeyboard(
+                          skill.wef_skill_id,
+                          direction,
+                          event.key,
+                        )
+                      }
                       onDragStart={(event) => {
                         event.dataTransfer.effectAllowed = "move";
-                        event.dataTransfer.setData("text/skill-id", String(skill.wef_skill_id));
+                        event.dataTransfer.setData(
+                          "text/skill-id",
+                          String(skill.wef_skill_id),
+                        );
                         setDraggedSkillId(skill.wef_skill_id);
                       }}
                       onDragEnd={() => {
@@ -245,7 +312,11 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
                     </article>
                   );
                 })}
-                {!items.length ? <p className="skills-direction-column__empty">Drop a skill here</p> : null}
+                {!items.length ? (
+                  <p className="skills-direction-column__empty">
+                    Drop a skill here
+                  </p>
+                ) : null}
               </div>
             </section>
           );
@@ -258,13 +329,10 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
             ? "Confirm your directions to see starter learning themes. These suggestions use templates based on your selected skills and directions."
             : "When you confirm, your chosen directions and supporting task text are sent to the model to create broad learning themes."}
         </p>
-        <Button
-          type="button"
-          className="profile-gradient-btn rounded-full px-6 font-normal"
-          disabled={generating}
-          onClick={() => void confirmDirections()}
-        >
-          {generating ? "Generating learning themes…" : "Confirm my skill directions"}
+        <Button {...buttonProps2}>
+          {generating
+            ? "Generating learning themes…"
+            : "Confirm my skill directions"}
           {!generating ? <Sparkles aria-hidden /> : null}
         </Button>
       </div>
@@ -277,7 +345,10 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
       ) : null}
 
       {themes.length ? (
-        <div id="learning-themes" className="skills-learning-themes scroll-mt-24">
+        <div
+          id="learning-themes"
+          className="skills-learning-themes scroll-mt-24"
+        >
           <div>
             <p className="skills-kicker">Your learning shortlist</p>
             <h3 className="mt-1 text-xl font-semibold text-[#2f2430]">
@@ -285,23 +356,35 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
             </h3>
             <p className="mt-1 text-sm leading-6 text-[#7f7280]">
               {useLocalLearningTemplates ? "Template suggestions · " : ""}
-              These are broad learning themes, not course recommendations. Select the ones
-              you want Learning Resources to use for course matching.
+              These are broad learning themes, not course recommendations.
+              Select the ones you want Learning Resources to use for course
+              matching.
             </p>
           </div>
 
           <div className="skills-learning-themes__grid">
             {themes.map((theme) => {
               const checked = selectedThemeIds.has(theme.theme_id);
+              const checkboxProps3 = {
+                checked: checked,
+                onCheckedChange: (value) =>
+                  toggleTheme(theme.theme_id, value === true),
+                "aria-label": `Add ${theme.title} to your learning shortlist`,
+              } satisfies Partial<ComponentProps<typeof Checkbox>>;
               return (
-                <label key={theme.theme_id} className={cn("skills-learning-theme", checked && "is-selected")}>
-                  <Checkbox
-                    checked={checked}
-                    onCheckedChange={(value) => toggleTheme(theme.theme_id, value === true)}
-                    aria-label={`Add ${theme.title} to your learning shortlist`}
-                  />
+                <label
+                  key={theme.theme_id}
+                  className={cn(
+                    "skills-learning-theme",
+                    checked && "is-selected",
+                  )}
+                >
+                  <Checkbox {...checkboxProps3} />
                   <span>
-                    <small>{theme.skill_name} · {DIRECTION_DETAILS[theme.direction].title}</small>
+                    <small>
+                      {theme.skill_name} ·{" "}
+                      {DIRECTION_DETAILS[theme.direction].title}
+                    </small>
                     <strong>{theme.title}</strong>
                     <span>{theme.description}</span>
                     <em>{theme.why_relevant}</em>
@@ -318,7 +401,13 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
                 : `${selectedThemeIds.size} selected`}
             </p>
             {addedCount ? (
-              <Button asChild variant="outline" className="profile-outline-btn rounded-full">
+              <Button
+                {...({
+                  asChild: true,
+                  variant: "outline",
+                  className: "profile-outline-btn rounded-full",
+                } satisfies Partial<ComponentProps<typeof Button>>)}
+              >
                 <Link to={ROUTES.learningCentre}>
                   View Learning Centre
                   <BookOpen aria-hidden />
@@ -326,10 +415,12 @@ const SkillDirectionBoard = ({ evidence, occupationTitle }: SkillDirectionBoardP
               </Button>
             ) : (
               <Button
-                type="button"
-                className="profile-gradient-btn rounded-full font-normal"
-                disabled={!selectedThemeIds.size}
-                onClick={addSelectedThemes}
+                {...({
+                  type: "button",
+                  className: "profile-gradient-btn rounded-full font-normal",
+                  disabled: !selectedThemeIds.size,
+                  onClick: addSelectedThemes,
+                } satisfies Partial<ComponentProps<typeof Button>>)}
               >
                 Add to Learning Centre
                 <ArrowRight aria-hidden />

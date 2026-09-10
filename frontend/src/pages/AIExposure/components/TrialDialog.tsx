@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { useAccount } from "@/components/account/useAccount";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -31,12 +32,8 @@ type Props = {
   onClose: () => void;
   onSave: (update: (current: TaskPractice) => TaskPractice) => void;
 };
-export default function TrialDialog({
-  task,
-  baselineTrial,
-  onClose,
-  onSave,
-}: Props) {
+export default function TrialDialog(props: Props) {
+  const { task, baselineTrial, onClose, onSave } = props;
   const { user } = useAccount();
   const baseline = task.practice?.baseline;
   const latest = task.practice?.trials.find(
@@ -128,8 +125,59 @@ export default function TrialDialog({
       );
     }
   };
+  const dialogProps1 = {
+    open: true,
+    onOpenChange: (open) => !open && onClose(),
+  } satisfies Partial<ComponentProps<typeof Dialog>>;
+  const formFieldProps2 = {
+    label: "Work completed",
+    hint: "For example: summarised 20 stock records. Use a comparable amount of work for timing comparisons.",
+  } satisfies Partial<ComponentProps<typeof FormField>>;
+  const textareaProps3 = {
+    className: "min-h-20",
+    rows: 2,
+    required: true,
+    maxLength: 300,
+    readOnly: Boolean(baselineTrial),
+    value: workload,
+    onChange: (event) => {
+      setWorkload(event.target.value);
+      setComparable(false);
+      const saved = matchingBaseline(
+        baseline,
+        task.wording,
+        event.target.value,
+      );
+      setBaselineMinutes(saved == null ? "" : String(saved));
+    },
+  } satisfies Partial<ComponentProps<typeof Textarea>>;
+  const formFieldProps4 = {
+    label: "Usual time without AI (minutes)",
+    hint: baselineTrial
+      ? "An estimate is fine."
+      : "Optional. An estimate is fine; leave blank if unknown or you already used AI before.",
+  } satisfies Partial<ComponentProps<typeof FormField>>;
+  const inputProps5 = {
+    required: Boolean(baselineTrial),
+    type: "number",
+    min: "0.1",
+    max: "100000",
+    step: "0.1",
+    value: baselineMinutes,
+    onChange: (e) => setBaselineMinutes(e.target.value),
+  } satisfies Partial<ComponentProps<typeof Input>>;
+  const buttonProps6 = {
+    type: "button",
+    variant: "outline",
+    className: "rounded-full",
+    onClick: onClose,
+  } satisfies Partial<ComponentProps<typeof Button>>;
+  const buttonProps7 = {
+    type: "submit",
+    className: "profile-blue-btn rounded-full",
+  } satisfies Partial<ComponentProps<typeof Button>>;
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
+    <Dialog {...dialogProps1}>
       <DialogContent className="profile-dialog-surface w-[calc(100%-2rem)] max-w-3xl max-h-[90dvh] overflow-y-auto rounded-3xl p-6">
         <DialogHeader>
           <DialogTitle>
@@ -146,77 +194,48 @@ export default function TrialDialog({
             save();
           }}
         >
-          <FormField
-            label="Work completed"
-            hint="For example: summarised 20 stock records. Use a comparable amount of work for timing comparisons."
-          >
-            <Textarea
-              className="min-h-20"
-              rows={2}
-              required
-              maxLength={300}
-              readOnly={Boolean(baselineTrial)}
-              value={workload}
-              onChange={(event) => {
-                setWorkload(event.target.value);
-                setComparable(false);
-                const saved = matchingBaseline(
-                  baseline,
-                  task.wording,
-                  event.target.value,
-                );
-                setBaselineMinutes(saved == null ? "" : String(saved));
-              }}
-            />
+          <FormField {...formFieldProps2}>
+            <Textarea {...textareaProps3} />
           </FormField>
           <div className="grid items-start gap-5 sm:grid-cols-2">
             {!baselineTrial && (
               <FormField
-                label="Total time using AI (minutes)"
-                hint="Include preparation, using AI, checking and correcting its output."
+                {...({
+                  label: "Total time using AI (minutes)",
+                  hint: "Include preparation, using AI, checking and correcting its output.",
+                } satisfies Partial<ComponentProps<typeof FormField>>)}
               >
                 <Input
-                  required
-                  type="number"
-                  min="0.1"
-                  max="100000"
-                  step="0.1"
-                  value={minutes}
-                  onChange={(e) => setMinutes(e.target.value)}
+                  {...({
+                    required: true,
+                    type: "number",
+                    min: "0.1",
+                    max: "100000",
+                    step: "0.1",
+                    value: minutes,
+                    onChange: (e) => setMinutes(e.target.value),
+                  } satisfies Partial<ComponentProps<typeof Input>>)}
                 />
               </FormField>
             )}
-            <FormField
-              label="Usual time without AI (minutes)"
-              hint={
-                baselineTrial
-                  ? "An estimate is fine."
-                  : "Optional. An estimate is fine; leave blank if unknown or you already used AI before."
-              }
-            >
-              <Input
-                required={Boolean(baselineTrial)}
-                type="number"
-                min="0.1"
-                max="100000"
-                step="0.1"
-                value={baselineMinutes}
-                onChange={(e) => setBaselineMinutes(e.target.value)}
-              />
+            <FormField {...formFieldProps4}>
+              <Input {...inputProps5} />
             </FormField>
             {!baselineTrial && (
               <FormField label="Did the result meet your requirements?">
                 <FormSelect
-                  label="Did the result meet your requirements?"
-                  required
-                  placeholder="Choose a result"
-                  value={quality}
-                  onValueChange={(value) => setQuality(value as TrialQuality)}
-                  options={[
-                    { value: "met", label: "Met requirements" },
-                    { value: "partly", label: "Partly met requirements" },
-                    { value: "not_met", label: "Did not meet requirements" },
-                  ]}
+                  {...({
+                    label: "Did the result meet your requirements?",
+                    required: true,
+                    placeholder: "Choose a result",
+                    value: quality,
+                    onValueChange: (value) => setQuality(value as TrialQuality),
+                    options: [
+                      { value: "met", label: "Met requirements" },
+                      { value: "partly", label: "Partly met requirements" },
+                      { value: "not_met", label: "Did not meet requirements" },
+                    ],
+                  } satisfies Partial<ComponentProps<typeof FormSelect>>)}
                 />
               </FormField>
             )}
@@ -238,7 +257,9 @@ export default function TrialDialog({
             )}
           </div>
           <p className="text-xs text-[#7f7280]">
-            {user ? "Saved with your account’s task profile." : "Saved in this browser with your task profile."}
+            {user
+              ? "Saved with your account’s task profile."
+              : "Saved in this browser with your task profile."}
           </p>
           {error && (
             <p role="alert" className="text-sm text-destructive">
@@ -246,15 +267,8 @@ export default function TrialDialog({
             </p>
           )}
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              className="rounded-full"
-              onClick={onClose}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" className="profile-blue-btn rounded-full">
+            <Button {...buttonProps6}>Cancel</Button>
+            <Button {...buttonProps7}>
               {baselineTrial ? "Save baseline" : "Save trial"}
             </Button>
           </DialogFooter>

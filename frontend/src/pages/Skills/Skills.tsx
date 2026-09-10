@@ -1,6 +1,6 @@
+import type { ComponentProps } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
-
 
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,6 @@ import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
 import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
 import "@/pages/Skills/skills.css";
-
 
 const Skills = () => {
   const { hash } = useLocation();
@@ -30,11 +29,17 @@ const Skills = () => {
       .wefSkills()
       .then((rows) => {
         if (cancelled) return;
-        setSkills([...rows].sort((left, right) => left.wef_skill_id - right.wef_skill_id));
+        setSkills(
+          [...rows].sort(
+            (left, right) => left.wef_skill_id - right.wef_skill_id,
+          ),
+        );
       })
       .catch(() => {
         if (!cancelled) {
-          setLoadError("The skill framework could not be loaded. Please try again.");
+          setLoadError(
+            "The skill framework could not be loaded. Please try again.",
+          );
         }
       })
       .finally(() => {
@@ -49,7 +54,9 @@ const Skills = () => {
   useEffect(() => {
     if (loading || loadError || hash !== "#skill-directions") return;
     const frame = requestAnimationFrame(() => {
-      const section = document.getElementById("skill-directions") ?? document.getElementById("identified-skills");
+      const section =
+        document.getElementById("skill-directions") ??
+        document.getElementById("identified-skills");
       section?.scrollIntoView({ behavior: "instant", block: "start" });
       section?.focus({ preventScroll: true });
     });
@@ -64,10 +71,14 @@ const Skills = () => {
     ({ skill }) => skill.wef_skill_id === selectedSkillId,
   )
     ? selectedSkillId
-    : evidence[0]?.skill.wef_skill_id ?? null;
+    : (evidence[0]?.skill.wef_skill_id ?? null);
 
   if (!analysis) {
-    return <Navigate to={ROUTES.workProfile} replace />;
+    const navigateProps1 = {
+      to: ROUTES.workProfile,
+      replace: true,
+    } satisfies Partial<ComponentProps<typeof Navigate>>;
+    return <Navigate {...navigateProps1} />;
   }
 
   const selectFromMap = (skillId: number) => {
@@ -80,6 +91,15 @@ const Skills = () => {
     });
   };
 
+  const buttonProps2 = {
+    asChild: true,
+    variant: "outline",
+    className: "profile-outline-btn rounded-full",
+  } satisfies Partial<ComponentProps<typeof Button>>;
+  const buttonProps3 = {
+    asChild: true,
+    className: "profile-gradient-btn rounded-full font-normal",
+  } satisfies Partial<ComponentProps<typeof Button>>;
   return (
     <div className="skills-page mx-auto w-full max-w-[1180px] space-y-6 pb-10">
       <PageHeader
@@ -87,10 +107,10 @@ const Skills = () => {
         description={`See the skills reflected across your confirmed tasks for ${analysis.occupationTitle}, and how their value may change in the future.`}
         actions={
           <div className="flex flex-wrap justify-end gap-2">
-            <Button asChild variant="outline" className="profile-outline-btn rounded-full">
+            <Button {...buttonProps2}>
               <Link to={ROUTES.task}>Edit tasks</Link>
             </Button>
-            <Button asChild className="profile-gradient-btn rounded-full font-normal">
+            <Button {...buttonProps3}>
               <Link to={ROUTES.aiExposure}>AI exposure</Link>
             </Button>
           </div>
@@ -118,28 +138,31 @@ const Skills = () => {
       ) : (
         <>
           <SkillMapOverview
-            skills={skills}
-            evidence={evidence}
-            taskCount={analysis.tasks.length}
-            selectedSkillId={activeSelectedSkillId}
-            onSelectSkill={selectFromMap}
+            {...({
+              skills: skills,
+              evidence: evidence,
+              taskCount: analysis.tasks.length,
+              selectedSkillId: activeSelectedSkillId,
+              onSelectSkill: selectFromMap,
+            } satisfies Partial<ComponentProps<typeof SkillMapOverview>>)}
           />
 
           <SkillDetailWorkspace
-            evidence={evidence}
-            selectedSkillId={activeSelectedSkillId}
-            onSelectSkill={setSelectedSkillId}
+            {...({
+              evidence: evidence,
+              selectedSkillId: activeSelectedSkillId,
+              onSelectSkill: setSelectedSkillId,
+            } satisfies Partial<ComponentProps<typeof SkillDetailWorkspace>>)}
           />
 
           <SkillDirectionBoard
-            evidence={evidence}
-            occupationTitle={analysis.occupationTitle}
+            {...({
+              evidence: evidence,
+              occupationTitle: analysis.occupationTitle,
+            } satisfies Partial<ComponentProps<typeof SkillDirectionBoard>>)}
           />
-
         </>
       )}
-
-
     </div>
   );
 };

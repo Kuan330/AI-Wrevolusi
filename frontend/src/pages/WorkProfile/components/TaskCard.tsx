@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { Trash2Icon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,16 @@ interface TaskCardProps {
   onDelete: (taskId: string) => Promise<void> | void;
 }
 
-const TaskCard = ({ task, onDelete }: TaskCardProps) => {
+const TaskCard = (props: TaskCardProps) => {
+  const { task, onDelete } = props;
+  const buttonProps1 = {
+    variant: "ghost",
+    size: "icon",
+    onClick: () => {
+      void onDelete(task.id);
+    },
+    "aria-label": "Delete task",
+  } satisfies Partial<ComponentProps<typeof Button>>;
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -24,14 +34,7 @@ const TaskCard = ({ task, onDelete }: TaskCardProps) => {
         <p className="text-sm text-muted-foreground">
           Exposure: {task.exposure?.replaceAll("_", " ") ?? "not assessed"}
         </p>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => {
-            void onDelete(task.id);
-          }}
-          aria-label="Delete task"
-        >
+        <Button {...buttonProps1}>
           <Trash2Icon className="size-4" />
         </Button>
       </CardContent>

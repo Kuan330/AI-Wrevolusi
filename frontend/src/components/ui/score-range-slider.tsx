@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import "./score-range-slider.css";
 import { RotateCcw } from "lucide-react";
 import { useId } from "react";
@@ -14,11 +15,27 @@ type ScoreRangeSliderProps = {
 };
 
 /** Shared score range control for task-level GenAI exposure scores. */
-const ScoreRangeSlider = ({ value, onValueChange, onReset, className }: ScoreRangeSliderProps) => {
+const ScoreRangeSlider = (props: ScoreRangeSliderProps) => {
+  const { value, onValueChange, onReset, className } = props;
   const labelId = useId();
   const [minimum, maximum] = value;
   const canReset = Boolean(onReset) && (minimum > 0 || maximum < 1);
 
+  const sliderProps1 = {
+    rangeStyle: { background: EXPOSURE_GRADIENT_CSS },
+    value: [minimum, maximum],
+    min: 0,
+    max: 1,
+    step: 0.01,
+    minStepsBetweenThumbs: 1,
+    "aria-labelledby": labelId,
+    "aria-label": "Filter tasks by score range",
+    onValueChange: (nextValue) => {
+      const next = nextValue as [number, number];
+      onValueChange(next[0] <= next[1] ? next : [next[1], next[0]]);
+    },
+    className: "score-range__control",
+  } satisfies Partial<ComponentProps<typeof Slider>>;
   return (
     <div className={cn("score-range__panel", className)}>
       <div className="score-range__header">
@@ -41,7 +58,12 @@ const ScoreRangeSlider = ({ value, onValueChange, onReset, className }: ScoreRan
               title="Reset"
               onClick={onReset}
             >
-              <RotateCcw className="score-range__reset-icon" aria-hidden="true" />
+              <RotateCcw
+                {...({
+                  className: "score-range__reset-icon",
+                  "aria-hidden": "true",
+                } satisfies Partial<ComponentProps<typeof RotateCcw>>)}
+              />
               <span className="score-range__reset-tooltip">Reset</span>
             </button>
           ) : null}
@@ -50,27 +72,15 @@ const ScoreRangeSlider = ({ value, onValueChange, onReset, className }: ScoreRan
           </span>
         </div>
       </div>
-      <Slider
-        rangeStyle={{ background: EXPOSURE_GRADIENT_CSS }}
-        value={[minimum, maximum]}
-        min={0}
-        max={1}
-        step={0.01}
-        minStepsBetweenThumbs={1}
-        aria-labelledby={labelId}
-        aria-label="Filter tasks by score range"
-        onValueChange={(nextValue) => {
-          const next = nextValue as [number, number];
-          onValueChange(next[0] <= next[1] ? next : [next[1], next[0]]);
-        }}
-        className="score-range__control"
-      />
+      <Slider {...sliderProps1} />
       <div className="score-range__endpoints">
         <span>
-          <strong className="score-range__endpoint-value">0</strong> · No GenAI automation potential
+          <strong className="score-range__endpoint-value">0</strong> · No GenAI
+          automation potential
         </span>
         <span>
-          <strong className="score-range__endpoint-value">1</strong> · Full GenAI automation potential
+          <strong className="score-range__endpoint-value">1</strong> · Full
+          GenAI automation potential
         </span>
       </div>
     </div>

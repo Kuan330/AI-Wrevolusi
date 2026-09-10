@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { Check, ChevronRight, Sparkles, TrendingUp, Users } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -41,7 +42,10 @@ const trendExplanation = (change: number | null): string => {
   return "More employers expect use of this skill to decrease than increase by 2030.";
 };
 
-const skillPosition = (importance: number | null | undefined, change: number | null) => {
+const skillPosition = (
+  importance: number | null | undefined,
+  change: number | null,
+) => {
   if (typeof importance !== "number" || typeof change !== "number") {
     return {
       label: "Position not available",
@@ -55,7 +59,8 @@ const skillPosition = (importance: number | null | undefined, change: number | n
   if (widelyValued && growing) {
     return {
       label: "Established and growing",
-      explanation: "This skill is already widely valued and expected to grow towards 2030.",
+      explanation:
+        "This skill is already widely valued and expected to grow towards 2030.",
     };
   }
   if (growing) {
@@ -68,7 +73,8 @@ const skillPosition = (importance: number | null | undefined, change: number | n
   if (widelyValued) {
     return {
       label: "Established and evolving",
-      explanation: "This skill is widely valued today, while its future use may be changing.",
+      explanation:
+        "This skill is widely valued today, while its future use may be changing.",
     };
   }
   return {
@@ -78,21 +84,21 @@ const skillPosition = (importance: number | null | undefined, change: number | n
   };
 };
 
-const SkillDetailWorkspace = ({
-  evidence,
-  selectedSkillId,
-  onSelectSkill,
-}: SkillDetailWorkspaceProps) => {
+const SkillDetailWorkspace = (props: SkillDetailWorkspaceProps) => {
+  const { evidence, selectedSkillId, onSelectSkill } = props;
   const selected =
-    evidence.find(({ skill }) => skill.wef_skill_id === selectedSkillId) ?? evidence[0];
+    evidence.find(({ skill }) => skill.wef_skill_id === selectedSkillId) ??
+    evidence[0];
 
   if (!selected) {
     return (
       <section className="skills-glass-card p-6 text-center sm:p-10">
-        <h2 className="text-xl font-semibold text-[#2f2430]">No skills identified yet</h2>
+        <h2 className="text-xl font-semibold text-[#2f2430]">
+          No skills identified yet
+        </h2>
         <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#7f7280]">
-          No skills are connected to the current confirmed tasks yet. You can return to your
-          tasks, add more detail, and analyse them again.
+          No skills are connected to the current confirmed tasks yet. You can
+          return to your tasks, add more detail, and analyse them again.
         </p>
       </section>
     );
@@ -100,38 +106,63 @@ const SkillDetailWorkspace = ({
 
   const { skill, tasks } = selected;
   const capacity = AI_CAPACITIES.find(
-    ({ id }) => id === aiCapacityFromCategory(skill.genai_substitution_capacity_category),
+    ({ id }) =>
+      id === aiCapacityFromCategory(skill.genai_substitution_capacity_category),
   );
   const position = skillPosition(
     skill.core_skill_importance_2025_pct,
     skill.future_net_increase_2025_2030,
   );
 
+  const usersProps2 = {
+    className: "size-5 text-[#4f91ba]",
+    "aria-hidden": true,
+  } satisfies Partial<ComponentProps<typeof Users>>;
+  const trendingUpProps3 = {
+    className: "size-5 text-[#4f91ba]",
+    "aria-hidden": true,
+  } satisfies Partial<ComponentProps<typeof TrendingUp>>;
+  const sparklesProps4 = {
+    className: "size-5 text-[#c99589]",
+    "aria-hidden": true,
+  } satisfies Partial<ComponentProps<typeof Sparkles>>;
   return (
     <section id="identified-skills" className="scroll-mt-24">
       <div className="mb-4">
         <p className="skills-kicker">Evidence from your work</p>
-        <h2 className="mt-1 text-2xl font-semibold text-[#2f2430]">Your identified skills</h2>
+        <h2 className="mt-1 text-2xl font-semibold text-[#2f2430]">
+          Your identified skills
+        </h2>
         <p className="mt-1 max-w-2xl text-sm leading-6 text-[#7f7280]">
-          Choose a skill to see the tasks connected to it, then explore what external
-          research suggests about its future use.
+          Choose a skill to see the tasks connected to it, then explore what
+          external research suggests about its future use.
         </p>
       </div>
 
       <div className="skills-workspace">
-        <aside className="skills-glass-card skills-navigation p-3" aria-label="Identified skills">
+        <aside
+          className="skills-glass-card skills-navigation p-3"
+          aria-label="Identified skills"
+        >
           <p className="px-3 pb-2 pt-1 text-xs leading-5 text-[#7f7280]">
-            <strong className="text-[#3d5f7a]">{evidence.length} skills</strong> reflected
-            across your confirmed tasks
+            <strong className="text-[#3d5f7a]">{evidence.length} skills</strong>{" "}
+            reflected across your confirmed tasks
           </p>
           <div className="skills-navigation-list">
             {evidence.map((item) => {
               const active = item.skill.wef_skill_id === skill.wef_skill_id;
+              const chevronRightProps1 = {
+                className: "mt-1 size-4 shrink-0 text-[#7f7280]",
+                "aria-hidden": true,
+              } satisfies Partial<ComponentProps<typeof ChevronRight>>;
               return (
                 <button
                   key={item.skill.wef_skill_id}
                   type="button"
-                  className={cn("skills-navigation-item", active && "is-active")}
+                  className={cn(
+                    "skills-navigation-item",
+                    active && "is-active",
+                  )}
                   aria-pressed={active}
                   onClick={() => onSelectSkill(item.skill.wef_skill_id)}
                 >
@@ -144,34 +175,44 @@ const SkillDetailWorkspace = ({
                       {item.tasks.length === 1 ? "task" : "tasks"}
                     </span>
                   </span>
-                  <ChevronRight className="mt-1 size-4 shrink-0 text-[#7f7280]" aria-hidden />
+                  <ChevronRight {...chevronRightProps1} />
                 </button>
               );
             })}
           </div>
         </aside>
 
-        <article className="skills-glass-card p-5 sm:p-6 lg:p-7" aria-live="polite">
+        <article
+          className="skills-glass-card p-5 sm:p-6 lg:p-7"
+          aria-live="polite"
+        >
           <div>
             <p className="skills-kicker">Selected skill</p>
             <h3 className="mt-1 text-2xl font-semibold leading-tight text-[#2f2430]">
               {skill.core_skill}
             </h3>
             <p className="mt-1 text-xs text-[#7f7280]">
-              {skill.wef_skill_group ?? "WEF core skill"} · identified from {tasks.length}{" "}
-              {tasks.length === 1 ? "task" : "tasks"}
+              {skill.wef_skill_group ?? "WEF core skill"} · identified from{" "}
+              {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
             </p>
           </div>
 
           <div className="skills-evidence-panel mt-6">
-            <p className="text-sm font-medium text-[#2f2430]">Tasks connected to this skill</p>
+            <p className="text-sm font-medium text-[#2f2430]">
+              Tasks connected to this skill
+            </p>
             <p className="mt-1 text-xs leading-5 text-[#7f7280]">
               These are the confirmed tasks currently linked to this result.
             </p>
             <ul className="mt-3 space-y-2">
               {tasks.map((task) => (
                 <li key={task.id} className="skills-evidence-task">
-                  <Check className="mt-0.5 size-4 shrink-0 text-[#4f91ba]" aria-hidden />
+                  <Check
+                    {...({
+                      className: "mt-0.5 size-4 shrink-0 text-[#4f91ba]",
+                      "aria-hidden": true,
+                    } satisfies Partial<ComponentProps<typeof Check>>)}
+                  />
                   <span>{task.wording}</span>
                 </li>
               ))}
@@ -193,12 +234,14 @@ const SkillDetailWorkspace = ({
               <span>{position.label}</span>
               <p>{position.explanation}</p>
             </div>
-            <small>Position based on current importance and future outlook.</small>
+            <small>
+              Position based on current importance and future outlook.
+            </small>
           </div>
 
           <div className="skills-outlook-grid">
             <div className="skills-insight-card">
-              <Users className="size-5 text-[#4f91ba]" aria-hidden />
+              <Users {...usersProps2} />
               <div className="min-w-0 flex-1">
                 <p className="skills-insight-card__label">Valued today</p>
                 <p className="skills-insight-card__value">
@@ -206,7 +249,9 @@ const SkillDetailWorkspace = ({
                     ? `${skill.core_skill_importance_2025_pct}%`
                     : "Not available"}
                 </p>
-                <p className="skills-insight-card__meta">of surveyed employers</p>
+                <p className="skills-insight-card__meta">
+                  of surveyed employers
+                </p>
                 <p className="skills-insight-card__description">
                   Consider this a core skill for their workforce in 2025.
                 </p>
@@ -214,14 +259,15 @@ const SkillDetailWorkspace = ({
             </div>
 
             <div className="skills-insight-card">
-              <TrendingUp className="size-5 text-[#4f91ba]" aria-hidden />
+              <TrendingUp {...trendingUpProps3} />
               <div className="min-w-0 flex-1">
                 <p className="skills-insight-card__label">Future use by 2030</p>
                 <p className="skills-insight-card__value">
                   {signedPoints(skill.future_net_increase_2025_2030)}
                 </p>
                 <p className="skills-insight-card__meta">
-                  {skill.future_trend_category ?? "Not classified"} · net employer outlook
+                  {skill.future_trend_category ?? "Not classified"} · net
+                  employer outlook
                 </p>
                 <p className="skills-insight-card__description">
                   {trendExplanation(skill.future_net_increase_2025_2030)}
@@ -230,15 +276,21 @@ const SkillDetailWorkspace = ({
             </div>
 
             <div className="skills-insight-card">
-              <Sparkles className="size-5 text-[#c99589]" aria-hidden />
+              <Sparkles {...sparklesProps4} />
               <div className="min-w-0 flex-1">
                 <p className="skills-insight-card__label">Working with GenAI</p>
                 <p className="skills-insight-card__value skills-insight-card__value--text">
-                  {capacity?.label ?? skill.genai_substitution_capacity_category ?? "Not shown"}
+                  {capacity?.label ??
+                    skill.genai_substitution_capacity_category ??
+                    "Not shown"}
                 </p>
-                <p className="skills-insight-card__meta">substitution capacity</p>
+                <p className="skills-insight-card__meta">
+                  substitution capacity
+                </p>
                 <p className="skills-insight-card__description">
-                  {capacityExplanation(skill.genai_substitution_capacity_category)}
+                  {capacityExplanation(
+                    skill.genai_substitution_capacity_category,
+                  )}
                 </p>
               </div>
             </div>

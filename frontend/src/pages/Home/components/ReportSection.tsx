@@ -5,7 +5,8 @@ const ReportSection = () => {
     <section className="report-section" id="report">
       <div className="container">
         <p className="report-label">
-          Sample for a shop supervisor. Your result will follow the tasks you confirm.
+          Sample for a shop supervisor. Your result will follow the tasks you
+          confirm.
         </p>
         <h2 className="report-title">A report you can actually act on</h2>
         <div className="report-grid">
@@ -24,7 +25,9 @@ const ReportSection = () => {
                   <tr key={row.task}>
                     <td>{row.task}</td>
                     <td>
-                      <span className={row.influenceClass}>{row.influence}</span>
+                      <span className={row.influenceClass}>
+                        {row.influence}
+                      </span>
                     </td>
                     <td>{row.suggestion}</td>
                   </tr>
@@ -32,7 +35,8 @@ const ReportSection = () => {
               </tbody>
             </table>
             <div className="report-tip">
-              Core reminder: roles rarely vanish overnight. Task mix changes first.
+              Core reminder: roles rarely vanish overnight. Task mix changes
+              first.
             </div>
           </div>
 

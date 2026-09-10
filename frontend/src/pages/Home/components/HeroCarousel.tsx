@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { useCallback, useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -5,13 +6,17 @@ import { HERO_CAROUSEL_SLIDES } from "./homeData";
 
 const ROTATE_MS = 6000;
 
-export const HeroCarouselBackground = ({ activeIndex }: { activeIndex: number }) => {
+export const HeroCarouselBackground = (props: { activeIndex: number }) => {
+  const { activeIndex } = props;
   return (
     <div className="landing-hero-carousel" aria-hidden="true">
       {HERO_CAROUSEL_SLIDES.map((slide, index) => (
         <div
           key={slide.id}
-          className={cn("landing-hero-carousel__slide", index === activeIndex && "is-active")}
+          className={cn(
+            "landing-hero-carousel__slide",
+            index === activeIndex && "is-active",
+          )}
           style={{ backgroundImage: `url(${slide.src})` }}
         />
       ))}
@@ -25,15 +30,23 @@ type HeroCarouselDotsProps = {
   onSelect: (index: number) => void;
 };
 
-export const HeroCarouselDots = ({ activeIndex, onSelect }: HeroCarouselDotsProps) => {
+export const HeroCarouselDots = (props: HeroCarouselDotsProps) => {
+  const { activeIndex, onSelect } = props;
   return (
-    <div className="landing-hero-carousel__dots" role="tablist" aria-label="Hero image carousel">
+    <div
+      className="landing-hero-carousel__dots"
+      role="tablist"
+      aria-label="Hero image carousel"
+    >
       {HERO_CAROUSEL_SLIDES.map((slide, index) => (
         <button
           key={slide.id}
           type="button"
           role="tab"
-          className={cn("landing-hero-carousel__dot", index === activeIndex && "is-active")}
+          className={cn(
+            "landing-hero-carousel__dot",
+            index === activeIndex && "is-active",
+          )}
           aria-label={`Show slide ${index + 1}: ${slide.alt}`}
           aria-selected={index === activeIndex}
           onClick={() => onSelect(index)}
@@ -58,10 +71,14 @@ const HeroCarousel = () => {
     return () => window.clearInterval(timer);
   }, [activeIndex]);
 
+  const heroCarouselDotsProps1 = {
+    activeIndex: activeIndex,
+    onSelect: goToSlide,
+  } satisfies Partial<ComponentProps<typeof HeroCarouselDots>>;
   return (
     <>
       <HeroCarouselBackground activeIndex={activeIndex} />
-      <HeroCarouselDots activeIndex={activeIndex} onSelect={goToSlide} />
+      <HeroCarouselDots {...heroCarouselDotsProps1} />
     </>
   );
 };

@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
@@ -68,7 +69,11 @@ export default function Possibilities() {
     return (
       <>
         <div className="mx-auto mb-4 max-w-[1180px]">
-          <Button variant="link" asChild>
+          <Button
+            {...({ variant: "link", asChild: true } satisfies Partial<
+              ComponentProps<typeof Button>
+            >)}
+          >
             <Link to={ROUTES.possibilities}>← Back to my direction</Link>
           </Button>
         </div>
@@ -79,7 +84,11 @@ export default function Possibilities() {
   if (!analysis)
     return (
       <JourneyIntro kind="possibilities">
-        <AppButton tone="gradient" asChild>
+        <AppButton
+          {...({ tone: "gradient", asChild: true } satisfies Partial<
+            ComponentProps<typeof AppButton>
+          >)}
+        >
           <Link
             to={
               readTaskWorkspace()?.tasksOccupationCode
@@ -97,12 +106,13 @@ export default function Possibilities() {
     );
   const chosen = options.find((option) => option.id === intent);
   const themes = readLearningCentreItems();
+  const pageHeaderProps1 = {
+    title: "Explore your possibilities",
+    description: `Start with your experience in ${analysis.occupationTitle}. Choose what you would like to explore next.`,
+  } satisfies Partial<ComponentProps<typeof PageHeader>>;
   return (
     <div className="mx-auto max-w-[1180px] pb-10">
-      <PageHeader
-        title="Explore your possibilities"
-        description={`Start with your experience in ${analysis.occupationTitle}. Choose what you would like to explore next.`}
-      />
+      <PageHeader {...pageHeaderProps1} />
       <Card className="rounded-3xl border-white/80 bg-white/80">
         <CardContent className="p-6 sm:p-8">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[#4f91ba]">
@@ -119,25 +129,30 @@ export default function Possibilities() {
             {options.map((option) => (
               <Button
                 key={option.id}
-                variant="outline"
-                aria-pressed={intent === option.id}
-                className="h-auto min-w-0 flex-col items-start whitespace-normal rounded-2xl p-5 text-left"
-                style={
-                  intent === option.id
-                    ? { background: PAGE_GRADIENT_CSS, borderColor: "#4f91ba" }
-                    : undefined
-                }
-                onClick={() => {
-                  try {
-                    accountStorage.setItem(key, JSON.stringify(option.id));
-                    setIntent(option.id);
-                    setError("");
-                  } catch {
-                    setError(
-                      "Could not save your direction. Please try again.",
-                    );
-                  }
-                }}
+                {...({
+                  variant: "outline",
+                  "aria-pressed": intent === option.id,
+                  className:
+                    "h-auto min-w-0 flex-col items-start whitespace-normal rounded-2xl p-5 text-left",
+                  style:
+                    intent === option.id
+                      ? {
+                          background: PAGE_GRADIENT_CSS,
+                          borderColor: "#4f91ba",
+                        }
+                      : undefined,
+                  onClick: () => {
+                    try {
+                      accountStorage.setItem(key, JSON.stringify(option.id));
+                      setIntent(option.id);
+                      setError("");
+                    } catch {
+                      setError(
+                        "Could not save your direction. Please try again.",
+                      );
+                    }
+                  },
+                } satisfies Partial<ComponentProps<typeof Button>>)}
               >
                 <span className="font-semibold">
                   {option.title}
@@ -181,7 +196,13 @@ export default function Possibilities() {
                   ? `You have ${themes.length} saved learning themes. Revisit them and decide which supports this direction.`
                   : "Review your skill map and choose a learning theme that supports your intention."}
               </p>
-              <AppButton tone="gradient" asChild className="mt-5">
+              <AppButton
+                {...({
+                  tone: "gradient",
+                  asChild: true,
+                  className: "mt-5",
+                } satisfies Partial<ComponentProps<typeof AppButton>>)}
+              >
                 <Link
                   to={themes.length ? ROUTES.learningCentre : ROUTES.skills}
                 >
@@ -194,9 +215,11 @@ export default function Possibilities() {
                 an illustrative profile.
               </p>
               <Button
-                variant="link"
-                asChild
-                className="mt-1 h-auto whitespace-normal p-0 text-left"
+                {...({
+                  variant: "link",
+                  asChild: true,
+                  className: "mt-1 h-auto whitespace-normal p-0 text-left",
+                } satisfies Partial<ComponentProps<typeof Button>>)}
               >
                 <Link to={`${ROUTES.possibilities}?example=1`}>
                   View example career connections →

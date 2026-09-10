@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { MenuIcon } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -25,7 +26,8 @@ type MobileMenuProps = {
   items?: NavigationItem[];
 };
 
-const MobileMenu = ({ items = PRIMARY_NAV_MENU }: MobileMenuProps) => {
+const MobileMenu = (props: MobileMenuProps) => {
+  const { items = PRIMARY_NAV_MENU } = props;
   const { pathname, hash, search, state } = useLocation();
 
   return (
@@ -33,7 +35,10 @@ const MobileMenu = ({ items = PRIMARY_NAV_MENU }: MobileMenuProps) => {
       <DialogTrigger asChild>
         <button
           type="button"
-          className={cn(buttonVariants({ variant: "outline", size: "icon" }), "lg:hidden")}
+          className={cn(
+            buttonVariants({ variant: "outline", size: "icon" }),
+            "lg:hidden",
+          )}
           aria-label="Open menu"
         >
           <MenuIcon className="size-4" />
@@ -47,14 +52,23 @@ const MobileMenu = ({ items = PRIMARY_NAV_MENU }: MobileMenuProps) => {
           {items.map((item) => (
             <NavLink
               key={item.key}
-              to={item.path}
-              state={item.path === "/profile" && pathname !== "/profile" ? { returnTo: pathname + search } : state}
-              className={`block rounded-md border border-border p-3 text-sm hover:bg-muted ${
-                itemIsActive(item.path, pathname, hash) ? "border-primary/30 bg-primary/10" : ""
-              }`}
+              {...({
+                to: item.path,
+                state:
+                  item.path === "/profile" && pathname !== "/profile"
+                    ? { returnTo: pathname + search }
+                    : state,
+                className: `block rounded-md border border-border p-3 text-sm hover:bg-muted ${
+                  itemIsActive(item.path, pathname, hash)
+                    ? "border-primary/30 bg-primary/10"
+                    : ""
+                }`,
+              } satisfies Partial<ComponentProps<typeof NavLink>>)}
             >
               <p className="font-medium">{item.label}</p>
-              <p className="text-xs text-muted-foreground">{item.description}</p>
+              <p className="text-xs text-muted-foreground">
+                {item.description}
+              </p>
             </NavLink>
           ))}
         </div>

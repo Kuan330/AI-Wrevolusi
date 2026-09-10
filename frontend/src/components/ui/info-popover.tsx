@@ -1,18 +1,16 @@
+import type { ComponentProps } from "react";
 import { useRef, useState, type ReactNode } from "react";
 import { Popover } from "@base-ui/react/popover";
 import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
 import { Info } from "lucide-react";
 
 /** An unfilled information trigger with hover, keyboard and touch access. */
-export function InfoPopover({
-  label,
-  children,
-  trigger,
-}: {
+export function InfoPopover(props: {
   label: string;
   children: ReactNode;
   trigger?: ReactNode;
 }) {
+  const { label, children, trigger } = props;
   const [open, setOpen] = useState(false);
   const closing = useRef(false);
   return (
@@ -35,9 +33,20 @@ export function InfoPopover({
         onBlur={() => {
           closing.current = false;
         }}
-        className={trigger ? "block w-full truncate border-0 bg-transparent p-0 text-left text-inherit font-inherit shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4f91ba]" : "ml-1 inline-flex size-6 items-center justify-center rounded-sm border-0 bg-transparent p-0 align-middle text-[#3d5f7a] shadow-none hover:text-[#4f91ba] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4f91ba]"}
+        className={
+          trigger
+            ? "block w-full truncate border-0 bg-transparent p-0 text-left text-inherit font-inherit shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4f91ba]"
+            : "ml-1 inline-flex size-6 items-center justify-center rounded-sm border-0 bg-transparent p-0 align-middle text-[#3d5f7a] shadow-none hover:text-[#4f91ba] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4f91ba]"
+        }
       >
-        {trigger ?? <Info className="size-4" aria-hidden="true" />}
+        {trigger ?? (
+          <Info
+            {...({
+              className: "size-4",
+              "aria-hidden": "true",
+            } satisfies Partial<ComponentProps<typeof Info>>)}
+          />
+        )}
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner

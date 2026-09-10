@@ -12,26 +12,21 @@ type SkillMapOverviewProps = {
 };
 
 const CLOUD_SKILL_ORDER = [
-  2, 3, 4,
-  5, 6, 7, 8,
-  10, 11, 1, 12,
-  13, 14, 9, 15,
-  17, 18, 16, 19,
-  20, 21, 22, 23,
-  24, 25, 26,
+  2, 3, 4, 5, 6, 7, 8, 10, 11, 1, 12, 13, 14, 9, 15, 17, 18, 16, 19, 20, 21, 22,
+  23, 24, 25, 26,
 ] as const;
 
 const CLOUD_ROW_LENGTHS = [3, 4, 4, 4, 4, 4, 3] as const;
-const CLOUD_SKILL_COUNT = CLOUD_ROW_LENGTHS.reduce((total, length) => total + length, 0);
+const CLOUD_SKILL_COUNT = CLOUD_ROW_LENGTHS.reduce(
+  (total, length) => total + length,
+  0,
+);
 
-const SkillMapOverview = ({
-  skills,
-  evidence,
-  taskCount,
-  selectedSkillId,
-  onSelectSkill,
-}: SkillMapOverviewProps) => {
-  const matchedSkillIds = new Set(evidence.map(({ skill }) => skill.wef_skill_id));
+const SkillMapOverview = (props: SkillMapOverviewProps) => {
+  const { skills, evidence, taskCount, selectedSkillId, onSelectSkill } = props;
+  const matchedSkillIds = new Set(
+    evidence.map(({ skill }) => skill.wef_skill_id),
+  );
   const cloudOrder = new Map<number, number>(
     CLOUD_SKILL_ORDER.map((skillId, index) => [skillId, index]),
   );
@@ -48,7 +43,8 @@ const SkillMapOverview = ({
     return orderedSkills.slice(start, start + rowLength);
   });
   const overflowSkills = orderedSkills.slice(CLOUD_SKILL_COUNT);
-  const rowsToRender = overflowSkills.length > 0 ? [...cloudRows, overflowSkills] : cloudRows;
+  const rowsToRender =
+    overflowSkills.length > 0 ? [...cloudRows, overflowSkills] : cloudRows;
 
   const renderSkill = (skill: WefSkill) => {
     const matched = matchedSkillIds.has(skill.wef_skill_id);
@@ -88,13 +84,16 @@ const SkillMapOverview = ({
             See the skills reflected in your work.
           </h2>
           <p className="mt-4 text-sm leading-6 text-[#574a55]">
-            We compare your confirmed tasks with the World Economic Forum&apos;s 26 core
-            skills. Skills supported by the work you shared are highlighted.
+            We compare your confirmed tasks with the World Economic Forum&apos;s
+            26 core skills. Skills supported by the work you shared are
+            highlighted.
           </p>
 
           <div className="skills-map-summary" aria-label="Skill map summary">
             <span>
-              <strong>{evidence.length} of {skills.length || 26}</strong>
+              <strong>
+                {evidence.length} of {skills.length || 26}
+              </strong>
               <small>skills reflected</small>
             </span>
             <span className="skills-map-summary__divider" aria-hidden />
@@ -110,8 +109,8 @@ const SkillMapOverview = ({
           </div>
 
           <p className="skills-map-note">
-            Not highlighted does not mean you lack a skill. It may simply not appear in the
-            tasks you shared.
+            Not highlighted does not mean you lack a skill. It may simply not
+            appear in the tasks you shared.
           </p>
         </aside>
 

@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import {
   hasConfirmedAnalysis,
   readTaskWorkspace,
@@ -68,13 +69,11 @@ const content = {
     path: ROUTES.workProfile,
   },
 };
-export default function JourneyIntro({
-  kind,
-  children,
-}: {
+export default function JourneyIntro(props: {
   kind: JourneyKind;
   children?: ReactNode;
 }) {
+  const { kind, children } = props;
   const data = content[kind];
   const { user, error } = useAccount();
   let action = data.action;
@@ -94,17 +93,19 @@ export default function JourneyIntro({
     }
   }
   const [authOpen, setAuthOpen] = useState(false);
+  const pageHeaderProps1 = {
+    title: data.name,
+    description: "Your next step, at your own pace.",
+  } satisfies Partial<ComponentProps<typeof PageHeader>>;
+  const cardContentProps2 = {
+    className: "grid gap-8 p-6 sm:p-10 lg:grid-cols-2",
+    style: { background: PAGE_GRADIENT_CSS },
+  } satisfies Partial<ComponentProps<typeof CardContent>>;
   return (
     <div className="mx-auto w-full max-w-[1180px] pb-10">
-      <PageHeader
-        title={data.name}
-        description="Your next step, at your own pace."
-      />
+      <PageHeader {...pageHeaderProps1} />
       <Card className="overflow-hidden rounded-3xl border-white/80 bg-white/80 shadow-xl">
-        <CardContent
-          className="grid gap-8 p-6 sm:p-10 lg:grid-cols-2"
-          style={{ background: PAGE_GRADIENT_CSS }}
-        >
+        <CardContent {...cardContentProps2}>
           <section className="self-center">
             <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-[#4f91ba]">
               {user ? "Ready when you are" : "Your personal learning space"}
@@ -118,7 +119,12 @@ export default function JourneyIntro({
             <div className="mt-6">
               {!user ? (
                 <>
-                  <AppButton tone="gradient" onClick={() => setAuthOpen(true)}>
+                  <AppButton
+                    {...({
+                      tone: "gradient",
+                      onClick: () => setAuthOpen(true),
+                    } satisfies Partial<ComponentProps<typeof AppButton>>)}
+                  >
                     Log in / Create account <ArrowRight className="size-4" />
                   </AppButton>
                   <p className="mt-3 text-xs text-[#7f7280]">
@@ -128,8 +134,18 @@ export default function JourneyIntro({
                 </>
               ) : (
                 (children ?? (
-                  <AppButton tone="gradient" asChild>
-                    <Link to={path === ROUTES.skills ? `${path}#skill-directions` : path}>
+                  <AppButton
+                    {...({ tone: "gradient", asChild: true } satisfies Partial<
+                      ComponentProps<typeof AppButton>
+                    >)}
+                  >
+                    <Link
+                      to={
+                        path === ROUTES.skills
+                          ? `${path}#skill-directions`
+                          : path
+                      }
+                    >
                       {action}
                       <ArrowRight className="size-4" />
                     </Link>
@@ -165,9 +181,11 @@ export default function JourneyIntro({
       </Card>
       {authOpen && (
         <AuthDialog
-          open
-          onClose={() => setAuthOpen(false)}
-          destination={window.location.pathname}
+          {...({
+            open: true,
+            onClose: () => setAuthOpen(false),
+            destination: window.location.pathname,
+          } satisfies Partial<ComponentProps<typeof AuthDialog>>)}
         />
       )}
     </div>
