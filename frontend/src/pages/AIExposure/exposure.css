@@ -434,12 +434,14 @@
   display: inline-flex;
   width: 1.75rem;
   height: 1.75rem;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   border-radius: 50%;
   background: #ffffffd9;
   color: #4f91ba;
   font-size: 0.75rem;
+  line-height: 1;
+  text-align: center;
   flex-shrink: 0;
 }
 .guide-tools {

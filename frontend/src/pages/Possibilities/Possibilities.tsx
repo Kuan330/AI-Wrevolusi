@@ -1,234 +1,59 @@
-import type { ComponentProps } from "react";
-import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { ArrowRight, Check } from "lucide-react";
-import PageHeader from "@/components/common/PageHeader";
-import { Card, CardContent } from "@/components/ui/card";
-import { AppButton } from "@/components/ui/app-button";
-import { Button } from "@/components/ui/button";
-import JourneyIntro from "@/components/account/JourneyIntro";
-import {
-  readConfirmedAnalysis,
-  readTaskWorkspace,
-} from "@/pages/WorkProfile/userProfile";
-import { readLearningCentreItems } from "@/pages/Skills/skillDirections";
-import { accountStorage } from "@/services/accountStorage";
-import { ROUTES } from "@/constants/routes";
-import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
-import PossibilitiesDemo from "./PossibilitiesDemo";
-const options = [
-  {
-    id: "grow",
-    title: "Grow in my current role",
-    description:
-      "Build on your experience and explore a skill you can use in your current work.",
-    steps: [
-      "Choose one recurring task you want to improve.",
-      "Review its related skills and pick a learning theme.",
-      "Try what you learn on a small task and record the result.",
-    ],
-  },
-  {
-    id: "related",
-    title: "Explore related roles",
-    description:
-      "Identify transferable skills and investigate roles where they could be useful.",
-    steps: [
-      "Review the skills reflected in your confirmed tasks.",
-      "Choose a related role that interests you and read its actual requirements.",
-      "Compare those requirements with your experience and choose one skill to develop.",
-    ],
-  },
-  {
-    id: "new",
-    title: "Consider a new direction",
-    description:
-      "Start with your interests and gather evidence before deciding on a change.",
-    steps: [
-      "Write down the kind of work you would like to explore.",
-      "Look at real role descriptions and note the experience or qualifications they require.",
-      "Choose a small learning activity to test your interest.",
-    ],
-  },
-];
-const key = "aiwrevolusi.possibilities.intent";
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import PageHeader from '@/components/common/PageHeader';
+import { AppButton } from '@/components/ui/app-button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import JourneyIntro from '@/components/account/JourneyIntro';
+import { readConfirmedAnalysis } from '@/pages/WorkProfile/userProfile';
+import { buildSkillEvidence } from '@/pages/Skills/lib/skillProfile';
+import { readLearningSkills, coursesForSkill, skillKey } from '@/pages/Skills/learningSkills';
+import { readLibrary } from '@/pages/LearningCentre/lib/libraryStorage';
+import { referenceService } from '@/services/referenceService';
+import type { WefSkill } from '@/types/reference';
+import { directions, matchDirections } from './skillDirections';
+import './skill-possibilities.css';
 export default function Possibilities() {
-  const [params] = useSearchParams();
-  const [intent, setIntent] = useState(() => {
-    try {
-      return JSON.parse(accountStorage.getItem(key) ?? "null") as string | null;
-    } catch {
-      return null;
-    }
+  const [analysis] = useState(readConfirmedAnalysis);
+  const [framework, setFramework] = useState<WefSkill[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [expanded, setExpanded] = useState<boolean | null>(null);
+  const [detail, setDetail] = useState<(typeof directions)[number] | null>(null);
+  const [learning] = useState(() => {
+    try { return { skills: readLearningSkills() ?? [], pending: readLibrary().pending.map(item => item.courseId), error: '' }; }
+    catch { return { skills: [], pending: [], error: 'Your learning choices could not be loaded. Please reload to try again.' }; }
   });
-  const [error, setError] = useState("");
-  if (
-    params.get("example") === "1" ||
-    (import.meta.env.DEV && params.get("demo") === "1")
-  )
-    return (
-      <>
-        <div className="mx-auto mb-4 max-w-[1180px]">
-          <Button
-            {...({ variant: "link", asChild: true } satisfies Partial<
-              ComponentProps<typeof Button>
-            >)}
-          >
-            <Link to={ROUTES.possibilities}>← Back to my direction</Link>
-          </Button>
-        </div>
-        <PossibilitiesDemo />
-      </>
-    );
-  const analysis = readConfirmedAnalysis();
-  if (!analysis)
-    return (
-      <JourneyIntro kind="possibilities">
-        <AppButton
-          {...({ tone: "gradient", asChild: true } satisfies Partial<
-            ComponentProps<typeof AppButton>
-          >)}
-        >
-          <Link
-            to={
-              readTaskWorkspace()?.tasksOccupationCode
-                ? ROUTES.task
-                : ROUTES.workProfile
-            }
-          >
-            {readTaskWorkspace()?.tasksOccupationCode
-              ? "Analyse your updated tasks"
-              : "Build your work profile"}
-            <ArrowRight className="size-4" />
-          </Link>
-        </AppButton>
-      </JourneyIntro>
-    );
-  const chosen = options.find((option) => option.id === intent);
-  const themes = readLearningCentreItems();
-  const pageHeaderProps1 = {
-    title: "Explore your possibilities",
-    description: `Start with your experience in ${analysis.occupationTitle}. Choose what you would like to explore next.`,
-  } satisfies Partial<ComponentProps<typeof PageHeader>>;
-  return (
-    <div className="mx-auto max-w-[1180px] pb-10">
-      <PageHeader {...pageHeaderProps1} />
-      <Card className="rounded-3xl border-white/80 bg-white/80">
-        <CardContent className="p-6 sm:p-8">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[#4f91ba]">
-            Choose your direction
-          </p>
-          <h2 className="text-2xl font-semibold">
-            What would you like to explore?
-          </h2>
-          <p className="mt-2 text-sm text-[#7f7280]">
-            You can change this at any time. These are exploration steps, not a
-            job suitability assessment.
-          </p>
-          <div className="mt-6 grid gap-4 lg:grid-cols-3">
-            {options.map((option) => (
-              <Button
-                key={option.id}
-                {...({
-                  variant: "outline",
-                  "aria-pressed": intent === option.id,
-                  className:
-                    "h-auto min-w-0 flex-col items-start whitespace-normal rounded-2xl p-5 text-left",
-                  style:
-                    intent === option.id
-                      ? {
-                          background: PAGE_GRADIENT_CSS,
-                          borderColor: "#4f91ba",
-                        }
-                      : undefined,
-                  onClick: () => {
-                    try {
-                      accountStorage.setItem(key, JSON.stringify(option.id));
-                      setIntent(option.id);
-                      setError("");
-                    } catch {
-                      setError(
-                        "Could not save your direction. Please try again.",
-                      );
-                    }
-                  },
-                } satisfies Partial<ComponentProps<typeof Button>>)}
-              >
-                <span className="font-semibold">
-                  {option.title}
-                  {intent === option.id && (
-                    <Check className="ml-2 inline size-4" />
-                  )}
-                </span>
-                <span className="mt-3 text-sm font-normal leading-6 text-[#7f7280]">
-                  {option.description}
-                </span>
-              </Button>
-            ))}
-          </div>
-          {error && <p role="alert">{error}</p>}
-        </CardContent>
-      </Card>
-      {chosen && (
-        <Card className="mt-6 rounded-3xl border-white/80 bg-white/80">
-          <CardContent className="grid gap-6 p-6 sm:p-8 lg:grid-cols-2">
-            <section>
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#4f91ba]">
-                Your saved intention
-              </p>
-              <h2 className="mt-3 text-2xl font-semibold">{chosen.title}</h2>
-              <ol className="mt-5 space-y-4">
-                {chosen.steps.map((step, index) => (
-                  <li className="flex gap-3 text-sm leading-6" key={step}>
-                    <span className="text-[#4f91ba]">0{index + 1}</span>
-                    {step}
-                  </li>
-                ))}
-              </ol>
-            </section>
-            <section
-              className="rounded-2xl p-5"
-              style={{ background: PAGE_GRADIENT_CSS }}
-            >
-              <h3 className="font-semibold">A learning step you can choose</h3>
-              <p className="mt-3 text-sm leading-6 text-[#7f7280]">
-                {themes.length
-                  ? `You have ${themes.length} saved learning themes. Revisit them and decide which supports this direction.`
-                  : "Review your skill map and choose a learning theme that supports your intention."}
-              </p>
-              <AppButton
-                {...({
-                  tone: "gradient",
-                  asChild: true,
-                  className: "mt-5",
-                } satisfies Partial<ComponentProps<typeof AppButton>>)}
-              >
-                <Link
-                  to={themes.length ? ROUTES.learningCentre : ROUTES.skills}
-                >
-                  {themes.length ? "Explore my resources" : "Review my skills"}
-                  <ArrowRight className="size-4" />
-                </Link>
-              </AppButton>
-              <p className="mt-4 text-xs leading-5 text-[#7f7280]">
-                Want to see how role connections could look? This preview uses
-                an illustrative profile.
-              </p>
-              <Button
-                {...({
-                  variant: "link",
-                  asChild: true,
-                  className: "mt-1 h-auto whitespace-normal p-0 text-left",
-                } satisfies Partial<ComponentProps<typeof Button>>)}
-              >
-                <Link to={`${ROUTES.possibilities}?example=1`}>
-                  View example career connections →
-                </Link>
-              </Button>
-            </section>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
+  useEffect(() => {
+    let active = true;
+    referenceService.wefSkills().then(rows => { if (active) setFramework(rows); })
+      .catch(() => { if (active) setError('Your work skills could not be loaded. Please reload to try again.'); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
+  if (!analysis) return <JourneyIntro kind="possibilities" />;
+  const work = buildSkillEvidence(analysis.tasks, framework).map(item => item.skill.core_skill);
+  const current = new Set(work.map(skillKey));
+  const planned = new Set(learning.skills.filter(skill => coursesForSkill(skill.id).some(id => learning.pending.includes(id))).map(skill => skill.id));
+  const additions = learning.skills.filter(skill => !current.has(skill.id));
+  const showLearning = expanded ?? additions.some(skill => planned.has(skill.id));
+  const names = [...work, ...(showLearning ? additions.map(skill => skill.name) : [])];
+  const results = matchDirections(names);
+  const tags = (skills: string[]) => skills.map(name => {
+    const extra = !current.has(skillKey(name));
+    return <span key={name} className={extra ? 'ps-tag ps-tag-new' : 'ps-tag'}>{name}{extra ? (planned.has(skillKey(name)) ? ' · In your plan' : ' · Preview') : planned.has(skillKey(name)) ? ' · Strengthening' : ''}</span>;
+  });
+  return <div className="ps-page">
+    <PageHeader title="Explore your possibilities" description={`Build on your experience in ${analysis.occupationTitle} and explore where your skills could take you.`} actions={<AppButton tone="gradient" asChild><Link to="/plan">Open My Plan</Link></AppButton>} />
+    <section className="ps-basis">
+      <div className="ps-basis-heading"><h2>Your skill starting point</h2>{!!additions.length && <div className="ps-switch" aria-label="Skill scenario"><button aria-pressed={!showLearning} onClick={() => setExpanded(false)}>Current skills</button><button aria-pressed={showLearning} onClick={() => setExpanded(true)}>With learning skills</button></div>}</div>
+      {loading ? <p role="status">Loading your work skills…</p> : error ? <p role="alert">{error}</p> : <><div className="ps-tags">{tags(names)}</div>{!names.length && <p>No skills were identified from your confirmed tasks yet. <Link to="/skills">Review your skills →</Link></p>}<p className="ps-muted">{showLearning ? 'Pink skills show what you are developing or considering; they are not yet confirmed abilities.' : 'These skills are reflected in your confirmed work tasks.'}</p></>}
+      {learning.error && <p role="alert">{learning.error}</p>}
+    </section>
+    {!loading && !error && <><div className="ps-results-heading"><h2>{showLearning ? 'Directions to explore as you learn' : 'Directions connected to your skills'}</h2><Link to="/skills#skill-directions">Adjust learning skills →</Link></div><p className="ps-muted">Exploration ideas based on skill associations, not a job eligibility assessment.</p>
+      <div className="ps-results">{results.map(({ direction, matched }) => {
+        const added = matched.filter(name => !current.has(skillKey(name)));
+        return <article className="ps-direction" key={direction.title}><h3>{direction.title}</h3><div className="ps-tags">{tags(matched.slice(0, 3))}</div><p>{direction.description}</p>{!!added.length && <p className="ps-benefit">Developing {added.join(', ')} could help you explore this direction further.</p>}<button onClick={() => setDetail(direction)}>View details →</button></article>;
+      })}</div>{!results.length && !!names.length && <p className="ps-basis">There are no direction associations for these skills yet. Add a learning skill to explore another starting point.</p>}</>}
+    <Dialog open={!!detail} onOpenChange={open => { if (!open) setDetail(null); }}><DialogContent className="rounded-3xl"><DialogHeader><DialogTitle>{detail?.title}</DialogTitle><DialogDescription>{detail?.description}</DialogDescription></DialogHeader>{detail && <><h3 className="font-semibold">Skills connecting you to this direction</h3><div className="ps-tags">{tags(detail.skills.filter(name => names.some(item => skillKey(item) === skillKey(name))))}</div><h3 className="font-semibold">What to explore next</h3><p className="ps-muted">{detail.next}</p><p className="ps-muted">Compare actual role requirements with your experience, qualifications and examples of your work.</p><AppButton tone="gradient" asChild><Link to="/learning-centre">Explore learning resources →</Link></AppButton></>}</DialogContent></Dialog>
+  </div>;
 }

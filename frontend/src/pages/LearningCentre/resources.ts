@@ -121,6 +121,9 @@ export type Selection = {
   chapterNames?: string[];
   weekdays?: number[];
   minutesPerDay?: number;
+  startTime?: string;
+  endTime?: string;
+  totalMinutes?: number | null;
   startDate?: string;
   scheduleMode?: "later" | "routine";
 };

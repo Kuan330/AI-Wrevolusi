@@ -156,6 +156,7 @@ const Skills = () => {
           />
 
           <LearningSkillPicker
+            key={JSON.stringify([analysis.occupationTitle, analysis.tasks, evidence.map(item => item.skill.wef_skill_id)])}
             {...({
               evidence: evidence,
             } satisfies Partial<ComponentProps<typeof LearningSkillPicker>>)}

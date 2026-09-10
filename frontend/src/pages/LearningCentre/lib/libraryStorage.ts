@@ -4,6 +4,7 @@ import type { LibraryState } from "../types";
 const KEY = "aiwrevolusi.courseLibrary.v1";
 export const emptyLibrary = (): LibraryState => ({
   version: 1,
+  workContext: accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "",
   skillId: focusSkills[0].id,
   saved: [],
   choices: {},
@@ -24,6 +25,10 @@ export function readLibrary(): LibraryState {
     throw new Error(
       "Saved courses could not be read. Your saved data has not been overwritten.",
     );
+  const context = accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "";
+  if (state.workContext !== context) {
+    return { ...state, workContext: context, saved: [], choices: {}, basis: {} };
+  }
   const known = new Set(courses.map((course) => course.id));
   state.saved = state.saved.filter((id) => known.has(id));
   state.pending = state.pending.filter((entry) => known.has(entry.courseId));
@@ -48,5 +53,5 @@ export function readLibrary(): LibraryState {
   return state;
 }
 export function saveLibrary(state: LibraryState) {
-  accountStorage.setItem(KEY, JSON.stringify(state));
+  accountStorage.setItem(KEY, JSON.stringify({...state, workContext: accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? ""}));
 }

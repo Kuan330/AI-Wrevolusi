@@ -41,8 +41,7 @@ const parseJson = <T>(raw: string | null): T | null => {
 
 const readLegacyAnalysis = (): ConfirmedAnalysis | null => {
   const parsed =
-    parseJson<ConfirmedAnalysis>(accountStorage.getItem(ANALYSIS_KEY)) ??
-    null;
+    parseJson<ConfirmedAnalysis>(accountStorage.getItem(ANALYSIS_KEY)) ?? null;
   if (!parsed?.occupationTitle || !Array.isArray(parsed.tasks)) return null;
   return parsed;
 };
@@ -71,7 +70,34 @@ export const readUserProfile = (): UserProfile => {
 };
 
 export const writeUserProfile = (patch: Partial<UserProfile>): UserProfile => {
-  const next = { ...readUserProfile(), ...patch };
+  const previous = readUserProfile();
+  const next = { ...previous, ...patch };
+  if (
+    JSON.stringify(previous.analysis) !== JSON.stringify(next.analysis) ||
+    previous.tasksOccupationCode !== next.tasksOccupationCode ||
+    JSON.stringify(previous.tasks) !== JSON.stringify(next.tasks)
+  ) {
+    const rawLibrary = accountStorage.getItem("aiwrevolusi.courseLibrary.v1");
+    if (rawLibrary) {
+      try {
+        const library = JSON.parse(rawLibrary);
+        accountStorage.setItem(
+          "aiwrevolusi.courseLibrary.v1",
+          JSON.stringify({
+            ...library,
+            saved: [],
+            choices: {},
+            basis: {},
+            workContext: next.analysis ? JSON.stringify(next.analysis) : "",
+          }),
+        );
+        accountStorage.removeItem("aiwrevolusi.planner.v1");
+        accountStorage.removeItem("aiwrevolusi.learningResourceSelections.v1");
+      } catch {
+        accountStorage.removeItem("aiwrevolusi.courseLibrary.v1");
+      }
+    }
+  }
   accountStorage.setItem(PROFILE_KEY, JSON.stringify(next));
   accountStorage.removeItem(OCCUPATION_KEY);
   if (next.analysis) {

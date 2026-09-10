@@ -1,3 +1,5 @@
+import { TimePicker } from "@/components/ui/time-picker";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, CalendarDays, Clock3 } from "lucide-react";
@@ -20,14 +22,19 @@ export type LearningPlanStepsProps = {
   inPlan: boolean;
   onBack: () => void;
   onClose: () => void;
-  onCommit: (choice: CourseChoice) => boolean;
+  onCommit: (choice: CourseChoice) => boolean | Promise<boolean>;
 };
 export default function LearningPlanSteps(props: LearningPlanStepsProps) {
   const { course, initialChoice, inPlan, onBack, onClose, onCommit } = props;
   const navigate = useNavigate();
+  const today = new Date();
+  const dateMin = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
   const [step, setStep] = useState<1 | 2>(1);
   const [choice, setChoice] = useState<CourseChoice>({
     ...initialChoice,
+    startDate: initialChoice.startDate || dateMin,
+    startTime: initialChoice.startTime || "18:30",
+    endTime: initialChoice.endTime || "19:00",
     scheduleMode:
       initialChoice.scheduleMode ??
       (initialChoice.weekdays.length ? "routine" : "later"),
@@ -41,11 +48,12 @@ export default function LearningPlanSteps(props: LearningPlanStepsProps) {
   const selected = {
     ...choice,
     chapters: partial ? choice.chapters : allChapters,
+    minutesPerDay: (Number(choice.endTime?.slice(0, 2)) * 60 + Number(choice.endTime?.slice(3))) - (Number(choice.startTime?.slice(0, 2)) * 60 + Number(choice.startTime?.slice(3))),
   };
   const mode = choice.scheduleMode ?? "later";
-  const today = new Date();
-  const dateMin = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-  function commit() {
+  const [importError, setImportError] = useState("");
+  const [saving, setSaving] = useState(false);
+  async function commit() {
     const next =
       mode === "later"
         ? { ...selected, weekdays: [], startDate: undefined }
@@ -59,15 +67,17 @@ export default function LearningPlanSteps(props: LearningPlanStepsProps) {
       setError("Choose today or a future start date.");
       return;
     }
-    if (!onCommit(next)) {
-      setError("Could not save your learning plan. Please try again.");
-      return;
-    }
+    setSaving(true);
+    try {
+      if (!await onCommit(next)) { setImportError("Could not save your learning plan. Please try again."); return; }
+    } catch (error) { setImportError(error instanceof Error ? error.message : "Could not import your plan."); return; }
+    finally { setSaving(false); }
     onClose();
-    if (mode === "routine") navigate(`/plan?resource=epic5-${course.id}`);
+    navigate(`/plan?resource=epic5-${course.id}`);
   }
   return (
     <div className="learning-plan-steps">
+      <Dialog open={!!importError} onOpenChange={open => { if (!open) setImportError(''); }}><DialogContent><DialogTitle>Unable to import course</DialogTitle><DialogDescription>{importError}</DialogDescription><AppButton tone="gradient" onClick={() => setImportError('')}>Got it</AppButton></DialogContent></Dialog>
       <div className="learning-step-indicator" aria-label={`Step ${step} of 2`}>
         <span className={step === 1 ? "is-current" : ""}>
           1 · Choose content
@@ -242,27 +252,14 @@ export default function LearningPlanSteps(props: LearningPlanStepsProps) {
                   </div>
                 </fieldset>
                 <fieldset>
-                  <legend>Session length</legend>
-                  <div className="library-weekdays">
-                    {[15, 30, 45, 60, 90].map((minutes) => (
-                      <Button
-                        key={minutes}
-                        size="sm"
-                        variant={
-                          choice.minutesPerDay === minutes
-                            ? "default"
-                            : "outline"
-                        }
-                        aria-pressed={choice.minutesPerDay === minutes}
-                        onClick={() =>
-                          setChoice({ ...choice, minutesPerDay: minutes })
-                        }
-                      >
-                        {minutes} min
-                      </Button>
-                    ))}
+                  <legend>Study time</legend>
+                  <div className="pl-form-row">
+                    <label>From<TimePicker value={choice.startTime} onChange={value => { setError(""); setChoice({ ...choice, startTime: value }); }} /></label>
+                    <label>To<TimePicker value={choice.endTime} onChange={value => { setError(""); setChoice({ ...choice, endTime: value }); }} /></label>
                   </div>
+                  <p className="library-muted">Starts today if the start time has not passed; otherwise from your next selected day. Sessions are imported together into My Plan.</p>
                 </fieldset>
+                {selectedMinutes(course, selected) === null && <label>Planned learning time (minutes)<Input type="number" min="1" max="100000" value={choice.estimatedMinutes ?? ''} onChange={event => { setError(''); setChoice({ ...choice, estimatedMinutes: Number(event.target.value) }); }} /><span className="library-muted">The provider has no duration for this content. Enter how much time you want to schedule.</span></label>}
                 <p className="learning-selection-summary">
                   {estimateLabel(course, selected)}
                 </p>
@@ -290,6 +287,7 @@ export default function LearningPlanSteps(props: LearningPlanStepsProps) {
         </Button>
         <AppButton
           tone="gradient"
+          disabled={saving}
           onClick={() => {
             if (step === 1) {
               if (course.chapters?.length && !selected.chapters.length) {
@@ -304,7 +302,7 @@ export default function LearningPlanSteps(props: LearningPlanStepsProps) {
           {step === 1
             ? "Continue"
             : mode === "routine"
-              ? "Review in My Plan"
+              ? "Import into My Plan"
               : inPlan
                 ? "Update My Plan"
                 : "Add to My Plan"}
