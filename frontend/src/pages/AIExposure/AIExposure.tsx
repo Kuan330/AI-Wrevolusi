@@ -20,10 +20,9 @@ export default function AIExposure() {
   const [analysis, setAnalysis] = useState(readConfirmedAnalysis);
   const [scoreRange, setScoreRange] = useState<TaskScoreRange>([0, 1]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
   if (!analysis) return <Navigate to={ROUTES.workProfile} replace />;
   const assessments = analysis.taskExposureAssessments ?? [];
-  const overview = taskOverview(analysis.tasks, assessments, scoreRange);
+  const overview = taskOverview(analysis.tasks, assessments);
   const task = analysis.tasks.find((item) => item.id === selectedId) ?? null;
   return (
     <div className="analysis-page exposure-page mx-auto w-full max-w-[1180px] pb-10">
@@ -51,16 +50,14 @@ export default function AIExposure() {
           </div>
         }
       />
-      <ExposureScoreOverview overview={overview} range={scoreRange} />
-      <div className="exposure-workspace">
+      <ExposureScoreOverview overview={overview} />
+      <div id="task-breakdown" tabIndex={-1} className="exposure-workspace scroll-mt-24">
         <ExposureTaskList
           tasks={analysis.tasks}
           assessments={assessments}
           selectedId={selectedId}
-          viewedIds={viewedIds}
           onSelect={(id) => {
             setSelectedId(id);
-            setViewedIds((current) => new Set([...current, id]));
             if (window.matchMedia("(max-width: 1023px)").matches)
               requestAnimationFrame(() =>
                 document

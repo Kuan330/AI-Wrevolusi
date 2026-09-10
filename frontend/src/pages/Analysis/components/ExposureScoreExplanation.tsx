@@ -3,35 +3,25 @@ import { cn } from "@/lib/utils";
 import { ILO_EXPOSURE_METHOD_URL } from "@/pages/Analysis/lib/iloExposure";
 import { OCCUPATION_BANDS } from "@/pages/Analysis/lib/occupationBands";
 
-type ExposureScoreExplanationProps = {
-  className?: string;
-};
-
-/** Shared explanation content used by the page and the score details drawer. */
-const ExposureScoreExplanation = ({
-  className,
-}: ExposureScoreExplanationProps) => (
-  <div className={cn("grid gap-3", className)}>
-    <div className="rounded-xl bg-[#eaf3fb] p-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-[#3d5f7a]">
-        Read the number
-      </p>
-      <p className="mt-1 text-sm leading-6 text-[#574a55]">
-        Higher means more potential task change, not a forecast of when a job
-        will disappear.
-      </p>
+/** Plain-language score guidance; classification details stay in one popover. */
+const ExposureScoreExplanation = ({ className }: { className?: string }) => (
+  <div className={cn("divide-y divide-[#e4dce7]/70", className)}>
+    <div className="py-5">
+      <h3 className="text-sm font-semibold text-[#3d5f7a]">Read the number</h3>
+      <p className="mt-2 text-sm leading-6 text-[#574a55]">Higher scores indicate greater potential for your tasks to change with generative AI.</p>
     </div>
-    <div className="rounded-xl bg-[#f8ecef] p-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-[#8f4f1f]">
-        ILO classification
-      </p>
-      <p className="mt-1 text-sm leading-6 text-[#574a55]">
-        Official occupation categories use both the mean (μ) and standard
-        deviation (σ) of task scores. A single task score cannot determine an
-        occupation category.
+    <div className="py-5">
+      <h3 className="text-sm font-semibold text-[#5a3f6c]">Know the limits</h3>
+      <p className="mt-2 text-sm leading-6 text-[#574a55]">The score does not predict whether or when you will lose your job.</p>
+    </div>
+    <div className="py-5">
+      <div className="flex items-center">
+        <h3 className="text-sm font-semibold text-[#3d5f7a]">ILO classification</h3>
         <InfoPopover label="ILO exposure categories">
-          <p className="mb-3 text-xs text-[#7f7280]">
-            μ = mean task score · σ = variation between task scores
+          <p>Official ILO occupation categories use both the mean and the variation of task scores. Your selected-task average does not determine an official occupation category.</p>
+          <p className="mt-2">The six categories describe occupations, not individual tasks or the probability of job loss. Tasks within one occupation can have different scores.</p>
+          <p className="my-3 text-xs text-[#7f7280]">
+            μ = mean task score · σ = standard deviation (variation between task scores)
           </p>
           <ul className="divide-y divide-[#e4dce7]">
             {OCCUPATION_BANDS.map((category) => (
@@ -60,17 +50,8 @@ const ExposureScoreExplanation = ({
             ILO Working Paper 140 · Table 5, p. 38
           </a>
         </InfoPopover>
-      </p>
-    </div>
-    <div className="rounded-xl bg-[#f5f3f8] p-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-[#5a3f6c]">
-        Know the limits
-      </p>
-      <p className="mt-1 text-sm leading-6 text-[#574a55]">
-        The six categories describe occupations, not individual tasks or the
-        probability of job loss. Tasks from one reference occupation can have
-        different scores.
-      </p>
+      </div>
+      <p className="mt-2 text-sm leading-6 text-[#574a55]">Your selected-task average is not an official ILO occupation category.</p>
     </div>
   </div>
 );

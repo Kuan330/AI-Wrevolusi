@@ -51,6 +51,17 @@ export function activateWorkspace(id: string | null, next?: Workspace) {
   }
   notify();
 }
+/** Clear browser work after a successful logout; saved account work stays on the server. */
+export function clearWorkspaceOnLogout() {
+  for (const key of Object.keys(localStorage)) {
+    if (workspaceKeys.includes(key) || key.startsWith("aiwrevolusi.account.") ||
+        key === "aiwrevolusi.selectedOccupation" || key === "aiwrevolusi.demo.credential") {
+      localStorage.removeItem(key);
+    }
+  }
+  activateWorkspace(null);
+}
+
 export async function flushWorkspace(): Promise<void> {
   clearTimeout(timer);
   if (saving) {

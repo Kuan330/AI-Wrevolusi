@@ -21,6 +21,7 @@ const Logo = ({
   return (
     <Link
       to={to}
+      state={to === ROUTES.home ? { showHome: true } : undefined}
       aria-label="AI-Wrevolusi home"
       className={cn("inline-flex shrink-0 items-center gap-2.5", className)}
     >

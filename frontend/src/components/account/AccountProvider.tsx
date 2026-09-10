@@ -5,6 +5,7 @@ import { api, ApiError } from "@/services/api";
 import { authService } from "@/services/authService";
 import {
   activateWorkspace,
+  clearWorkspaceOnLogout,
   accountStorage,
   flushWorkspace,
   workspaceKeys,
@@ -108,7 +109,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     await flushWorkspace();
     await authService.logout();
     clearSelectedOccupation();
-    activateWorkspace(null);
+    clearWorkspaceOnLogout();
     setUser(null);
   }
   return (

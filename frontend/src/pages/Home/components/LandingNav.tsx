@@ -1,6 +1,8 @@
+import AccountMenu from "@/components/account/AccountMenu";
+import { useAccount } from "@/components/account/useAccount";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, User, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 import Logo from "@/components/common/Logo";
 import { ROUTES } from "@/constants/routes";
@@ -8,6 +10,7 @@ import { ROUTES } from "@/constants/routes";
 import { NAV_LINKS } from "./homeData";
 
 const LandingNav = () => {
+  const { user } = useAccount();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -20,12 +23,10 @@ const LandingNav = () => {
               {link.label}
             </a>
           ))}
-          <Link to={ROUTES.workProfile} className="btn btn-primary btn-sm" style={{ color: "#fff" }}>
+          <Link to={user ? ROUTES.aiExposure : ROUTES.workProfile} className="btn btn-primary btn-sm" style={{ color: "#fff" }}>
             Start free analysis
           </Link>
-          <button type="button" aria-label="Account" className="landing-nav-avatar">
-            <User className="h-4 w-4" aria-hidden />
-          </button>
+          <AccountMenu iconOnly />
         </div>
         <button
           type="button"
@@ -43,12 +44,13 @@ const LandingNav = () => {
           </a>
         ))}
         <Link
-          to={ROUTES.workProfile}
+          to={user ? ROUTES.aiExposure : ROUTES.workProfile}
           className="btn btn-primary btn-sm"
           style={{ color: "#fff", alignSelf: "flex-start" }}
         >
           Start free analysis
         </Link>
+        <AccountMenu iconOnly />
       </div>
     </nav>
   );

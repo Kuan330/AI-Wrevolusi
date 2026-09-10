@@ -1,6 +1,7 @@
+import { useAccount } from "@/components/account/useAccount";
 import AccountGate from "@/components/account/AccountGate";
 import { AccountProvider } from "@/components/account/AccountProvider";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import MainLayout from "@/components/layout/MainLayout";
 import ProfileLayout from "@/components/layout/ProfileLayout";
@@ -15,12 +16,20 @@ import Skills from "@/pages/Skills/Skills";
 import WorkProfile from "@/pages/WorkProfile/WorkProfile";
 import ProfileTasks from "@/pages/WorkProfile/ProfileTasks";
 
+const HomeRoute = () => {
+  const { user } = useAccount();
+  const location = useLocation();
+  return user && !location.state?.showHome
+    ? <Navigate to={ROUTES.aiExposure} replace />
+    : <Home />;
+};
+
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <AccountProvider>
         <Routes>
-          <Route path={ROUTES.home} element={<Home />} />
+          <Route path={ROUTES.home} element={<HomeRoute />} />
           <Route element={<ProfileLayout />}>
             <Route path={ROUTES.workProfile} element={<WorkProfile />} />
             <Route path={ROUTES.task} element={<ProfileTasks />} />
