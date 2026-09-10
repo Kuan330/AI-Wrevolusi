@@ -12,7 +12,7 @@ Add these to `backend/.env` locally (never commit real keys):
 
 | Variable | Default | Effect |
 |---|---|---|
-| `AI_API_KEY` | *(empty)* | Enables the OpenAI-compatible provider. **Empty = deterministic only.** |
+| `AI_API_KEY` | *(empty)* | Enables the OpenAI-compatible provider. **Empty without `AI_KEYLESS=true` = deterministic only.** |
 | `AI_BASE_URL` | `https://api.openai.com/v1` | Any OpenAI-compatible endpoint (OpenAI, OpenRouter-style proxies, local gateways) |
 | `AI_MODEL` | `gpt-4o-mini` | Model name sent to the provider |
 | `AI_API_MODE` | `chat_completions` | Wire protocol: `chat_completions` or `responses` (some relays/models are served on one only) |
