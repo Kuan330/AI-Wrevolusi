@@ -18,15 +18,16 @@ interface FilterableSelectProps {
   onValueChange: (value: string) => void;
 }
 
-const FilterableSelect = ({
-  value,
-  placeholder,
-  options,
-  disabled = false,
-  showSearchIcon = true,
-  emptyMessage = "No matching options.",
-  onValueChange,
-}: FilterableSelectProps) => {
+const FilterableSelect = (props: FilterableSelectProps) => {
+  const {
+    value,
+    placeholder,
+    options,
+    disabled = false,
+    showSearchIcon = true,
+    emptyMessage = "No matching options.",
+    onValueChange,
+  } = props;
   const selected = useMemo(
     () => options.find((option) => option.value === value) ?? null,
     [options, value],
@@ -41,7 +42,9 @@ const FilterableSelect = ({
   const filteredOptions = useMemo(() => {
     const needle = query.trim().toLowerCase();
     if (!needle) return options;
-    return options.filter((option) => option.label.toLowerCase().includes(needle));
+    return options.filter((option) =>
+      option.label.toLowerCase().includes(needle),
+    );
   }, [options, query]);
 
   return (
@@ -93,7 +96,9 @@ const FilterableSelect = ({
       {open && !disabled ? (
         <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-64 overflow-y-auto rounded-xl border border-white/85 bg-white p-2 shadow-xl">
           {filteredOptions.length === 0 ? (
-            <p className="px-3 py-2 text-sm text-muted-foreground">{emptyMessage}</p>
+            <p className="px-3 py-2 text-sm text-muted-foreground">
+              {emptyMessage}
+            </p>
           ) : (
             filteredOptions.map((option) => (
               <button

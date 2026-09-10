@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -13,15 +14,12 @@ import { Button } from "@/components/ui/button";
 import { useAccount } from "./useAccount";
 import { ROUTES } from "@/constants/routes";
 
-export function AuthDialog({
-  open,
-  onClose,
-  destination,
-}: {
+export function AuthDialog(props: {
   open: boolean;
   onClose: () => void;
   destination?: string;
 }) {
+  const { open, onClose, destination } = props;
   const { authenticate } = useAccount();
   const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -31,22 +29,73 @@ export function AuthDialog({
   const [importGuest, setImportGuest] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const dialogProps1 = {
+    open: open,
+    onOpenChange: (value) => {
+      if (!value && !busy) onClose();
+    },
+  } satisfies Partial<ComponentProps<typeof Dialog>>;
+  const dialogContentProps2 = {
+    className: "profile-dialog-surface rounded-3xl",
+    onEscapeKeyDown: (e) => {
+      if (busy) e.preventDefault();
+    },
+    onPointerDownOutside: (e) => {
+      if (busy) e.preventDefault();
+    },
+  } satisfies Partial<ComponentProps<typeof DialogContent>>;
+  const formFieldProps3 = {
+    label: "Username",
+    hint: "3–32 letters, numbers or underscores. Usernames are not case-sensitive.",
+  } satisfies Partial<ComponentProps<typeof FormField>>;
+  const inputProps4 = {
+    required: true,
+    autoComplete: "username",
+    minLength: 3,
+    maxLength: 32,
+    pattern: "[a-zA-Z0-9_]+",
+    value: username,
+    onChange: (e) => setUsername(e.target.value),
+    disabled: busy,
+  } satisfies Partial<ComponentProps<typeof Input>>;
+  const formFieldProps5 = {
+    label: "Password",
+    hint:
+      mode === "register"
+        ? "Use at least 8 characters. Save your username and password in your password manager; email recovery is not available."
+        : undefined,
+  } satisfies Partial<ComponentProps<typeof FormField>>;
+  const inputProps6 = {
+    required: true,
+    type: "password",
+    minLength: 8,
+    maxLength: 128,
+    autoComplete: mode === "login" ? "current-password" : "new-password",
+    value: password,
+    onChange: (e) => setPassword(e.target.value),
+    disabled: busy,
+  } satisfies Partial<ComponentProps<typeof Input>>;
+  const appButtonProps7 = {
+    type: "submit",
+    disabled: busy,
+    className: "w-full",
+    tone: "gradient",
+  } satisfies Partial<ComponentProps<typeof AppButton>>;
+  const buttonProps8 = {
+    type: "button",
+    variant: "link",
+    className: "w-full",
+    disabled: busy,
+    onClick: () => {
+      setMode(mode === "login" ? "register" : "login");
+      setError("");
+      setPassword("");
+      setConfirm("");
+    },
+  } satisfies Partial<ComponentProps<typeof Button>>;
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(value) => {
-        if (!value && !busy) onClose();
-      }}
-    >
-      <DialogContent
-        className="profile-dialog-surface rounded-3xl"
-        onEscapeKeyDown={(e) => {
-          if (busy) e.preventDefault();
-        }}
-        onPointerDownOutside={(e) => {
-          if (busy) e.preventDefault();
-        }}
-      >
+    <Dialog {...dialogProps1}>
+      <DialogContent {...dialogContentProps2}>
         <DialogHeader>
           <DialogTitle>
             {mode === "login" ? "Welcome back" : "Create your account"}
@@ -71,7 +120,7 @@ export function AuthDialog({
               navigate(
                 mode === "register"
                   ? ROUTES.workProfile
-                  : destination ?? ROUTES.aiExposure,
+                  : (destination ?? ROUTES.aiExposure),
               );
             } catch (issue) {
               setError(
@@ -84,52 +133,24 @@ export function AuthDialog({
             }
           }}
         >
-          <FormField
-            label="Username"
-            hint="3–32 letters, numbers or underscores. Usernames are not case-sensitive."
-          >
-            <Input
-              required
-              autoComplete="username"
-              minLength={3}
-              maxLength={32}
-              pattern="[a-zA-Z0-9_]+"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              disabled={busy}
-            />
+          <FormField {...formFieldProps3}>
+            <Input {...inputProps4} />
           </FormField>
-          <FormField
-            label="Password"
-            hint={
-              mode === "register"
-                ? "Use at least 8 characters. Save your username and password in your password manager; email recovery is not available."
-                : undefined
-            }
-          >
-            <Input
-              required
-              type="password"
-              minLength={8}
-              maxLength={128}
-              autoComplete={
-                mode === "login" ? "current-password" : "new-password"
-              }
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={busy}
-            />
+          <FormField {...formFieldProps5}>
+            <Input {...inputProps6} />
           </FormField>
           {mode === "register" && (
             <>
               <FormField label="Confirm password">
                 <Input
-                  required
-                  type="password"
-                  autoComplete="new-password"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  disabled={busy}
+                  {...({
+                    required: true,
+                    type: "password",
+                    autoComplete: "new-password",
+                    value: confirm,
+                    onChange: (e) => setConfirm(e.target.value),
+                    disabled: busy,
+                  } satisfies Partial<ComponentProps<typeof Input>>)}
                 />
               </FormField>
               <label className="flex items-start gap-2 text-sm">
@@ -160,30 +181,14 @@ export function AuthDialog({
               {error}
             </p>
           )}
-          <AppButton
-            type="submit"
-            disabled={busy}
-            className="w-full"
-            tone="gradient"
-          >
+          <AppButton {...appButtonProps7}>
             {busy
               ? "Please wait…"
               : mode === "login"
                 ? "Log in"
                 : "Create account"}
           </AppButton>
-          <Button
-            type="button"
-            variant="link"
-            className="w-full"
-            disabled={busy}
-            onClick={() => {
-              setMode(mode === "login" ? "register" : "login");
-              setError("");
-              setPassword("");
-              setConfirm("");
-            }}
-          >
+          <Button {...buttonProps8}>
             {mode === "login"
               ? "New here? Create an account"
               : "Already have an account? Log in"}

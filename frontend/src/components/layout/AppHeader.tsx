@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { NavLink, useLocation, useMatch } from "react-router-dom";
 import AccountMenu from "@/components/account/AccountMenu";
 import { useAccount } from "@/components/account/useAccount";
@@ -37,12 +38,17 @@ const AppHeader = () => {
             {navigationItems.map((item) => (
               <NavLink
                 key={item.key}
-                to={item.path}
-                state={item.path === ROUTES.workProfile && location.pathname !== ROUTES.workProfile ? { returnTo: location.pathname + location.search } : location.state}
-                end={item.path === ROUTES.workProfile}
-                className={({ isActive }) =>
-                  cn("app-header-nav__link", isActive && "is-active")
-                }
+                {...({
+                  to: item.path,
+                  state:
+                    item.path === ROUTES.workProfile &&
+                    location.pathname !== ROUTES.workProfile
+                      ? { returnTo: location.pathname + location.search }
+                      : location.state,
+                  end: item.path === ROUTES.workProfile,
+                  className: ({ isActive }) =>
+                    cn("app-header-nav__link", isActive && "is-active"),
+                } satisfies Partial<ComponentProps<typeof NavLink>>)}
               >
                 {item.label}
               </NavLink>

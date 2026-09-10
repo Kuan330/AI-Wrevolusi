@@ -1,14 +1,16 @@
+import type { ComponentProps } from "react";
 import SectionHeader from "@/components/ui/section-header";
 import { TESTIMONIALS } from "./homeData";
 
 const TestimonialsSection = () => {
+  const sectionHeaderProps1 = {
+    title: "What they said",
+    subtitle: "Illustrative voices from women thinking through AI at work.",
+  } satisfies Partial<ComponentProps<typeof SectionHeader>>;
   return (
     <section className="section">
       <div className="container">
-        <SectionHeader
-          title="What they said"
-          subtitle="Illustrative voices from women thinking through AI at work."
-        />
+        <SectionHeader {...sectionHeaderProps1} />
         <div className="testimonials-grid">
           {TESTIMONIALS.map((item) => (
             <div key={item.quote} className="testimonial-card glass">

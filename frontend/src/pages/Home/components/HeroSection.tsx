@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { useAccount } from "@/components/account/useAccount";
 import { Link } from "react-router-dom";
 
@@ -5,27 +6,33 @@ import { ROUTES } from "@/constants/routes";
 
 const HeroSection = () => {
   const { user } = useAccount();
+  const linkProps1 = {
+    to: user ? ROUTES.aiExposure : ROUTES.workProfile,
+    className: "btn btn-warm",
+  } satisfies Partial<ComponentProps<typeof Link>>;
   return (
     <section className="hero">
       <div className="container">
         <div className="hero-grid">
           <div>
-            <div className="hero-badge">Designed for women's career development</div>
+            <div className="hero-badge">
+              Designed for women's career development
+            </div>
             <h1>
               AI is changing your work,
               <br />
               but change is not only risk.
             </h1>
             <p className="lead">
-              In about 5 minutes, see how tasks may change, where you are strong, and what
-              to grow next.
+              In about 5 minutes, see how tasks may change, where you are
+              strong, and what to grow next.
             </p>
             <div>
-              <Link to={user ? ROUTES.aiExposure : ROUTES.workProfile} className="btn btn-warm">
-                Start free analysis
-              </Link>
+              <Link {...linkProps1}>Start free analysis</Link>
             </div>
-            <div className="hero-note">No CV upload - Results stay with you</div>
+            <div className="hero-note">
+              No CV upload - Results stay with you
+            </div>
           </div>
           <div className="hero-card glass-strong">
             <h3>Task-change snapshot</h3>

@@ -10,13 +10,14 @@ interface ScrollRevealProps {
   once?: boolean;
 }
 
-const ScrollReveal = ({
-  children,
-  className,
-  delay = 0,
-  threshold = 0.2,
-  once = true,
-}: ScrollRevealProps) => {
+const ScrollReveal = (props: ScrollRevealProps) => {
+  const {
+    children,
+    className,
+    delay = 0,
+    threshold = 0.2,
+    once = true,
+  } = props;
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -48,7 +49,7 @@ const ScrollReveal = ({
       {
         threshold,
         rootMargin: "0px 0px -8% 0px",
-      }
+      },
     );
 
     observer.observe(node);

@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { Info, X } from "lucide-react";
 import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 
@@ -11,13 +12,8 @@ type SkillsInfoPopoverProps = {
   triggerText?: string;
 };
 
-const SkillsInfoPopover = ({
-  ariaLabel,
-  title,
-  children,
-  placement = "side",
-  triggerText,
-}: SkillsInfoPopoverProps) => {
+const SkillsInfoPopover = (props: SkillsInfoPopoverProps) => {
+  const { ariaLabel, title, children, placement = "side", triggerText } = props;
   const [open, setOpen] = useState(false);
   const popoverId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -40,22 +36,37 @@ const SkillsInfoPopover = ({
     };
   }, [open]);
 
+  const infoProps1 = {
+    className: "size-4",
+    "aria-hidden": true,
+  } satisfies Partial<ComponentProps<typeof Info>>;
   return (
-    <div ref={rootRef} className={cn("skills-info", `skills-info--${placement}`)}>
+    <div
+      ref={rootRef}
+      className={cn("skills-info", `skills-info--${placement}`)}
+    >
       <button
         type="button"
-        className={cn("skills-info__trigger", triggerText && "skills-info__trigger--text")}
+        className={cn(
+          "skills-info__trigger",
+          triggerText && "skills-info__trigger--text",
+        )}
         aria-label={ariaLabel}
         aria-expanded={open}
         aria-controls={popoverId}
         onClick={() => setOpen((current) => !current)}
       >
         {triggerText ? <span>{triggerText}</span> : null}
-        <Info className="size-4" aria-hidden />
+        <Info {...infoProps1} />
       </button>
 
       {open ? (
-        <div id={popoverId} className="skills-info__popover" role="dialog" aria-label={ariaLabel}>
+        <div
+          id={popoverId}
+          className="skills-info__popover"
+          role="dialog"
+          aria-label={ariaLabel}
+        >
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-[#2f2430]">{title}</p>
@@ -67,7 +78,12 @@ const SkillsInfoPopover = ({
               aria-label="Close explanation"
               onClick={() => setOpen(false)}
             >
-              <X className="size-4" aria-hidden />
+              <X
+                {...({
+                  className: "size-4",
+                  "aria-hidden": true,
+                } satisfies Partial<ComponentProps<typeof X>>)}
+              />
             </button>
           </div>
         </div>

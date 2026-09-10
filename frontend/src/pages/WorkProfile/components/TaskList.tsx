@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { useState } from "react";
 
 import EmptyState from "@/components/common/EmptyState";
@@ -10,7 +11,8 @@ import { useTasks } from "@/hooks/useTasks";
 import { validateTaskTitle } from "@/utils/validation";
 
 const TaskList = () => {
-  const { tasks, addTask, removeTask, loading, mutating, currentUser, error } = useTasks();
+  const { tasks, addTask, removeTask, loading, mutating, currentUser, error } =
+    useTasks();
   const [newTask, setNewTask] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -39,14 +41,19 @@ const TaskList = () => {
   }
 
   if (!currentUser) {
-    return (
-      <EmptyState
-        title="Session unavailable"
-        message={error ?? "Unable to initialize backend session."}
-      />
-    );
+    const emptyStateProps1 = {
+      title: "Session unavailable",
+      message: error ?? "Unable to initialize backend session.",
+    } satisfies Partial<ComponentProps<typeof EmptyState>>;
+    return <EmptyState {...emptyStateProps1} />;
   }
 
+  const buttonProps2 = {
+    onClick: () => {
+      void handleAddTask();
+    },
+    disabled: mutating,
+  } satisfies Partial<ComponentProps<typeof Button>>;
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-border bg-card p-4">
@@ -59,26 +66,31 @@ const TaskList = () => {
             className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm"
             disabled={mutating}
           />
-          <Button
-            onClick={() => {
-              void handleAddTask();
-            }}
-            disabled={mutating}
-          >
-            Add
-          </Button>
+          <Button {...buttonProps2}>Add</Button>
         </div>
-        {formError ? <p className="mt-2 text-xs text-destructive">{formError}</p> : null}
+        {formError ? (
+          <p className="mt-2 text-xs text-destructive">{formError}</p>
+        ) : null}
       </div>
 
       {tasks.length ? (
         <div className="grid gap-3">
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} onDelete={removeTask} />
+            <TaskCard
+              key={task.id}
+              {...({ task: task, onDelete: removeTask } satisfies Partial<
+                ComponentProps<typeof TaskCard>
+              >)}
+            />
           ))}
         </div>
       ) : (
-        <EmptyState title="No tasks yet" message={MESSAGES.emptyTasks} />
+        <EmptyState
+          {...({
+            title: "No tasks yet",
+            message: MESSAGES.emptyTasks,
+          } satisfies Partial<ComponentProps<typeof EmptyState>>)}
+        />
       )}
     </div>
   );

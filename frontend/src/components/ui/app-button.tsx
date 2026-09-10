@@ -1,7 +1,7 @@
-import * as React from "react"
+import * as React from "react";
 
-import { Button, type ButtonProps } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { Button, type ButtonProps } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const toneClass = {
   brand: "profile-primary-btn",
@@ -9,23 +9,30 @@ const toneClass = {
   outline: "profile-outline-btn",
   blue: "profile-blue-btn",
   muted: "profile-batch-btn",
-} as const
+} as const;
 
-export type AppButtonTone = keyof typeof toneClass
+export type AppButtonTone = keyof typeof toneClass;
 
 export type AppButtonProps = ButtonProps & {
-  tone?: AppButtonTone
-}
+  tone?: AppButtonTone;
+};
 
 const AppButton = React.forwardRef<HTMLButtonElement, AppButtonProps>(
-  ({ tone = "brand", className, ...props }, ref) => (
-    <Button
-      ref={ref}
-      className={cn("h-10 whitespace-nowrap rounded-full px-5", toneClass[tone], className)}
-      {...props}
-    />
-  ),
-)
-AppButton.displayName = "AppButton"
+  (props, ref) => {
+    const { tone = "brand", className, ...restProps } = props;
+    return (
+      <Button
+        ref={ref}
+        className={cn(
+          "h-10 whitespace-nowrap rounded-full px-5",
+          toneClass[tone],
+          className,
+        )}
+        {...restProps}
+      />
+    );
+  },
+);
+AppButton.displayName = "AppButton";
 
-export { AppButton }
+export { AppButton };

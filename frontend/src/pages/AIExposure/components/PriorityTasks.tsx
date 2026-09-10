@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,8 @@ const buildAssistanceTemplate = (item: PriorityItem) => {
   };
 };
 
-export default function PriorityTasks({ tasks, className }: PriorityTasksProps) {
+export default function PriorityTasks(props: PriorityTasksProps) {
+  const { tasks, className } = props;
   const [detailsId, setDetailsId] = useState<string | null>(null);
   const [assistId, setAssistId] = useState<string | null>(null);
 
@@ -46,13 +48,26 @@ export default function PriorityTasks({ tasks, className }: PriorityTasksProps) 
   const assistItem = tasks.find(({ task }) => task.id === assistId) ?? null;
   const assistance = assistItem ? buildAssistanceTemplate(assistItem) : null;
 
+  const taskDetailsDrawerProps1 = {
+    selectedTask: detailsItem?.task ?? null,
+    selectedAssessment: detailsItem?.assessment ?? null,
+    onClose: () => setDetailsId(null),
+  } satisfies Partial<ComponentProps<typeof TaskDetailsDrawer>>;
+  const dialogProps2 = {
+    open: assistItem !== null,
+    onOpenChange: (open) => {
+      if (!open) setAssistId(null);
+    },
+  } satisfies Partial<ComponentProps<typeof Dialog>>;
   return (
-    <section className={`exposure-glass-card priority-tasks ${className ?? ""}`.trim()}>
+    <section
+      className={`exposure-glass-card priority-tasks ${className ?? ""}`.trim()}
+    >
       <p className="exposure-eyebrow">Where to start</p>
       <h2 className="exposure-title">Your highest-exposure tasks</h2>
       <p className="exposure-caption">
-        The highest scores across your confirmed tasks, independent of the filter. Start by
-        reviewing how these tasks may change.
+        The highest scores across your confirmed tasks, independent of the
+        filter. Start by reviewing how these tasks may change.
       </p>
       {tasks.length === 0 ? (
         <p className="exposure-caption">No task scores are available yet.</p>
@@ -69,16 +84,20 @@ export default function PriorityTasks({ tasks, className }: PriorityTasksProps) 
                 </p>
                 <div className="priority-tasks__actions">
                   <Button
-                    variant="outline"
-                    className="task-details-button"
-                    onClick={() => setAssistId(item.task.id)}
+                    {...({
+                      variant: "outline",
+                      className: "task-details-button",
+                      onClick: () => setAssistId(item.task.id),
+                    } satisfies Partial<ComponentProps<typeof Button>>)}
                   >
                     AI assistance
                   </Button>
                   <Button
-                    variant="outline"
-                    className="task-details-button"
-                    onClick={() => setDetailsId(item.task.id)}
+                    {...({
+                      variant: "outline",
+                      className: "task-details-button",
+                      onClick: () => setDetailsId(item.task.id),
+                    } satisfies Partial<ComponentProps<typeof Button>>)}
                   >
                     View details
                   </Button>
@@ -89,18 +108,9 @@ export default function PriorityTasks({ tasks, className }: PriorityTasksProps) 
         </ol>
       )}
 
-      <TaskDetailsDrawer
-        selectedTask={detailsItem?.task ?? null}
-        selectedAssessment={detailsItem?.assessment ?? null}
-        onClose={() => setDetailsId(null)}
-      />
+      <TaskDetailsDrawer {...taskDetailsDrawerProps1} />
 
-      <Dialog
-        open={assistItem !== null}
-        onOpenChange={(open) => {
-          if (!open) setAssistId(null);
-        }}
-      >
+      <Dialog {...dialogProps2}>
         <DialogContent className="max-w-lg border-white/80 bg-[#fffafe]/95 text-[#2f2430] backdrop-blur-xl">
           {assistItem && assistance ? (
             <>
@@ -118,12 +128,16 @@ export default function PriorityTasks({ tasks, className }: PriorityTasksProps) 
 
               <div className="space-y-4 text-sm leading-6 text-[#574a55]">
                 <section className="rounded-2xl border border-[#eadde4] bg-white/70 p-4">
-                  <h3 className="text-sm font-semibold text-[#3d5f7a]">Why this task is in focus</h3>
+                  <h3 className="text-sm font-semibold text-[#3d5f7a]">
+                    Why this task is in focus
+                  </h3>
                   <p className="mt-2">{assistance.summary}</p>
                 </section>
 
                 <section className="rounded-2xl border border-[#eadde4] bg-white/70 p-4">
-                  <h3 className="text-sm font-semibold text-[#3d5f7a]">Where AI can assist</h3>
+                  <h3 className="text-sm font-semibold text-[#3d5f7a]">
+                    Where AI can assist
+                  </h3>
                   <ul className="mt-2 list-disc space-y-1.5 pl-5">
                     {assistance.helpsWith.map((item) => (
                       <li key={item}>{item}</li>
@@ -132,7 +146,9 @@ export default function PriorityTasks({ tasks, className }: PriorityTasksProps) 
                 </section>
 
                 <section className="rounded-2xl border border-[#eadde4] bg-white/70 p-4">
-                  <h3 className="text-sm font-semibold text-[#3d5f7a]">What still needs you</h3>
+                  <h3 className="text-sm font-semibold text-[#3d5f7a]">
+                    What still needs you
+                  </h3>
                   <ul className="mt-2 list-disc space-y-1.5 pl-5">
                     {assistance.stillNeedsYou.map((item) => (
                       <li key={item}>{item}</li>
@@ -141,8 +157,9 @@ export default function PriorityTasks({ tasks, className }: PriorityTasksProps) 
                 </section>
 
                 <p className="text-xs leading-5 text-[#7f7280]">
-                  This is a first-version template based on your task evidence. It is guidance for
-                  learning and redesign — not a promise that AI can replace this work.
+                  This is a first-version template based on your task evidence.
+                  It is guidance for learning and redesign — not a promise that
+                  AI can replace this work.
                 </p>
               </div>
             </>

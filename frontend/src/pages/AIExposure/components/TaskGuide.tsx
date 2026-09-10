@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { ArrowLeft, Plus, Wrench } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -37,17 +38,13 @@ const stepTitles = [
   "Check and refine",
 ];
 
-export default function TaskGuide({
-  task,
-  assessment,
-  onClear,
-  onSave,
-}: {
+export default function TaskGuide(props: {
   task: ProfileTask | null;
   assessment?: ConfirmedTaskExposureAssessment;
   onClear: () => void;
   onSave: (update: (current: Practice) => Practice) => void;
 }) {
+  const { task, assessment, onClear, onSave } = props;
   const [details, setDetails] = useState(false);
   const [recordOpen, setRecordOpen] = useState(false);
   const [tab, setTab] = useState("guide");
@@ -62,7 +59,12 @@ export default function TaskGuide({
       eyebrow="Your AI task guide"
       title={
         task && guidance ? (
-          <InfoPopover label="Full task description" trigger={guidance.title}>
+          <InfoPopover
+            {...({
+              label: "Full task description",
+              trigger: guidance.title,
+            } satisfies Partial<ComponentProps<typeof InfoPopover>>)}
+          >
             <p>{task.wording}</p>
           </InfoPopover>
         ) : (
@@ -85,10 +87,12 @@ export default function TaskGuide({
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-0 text-xs text-[#3d5f7a]"
-              onClick={onClear}
+              {...({
+                variant: "ghost",
+                size: "sm",
+                className: "h-7 px-0 text-xs text-[#3d5f7a]",
+                onClick: onClear,
+              } satisfies Partial<ComponentProps<typeof Button>>)}
             >
               <ArrowLeft className="size-3.5" />
               Overview
@@ -120,33 +124,56 @@ export default function TaskGuide({
               </p>
             </div>
             <AppButton
-              tone="gradient"
-              className="shrink-0"
-              onClick={() => setRecordOpen(true)}
+              {...({
+                tone: "gradient",
+                className: "shrink-0",
+                onClick: () => setRecordOpen(true),
+              } satisfies Partial<ComponentProps<typeof AppButton>>)}
             >
               <Plus className="size-4" />
               Record a trial
             </AppButton>
           </div>
-          <Tabs value={tab} onValueChange={setTab}>
+          <Tabs
+            {...({ value: tab, onValueChange: setTab } satisfies Partial<
+              ComponentProps<typeof Tabs>
+            >)}
+          >
             <TabsList
-              className="guide-tabs"
-              aria-label="Task guidance and results"
+              {...({
+                className: "guide-tabs",
+                "aria-label": "Task guidance and results",
+              } satisfies Partial<ComponentProps<typeof TabsList>>)}
             >
               <TabsTrigger value="guide">How to use AI</TabsTrigger>
               <TabsTrigger value="results">
                 My results{trials.length ? ` · ${trials.length}` : ""}
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="guide" className="mt-4 space-y-4">
+            <TabsContent
+              {...({
+                value: "guide",
+                className: "mt-4 space-y-4",
+              } satisfies Partial<ComponentProps<typeof TabsContent>>)}
+            >
               <section>
                 <h3 className="guide-subtitle">Three steps to try</h3>
-                <Accordion type="single" collapsible className="guide-steps">
+                <Accordion
+                  {...({
+                    type: "single",
+                    collapsible: true,
+                    className: "guide-steps",
+                  } satisfies Partial<ComponentProps<typeof Accordion>>)}
+                >
                   {guidance.steps.map((step, index) => (
                     <AccordionItem
                       key={step}
-                      value={String(index)}
-                      className="border-[#e5dbe6] last:border-b-0"
+                      {...({
+                        value: String(index),
+                        className: "border-[#e5dbe6] last:border-b-0",
+                      } satisfies Partial<
+                        ComponentProps<typeof AccordionItem>
+                      >)}
                     >
                       <AccordionTrigger className="gap-3 py-3 hover:no-underline">
                         <span className="flex items-center gap-3">
@@ -179,7 +206,12 @@ export default function TaskGuide({
                   ))}
                 </dl>
               </section>
-              <Accordion type="multiple" className="guide-extras">
+              <Accordion
+                {...({
+                  type: "multiple",
+                  className: "guide-extras",
+                } satisfies Partial<ComponentProps<typeof Accordion>>)}
+              >
                 <AccordionItem value="review">
                   <AccordionTrigger className="py-3">
                     What you should check
@@ -210,31 +242,45 @@ export default function TaskGuide({
                 )}
               </Accordion>
               <Button
-                variant="link"
-                className="h-auto p-0 text-xs text-[#326889]"
-                onClick={() => setDetails(true)}
+                {...({
+                  variant: "link",
+                  className: "h-auto p-0 text-xs text-[#326889]",
+                  onClick: () => setDetails(true),
+                } satisfies Partial<ComponentProps<typeof Button>>)}
               >
                 Exposure score and evidence
               </Button>
             </TabsContent>
-            <TabsContent value="results" className="mt-4">
-              <TaskPractice task={task} onSave={onSave} />
+            <TabsContent
+              {...({ value: "results", className: "mt-4" } satisfies Partial<
+                ComponentProps<typeof TabsContent>
+              >)}
+            >
+              <TaskPractice
+                {...({ task: task, onSave: onSave } satisfies Partial<
+                  ComponentProps<typeof TaskPractice>
+                >)}
+              />
             </TabsContent>
           </Tabs>
           {recordOpen && (
             <TrialDialog
-              task={task}
-              onClose={() => setRecordOpen(false)}
-              onSave={(update) => {
-                onSave(update);
-                setTab("results");
-              }}
+              {...({
+                task: task,
+                onClose: () => setRecordOpen(false),
+                onSave: (update) => {
+                  onSave(update);
+                  setTab("results");
+                },
+              } satisfies Partial<ComponentProps<typeof TrialDialog>>)}
             />
           )}
           <TaskDetailsDrawer
-            selectedTask={details ? task : null}
-            selectedAssessment={assessment ?? null}
-            onClose={() => setDetails(false)}
+            {...({
+              selectedTask: details ? task : null,
+              selectedAssessment: assessment ?? null,
+              onClose: () => setDetails(false),
+            } satisfies Partial<ComponentProps<typeof TaskDetailsDrawer>>)}
           />
         </div>
       ) : (

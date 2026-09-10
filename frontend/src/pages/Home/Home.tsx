@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { useCallback, useEffect, useState } from "react";
 
 import {
@@ -36,6 +37,10 @@ const Home = () => {
     return () => window.clearInterval(timer);
   }, [activeSlide]);
 
+  const heroCarouselDotsProps1 = {
+    activeIndex: activeSlide,
+    onSelect: goToSlide,
+  } satisfies Partial<ComponentProps<typeof HeroCarouselDots>>;
   return (
     <div className="landing-page">
       <LandingNav />
@@ -47,7 +52,7 @@ const Home = () => {
         <ScrollReveal delay={40}>
           <div className="hero-trust-area">
             <TrustBar />
-            <HeroCarouselDots activeIndex={activeSlide} onSelect={goToSlide} />
+            <HeroCarouselDots {...heroCarouselDotsProps1} />
           </div>
         </ScrollReveal>
       </div>

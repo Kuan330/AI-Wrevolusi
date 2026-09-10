@@ -15,15 +15,16 @@ const ProfileLayout = () => {
         lockViewport ? "flex h-screen flex-col overflow-hidden" : "min-h-screen"
       }`}
       style={{
-        background: "linear-gradient(90deg, #eaf3fb 0%, #f5f3f8 48%, #f8ecef 100%)",
+        background:
+          "linear-gradient(90deg, #eaf3fb 0%, #f5f3f8 48%, #f8ecef 100%)",
       }}
     >
       <AppHeader />
       <main
         className={`mx-auto flex w-full min-h-0 flex-1 flex-col px-4 lg:px-6 ${
           isTasksPage
-              ? "max-w-2xl py-4 lg:px-0 lg:py-5"
-              : "max-w-2xl py-6 lg:px-0 lg:py-10"
+            ? "max-w-2xl py-4 lg:px-0 lg:py-5"
+            : "max-w-2xl py-6 lg:px-0 lg:py-10"
         }`}
       >
         <Outlet />

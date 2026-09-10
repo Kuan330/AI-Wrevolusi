@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { useState } from "react";
 import { Clock3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,13 +15,11 @@ import {
 } from "../lib/taskPractice";
 import TrialDialog from "./TrialDialog";
 
-export default function TaskPractice({
-  task,
-  onSave,
-}: {
+export default function TaskPractice(props: {
   task: ProfileTask;
   onSave: (update: (current: Practice) => Practice) => void;
 }) {
+  const { task, onSave } = props;
   const [dialog, setDialog] = useState<TaskTrial | null>(null);
   const trials = task.practice?.trials ?? [];
   const latest = trials.find((trial) => trial.taskWording === task.wording);
@@ -72,9 +71,11 @@ export default function TaskPractice({
               </p>
             )}
             <Button
-              variant="link"
-              className="h-auto p-0 text-[#326889]"
-              onClick={() => setDialog(latest)}
+              {...({
+                variant: "link",
+                className: "h-auto p-0 text-[#326889]",
+                onClick: () => setDialog(latest),
+              } satisfies Partial<ComponentProps<typeof Button>>)}
             >
               {latest.baselineMinutes == null
                 ? "Add baseline time"
@@ -118,9 +119,11 @@ export default function TaskPractice({
                       : "Workload comparison not confirmed"}
                   </p>
                   <Button
-                    variant="link"
-                    className="h-auto p-0 text-xs text-[#326889]"
-                    onClick={() => setDialog(trial)}
+                    {...({
+                      variant: "link",
+                      className: "h-auto p-0 text-xs text-[#326889]",
+                      onClick: () => setDialog(trial),
+                    } satisfies Partial<ComponentProps<typeof Button>>)}
                   >
                     Review baseline
                   </Button>
@@ -130,16 +133,18 @@ export default function TaskPractice({
           </details>
         )}
         <p className="text-xs text-[#7f7280]">
-          Self-reported timings, saved with your task profile. These records do not
-          change your ILO exposure score.
+          Self-reported timings, saved with your task profile. These records do
+          not change your ILO exposure score.
         </p>
         {dialog && (
           <TrialDialog
             key={dialog.id}
-            task={task}
-            baselineTrial={dialog}
-            onClose={() => setDialog(null)}
-            onSave={onSave}
+            {...({
+              task: task,
+              baselineTrial: dialog,
+              onClose: () => setDialog(null),
+              onSave: onSave,
+            } satisfies Partial<ComponentProps<typeof TrialDialog>>)}
           />
         )}
       </CardContent>

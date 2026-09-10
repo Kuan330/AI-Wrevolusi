@@ -1,15 +1,20 @@
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
-import { EXPOSURE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette"
+import { cn } from "@/lib/utils";
+import { EXPOSURE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
 
 type GradientBarProps = React.HTMLAttributes<HTMLDivElement> & {
-  value: number
-}
+  value: number;
+};
 
 const GradientBar = React.forwardRef<HTMLDivElement, GradientBarProps>(
-  ({ value, className, ...props }, ref) => {
-    const percent = Math.min(100, Math.max(0, Number.isFinite(value) ? value : 0))
+  (props, ref) => {
+    const { value, className, ...restProps } = props;
+
+    const percent = Math.min(
+      100,
+      Math.max(0, Number.isFinite(value) ? value : 0),
+    );
 
     return (
       <div
@@ -22,7 +27,7 @@ const GradientBar = React.forwardRef<HTMLDivElement, GradientBarProps>(
           "relative h-3.5 w-full overflow-hidden rounded-full bg-[rgba(127,114,128,0.12)]",
           className,
         )}
-        {...props}
+        {...restProps}
       >
         <div
           className="h-full min-w-0 rounded-full shadow-[0_2px_10px_rgba(79,145,186,0.28)] transition-[width] duration-300"
@@ -33,9 +38,9 @@ const GradientBar = React.forwardRef<HTMLDivElement, GradientBarProps>(
           }}
         />
       </div>
-    )
+    );
   },
-)
-GradientBar.displayName = "GradientBar"
+);
+GradientBar.displayName = "GradientBar";
 
-export { GradientBar }
+export { GradientBar };

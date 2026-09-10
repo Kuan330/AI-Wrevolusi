@@ -1,7 +1,15 @@
+import type { ComponentProps } from "react";
 import "./TaskDetailsDrawer.css";
 
 import AiSkillSuggestions from "@/pages/Analysis/components/AiSkillSuggestions";
-import { Drawer, DrawerBody, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import ExposureScorePanel from "@/components/ui/exposure-score-panel";
 import { taskScore } from "@/pages/Analysis/lib/taskScore";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
@@ -24,24 +32,24 @@ const formatScoreBand = (
   return "Higher exposure band";
 };
 
-export default function TaskDetailsDrawer({
-  selectedTask,
-  selectedAssessment,
-  onClose,
-}: {
+export default function TaskDetailsDrawer(props: {
   selectedTask: ProfileTask | null;
   selectedAssessment: ConfirmedTaskExposureAssessment | null;
   onClose: () => void;
 }) {
-  const selectedScore = selectedTask ? taskScore(selectedTask, selectedAssessment) : null;
+  const { selectedTask, selectedAssessment, onClose } = props;
+  const selectedScore = selectedTask
+    ? taskScore(selectedTask, selectedAssessment)
+    : null;
 
+  const drawerProps1 = {
+    open: selectedTask !== null,
+    onOpenChange: (open) => {
+      if (!open) onClose();
+    },
+  } satisfies Partial<ComponentProps<typeof Drawer>>;
   return (
-    <Drawer
-      open={selectedTask !== null}
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
-    >
+    <Drawer {...drawerProps1}>
       <DrawerContent aria-describedby="task-details-description">
         {selectedTask ? (
           <>
@@ -53,7 +61,12 @@ export default function TaskDetailsDrawer({
               </DrawerDescription>
             </DrawerHeader>
             <DrawerBody>
-              <ExposureScorePanel score={selectedScore} className="mb-4" />
+              <ExposureScorePanel
+                {...({
+                  score: selectedScore,
+                  className: "mb-4",
+                } satisfies Partial<ComponentProps<typeof ExposureScorePanel>>)}
+              />
               {selectedAssessment?.score_explanation ? (
                 <div className="task-details__score-context mb-4">
                   {selectedAssessment.score_band ? (
@@ -80,18 +93,25 @@ export default function TaskDetailsDrawer({
                   <div className="task-details__evidence">
                     <p>
                       <strong>Evidence method:</strong>{" "}
-                      {formatTaskAssessmentMatchLayer(selectedAssessment.match_layer)}
+                      {formatTaskAssessmentMatchLayer(
+                        selectedAssessment.match_layer,
+                      )}
                     </p>
                     <p>
-                      <strong>Uncertainty:</strong> {selectedAssessment.uncertainty}
+                      <strong>Uncertainty:</strong>{" "}
+                      {selectedAssessment.uncertainty}
                     </p>
                     <p>
-                      <strong>Limitations:</strong> {selectedAssessment.limitations}
+                      <strong>Limitations:</strong>{" "}
+                      {selectedAssessment.limitations}
                     </p>
                     {selectedAssessment.matched_reference_tasks[0] ? (
                       <p>
                         <strong>Closest ILO task evidence:</strong>{" "}
-                        {selectedAssessment.matched_reference_tasks[0].task_text}
+                        {
+                          selectedAssessment.matched_reference_tasks[0]
+                            .task_text
+                        }
                       </p>
                     ) : null}
                     <p>
@@ -102,7 +122,8 @@ export default function TaskDetailsDrawer({
                         rel="noreferrer"
                         className="task-details__source-link"
                       >
-                        {selectedAssessment.source_name} ({selectedAssessment.source_year})
+                        {selectedAssessment.source_name} (
+                        {selectedAssessment.source_year})
                       </a>
                     </p>
                   </div>
