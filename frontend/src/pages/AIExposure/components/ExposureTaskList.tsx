@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import TaskDetailsDrawer from "@/pages/Analysis/components/TaskDetailsDrawer";
-import { ChevronDown, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AppButton } from "@/components/ui/app-button";
 import ScoreRangeSlider from "@/components/ui/score-range-slider";
 import AnalysisCard from "@/pages/Analysis/components/AnalysisCard";
 import {
@@ -19,7 +18,6 @@ type Props = {
   tasks: ProfileTask[];
   assessments: ConfirmedTaskExposureAssessment[];
   selectedId: string | null;
-  viewedIds: Set<string>;
   onSelect: (id: string) => void;
   range: TaskScoreRange;
   onRangeChange: (range: TaskScoreRange) => void;
@@ -28,7 +26,6 @@ export default function ExposureTaskList({
   tasks,
   assessments,
   selectedId,
-  viewedIds,
   onSelect,
   range,
   onRangeChange,
@@ -72,7 +69,7 @@ export default function ExposureTaskList({
     <AnalysisCard
       eyebrow="Compare your tasks"
       title="Your task exposure"
-      description="Highest scores first. Explore a task to see practical AI assistance."
+      description="Highest scores first. Select a task to see AI guidance."
       className="exposure-task-list"
     >
       <details open className="guide-disclosure mb-5">
@@ -91,7 +88,7 @@ export default function ExposureTaskList({
       <p className="mb-3 text-xs text-[#7f7280]" aria-live="polite">
         Showing {visible.length} of {tasks.length} tasks
       </p>
-      <div ref={listRef} className="exposure-task-scroll analysis-list-scroll space-y-3" role="region" aria-label="Assessed tasks" tabIndex={0}>
+      <div ref={listRef} className="exposure-task-scroll analysis-list-scroll space-y-1" role="region" aria-label="Assessed tasks" tabIndex={0}>
         {visible.map(({ task, score }) => {
           const trials = task.practice?.trials ?? [];
           const latest = trials.find(
@@ -101,7 +98,7 @@ export default function ExposureTaskList({
             <article
               key={task.id}
               onClick={(event) => {
-                // Keep the evidence and assistance buttons independent.
+                // Evidence opens independently of task selection.
                 if ((event.target as HTMLElement).closest("button, a")) return;
                 if (window.getSelection()?.toString()) return;
                 onSelect(task.id);
@@ -111,11 +108,18 @@ export default function ExposureTaskList({
                 task.id === selectedId && "is-selected",
               )}
             >
-              <div className="flex items-start gap-3">
-                <h3 className="min-w-0 flex-1 text-sm font-medium leading-6">
-                  {task.wording}
-                </h3>
-              </div>
+              <h3>
+                <button
+                  type="button"
+                  className="exposure-task__select"
+                  aria-controls="task-guide"
+                  aria-pressed={task.id === selectedId}
+                  onClick={() => onSelect(task.id)}
+                >
+                  <span className="min-w-0 flex-1">{task.wording}</span>
+                  <ChevronRight className="size-4 shrink-0 text-[#7f7280]" aria-hidden="true" />
+                </button>
+              </h3>
               {score == null && (
                 <p className="mt-3 text-xs text-[#7f7280]">
                   No reliable exposure score available.
@@ -130,19 +134,7 @@ export default function ExposureTaskList({
                 >
                   Exposure score and evidence
                 </Button>
-              <AppButton
-                tone="gradient"
-                className="ml-auto flex h-8 w-fit px-3"
-                size="sm"
-                aria-controls="task-guide"
-                aria-pressed={task.id === selectedId}
-                onClick={() => onSelect(task.id)}
-              >
-                <Sparkles className="size-3.5" />
-                {viewedIds.has(task.id)
-                  ? "View AI guidance"
-                  : "Explore AI assistance"}
-              </AppButton>
+
               </div>
               {latest && (
                 <p className="mt-3 text-xs text-[#7f7280]">

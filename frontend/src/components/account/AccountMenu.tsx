@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { useAccount } from "./useAccount";
 import { AuthDialog } from "./AuthDialog";
-export default function AccountMenu() {
+export default function AccountMenu({ iconOnly = false }: { iconOnly?: boolean }) {
   const { user, logout } = useAccount();
   const [authOpen, setAuthOpen] = useState(false);
   const [open, setOpen] = useState(false);
@@ -18,11 +18,12 @@ export default function AccountMenu() {
     return (
       <>
         <Button
+          aria-label="Log in or create an account"
           variant="outline"
           className="shrink-0 rounded-full"
           onClick={() => setAuthOpen(true)}
         >
-          Log in
+          {iconOnly ? <User className="size-4" aria-hidden="true" /> : "Log in"}
         </Button>
         {authOpen && <AuthDialog open onClose={() => setAuthOpen(false)} />}
       </>
@@ -50,7 +51,6 @@ export default function AccountMenu() {
             {[
               [ROUTES.workProfile, "My work profile"],
               [ROUTES.task, "Edit my tasks"],
-              [ROUTES.workProfile, "Change occupation"],
             ].map(([path, label]) => (
               <Link
                 key={label}
@@ -72,7 +72,7 @@ export default function AccountMenu() {
                 try {
                   await logout();
                   setOpen(false);
-                  navigate(ROUTES.workProfile);
+                  navigate(ROUTES.home, { replace: true });
                 } catch (e) {
                   setError(
                     e instanceof Error

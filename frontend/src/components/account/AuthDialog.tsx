@@ -11,10 +11,6 @@ import { FormField, Input } from "@/components/ui/form-field";
 import { AppButton } from "@/components/ui/app-button";
 import { Button } from "@/components/ui/button";
 import { useAccount } from "./useAccount";
-import {
-  hasConfirmedAnalysis,
-  readTaskWorkspace,
-} from "@/pages/WorkProfile/userProfile";
 import { ROUTES } from "@/constants/routes";
 
 export function AuthDialog({
@@ -73,12 +69,9 @@ export function AuthDialog({
               await authenticate(mode, username.trim(), password, importGuest);
               onClose();
               navigate(
-                destination ??
-                  (hasConfirmedAnalysis()
-                    ? ROUTES.aiExposure
-                    : readTaskWorkspace()?.tasksOccupationCode
-                      ? ROUTES.task
-                      : ROUTES.workProfile),
+                mode === "register"
+                  ? ROUTES.workProfile
+                  : destination ?? ROUTES.aiExposure,
               );
             } catch (issue) {
               setError(

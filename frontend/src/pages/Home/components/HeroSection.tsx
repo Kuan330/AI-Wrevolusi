@@ -1,8 +1,10 @@
+import { useAccount } from "@/components/account/useAccount";
 import { Link } from "react-router-dom";
 
 import { ROUTES } from "@/constants/routes";
 
 const HeroSection = () => {
+  const { user } = useAccount();
   return (
     <section className="hero">
       <div className="container">
@@ -19,7 +21,7 @@ const HeroSection = () => {
               to grow next.
             </p>
             <div>
-              <Link to={ROUTES.workProfile} className="btn btn-warm">
+              <Link to={user ? ROUTES.aiExposure : ROUTES.workProfile} className="btn btn-warm">
                 Start free analysis
               </Link>
             </div>
