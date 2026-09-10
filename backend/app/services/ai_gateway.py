@@ -313,6 +313,60 @@ _SYSTEM_PROMPT_TEMPLATE = (
 )
 
 
+# Provider wire protocols. ``chat_completions`` is the OpenAI default wire;
+# ``responses`` targets the OpenAI Responses API, which some relays (for
+# example OpenCode Zen) exclusively serve certain models on.
+_CHAT_COMPLETIONS_MODE = 'chat_completions'
+_RESPONSES_MODE = 'responses'
+_SUPPORTED_API_MODES = frozenset({_CHAT_COMPLETIONS_MODE, _RESPONSES_MODE})
+
+
+def _normalize_extra_headers(raw: Any) -> dict[str, str]:
+    """Parse the optional ``AI_EXTRA_HEADERS`` JSON object leniently.
+
+    Invalid input is logged and ignored so a typo in ``.env`` can never stop
+    the provider from starting.
+    """
+    if isinstance(raw, dict):
+        candidates: Any = raw
+    elif isinstance(raw, str) and raw.strip():
+        try:
+            candidates = json.loads(raw)
+        except ValueError:
+            _LOGGER.warning('AI_EXTRA_HEADERS was not valid JSON and was ignored')
+            return {}
+    else:
+        return {}
+    if not isinstance(candidates, dict):
+        _LOGGER.warning('AI_EXTRA_HEADERS must be a JSON object and was ignored')
+        return {}
+    cleaned: dict[str, str] = {}
+    for name, value in candidates.items():
+        if isinstance(name, str) and name.strip() and isinstance(value, str):
+            cleaned[name.strip()] = value
+        else:
+            _LOGGER.warning('AI_EXTRA_HEADERS entry %r was ignored (non-string)', name)
+    return cleaned
+
+
+def _load_message_json(text: str) -> Any:
+    """Parse a model answer, tolerating markdown code fences around the JSON."""
+    stripped = text.strip()
+    if stripped.startswith('```'):
+        stripped = stripped[3:]
+        first_newline = stripped.find('\n')
+        if first_newline != -1:
+            stripped = stripped[first_newline + 1:]
+        stripped = stripped.rstrip()
+        if stripped.endswith('```'):
+            stripped = stripped[:-3]
+        stripped = stripped.strip()
+    try:
+        return json.loads(stripped)
+    except ValueError as error:
+        raise AIProviderError('provider message content was not valid JSON') from error
+
+
 class _BoundedLruCache:
     """Small thread-safe LRU cache for raw provider responses."""
 
@@ -342,7 +396,13 @@ class _BoundedLruCache:
 
 
 class OpenAICompatibleProvider:
-    """Structured-JSON adapter for OpenAI-compatible chat completion APIs.
+    """Structured-JSON adapter for OpenAI-compatible model APIs.
+
+    Two wire protocols are supported: ``chat_completions`` (the OpenAI
+    default) and ``responses`` (the OpenAI Responses API, which relays may
+    require for certain models).  The adapter can also run keyless for
+    anonymous relays: ``keyless=True`` relaxes the credential requirement and
+    an explicit empty ``Authorization`` header goes out instead of a bearer.
 
     The adapter is deliberately thin: it retries transient failures with
     exponential backoff, caches raw responses, applies a local requests-per-
@@ -361,6 +421,9 @@ class OpenAICompatibleProvider:
         api_key: str,
         model: str,
         base_url: str = 'https://api.openai.com/v1',
+        api_mode: str = _CHAT_COMPLETIONS_MODE,
+        keyless: bool = False,
+        extra_headers: dict[str, str] | None = None,
         timeout_s: float = 20.0,
         max_retries: int = 2,
         backoff_base_s: float = 0.5,
@@ -372,7 +435,7 @@ class OpenAICompatibleProvider:
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         cleaned_key = (api_key or '').strip()
-        if not cleaned_key:
+        if not cleaned_key and not keyless:
             raise ValueError('api_key must contain non-whitespace characters')
         if not (model or '').strip():
             raise ValueError('model must contain non-whitespace characters')
@@ -381,12 +444,28 @@ class OpenAICompatibleProvider:
         if rpm_limit < 1:
             raise ValueError('rpm_limit must be at least 1')
 
+        mode = str(api_mode or _CHAT_COMPLETIONS_MODE).strip().lower()
+        if mode not in _SUPPORTED_API_MODES:
+            _LOGGER.warning(
+                'Unknown ai_api_mode %r; falling back to %s',
+                api_mode,
+                _CHAT_COMPLETIONS_MODE,
+            )
+            mode = _CHAT_COMPLETIONS_MODE
+
         self.model = model.strip()
-        self._endpoint = f"{base_url.rstrip('/')}/chat/completions"
-        self._headers = {
-            'Authorization': f'Bearer {cleaned_key}',
-            'Content-Type': 'application/json',
-        }
+        self.api_mode = mode
+        path = '/chat/completions' if mode == _CHAT_COMPLETIONS_MODE else '/responses'
+        self._endpoint = f"{base_url.rstrip('/')}{path}"
+        headers = {'Content-Type': 'application/json'}
+        if extra_headers:
+            headers.update(extra_headers)
+        if cleaned_key:
+            headers['Authorization'] = f'Bearer {cleaned_key}'
+        elif 'Authorization' not in headers:
+            # Keyless relays expect an explicit empty bearer instead of no header.
+            headers['Authorization'] = ''
+        self._headers = headers
         self.max_retries = int(max_retries)
         self._backoff_base_s = max(0.0, float(backoff_base_s))
         self._rpm_limit = int(rpm_limit)
@@ -455,7 +534,7 @@ class OpenAICompatibleProvider:
                 )
 
             try:
-                parsed = self._parse_completion_payload(response)
+                parsed = self._parse_payload(response)
             except AIProviderError as error:
                 last_error = error
                 _LOGGER.warning(
@@ -496,18 +575,29 @@ class OpenAICompatibleProvider:
         system_prompt = _SYSTEM_PROMPT_TEMPLATE.format(
             schema=json.dumps(schema, sort_keys=True, default=str),
         )
+        request_payload = json.dumps(
+            {'operation': operation, 'request': payload},
+            sort_keys=True,
+            default=str,
+        )
+        if self.api_mode == _RESPONSES_MODE:
+            # The Responses API carries the system prompt via ``instructions``
+            # and the task payload as one input string; the temperature stays
+            # at the model default because reasoning models may reject 0.
+            body: dict[str, Any] = {
+                'model': self.model,
+                'instructions': system_prompt,
+                'input': request_payload,
+                'stream': False,
+            }
+            if self._max_tokens is not None:
+                body['max_output_tokens'] = self._max_tokens
+            return body
         body: dict[str, Any] = {
             'model': self.model,
             'messages': [
                 {'role': 'system', 'content': system_prompt},
-                {
-                    'role': 'user',
-                    'content': json.dumps(
-                        {'operation': operation, 'request': payload},
-                        sort_keys=True,
-                        default=str,
-                    ),
-                },
+                {'role': 'user', 'content': request_payload},
             ],
             'response_format': {'type': 'json_object'},
             'temperature': 0,
@@ -515,6 +605,12 @@ class OpenAICompatibleProvider:
         if self._max_tokens is not None:
             body['max_tokens'] = self._max_tokens
         return body
+
+    def _parse_payload(self, response: httpx.Response) -> Any:
+        """Parse provider content with the wire format of the active mode."""
+        if self.api_mode == _RESPONSES_MODE:
+            return self._parse_responses_payload(response)
+        return self._parse_completion_payload(response)
 
     @staticmethod
     def _parse_completion_payload(response: httpx.Response) -> Any:
@@ -527,25 +623,44 @@ class OpenAICompatibleProvider:
             ) from error
 
         if isinstance(content, str):
-            text = content.strip()
-            if text.startswith('```'):
-                text = text[3:]
-                first_newline = text.find('\n')
-                if first_newline != -1:
-                    text = text[first_newline + 1:]
-                stripped = text.rstrip()
-                if stripped.endswith('```'):
-                    text = stripped[:-3]
-                text = text.strip()
-            try:
-                return json.loads(text)
-            except ValueError as error:
-                raise AIProviderError(
-                    'provider message content was not valid JSON'
-                ) from error
+            return _load_message_json(content)
         if isinstance(content, (dict, list)):
             return content
         raise AIProviderError('provider message content had an unsupported type')
+
+    @staticmethod
+    def _parse_responses_payload(response: httpx.Response) -> Any:
+        """Extract the JSON answer from an OpenAI Responses API payload."""
+        try:
+            data = response.json()
+        except ValueError as error:
+            raise AIProviderError(
+                'provider response did not include an output message'
+            ) from error
+        if not isinstance(data, dict):
+            raise AIProviderError('provider response did not include an output message')
+
+        text: str | None = None
+        output = data.get('output')
+        if isinstance(output, list):
+            for item in output:
+                if not isinstance(item, dict) or item.get('type') != 'message':
+                    continue
+                for part in item.get('content') or []:
+                    if (
+                        isinstance(part, dict)
+                        and part.get('type') in {'output_text', 'text'}
+                        and isinstance(part.get('text'), str)
+                    ):
+                        text = part['text']
+                        break
+                if text is not None:
+                    break
+        if text is None and isinstance(data.get('output_text'), str):
+            text = data['output_text']
+        if text is None:
+            raise AIProviderError('provider response did not include an output message')
+        return _load_message_json(text)
 
     def _consume_rate_limit_slot(self) -> None:
         """Refuse to send when the local per-minute budget is exhausted.
@@ -575,14 +690,19 @@ class OpenAICompatibleProvider:
 
 
 def build_provider_from_settings(settings_obj: Any | None = None) -> OpenAICompatibleProvider | None:
-    """Build the optional provider from settings; return None without a key."""
+    """Build the optional provider from settings; return None without a key.
+
+    ``AI_KEYLESS=true`` builds the provider without any credential for
+    anonymous relays; otherwise a non-empty ``AI_API_KEY`` is required.
+    """
     if settings_obj is None:
         from app.core.config import get_settings
 
         settings_obj = get_settings()
 
     api_key = getattr(settings_obj, 'ai_api_key', None)
-    if not api_key or not str(api_key).strip():
+    keyless = bool(getattr(settings_obj, 'ai_keyless', False))
+    if (not api_key or not str(api_key).strip()) and not keyless:
         _LOGGER.warning(
             'AI provider is not configured (AI_API_KEY is empty); '
             'AI endpoints run on deterministic logic only.'
@@ -590,9 +710,12 @@ def build_provider_from_settings(settings_obj: Any | None = None) -> OpenAICompa
         return None
 
     return OpenAICompatibleProvider(
-        api_key=str(api_key),
+        api_key=str(api_key or ''),
         model=str(getattr(settings_obj, 'ai_model', 'gpt-4o-mini')),
         base_url=str(getattr(settings_obj, 'ai_base_url', 'https://api.openai.com/v1')),
+        api_mode=str(getattr(settings_obj, 'ai_api_mode', _CHAT_COMPLETIONS_MODE)),
+        keyless=keyless,
+        extra_headers=_normalize_extra_headers(getattr(settings_obj, 'ai_extra_headers', '')),
         timeout_s=float(getattr(settings_obj, 'ai_timeout_seconds', 20.0)),
         max_retries=int(getattr(settings_obj, 'ai_max_retries', 2)),
         rpm_limit=int(getattr(settings_obj, 'ai_rpm_limit', 60)),
