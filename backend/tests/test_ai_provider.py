@@ -161,19 +161,20 @@ def test_provider_rate_limit_refuses_a_burst() -> None:
     assert calls['count'] == 1
 
 
-def test_build_provider_from_settings_requires_a_key() -> None:
-    without_key = SimpleNamespace(
-        ai_api_key=None,
+def test_build_provider_from_settings_keeps_a_key_optional_when_the_fallback_is_off() -> None:
+    base = dict(
         ai_model='test-model',
         ai_base_url='https://example.test/v1',
         ai_timeout_seconds=5.0,
         ai_max_retries=1,
         ai_rpm_limit=10,
         ai_cache_size=5,
+        ai_fallback_enabled=False,
     )
+    without_key = SimpleNamespace(**base, ai_api_key=None)
     assert build_provider_from_settings(without_key) is None
 
-    with_key = SimpleNamespace(**{**vars(without_key), 'ai_api_key': 'secret-key'})
+    with_key = SimpleNamespace(**base, ai_api_key='secret-key')
     provider = build_provider_from_settings(with_key)
     try:
         assert isinstance(provider, OpenAICompatibleProvider)

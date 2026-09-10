@@ -18,6 +18,9 @@ Add these to `backend/.env` locally (never commit real keys):
 | `AI_API_MODE` | `chat_completions` | Wire protocol: `chat_completions` or `responses` (some relays/models are served on one only) |
 | `AI_KEYLESS` | `false` | `true` = call the endpoint without any credential (anonymous free relays) |
 | `AI_EXTRA_HEADERS` | *(empty)* | Optional JSON object of extra request headers, e.g. `{"Authorization": "", "x-opencode-session": "my-app"}` |
+| `AI_FALLBACK_ENABLED` | `true` | Built-in OpenCode free-relay fallback when no key is set or the configured provider fails |
+| `AI_FALLBACK_BASE_URL` | `https://opencode.ai/zen/v1` | Fallback relay endpoint |
+| `AI_FALLBACK_MODEL` | `muse-spark-1.3-contributor-free` | Fallback model (served on the Responses API) |
 | `AI_TIMEOUT_SECONDS` | `20` | Per-request timeout |
 | `AI_MAX_RETRIES` | `2` | Retries after the first attempt (0 disables) |
 | `AI_RPM_LIMIT` | `60` | Local requests-per-minute guard; bursts degrade to deterministic results |
@@ -86,6 +89,10 @@ curl -s -X POST http://127.0.0.1:8000/api/v1/ai/skill-match \
      served on `responses` only) and any required headers via
      `AI_EXTRA_HEADERS` — the free tier rejects non-empty bearers and needs the
      `x-opencode-session` session-affinity header.
+   Configuration is optional: with no key, or when the configured provider
+   fails at runtime (rejected credential, outage, unusable output), calls
+   automatically fall back to the built-in OpenCode free relay. Set
+   `AI_FALLBACK_ENABLED=false` to require an explicit key instead.
 2. Repeat the curl calls above — same JSON shape, now potentially ordered by
    the provider.
 3. To confirm the fallback still works, temporarily set an invalid key or an
@@ -101,9 +108,9 @@ curl -s -X POST http://127.0.0.1:8000/api/v1/ai/skill-match \
 ### 3.3 Test suites and build
 
 ```bash
-cd backend && .venv/Scripts/python.exe -m pytest -q      # expect: 95 passed
-# Local .env has a live provider? Keep the suite offline with:
-# AI_KEYLESS=false AI_API_KEY= .venv/Scripts/python.exe -m pytest -q
+cd backend && .venv/Scripts/python.exe -m pytest -q      # expect: 101 passed
+# tests/conftest.py pins the provider chain off, so the suite never calls out
+# even when the local .env configures a provider.
 cd frontend && npm run build                              # expect: build success
 ```
 
@@ -132,7 +139,7 @@ backend). For Iteration 2:
 |---|---|---|
 | `ECONNREFUSED 127.0.0.1:8000` in frontend | Backend not running / still importing | Start backend, wait for "Uvicorn running" |
 | AI responses look identical with/without key | Allowlist/confidence rules filtered provider output, or cache hit | Expected; try a different task text |
-| Warning in logs: "AI provider is not configured" | `AI_API_KEY` empty and `AI_KEYLESS` false | Set the key (or `AI_KEYLESS=true`) in `backend/.env` and restart |
+| Warning in logs: "AI provider is not configured" | No `AI_API_KEY` and `AI_FALLBACK_ENABLED=false` | Set a key (or re-enable the fallback) in `backend/.env` and restart |
 | Provider 401/403 in logs, responses still 200 | Key or base URL wrong | Fix `AI_*` values; endpoints keep working deterministically |
 | Free-relay 400/500 errors in logs, responses still 200 | Relay gating (missing session header, non-empty bearer on a keyless tier, or a model served on a different wire) | Align `AI_EXTRA_HEADERS` / `AI_API_MODE` with the relay contract; deterministic fallback keeps the UI usable |
 | Rate-limit warning | `AI_RPM_LIMIT` reached | Raise the limit or reduce traffic; bursts are safe by design |

@@ -61,6 +61,12 @@ class Settings(BaseSettings):
     ai_api_mode: str = 'chat_completions'
     ai_keyless: bool = False
     ai_extra_headers: str = ''
+    # Built-in safety net for the provider chain: when no key is configured
+    # (or the configured provider is unavailable at runtime) the AI layers
+    # fall back to the OpenCode Zen free relay. Set to false to disable it.
+    ai_fallback_enabled: bool = True
+    ai_fallback_base_url: str = 'https://opencode.ai/zen/v1'
+    ai_fallback_model: str = 'muse-spark-1.3-contributor-free'
     ai_timeout_seconds: float = Field(default=20, gt=0, le=180)
     ai_max_retries: int = Field(default=2, ge=0, le=5)
     ai_rpm_limit: int = Field(default=60, gt=0, le=6000)

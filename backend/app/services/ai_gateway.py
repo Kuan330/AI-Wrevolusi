@@ -295,6 +295,11 @@ class AIGateway:
 class AIProviderError(RuntimeError):
     """Raised when the configured HTTP provider cannot return usable JSON."""
 
+    def __init__(self, message: str, *, status_code: int | None = None) -> None:
+        """Keep the upstream status (when known) for the fallback decision."""
+        super().__init__(message)
+        self.status_code = status_code
+
 
 # Transient upstream failures worth one more attempt: throttling, timeouts
 # surfaced as status codes, and 5xx responses.
@@ -454,6 +459,7 @@ class OpenAICompatibleProvider:
             mode = _CHAT_COMPLETIONS_MODE
 
         self.model = model.strip()
+        self.base_url = base_url.rstrip('/')
         self.api_mode = mode
         path = '/chat/completions' if mode == _CHAT_COMPLETIONS_MODE else '/responses'
         self._endpoint = f"{base_url.rstrip('/')}{path}"
@@ -530,7 +536,8 @@ class OpenAICompatibleProvider:
                 continue
             if response.status_code >= 400:
                 raise AIProviderError(
-                    f'provider rejected the request with status {response.status_code}'
+                    f'provider rejected the request with status {response.status_code}',
+                    status_code=response.status_code,
                 )
 
             try:
@@ -689,11 +696,75 @@ class OpenAICompatibleProvider:
         return hashlib.sha256(encoded.encode('utf-8')).hexdigest()
 
 
-def build_provider_from_settings(settings_obj: Any | None = None) -> OpenAICompatibleProvider | None:
-    """Build the optional provider from settings; return None without a key.
+_AUTH_FAILURE_STATUS_CODES = frozenset({401, 403})
 
-    ``AI_KEYLESS=true`` builds the provider without any credential for
-    anonymous relays; otherwise a non-empty ``AI_API_KEY`` is required.
+# Built-in safety net: the OpenCode Zen free relay (keyless). The relay's
+# contract is documented in docs/iteration2_integration_and_deployment.md —
+# anonymous access, the Responses API for Muse Spark, and the
+# ``x-opencode-session`` affinity header.
+_OPENCODE_FALLBACK_BASE_URL = 'https://opencode.ai/zen/v1'
+_OPENCODE_FALLBACK_MODEL = 'muse-spark-1.3-contributor-free'
+_OPENCODE_FALLBACK_API_MODE = _RESPONSES_MODE
+_OPENCODE_FALLBACK_TIMEOUT_S = 45.0
+_OPENCODE_FALLBACK_EXTRA_HEADERS = {
+    'Authorization': '',
+    'x-opencode-session': 'ai-wrevolusi-fallback',
+    'X-Title': 'AI-Wrevolusi',
+    'User-Agent': 'AI-Wrevolusi/0.1',
+}
+
+
+class FallbackProvider:
+    """Primary provider with the OpenCode free relay as its safety net.
+
+    The primary (the configured key) is tried first; any failure — rejected
+    credential, outage, timeout, unusable output — routes that call to the
+    fallback instead of dropping straight to the deterministic path.  After an
+    authentication failure the primary is skipped for the rest of the process
+    so a dead key cannot slow every request down.
+    """
+
+    name = 'fallback-chain'
+
+    def __init__(self, primary: AIGatewayProvider, fallback: AIGatewayProvider) -> None:
+        self.primary = primary
+        self.fallback = fallback
+        self._primary_disabled = False
+
+    def complete_json(self, **kwargs: Any) -> Any:
+        if not self._primary_disabled:
+            try:
+                return self.primary.complete_json(**kwargs)
+            except AIProviderError as error:
+                _LOGGER.warning(
+                    'primary AI provider failed (%s); using the OpenCode fallback for this call',
+                    error,
+                )
+                if getattr(error, 'status_code', None) in _AUTH_FAILURE_STATUS_CODES:
+                    self._primary_disabled = True
+                    _LOGGER.warning(
+                        'primary AI provider disabled for this process after an '
+                        'authentication failure; fix the credentials and restart '
+                        'the backend to re-enable it'
+                    )
+        return self.fallback.complete_json(**kwargs)
+
+    def close(self) -> None:
+        for provider in (self.primary, self.fallback):
+            close = getattr(provider, 'close', None)
+            if callable(close):
+                close()
+
+
+def build_provider_from_settings(
+    settings_obj: Any | None = None,
+) -> OpenAICompatibleProvider | FallbackProvider | None:
+    """Build the AI provider chain from settings.
+
+    Priority: the configured provider when ``AI_API_KEY`` is present (or an
+    explicit ``AI_KEYLESS=true`` relay), with the built-in OpenCode free relay
+    as the safety net for a missing or failing credential.  Returns ``None``
+    (deterministic only) when neither side can be built.
     """
     if settings_obj is None:
         from app.core.config import get_settings
@@ -702,25 +773,61 @@ def build_provider_from_settings(settings_obj: Any | None = None) -> OpenAICompa
 
     api_key = getattr(settings_obj, 'ai_api_key', None)
     keyless = bool(getattr(settings_obj, 'ai_keyless', False))
-    if (not api_key or not str(api_key).strip()) and not keyless:
+    has_key = bool(api_key and str(api_key).strip())
+
+    primary: OpenAICompatibleProvider | None = None
+    if has_key or keyless:
+        primary = OpenAICompatibleProvider(
+            api_key=str(api_key or ''),
+            model=str(getattr(settings_obj, 'ai_model', 'gpt-4o-mini')),
+            base_url=str(getattr(settings_obj, 'ai_base_url', 'https://api.openai.com/v1')),
+            api_mode=str(getattr(settings_obj, 'ai_api_mode', _CHAT_COMPLETIONS_MODE)),
+            keyless=keyless,
+            extra_headers=_normalize_extra_headers(getattr(settings_obj, 'ai_extra_headers', '')),
+            timeout_s=float(getattr(settings_obj, 'ai_timeout_seconds', 20.0)),
+            max_retries=int(getattr(settings_obj, 'ai_max_retries', 2)),
+            rpm_limit=int(getattr(settings_obj, 'ai_rpm_limit', 60)),
+            cache_size=int(getattr(settings_obj, 'ai_cache_size', 128)),
+        )
+
+    fallback: OpenAICompatibleProvider | None = None
+    if bool(getattr(settings_obj, 'ai_fallback_enabled', True)):
+        fallback_base_url = str(
+            getattr(settings_obj, 'ai_fallback_base_url', _OPENCODE_FALLBACK_BASE_URL)
+        ).strip()
+        fallback_model = str(
+            getattr(settings_obj, 'ai_fallback_model', _OPENCODE_FALLBACK_MODEL)
+        ).strip()
+        duplicate_of_primary = bool(
+            primary is not None
+            and primary.base_url.lower() == fallback_base_url.rstrip('/').lower()
+            and primary.model == fallback_model
+        )
+        if fallback_base_url and fallback_model and not duplicate_of_primary:
+            fallback = OpenAICompatibleProvider(
+                api_key='',
+                model=fallback_model,
+                base_url=fallback_base_url,
+                api_mode=_OPENCODE_FALLBACK_API_MODE,
+                keyless=True,
+                extra_headers=dict(_OPENCODE_FALLBACK_EXTRA_HEADERS),
+                timeout_s=_OPENCODE_FALLBACK_TIMEOUT_S,
+                max_retries=int(getattr(settings_obj, 'ai_max_retries', 2)),
+                rpm_limit=int(getattr(settings_obj, 'ai_rpm_limit', 60)),
+                cache_size=int(getattr(settings_obj, 'ai_cache_size', 128)),
+            )
+
+    if primary is None and fallback is None:
         _LOGGER.warning(
-            'AI provider is not configured (AI_API_KEY is empty); '
-            'AI endpoints run on deterministic logic only.'
+            'AI provider is not configured (no AI_API_KEY and the OpenCode '
+            'fallback is disabled); AI endpoints run on deterministic logic only.'
         )
         return None
-
-    return OpenAICompatibleProvider(
-        api_key=str(api_key or ''),
-        model=str(getattr(settings_obj, 'ai_model', 'gpt-4o-mini')),
-        base_url=str(getattr(settings_obj, 'ai_base_url', 'https://api.openai.com/v1')),
-        api_mode=str(getattr(settings_obj, 'ai_api_mode', _CHAT_COMPLETIONS_MODE)),
-        keyless=keyless,
-        extra_headers=_normalize_extra_headers(getattr(settings_obj, 'ai_extra_headers', '')),
-        timeout_s=float(getattr(settings_obj, 'ai_timeout_seconds', 20.0)),
-        max_retries=int(getattr(settings_obj, 'ai_max_retries', 2)),
-        rpm_limit=int(getattr(settings_obj, 'ai_rpm_limit', 60)),
-        cache_size=int(getattr(settings_obj, 'ai_cache_size', 128)),
-    )
+    if primary is None:
+        return fallback
+    if fallback is None:
+        return primary
+    return FallbackProvider(primary=primary, fallback=fallback)
 
 
 _default_gateway: AIGateway | None = None

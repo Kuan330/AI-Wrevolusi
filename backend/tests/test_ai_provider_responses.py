@@ -16,6 +16,7 @@ from pydantic import BaseModel
 
 from app.services.ai_gateway import (
     AIProviderError,
+    FallbackProvider,
     OpenAICompatibleProvider,
     build_provider_from_settings,
 )
@@ -136,7 +137,7 @@ def test_unknown_api_mode_falls_back_to_chat_completions() -> None:
 
 
 def test_build_provider_from_settings_allows_a_keyless_responses_relay() -> None:
-    settings = SimpleNamespace(
+    base = dict(
         ai_api_key=None,
         ai_model='muse-spark-1.3-contributor-free',
         ai_base_url='https://relay.test/zen/v1',
@@ -148,10 +149,19 @@ def test_build_provider_from_settings_allows_a_keyless_responses_relay() -> None
         ai_rpm_limit=10,
         ai_cache_size=5,
     )
-    provider = build_provider_from_settings(settings)
+    provider = build_provider_from_settings(SimpleNamespace(**base, ai_fallback_enabled=False))
     try:
         assert isinstance(provider, OpenAICompatibleProvider)
         assert provider.api_mode == 'responses'
         assert provider.model == 'muse-spark-1.3-contributor-free'
+    finally:
+        provider.close()
+
+    # With the fallback enabled the keyless relay becomes the chain's primary.
+    provider = build_provider_from_settings(SimpleNamespace(**base, ai_fallback_enabled=True))
+    try:
+        assert isinstance(provider, FallbackProvider)
+        assert isinstance(provider.primary, OpenAICompatibleProvider)
+        assert provider.primary.api_mode == 'responses'
     finally:
         provider.close()
