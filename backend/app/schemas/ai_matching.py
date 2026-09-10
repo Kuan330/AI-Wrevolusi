@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
@@ -45,6 +47,9 @@ class TaskMatchRequest(BaseModel):
         return candidates
 
 
+TaskMatchStatus = Literal['matched', 'no_match', 'needs_more_input']
+
+
 class TaskMatchResponse(BaseModel):
     """Structured, provider-independent task matching output."""
 
@@ -56,6 +61,15 @@ class TaskMatchResponse(BaseModel):
     unmatched_concepts: list[str] = Field(default_factory=list, max_length=50)
     reason: str = Field(min_length=1, max_length=2000)
     clarifying_question: str | None = Field(default=None, max_length=1000)
+    status: TaskMatchStatus = Field(
+        default='no_match',
+        description=(
+            'Outcome of this check: "matched" selected one of the supplied '
+            'candidates, "no_match" found no reliable candidate, and '
+            '"needs_more_input" means the task text was below the minimum '
+            'word count so no matching was attempted.'
+        ),
+    )
     needs_user_confirmation: bool = Field(
         default=True,
         description=(
@@ -79,4 +93,5 @@ __all__ = [
     'TaskMatchRequest',
     'TaskMatchOutput',
     'TaskMatchResponse',
+    'TaskMatchStatus',
 ]

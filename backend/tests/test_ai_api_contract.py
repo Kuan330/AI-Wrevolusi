@@ -178,6 +178,7 @@ def test_ai_request_and_response_schemas_expose_the_contract_fields() -> None:
             'unmatched_concepts',
             'reason',
             'clarifying_question',
+            'status',
             'needs_user_confirmation',
         },
         '/api/v1/ai/occupation-suggestions': {
@@ -270,7 +271,7 @@ def test_no_fit_returns_empty_or_clarifying_json_without_prohibited_predictions(
     requests = {
         '/api/v1/ai/task-match': {
             'occupation_code': '5222',
-            'user_task': 'Repair satellites in deep space.',
+            'user_task': 'Repair satellites in deep space orbits.',
             'candidates': TASK_CANDIDATES,
         },
         '/api/v1/ai/occupation-suggestions': {
@@ -302,12 +303,37 @@ def test_no_fit_returns_empty_or_clarifying_json_without_prohibited_predictions(
             if path.endswith('task-match'):
                 assert payload['candidate_id'] == ''
                 assert payload['clarifying_question']
+                assert payload['status'] == 'no_match'
             elif path.endswith('skill-match'):
                 assert payload['skills'] == []
             else:
                 assert payload['status'] == 'clarifying'
                 assert payload['candidates'] == []
                 assert payload['clarifying_questions']
+
+
+def test_task_match_below_the_word_gate_returns_a_needs_more_input_status() -> None:
+    application = _make_app()
+
+    with TestClient(application) as client:
+        response = client.post(
+            '/api/v1/ai/task-match',
+            json={
+                'occupation_code': '5222',
+                'user_task': 'Prepare a report',
+                'candidates': TASK_CANDIDATES,
+            },
+        )
+
+    assert response.status_code == 200
+    payload = _json_response(response)
+    assert payload['status'] == 'needs_more_input'
+    assert payload['candidate_id'] == ''
+    assert payload['confidence'] == 0.0
+    assert payload['clarifying_question']
+    rendered = json.dumps(payload, ensure_ascii=False)
+    assert not FORBIDDEN_CLAIM_RE.search(rendered)
+    assert not DATE_PREDICTION_RE.search(rendered)
 
 
 def test_malformed_requests_return_json_validation_errors() -> None:
@@ -337,7 +363,7 @@ def test_task_match_provider_exception_returns_a_safe_json_fallback() -> None:
                 '/api/v1/ai/task-match',
                 json={
                     'occupation_code': '5222',
-                    'user_task': 'prepare a report',
+                    'user_task': 'prepare a weekly report for the sales team',
                     'candidates': TASK_CANDIDATES,
                 },
             )
@@ -372,7 +398,7 @@ def test_task_match_malformed_provider_output_cannot_invent_a_candidate() -> Non
                 '/api/v1/ai/task-match',
                 json={
                     'occupation_code': '5222',
-                    'user_task': 'prepare a report',
+                    'user_task': 'prepare a weekly report for the sales team',
                     'candidates': TASK_CANDIDATES,
                 },
             )

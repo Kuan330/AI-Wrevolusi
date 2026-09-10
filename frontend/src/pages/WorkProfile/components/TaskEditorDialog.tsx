@@ -9,10 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useStandardTaskMatch } from "@/pages/WorkProfile/hooks/useStandardTaskMatch";
+import { MIN_TASK_MATCH_WORDS } from "@/pages/WorkProfile/taskMatchWords";
 import { TIME_SPENT_OPTIONS } from "@/pages/WorkProfile/taskOptions";
 import type { TaskEditorValues } from "@/pages/WorkProfile/types";
-import { aiService } from "@/services/aiService";
-import { referenceService } from "@/services/referenceService";
 import { validateTaskTitle } from "@/utils/validation";
 
 type Props = {
@@ -33,49 +33,12 @@ export default function TaskEditorDialog({
 }: Props) {
   const [values, setValues] = useState(initialValues);
   const [error, setError] = useState<string | null>(null);
-  const [standardTaskStatus, setStandardTaskStatus] = useState<
-    "idle" | "loading" | "done" | "error"
-  >("idle");
-  const [standardTaskMatch, setStandardTaskMatch] = useState<{
-    taskText: string;
-    confidence: number;
-    reason: string;
-  } | null>(null);
+  const standardTaskCheck = useStandardTaskMatch({
+    enabled: open && Boolean(occupationCode),
+    occupationCode,
+    wording: values.wording,
+  });
 
-  const findClosestStandardTask = async () => {
-    if (!occupationCode || values.wording.trim().length < 3) return;
-    setStandardTaskStatus("loading");
-    setStandardTaskMatch(null);
-    try {
-      const rows = await referenceService.tasks(occupationCode);
-      if (rows.length === 0) {
-        setStandardTaskStatus("error");
-        return;
-      }
-      const response = await aiService.taskMatch({
-        occupation_code: occupationCode,
-        user_task: values.wording.trim(),
-        candidates: rows.map((task) => ({
-          id: task.task_id,
-          text: task.task_text,
-        })),
-      });
-      const chosen =
-        rows.find((task) => task.task_id === response.candidate_id) ?? null;
-      setStandardTaskMatch(
-        chosen
-          ? {
-              taskText: chosen.task_text,
-              confidence: response.confidence,
-              reason: response.reason,
-            }
-          : null,
-      );
-      setStandardTaskStatus("done");
-    } catch {
-      setStandardTaskStatus("error");
-    }
-  };
   return (
     <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
       <DialogContent className="profile-dialog-surface max-h-[90dvh] overflow-y-auto rounded-3xl p-6">
@@ -123,49 +86,54 @@ export default function TaskEditorDialog({
             <span className="block text-sm font-semibold text-[#2f2430]">
               Standard task check
             </span>
-            <Button
-              type="button"
-              variant="outline"
-              className="rounded-full"
-              disabled={
-                standardTaskStatus === "loading" ||
-                !occupationCode ||
-                values.wording.trim().length < 3
-              }
-              onClick={() => void findClosestStandardTask()}
-            >
-              {standardTaskStatus === "loading"
-                ? "Checking…"
-                : "Find closest standard task"}
-            </Button>
             <span className="block text-xs leading-5 text-[#7f7280]">
-              Compare your wording with the occupation&apos;s standard task
-              list. Suggestions need your review before they count.
+              Matching runs automatically while you type — at least{" "}
+              {MIN_TASK_MATCH_WORDS} meaningful words are needed. Suggestions
+              need your review before they count.
             </span>
-            {standardTaskStatus === "done" && standardTaskMatch ? (
+            {standardTaskCheck.status === "below_minimum" ? (
+              <p className="text-xs text-[#7f7280]">
+                Keep typing — matching starts after {MIN_TASK_MATCH_WORDS}{" "}
+                words.
+              </p>
+            ) : null}
+            {standardTaskCheck.status === "loading" ? (
+              <p className="text-xs text-[#7f7280]">Checking…</p>
+            ) : null}
+            {standardTaskCheck.match ? (
               <div className="rounded-2xl border border-[#eadde4] bg-white/70 p-3 text-sm leading-6 text-[#574a55]">
                 <p className="text-sm font-semibold text-[#3d5f7a]">
                   Closest standard task
                 </p>
-                <p className="mt-1">{standardTaskMatch.taskText}</p>
+                <p className="mt-1">{standardTaskCheck.match.taskText}</p>
                 <p className="mt-1 text-xs text-[#7f7280]">
-                  Match confidence {standardTaskMatch.confidence.toFixed(2)}.{" "}
-                  {standardTaskMatch.reason}
+                  Match confidence{" "}
+                  {standardTaskCheck.match.confidence.toFixed(2)}.{" "}
+                  {standardTaskCheck.match.reason}
                 </p>
                 <p className="mt-2 text-xs text-[#7f7280]">
                   Suggestion only — review it before relying on it.
                 </p>
               </div>
             ) : null}
-            {standardTaskStatus === "done" && !standardTaskMatch ? (
+            {standardTaskCheck.status === "no_match" ? (
               <p className="text-xs text-[#7f7280]">
                 No reliable standard task was found for this wording.
               </p>
             ) : null}
-            {standardTaskStatus === "error" ? (
-              <p className="text-xs text-[#7f7280]">
-                The standard-task check is unavailable right now.
-              </p>
+            {standardTaskCheck.status === "error" ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-xs text-[#7f7280]">
+                  The standard-task check is unavailable right now.
+                </p>
+                <button
+                  type="button"
+                  onClick={standardTaskCheck.retry}
+                  className="text-xs font-medium text-[#3d5f7a] underline underline-offset-2"
+                >
+                  Retry
+                </button>
+              </div>
             ) : null}
           </div>
           <FormField

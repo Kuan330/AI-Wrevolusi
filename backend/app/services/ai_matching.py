@@ -18,6 +18,12 @@ from app.schemas.ai_matching import TaskMatchCandidate, TaskMatchResponse
 
 
 MINIMUM_TASK_MATCH_CONFIDENCE = 0.5
+
+# The task editor runs its automatic check once this many meaningful words are
+# present.  The client mirrors the same counting rule (see
+# frontend/src/pages/WorkProfile/taskMatchWords.ts); keep both in sync.
+MINIMUM_TASK_MATCH_WORDS = 5
+
 MAXIMUM_CONCEPTS = 50
 MAXIMUM_REASON_LENGTH = 2000
 MAXIMUM_QUESTION_LENGTH = 1000
@@ -136,6 +142,24 @@ def tokenize_task_text_for_matching(value: str) -> list[str]:
     """Expose the shared comparison tokenisation for other AI endpoints."""
 
     return [canonical for _, canonical in _concept_tokens(value)]
+
+
+def count_task_text_words_for_matching(value: str) -> int:
+    """Count meaningful words for the minimum-input gate.
+
+    A word is a non-stop-word token under the same tokenisation the matcher
+    uses (case-folded letters/digits; a run of characters from a script
+    without spaces, such as Chinese, counts as one token).  Duplicates are
+    counted so the gate reflects how much text was typed.  The client-side
+    copy of this rule lives in
+    ``frontend/src/pages/WorkProfile/taskMatchWords.ts``.
+    """
+
+    return sum(
+        1
+        for token in _TOKEN_PATTERN.findall(value.casefold())
+        if token not in TASK_MATCH_STOP_WORDS
+    )
 
 
 def _sequence_similarity(first: str, second: str) -> float:
@@ -389,9 +413,11 @@ __all__ = [
     'DEFAULT_CLARIFYING_QUESTION',
     'DeterministicTaskMatchProvider',
     'MINIMUM_TASK_MATCH_CONFIDENCE',
+    'MINIMUM_TASK_MATCH_WORDS',
     'RankedTaskCandidate',
     'TaskMatchProvider',
     'TaskMatchProviderResult',
+    'count_task_text_words_for_matching',
     'default_task_match_provider',
     'enforce_task_match_contract',
     'normalize_task_text_for_matching',
