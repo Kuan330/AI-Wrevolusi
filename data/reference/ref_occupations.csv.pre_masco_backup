@@ -1,0 +1,7 @@
+occupation_code,level,parent_code,title,description,skill_level,source,source_year
+5,major,,Service and Sales Workers,,2,MASCO 2020,2020
+52,sub_major,5,Sales Workers,,,MASCO 2020,2020
+522,minor,52,Shop Salespersons,,,MASCO 2020,2020
+5221,unit,522,Shopkeepers,Shopkeepers operate small retail shops either independently or with support from a small number of others.,,MASCO 2020,2020
+5222,unit,522,Shop Supervisors,Shop Supervisors supervise and coordinate the activities of shop sales assistants and other workers in retail and wholesale shops such as supermarkets and department stores.,,MASCO 2020,2020
+5223,unit,522,Shop Sales Assistants,Shop Sales Assistants sell a range of goods and services directly to the public or on behalf of retail and wholesale establishments. They explain the functions and qualities of these goods or services.,,MASCO 2020,2020

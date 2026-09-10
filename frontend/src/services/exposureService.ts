@@ -29,6 +29,8 @@ export interface ConfirmedTaskExposureAssessmentRequestItem {
 export interface ConfirmedTaskExposureAssessmentBatchRequest {
   occupation_code: string;
   confirmed_tasks: ConfirmedTaskExposureAssessmentRequestItem[];
+  /** Ask for an AI-assisted match even below the deterministic similarity floor. */
+  prefer_llm_match?: boolean;
 }
 
 export interface MatchedIloTaskExposureEvidence {
@@ -43,9 +45,15 @@ export interface ConfirmedTaskExposureAssessment {
   task_id: string;
   suggested_state: ExposureState;
   potential25: string | null;
-  match_layer: "exact" | "nlp" | "insufficient_data";
+  match_layer: "exact" | "nlp" | "llm" | "insufficient_data";
   baseline_score: number | null;
   adjusted_score: number | null;
+  /** Band for the adjusted 0-1 task-level exposure index. */
+  score_band: "low" | "moderate" | "high" | null;
+  /** Plain-language description of what the 0-1 value represents. */
+  score_scale: string | null;
+  /** How to read the value: source, calculation, band, and non-prediction note. */
+  score_explanation: string | null;
   confidence: number;
   source_name: string;
   source_year: string;

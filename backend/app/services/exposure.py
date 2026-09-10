@@ -7,6 +7,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.constants.exposure_types import ExposureType
+from app.schemas.ai_matching import TaskMatchCandidate
 from app.schemas.exposure import (
     ConfirmedTaskAssessmentContextInput,
     ConfirmedTaskExposureAssessment,
@@ -14,7 +15,9 @@ from app.schemas.exposure import (
     ConfirmedTaskExposureAssessmentBatchResponse,
     ConfirmedTaskExposureAssessmentRequestItem,
     MatchedIloTaskExposureEvidence,
+    TaskAssessmentMatchLayer,
 )
+from app.services.ai_task_judge import TaskMatchJudge
 
 ILO_EXPOSURE_SOURCE_NAME = 'Gmyrek et al. 2025 · ILO Working Paper 140'
 ILO_EXPOSURE_SOURCE_YEAR = '2025'
@@ -25,6 +28,12 @@ ILO_EXPOSURE_SOURCE_URL = (
 # ponytail: pilot-calibrated threshold and context weights; replace with
 # labelled-user calibration before expanding beyond the three pilot occupations.
 MINIMUM_RELIABLE_TASK_TEXT_SIMILARITY = 0.18
+# Deterministic similarities inside this borderline band are confirmed by the
+# optional LLM judge when one is configured. Above the upper bound the
+# deterministic evidence is trusted as-is; below the reliable floor the outcome
+# stays "insufficient_data" unless the caller explicitly asks for an
+# AI-assisted match (prefer_llm_match).
+LLM_JUDGE_BORDERLINE_SIMILARITY_UPPER = 0.5
 MAXIMUM_MATCHED_REFERENCE_TASKS = 3
 TASK_MATCHING_STOP_WORDS = {
     'a',
@@ -196,6 +205,41 @@ def map_adjusted_exposure_score_to_suggested_state(adjusted_score: float) -> Exp
     return ExposureType.reshaped
 
 
+EXPOSURE_SCORE_SCALE_DESCRIPTION = (
+    'Task-level exposure index from 0 (little task change indicated) to 1 '
+    '(task strongly reshaped in the ILO study), before any job-level interpretation.'
+)
+
+
+def describe_adjusted_exposure_score_band(adjusted_score: float) -> str:
+    """Band the adjusted 0-1 index: low <0.25, moderate 0.25-0.55, high >=0.55."""
+    if adjusted_score < 0.25:
+        return 'low'
+    if adjusted_score < 0.55:
+        return 'moderate'
+    return 'high'
+
+
+def build_exposure_score_explanation(
+    adjusted_score: float,
+    baseline_score: float,
+    context_summary: str,
+    *,
+    has_context: bool = False,
+) -> str:
+    """Explain the value so the number is not read as a timeline or outcome."""
+    band = describe_adjusted_exposure_score_band(adjusted_score)
+    if has_context:
+        context_clause = f'and applies your optional workplace context ({context_summary})'
+    else:
+        context_clause = 'with no optional workplace context applied'
+    return (
+        f'How to read this value: {adjusted_score:.2f}/1.0 is a task-level exposure index '
+        f'(band: {band}). It starts from the matched ILO task score {baseline_score:.2f} '
+        f'{context_clause}. It describes possible task-level change, not a date or a job outcome.'
+    )
+
+
 def create_insufficient_data_task_exposure_assessment(
     confirmed_task: ConfirmedTaskExposureAssessmentRequestItem,
     missing_data_status: str,
@@ -223,9 +267,72 @@ def create_insufficient_data_task_exposure_assessment(
     )
 
 
+def _resolve_llm_task_match_judgement(
+    llm_judge: TaskMatchJudge | None,
+    occupation_code: str | None,
+    confirmed_task: ConfirmedTaskExposureAssessmentRequestItem,
+    ilo_reference_tasks: list[IloTaskExposureReference],
+    *,
+    best_similarity: float,
+    prefer_llm_match: bool,
+) -> tuple[IloTaskExposureReference, float] | None:
+    """Return the ILO task the optional judge reliably selects, else None.
+
+    The judge is only consulted for borderline deterministic similarities (or
+    when the caller explicitly asks for an AI-assisted match). Every failure
+    path returns None so the deterministic result is kept unchanged.
+    """
+    if llm_judge is None or not getattr(llm_judge, 'available', False):
+        return None
+    within_borderline_band = (
+        MINIMUM_RELIABLE_TASK_TEXT_SIMILARITY
+        <= best_similarity
+        < LLM_JUDGE_BORDERLINE_SIMILARITY_UPPER
+    )
+    if not (prefer_llm_match or within_borderline_band):
+        return None
+
+    scorable_reference_tasks = [
+        reference_task
+        for reference_task in ilo_reference_tasks
+        if reference_task.score_2025 is not None and reference_task.task_text.strip()
+    ]
+    candidates = [
+        TaskMatchCandidate(id=reference_task.ilo_task_id, text=reference_task.task_text)
+        for reference_task in scorable_reference_tasks
+    ]
+    if not candidates:
+        return None
+    try:
+        judge_result = llm_judge.match_task(
+            occupation_code or '',
+            confirmed_task.task_text,
+            candidates,
+        )
+    except Exception:  # noqa: BLE001 - the judge is optional by design
+        return None
+    if judge_result is None or not judge_result.candidate_id:
+        return None
+    selected_reference_task = next(
+        (
+            reference_task
+            for reference_task in scorable_reference_tasks
+            if reference_task.ilo_task_id == judge_result.candidate_id
+        ),
+        None,
+    )
+    if selected_reference_task is None:
+        return None
+    return selected_reference_task, float(judge_result.confidence)
+
+
 def assess_confirmed_task_against_ilo_references(
     confirmed_task: ConfirmedTaskExposureAssessmentRequestItem,
     ilo_reference_tasks: list[IloTaskExposureReference],
+    *,
+    occupation_code: str | None = None,
+    llm_judge: TaskMatchJudge | None = None,
+    prefer_llm_match: bool = False,
 ) -> ConfirmedTaskExposureAssessment:
     if not ilo_reference_tasks:
         return create_insufficient_data_task_exposure_assessment(
@@ -251,31 +358,47 @@ def assess_confirmed_task_against_ilo_references(
     ):
         matched_reference_tasks = [(exact_reference_task, 1.0)]
         baseline_score = float(exact_reference_task.score_2025)
-        match_layer = 'exact'
+        match_layer: TaskAssessmentMatchLayer = 'exact'
         confidence = 0.95
     else:
         ranked_reference_tasks = rank_ilo_reference_tasks_by_semantic_similarity(
             confirmed_task.task_text,
             ilo_reference_tasks,
         )
-        if (
-            not ranked_reference_tasks
-            or ranked_reference_tasks[0][1] < MINIMUM_RELIABLE_TASK_TEXT_SIMILARITY
-        ):
-            return create_insufficient_data_task_exposure_assessment(
-                confirmed_task,
-                'no_reliable_match',
-                'The confirmed task wording was not sufficiently similar to the available ILO task evidence.',
-            )
-        matched_reference_tasks = ranked_reference_tasks[:MAXIMUM_MATCHED_REFERENCE_TASKS]
-        similarity_total = sum(similarity for _, similarity in matched_reference_tasks)
-        baseline_score = sum(
-            float(reference_task.score_2025) * similarity
-            for reference_task, similarity in matched_reference_tasks
-            if reference_task.score_2025 is not None
-        ) / similarity_total
-        match_layer = 'nlp'
-        confidence = min(0.9, matched_reference_tasks[0][1])
+        best_similarity = ranked_reference_tasks[0][1] if ranked_reference_tasks else 0.0
+        llm_judgement = _resolve_llm_task_match_judgement(
+            llm_judge,
+            occupation_code,
+            confirmed_task,
+            ilo_reference_tasks,
+            best_similarity=best_similarity,
+            prefer_llm_match=prefer_llm_match,
+        )
+        if llm_judgement is not None:
+            judged_reference_task, judged_confidence = llm_judgement
+            matched_reference_tasks = [(judged_reference_task, judged_confidence)]
+            baseline_score = float(judged_reference_task.score_2025)
+            match_layer = 'llm'
+            confidence = min(0.9, judged_confidence)
+        else:
+            if (
+                not ranked_reference_tasks
+                or best_similarity < MINIMUM_RELIABLE_TASK_TEXT_SIMILARITY
+            ):
+                return create_insufficient_data_task_exposure_assessment(
+                    confirmed_task,
+                    'no_reliable_match',
+                    'The confirmed task wording was not sufficiently similar to the available ILO task evidence.',
+                )
+            matched_reference_tasks = ranked_reference_tasks[:MAXIMUM_MATCHED_REFERENCE_TASKS]
+            similarity_total = sum(similarity for _, similarity in matched_reference_tasks)
+            baseline_score = sum(
+                float(reference_task.score_2025) * similarity
+                for reference_task, similarity in matched_reference_tasks
+                if reference_task.score_2025 is not None
+            ) / similarity_total
+            match_layer = 'nlp'
+            confidence = min(0.9, matched_reference_tasks[0][1])
 
     context_adjustment, described_context_factors, has_missing_context = (
         calculate_transparent_context_score_adjustment(confirmed_task.context)
@@ -288,19 +411,38 @@ def assess_confirmed_task_against_ilo_references(
         if described_context_factors
         else 'no optional workplace context was provided'
     )
-    reasoning = (
-        f'The {match_layer} match used ILO task evidence beginning "'
-        f'{strongest_reference_task.task_text[:120]}" with similarity '
-        f'{strongest_similarity:.2f}. The baseline score {baseline_score:.2f} was adjusted '
-        f'to {adjusted_score:.2f} using {context_summary}.'
-    )
-    uncertainty = (
-        'Low source-matching uncertainty; workplace variation can still change how the task is performed.'
-        if match_layer == 'exact'
-        else 'Moderate uncertainty because semantic wording similarity is not a verified one-to-one task match.'
-    )
+    if match_layer == 'llm':
+        reasoning = (
+            f'An optional language-model review of the supplied ILO task candidates selected '
+            f'the closest task "{strongest_reference_task.task_text[:120]}" with confidence '
+            f'{strongest_similarity:.2f}. The official ILO task score {baseline_score:.2f} was '
+            f'adjusted to {adjusted_score:.2f} ({context_summary}).'
+        )
+        uncertainty = (
+            'Moderate uncertainty because the match was confirmed by a language-model review '
+            'of the supplied candidates rather than a verified one-to-one task match.'
+        )
+    else:
+        reasoning = (
+            f'The {match_layer} match used ILO task evidence beginning "'
+            f'{strongest_reference_task.task_text[:120]}" with similarity '
+            f'{strongest_similarity:.2f}. The baseline score {baseline_score:.2f} was adjusted '
+            f'to {adjusted_score:.2f} ({context_summary}).'
+        )
+        uncertainty = (
+            'Low source-matching uncertainty; workplace variation can still change how the task is performed.'
+            if match_layer == 'exact'
+            else 'Moderate uncertainty because semantic wording similarity is not a verified one-to-one task match.'
+        )
     if has_missing_context:
         uncertainty += ' Some optional context factors were not provided.'
+
+    score_explanation = build_exposure_score_explanation(
+        adjusted_score,
+        baseline_score,
+        context_summary,
+        has_context=bool(described_context_factors),
+    )
 
     return ConfirmedTaskExposureAssessment(
         task_id=confirmed_task.task_id,
@@ -309,6 +451,9 @@ def assess_confirmed_task_against_ilo_references(
         match_layer=match_layer,
         baseline_score=round(baseline_score, 4),
         adjusted_score=round(adjusted_score, 4),
+        score_band=describe_adjusted_exposure_score_band(adjusted_score),
+        score_scale=EXPOSURE_SCORE_SCALE_DESCRIPTION,
+        score_explanation=score_explanation,
         confidence=round(confidence, 4),
         source_name=ILO_EXPOSURE_SOURCE_NAME,
         source_year=ILO_EXPOSURE_SOURCE_YEAR,
@@ -360,6 +505,7 @@ async def load_ilo_task_exposure_references_for_occupation(
 async def assess_confirmed_tasks_against_ilo_references(
     db: AsyncSession,
     request: ConfirmedTaskExposureAssessmentBatchRequest,
+    llm_judge: TaskMatchJudge | None = None,
 ) -> ConfirmedTaskExposureAssessmentBatchResponse:
     ilo_reference_tasks = await load_ilo_task_exposure_references_for_occupation(
         db,
@@ -367,7 +513,13 @@ async def assess_confirmed_tasks_against_ilo_references(
     )
     return ConfirmedTaskExposureAssessmentBatchResponse(
         assessments=[
-            assess_confirmed_task_against_ilo_references(confirmed_task, ilo_reference_tasks)
+            assess_confirmed_task_against_ilo_references(
+                confirmed_task,
+                ilo_reference_tasks,
+                occupation_code=request.occupation_code,
+                llm_judge=llm_judge,
+                prefer_llm_match=request.prefer_llm_match,
+            )
             for confirmed_task in request.confirmed_tasks
         ]
     )

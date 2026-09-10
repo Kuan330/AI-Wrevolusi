@@ -50,6 +50,28 @@ class Settings(BaseSettings):
     skill_max_retries: int = Field(default=2, ge=0, le=5)
     skill_prompt_version: str = 'skill-directions-v1'
 
+    # Optional OpenAI-compatible provider for the candidate-constrained AI
+    # endpoints. The provider is skipped when ai_api_key is empty and
+    # ai_keyless is false; ai_api_mode selects the wire protocol and
+    # ai_extra_headers adds optional JSON-configured request headers (for
+    # example an anonymous relay's session-affinity header).
+    ai_api_key: str | None = None
+    ai_base_url: str = 'https://api.openai.com/v1'
+    ai_model: str = 'gpt-4o-mini'
+    ai_api_mode: str = 'chat_completions'
+    ai_keyless: bool = False
+    ai_extra_headers: str = ''
+    # Built-in safety net for the provider chain: when no key is configured
+    # (or the configured provider is unavailable at runtime) the AI layers
+    # fall back to the OpenCode Zen free relay. Set to false to disable it.
+    ai_fallback_enabled: bool = True
+    ai_fallback_base_url: str = 'https://opencode.ai/zen/v1'
+    ai_fallback_model: str = 'muse-spark-1.3-contributor-free'
+    ai_timeout_seconds: float = Field(default=20, gt=0, le=180)
+    ai_max_retries: int = Field(default=2, ge=0, le=5)
+    ai_rpm_limit: int = Field(default=60, gt=0, le=6000)
+    ai_cache_size: int = Field(default=128, ge=0, le=4096)
+
     @field_validator('cors_origins', mode='before')
     @classmethod
     def parse_cors_origins(cls, value: str | list[str]) -> list[str]:

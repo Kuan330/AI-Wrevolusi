@@ -294,6 +294,7 @@ const ProfileTasks = () => {
             open: editorOpen,
             mode: editorMode,
             initialValues: editorValues,
+            occupationCode: selected.unit.occupation_code,
             onClose: closeEditor,
             onSave: saveTask,
           } satisfies Partial<ComponentProps<typeof TaskEditorDialog>>)}
