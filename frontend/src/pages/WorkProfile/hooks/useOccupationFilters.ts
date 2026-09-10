@@ -39,6 +39,7 @@ export const useOccupationFilters = () => {
   const [error, setError] = useState<string | null>(null);
   const occupationCacheRef = useRef(new Map<string, ReferenceOccupation>());
   const activeSearchRequestRef = useRef(0);
+  const searchAbortRef = useRef<AbortController | null>(null);
 
   const selectedUnit = selections.unit;
   const selectedPath = FILTER_ORDER.map((key) => selections[key]).filter(
@@ -185,6 +186,7 @@ export const useOccupationFilters = () => {
     const requestId = ++activeSearchRequestRef.current;
     const trimmed = query.trim();
     if (trimmed.length < 2) {
+      searchAbortRef.current?.abort();
       setHasSearched(false);
       setSearching(false);
       setSearchResults([]);
@@ -198,8 +200,16 @@ export const useOccupationFilters = () => {
 
     const timer = setTimeout(() => {
       void (async () => {
+        // Supersede any previous request: its late response must never
+        // overwrite the results of the newer query.
+        searchAbortRef.current?.abort();
+        const controller = new AbortController();
+        searchAbortRef.current = controller;
         try {
-          const matches = await referenceService.searchOccupations(trimmed);
+          const matches = await referenceService.searchOccupations(
+            trimmed,
+            controller.signal,
+          );
           cacheOccupations(matches);
           const expanded = await Promise.all(
             matches.map(async (unit) => {
@@ -230,11 +240,12 @@ export const useOccupationFilters = () => {
           }
         }
       })();
-    }, 220);
+    }, 400);
 
     return () => {
       clearTimeout(timer);
       activeSearchRequestRef.current += 1;
+      searchAbortRef.current?.abort();
     };
   }, [cacheOccupations, pathForUnit, query]);
 
