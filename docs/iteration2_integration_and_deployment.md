@@ -15,6 +15,9 @@ Add these to `backend/.env` locally (never commit real keys):
 | `AI_API_KEY` | *(empty)* | Enables the OpenAI-compatible provider. **Empty = deterministic only.** |
 | `AI_BASE_URL` | `https://api.openai.com/v1` | Any OpenAI-compatible endpoint (OpenAI, OpenRouter-style proxies, local gateways) |
 | `AI_MODEL` | `gpt-4o-mini` | Model name sent to the provider |
+| `AI_API_MODE` | `chat_completions` | Wire protocol: `chat_completions` or `responses` (some relays/models are served on one only) |
+| `AI_KEYLESS` | `false` | `true` = call the endpoint without any credential (anonymous free relays) |
+| `AI_EXTRA_HEADERS` | *(empty)* | Optional JSON object of extra request headers, e.g. `{"Authorization": "", "x-opencode-session": "my-app"}` |
 | `AI_TIMEOUT_SECONDS` | `20` | Per-request timeout |
 | `AI_MAX_RETRIES` | `2` | Retries after the first attempt (0 disables) |
 | `AI_RPM_LIMIT` | `60` | Local requests-per-minute guard; bursts degrade to deterministic results |
@@ -74,8 +77,15 @@ curl -s -X POST http://127.0.0.1:8000/api/v1/ai/skill-match \
 
 ### 3.2 LLM path
 
-1. Set `AI_API_KEY` (and optionally `AI_BASE_URL` / `AI_MODEL`) in
-   `backend/.env`, restart the backend.
+1. Configure the provider in `backend/.env` and restart the backend. Two shapes
+   are supported:
+   - **Keyed endpoint** (OpenAI, proxies, ...): set `AI_API_KEY` (and optionally
+     `AI_BASE_URL` / `AI_MODEL`).
+   - **Keyless relay** (anonymous free tiers, e.g. the OpenCode Zen free
+     models): set `AI_KEYLESS=true`, the matching `AI_API_MODE` (Muse Spark is
+     served on `responses` only) and any required headers via
+     `AI_EXTRA_HEADERS` — the free tier rejects non-empty bearers and needs the
+     `x-opencode-session` session-affinity header.
 2. Repeat the curl calls above — same JSON shape, now potentially ordered by
    the provider.
 3. To confirm the fallback still works, temporarily set an invalid key or an
@@ -84,11 +94,16 @@ curl -s -X POST http://127.0.0.1:8000/api/v1/ai/skill-match \
    (`app.services.ai_gateway`).
 4. Cost reminder: each unique request that misses the cache may call the
    provider; the LRU cache absorbs repeated identical requests.
+5. Latency: reasoning models on free relays can take 5–30 seconds per uncached
+   request; the frontend stays usable while a request is in flight and falls
+   back silently if the provider does not answer within `AI_TIMEOUT_SECONDS`.
 
 ### 3.3 Test suites and build
 
 ```bash
-cd backend && .venv/Scripts/python.exe -m pytest -q      # expect: 88 passed
+cd backend && .venv/Scripts/python.exe -m pytest -q      # expect: 95 passed
+# Local .env has a live provider? Keep the suite offline with:
+# AI_KEYLESS=false AI_API_KEY= .venv/Scripts/python.exe -m pytest -q
 cd frontend && npm run build                              # expect: build success
 ```
 
@@ -117,8 +132,9 @@ backend). For Iteration 2:
 |---|---|---|
 | `ECONNREFUSED 127.0.0.1:8000` in frontend | Backend not running / still importing | Start backend, wait for "Uvicorn running" |
 | AI responses look identical with/without key | Allowlist/confidence rules filtered provider output, or cache hit | Expected; try a different task text |
-| Warning in logs: "AI provider is not configured" | `AI_API_KEY` empty | Set the key in `backend/.env` and restart |
+| Warning in logs: "AI provider is not configured" | `AI_API_KEY` empty and `AI_KEYLESS` false | Set the key (or `AI_KEYLESS=true`) in `backend/.env` and restart |
 | Provider 401/403 in logs, responses still 200 | Key or base URL wrong | Fix `AI_*` values; endpoints keep working deterministically |
+| Free-relay 400/500 errors in logs, responses still 200 | Relay gating (missing session header, non-empty bearer on a keyless tier, or a model served on a different wire) | Align `AI_EXTRA_HEADERS` / `AI_API_MODE` with the relay contract; deterministic fallback keeps the UI usable |
 | Rate-limit warning | `AI_RPM_LIMIT` reached | Raise the limit or reduce traffic; bursts are safe by design |
 
 ---
