@@ -23,7 +23,7 @@ export default function WeekCalendar({ days, events, selectedId, onSelect, onAdd
         {events.filter(event => event.date === day).map(event => {
           const peers = events.filter(other => other.date === day && (other.id === event.id || overlaps(event, other))).sort((a,b) => a.id.localeCompare(b.id));
           const lane = peers.findIndex(other => other.id === event.id);
-          return <button key={event.id} className={`pl-timed-event ${event.kind} ${event.completed ? 'completed' : ''} ${event.id === selectedId ? 'selected' : ''}`} style={{ top: (mins(event.start) - firstHour * 60) * hourHeight / 60, height: Math.max(20, (mins(event.end) - mins(event.start)) * hourHeight / 60 - 2), left: `calc(${lane * 100 / peers.length}% + 3px)`, width: `calc(${100 / peers.length}% - 6px)` }} onClick={() => onSelect(event.id)} title={`${event.title} · ${event.start}–${event.end}`}><strong>{event.title}</strong><span>{event.start}–{event.end}</span></button>;
+          return <button key={event.id} className={`pl-timed-event ${event.kind} ${peers.length > 1 ? "conflicted" : ""} ${event.completed ? 'completed' : ''} ${event.id === selectedId ? 'selected' : ''}`} style={{ top: (mins(event.start) - firstHour * 60) * hourHeight / 60, height: Math.max(20, (mins(event.end) - mins(event.start)) * hourHeight / 60 - 2), left: `calc(${lane * 100 / peers.length}% + 3px)`, width: `calc(${100 / peers.length}% - 6px)` }} onClick={() => onSelect(event.id)} title={`${event.title} · ${event.start}–${event.end}`}><strong>{peers.length > 1 ? "⚠ " : ""}{event.title}</strong><span>{event.start}–{event.end}</span></button>;
         })}</div>)}
     </div>
   </div></div>;

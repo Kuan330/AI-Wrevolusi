@@ -14,7 +14,7 @@ export function scheduleCourses(selections: Selection[], resources: Resource[], 
     }
     const total = selection.totalMinutes === undefined ? resource.minutes : selection.totalMinutes;
     if (!total || total <= 0) { issues.push(`${resource.title}: duration is unknown; schedule a session manually.`); continue; }
-    let remaining = Math.max(0, total - existing.concat(events).filter(item => item.resourceId === resource.id).reduce((sum, item) => sum + duration(item), 0));
+    let remaining = Math.max(0, total - existing.concat(events).filter(item => item.kind === 'learning' && item.resourceId === resource.id).reduce((sum, item) => sum + duration(item), 0));
     const today = dateKey(now);
     let from = selection.startDate && selection.startDate > today ? selection.startDate : today;
     if (from === today && new Date(`${today}T${start}`).getTime() < now.getTime()) from = addDays(today, 1);

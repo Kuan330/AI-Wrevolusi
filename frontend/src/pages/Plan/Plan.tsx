@@ -1,3 +1,4 @@
+import ConflictMessage, { WhatsAppIcon } from "./ConflictMessage";
 import { Drawer, DrawerContent, DrawerTitle, DrawerDescription, DrawerBody } from "@/components/ui/drawer";
 import PlanCourseDrawer from "./PlanCourseDrawer";
 import { courses } from "@/pages/LearningCentre/catalogue";
@@ -15,7 +16,6 @@ import {
   ArrowRight,
   BookOpen,
   CalendarDays,
-  Check,
   ChevronLeft,
   ChevronRight,
   Clock3,
@@ -91,7 +91,6 @@ function PlanContent(props: { demo: boolean }) {
   const [editor, setEditor] = useState<PlanEvent | null>(null);
   const [repeat, setRepeat] = useState(false);
   const [savedCourseIds] = useState(() => { try { return readLibrary().saved.slice().reverse(); } catch { return []; } });
-  const [view, setView] = useState<'schedule' | 'progress'>('schedule');
   const [workOpen, setWorkOpen] = useState(false);
   const [workDays, setWorkDays] = useState([0, 1, 2, 3, 4]);
   const [workStart, setWorkStart] = useState('09:00');
@@ -189,7 +188,6 @@ function PlanContent(props: { demo: boolean }) {
   const selectedConflicts = selected
     ? state.events.filter((e) => overlaps(selected, e))
     : [];
-  const learning = visible.filter((e) => e.kind === "learning");
   function newEvent(resourceId?: string) {
     const resource = catalogue.find((r) => r.id === resourceId);
     setFormError("");
@@ -314,6 +312,20 @@ function PlanContent(props: { demo: boolean }) {
     try { if (!demo) saveSelections(next); setShortlist(next); }
     catch { setError('Could not save study times. Please try again.'); }
   }
+  const courseTasks = state.events.filter(event => event.kind === 'learning' && courses.some(course => `epic5-${course.id}` === event.resourceId));
+  const completedCourseTasks = courseTasks.filter(event => event.completed).length;
+  const courseProgress = courses.flatMap(course => {
+    const tasks = courseTasks.filter(event => event.resourceId === `epic5-${course.id}`);
+    if (!tasks.length) return [];
+    const preference = shortlist.find(item => item.resourceId === `epic5-${course.id}`);
+    const total = preference?.totalMinutes === undefined ? course.durationMin : preference.totalMinutes;
+    const daily = preference?.startTime && preference.endTime
+      ? (Number(preference.endTime.slice(0,2)) * 60 + Number(preference.endTime.slice(3))) - (Number(preference.startTime.slice(0,2)) * 60 + Number(preference.startTime.slice(3)))
+      : Math.max(...tasks.map(duration));
+    return [{ title: course.title, total, daily, days: total && daily > 0 ? Math.ceil(total / daily) : null,
+      done: tasks.filter(event => event.completed).length, count: tasks.length,
+      finish: tasks.map(event => event.date).sort().at(-1) }];
+  });
   const busyOrLoading = busy || loading;
 
   const dialogProps1 = {
@@ -353,57 +365,12 @@ function PlanContent(props: { demo: boolean }) {
           <Link to={`${ROUTES.plan}?demo=0`}>Exit demo</Link>
         </div>
       )}
-      <div className="pl-view-tabs"><button aria-pressed={view === 'schedule'} onClick={() => setView('schedule')}>Schedule</button><button aria-pressed={view === 'progress'} onClick={() => setView('progress')}>Learning progress</button></div>
-      {view === 'progress' && <section className="pl-progress pl-panel"><h2>Learning progress</h2><p className="pl-muted">Based on sessions you mark complete.</p>
-        {shortlist.length ? shortlist.map(selection => {
-          const sessions = state.events.filter(event => event.resourceId === selection.resourceId);
-          const done = sessions.filter(event => event.completed).length;
-          return <details key={selection.resourceId}><summary>{catalogue.find(resource => resource.id === selection.resourceId)?.title ?? selection.themeTitle} <span>{done} / {sessions.length} sessions completed</span></summary><progress max={Math.max(1, sessions.length)} value={done} />{sessions.map(event => <label key={event.id}><input type="checkbox" checked={event.completed} disabled={busyOrLoading} onChange={() => commit(state.events.map(item => item.id === event.id ? { ...item, completed: !item.completed } : item))} /> {event.date} · {event.start}–{event.end}</label>)}</details>;
-        }) : <p>No learning courses yet. Your calendar is ready for everyday activities. <Link to={ROUTES.learningCentre}>Choose a course →</Link></p>}
-      </section>}
-      <div className="pl-summary" hidden={view !== 'schedule'}>
-        <div>
-          <BookOpen />
-          <span>
-            <strong>{learning.reduce((n, e) => n + duration(e), 0)} min</strong>
-            learning planned
-          </span>
-        </div>
-        <div>
-          <Check />
-          <span>
-            <strong>
-              {learning
-                .filter((e) => e.completed)
-                .reduce((n, e) => n + duration(e), 0)}{" "}
-              min
-            </strong>
-            completed this week
-          </span>
-        </div>
-        <div className={pairs.length ? "pl-warning" : ""}>
-          <AlertTriangle />
-          <span>
-            <strong>
-              {pairs.length} {pairs.length === 1 ? "conflict" : "conflicts"}
-            </strong>
-            need your attention
-          </span>
-        </div>
-        <div>
-          <MessageCircle />
-          <span>
-            <strong>
-              {
-                state.events.filter((e) => e.assistance?.status === "pending")
-                  .length
-              }{" "}
-              requests
-            </strong>
-            waiting for a reply
-          </span>
-        </div>
-      </div>
+      <section className="pl-task-progress" aria-label="Course task progress">
+        <div><div><p className="pl-kicker">COURSE LEARNING ONLY</p><h2>Course plan progress</h2></div><strong>{completedCourseTasks} / {courseTasks.length}<small>learning sessions completed</small></strong></div>
+        <progress aria-label="Completed course tasks" value={completedCourseTasks} max={Math.max(1, courseTasks.length)} />
+        <p className="pl-muted">Work and personal activities are excluded.</p>
+        <div className="pl-course-progress-breakdown">{courseProgress.map(course => <div key={course.title}><strong>{course.title}</strong><span>{course.days ? `${course.days} study days · ${course.total} min ÷ ${course.daily} min/day` : 'Study duration not available'}</span><small>{course.done}/{course.count} sessions completed · Last scheduled: {course.finish}</small></div>)}</div>
+      </section>
       {error && (
         <div className="pl-error" role="alert">
           {error}{" "}
@@ -416,12 +383,12 @@ function PlanContent(props: { demo: boolean }) {
       {loading ? (
         <p>Loading your plan…</p>
       ) : (
-        <div className="pl-layout" hidden={view !== "schedule"}>
+        <div className="pl-layout">
           <aside className="pl-sidebar pl-panel">
             <p className="pl-kicker">YOUR NEXT STEPS</p>
             <h2>Recently saved · {savedQueue.length}</h2>
             <p className="pl-muted">
-              Saved courses that have not been imported into your learning plan.
+              Choose a time for your saved courses.
             </p>
             {savedQueue.length ? (
               savedQueue.map((s) => {
@@ -434,7 +401,7 @@ function PlanContent(props: { demo: boolean }) {
                 if (total && scheduled >= total) return null;
                 return (
                   <article className="pl-resource" key={r.id}>
-                    <span>{s.skillName}</span>
+                    {s.skillName && <span>{s.skillName}</span>}
                     <h3>{r.title}</h3>
                     <p>
                       {total
@@ -470,7 +437,7 @@ function PlanContent(props: { demo: boolean }) {
                       </p>
                     ) : null}
                     <div className="pl-work-days">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day,index) => <button key={day} aria-pressed={s.weekdays?.includes(index) ?? false} onClick={() => updatePreference(s.resourceId, { weekdays: s.weekdays?.includes(index) ? s.weekdays.filter(item => item !== index) : [...(s.weekdays ?? []), index] })}>{day}</button>)}</div>
-                    <div className="pl-form-row"><label>From<TimePicker value={s.startTime ?? ''} onChange={value => updatePreference(s.resourceId, { startTime: value })} /></label><label>To<TimePicker value={s.endTime ?? ''} onChange={value => updatePreference(s.resourceId, { endTime: value })} /></label></div>
+                    <div className="pl-form-row"><label>From<TimePicker compact label="Study start time" value={s.startTime ?? ''} onChange={value => updatePreference(s.resourceId, { startTime: value })} /></label><label>To<TimePicker compact label="Study end time" value={s.endTime ?? ''} onChange={value => updatePreference(s.resourceId, { endTime: value })} /></label></div>
                     {!total && <label>Planned minutes<input type="number" min="1" value={s.totalMinutes ?? ''} onChange={event => updatePreference(s.resourceId, { totalMinutes: Number(event.target.value) })} /></label>}
                     {scheduled > 0 && (
                       <p>{scheduled} min scheduled across your plan</p>
@@ -562,11 +529,7 @@ function PlanContent(props: { demo: boolean }) {
                   {pairs.length === 1 ? "pair" : "pairs"} this week
                 </span>
                 <button
-                  onClick={() =>
-                    setSelectedId(
-                      (pairs[0].find((e) => e.shareable) || pairs[0][0]).id,
-                    )
-                  }
+                  onClick={() => { setSelectedId((pairs[0].find((e) => e.shareable) || pairs[0][0]).id); setCourseOpen(true); }}
                 >
                   Review
                 </button>
@@ -630,6 +593,7 @@ function PlanContent(props: { demo: boolean }) {
                       ))}
                   </div>
                 )}
+                {selectedConflicts.length > 0 && <ConflictMessage key={selected.id} event={selected} conflicts={selectedConflicts} />}
                 <div className="pl-detail-actions">
                   <button
                     disabled={busyOrLoading}
@@ -740,12 +704,12 @@ function PlanContent(props: { demo: boolean }) {
                         {selected.assistance.status === "draft" && (
                           <>
                             <a
-                              className="pl-whatsapp"
+                              className="pl-whatsapp-action"
                               href={whatsappLink(selected.assistance.message)}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              Open WhatsApp <ArrowRight size={14} />
+                              <WhatsAppIcon /> Open WhatsApp
                             </a>
                             <p>
                               Choose the intended person and send in WhatsApp.
@@ -851,7 +815,7 @@ function PlanContent(props: { demo: boolean }) {
           : "Your plan is saved to your account."}{" "}
         WhatsApp delivery and replies are not tracked automatically.
       </p>
-      {courseOpen && selected && courses.some(course => `epic5-${course.id}` === selected.resourceId) && <PlanCourseDrawer selectedEvent={selected} busy={busyOrLoading} onComplete={event => commit(state.events.map(item => item.id === event.id ? { ...item, completed: !item.completed } : item))} course={courses.find(course => `epic5-${course.id}` === selected.resourceId)!} events={state.events.filter(event => event.resourceId === selected.resourceId)} onClose={() => setCourseOpen(false)} onEdit={event => { setCourseOpen(false); setFormError(''); setRepeat(false); setEditor({ ...event }); }} />}
+      {courseOpen && selected && courses.some(course => `epic5-${course.id}` === selected.resourceId) && <PlanCourseDrawer conflicts={selectedConflicts} selectedEvent={selected} busy={busyOrLoading} onComplete={event => commit(state.events.map(item => item.id === event.id ? { ...item, completed: !item.completed } : item))} course={courses.find(course => `epic5-${course.id}` === selected.resourceId)!} events={state.events.filter(event => event.resourceId === selected.resourceId)} onClose={() => setCourseOpen(false)} onEdit={event => { setCourseOpen(false); setFormError(''); setRepeat(false); setEditor({ ...event }); }} />}
       <Dialog open={workOpen} onOpenChange={setWorkOpen}><DialogContent className="pl-modal"><DialogTitle>Set work hours</DialogTitle><DialogDescription>Choose weekdays and the date range for your recurring work schedule.</DialogDescription>
         <div className="pl-work-days">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day,index) => <button key={day} aria-pressed={workDays.includes(index)} onClick={() => setWorkDays(workDays.includes(index) ? workDays.filter(item => item !== index) : [...workDays,index])}>{day}</button>)}</div>
         <div className="pl-form-row"><label>From<TimePicker value={workStart} onChange={value => setWorkStart(value)} /></label><label>To<TimePicker value={workEnd} onChange={value => setWorkEnd(value)} /></label></div>
