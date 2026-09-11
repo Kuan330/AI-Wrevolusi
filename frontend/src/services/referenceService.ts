@@ -1,9 +1,3 @@
-import {
-  getPilotOccupation,
-  listPilotOccupations,
-  listPilotTasks,
-  searchPilotOccupations,
-} from "@/data/pilotReference";
 import { PILOT_WEF_SKILLS } from "@/data/pilotWefSkills";
 import { api } from "@/services/api";
 import type { ReferenceOccupation, ReferenceTask, WefSkill } from "@/types/reference";
@@ -20,41 +14,20 @@ const onlyUnits = (rows: ReferenceOccupation[]) => rows.filter((item) => item.le
 
 export const referenceService = {
   occupations: (parent?: string) =>
-    withPilotFallback(
-      () =>
-        api.get<ReferenceOccupation[]>(
-          parent
-            ? `/reference/occupations?parent=${encodeURIComponent(parent)}`
-            : "/reference/occupations",
-        ),
-      () => listPilotOccupations(parent),
+    api.get<ReferenceOccupation[]>(
+      parent
+        ? `/reference/occupations?parent=${encodeURIComponent(parent)}`
+        : "/reference/occupations",
     ),
   getOccupation: (code: string) =>
-    withPilotFallback(
-      () => api.get<ReferenceOccupation>(`/reference/occupations/${encodeURIComponent(code)}`),
-      () => {
-        const row = getPilotOccupation(code);
-        if (!row) throw new Error("occupation not found");
-        return row;
-      },
-    ),
-  searchOccupations: async (query: string) => {
-    const rows = await withPilotFallback(
-      () =>
-        api.get<ReferenceOccupation[]>(
-          `/reference/occupations?q=${encodeURIComponent(query)}`,
-        ),
-      () => searchPilotOccupations(query),
-    );
-    return onlyUnits(rows);
-  },
+    api.get<ReferenceOccupation>(`/reference/occupations/${encodeURIComponent(code)}`),
+  searchOccupations: async (query: string) =>
+    onlyUnits(await api.get<ReferenceOccupation[]>(
+      `/reference/occupations?q=${encodeURIComponent(query.trim())}`,
+    )),
   tasks: (occupationCode: string) =>
-    withPilotFallback(
-      () =>
-        api.get<ReferenceTask[]>(
-          `/reference/occupations/${encodeURIComponent(occupationCode)}/tasks`,
-        ),
-      () => listPilotTasks(occupationCode),
+    api.get<ReferenceTask[]>(
+      `/reference/occupations/${encodeURIComponent(occupationCode)}/tasks`,
     ),
   wefSkills: () =>
     withPilotFallback(

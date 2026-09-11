@@ -19,6 +19,7 @@ export interface WefSkill {
   wef_skill_id: number;
   core_skill: string;
   wef_skill_group: string | null;
+  core_skill_importance_2025_pct?: number | null;
   future_trend_category: string | null;
   future_net_increase_2025_2030: number | null;
   genai_substitution_capacity_category: string | null;

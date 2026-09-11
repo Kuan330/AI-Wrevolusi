@@ -1,10 +1,15 @@
-import { ChevronDown, Plus, Trash2 } from "lucide-react";
+import type { ComponentProps } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ChevronDown, ListChecks, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import BatchDeleteTaskDialog from "@/pages/WorkProfile/components/BatchDeleteTaskDialog";
 import DeleteTaskDialog from "@/pages/WorkProfile/components/DeleteTaskDialog";
-import { optionLabel, RESPONSIBILITY_OPTIONS, TIME_SPENT_OPTIONS } from "@/pages/WorkProfile/taskOptions";
+import {
+  optionLabel,
+  TIME_SPENT_OPTIONS,
+} from "@/pages/WorkProfile/taskOptions";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
 
 type ProfileTaskListProps = {
@@ -18,34 +23,37 @@ type ProfileTaskListProps = {
 };
 
 const taskMeta = (task: ProfileTask) => {
-  const time = task.timeSpent ? optionLabel(TIME_SPENT_OPTIONS, task.timeSpent) : "";
-  const responsibility = task.responsibility
-    ? optionLabel(RESPONSIBILITY_OPTIONS, task.responsibility)
+  const time = task.timeSpent
+    ? optionLabel(TIME_SPENT_OPTIONS, task.timeSpent)
     : "";
-  return [time, responsibility].filter(Boolean).join(" · ");
+  const count = task.practice?.trials.length ?? 0;
+  return [
+    time,
+    count ? `${count} AI ${count === 1 ? "trial" : "trials"} recorded` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
 };
 
-const ProfileTaskList = ({
-  tasks,
-  loading,
-  error,
-  onAdd,
-  onEdit,
-  onDelete,
-  onBatchDelete,
-}: ProfileTaskListProps) => {
+const ProfileTaskList = (props: ProfileTaskListProps) => {
+  const { tasks, loading, error, onAdd, onEdit, onDelete, onBatchDelete } =
+    props;
   const [deleteTarget, setDeleteTarget] = useState<ProfileTask | null>(null);
   const [batchMode, setBatchMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [scrollHint, setScrollHint] = useState({ canScroll: false, atBottom: true });
+  const [scrollHint, setScrollHint] = useState({
+    canScroll: false,
+    atBottom: true,
+  });
 
   const updateScrollHint = useCallback(() => {
     const element = scrollRef.current;
     if (!element) return;
     const canScroll = element.scrollHeight > element.clientHeight + 1;
-    const atBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 8;
+    const atBottom =
+      element.scrollTop + element.clientHeight >= element.scrollHeight - 8;
     setScrollHint({ canScroll, atBottom });
   }, []);
 
@@ -64,7 +72,10 @@ const ProfileTaskList = ({
   const scrollTowardBottom = () => {
     const element = scrollRef.current;
     if (!element) return;
-    element.scrollBy({ top: Math.max(120, element.clientHeight * 0.65), behavior: "smooth" });
+    element.scrollBy({
+      top: Math.max(120, element.clientHeight * 0.65),
+      behavior: "smooth",
+    });
   };
 
   const exitBatchMode = () => {
@@ -84,53 +95,124 @@ const ProfileTaskList = ({
     });
   };
 
+  const selectedTaskIds = tasks
+    .filter((task) => selectedIds.has(task.id))
+    .map((task) => task.id);
+  const allSelected =
+    tasks.length > 0 && selectedTaskIds.length === tasks.length;
+
   const handleBatchDeleteConfirm = () => {
-    onBatchDelete(Array.from(selectedIds));
+    onBatchDelete(selectedTaskIds);
     exitBatchMode();
   };
 
+  const deleteTaskDialogProps1 = {
+    open: Boolean(deleteTarget),
+    taskWording: deleteTarget?.wording ?? "",
+    onClose: () => setDeleteTarget(null),
+    onConfirm: () => {
+      if (deleteTarget) onDelete(deleteTarget.id);
+    },
+  } satisfies Partial<ComponentProps<typeof DeleteTaskDialog>>;
+  const batchDeleteTaskDialogProps2 = {
+    open: batchDeleteOpen,
+    count: selectedTaskIds.length,
+    onClose: () => setBatchDeleteOpen(false),
+    onConfirm: handleBatchDeleteConfirm,
+  } satisfies Partial<ComponentProps<typeof BatchDeleteTaskDialog>>;
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
-          {batchMode ? (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                className="profile-outline-btn h-10 rounded-full px-4"
-                onClick={exitBatchMode}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal"
-                disabled={selectedIds.size === 0}
-                onClick={() => setBatchDeleteOpen(true)}
-              >
-                <Trash2 className="h-4 w-4" aria-hidden />
-                Delete selected ({selectedIds.size})
-              </Button>
-            </>
-          ) : (
+        {batchMode ? (
+          <>
+            <label className="mr-auto flex items-center gap-2 text-sm text-[#574a55]">
+              <Checkbox
+                {...({
+                  "aria-label": "Select all tasks",
+                  checked: allSelected
+                    ? true
+                    : selectedTaskIds.length
+                      ? "indeterminate"
+                      : false,
+                  onCheckedChange: () =>
+                    setSelectedIds(
+                      allSelected
+                        ? new Set()
+                        : new Set(tasks.map((task) => task.id)),
+                    ),
+                } satisfies Partial<ComponentProps<typeof Checkbox>>)}
+              />
+              Select all
+              <span className="ml-2 text-[#7f7280]" role="status">
+                {selectedTaskIds.length} of {tasks.length} selected
+              </span>
+            </label>
             <Button
-              type="button"
-              className="profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal"
-              disabled={tasks.length === 0}
-              onClick={() => setBatchMode(true)}
+              {...({
+                type: "button",
+                variant: "outline",
+                className: "profile-outline-btn h-10 rounded-full px-4",
+                onClick: exitBatchMode,
+              } satisfies Partial<ComponentProps<typeof Button>>)}
             >
-              <Trash2 className="h-4 w-4" aria-hidden />
-              Batch delete
+              Cancel
             </Button>
-          )}
-          <Button className="profile-blue-btn inline-flex h-10 items-center gap-2 rounded-full px-4 font-normal" onClick={onAdd}>
+            <Button
+              {...({
+                type: "button",
+                className:
+                  "profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal",
+                disabled: selectedTaskIds.length === 0,
+                onClick: () => setBatchDeleteOpen(true),
+              } satisfies Partial<ComponentProps<typeof Button>>)}
+            >
+              <Trash2
+                {...({
+                  className: "h-4 w-4",
+                  "aria-hidden": true,
+                } satisfies Partial<ComponentProps<typeof Trash2>>)}
+              />
+              Delete selected ({selectedTaskIds.length})
+            </Button>
+          </>
+        ) : (
+          <Button
+            {...({
+              type: "button",
+              className:
+                "profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal",
+              disabled: loading || tasks.length === 0,
+              onClick: () => setBatchMode(true),
+            } satisfies Partial<ComponentProps<typeof Button>>)}
+          >
+            <ListChecks
+              {...({
+                className: "h-4 w-4",
+                "aria-hidden": true,
+              } satisfies Partial<ComponentProps<typeof ListChecks>>)}
+            />
+            Select tasks
+          </Button>
+        )}
+        {!batchMode && (
+          <Button
+            {...({
+              className:
+                "profile-blue-btn inline-flex h-10 items-center gap-2 rounded-full px-4 font-normal",
+              onClick: onAdd,
+            } satisfies Partial<ComponentProps<typeof Button>>)}
+          >
             <Plus className="h-4 w-4" />
             Add a task
           </Button>
+        )}
       </div>
 
       {batchMode ? (
-        <p className="shrink-0 text-sm text-[#7f7280]">Select the tasks you want to remove.</p>
+        <p className="shrink-0 text-sm text-[#7f7280]">
+          Select tasks below, or select all tasks including those further down
+          the list.
+        </p>
       ) : null}
 
       {error ? (
@@ -146,73 +228,92 @@ const ProfileTaskList = ({
           onScroll={updateScrollHint}
         >
           <div className="space-y-3 pr-1 pb-10">
-      {loading ? (
-        <div className="space-y-3">
-          {[0, 1, 2].map((item) => (
-            <div key={item} className="h-20 animate-pulse rounded-2xl bg-white/50" />
-          ))}
-        </div>
-      ) : tasks.length === 0 ? (
-        <div className="profile-task-card border border-dashed p-6 text-sm text-[#7f7280]">
-          No tasks in your profile yet. Add one that matches your day-to-day work.
-        </div>
-      ) : (
-        tasks.map((task) => {
-          const isSelected = selectedIds.has(task.id);
-
-          return (
-            <div key={task.id} className="profile-task-card p-4">
-              <div className="flex items-center gap-3">
-                {batchMode ? (
-                  <button
-                    type="button"
-                    className="profile-task-checkbox"
-                    aria-label={isSelected ? "Deselect task" : "Select task"}
-                    onClick={() => toggleSelection(task.id)}
-                  >
-                    <img
-                      src={
-                        isSelected
-                          ? "/images/icons/icon-checkbox-checked.svg"
-                          : "/images/icons/icon-checkbox-unchecked.svg"
-                      }
-                      alt=""
-                      className="block h-[22px] w-[22px] object-contain"
-                    />
-                  </button>
-                ) : null}
-                <p className="min-w-0 flex-1 text-sm leading-6 text-[#2f2430]">{task.wording}</p>
-                {!batchMode ? (
-                  <div className="profile-icon-actions">
-                    <button
-                      type="button"
-                      className="profile-icon-btn"
-                      aria-label="Edit task"
-                      onClick={() => onEdit(task)}
-                    >
-                      <img src="/images/icons/icon-edit.svg" alt="" />
-                    </button>
-                    <button
-                      type="button"
-                      className="profile-icon-btn profile-icon-btn--delete"
-                      aria-label="Delete task"
-                      onClick={() => setDeleteTarget(task)}
-                    >
-                      <Trash2 className="h-4 w-4" aria-hidden />
-                    </button>
-                  </div>
-                ) : null}
+            {loading ? (
+              <div className="space-y-3">
+                {[0, 1, 2].map((item) => (
+                  <div
+                    key={item}
+                    className="h-20 animate-pulse rounded-2xl bg-white/50"
+                  />
+                ))}
               </div>
-              {taskMeta(task) ? (
-                <p className={`mt-2 text-xs text-[#7f7280] ${batchMode ? "pl-[52px]" : ""}`}>
-                  {taskMeta(task)}
-                </p>
-              ) : null}
-            </div>
-          );
-        })
-      )}
-        </div>
+            ) : tasks.length === 0 ? (
+              <div className="profile-task-card border border-dashed p-6 text-sm text-[#7f7280]">
+                No tasks in your profile yet. Add one that matches your
+                day-to-day work.
+              </div>
+            ) : (
+              tasks.map((task) => {
+                const isSelected = selectedIds.has(task.id);
+
+                return (
+                  <div
+                    key={task.id}
+                    className={`profile-task-card p-4 ${batchMode && isSelected ? "ring-1 ring-[#8dbbd6] bg-[#eaf4fb]" : ""}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {batchMode ? (
+                        <Checkbox
+                          {...({
+                            id: `select-task-${task.id}`,
+                            "aria-label": `Select task: ${task.wording}`,
+                            checked: isSelected,
+                            onCheckedChange: () => toggleSelection(task.id),
+                          } satisfies Partial<ComponentProps<typeof Checkbox>>)}
+                        />
+                      ) : null}
+                      <p className="min-w-0 flex-1 text-sm leading-6 text-[#2f2430]">
+                        {batchMode ? (
+                          <label
+                            htmlFor={`select-task-${task.id}`}
+                            className="block cursor-pointer"
+                          >
+                            {task.wording}
+                          </label>
+                        ) : (
+                          task.wording
+                        )}
+                      </p>
+                      {!batchMode ? (
+                        <div className="profile-icon-actions">
+                          <button
+                            type="button"
+                            className="profile-icon-btn"
+                            aria-label="Edit task"
+                            onClick={() => onEdit(task)}
+                          >
+                            <img src="/images/icons/icon-edit.svg" alt="" />
+                          </button>
+                          <button
+                            type="button"
+                            className="profile-icon-btn profile-icon-btn--delete"
+                            aria-label="Delete task"
+                            onClick={() => setDeleteTarget(task)}
+                          >
+                            <Trash2
+                              {...({
+                                className: "h-4 w-4",
+                                "aria-hidden": true,
+                              } satisfies Partial<
+                                ComponentProps<typeof Trash2>
+                              >)}
+                            />
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                    {taskMeta(task) ? (
+                      <p
+                        className={`mt-2 text-xs text-[#7f7280] ${batchMode ? "pl-[52px]" : ""}`}
+                      >
+                        {taskMeta(task)}
+                      </p>
+                    ) : null}
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
 
         {showScrollHint ? (
@@ -222,26 +323,19 @@ const ProfileTaskList = ({
             aria-label="Scroll to see more tasks"
             onClick={scrollTowardBottom}
           >
-            <ChevronDown className="h-4 w-4" aria-hidden />
+            <ChevronDown
+              {...({
+                className: "h-4 w-4",
+                "aria-hidden": true,
+              } satisfies Partial<ComponentProps<typeof ChevronDown>>)}
+            />
           </button>
         ) : null}
       </div>
 
-      <DeleteTaskDialog
-        open={Boolean(deleteTarget)}
-        taskWording={deleteTarget?.wording ?? ""}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={() => {
-          if (deleteTarget) onDelete(deleteTarget.id);
-        }}
-      />
+      <DeleteTaskDialog {...deleteTaskDialogProps1} />
 
-      <BatchDeleteTaskDialog
-        open={batchDeleteOpen}
-        count={selectedIds.size}
-        onClose={() => setBatchDeleteOpen(false)}
-        onConfirm={handleBatchDeleteConfirm}
-      />
+      <BatchDeleteTaskDialog {...batchDeleteTaskDialogProps2} />
     </div>
   );
 };

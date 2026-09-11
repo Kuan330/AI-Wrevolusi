@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { Link } from "react-router-dom";
 
 import { ROUTES } from "@/constants/routes";
@@ -12,18 +13,21 @@ type LogoProps = {
 
 const LOGO_MARK_SRC = "/images/logo-mark.svg";
 
-const Logo = ({
-  to = ROUTES.home,
-  showWordmark = true,
-  className,
-  imageClassName,
-}: LogoProps) => {
+const Logo = (props: LogoProps) => {
+  const {
+    to = ROUTES.home,
+    showWordmark = true,
+    className,
+    imageClassName,
+  } = props;
+  const linkProps1 = {
+    to: to,
+    state: to === ROUTES.home ? { showHome: true } : undefined,
+    "aria-label": "AI-Wrevolusi home",
+    className: cn("inline-flex shrink-0 items-center gap-2.5", className),
+  } satisfies Partial<ComponentProps<typeof Link>>;
   return (
-    <Link
-      to={to}
-      aria-label="AI-Wrevolusi home"
-      className={cn("inline-flex shrink-0 items-center gap-2.5", className)}
-    >
+    <Link {...linkProps1}>
       <img
         src={LOGO_MARK_SRC}
         alt={showWordmark ? "" : "AI-Wrevolusi"}
@@ -31,7 +35,9 @@ const Logo = ({
         className={cn("h-9 w-auto object-contain", imageClassName)}
       />
       {showWordmark ? (
-        <span className="text-[18px] font-semibold tracking-tight text-[#3D2B36]">AI-Wrevolusi</span>
+        <span className="text-[18px] font-semibold tracking-tight text-[#3D2B36]">
+          AI-Wrevolusi
+        </span>
       ) : null}
     </Link>
   );

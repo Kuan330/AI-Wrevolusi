@@ -21,18 +21,21 @@ SHOP_SUPERVISOR_REFERENCE_TASKS = [
         task_text='Planning and preparing work schedules and assigning staff to specific duties;',
         score_2025=0.525,
         source_method='predicted',
+        potential25='Exposed: Gradient 3',
     ),
     IloTaskExposureReference(
         ilo_task_id='2',
         task_text='Instructing staff on sales procedures and handling difficult cases;',
         score_2025=0.365,
         source_method='predicted',
+        potential25='Minimal Exposure',
     ),
     IloTaskExposureReference(
         ilo_task_id='3',
         task_text='Ensuring that customers receive prompt service;',
         score_2025=0.515,
         source_method='predicted',
+        potential25='Exposed: Gradient 3',
     ),
 ]
 
@@ -48,6 +51,7 @@ class FakeIloTaskExposureReferenceQueryResult:
                 'task_text': reference_task.task_text,
                 'score_2025': reference_task.score_2025,
                 'source': reference_task.source_method,
+                'potential25': reference_task.potential25,
             }
             for reference_task in SHOP_SUPERVISOR_REFERENCE_TASKS
         ]
@@ -91,6 +95,7 @@ def test_batch_task_exposure_assessment_endpoint_returns_explainable_result() ->
     assessment = response.json()['assessments'][0]
     assert assessment['task_id'] == 'task-api-1'
     assert assessment['match_layer'] == 'exact'
+    assert assessment['potential25'] == 'Exposed: Gradient 3'
     assert assessment['reasoning']
     assert assessment['uncertainty']
     assert assessment['limitations']
@@ -99,6 +104,7 @@ def test_batch_task_exposure_assessment_endpoint_returns_explainable_result() ->
 def test_adjusted_exposure_score_boundaries_map_to_the_four_supported_states() -> None:
     assert map_adjusted_exposure_score_to_suggested_state(0.24) == ExposureType.human_led
     assert map_adjusted_exposure_score_to_suggested_state(0.25) == ExposureType.ai_assisted
+    assert map_adjusted_exposure_score_to_suggested_state(0.26) == ExposureType.ai_assisted
     assert map_adjusted_exposure_score_to_suggested_state(0.4) == ExposureType.partly_automated
     assert map_adjusted_exposure_score_to_suggested_state(0.55) == ExposureType.reshaped
 
@@ -123,6 +129,7 @@ def test_exact_ilo_task_uses_exact_match_layer_and_source_score() -> None:
     assert assessment.baseline_score == 0.525
     assert assessment.suggested_state == ExposureType.partly_automated
     assert assessment.matched_reference_tasks[0].similarity == 1.0
+    assert assessment.potential25 == 'Exposed: Gradient 3'
 
 
 def test_edited_task_uses_nlp_similarity_instead_of_stale_exact_score() -> None:

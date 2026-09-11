@@ -6,6 +6,12 @@ export interface HomeNavLink {
 export interface StepItem {
   title: string;
   description: string;
+  accent: "warm" | "blue";
+}
+
+export interface StepEvidenceItem {
+  label: string;
+  detail: string;
 }
 
 export interface TestimonialItem {
@@ -65,19 +71,44 @@ export const TRUST_ITEMS = [
 
 export const STEPS: StepItem[] = [
   {
-    title: "Which tasks are changing?",
-    description:
-      "Separate AI-assisted work, tasks that may be redesigned, and work that still needs you.",
+    title: "Record your real work.",
+    description: "Choose an occupation and adjust its tasks to match your working day.",
+    accent: "warm",
   },
   {
-    title: "What makes you more valuable?",
-    description:
-      "Surface judgement, communication, creativity, and domain experience you already use.",
+    title: "See where AI may change tasks.",
+    description: "Review task-level evidence for AI assistance, reshaping or human-led work.",
+    accent: "blue",
   },
   {
-    title: "What should you do next?",
-    description:
-      "Get a 90-day learning and action path that fits your time and career stage.",
+    title: "Make your skills visible.",
+    description: "Connect your work to skills whose value can grow, stay steady or shift.",
+    accent: "warm",
+  },
+  {
+    title: "Explore your next options.",
+    description: "Find occupations where your current strengths can transfer.",
+    accent: "blue",
+  },
+  {
+    title: "Build a plan that fits your life.",
+    description: "Turn your choices into practical learning steps around your real constraints.",
+    accent: "warm",
+  },
+];
+
+export const STEP_EVIDENCE: StepEvidenceItem[] = [
+  {
+    label: "MASCO",
+    detail: "Malaysia's official occupation classification helps anchor your work profile.",
+  },
+  {
+    label: "ILO",
+    detail: "Task-level evidence shows where generative AI may change work.",
+  },
+  {
+    label: "WEF",
+    detail: "Future of Jobs 2025 informs the skills and opportunity view.",
   },
 ];
 
@@ -136,16 +167,16 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Start free analysis" },
       { label: "Work profile (E1)" },
       { label: "AI exposure (E2)" },
-      { label: "Capabilities (E3)" },
+      { label: "Skills (E3)" },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "Interpretation (E4)" },
-      { label: "Priorities (E6)" },
-      { label: "Preparation (E7)" },
-      { label: "Task efficiency" },
+      { label: "Evidence sources" },
+      { label: "Task priorities" },
+      { label: "Future iterations" },
+      { label: "Project methodology" },
     ],
   },
   {
@@ -153,8 +184,8 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     links: [
       { label: "How it works" },
       { label: "Sample report" },
-      { label: "Flexibility plan (E8)" },
-      { label: "Dashboard" },
+      { label: "Read your results" },
+      { label: "Review task evidence" },
     ],
   },
   {

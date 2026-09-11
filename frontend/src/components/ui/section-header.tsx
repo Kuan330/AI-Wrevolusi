@@ -3,7 +3,8 @@ interface SectionHeaderProps {
   subtitle: string;
 }
 
-const SectionHeader = ({ title, subtitle }: SectionHeaderProps) => {
+const SectionHeader = (props: SectionHeaderProps) => {
+  const { title, subtitle } = props;
   return (
     <>
       <h2 className="section-title">{title}</h2>

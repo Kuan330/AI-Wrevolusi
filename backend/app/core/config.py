@@ -15,6 +15,7 @@ class Settings(BaseSettings):
         env_file=(REPO_DIR / '.env', BACKEND_DIR / '.env'),
         env_file_encoding='utf-8',
         case_sensitive=False,
+        extra='ignore',
     )
 
     app_name: str = 'AI-Wrevolusi API'
@@ -39,6 +40,37 @@ class Settings(BaseSettings):
     cookie_samesite: str = 'lax'
 
     cors_origins: list[str] = ['http://localhost:5173', 'http://127.0.0.1:5173']
+
+    skill_llm_base_url: str = 'https://openrouter.ai/api/v1'
+    skill_llm_api_key: str | None = None
+    skill_llm_model: str = 'openai/gpt-5-mini'
+    skill_llm_app_name: str = 'AI-Wrevolusi'
+    skill_llm_app_url: str | None = None
+    skill_request_timeout_s: float = Field(default=60, gt=0, le=180)
+    skill_max_retries: int = Field(default=2, ge=0, le=5)
+    skill_prompt_version: str = 'skill-directions-v1'
+
+    # Optional OpenAI-compatible provider for the candidate-constrained AI
+    # endpoints. The provider is skipped when ai_api_key is empty and
+    # ai_keyless is false; ai_api_mode selects the wire protocol and
+    # ai_extra_headers adds optional JSON-configured request headers (for
+    # example an anonymous relay's session-affinity header).
+    ai_api_key: str | None = None
+    ai_base_url: str = 'https://api.openai.com/v1'
+    ai_model: str = 'gpt-4o-mini'
+    ai_api_mode: str = 'chat_completions'
+    ai_keyless: bool = False
+    ai_extra_headers: str = ''
+    # Built-in safety net for the provider chain: when no key is configured
+    # (or the configured provider is unavailable at runtime) the AI layers
+    # fall back to the OpenCode Zen free relay. Set to false to disable it.
+    ai_fallback_enabled: bool = True
+    ai_fallback_base_url: str = 'https://opencode.ai/zen/v1'
+    ai_fallback_model: str = 'muse-spark-1.3-contributor-free'
+    ai_timeout_seconds: float = Field(default=20, gt=0, le=180)
+    ai_max_retries: int = Field(default=2, ge=0, le=5)
+    ai_rpm_limit: int = Field(default=60, gt=0, le=6000)
+    ai_cache_size: int = Field(default=128, ge=0, le=4096)
 
     @field_validator('cors_origins', mode='before')
     @classmethod

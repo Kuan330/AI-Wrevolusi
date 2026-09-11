@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api/v1";
+const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL ?? "/api/v1";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -25,9 +25,14 @@ const parseResponseBody = async (response: Response): Promise<unknown> => {
   return response.text();
 };
 
-const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
+const request = async <T>(
+  path: string,
+  init?: RequestInit,
+  timeoutMs = 4000,
+  retrySession = true,
+): Promise<T> => {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 4000);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -40,6 +45,10 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
       signal: controller.signal,
     });
 
+    if (response.status === 401 && path === "/account/workspace" && retrySession) {
+      await request("/auth/refresh", { method: "POST" }, timeoutMs, false);
+      return request<T>(path, init, timeoutMs, false);
+    }
     const body = await parseResponseBody(response);
     if (!response.ok) {
       const detail =
@@ -65,11 +74,11 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
 
 export const api = {
   get: <T>(path: string) => request<T>(path, { method: "GET" }),
-  post: <T, TBody = unknown>(path: string, payload?: TBody) =>
+  post: <T, TBody = unknown>(path: string, payload?: TBody, timeoutMs?: number) =>
     request<T>(path, {
       method: "POST",
       body: payload ? JSON.stringify(payload) : undefined,
-    }),
+    }, timeoutMs),
   patch: <T, TBody = unknown>(path: string, payload?: TBody) =>
     request<T>(path, {
       method: "PATCH",

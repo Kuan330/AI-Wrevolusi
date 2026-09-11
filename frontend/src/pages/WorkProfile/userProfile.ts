@@ -1,3 +1,4 @@
+import { accountStorage } from "../../services/accountStorage.ts";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 import type { ReferenceOccupation } from "@/types/reference";
@@ -5,6 +6,8 @@ import type { ReferenceOccupation } from "@/types/reference";
 const PROFILE_KEY = "aiwrevolusi.userProfile";
 const OCCUPATION_KEY = "aiwrevolusi.selectedOccupation";
 const ANALYSIS_KEY = "aiwrevolusi.confirmedAnalysis";
+
+let transientSelectedOccupation: SelectedOccupation | null = null;
 
 export type SelectedOccupation = {
   unit: ReferenceOccupation;
@@ -22,20 +25,12 @@ export type ConfirmedAnalysis = {
 };
 
 export type UserProfile = {
-  occupation: SelectedOccupation | null;
   tasks: ProfileTask[];
   tasksOccupationCode: string | null;
   analysis: ConfirmedAnalysis | null;
 };
 
-const emptyProfile = (): UserProfile => ({
-  occupation: null,
-  tasks: [],
-  tasksOccupationCode: null,
-  analysis: null,
-});
-
-const parseJson = <T,>(raw: string | null): T | null => {
+const parseJson = <T>(raw: string | null): T | null => {
   if (!raw) return null;
   try {
     return JSON.parse(raw) as T;
@@ -44,78 +39,117 @@ const parseJson = <T,>(raw: string | null): T | null => {
   }
 };
 
-const readLegacyOccupation = (): SelectedOccupation | null => {
-  const parsed =
-    parseJson<SelectedOccupation>(localStorage.getItem(OCCUPATION_KEY)) ??
-    parseJson<SelectedOccupation>(sessionStorage.getItem(OCCUPATION_KEY));
-  if (!parsed?.unit?.occupation_code || !parsed.unit.title) return null;
-  return parsed;
-};
-
 const readLegacyAnalysis = (): ConfirmedAnalysis | null => {
   const parsed =
-    parseJson<ConfirmedAnalysis>(localStorage.getItem(ANALYSIS_KEY)) ??
-    parseJson<ConfirmedAnalysis>(sessionStorage.getItem(ANALYSIS_KEY));
+    parseJson<ConfirmedAnalysis>(accountStorage.getItem(ANALYSIS_KEY)) ?? null;
   if (!parsed?.occupationTitle || !Array.isArray(parsed.tasks)) return null;
   return parsed;
 };
 
 export const readUserProfile = (): UserProfile => {
-  const stored = parseJson<UserProfile>(localStorage.getItem(PROFILE_KEY));
-  if (stored?.occupation || stored?.analysis || stored?.tasksOccupationCode) {
-    return { ...emptyProfile(), ...stored };
+  const stored = parseJson<UserProfile>(accountStorage.getItem(PROFILE_KEY));
+  if (stored) {
+    const cleaned: UserProfile = {
+      tasks: Array.isArray(stored.tasks) ? stored.tasks : [],
+      tasksOccupationCode: stored.tasksOccupationCode ?? null,
+      analysis: stored.analysis ?? null,
+    };
+    accountStorage.removeItem(OCCUPATION_KEY);
+
+    return cleaned;
   }
 
-  const occupation = readLegacyOccupation();
   const analysis = readLegacyAnalysis();
   const migrated: UserProfile = {
-    occupation,
     tasks: analysis?.tasks ?? [],
-    tasksOccupationCode: analysis?.occupationCode ?? occupation?.unit.occupation_code ?? null,
+    tasksOccupationCode: analysis?.occupationCode ?? null,
     analysis,
   };
-  if (occupation || analysis) {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(migrated));
-  }
+  accountStorage.removeItem(OCCUPATION_KEY);
   return migrated;
 };
 
 export const writeUserProfile = (patch: Partial<UserProfile>): UserProfile => {
-  const next = { ...readUserProfile(), ...patch };
-  localStorage.setItem(PROFILE_KEY, JSON.stringify(next));
-  if (next.occupation) {
-    localStorage.setItem(OCCUPATION_KEY, JSON.stringify(next.occupation));
+  const previous = readUserProfile();
+  const next = { ...previous, ...patch };
+  if (
+    JSON.stringify(previous.analysis) !== JSON.stringify(next.analysis) ||
+    previous.tasksOccupationCode !== next.tasksOccupationCode ||
+    JSON.stringify(previous.tasks) !== JSON.stringify(next.tasks)
+  ) {
+    const rawLibrary = accountStorage.getItem("aiwrevolusi.courseLibrary.v1");
+    if (rawLibrary) {
+      try {
+        const library = JSON.parse(rawLibrary);
+        accountStorage.setItem(
+          "aiwrevolusi.courseLibrary.v1",
+          JSON.stringify({
+            ...library,
+            saved: [],
+            choices: {},
+            basis: {},
+            workContext: next.analysis ? JSON.stringify(next.analysis) : "",
+          }),
+        );
+        accountStorage.removeItem("aiwrevolusi.planner.v1");
+        accountStorage.removeItem("aiwrevolusi.learningResourceSelections.v1");
+      } catch {
+        accountStorage.removeItem("aiwrevolusi.courseLibrary.v1");
+      }
+    }
   }
+  accountStorage.setItem(PROFILE_KEY, JSON.stringify(next));
+  accountStorage.removeItem(OCCUPATION_KEY);
   if (next.analysis) {
-    localStorage.setItem(ANALYSIS_KEY, JSON.stringify(next.analysis));
+    accountStorage.setItem(ANALYSIS_KEY, JSON.stringify(next.analysis));
   } else {
-    localStorage.removeItem(ANALYSIS_KEY);
+    accountStorage.removeItem(ANALYSIS_KEY);
   }
   return next;
 };
 
 export const saveSelectedOccupation = (occupation: SelectedOccupation) => {
-  const prev = readUserProfile();
-  const same = prev.occupation?.unit.occupation_code === occupation.unit.occupation_code;
-  writeUserProfile({
-    occupation,
-    tasks: same ? prev.tasks : [],
-    tasksOccupationCode: same ? prev.tasksOccupationCode : null,
-    analysis: same ? prev.analysis : null,
-  });
+  transientSelectedOccupation = occupation;
 };
 
 export const readSelectedOccupation = (): SelectedOccupation | null =>
-  readUserProfile().occupation ?? readLegacyOccupation();
+  transientSelectedOccupation;
 
-export const saveProfileTasks = (occupationCode: string, tasks: ProfileTask[]) => {
-  writeUserProfile({ tasks, tasksOccupationCode: occupationCode, analysis: null });
+export const clearSelectedOccupation = () => {
+  transientSelectedOccupation = null;
+  accountStorage.removeItem(OCCUPATION_KEY);
 };
 
-export const readProfileTasks = (occupationCode: string): ProfileTask[] | null => {
+export const saveProfileTasks = (
+  occupationCode: string,
+  tasks: ProfileTask[],
+) => {
+  writeUserProfile({
+    tasks,
+    tasksOccupationCode: occupationCode,
+    analysis: null,
+  });
+};
+
+export const readProfileTasks = (
+  occupationCode: string,
+): ProfileTask[] | null => {
   const profile = readUserProfile();
   if (profile.tasksOccupationCode !== occupationCode) return null;
   return profile.tasks;
+};
+
+export const readTaskWorkspace = (): Pick<
+  UserProfile,
+  "tasks" | "tasksOccupationCode"
+> | null => {
+  const profile = readUserProfile();
+  if (!profile.tasksOccupationCode || !Array.isArray(profile.tasks))
+    return null;
+  return {
+    tasks: profile.tasks,
+    tasksOccupationCode: profile.tasksOccupationCode,
+  };
 };
 
 export const saveConfirmedAnalysis = (analysis: ConfirmedAnalysis) => {
@@ -132,4 +166,40 @@ export const readConfirmedAnalysis = (): ConfirmedAnalysis | null =>
 export const hasConfirmedAnalysis = (): boolean => {
   const analysis = readConfirmedAnalysis();
   return Boolean(analysis && analysis.tasks.length > 0);
+};
+
+/** Practice updates keep confirmed exposure evidence and the task workspace in sync. */
+export const saveTaskPractice = (
+  occupationCode: string,
+  taskId: string,
+  taskWording: string,
+  update: (
+    current: import("./types").TaskPractice,
+  ) => import("./types").TaskPractice,
+): ConfirmedAnalysis => {
+  const profile = readUserProfile();
+  const task = profile.tasks.find((item) => item.id === taskId);
+  if (
+    profile.tasksOccupationCode !== occupationCode ||
+    !profile.analysis ||
+    profile.analysis.occupationCode !== occupationCode ||
+    !task ||
+    task.wording !== taskWording ||
+    !profile.analysis.tasks.some(
+      (item) => item.id === taskId && item.wording === taskWording,
+    )
+  ) {
+    throw new Error(
+      "This task changed. Reload the page before recording a trial.",
+    );
+  }
+  const practice = update(task.practice ?? { trials: [] });
+  const patchTask = (item: ProfileTask) =>
+    item.id === taskId ? { ...item, practice } : item;
+  const analysis = {
+    ...profile.analysis,
+    tasks: profile.analysis.tasks.map(patchTask),
+  };
+  writeUserProfile({ tasks: profile.tasks.map(patchTask), analysis });
+  return analysis;
 };

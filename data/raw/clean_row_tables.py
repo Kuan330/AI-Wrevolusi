@@ -69,8 +69,11 @@ from pathlib import Path
 
 import pandas as pd
 
+from masco_pdf import MASCO_COLUMNS, extract_masco_rows
+
 HERE = Path(__file__).resolve().parent
 SOURCES = HERE.parent / "sources"
+DEFAULT_MASCO_SOURCE = SOURCES / "masco" / "masco_2020_en.pdf"
 
 DEFAULT_ILO_SOURCE = SOURCES / "ilo" / "Final_Scores_ISCO08_Gmyrek_et_al_2025.xlsx"
 DEFAULT_WEF_SOURCE = (
@@ -351,29 +354,18 @@ def write_wef_csv(source: Path, output_path: Path) -> pd.DataFrame:
     return cleaned
 
 
-def build_masco_rows() -> list[dict[str, str]]:
-    rows: list[dict[str, str]] = []
-    for unit in UNIT_GROUPS:
-        for letter, text in unit["tasks"]:
-            row = {col: "" for col in MASCO_COLUMNS}
-            for col in MASCO_COLUMNS:
-                if col in ("task_letter", "task_text"):
-                    continue
-                if col in unit:
-                    row[col] = str(unit[col])
-            row["task_letter"] = letter
-            row["task_text"] = text
-            rows.append(row)
-    return rows
-
-
-def write_masco_csv(output_path: Path) -> list[dict[str, str]]:
-    rows = build_masco_rows()
+def write_masco_csv(source: Path, output_path: Path) -> list[dict[str, str]]:
+    rows = extract_masco_rows(source.expanduser().resolve())
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=MASCO_COLUMNS, extrasaction="ignore")
-        writer.writeheader()
-        writer.writerows(rows)
+    temporary_path = output_path.with_suffix(output_path.suffix + ".tmp")
+    try:
+        with temporary_path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=MASCO_COLUMNS, extrasaction="ignore")
+            writer.writeheader()
+            writer.writerows(rows)
+        temporary_path.replace(output_path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
     return rows
 
 
@@ -409,6 +401,12 @@ def parse_args() -> argparse.Namespace:
         description="Clean MASCO, ILO, and WEF source row tables to CSV."
     )
     parser.add_argument(
+        "--masco-source",
+        type=Path,
+        default=DEFAULT_MASCO_SOURCE,
+        help="Path to the MASCO 2020 English PDF",
+    )
+    parser.add_argument(
         "--ilo-source",
         type=Path,
         default=DEFAULT_ILO_SOURCE,
@@ -435,7 +433,7 @@ def main() -> None:
     masco_path = out_dir / "masco_occupation_raw.csv"
     ilo_path = out_dir / "ilo_task_score_raw.csv"
 
-    masco_rows = write_masco_csv(masco_path)
+    masco_rows = write_masco_csv(args.masco_source, masco_path)
     masco_units = ", ".join(sorted({row["unit_code"] for row in masco_rows}))
     print(f"MASCO: {len(masco_rows)} rows, units {masco_units} -> {masco_path}")
 

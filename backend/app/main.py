@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.db.session import init_models
 from app.routers import (
+    accounts,
+    ai,
     auth,
     capabilities,
     exposure,
@@ -11,6 +13,7 @@ from app.routers import (
     preparation,
     reference,
     schedule,
+    skill_directions,
     tasks,
     users,
 )
@@ -34,7 +37,9 @@ def create_app(api_root: str = '/api') -> FastAPI:
 
     api_root = api_root.rstrip('/')
     api_prefix = f'{api_root}/{settings.api_version}'
+    application.include_router(ai.router, prefix=api_prefix)
     application.include_router(auth.router, prefix=api_prefix)
+    application.include_router(accounts.router, prefix=api_prefix)
     application.include_router(users.router, prefix=api_prefix)
     application.include_router(occupations.router, prefix=api_prefix)
     application.include_router(tasks.router, prefix=api_prefix)
@@ -43,6 +48,7 @@ def create_app(api_root: str = '/api') -> FastAPI:
     application.include_router(preparation.router, prefix=api_prefix)
     application.include_router(schedule.router, prefix=api_prefix)
     application.include_router(reference.router, prefix=api_prefix)
+    application.include_router(skill_directions.router, prefix=api_prefix)
 
     @application.on_event('startup')
     async def startup_event() -> None:

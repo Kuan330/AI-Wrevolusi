@@ -1,0 +1,1023 @@
+import ConflictMessage, { WhatsAppIcon } from "./ConflictMessage";
+import { Drawer, DrawerContent, DrawerTitle, DrawerDescription, DrawerBody } from "@/components/ui/drawer";
+import PlanCourseDrawer from "./PlanCourseDrawer";
+import { courses } from "@/pages/LearningCentre/catalogue";
+import { AppButton } from "@/components/ui/app-button";
+import { readLibrary } from "@/pages/LearningCentre/lib/libraryStorage";
+import { TimePicker } from "@/components/ui/time-picker";
+import { learningSession } from "@/pages/LearningCentre/lib/learningSession";
+import type { ComponentProps } from "react";
+import WeekCalendar from "./WeekCalendar";
+import { scheduleCourses } from "./scheduleCourses";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
+import {
+  AlertTriangle,
+  ArrowRight,
+  BookOpen,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+  Copy,
+  MessageCircle,
+  Plus,
+  Trash2,
+} from "lucide-react";
+import PageHeader from "@/components/common/PageHeader";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ROUTES } from "@/constants/routes";
+import {
+  resources,
+  readSelections,
+  saveSelections,
+  type Selection,
+} from "@/pages/LearningCentre/resources";
+import { demoResources, demoSelections } from "@/pages/LearningCentre/demoData";
+import { localPlanRepository } from "@/services/planService";
+import {
+  addDays,
+  conflicts,
+  dateKey,
+  duration,
+  monday,
+  overlaps,
+  requestMessage,
+  suggestions,
+  validateEvent,
+  whatsappLink,
+  type PlanEvent,
+  type PlanState,
+} from "./planModel";
+import "./plan.css";
+const labels = {
+  learning: "Learning",
+  work: "Work",
+  care: "Family & care",
+  personal: "Personal & rest",
+};
+const readable = (date: string) =>
+  new Date(`${date}T12:00:00`).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+  });
+export default function Plan() {
+  const [params] = useSearchParams();
+  // Example content is opt-in only.
+  const demo = import.meta.env.DEV && params.get("demo") === "1";
+  return <PlanContent key={String(demo)} demo={demo} />;
+}
+function PlanContent(props: { demo: boolean }) {
+  const { demo } = props;
+  const location = useLocation();
+  const repository = useMemo(() => localPlanRepository(demo), [demo]);
+  const [state, setState] = useState<PlanState>({
+    version: 1,
+    revision: 0,
+    events: [],
+  });
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [week, setWeek] = useState(monday(dateKey(new Date())));
+  const [selectedId, setSelectedId] = useState("");
+  const [courseOpen, setCourseOpen] = useState(false);
+  const [editor, setEditor] = useState<PlanEvent | null>(null);
+  const [repeat, setRepeat] = useState(false);
+  const [savedCourseIds] = useState(() => { try { return readLibrary().saved.slice().reverse(); } catch { return []; } });
+  const [workOpen, setWorkOpen] = useState(false);
+  const [workDays, setWorkDays] = useState([0, 1, 2, 3, 4]);
+  const [workStart, setWorkStart] = useState('09:00');
+  const [workEnd, setWorkEnd] = useState('17:00');
+  const [workFrom, setWorkFrom] = useState(dateKey(new Date()));
+  const [workTo, setWorkTo] = useState(addDays(dateKey(new Date()), 83));
+  const [formError, setFormError] = useState("");
+  const [helper, setHelper] = useState("");
+  const [message, setMessage] = useState("");
+  const [requestOpen, setRequestOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const catalogue = demo ? demoResources : resources;
+  const [shortlist, setShortlist] = useState<Selection[]>(() =>
+    demo
+      ? Array.isArray(location.state?.shortlist)
+        ? location.state.shortlist.filter(
+            (s: Selection) =>
+              s && demoResources.some((r) => r.id === s.resourceId),
+          )
+        : demoSelections
+      : readSelections(),
+  );
+  useEffect(() => {
+    let active = true;
+    repository
+      .load()
+      .then(async (data) => {
+        if (active) {
+          setState(data);
+          setSelectedId(data.events.find((e) => e.kind === "care")?.id || "");
+          const requestedId = new URLSearchParams(location.search).get(
+            "resource",
+          );
+          const selection = (demo ? demoSelections : readSelections()).find(
+            (item) => item.resourceId === requestedId,
+          );
+          const resource = catalogue.find((item) => item.id === requestedId);
+          if (selection && resource) {
+            const existing = data.events.filter(event => event.resourceId === resource.id).sort((a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start))[0];
+            if (existing) {
+              setWeek(monday(existing.date));
+              setSelectedId(existing.id);
+              setNotice(
+                `${resource.title} · ${data.events.filter(event => event.resourceId === resource.id).length} sessions in your calendar, starting ${existing.date} at ${existing.start}.`,
+              );
+            } else {
+              if (selection.startTime && selection.endTime && selection.scheduleMode === "routine") {
+                const batch = scheduleCourses([selection], catalogue, data.events);
+                if (batch.events.length && active) {
+                  const saved = await repository.save({ ...data, events: [...data.events, ...batch.events] }, data.revision);
+                  if (!active) return;
+                  setState(saved);
+                  setWeek(monday(batch.events[0].date));
+                  setSelectedId(batch.events[0].id);
+                }
+                if (active) setNotice([`${batch.events.length} learning sessions imported.`, ...batch.issues].join(' '));
+              } else {
+                setNotice('Choose study days and times to import your course, or add individual sessions.');
+              }
+            }
+          }
+        }
+      })
+      .catch((e) => {
+        if (active) setError(e.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [repository, location.search, catalogue, demo]);
+  async function commit(events: PlanEvent[]) {
+    setBusy(true);
+    setError("");
+    try {
+      const next = await repository.save({ ...state, events }, state.revision);
+      setState(next);
+      setNotice("Plan saved. Account sync runs automatically.");
+      return true;
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "Could not save. Please try again.",
+      );
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  }
+  const days = Array.from({ length: 7 }, (_, i) => addDays(week, i));
+  const visible = state.events.filter((e) => days.includes(e.date));
+  const pairs = conflicts(visible);
+  const selected = state.events.find((e) => e.id === selectedId);
+  const selectedConflicts = selected
+    ? state.events.filter((e) => overlaps(selected, e))
+    : [];
+  function newEvent(resourceId?: string) {
+    const resource = catalogue.find((r) => r.id === resourceId);
+    setFormError("");
+    setRepeat(false);
+    setEditor(
+      learningSession(
+        resource,
+        shortlist.find((item) => item.resourceId === resourceId),
+        week < dateKey(new Date()) ? dateKey(new Date()) : week,
+      ),
+    );
+  }
+  async function saveEvent() {
+    if (!editor) return;
+    const validation = validateEvent(editor);
+    if (validation) {
+      setFormError(validation);
+      return;
+    }
+    const previous = state.events.find((e) => e.id === editor.id);
+    const changed =
+      previous &&
+      (previous.date !== editor.date ||
+        previous.start !== editor.start ||
+        previous.end !== editor.end ||
+        previous.title !== editor.title ||
+        previous.shareable !== editor.shareable);
+    const event = {
+      ...editor,
+      title: editor.title.trim(),
+      assistance: changed ? undefined : editor.assistance,
+    };
+    let events = state.events.filter((e) => e.id !== event.id).concat(event);
+    if (repeat && !previous)
+      events = events.concat(
+        [1, 2, 3].map((i) => ({
+          ...event,
+          id: crypto.randomUUID(),
+          date: addDays(event.date, i * 7),
+        })),
+      );
+    if (await commit(events)) {
+      setEditor(null);
+      setSelectedId(event.id);
+      setWeek(monday(event.date));
+      if (changed && previous.assistance)
+        setNotice(
+          "Updated. The previous assistance confirmation has been cleared; contact your helper about the change.",
+        );
+    }
+  }
+  function openRequest() {
+    if (!selected) return;
+    setCourseOpen(false);
+    const name = selected.assistance?.name || "";
+    setHelper(name);
+    setMessage(
+      selected.assistance?.message || requestMessage(selected, name || "there"),
+    );
+    setFormError("");
+    setRequestOpen(true);
+  }
+  async function saveRequest() {
+    if (!selected) return;
+    if (!helper.trim() || !message.trim()) {
+      setFormError("Enter a helper name and message.");
+      return;
+    }
+    if (
+      await commit(
+        state.events.map((e) =>
+          e.id === selected.id
+            ? {
+                ...e,
+                assistance: {
+                  name: helper.trim(),
+                  message,
+                  status: "draft",
+                  updatedAt: new Date().toISOString(),
+                },
+              }
+            : e,
+        ),
+      )
+    )
+      setRequestOpen(false);
+  }
+  async function status(status: "pending" | "accepted" | "declined") {
+    if (!selected?.assistance) return;
+    await commit(
+      state.events.map((e) =>
+        e.id === selected.id
+          ? {
+              ...e,
+              assistance: {
+                ...selected.assistance!,
+                status,
+                updatedAt: new Date().toISOString(),
+              },
+            }
+          : e,
+      ),
+    );
+  }
+  async function copy(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setNotice("Message copied.");
+    } catch {
+      setNotice("Copy unavailable. Select and copy the message text below.");
+    }
+  }
+  const savedQueue = savedCourseIds.map(id => {
+    const resource = catalogue.find(item => item.id === `epic5-${id}`);
+    if (!resource || state.events.some(event => event.resourceId === resource.id)) return null;
+    return shortlist.find(item => item.resourceId === resource.id) ?? { resourceId: resource.id, themeTitle: resource.title, skillName: '', addedAt: '', weekdays: [], scheduleMode: 'routine' as const };
+  }).filter((item): item is Selection => !!item);
+  function updatePreference(resourceId: string, patch: Partial<Selection>) {
+    const previous = shortlist.find(item => item.resourceId === resourceId) ?? savedQueue.find(item => item.resourceId === resourceId);
+    if (!previous) return;
+    const next = shortlist.filter(item => item.resourceId !== resourceId).concat({ ...previous, ...patch });
+    try { if (!demo) saveSelections(next); setShortlist(next); }
+    catch { setError('Could not save study times. Please try again.'); }
+  }
+  const courseTasks = state.events.filter(event => event.kind === 'learning' && courses.some(course => `epic5-${course.id}` === event.resourceId));
+  const completedCourseTasks = courseTasks.filter(event => event.completed).length;
+  const courseProgress = courses.flatMap(course => {
+    const tasks = courseTasks.filter(event => event.resourceId === `epic5-${course.id}`);
+    if (!tasks.length) return [];
+    const preference = shortlist.find(item => item.resourceId === `epic5-${course.id}`);
+    const total = preference?.totalMinutes === undefined ? course.durationMin : preference.totalMinutes;
+    const daily = preference?.startTime && preference.endTime
+      ? (Number(preference.endTime.slice(0,2)) * 60 + Number(preference.endTime.slice(3))) - (Number(preference.startTime.slice(0,2)) * 60 + Number(preference.startTime.slice(3)))
+      : Math.max(...tasks.map(duration));
+    return [{ title: course.title, total, daily, days: total && daily > 0 ? Math.ceil(total / daily) : null,
+      done: tasks.filter(event => event.completed).length, count: tasks.length,
+      finish: tasks.map(event => event.date).sort().at(-1) }];
+  });
+  const busyOrLoading = busy || loading;
+
+  const dialogProps1 = {
+    open: !!editor,
+    onOpenChange: (open) => {
+      if (!open && !busy) setEditor(null);
+    },
+  } satisfies Partial<ComponentProps<typeof Dialog>>;
+  const dialogProps2 = {
+    open: requestOpen,
+    onOpenChange: (open) => {
+      if (!busy) setRequestOpen(open);
+    },
+  } satisfies Partial<ComponentProps<typeof Dialog>>;
+  const dialogProps3 = {
+    open: deleteOpen,
+    onOpenChange: setDeleteOpen,
+  } satisfies Partial<ComponentProps<typeof Dialog>>;
+  return (
+    <div className="pl-page">
+      <PageHeader
+        title="My Plan"
+        description="Make room for learning, everyday life and the people who matter."
+        actions={
+          <div className="flex flex-wrap items-center gap-4">
+          <AppButton tone="outline" variant="outline" asChild><Link to={ROUTES.learningCentre}>Choose courses</Link></AppButton>
+          <AppButton tone="gradient" asChild><Link to={ROUTES.possibilities}>Explore possibilities</Link></AppButton>
+          </div>
+        }
+      />
+      {demo && (
+        <div className="pl-demo">
+          <span>
+            <strong>Demo plan</strong> · Example activities and conflicts.
+            Changes are saved separately from your own plan.
+          </span>
+          <Link to={`${ROUTES.plan}?demo=0`}>Exit demo</Link>
+        </div>
+      )}
+      <section className="pl-task-progress" aria-label="Course task progress">
+        <div><div><p className="pl-kicker">COURSE LEARNING ONLY</p><h2>Course plan progress</h2></div><strong>{completedCourseTasks} / {courseTasks.length}<small>learning sessions completed</small></strong></div>
+        <progress aria-label="Completed course tasks" value={completedCourseTasks} max={Math.max(1, courseTasks.length)} />
+        <p className="pl-muted">Work and personal activities are excluded.</p>
+        <div className="pl-course-progress-breakdown">{courseProgress.map(course => <div key={course.title}><strong>{course.title}</strong><span>{course.days ? `${course.days} study days · ${course.total} min ÷ ${course.daily} min/day` : 'Study duration not available'}</span><small>{course.done}/{course.count} sessions completed · Last scheduled: {course.finish}</small></div>)}</div>
+      </section>
+      {error && (
+        <div className="pl-error" role="alert">
+          {error}{" "}
+          <button onClick={() => window.location.reload()}>Reload plan</button>
+        </div>
+      )}
+      <p className="pl-notice" role="status">
+        {notice}
+      </p>
+      {loading ? (
+        <p>Loading your plan…</p>
+      ) : (
+        <div className="pl-layout">
+          <aside className="pl-sidebar pl-panel">
+            <p className="pl-kicker">YOUR NEXT STEPS</p>
+            <h2>Recently saved · {savedQueue.length}</h2>
+            <p className="pl-muted">
+              Choose a time for your saved courses.
+            </p>
+            {savedQueue.length ? (
+              savedQueue.map((s) => {
+                const r = catalogue.find((r) => r.id === s.resourceId);
+                if (!r) return null;
+                const scheduled = state.events
+                  .filter((e) => e.resourceId === r.id)
+                  .reduce((n, e) => n + duration(e), 0);
+                const total = s.totalMinutes === undefined ? r.minutes : s.totalMinutes;
+                if (total && scheduled >= total) return null;
+                return (
+                  <article className="pl-resource" key={r.id}>
+                    {s.skillName && <span>{s.skillName}</span>}
+                    <h3>{r.title}</h3>
+                    <p>
+                      {total
+                        ? `${total} min selected`
+                        : "Confirm duration with provider"}
+                    </p>
+                    {s.chapterNames?.length ? (
+                      <details>
+                        <summary>
+                          {s.chapterNames.length} selected chapters
+                        </summary>
+                        <ul>
+                          {s.chapterNames.map((name) => (
+                            <li key={name}>{name}</li>
+                          ))}
+                        </ul>
+                      </details>
+                    ) : null}
+                    {s.scheduleMode === "routine" && s.startDate ? (
+                      <p>Preferred start: {s.startDate}</p>
+                    ) : null}
+                    {s.weekdays?.length && s.minutesPerDay ? (
+                      <p>
+                        {s.weekdays
+                          .map(
+                            (day) =>
+                              ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][
+                                day
+                              ],
+                          )
+                          .join(", ")}{" "}
+                        · {s.startTime && s.endTime ? `${s.startTime}–${s.endTime}` : `${s.minutesPerDay} min/day preferred`}
+                      </p>
+                    ) : null}
+                    <div className="pl-work-days">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day,index) => <button key={day} aria-pressed={s.weekdays?.includes(index) ?? false} onClick={() => updatePreference(s.resourceId, { weekdays: s.weekdays?.includes(index) ? s.weekdays.filter(item => item !== index) : [...(s.weekdays ?? []), index] })}>{day}</button>)}</div>
+                    <div className="pl-form-row"><label>From<TimePicker compact label="Study start time" value={s.startTime ?? ''} onChange={value => updatePreference(s.resourceId, { startTime: value })} /></label><label>To<TimePicker compact label="Study end time" value={s.endTime ?? ''} onChange={value => updatePreference(s.resourceId, { endTime: value })} /></label></div>
+                    {!total && <label>Planned minutes<input type="number" min="1" value={s.totalMinutes ?? ''} onChange={event => updatePreference(s.resourceId, { totalMinutes: Number(event.target.value) })} /></label>}
+                    {scheduled > 0 && (
+                      <p>{scheduled} min scheduled across your plan</p>
+                    )}
+                    <button
+                      disabled={busyOrLoading}
+                      onClick={() => newEvent(r.id)}
+                    >
+                      Schedule a session <Plus size={14} />
+                    </button>
+                  </article>
+                );
+              })
+            ) : (
+              <div className="pl-empty">
+                <BookOpen />
+                <p>No saved courses waiting to be scheduled.</p>
+              </div>
+            )}
+            {!!savedQueue.length && <button className="pl-primary" disabled={busyOrLoading} onClick={async () => {
+              const batch = scheduleCourses(savedQueue, catalogue, state.events);
+              if (batch.events.length) {
+                if (!await commit([...state.events, ...batch.events])) return;
+                setWeek(monday(batch.events[0].date));
+              }
+              setNotice([`${batch.events.length} sessions imported.`, ...batch.issues].join(' '));
+            }}>Import course schedule</button>}
+            <Link
+              {...({
+                className: "pl-link",
+                to: `${ROUTES.learningCentre}${demo ? "" : "?demo=0"}`,
+              } satisfies Partial<ComponentProps<typeof Link>>)}
+            >
+              Explore learning resources <ArrowRight size={14} />
+            </Link>
+            <div className="pl-tip">
+              <Clock3 size={19} />
+              <h3>Leave a little breathing room</h3>
+              <p>
+                Keep time for rest and unexpected changes. An empty space does
+                not have to be filled.
+              </p>
+            </div>
+          </aside>
+          <main className="pl-calendar pl-panel">
+            <div className="pl-calendar-tools"><button className="pl-work-button" disabled={busyOrLoading} onClick={() => { setFormError(''); setWorkOpen(true); }}>Set work hours</button><button className="pl-primary" disabled={busyOrLoading} onClick={() => newEvent()}><Plus size={16} /> Add activity</button></div>
+            <div className="pl-weekbar">
+              <div>
+                <p className="pl-kicker">YOUR WEEK AT A GLANCE</p>
+                <h2>
+                  {readable(week)} – {readable(addDays(week, 6))}
+                </h2>
+              </div>
+              <div className="pl-week-buttons">
+                <button
+                  aria-label="Previous week"
+                  onClick={() => setWeek(addDays(week, -7))}
+                >
+                  <ChevronLeft size={17} />
+                </button>
+                <button onClick={() => setWeek(monday(dateKey(new Date())))}>
+                  Today
+                </button>
+                <button
+                  aria-label="Next week"
+                  onClick={() => setWeek(addDays(week, 7))}
+                >
+                  <ChevronRight size={17} />
+                </button>
+              </div>
+            </div>
+            <div className="pl-legend">
+              {Object.entries(labels).map(([kind, label]) => (
+                <span key={kind}>
+                  <i className={`pl-dot ${kind}`} />
+                  {label}
+                </span>
+              ))}
+            </div>
+            <p className="pl-timezone">
+              Times in {Intl.DateTimeFormat().resolvedOptions().timeZone} ·
+              Select an activity to manage it
+            </p>
+            {pairs.length > 0 && (
+              <div className="pl-conflict-strip">
+                <AlertTriangle size={17} />
+                <span>
+                  {pairs.length} overlapping{" "}
+                  {pairs.length === 1 ? "pair" : "pairs"} this week
+                </span>
+                <button
+                  onClick={() => { setSelectedId((pairs[0].find((e) => e.shareable) || pairs[0][0]).id); setCourseOpen(true); }}
+                >
+                  Review
+                </button>
+              </div>
+            )}
+            <WeekCalendar days={days} events={visible} selectedId={selectedId} onSelect={id => { setSelectedId(id); setCourseOpen(true); }} onAdd={(date, start) => {
+              setFormError(''); setRepeat(false);
+              const hour = Number(start.slice(0, 2));
+              setEditor({ id: crypto.randomUUID(), title: '', kind: 'personal', date, start, end: hour === 23 ? '23:59' : `${String(hour + 1).padStart(2, '0')}:00`, flexible: false, shareable: false, completed: false });
+            }} />
+          </main>
+          <Drawer open={courseOpen && !!selected && !courses.some(course => `epic5-${course.id}` === selected.resourceId)} onOpenChange={open => setCourseOpen(open)}>
+          <DrawerContent className="activity-drawer sm:max-w-xl"><DrawerBody className="pl-detail">
+            <p className="pl-kicker">ACTIVITY & SUPPORT</p>
+            {selected ? (
+              <>
+                <div className="pl-detail-heading">
+                  <DrawerTitle>{selected.title}</DrawerTitle>
+
+                </div>
+                <DrawerDescription className="pl-detail-date">
+                  {selected.date} · {selected.start}–{selected.end}
+                </DrawerDescription>
+                <div className="pl-tags">
+                  <span>{labels[selected.kind]}</span>
+                  <span>
+                    {selected.flexible ? "Flexible time" : "Fixed time"}
+                  </span>
+                </div>
+                <p className="pl-owner">
+                  Responsible:{" "}
+                  <strong>
+                    {selected.assistance?.status === "accepted"
+                      ? selected.assistance.name
+                      : "You"}
+                  </strong>
+                </p>
+                {selectedConflicts.length > 0 && (
+                  <div className="pl-conflict-box">
+                    <AlertTriangle size={18} />
+                    <h3>Two things need your time</h3>
+                    {selectedConflicts.map((e) => (
+                      <p key={e.id}>
+                        {e.title} · {e.start}–{e.end}
+                      </p>
+                    ))}
+                    <p>
+                      Move a flexible activity or ask someone to help with a
+                      shareable responsibility.
+                    </p>
+                    {selectedConflicts
+                      .filter((e) => e.flexible)
+                      .map((e) => (
+                        <button
+                          key={e.id}
+                          className="pl-link"
+                          onClick={() => setSelectedId(e.id)}
+                        >
+                          Adjust {e.title} →
+                        </button>
+                      ))}
+                  </div>
+                )}
+                {selectedConflicts.length > 0 && <ConflictMessage key={selected.id} event={selected} conflicts={selectedConflicts} />}
+                <div className="pl-detail-actions">
+                  <button
+                    disabled={busyOrLoading}
+                    onClick={() => {
+                      setCourseOpen(false);
+                      setEditor({ ...selected });
+                      setRepeat(false);
+                      setFormError("");
+                    }}
+                  >
+                    Edit activity
+                  </button>
+                  {selected && (
+                    <button
+                      disabled={busyOrLoading}
+                      onClick={() =>
+                        commit(
+                          state.events.map((e) =>
+                            e.id === selected.id
+                              ? { ...e, completed: !e.completed }
+                              : e,
+                          ),
+                        )
+                      }
+                    >
+                      {selected.completed
+                        ? "Mark incomplete"
+                        : "Mark completed"}
+                    </button>
+                  )}
+                </div>
+                {selected.flexible && (
+                  <section className="pl-suggestions">
+                    <h3>Other available times</h3>
+                    <p>
+                      Based on your saved activities, between 08:00 and 21:00.
+                      Choose a time that suits you.
+                    </p>
+                    {suggestions(selected, state.events).map((slot) => (
+                      <button
+                        disabled={busyOrLoading}
+                        key={slot.date + slot.start}
+                        onClick={async () => {
+                          if (
+                            await commit(
+                              state.events.map((e) =>
+                                e.id === selected.id
+                                  ? { ...e, ...slot, assistance: undefined }
+                                  : e,
+                              ),
+                            )
+                          ) {
+                            setWeek(monday(slot.date));
+                            setNotice(
+                              "Activity moved. Any previous assistance confirmation was cleared.",
+                            );
+                          }
+                        }}
+                      >
+                        {readable(slot.date)} · {slot.start}–{slot.end}
+                        <ArrowRight size={13} />
+                      </button>
+                    ))}
+                    {!suggestions(selected, state.events).length && (
+                      <p>
+                        No available suggestion in the next seven days. Edit the
+                        activity to choose another date.
+                      </p>
+                    )}
+                  </section>
+                )}
+                {selected.shareable && (
+                  <section className="pl-help">
+                    <MessageCircle size={21} />
+                    <h3>Ask family for a hand</h3>
+                    <p>
+                      Your family can reply in WhatsApp. They do not need an
+                      account here.
+                    </p>
+                    {!selected.assistance ? (
+                      <button
+                        className="pl-primary"
+                        disabled={busyOrLoading}
+                        onClick={openRequest}
+                      >
+                        Prepare a request
+                      </button>
+                    ) : (
+                      <>
+                        <div
+                          className={`pl-request-status ${selected.assistance.status}`}
+                        >
+                          <strong>{selected.assistance.name}</strong>
+                          <span>
+                            {
+                              {
+                                draft: "Draft · not sent",
+                                pending: "Waiting for a reply",
+                                accepted: "Accepted · recorded by you",
+                                declined: "Unable to help · recorded by you",
+                              }[selected.assistance.status]
+                            }
+                          </span>
+                        </div>
+                        <p className="pl-message">
+                          {selected.assistance.message}
+                        </p>
+                        {selected.assistance.status === "draft" && (
+                          <>
+                            <a
+                              className="pl-whatsapp-action"
+                              href={whatsappLink(selected.assistance.message)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <WhatsAppIcon /> Open WhatsApp
+                            </a>
+                            <p>
+                              Choose the intended person and send in WhatsApp.
+                              Opening it does not send or confirm this request.
+                            </p>
+                            <button
+                              disabled={busyOrLoading}
+                              onClick={() => status("pending")}
+                            >
+                              I sent the request
+                            </button>
+                            <button
+                              disabled={busyOrLoading}
+                              onClick={openRequest}
+                            >
+                              Edit draft
+                            </button>
+                          </>
+                        )}
+                        {selected.assistance.status === "pending" && (
+                          <>
+                            <p>
+                              After reading their reply, record the result
+                              below. You remain responsible until they accept.
+                            </p>
+                            <button
+                              disabled={busyOrLoading}
+                              className="pl-primary"
+                              onClick={() => status("accepted")}
+                            >
+                              They accepted
+                            </button>
+                            <button
+                              disabled={busyOrLoading}
+                              onClick={() => status("declined")}
+                            >
+                              They cannot help
+                            </button>
+                          </>
+                        )}
+                        {selected.assistance.status === "declined" && (
+                          <button
+                            disabled={busyOrLoading}
+                            onClick={openRequest}
+                          >
+                            Prepare another request
+                          </button>
+                        )}
+                        {selected.assistance.status === "accepted" && (
+                          <p>
+                            Check any handover details with{" "}
+                            {selected.assistance.name}. Their calendar is not
+                            connected.
+                          </p>
+                        )}
+                        <button
+                          onClick={() => copy(selected.assistance!.message)}
+                        >
+                          <Copy size={13} /> Copy message
+                        </button>
+                        <button
+                          disabled={busyOrLoading}
+                          onClick={() =>
+                            commit(
+                              state.events.map((e) =>
+                                e.id === selected.id
+                                  ? { ...e, assistance: undefined }
+                                  : e,
+                              ),
+                            )
+                          }
+                        >
+                          Clear request / take responsibility back
+                        </button>
+                      </>
+                    )}
+                  </section>
+                )}
+                <button
+                  className="pl-delete"
+                  disabled={busyOrLoading}
+                  onClick={() => { setCourseOpen(false); setDeleteOpen(true); }}
+                >
+                  <Trash2 size={14} /> Delete activity
+                </button>
+              </>
+            ) : (
+              <div className="pl-empty">
+                <CalendarDays />
+                <h3>A little space to organise</h3>
+                <p>
+                  Select an activity to edit its time, review a conflict or ask
+                  for help.
+                </p>
+              </div>
+            )}
+          </DrawerBody></DrawerContent></Drawer>
+        </div>
+      )}
+      <p className="pl-footer">
+        {demo
+          ? "Demo data stays in this browser."
+          : "Your plan is saved to your account."}{" "}
+        WhatsApp delivery and replies are not tracked automatically.
+      </p>
+      {courseOpen && selected && courses.some(course => `epic5-${course.id}` === selected.resourceId) && <PlanCourseDrawer conflicts={selectedConflicts} selectedEvent={selected} busy={busyOrLoading} onComplete={event => commit(state.events.map(item => item.id === event.id ? { ...item, completed: !item.completed } : item))} course={courses.find(course => `epic5-${course.id}` === selected.resourceId)!} events={state.events.filter(event => event.resourceId === selected.resourceId)} onClose={() => setCourseOpen(false)} onEdit={event => { setCourseOpen(false); setFormError(''); setRepeat(false); setEditor({ ...event }); }} />}
+      <Dialog open={workOpen} onOpenChange={setWorkOpen}><DialogContent className="pl-modal"><DialogTitle>Set work hours</DialogTitle><DialogDescription>Choose weekdays and the date range for your recurring work schedule.</DialogDescription>
+        <div className="pl-work-days">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day,index) => <button key={day} aria-pressed={workDays.includes(index)} onClick={() => setWorkDays(workDays.includes(index) ? workDays.filter(item => item !== index) : [...workDays,index])}>{day}</button>)}</div>
+        <div className="pl-form-row"><label>From<TimePicker value={workStart} onChange={value => setWorkStart(value)} /></label><label>To<TimePicker value={workEnd} onChange={value => setWorkEnd(value)} /></label></div>
+        <div className="pl-form-row"><label>Start date<input type="date" value={workFrom} onChange={e => setWorkFrom(e.target.value)} /></label><label>Through<input type="date" value={workTo} min={workFrom} onChange={e => setWorkTo(e.target.value)} /></label></div>
+        {formError && <p role="alert">{formError}</p>}<button className="pl-primary" disabled={busyOrLoading} onClick={async () => {
+          if (!workDays.length || !workFrom || !workTo || workTo < workFrom || !workStart || !workEnd || workEnd <= workStart) { setFormError('Choose work days, a valid date range and an end time after the start.'); return; }
+          if (workTo > addDays(workFrom, 365)) { setFormError('Choose a date range of up to one year.'); return; }
+          const additions: PlanEvent[] = [];
+          for (let date = workFrom; date <= workTo; date = addDays(date, 1)) {
+            if (!workDays.includes((new Date(`${date}T12:00:00`).getDay() + 6) % 7)) continue;
+            if (state.events.some(e => e.kind === 'work' && e.date === date && e.start === workStart && e.end === workEnd)) continue;
+            additions.push({id: crypto.randomUUID(), title: 'Work', kind: 'work', date, start: workStart, end: workEnd, flexible: false, shareable: false, completed: false});
+          }
+          if (await commit([...state.events, ...additions])) { setWorkOpen(false); setWeek(monday(workFrom)); }
+        }}>Save work hours</button>
+      </DialogContent></Dialog>
+      <Dialog {...dialogProps1}>
+        <DialogContent className="pl-modal">
+          <DialogTitle>
+            {state.events.some((e) => e.id === editor?.id)
+              ? "Edit activity"
+              : "Add an activity"}
+          </DialogTitle>
+          <DialogDescription>
+            Choose a time for learning or everyday life. Overlaps are allowed
+            and will be highlighted.
+          </DialogDescription>
+          {editor && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                void saveEvent();
+              }}
+            >
+              <label>
+                Activity title
+                <input
+                  required
+                  maxLength={160}
+                  value={editor.title}
+                  onChange={(e) =>
+                    setEditor({ ...editor, title: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Category
+                <select
+                  value={editor.kind}
+                  onChange={(e) =>
+                    setEditor({
+                      ...editor,
+                      kind: e.target.value as PlanEvent["kind"],
+                      shareable: false,
+                      assistance: undefined,
+                      resourceId: undefined,
+                    })
+                  }
+                >
+                  {Object.entries(labels).map(([k, v]) => (
+                    <option key={k} value={k}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Date
+                <input
+                  required
+                  type="date"
+                  value={editor.date}
+                  onChange={(e) =>
+                    setEditor({ ...editor, date: e.target.value })
+                  }
+                />
+              </label>
+              <div className="pl-form-row">
+                <label>
+                  Start
+                  <TimePicker label="Start time" value={editor.start} onChange={value => setEditor({ ...editor, start: value })} />
+                </label>
+                <label>
+                  End
+                  <TimePicker label="End time" value={editor.end} onChange={value => setEditor({ ...editor, end: value })} />
+                </label>
+              </div>
+              <label className="pl-check">
+                <input
+                  type="checkbox"
+                  checked={editor.flexible}
+                  onChange={(e) =>
+                    setEditor({ ...editor, flexible: e.target.checked })
+                  }
+                />{" "}
+                Time can be adjusted
+              </label>
+              {editor.kind === "care" && (
+                <label className="pl-check">
+                  <input
+                    type="checkbox"
+                    checked={editor.shareable}
+                    onChange={(e) =>
+                      setEditor({ ...editor, shareable: e.target.checked })
+                    }
+                  />{" "}
+                  I can ask someone to share this responsibility
+                </label>
+              )}
+              {!state.events.some((e) => e.id === editor.id) && (
+                <label className="pl-check">
+                  <input
+                    type="checkbox"
+                    checked={repeat}
+                    onChange={(e) => setRepeat(e.target.checked)}
+                  />{" "}
+                  Repeat weekly for 4 weeks (independent activities)
+                </label>
+              )}
+              {editor.assistance && (
+                <p>
+                  Changing the title, time or sharing setting clears this
+                  request. Tell your helper about any changes.
+                </p>
+              )}
+              {formError && (
+                <p role="alert" className="pl-error">
+                  {formError}
+                </p>
+              )}
+              <button className="pl-primary" disabled={busy} type="submit">
+                {busy ? "Saving…" : "Save activity"}
+              </button>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+      <Dialog {...dialogProps2}>
+        <DialogContent className="pl-modal">
+          <DialogTitle>Prepare a WhatsApp request</DialogTitle>
+          <DialogDescription>
+            Only the message below will be shared. Review it before opening
+            WhatsApp.
+          </DialogDescription>
+          <label>
+            Who would you like to ask?
+            <input
+              maxLength={80}
+              value={helper}
+              onChange={(e) => {
+                setHelper(e.target.value);
+                if (selected)
+                  setMessage(
+                    requestMessage(selected, e.target.value || "there"),
+                  );
+              }}
+              placeholder="Family member’s name"
+            />
+          </label>
+          <label>
+            Message
+            <textarea
+              rows={6}
+              maxLength={2000}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+          </label>
+          <p>
+            You will choose the recipient in WhatsApp. No message is sent from
+            this website.
+          </p>
+          {formError && <p role="alert">{formError}</p>}
+          <button className="pl-primary" disabled={busy} onClick={saveRequest}>
+            Save request draft
+          </button>
+        </DialogContent>
+      </Dialog>
+      <Dialog {...dialogProps3}>
+        <DialogContent className="pl-modal">
+          <DialogTitle>Delete this activity?</DialogTitle>
+          <DialogDescription>
+            Only this occurrence will be deleted. If you have asked someone for
+            help, let them know separately.
+          </DialogDescription>
+          <button
+            className="pl-primary"
+            disabled={busy}
+            onClick={async () => {
+              if (
+                selected &&
+                (await commit(state.events.filter((e) => e.id !== selected.id)))
+              ) {
+                setDeleteOpen(false);
+                setSelectedId("");
+              }
+            }}
+          >
+            Delete activity
+          </button>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

@@ -5,11 +5,13 @@ export interface ProfileTask {
   id: string;
   wording: string;
   timeSpent: string;
+  notes?: string;
   responsibility: string;
   routineProcessingLevel: TaskAssessmentContextLevel;
   informationUseLevel: TaskAssessmentContextLevel;
   humanInteractionLevel: TaskAssessmentContextLevel;
   judgementLevel: TaskAssessmentContextLevel;
+  practice?: TaskPractice;
   source: ProfileTaskSource;
   iloTaskId?: string;
   originalWording?: string;
@@ -21,9 +23,26 @@ export interface ProfileTask {
 export interface TaskEditorValues {
   wording: string;
   timeSpent: string;
-  responsibility: string;
-  routineProcessingLevel: TaskAssessmentContextLevel;
-  informationUseLevel: TaskAssessmentContextLevel;
-  humanInteractionLevel: TaskAssessmentContextLevel;
-  judgementLevel: TaskAssessmentContextLevel;
+  notes: string;
+}
+
+export type TrialQuality = "met" | "partly" | "not_met";
+export interface TaskBaseline {
+  minutes: number;
+  workload: string;
+  taskWording: string;
+}
+export interface TaskTrial {
+  id: string;
+  createdAt: string;
+  taskWording: string;
+  workload: string;
+  minutes: number;
+  quality: TrialQuality;
+  baselineMinutes: number | null;
+  sameWorkload: boolean;
+}
+export interface TaskPractice {
+  baseline?: TaskBaseline;
+  trials: TaskTrial[];
 }

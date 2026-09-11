@@ -1,6 +1,9 @@
+import type { ComponentProps } from "react";
+import AccountMenu from "@/components/account/AccountMenu";
+import { useAccount } from "@/components/account/useAccount";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, User, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 import Logo from "@/components/common/Logo";
 import { ROUTES } from "@/constants/routes";
@@ -8,8 +11,19 @@ import { ROUTES } from "@/constants/routes";
 import { NAV_LINKS } from "./homeData";
 
 const LandingNav = () => {
+  const { user } = useAccount();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const linkProps1 = {
+    to: user ? ROUTES.aiExposure : ROUTES.workProfile,
+    className: "btn btn-primary btn-sm",
+    style: { color: "#fff" },
+  } satisfies Partial<ComponentProps<typeof Link>>;
+  const linkProps2 = {
+    to: user ? ROUTES.aiExposure : ROUTES.workProfile,
+    className: "btn btn-primary btn-sm",
+    style: { color: "#fff", alignSelf: "flex-start" },
+  } satisfies Partial<ComponentProps<typeof Link>>;
   return (
     <nav className="landing-nav">
       <div className="nav-inner">
@@ -20,12 +34,8 @@ const LandingNav = () => {
               {link.label}
             </a>
           ))}
-          <Link to={ROUTES.workProfile} className="btn btn-primary btn-sm" style={{ color: "#fff" }}>
-            Start free analysis
-          </Link>
-          <button type="button" aria-label="Account" className="landing-nav-avatar">
-            <User className="h-4 w-4" aria-hidden />
-          </button>
+          <Link {...linkProps1}>Start free analysis</Link>
+          <AccountMenu iconOnly />
         </div>
         <button
           type="button"
@@ -33,22 +43,25 @@ const LandingNav = () => {
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           onClick={() => setMobileOpen((open) => !open)}
         >
-          {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          {mobileOpen ? (
+            <X className="h-4 w-4" />
+          ) : (
+            <Menu className="h-4 w-4" />
+          )}
         </button>
       </div>
       <div className={`mobile-panel container ${mobileOpen ? "open" : ""}`}>
         {NAV_LINKS.map((link) => (
-          <a key={link.href} href={link.href} onClick={() => setMobileOpen(false)}>
+          <a
+            key={link.href}
+            href={link.href}
+            onClick={() => setMobileOpen(false)}
+          >
             {link.label}
           </a>
         ))}
-        <Link
-          to={ROUTES.workProfile}
-          className="btn btn-primary btn-sm"
-          style={{ color: "#fff", alignSelf: "flex-start" }}
-        >
-          Start free analysis
-        </Link>
+        <Link {...linkProps2}>Start free analysis</Link>
+        <AccountMenu iconOnly />
       </div>
     </nav>
   );

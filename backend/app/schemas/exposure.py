@@ -14,7 +14,8 @@ class ExposureResult(BaseModel):
 
 
 TaskAssessmentContextLevel = Literal['low', 'medium', 'high']
-TaskAssessmentMatchLayer = Literal['exact', 'nlp', 'insufficient_data']
+TaskAssessmentMatchLayer = Literal['exact', 'nlp', 'llm', 'insufficient_data']
+TaskAssessmentScoreBand = Literal['low', 'moderate', 'high']
 TaskAssessmentMissingDataStatus = Literal[
     'complete',
     'partial_context',
@@ -47,6 +48,14 @@ class ConfirmedTaskExposureAssessmentBatchRequest(BaseModel):
         min_length=1,
         max_length=50,
     )
+    prefer_llm_match: bool = Field(
+        default=False,
+        description=(
+            'Ask for an AI-assisted task match even when deterministic text '
+            'similarity is below the reliable floor. The AI review can only '
+            'choose from the supplied ILO reference tasks.'
+        ),
+    )
 
 
 class MatchedIloTaskExposureEvidence(BaseModel):
@@ -60,9 +69,34 @@ class MatchedIloTaskExposureEvidence(BaseModel):
 class ConfirmedTaskExposureAssessment(BaseModel):
     task_id: str
     suggested_state: ExposureType
+    potential25: str | None = Field(
+        default=None,
+        description=(
+            'The matched task\'s raw potential25 category from '
+            'Final Scores ISCO08 (Gmyrek et al., 2025).'
+        ),
+    )
     match_layer: TaskAssessmentMatchLayer
     baseline_score: float | None
     adjusted_score: float | None
+    score_band: TaskAssessmentScoreBand | None = Field(
+        default=None,
+        description=(
+            'Band for the adjusted 0-1 task-level exposure index: '
+            'low (<0.25), moderate (0.25-0.55), high (>=0.55).'
+        ),
+    )
+    score_scale: str | None = Field(
+        default=None,
+        description='Plain-language description of what the 0-1 value represents.',
+    )
+    score_explanation: str | None = Field(
+        default=None,
+        description=(
+            'How to read the value: data source, calculation, band, and the '
+            'explicit statement that it is not a date or a job outcome.'
+        ),
+    )
     confidence: float
     source_name: str
     source_year: str

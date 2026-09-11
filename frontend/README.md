@@ -10,9 +10,14 @@ npm install
 npm run dev
 ```
 
-Default URL:
+Fixed development URL:
 
 - `http://127.0.0.1:5173`
+
+Vite uses `strictPort: true`. If port 5173 is occupied, it stops with an
+error instead of selecting another port. Reuse the existing development
+server or stop it before running `npm run dev` again. Do not pass a different
+`--port` argument.
 
 ## Build
 

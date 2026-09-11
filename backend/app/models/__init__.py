@@ -1,3 +1,4 @@
+from app.models.account import Account
 from app.models.capability import Capability
 from app.models.occupation import Occupation
 from app.models.preparation import Preparation

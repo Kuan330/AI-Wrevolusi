@@ -1,9 +1,10 @@
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import type { ComponentProps } from "react";
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
-import { PAGE_GRADIENT_CSS, Palette } from "@/pages/Dashboard/lib/palette"
+import { cn } from "@/lib/utils";
+import { PAGE_GRADIENT_CSS, Palette } from "@/pages/Analysis/lib/palette";
 
 const gradientPillVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-full font-semibold shadow-sm",
@@ -18,31 +19,30 @@ const gradientPillVariants = cva(
       size: "default",
     },
   },
-)
+);
 
 export type GradientPillProps = React.HTMLAttributes<HTMLElement> &
   VariantProps<typeof gradientPillVariants> & {
-    asChild?: boolean
-  }
+    asChild?: boolean;
+  };
 
 const GradientPill = React.forwardRef<HTMLElement, GradientPillProps>(
-  ({ asChild = false, className, size, style, ...props }, ref) => {
-    const Comp = asChild ? Slot : "span"
+  (props, ref) => {
+    const { asChild = false, className, size, style, ...restProps } = props;
 
-    return (
-      <Comp
-        ref={ref}
-        className={cn(gradientPillVariants({ size }), className)}
-        style={{
-          background: PAGE_GRADIENT_CSS,
-          color: Palette.Ink,
-          ...style,
-        }}
-        {...props}
-      />
-    )
+    const Comp = asChild ? Slot : "span";
+
+    const compProps1 = {
+      className: cn("gradient-pill", gradientPillVariants({ size }), className),
+      style: {
+        background: PAGE_GRADIENT_CSS,
+        color: Palette.Ink,
+        ...style,
+      },
+    } satisfies Partial<ComponentProps<typeof Comp>>;
+    return <Comp ref={ref} {...compProps1} {...restProps} />;
   },
-)
-GradientPill.displayName = "GradientPill"
+);
+GradientPill.displayName = "GradientPill";
 
-export { GradientPill, gradientPillVariants }
+export { GradientPill, gradientPillVariants };
