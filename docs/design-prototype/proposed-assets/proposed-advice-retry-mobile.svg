@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844">
+<title>Outdated course advice and retry — proposed Iteration 2</title>
+<defs><linearGradient id="background" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#EEF8FC"/><stop offset="1" stop-color="#FDF0F5"/></linearGradient></defs>
+<rect x="0" y="0" width="390" height="844" rx="0" fill="url(#background)"/>
+<rect x="0" y="0" width="390" height="64" rx="0" fill="#FFFFFF"/>
+<rect x="16" y="14" width="36" height="36" rx="10" fill="#F7F8FA" stroke="#D9DDE5"/>
+<line x1="27" y1="25" x2="41" y2="25" stroke="#2F2430"/>
+<line x1="27" y1="31" x2="41" y2="31" stroke="#2F2430"/>
+<line x1="27" y1="37" x2="41" y2="37" stroke="#2F2430"/>
+<text x="65" y="40" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="600">AI-Wrevolusi</text>
+<text x="350" y="39" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="400">○</text>
+<rect x="0" y="64" width="390" height="34" rx="0" fill="#FFF2DB"/>
+<text x="16" y="86" fill="#694B15" font-family="Inter, Arial, sans-serif" font-size="10.8" font-weight="700">PROPOSED ITERATION 2 — NOT CURRENT BEHAVIOUR</text>
+<text x="20" y="127" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="23" font-weight="650">Course advice</text>
+<text x="20" y="151" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Pandas · Catalogue course</text>
+<rect x="16" y="169" width="358" height="563" rx="20" fill="#FFFFFF" stroke="#D9DDE5"/>
+<rect x="32" y="185" width="188" height="26" rx="13" fill="#FFF2DB"/>
+<text x="43" y="203" fill="#694B15" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600">Outdated · Based on version 1</text>
+<text x="32" y="241" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="600">Your learning focus has changed</text>
+<text x="32" y="266" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400">You confirmed version 2. The older advice</text>
+<text x="32" y="285" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400">below has not been updated.</text>
+<rect x="32" y="319" width="326" height="89" rx="13" fill="#FFF2F4" stroke="#E8BEC5"/>
+<text x="46" y="345" fill="#9B4556" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="600">The update failed</text>
+<text x="46" y="369" fill="#834957" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400">Try again. Your confirmed goal and</text>
+<text x="46" y="387" fill="#834957" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400">selected chapters have been kept.</text>
+<text x="32" y="444" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="600">Previous advice · Prototype example</text>
+<text x="32" y="470" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Practise checking a small sales table.</text>
+<text x="32" y="491" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Compare an AI suggestion with the</text>
+<text x="32" y="512" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">original records before using it.</text>
+<line x1="32" y1="533" x2="358" y2="533" stroke="#D9DDE5"/>
+<text x="32" y="562" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="600">Advice sources</text>
+<text x="32" y="587" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="11.8" font-weight="400">Work task: Check sales records for errors</text>
+<text x="32" y="610" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="11.8" font-weight="400">Course source: Catalogue entry</text>
+<text x="32" y="633" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="11.8" font-weight="400">Provider version: Unknown</text>
+<text x="32" y="656" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="11.8" font-weight="400">Chapter reference: Not available</text>
+<text x="32" y="704" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="500">Guidance does not verify provider claims.</text>
+<rect x="20" y="747" width="164" height="44" rx="23" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="36" y="775" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Review my focus</text>
+<rect x="196" y="747" width="174" height="44" rx="23" fill="#3D5F7A"/>
+<text x="212" y="775" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Retry advice</text>
+<text x="20" y="819" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="400">Retry → Updating → Advice ready or Try again</text>
+</svg>

@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-Wrevolusi · Derived frontend wireframes</title>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#242424;background:#f3f3f3;font:15px/1.5 system-ui,sans-serif}main{max-width:1700px;margin:auto;padding:32px}header{max-width:950px}h1{font-size:32px;line-height:1.2}h2{font-size:21px;margin:0}a{color:#185f89}.notice{padding:16px;border:1px solid #b7b7b7;background:white}nav{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}nav a{padding:6px 10px;border:1px solid #c4c4c4;background:#fff;font-size:13px}.screen{margin:32px 0 56px;padding:20px;background:#fff;border:1px solid #c6c6c6;scroll-margin-top:16px}.meta{color:#555;font-size:13px;margin:8px 0 16px;overflow-wrap:anywhere}.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}figure{margin:0;min-width:0}figcaption{margin-bottom:8px;font-weight:600}figure img{display:block;width:100%;height:auto;border:1px solid #c8c8c8;background:white}.missing{padding:30px;border:1px dashed #999}@media(max-width:760px){main{padding:16px}.screen{padding:12px}.pair{grid-template-columns:1fr}h1{font-size:27px}}
+</style></head><body><main><header><p>AI-WREVOLUSI · EXISTING FRONTEND</p>
+<h1>Wireframes derived from actual screens</h1>
+<p>These 81 assets keep the measured desktop and mobile layouts, text fragments, card shapes and control positions from the current frontend. Colours and images are reduced to neutral shapes.</p>
+<p class="notice">These are local editable SVG review assets. They are <strong>not completed Figma screens</strong> and do not include Figma prototype links. Proposed Iteration 2 changes and future concepts are separate from this existing-behaviour gallery.</p>
+<p>Open either image for its original size. SVG text and shapes remain editable. Text metrics can differ when the captured font is unavailable. Image artwork is represented by labelled placeholders.</p>
+</header><nav aria-label="Screens"><a href="#account-gate-desktop">account-gate-desktop</a><a href="#account-gate-mobile">account-gate-mobile</a><a href="#activity-desktop">activity-desktop</a><a href="#activity-mobile">activity-mobile</a><a href="#arrange-start-desktop">arrange-start-desktop</a><a href="#arrange-start-mobile">arrange-start-mobile</a><a href="#chapters-desktop">chapters-desktop</a><a href="#chapters-mobile">chapters-mobile</a><a href="#chapters-start-desktop">chapters-start-desktop</a><a href="#chapters-start-mobile">chapters-start-mobile</a><a href="#complete-desktop">complete-desktop</a><a href="#complete-mobile">complete-mobile</a><a href="#conflict-review-desktop">conflict-review-desktop</a><a href="#conflict-review-mobile">conflict-review-mobile</a><a href="#content-desktop">content-desktop</a><a href="#content-mobile">content-mobile</a><a href="#content-start-desktop">content-start-desktop</a><a href="#content-start-mobile">content-start-mobile</a><a href="#course-desktop">course-desktop</a><a href="#course-mobile">course-mobile</a><a href="#course-start-desktop">course-start-desktop</a><a href="#course-start-mobile">course-start-mobile</a><a href="#exposure-desktop">exposure-desktop</a><a href="#exposure-mobile">exposure-mobile</a><a href="#focus-desktop">focus-desktop</a><a href="#focus-mobile">focus-mobile</a><a href="#help-accepted-desktop">help-accepted-desktop</a><a href="#help-accepted-mobile">help-accepted-mobile</a><a href="#help-declined-desktop">help-declined-desktop</a><a href="#help-declined-mobile">help-declined-mobile</a><a href="#help-draft-desktop">help-draft-desktop</a><a href="#help-draft-mobile">help-draft-mobile</a><a href="#help-request-desktop">help-request-desktop</a><a href="#help-request-mobile">help-request-mobile</a><a href="#help-status-desktop">help-status-desktop</a><a href="#help-status-mobile">help-status-mobile</a><a href="#help-waiting-desktop">help-waiting-desktop</a><a href="#help-waiting-mobile">help-waiting-mobile</a><a href="#home-desktop">home-desktop</a><a href="#home-mobile">home-mobile</a><a href="#occupation-desktop">occupation-desktop</a><a href="#occupation-mobile">occupation-mobile</a><a href="#occupation-selected-desktop">occupation-selected-desktop</a><a href="#occupation-selected-mobile">occupation-selected-mobile</a><a href="#plan-completed-desktop">plan-completed-desktop</a><a href="#plan-completed-mobile">plan-completed-mobile</a><a href="#plan-conflict-desktop">plan-conflict-desktop</a><a href="#plan-conflict-mobile">plan-conflict-mobile</a><a href="#plan-desktop">plan-desktop</a><a href="#plan-empty-desktop">plan-empty-desktop</a><a href="#plan-empty-mobile">plan-empty-mobile</a><a href="#plan-mobile">plan-mobile</a><a href="#plan-resolved-desktop">plan-resolved-desktop</a><a href="#plan-resolved-mobile">plan-resolved-mobile</a><a href="#resources-desktop">resources-desktop</a><a href="#resources-mobile">resources-mobile</a><a href="#resources-start-desktop">resources-start-desktop</a><a href="#resources-start-mobile">resources-start-mobile</a><a href="#routine-desktop">routine-desktop</a><a href="#routine-error-mobile">routine-error-mobile</a><a href="#routine-mobile">routine-mobile</a><a href="#routine-start-desktop">routine-start-desktop</a><a href="#routine-start-mobile">routine-start-mobile</a><a href="#saved-desktop">saved-desktop</a><a href="#saved-mobile">saved-mobile</a><a href="#search-mode-desktop">search-mode-desktop</a><a href="#search-mode-mobile">search-mode-mobile</a><a href="#search-results-desktop">search-results-desktop</a><a href="#search-results-mobile">search-results-mobile</a><a href="#session-desktop">session-desktop</a><a href="#session-mobile">session-mobile</a><a href="#sign-in-desktop">sign-in-desktop</a><a href="#sign-in-mobile">sign-in-mobile</a><a href="#skills-desktop">skills-desktop</a><a href="#skills-mobile">skills-mobile</a><a href="#skills-signed-desktop">skills-signed-desktop</a><a href="#skills-signed-mobile">skills-signed-mobile</a><a href="#task-editor-desktop">task-editor-desktop</a><a href="#task-editor-mobile">task-editor-mobile</a><a href="#tasks-desktop">tasks-desktop</a><a href="#tasks-mobile">tasks-mobile</a></nav><section class="screen" id="account-gate-desktop">
+<h2>account-gate-desktop</h2>
+<p class="meta">1440 × 1001 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/account-gate-desktop.jpg"><img src="../layout-captures/account-gate-desktop.jpg" alt="Actual frontend: account-gate-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="account-gate-desktop.svg" download>Download SVG</a></figcaption>
+<a href="account-gate-desktop.svg"><img src="account-gate-desktop.svg" alt="Derived wireframe: account-gate-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/account-gate-desktop.json">account-gate-desktop.json</a> · 30 text fragments · 14 shapes · 10 control regions</p>
+</section><section class="screen" id="account-gate-mobile">
+<h2>account-gate-mobile</h2>
+<p class="meta">390 × 1057 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/account-gate-mobile.jpg"><img src="../layout-captures/account-gate-mobile.jpg" alt="Actual frontend: account-gate-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="account-gate-mobile.svg" download>Download SVG</a></figcaption>
+<a href="account-gate-mobile.svg"><img src="account-gate-mobile.svg" alt="Derived wireframe: account-gate-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/account-gate-mobile.json">account-gate-mobile.json</a> · 30 text fragments · 14 shapes · 4 control regions</p>
+</section><section class="screen" id="activity-desktop">
+<h2>activity-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/activity-desktop.jpg"><img src="../layout-captures/activity-desktop.jpg" alt="Actual frontend: activity-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="activity-desktop.svg" download>Download SVG</a></figcaption>
+<a href="activity-desktop.svg"><img src="activity-desktop.svg" alt="Derived wireframe: activity-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/activity-desktop.json">activity-desktop.json</a> · 15 text fragments · 7 shapes · 9 control regions</p>
+</section><section class="screen" id="activity-mobile">
+<h2>activity-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/activity-mobile.jpg"><img src="../layout-captures/activity-mobile.jpg" alt="Actual frontend: activity-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="activity-mobile.svg" download>Download SVG</a></figcaption>
+<a href="activity-mobile.svg"><img src="activity-mobile.svg" alt="Derived wireframe: activity-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/activity-mobile.json">activity-mobile.json</a> · 15 text fragments · 7 shapes · 9 control regions</p>
+</section><section class="screen" id="arrange-start-desktop">
+<h2>arrange-start-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/arrange-start-desktop.jpg"><img src="../layout-captures/arrange-start-desktop.jpg" alt="Actual frontend: arrange-start-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="arrange-start-desktop.svg" download>Download SVG</a></figcaption>
+<a href="arrange-start-desktop.svg"><img src="arrange-start-desktop.svg" alt="Derived wireframe: arrange-start-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/arrange-start-desktop.json">arrange-start-desktop.json</a> · 20 text fragments · 6 shapes · 5 control regions</p>
+</section><section class="screen" id="arrange-start-mobile">
+<h2>arrange-start-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/arrange-start-mobile.jpg"><img src="../layout-captures/arrange-start-mobile.jpg" alt="Actual frontend: arrange-start-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="arrange-start-mobile.svg" download>Download SVG</a></figcaption>
+<a href="arrange-start-mobile.svg"><img src="arrange-start-mobile.svg" alt="Derived wireframe: arrange-start-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/arrange-start-mobile.json">arrange-start-mobile.json</a> · 22 text fragments · 6 shapes · 5 control regions</p>
+</section><section class="screen" id="chapters-desktop">
+<h2>chapters-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/chapters-desktop.jpg"><img src="../layout-captures/chapters-desktop.jpg" alt="Actual frontend: chapters-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="chapters-desktop.svg" download>Download SVG</a></figcaption>
+<a href="chapters-desktop.svg"><img src="chapters-desktop.svg" alt="Derived wireframe: chapters-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/chapters-desktop.json">chapters-desktop.json</a> · 36 text fragments · 19 shapes · 7 control regions</p>
+</section><section class="screen" id="chapters-mobile">
+<h2>chapters-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/chapters-mobile.jpg"><img src="../layout-captures/chapters-mobile.jpg" alt="Actual frontend: chapters-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="chapters-mobile.svg" download>Download SVG</a></figcaption>
+<a href="chapters-mobile.svg"><img src="chapters-mobile.svg" alt="Derived wireframe: chapters-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/chapters-mobile.json">chapters-mobile.json</a> · 34 text fragments · 18 shapes · 7 control regions</p>
+</section><section class="screen" id="chapters-start-desktop">
+<h2>chapters-start-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/chapters-start-desktop.jpg"><img src="../layout-captures/chapters-start-desktop.jpg" alt="Actual frontend: chapters-start-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="chapters-start-desktop.svg" download>Download SVG</a></figcaption>
+<a href="chapters-start-desktop.svg"><img src="chapters-start-desktop.svg" alt="Derived wireframe: chapters-start-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/chapters-start-desktop.json">chapters-start-desktop.json</a> · 34 text fragments · 18 shapes · 6 control regions</p>
+</section><section class="screen" id="chapters-start-mobile">
+<h2>chapters-start-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/chapters-start-mobile.jpg"><img src="../layout-captures/chapters-start-mobile.jpg" alt="Actual frontend: chapters-start-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="chapters-start-mobile.svg" download>Download SVG</a></figcaption>
+<a href="chapters-start-mobile.svg"><img src="chapters-start-mobile.svg" alt="Derived wireframe: chapters-start-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/chapters-start-mobile.json">chapters-start-mobile.json</a> · 35 text fragments · 18 shapes · 6 control regions</p>
+</section><section class="screen" id="complete-desktop">
+<h2>complete-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/complete-desktop.jpg"><img src="../layout-captures/complete-desktop.jpg" alt="Actual frontend: complete-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="complete-desktop.svg" download>Download SVG</a></figcaption>
+<a href="complete-desktop.svg"><img src="complete-desktop.svg" alt="Derived wireframe: complete-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/complete-desktop.json">complete-desktop.json</a> · 34 text fragments · 9 shapes · 7 control regions</p>
+</section><section class="screen" id="complete-mobile">
+<h2>complete-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/complete-mobile.jpg"><img src="../layout-captures/complete-mobile.jpg" alt="Actual frontend: complete-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="complete-mobile.svg" download>Download SVG</a></figcaption>
+<a href="complete-mobile.svg"><img src="complete-mobile.svg" alt="Derived wireframe: complete-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/complete-mobile.json">complete-mobile.json</a> · 36 text fragments · 9 shapes · 7 control regions</p>
+</section><section class="screen" id="conflict-review-desktop">
+<h2>conflict-review-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/conflict-review-desktop.jpg"><img src="../layout-captures/conflict-review-desktop.jpg" alt="Actual frontend: conflict-review-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="conflict-review-desktop.svg" download>Download SVG</a></figcaption>
+<a href="conflict-review-desktop.svg"><img src="conflict-review-desktop.svg" alt="Derived wireframe: conflict-review-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/conflict-review-desktop.json">conflict-review-desktop.json</a> · 32 text fragments · 12 shapes · 7 control regions</p>
+</section><section class="screen" id="conflict-review-mobile">
+<h2>conflict-review-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/conflict-review-mobile.jpg"><img src="../layout-captures/conflict-review-mobile.jpg" alt="Actual frontend: conflict-review-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="conflict-review-mobile.svg" download>Download SVG</a></figcaption>
+<a href="conflict-review-mobile.svg"><img src="conflict-review-mobile.svg" alt="Derived wireframe: conflict-review-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/conflict-review-mobile.json">conflict-review-mobile.json</a> · 32 text fragments · 10 shapes · 6 control regions</p>
+</section><section class="screen" id="content-desktop">
+<h2>content-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/content-desktop.jpg"><img src="../layout-captures/content-desktop.jpg" alt="Actual frontend: content-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="content-desktop.svg" download>Download SVG</a></figcaption>
+<a href="content-desktop.svg"><img src="content-desktop.svg" alt="Derived wireframe: content-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/content-desktop.json">content-desktop.json</a> · 25 text fragments · 8 shapes · 5 control regions</p>
+</section><section class="screen" id="content-mobile">
+<h2>content-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/content-mobile.jpg"><img src="../layout-captures/content-mobile.jpg" alt="Actual frontend: content-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="content-mobile.svg" download>Download SVG</a></figcaption>
+<a href="content-mobile.svg"><img src="content-mobile.svg" alt="Derived wireframe: content-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/content-mobile.json">content-mobile.json</a> · 26 text fragments · 8 shapes · 5 control regions</p>
+</section><section class="screen" id="content-start-desktop">
+<h2>content-start-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/content-start-desktop.jpg"><img src="../layout-captures/content-start-desktop.jpg" alt="Actual frontend: content-start-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="content-start-desktop.svg" download>Download SVG</a></figcaption>
+<a href="content-start-desktop.svg"><img src="content-start-desktop.svg" alt="Derived wireframe: content-start-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/content-start-desktop.json">content-start-desktop.json</a> · 24 text fragments · 7 shapes · 5 control regions</p>
+</section><section class="screen" id="content-start-mobile">
+<h2>content-start-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/content-start-mobile.jpg"><img src="../layout-captures/content-start-mobile.jpg" alt="Actual frontend: content-start-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="content-start-mobile.svg" download>Download SVG</a></figcaption>
+<a href="content-start-mobile.svg"><img src="content-start-mobile.svg" alt="Derived wireframe: content-start-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/content-start-mobile.json">content-start-mobile.json</a> · 25 text fragments · 7 shapes · 5 control regions</p>
+</section><section class="screen" id="course-desktop">
+<h2>course-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/course-desktop.jpg"><img src="../layout-captures/course-desktop.jpg" alt="Actual frontend: course-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="course-desktop.svg" download>Download SVG</a></figcaption>
+<a href="course-desktop.svg"><img src="course-desktop.svg" alt="Derived wireframe: course-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/course-desktop.json">course-desktop.json</a> · 44 text fragments · 8 shapes · 7 control regions</p>
+</section><section class="screen" id="course-mobile">
+<h2>course-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/course-mobile.jpg"><img src="../layout-captures/course-mobile.jpg" alt="Actual frontend: course-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="course-mobile.svg" download>Download SVG</a></figcaption>
+<a href="course-mobile.svg"><img src="course-mobile.svg" alt="Derived wireframe: course-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/course-mobile.json">course-mobile.json</a> · 32 text fragments · 8 shapes · 7 control regions</p>
+</section><section class="screen" id="course-start-desktop">
+<h2>course-start-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/course-start-desktop.jpg"><img src="../layout-captures/course-start-desktop.jpg" alt="Actual frontend: course-start-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="course-start-desktop.svg" download>Download SVG</a></figcaption>
+<a href="course-start-desktop.svg"><img src="course-start-desktop.svg" alt="Derived wireframe: course-start-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/course-start-desktop.json">course-start-desktop.json</a> · 42 text fragments · 7 shapes · 6 control regions</p>
+</section><section class="screen" id="course-start-mobile">
+<h2>course-start-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/course-start-mobile.jpg"><img src="../layout-captures/course-start-mobile.jpg" alt="Actual frontend: course-start-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="course-start-mobile.svg" download>Download SVG</a></figcaption>
+<a href="course-start-mobile.svg"><img src="course-start-mobile.svg" alt="Derived wireframe: course-start-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/course-start-mobile.json">course-start-mobile.json</a> · 36 text fragments · 7 shapes · 6 control regions</p>
+</section><section class="screen" id="exposure-desktop">
+<h2>exposure-desktop</h2>
+<p class="meta">1440 × 1622 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/exposure-desktop.jpg"><img src="../layout-captures/exposure-desktop.jpg" alt="Actual frontend: exposure-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="exposure-desktop.svg" download>Download SVG</a></figcaption>
+<a href="exposure-desktop.svg"><img src="exposure-desktop.svg" alt="Derived wireframe: exposure-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/exposure-desktop.json">exposure-desktop.json</a> · 89 text fragments · 36 shapes · 26 control regions</p>
+</section><section class="screen" id="exposure-mobile">
+<h2>exposure-mobile</h2>
+<p class="meta">390 × 3192 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/exposure-mobile.jpg"><img src="../layout-captures/exposure-mobile.jpg" alt="Actual frontend: exposure-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="exposure-mobile.svg" download>Download SVG</a></figcaption>
+<a href="exposure-mobile.svg"><img src="exposure-mobile.svg" alt="Derived wireframe: exposure-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/exposure-mobile.json">exposure-mobile.json</a> · 105 text fragments · 37 shapes · 22 control regions</p>
+</section><section class="screen" id="focus-desktop">
+<h2>focus-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/focus-desktop.jpg"><img src="../layout-captures/focus-desktop.jpg" alt="Actual frontend: focus-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="focus-desktop.svg" download>Download SVG</a></figcaption>
+<a href="focus-desktop.svg"><img src="focus-desktop.svg" alt="Derived wireframe: focus-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/focus-desktop.json">focus-desktop.json</a> · 17 text fragments · 10 shapes · 9 control regions</p>
+</section><section class="screen" id="focus-mobile">
+<h2>focus-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/focus-mobile.jpg"><img src="../layout-captures/focus-mobile.jpg" alt="Actual frontend: focus-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="focus-mobile.svg" download>Download SVG</a></figcaption>
+<a href="focus-mobile.svg"><img src="focus-mobile.svg" alt="Derived wireframe: focus-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/focus-mobile.json">focus-mobile.json</a> · 18 text fragments · 10 shapes · 9 control regions</p>
+</section><section class="screen" id="help-accepted-desktop">
+<h2>help-accepted-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/help-accepted-desktop.jpg"><img src="../layout-captures/help-accepted-desktop.jpg" alt="Actual frontend: help-accepted-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="help-accepted-desktop.svg" download>Download SVG</a></figcaption>
+<a href="help-accepted-desktop.svg"><img src="help-accepted-desktop.svg" alt="Derived wireframe: help-accepted-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/help-accepted-desktop.json">help-accepted-desktop.json</a> · 28 text fragments · 11 shapes · 6 control regions</p>
+</section><section class="screen" id="help-accepted-mobile">
+<h2>help-accepted-mobile</h2>
+<p class="meta">390 × 891 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/help-accepted-mobile.jpg"><img src="../layout-captures/help-accepted-mobile.jpg" alt="Actual frontend: help-accepted-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="help-accepted-mobile.svg" download>Download SVG</a></figcaption>
+<a href="help-accepted-mobile.svg"><img src="help-accepted-mobile.svg" alt="Derived wireframe: help-accepted-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/help-accepted-mobile.json">help-accepted-mobile.json</a> · 32 text fragments · 11 shapes · 6 control regions</p>
+</section><section class="screen" id="help-declined-desktop">
+<h2>help-declined-desktop</h2>
+<p class="meta">1440 × 1313 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/help-declined-desktop.jpg"><img src="../layout-captures/help-declined-desktop.jpg" alt="Actual frontend: help-declined-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="help-declined-desktop.svg" download>Download SVG</a></figcaption>
+<a href="help-declined-desktop.svg"><img src="help-declined-desktop.svg" alt="Derived wireframe: help-declined-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/help-declined-desktop.json">help-declined-desktop.json</a> · 40 text fragments · 16 shapes · 10 control regions</p>
+</section><section class="screen" id="help-declined-mobile">
+<h2>help-declined-mobile</h2>
+<p class="meta">390 × 1433 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/help-declined-mobile.jpg"><img src="../layout-captures/help-declined-mobile.jpg" alt="Actual frontend: help-declined-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="help-declined-mobile.svg" download>Download SVG</a></figcaption>
+<a href="help-declined-mobile.svg"><img src="help-declined-mobile.svg" alt="Derived wireframe: help-declined-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/help-declined-mobile.json">help-declined-mobile.json</a> · 46 text fragments · 16 shapes · 10 control regions</p>
+</section><section class="screen" id="help-draft-desktop">
+<h2>help-draft-desktop</h2>
+<p class="meta">1440 × 1403 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/help-draft-desktop.jpg"><img src="../layout-captures/help-draft-desktop.jpg" alt="Actual frontend: help-draft-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="help-draft-desktop.svg" download>Download SVG</a></figcaption>
+<a href="help-draft-desktop.svg"><img src="help-draft-desktop.svg" alt="Derived wireframe: help-draft-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/help-draft-desktop.json">help-draft-desktop.json</a> · 105 text fragments · 140 shapes · 132 control regions</p>
+</section><section class="screen" id="help-draft-mobile">
+<h2>help-draft-mobile</h2>
+<p class="meta">390 × 1719 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/help-draft-mobile.jpg"><img src="../layout-captures/help-draft-mobile.jpg" alt="Actual frontend: help-draft-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="help-draft-mobile.svg" download>Download SVG</a></figcaption>
+<a href="help-draft-mobile.svg"><img src="help-draft-mobile.svg" alt="Derived wireframe: help-draft-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/help-draft-mobile.json">help-draft-mobile.json</a> · 90 text fragments · 69 shapes · 57 control regions</p>
+</section><section class="screen" id="help-request-desktop">
+<h2>help-request-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/help-request-desktop.jpg"><img src="../layout-captures/help-request-desktop.jpg" alt="Actual frontend: help-request-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="help-request-desktop.svg" download>Download SVG</a></figcaption>
+<a href="help-request-desktop.svg"><img src="help-request-desktop.svg" alt="Derived wireframe: help-request-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/help-request-desktop.json">help-request-desktop.json</a> · 9 text fragments · 4 shapes · 4 control regions</p>
+</section><section class="screen" id="help-request-mobile">
+<h2>help-request-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/help-request-mobile.jpg"><img src="../layout-captures/help-request-mobile.jpg" alt="Actual frontend: help-request-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="help-request-mobile.svg" download>Download SVG</a></figcaption>
+<a href="help-request-mobile.svg"><img src="help-request-mobile.svg" alt="Derived wireframe: help-request-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/help-request-mobile.json">help-request-mobile.json</a> · 11 text fragments · 4 shapes · 4 control regions</p>
+</section><section class="screen" id="help-status-desktop">
+<h2>help-status-desktop</h2>
+<p class="meta">1440 × 1451 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/help-status-desktop.jpg"><img src="../layout-captures/help-status-desktop.jpg" alt="Actual frontend: help-status-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="help-status-desktop.svg" download>Download SVG</a></figcaption>
+<a href="help-status-desktop.svg"><img src="help-status-desktop.svg" alt="Derived wireframe: help-status-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/help-status-desktop.json">help-status-desktop.json</a> · 44 text fragments · 18 shapes · 12 control regions</p>
+</section><section class="screen" id="help-status-mobile">
+<h2>help-status-mobile</h2>
+<p class="meta">390 × 1571 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/help-status-mobile.jpg"><img src="../layout-captures/help-status-mobile.jpg" alt="Actual frontend: help-status-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="help-status-mobile.svg" download>Download SVG</a></figcaption>
+<a href="help-status-mobile.svg"><img src="help-status-mobile.svg" alt="Derived wireframe: help-status-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/help-status-mobile.json">help-status-mobile.json</a> · 50 text fragments · 18 shapes · 12 control regions</p>
+</section><section class="screen" id="help-waiting-desktop">
+<h2>help-waiting-desktop</h2>
+<p class="meta">1440 × 1403 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/help-waiting-desktop.jpg"><img src="../layout-captures/help-waiting-desktop.jpg" alt="Actual frontend: help-waiting-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="help-waiting-desktop.svg" download>Download SVG</a></figcaption>
+<a href="help-waiting-desktop.svg"><img src="help-waiting-desktop.svg" alt="Derived wireframe: help-waiting-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/help-waiting-desktop.json">help-waiting-desktop.json</a> · 43 text fragments · 17 shapes · 11 control regions</p>
+</section><section class="screen" id="help-waiting-mobile">
+<h2>help-waiting-mobile</h2>
+<p class="meta">390 × 1523 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/help-waiting-mobile.jpg"><img src="../layout-captures/help-waiting-mobile.jpg" alt="Actual frontend: help-waiting-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="help-waiting-mobile.svg" download>Download SVG</a></figcaption>
+<a href="help-waiting-mobile.svg"><img src="help-waiting-mobile.svg" alt="Derived wireframe: help-waiting-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/help-waiting-mobile.json">help-waiting-mobile.json</a> · 49 text fragments · 17 shapes · 11 control regions</p>
+</section><section class="screen" id="home-desktop">
+<h2>home-desktop</h2>
+<p class="meta">1440 × 2577 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/home-desktop.jpg"><img src="../layout-captures/home-desktop.jpg" alt="Actual frontend: home-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="home-desktop.svg" download>Download SVG</a></figcaption>
+<a href="home-desktop.svg"><img src="home-desktop.svg" alt="Derived wireframe: home-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/home-desktop.json">home-desktop.json</a> · 75 text fragments · 29 shapes · 10 control regions</p>
+</section><section class="screen" id="home-mobile">
+<h2>home-mobile</h2>
+<p class="meta">390 × 5256 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/home-mobile.jpg"><img src="../layout-captures/home-mobile.jpg" alt="Actual frontend: home-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="home-mobile.svg" download>Download SVG</a></figcaption>
+<a href="home-mobile.svg"><img src="home-mobile.svg" alt="Derived wireframe: home-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/home-mobile.json">home-mobile.json</a> · 60 text fragments · 28 shapes · 7 control regions</p>
+</section><section class="screen" id="occupation-desktop">
+<h2>occupation-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/occupation-desktop.jpg"><img src="../layout-captures/occupation-desktop.jpg" alt="Actual frontend: occupation-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="occupation-desktop.svg" download>Download SVG</a></figcaption>
+<a href="occupation-desktop.svg"><img src="occupation-desktop.svg" alt="Derived wireframe: occupation-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/occupation-desktop.json">occupation-desktop.json</a> · 21 text fragments · 13 shapes · 9 control regions</p>
+</section><section class="screen" id="occupation-mobile">
+<h2>occupation-mobile</h2>
+<p class="meta">390 × 927 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/occupation-mobile.jpg"><img src="../layout-captures/occupation-mobile.jpg" alt="Actual frontend: occupation-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="occupation-mobile.svg" download>Download SVG</a></figcaption>
+<a href="occupation-mobile.svg"><img src="occupation-mobile.svg" alt="Derived wireframe: occupation-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/occupation-mobile.json">occupation-mobile.json</a> · 25 text fragments · 13 shapes · 9 control regions</p>
+</section><section class="screen" id="occupation-selected-desktop">
+<h2>occupation-selected-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/occupation-selected-desktop.jpg"><img src="../layout-captures/occupation-selected-desktop.jpg" alt="Actual frontend: occupation-selected-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="occupation-selected-desktop.svg" download>Download SVG</a></figcaption>
+<a href="occupation-selected-desktop.svg"><img src="occupation-selected-desktop.svg" alt="Derived wireframe: occupation-selected-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/occupation-selected-desktop.json">occupation-selected-desktop.json</a> · 15 text fragments · 10 shapes · 6 control regions</p>
+</section><section class="screen" id="occupation-selected-mobile">
+<h2>occupation-selected-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/occupation-selected-mobile.jpg"><img src="../layout-captures/occupation-selected-mobile.jpg" alt="Actual frontend: occupation-selected-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="occupation-selected-mobile.svg" download>Download SVG</a></figcaption>
+<a href="occupation-selected-mobile.svg"><img src="occupation-selected-mobile.svg" alt="Derived wireframe: occupation-selected-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/occupation-selected-mobile.json">occupation-selected-mobile.json</a> · 18 text fragments · 10 shapes · 6 control regions</p>
+</section><section class="screen" id="plan-completed-desktop">
+<h2>plan-completed-desktop</h2>
+<p class="meta">1440 × 1340 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/plan-completed-desktop.jpg"><img src="../layout-captures/plan-completed-desktop.jpg" alt="Actual frontend: plan-completed-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="plan-completed-desktop.svg" download>Download SVG</a></figcaption>
+<a href="plan-completed-desktop.svg"><img src="plan-completed-desktop.svg" alt="Derived wireframe: plan-completed-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/plan-completed-desktop.json">plan-completed-desktop.json</a> · 90 text fragments · 136 shapes · 128 control regions</p>
+</section><section class="screen" id="plan-completed-mobile">
+<h2>plan-completed-mobile</h2>
+<p class="meta">390 × 1633 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/plan-completed-mobile.jpg"><img src="../layout-captures/plan-completed-mobile.jpg" alt="Actual frontend: plan-completed-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="plan-completed-mobile.svg" download>Download SVG</a></figcaption>
+<a href="plan-completed-mobile.svg"><img src="plan-completed-mobile.svg" alt="Derived wireframe: plan-completed-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/plan-completed-mobile.json">plan-completed-mobile.json</a> · 76 text fragments · 66 shapes · 54 control regions</p>
+</section><section class="screen" id="plan-conflict-desktop">
+<h2>plan-conflict-desktop</h2>
+<p class="meta">1440 × 1380 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/plan-conflict-desktop.jpg"><img src="../layout-captures/plan-conflict-desktop.jpg" alt="Actual frontend: plan-conflict-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="plan-conflict-desktop.svg" download>Download SVG</a></figcaption>
+<a href="plan-conflict-desktop.svg"><img src="plan-conflict-desktop.svg" alt="Derived wireframe: plan-conflict-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/plan-conflict-desktop.json">plan-conflict-desktop.json</a> · 104 text fragments · 140 shapes · 132 control regions</p>
+</section><section class="screen" id="plan-conflict-mobile">
+<h2>plan-conflict-mobile</h2>
+<p class="meta">390 × 1696 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/plan-conflict-mobile.jpg"><img src="../layout-captures/plan-conflict-mobile.jpg" alt="Actual frontend: plan-conflict-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="plan-conflict-mobile.svg" download>Download SVG</a></figcaption>
+<a href="plan-conflict-mobile.svg"><img src="plan-conflict-mobile.svg" alt="Derived wireframe: plan-conflict-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/plan-conflict-mobile.json">plan-conflict-mobile.json</a> · 87 text fragments · 66 shapes · 54 control regions</p>
+</section><section class="screen" id="plan-desktop">
+<h2>plan-desktop</h2>
+<p class="meta">1440 × 1317 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/plan-desktop.jpg"><img src="../layout-captures/plan-desktop.jpg" alt="Actual frontend: plan-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="plan-desktop.svg" download>Download SVG</a></figcaption>
+<a href="plan-desktop.svg"><img src="plan-desktop.svg" alt="Derived wireframe: plan-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/plan-desktop.json">plan-desktop.json</a> · 91 text fragments · 143 shapes · 135 control regions</p>
+</section><section class="screen" id="plan-empty-desktop">
+<h2>plan-empty-desktop</h2>
+<p class="meta">1440 × 1286 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/plan-empty-desktop.jpg"><img src="../layout-captures/plan-empty-desktop.jpg" alt="Actual frontend: plan-empty-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="plan-empty-desktop.svg" download>Download SVG</a></figcaption>
+<a href="plan-empty-desktop.svg"><img src="plan-empty-desktop.svg" alt="Derived wireframe: plan-empty-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/plan-empty-desktop.json">plan-empty-desktop.json</a> · 97 text fragments · 152 shapes · 145 control regions</p>
+</section><section class="screen" id="plan-empty-mobile">
+<h2>plan-empty-mobile</h2>
+<p class="meta">390 × 1709 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/plan-empty-mobile.jpg"><img src="../layout-captures/plan-empty-mobile.jpg" alt="Actual frontend: plan-empty-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="plan-empty-mobile.svg" download>Download SVG</a></figcaption>
+<a href="plan-empty-mobile.svg"><img src="plan-empty-mobile.svg" alt="Derived wireframe: plan-empty-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/plan-empty-mobile.json">plan-empty-mobile.json</a> · 82 text fragments · 75 shapes · 64 control regions</p>
+</section><section class="screen" id="plan-mobile">
+<h2>plan-mobile</h2>
+<p class="meta">390 × 1633 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/plan-mobile.jpg"><img src="../layout-captures/plan-mobile.jpg" alt="Actual frontend: plan-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="plan-mobile.svg" download>Download SVG</a></figcaption>
+<a href="plan-mobile.svg"><img src="plan-mobile.svg" alt="Derived wireframe: plan-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/plan-mobile.json">plan-mobile.json</a> · 76 text fragments · 66 shapes · 54 control regions</p>
+</section><section class="screen" id="plan-resolved-desktop">
+<h2>plan-resolved-desktop</h2>
+<p class="meta">1440 × 1340 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/plan-resolved-desktop.jpg"><img src="../layout-captures/plan-resolved-desktop.jpg" alt="Actual frontend: plan-resolved-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="plan-resolved-desktop.svg" download>Download SVG</a></figcaption>
+<a href="plan-resolved-desktop.svg"><img src="plan-resolved-desktop.svg" alt="Derived wireframe: plan-resolved-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/plan-resolved-desktop.json">plan-resolved-desktop.json</a> · 99 text fragments · 139 shapes · 131 control regions</p>
+</section><section class="screen" id="plan-resolved-mobile">
+<h2>plan-resolved-mobile</h2>
+<p class="meta">390 × 1633 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/plan-resolved-mobile.jpg"><img src="../layout-captures/plan-resolved-mobile.jpg" alt="Actual frontend: plan-resolved-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="plan-resolved-mobile.svg" download>Download SVG</a></figcaption>
+<a href="plan-resolved-mobile.svg"><img src="plan-resolved-mobile.svg" alt="Derived wireframe: plan-resolved-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/plan-resolved-mobile.json">plan-resolved-mobile.json</a> · 82 text fragments · 65 shapes · 53 control regions</p>
+</section><section class="screen" id="resources-desktop">
+<h2>resources-desktop</h2>
+<p class="meta">1440 × 1454 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/resources-desktop.jpg"><img src="../layout-captures/resources-desktop.jpg" alt="Actual frontend: resources-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="resources-desktop.svg" download>Download SVG</a></figcaption>
+<a href="resources-desktop.svg"><img src="resources-desktop.svg" alt="Derived wireframe: resources-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/resources-desktop.json">resources-desktop.json</a> · 71 text fragments · 30 shapes · 22 control regions</p>
+</section><section class="screen" id="resources-mobile">
+<h2>resources-mobile</h2>
+<p class="meta">390 × 4514 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/resources-mobile.jpg"><img src="../layout-captures/resources-mobile.jpg" alt="Actual frontend: resources-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="resources-mobile.svg" download>Download SVG</a></figcaption>
+<a href="resources-mobile.svg"><img src="resources-mobile.svg" alt="Derived wireframe: resources-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/resources-mobile.json">resources-mobile.json</a> · 166 text fragments · 50 shapes · 29 control regions</p>
+</section><section class="screen" id="resources-start-desktop">
+<h2>resources-start-desktop</h2>
+<p class="meta">1440 × 1454 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/resources-start-desktop.jpg"><img src="../layout-captures/resources-start-desktop.jpg" alt="Actual frontend: resources-start-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="resources-start-desktop.svg" download>Download SVG</a></figcaption>
+<a href="resources-start-desktop.svg"><img src="resources-start-desktop.svg" alt="Derived wireframe: resources-start-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/resources-start-desktop.json">resources-start-desktop.json</a> · 69 text fragments · 29 shapes · 22 control regions</p>
+</section><section class="screen" id="resources-start-mobile">
+<h2>resources-start-mobile</h2>
+<p class="meta">390 × 4500 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/resources-start-mobile.jpg"><img src="../layout-captures/resources-start-mobile.jpg" alt="Actual frontend: resources-start-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="resources-start-mobile.svg" download>Download SVG</a></figcaption>
+<a href="resources-start-mobile.svg"><img src="resources-start-mobile.svg" alt="Derived wireframe: resources-start-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/resources-start-mobile.json">resources-start-mobile.json</a> · 164 text fragments · 49 shapes · 29 control regions</p>
+</section><section class="screen" id="routine-desktop">
+<h2>routine-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/routine-desktop.jpg"><img src="../layout-captures/routine-desktop.jpg" alt="Actual frontend: routine-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="routine-desktop.svg" download>Download SVG</a></figcaption>
+<a href="routine-desktop.svg"><img src="routine-desktop.svg" alt="Derived wireframe: routine-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/routine-desktop.json">routine-desktop.json</a> · 40 text fragments · 18 shapes · 15 control regions</p>
+</section><section class="screen" id="routine-error-mobile">
+<h2>routine-error-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/routine-error-mobile.jpg"><img src="../layout-captures/routine-error-mobile.jpg" alt="Actual frontend: routine-error-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="routine-error-mobile.svg" download>Download SVG</a></figcaption>
+<a href="routine-error-mobile.svg"><img src="routine-error-mobile.svg" alt="Derived wireframe: routine-error-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/routine-error-mobile.json">routine-error-mobile.json</a> · 36 text fragments · 16 shapes · 13 control regions</p>
+</section><section class="screen" id="routine-mobile">
+<h2>routine-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/routine-mobile.jpg"><img src="../layout-captures/routine-mobile.jpg" alt="Actual frontend: routine-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="routine-mobile.svg" download>Download SVG</a></figcaption>
+<a href="routine-mobile.svg"><img src="routine-mobile.svg" alt="Derived wireframe: routine-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/routine-mobile.json">routine-mobile.json</a> · 37 text fragments · 15 shapes · 13 control regions</p>
+</section><section class="screen" id="routine-start-desktop">
+<h2>routine-start-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/routine-start-desktop.jpg"><img src="../layout-captures/routine-start-desktop.jpg" alt="Actual frontend: routine-start-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="routine-start-desktop.svg" download>Download SVG</a></figcaption>
+<a href="routine-start-desktop.svg"><img src="routine-start-desktop.svg" alt="Derived wireframe: routine-start-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/routine-start-desktop.json">routine-start-desktop.json</a> · 39 text fragments · 17 shapes · 15 control regions</p>
+</section><section class="screen" id="routine-start-mobile">
+<h2>routine-start-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/routine-start-mobile.jpg"><img src="../layout-captures/routine-start-mobile.jpg" alt="Actual frontend: routine-start-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="routine-start-mobile.svg" download>Download SVG</a></figcaption>
+<a href="routine-start-mobile.svg"><img src="routine-start-mobile.svg" alt="Derived wireframe: routine-start-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/routine-start-mobile.json">routine-start-mobile.json</a> · 36 text fragments · 14 shapes · 13 control regions</p>
+</section><section class="screen" id="saved-desktop">
+<h2>saved-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/saved-desktop.jpg"><img src="../layout-captures/saved-desktop.jpg" alt="Actual frontend: saved-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="saved-desktop.svg" download>Download SVG</a></figcaption>
+<a href="saved-desktop.svg"><img src="saved-desktop.svg" alt="Derived wireframe: saved-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/saved-desktop.json">saved-desktop.json</a> · 8 text fragments · 4 shapes · 4 control regions</p>
+</section><section class="screen" id="saved-mobile">
+<h2>saved-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/saved-mobile.jpg"><img src="../layout-captures/saved-mobile.jpg" alt="Actual frontend: saved-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="saved-mobile.svg" download>Download SVG</a></figcaption>
+<a href="saved-mobile.svg"><img src="saved-mobile.svg" alt="Derived wireframe: saved-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/saved-mobile.json">saved-mobile.json</a> · 9 text fragments · 4 shapes · 4 control regions</p>
+</section><section class="screen" id="search-mode-desktop">
+<h2>search-mode-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/search-mode-desktop.jpg"><img src="../layout-captures/search-mode-desktop.jpg" alt="Actual frontend: search-mode-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="search-mode-desktop.svg" download>Download SVG</a></figcaption>
+<a href="search-mode-desktop.svg"><img src="search-mode-desktop.svg" alt="Derived wireframe: search-mode-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/search-mode-desktop.json">search-mode-desktop.json</a> · 12 text fragments · 10 shapes · 6 control regions</p>
+</section><section class="screen" id="search-mode-mobile">
+<h2>search-mode-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/search-mode-mobile.jpg"><img src="../layout-captures/search-mode-mobile.jpg" alt="Actual frontend: search-mode-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="search-mode-mobile.svg" download>Download SVG</a></figcaption>
+<a href="search-mode-mobile.svg"><img src="search-mode-mobile.svg" alt="Derived wireframe: search-mode-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/search-mode-mobile.json">search-mode-mobile.json</a> · 13 text fragments · 10 shapes · 6 control regions</p>
+</section><section class="screen" id="search-results-desktop">
+<h2>search-results-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/search-results-desktop.jpg"><img src="../layout-captures/search-results-desktop.jpg" alt="Actual frontend: search-results-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="search-results-desktop.svg" download>Download SVG</a></figcaption>
+<a href="search-results-desktop.svg"><img src="search-results-desktop.svg" alt="Derived wireframe: search-results-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/search-results-desktop.json">search-results-desktop.json</a> · 14 text fragments · 11 shapes · 7 control regions</p>
+</section><section class="screen" id="search-results-mobile">
+<h2>search-results-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/search-results-mobile.jpg"><img src="../layout-captures/search-results-mobile.jpg" alt="Actual frontend: search-results-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="search-results-mobile.svg" download>Download SVG</a></figcaption>
+<a href="search-results-mobile.svg"><img src="search-results-mobile.svg" alt="Derived wireframe: search-results-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/search-results-mobile.json">search-results-mobile.json</a> · 16 text fragments · 11 shapes · 7 control regions</p>
+</section><section class="screen" id="session-desktop">
+<h2>session-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/session-desktop.jpg"><img src="../layout-captures/session-desktop.jpg" alt="Actual frontend: session-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="session-desktop.svg" download>Download SVG</a></figcaption>
+<a href="session-desktop.svg"><img src="session-desktop.svg" alt="Derived wireframe: session-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/session-desktop.json">session-desktop.json</a> · 34 text fragments · 9 shapes · 7 control regions</p>
+</section><section class="screen" id="session-mobile">
+<h2>session-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/session-mobile.jpg"><img src="../layout-captures/session-mobile.jpg" alt="Actual frontend: session-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="session-mobile.svg" download>Download SVG</a></figcaption>
+<a href="session-mobile.svg"><img src="session-mobile.svg" alt="Derived wireframe: session-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/session-mobile.json">session-mobile.json</a> · 36 text fragments · 9 shapes · 7 control regions</p>
+</section><section class="screen" id="sign-in-desktop">
+<h2>sign-in-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/sign-in-desktop.jpg"><img src="../layout-captures/sign-in-desktop.jpg" alt="Actual frontend: sign-in-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="sign-in-desktop.svg" download>Download SVG</a></figcaption>
+<a href="sign-in-desktop.svg"><img src="sign-in-desktop.svg" alt="Derived wireframe: sign-in-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/sign-in-desktop.json">sign-in-desktop.json</a> · 9 text fragments · 4 shapes · 6 control regions</p>
+</section><section class="screen" id="sign-in-mobile">
+<h2>sign-in-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/sign-in-mobile.jpg"><img src="../layout-captures/sign-in-mobile.jpg" alt="Actual frontend: sign-in-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="sign-in-mobile.svg" download>Download SVG</a></figcaption>
+<a href="sign-in-mobile.svg"><img src="sign-in-mobile.svg" alt="Derived wireframe: sign-in-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/sign-in-mobile.json">sign-in-mobile.json</a> · 11 text fragments · 4 shapes · 6 control regions</p>
+</section><section class="screen" id="skills-desktop">
+<h2>skills-desktop</h2>
+<p class="meta">1440 × 2753 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/skills-desktop.jpg"><img src="../layout-captures/skills-desktop.jpg" alt="Actual frontend: skills-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="skills-desktop.svg" download>Download SVG</a></figcaption>
+<a href="skills-desktop.svg"><img src="skills-desktop.svg" alt="Derived wireframe: skills-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/skills-desktop.json">skills-desktop.json</a> · 206 text fragments · 93 shapes · 71 control regions</p>
+</section><section class="screen" id="skills-mobile">
+<h2>skills-mobile</h2>
+<p class="meta">390 × 5850 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/skills-mobile.jpg"><img src="../layout-captures/skills-mobile.jpg" alt="Actual frontend: skills-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="skills-mobile.svg" download>Download SVG</a></figcaption>
+<a href="skills-mobile.svg"><img src="skills-mobile.svg" alt="Derived wireframe: skills-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/skills-mobile.json">skills-mobile.json</a> · 241 text fragments · 86 shapes · 58 control regions</p>
+</section><section class="screen" id="skills-signed-desktop">
+<h2>skills-signed-desktop</h2>
+<p class="meta">1440 × 2700 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/skills-signed-desktop.jpg"><img src="../layout-captures/skills-signed-desktop.jpg" alt="Actual frontend: skills-signed-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="skills-signed-desktop.svg" download>Download SVG</a></figcaption>
+<a href="skills-signed-desktop.svg"><img src="skills-signed-desktop.svg" alt="Derived wireframe: skills-signed-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/skills-signed-desktop.json">skills-signed-desktop.json</a> · 187 text fragments · 85 shapes · 61 control regions</p>
+</section><section class="screen" id="skills-signed-mobile">
+<h2>skills-signed-mobile</h2>
+<p class="meta">390 × 5108 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/skills-signed-mobile.jpg"><img src="../layout-captures/skills-signed-mobile.jpg" alt="Actual frontend: skills-signed-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="skills-signed-mobile.svg" download>Download SVG</a></figcaption>
+<a href="skills-signed-mobile.svg"><img src="skills-signed-mobile.svg" alt="Derived wireframe: skills-signed-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/skills-signed-mobile.json">skills-signed-mobile.json</a> · 219 text fragments · 78 shapes · 50 control regions</p>
+</section><section class="screen" id="task-editor-desktop">
+<h2>task-editor-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/task-editor-desktop.jpg"><img src="../layout-captures/task-editor-desktop.jpg" alt="Actual frontend: task-editor-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="task-editor-desktop.svg" download>Download SVG</a></figcaption>
+<a href="task-editor-desktop.svg"><img src="task-editor-desktop.svg" alt="Derived wireframe: task-editor-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/task-editor-desktop.json">task-editor-desktop.json</a> · 17 text fragments · 7 shapes · 8 control regions</p>
+</section><section class="screen" id="task-editor-mobile">
+<h2>task-editor-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/task-editor-mobile.jpg"><img src="../layout-captures/task-editor-mobile.jpg" alt="Actual frontend: task-editor-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="task-editor-mobile.svg" download>Download SVG</a></figcaption>
+<a href="task-editor-mobile.svg"><img src="task-editor-mobile.svg" alt="Derived wireframe: task-editor-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/task-editor-mobile.json">task-editor-mobile.json</a> · 19 text fragments · 6 shapes · 7 control regions</p>
+</section><section class="screen" id="tasks-desktop">
+<h2>tasks-desktop</h2>
+<p class="meta">1440 × 1000 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/tasks-desktop.jpg"><img src="../layout-captures/tasks-desktop.jpg" alt="Actual frontend: tasks-desktop" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="tasks-desktop.svg" download>Download SVG</a></figcaption>
+<a href="tasks-desktop.svg"><img src="tasks-desktop.svg" alt="Derived wireframe: tasks-desktop" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/tasks-desktop.json">tasks-desktop.json</a> · 24 text fragments · 33 shapes · 24 control regions</p>
+</section><section class="screen" id="tasks-mobile">
+<h2>tasks-mobile</h2>
+<p class="meta">390 × 844 CSS pixels · Captured existing behaviour</p>
+<div class="pair"><figure><figcaption>Actual frontend screenshot</figcaption><a href="../layout-captures/tasks-mobile.jpg"><img src="../layout-captures/tasks-mobile.jpg" alt="Actual frontend: tasks-mobile" loading="lazy"></a></figure>
+<figure><figcaption>Derived editable wireframe · <a href="tasks-mobile.svg" download>Download SVG</a></figcaption>
+<a href="tasks-mobile.svg"><img src="tasks-mobile.svg" alt="Derived wireframe: tasks-mobile" loading="lazy"></a></figure></div>
+<p class="meta">Source: <a href="../layout-captures/tasks-mobile.json">tasks-mobile.json</a> · 23 text fragments · 22 shapes · 15 control regions</p>
+</section>
+</main></body></html>

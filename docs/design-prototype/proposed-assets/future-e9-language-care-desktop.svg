@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000">
+<title>E9 language and care mode — future concept</title>
+<defs><linearGradient id="background" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#EEF8FC"/><stop offset="1" stop-color="#FDF0F5"/></linearGradient></defs>
+<rect x="0" y="0" width="1440" height="1000" rx="0" fill="url(#background)"/>
+<rect x="0" y="0" width="1440" height="64" rx="0" fill="#FFFFFF"/>
+<text x="32" y="41" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="650">AI-Wrevolusi</text>
+<text x="227" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">AI Exposure</text>
+<text x="365" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Skills</text>
+<text x="450" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Learning Resources</text>
+<text x="651" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">My Plan</text>
+<rect x="748" y="13" width="115" height="38" rx="20" fill="#EDF5FA"/>
+<text x="762" y="38" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Possibilities</text>
+<text x="1382" y="39" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="400">○</text>
+<rect x="0" y="64" width="1440" height="36" rx="0" fill="#F0E9F7"/>
+<text x="120" y="88" fill="#644D7A" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700">FUTURE CONCEPT — NOT COMMITTED</text>
+<text x="120" y="148" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="650">Make this feel familiar</text>
+<text x="120" y="180" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="400">Choose how much detail you want to see, and return to the next step when you have time.</text>
+<rect x="120" y="215" width="556" height="667" rx="24" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="148" y="257" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="600">Language and reading pace</text>
+<text x="148" y="303" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="600">Language</text>
+<rect x="148" y="319" width="500" height="48" rx="12" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="162" y="344" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">English · Current design language</text>
+<rect x="148" y="389" width="500" height="93" rx="14" fill="#FFF4E4"/>
+<text x="168" y="418" fill="#785827" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Supported languages are undecided.</text>
+<text x="168" y="444" fill="#785827" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Translation quality and review still need agreement.</text>
+<text x="148" y="527" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="600">Care mode</text>
+<rect x="585" y="503" width="63" height="31" rx="16" fill="#4F91BA"/>
+<rect x="618" y="507" width="23" height="23" rx="13" fill="#FFFFFF"/>
+<text x="148" y="558" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Use shorter explanations and show one next step.</text>
+<text x="148" y="584" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Keep a way to read the full detail.</text>
+<text x="148" y="646" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="600">When the display changes</text>
+<text x="148" y="679" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Keep my selected skill and learning goal.</text>
+<text x="148" y="709" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Keep my chosen chapters and study times.</text>
+<text x="148" y="739" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Return to the place where I stopped.</text>
+<rect x="148" y="792" width="238" height="44" rx="23" fill="#3D5F7A"/>
+<text x="164" y="820" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Preview these preferences</text>
+<rect x="700" y="215" width="620" height="667" rx="24" fill="#FFFFFF" stroke="#D9DDE5"/>
+<rect x="728" y="238" width="223" height="26" rx="13" fill="#EAF4FA"/>
+<text x="739" y="256" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600">Example preview · Care mode on</text>
+<text x="728" y="314" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="600">One useful step today</text>
+<text x="728" y="350" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="400">Review your learning goal.</text>
+<text x="728" y="379" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="400">You can change it before you choose a course.</text>
+<rect x="728" y="427" width="564" height="179" rx="20" fill="#EDF6FB"/>
+<text x="752" y="465" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="600">Your goal</text>
+<text x="752" y="502" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="550">Use evidence to improve my</text>
+<text x="752" y="533" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="550">weekly sales reports.</text>
+<text x="752" y="580" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400">Prototype example · Your wording stays editable</text>
+<rect x="728" y="637" width="182" height="44" rx="23" fill="#3D5F7A"/>
+<text x="744" y="665" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Review my goal</text>
+<rect x="922" y="637" width="140" height="44" rx="23" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="938" y="665" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Read details</text>
+<rect x="728" y="720" width="564" height="114" rx="17" fill="#FAF3F8"/>
+<text x="751" y="755" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="600">You can come back later</text>
+<text x="751" y="783" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">This preview shows the intended return experience.</text>
+<text x="751" y="806" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">It does not verify storage or reminders.</text>
+<text x="120" y="937" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="500">E9 · Supported languages, translation review, reminder channels and delivery commitment remain undecided.</text>
+</svg>

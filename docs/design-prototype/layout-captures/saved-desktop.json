@@ -1,0 +1,361 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 250, 254, 0.95)",
+      "height": 1000,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(61, 43, 54, 0.16) -16px 0px 40px 0px",
+      "width": 576,
+      "x": 864,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(228, 220, 231)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(255, 250, 254)",
+      "height": 69,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 511,
+      "x": 897,
+      "y": 899
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 100.875,
+      "x": 1307.125,
+      "y": 916
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(216, 232, 243)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.8)",
+      "height": 34,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 34,
+      "x": 1386,
+      "y": 20
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 775.5,
+        "width": 511,
+        "x": 897,
+        "y": 107.5
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Edit learning plan",
+      "role": "button",
+      "width": 171.875,
+      "x": 897,
+      "y": 180
+    },
+    {
+      "clip": {
+        "height": 775.5,
+        "width": 511,
+        "x": 897,
+        "y": 107.5
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Remove Pandas from saved courses",
+      "role": "button",
+      "width": 36,
+      "x": 1080.875,
+      "y": 180
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Export list",
+      "role": "button",
+      "width": 100.875,
+      "x": 1307.125,
+      "y": 916
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 34,
+      "href": null,
+      "label": "Close details",
+      "role": "button",
+      "width": 34,
+      "x": 1386,
+      "y": 20
+    }
+  ],
+  "height": 1000,
+  "icons": [
+    {
+      "clip": {
+        "height": 775.5,
+        "width": 511,
+        "x": 897,
+        "y": 107.5
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-arrow-right\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"m12 5 7 7-7 7\"></path></svg>",
+      "width": 16,
+      "x": 1036.875,
+      "y": 190
+    },
+    {
+      "clip": {
+        "height": 775.5,
+        "width": 511,
+        "x": 897,
+        "y": 107.5
+      },
+      "color": "rgb(47, 36, 48)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-trash2 lucide-trash-2\" aria-hidden=\"true\"><path d=\"M10 11v6\"></path><path d=\"M14 11v6\"></path><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"></path><path d=\"M3 6h18\"></path><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"></path></svg>",
+      "width": 16,
+      "x": 1090.875,
+      "y": 190
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x size-4\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg>",
+      "width": 16,
+      "x": 1395,
+      "y": 29
+    }
+  ],
+  "images": [],
+  "overlay": true,
+  "scrollY": 0,
+  "texts": [
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 20,
+      "fontWeight": "600",
+      "height": 24,
+      "letterSpacing": "normal",
+      "lineHeight": "27.5px",
+      "text": "Saved courses",
+      "width": 142.71875,
+      "x": 897,
+      "y": 33
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Your shortlist. Save now and decide when to learn later.",
+      "width": 367.171875,
+      "x": 897,
+      "y": 70.5
+    },
+    {
+      "clip": {
+        "height": 775.5,
+        "width": 511,
+        "x": 897,
+        "y": 107.5
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "KAGGLE LEARN",
+      "width": 101.5625,
+      "x": 897,
+      "y": 124.5
+    },
+    {
+      "clip": {
+        "height": 775.5,
+        "width": 511,
+        "x": 897,
+        "y": 107.5
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Pandas",
+      "width": 57.140625,
+      "x": 897,
+      "y": 150
+    },
+    {
+      "clip": {
+        "height": 775.5,
+        "width": 511,
+        "x": 897,
+        "y": 107.5
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Edit learning plan",
+      "width": 115.875,
+      "x": 913,
+      "y": 189
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Removing a saved course does not delete its plan.",
+      "width": 284.328125,
+      "x": 897,
+      "y": 926
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Export list",
+      "width": 66.875,
+      "x": 1324.125,
+      "y": 925
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Close",
+      "width": 47.4375,
+      "x": 1402,
+      "y": 46
+    }
+  ],
+  "url": "http://127.0.0.1:4173/learning-centre",
+  "viewportHeight": 1000,
+  "width": 1440,
+  "name": "saved-desktop",
+  "screenshot": "saved-desktop.jpg"
+}

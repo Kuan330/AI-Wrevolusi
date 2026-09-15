@@ -1,0 +1,354 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 490.6875,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px",
+      "width": 512,
+      "x": 464,
+      "y": 254.65625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(221, 212, 229)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "fill": "rgb(255, 255, 255)",
+      "height": 38,
+      "kind": "input",
+      "opacity": 1,
+      "radius": 7,
+      "shadow": "none",
+      "width": 462,
+      "x": 489,
+      "y": 387.25
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(221, 212, 229)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "fill": "rgb(255, 255, 255)",
+      "height": 128,
+      "kind": "textarea",
+      "opacity": 1,
+      "radius": 7,
+      "shadow": "none",
+      "width": 462,
+      "x": 489,
+      "y": 489.25
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "fill": "rgb(72, 111, 136)",
+      "height": 37.5,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 24,
+      "shadow": "none",
+      "width": 462,
+      "x": 489,
+      "y": 682.84375
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "disabled": false,
+      "height": 38,
+      "href": null,
+      "label": "Family member’s name",
+      "role": "input",
+      "width": 462,
+      "x": 489,
+      "y": 387.25
+    },
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "disabled": false,
+      "height": 128,
+      "href": null,
+      "label": "",
+      "role": "textarea",
+      "width": 462,
+      "x": 489,
+      "y": 489.25
+    },
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "disabled": false,
+      "height": 37.5,
+      "href": null,
+      "label": "Save request draft",
+      "role": "button",
+      "width": 462,
+      "x": 489,
+      "y": 682.84375
+    },
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "disabled": false,
+      "height": 16,
+      "href": null,
+      "label": "Close",
+      "role": "button",
+      "width": 16,
+      "x": 943,
+      "y": 271.65625
+    }
+  ],
+  "height": 1000,
+  "icons": [
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "color": "rgb(60, 42, 53)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x h-4 w-4\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg>",
+      "width": 16,
+      "x": 943,
+      "y": 271.65625
+    }
+  ],
+  "images": [],
+  "overlay": true,
+  "scrollY": 86,
+  "texts": [
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "-0.45px",
+      "lineHeight": "18px",
+      "text": "Prepare a WhatsApp request",
+      "width": 238.328125,
+      "x": 489,
+      "y": 277.65625
+    },
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "fill": "rgb(136, 121, 145)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "21.6px",
+      "text": "Only the message below will be shared. Review it before opening WhatsApp.",
+      "width": 434.15625,
+      "x": 489,
+      "y": 316.65625
+    },
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "fill": "rgb(109, 93, 119)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "Who would you like to ask?",
+      "width": 153.875,
+      "x": 489,
+      "y": 364.25
+    },
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "fill": "rgb(69, 57, 78)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 14.4,
+      "lineHeight": "18px",
+      "multiline": false,
+      "synthetic": true,
+      "text": "Prototype helper",
+      "width": 440,
+      "x": 500,
+      "y": 399.05
+    },
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "fill": "rgb(109, 93, 119)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "Message",
+      "width": 51.609375,
+      "x": 489,
+      "y": 466.25
+    },
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "fill": "rgb(69, 57, 78)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 110,
+      "lineHeight": "18px",
+      "multiline": true,
+      "synthetic": true,
+      "text": "Hi Prototype helper, could you help with “Prototype example: school pickup” on 2026-09-16, 18:15–19:00 (Asia/Kuala_Lumpur)? Please reply to confirm whether you can take this on. Thank you!",
+      "width": 440,
+      "x": 500,
+      "y": 499.25
+    },
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "fill": "rgb(136, 121, 145)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "21.6px",
+      "text": "You will choose the recipient in WhatsApp. No message is sent from this website.",
+      "width": 460.46875,
+      "x": 489,
+      "y": 648.25
+    },
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "fill": "rgb(255, 255, 255)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "Save request draft",
+      "width": 112.78125,
+      "x": 663.609375,
+      "y": 692.84375
+    },
+    {
+      "clip": {
+        "height": 490.6875,
+        "width": 512,
+        "x": 464,
+        "y": 254.65625
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Close",
+      "width": 42.9375,
+      "x": 950,
+      "y": 288.65625
+    }
+  ],
+  "url": "http://127.0.0.1:4173/plan",
+  "viewportHeight": 1000,
+  "width": 1440,
+  "name": "help-request-desktop",
+  "screenshot": "help-request-desktop.jpg"
+}

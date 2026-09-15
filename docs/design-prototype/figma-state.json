@@ -1,0 +1,180 @@
+{
+  "file": "v7f5dr4CBH1KDNA7fOxctD",
+  "url": "https://www.figma.com/design/v7f5dr4CBH1KDNA7fOxctD",
+  "status": "paused-at-user-accepted-design-checkpoint",
+  "pages": {
+    "brief": "0:1",
+    "prototype": "3:2",
+    "concepts": "3:3"
+  },
+  "tokens": {
+    "collectionId": "VariableCollectionId:4:2",
+    "variables": {
+      "ink": "VariableID:4:3",
+      "blue": "VariableID:4:4",
+      "sky": "VariableID:4:5",
+      "rose": "VariableID:4:6",
+      "white": "VariableID:4:7",
+      "muted": "VariableID:4:8",
+      "border": "VariableID:4:9"
+    }
+  },
+  "styles": {
+    "Display": "S:38c4d58d9db7c603f6cb20ef8fa994e4fadd985c,",
+    "Heading": "S:48a9fc9acd4fdc90b6e71f84e76d8069fd24bd53,",
+    "Body": "S:3779600526030a23b31cfe98d4e4bd12f7dc50e8,",
+    "Label": "S:2899ea4e142692d2c1b3eb509aea7f2257b7f4bb,"
+  },
+  "button": {
+    "id": "5:10",
+    "label": "Label#5:0"
+  },
+  "card": {
+    "id": "5:12",
+    "keys": {
+      "Eyebrow": "Eyebrow#5:1",
+      "Title": "Title#5:2",
+      "Body": "Body#5:3"
+    }
+  },
+  "nav": {
+    "id": "6:2"
+  },
+  "unfinishedScreens": {
+    "home": {
+      "createdNodeIds": [
+        "7:2",
+        "7:3",
+        "I7:3;6:3",
+        "I7:3;6:4",
+        "I7:3;6:5",
+        "I7:3;6:6",
+        "I7:3;6:7",
+        "I7:3;6:8",
+        "7:10",
+        "7:11",
+        "7:12"
+      ],
+      "frame": "7:2",
+      "nav": "7:3",
+      "page": "3:2"
+    },
+    "occupation": {
+      "createdNodeIds": [
+        "7:13",
+        "7:14",
+        "I7:14;6:3",
+        "I7:14;6:4",
+        "I7:14;6:5",
+        "I7:14;6:6",
+        "I7:14;6:7",
+        "I7:14;6:8",
+        "7:21",
+        "7:22",
+        "7:23"
+      ],
+      "frame": "7:13",
+      "nav": "7:14",
+      "page": "3:2"
+    },
+    "tasks": {
+      "createdNodeIds": [
+        "7:24",
+        "7:25",
+        "I7:25;6:3",
+        "I7:25;6:4",
+        "I7:25;6:5",
+        "I7:25;6:6",
+        "I7:25;6:7",
+        "I7:25;6:8",
+        "7:32",
+        "7:33",
+        "7:34"
+      ],
+      "frame": "7:24",
+      "nav": "7:25",
+      "page": "3:2"
+    }
+  },
+  "lastConnectionCheck": {
+    "checkedAt": "2026-09-15",
+    "whoami": "success",
+    "email": "leekuanloong17@gmail.com",
+    "intendedEmailMatches": true,
+    "team": "Kuan_'s team",
+    "seat": "View",
+    "plan": "starter",
+    "planKey": "team::1653045259955357776",
+    "getMetadata": "success",
+    "listedPages": [
+      {
+        "id": "0:1",
+        "name": "01 \u00b7 Brief & wireframes"
+      }
+    ],
+    "useFigma": "blocked",
+    "error": "You've reached the Figma MCP tool call limit on the Starter plan.",
+    "historicalIds": "All three original page IDs were verified in the regular editor. Other historical node IDs remain preserved; this is not a fresh audit of every token, style or component.",
+    "mcpMutationsMade": false,
+    "metadataScope": "The connector metadata result listed one page. Later regular-editor verification confirmed all three original pages."
+  },
+  "continuation": {
+    "sourceBranch": "kuan/design-prototype",
+    "sourceCommit": "5e0e196da400b89f6ac9b4e8542b970d1ba7deee",
+    "localConceptIsFaithful": false,
+    "captureGallery": "frontend-captures/index.html",
+    "captureManifest": "frontend-captures/manifest.json",
+    "captureCount": 82,
+    "frontendMap": "current-frontend-map.md",
+    "pending": [
+      "Full native Present-mode journey verification",
+      "Native import of four wireframe boards and seven proposed/future assets",
+      "Remaining navigation and replacement calendar activity links",
+      "Final Figma-to-frontend comparison",
+      "Separate instruction before application integration"
+    ],
+    "currentScreenCaptureManifest": "screen-assets/manifest.json",
+    "currentScreenCaptureCount": 81,
+    "historicalCaptureGalleryCount": 37,
+    "captureCountScope": "Original frontend-captures gallery; expanded current-screen captures are counted separately.",
+    "nativeScreenCount": 82,
+    "nativeRecordedLinkCount": 136,
+    "handoff": "checkpoint-handoff.md",
+    "stopReason": "User: I think this is good enough",
+    "lastUnfinishedInteraction": {
+      "source": "plan-mobile",
+      "nodeId": "23:5804",
+      "actualDestination": "CURRENT \u00b7 M11 \u00b7 Study routine",
+      "intendedDestination": "CURRENT \u00b7 M13 \u00b7 Learning session",
+      "status": "Final correction rejected by automatic approval review after user requested stopping; no retry"
+    }
+  },
+  "nativeEditorProgress": {
+    "snapshotDate": "2026-09-15",
+    "access": "User signed in to the regular Figma editor; work continued there while MCP remained quota-blocked.",
+    "originalPagesVerified": true,
+    "originalPageCount": 3,
+    "existingWorkPreserved": true,
+    "figmaMutationsMade": true,
+    "nativeScreenImportCount": 81,
+    "nativeImportRegistry": "native-figma-imports.json",
+    "nativeLinkRegistry": "native-prototype-links.json",
+    "nativeLinkCountSnapshot": 40,
+    "linkingStatus": "in-progress",
+    "finalLinkCountPending": true,
+    "localWireframeCount": 81,
+    "localProposalCount": 7,
+    "wireframeManifest": "wireframes/manifest.json",
+    "wireframeBoardManifest": "wireframe-boards/manifest.json",
+    "proposalManifest": "proposed-assets/manifest.json",
+    "wireframeBoardNativeImport": "pending-at-this-snapshot",
+    "proposalNativeImport": "pending-at-this-snapshot",
+    "screenshotComparison": "in-progress",
+    "fullPresentModeJourneyVerified": false,
+    "applicationIntegration": "pending-user-visual-approval",
+    "trackedApplicationEditsMade": false,
+    "deployed": false,
+    "committed": false,
+    "billingChanged": false
+  }
+}

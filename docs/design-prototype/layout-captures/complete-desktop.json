@@ -1,0 +1,1008 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 250, 254, 0.95)",
+      "height": 1000,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(61, 43, 54, 0.16) -16px 0px 40px 0px",
+      "width": 672,
+      "x": 768,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(244, 225, 233)",
+      "height": 24,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 113.03125,
+      "x": 885.46875,
+      "y": 64
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(to right, rgb(234, 243, 251), rgb(248, 236, 239))",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 70,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "none",
+      "width": 607,
+      "x": 801,
+      "y": 136
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(232, 240, 247)",
+      "height": 36,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 603,
+      "x": 801,
+      "y": 222
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 28,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 198.328125,
+      "x": 805,
+      "y": 226
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(233, 225, 233)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 97,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 607,
+      "x": 801,
+      "y": 871
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.28)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 297.5,
+      "x": 801,
+      "y": 888
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(79, 145, 186)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(214, 234, 247)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(79, 145, 186, 0.24) 0px 6px 20px 0px",
+      "width": 297.5,
+      "x": 1110.5,
+      "y": 887
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(216, 232, 243)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.8)",
+      "height": 34,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 34,
+      "x": 1386,
+      "y": 20
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "disabled": false,
+      "height": 28,
+      "href": null,
+      "label": "Overview",
+      "role": "tab",
+      "width": 198.328125,
+      "x": 805,
+      "y": 226
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "disabled": false,
+      "height": 28,
+      "href": null,
+      "label": "Chapters",
+      "role": "tab",
+      "width": 198.328125,
+      "x": 1003.328125,
+      "y": 226
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "disabled": false,
+      "height": 28,
+      "href": null,
+      "label": "Schedule",
+      "role": "tab",
+      "width": 198.328125,
+      "x": 1201.65625,
+      "y": 226
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Edit time",
+      "role": "button",
+      "width": 297.5,
+      "x": 801,
+      "y": 888
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Undo completion",
+      "role": "button",
+      "width": 297.5,
+      "x": 1110.5,
+      "y": 887
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 28,
+      "href": "/learning-centre?q=Pandas",
+      "label": "View in Learning Resources →",
+      "role": "a",
+      "width": 607,
+      "x": 801,
+      "y": 940
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 34,
+      "href": null,
+      "label": "Close details",
+      "role": "button",
+      "width": 34,
+      "x": 1386,
+      "y": 20
+    }
+  ],
+  "height": 1000,
+  "icons": [
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-pencil\" aria-hidden=\"true\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg>",
+      "width": 16,
+      "x": 908.71875,
+      "y": 900
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-undo2 lucide-undo-2\" aria-hidden=\"true\"><path d=\"M9 14 4 9l5-5\"></path><path d=\"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11\"></path></svg>",
+      "width": 16,
+      "x": 1190.15625,
+      "y": 899
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x size-4\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg>",
+      "width": 16,
+      "x": 1395,
+      "y": 29
+    }
+  ],
+  "images": [],
+  "overlay": true,
+  "scrollY": 317,
+  "texts": [
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "1.4px",
+      "lineHeight": "20px",
+      "text": "KAGGLE LEARN",
+      "width": 122.109375,
+      "x": 801,
+      "y": 33
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 20,
+      "fontWeight": "600",
+      "height": 24,
+      "letterSpacing": "normal",
+      "lineHeight": "27.5px",
+      "text": "Pandas",
+      "width": 71.421875,
+      "x": 801,
+      "y": 61
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(156, 95, 120)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "In learning plan",
+      "width": 89.03125,
+      "x": 897.46875,
+      "y": 68
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "beginner",
+      "width": 58.6875,
+      "x": 801,
+      "y": 99
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "·",
+      "width": 7.984375,
+      "x": 863.625,
+      "y": 99
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "English",
+      "width": 47.734375,
+      "x": 871.609375,
+      "y": 99
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "700",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Selected session ·",
+      "width": 127.640625,
+      "x": 818,
+      "y": 150
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "700",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "2026-09-16",
+      "width": 82.9375,
+      "x": 945.640625,
+      "y": 150
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(156, 95, 120)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Completed",
+      "width": 72.1875,
+      "x": 1318.8125,
+      "y": 150
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "18:30",
+      "width": 35.875,
+      "x": 818,
+      "y": 174
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "–",
+      "width": 7,
+      "x": 853.875,
+      "y": 174
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "19:00",
+      "width": 36.078125,
+      "x": 860.875,
+      "y": 174
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "·",
+      "width": 7.984375,
+      "x": 900.890625,
+      "y": 174
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "1",
+      "width": 5.703125,
+      "x": 908.875,
+      "y": 174
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "of",
+      "width": 17.515625,
+      "x": 918.515625,
+      "y": 174
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "8",
+      "width": 8.671875,
+      "x": 936.03125,
+      "y": 174
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "sessions completed",
+      "width": 131.6875,
+      "x": 948.640625,
+      "y": 174
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Overview",
+      "width": 63.53125,
+      "x": 872.390625,
+      "y": 231
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Chapters",
+      "width": 61.109375,
+      "x": 1071.9375,
+      "y": 231
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Schedule",
+      "width": 62.609375,
+      "x": 1269.515625,
+      "y": 231
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 15,
+      "fontWeight": "600",
+      "height": 19,
+      "letterSpacing": "normal",
+      "lineHeight": "26.25px",
+      "text": "About this course",
+      "width": 128.25,
+      "x": 801,
+      "y": 285
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(97, 85, 100)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24.5px",
+      "text": "Reading, filtering, grouping and merging tabular data (DataFrames) across 6 lessons — the",
+      "width": 600.140625,
+      "x": 801,
+      "y": 331.25
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(97, 85, 100)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24.5px",
+      "text": "most common data-tidying toolkit beyond Excel. Provider states about 4 hours to the",
+      "width": 559.9375,
+      "x": 801,
+      "y": 355.75
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(97, 85, 100)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24.5px",
+      "text": "certificate.",
+      "width": 70.828125,
+      "x": 801,
+      "y": 380.25
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 15,
+      "fontWeight": "600",
+      "height": 19,
+      "letterSpacing": "normal",
+      "lineHeight": "26.25px",
+      "text": "What you will learn",
+      "width": 137.796875,
+      "x": 801,
+      "y": 424.75
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(97, 85, 100)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24.5px",
+      "text": "Read CSV files and inspect data structures",
+      "width": 282.53125,
+      "x": 821,
+      "y": 471
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(97, 85, 100)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24.5px",
+      "text": "Filter, sort and group data",
+      "width": 170.40625,
+      "x": 821,
+      "y": 503.5
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(97, 85, 100)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24.5px",
+      "text": "Handle missing values and merge tables",
+      "width": 266.859375,
+      "x": 821,
+      "y": 536
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 15,
+      "fontWeight": "600",
+      "height": 19,
+      "letterSpacing": "normal",
+      "lineHeight": "26.25px",
+      "text": "Before you start",
+      "width": 116.03125,
+      "x": 801,
+      "y": 580.5
+    },
+    {
+      "clip": {
+        "height": 633,
+        "width": 607,
+        "x": 801,
+        "y": 222
+      },
+      "fill": "rgb(97, 85, 100)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24.5px",
+      "text": "Basic Python required (provider notes it builds on the Python course).",
+      "width": 459.96875,
+      "x": 801,
+      "y": 626.75
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Edit time",
+      "width": 58.0625,
+      "x": 932.71875,
+      "y": 899
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Undo completion",
+      "width": 114.171875,
+      "x": 1214.15625,
+      "y": 898
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "View in Learning Resources →",
+      "width": 200.0625,
+      "x": 1004.46875,
+      "y": 945
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Close",
+      "width": 47.4375,
+      "x": 1402,
+      "y": 46
+    }
+  ],
+  "url": "http://127.0.0.1:4173/plan",
+  "viewportHeight": 1000,
+  "width": 1440,
+  "name": "complete-desktop",
+  "screenshot": "complete-desktop.jpg"
+}

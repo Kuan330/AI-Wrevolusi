@@ -1,0 +1,1211 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 250, 254, 0.95)",
+      "height": 844,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(61, 43, 54, 0.16) -16px 0px 40px 0px",
+      "width": 390,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(244, 225, 233)",
+      "height": 25.390625,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "none",
+      "width": 100.703125,
+      "x": 109.46875,
+      "y": 50.34375
+    },
+    {
+      "background": true,
+      "backgroundImage": "linear-gradient(100deg, rgb(234, 243, 251), rgb(248, 236, 239))",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(232, 240, 247)",
+      "height": 36,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 322,
+      "x": 25,
+      "y": 179.375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 28,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 157,
+      "x": 186,
+      "y": 183.375
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(229, 237, 244)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 70.59375,
+      "kind": "li",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 322,
+      "x": 25,
+      "y": 304.3125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(234, 243, 251)",
+      "height": 27.1875,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 50,
+      "shadow": "none",
+      "width": 27.1875,
+      "x": 38.796875,
+      "y": 318.109375
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(229, 237, 244)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 70.59375,
+      "kind": "li",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 322,
+      "x": 25,
+      "y": 386.90625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(234, 243, 251)",
+      "height": 27.1875,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 50,
+      "shadow": "none",
+      "width": 27.1875,
+      "x": 38.796875,
+      "y": 400.703125
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(229, 237, 244)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 70.59375,
+      "kind": "li",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 322,
+      "x": 25,
+      "y": 469.5
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(234, 243, 251)",
+      "height": 27.1875,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 50,
+      "shadow": "none",
+      "width": 27.1875,
+      "x": 38.796875,
+      "y": 483.296875
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(229, 237, 244)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 70.59375,
+      "kind": "li",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 322,
+      "x": 25,
+      "y": 552.09375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(234, 243, 251)",
+      "height": 27.1875,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 50,
+      "shadow": "none",
+      "width": 27.1875,
+      "x": 38.796875,
+      "y": 565.890625
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(229, 237, 244)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 70.59375,
+      "kind": "li",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 322,
+      "x": 25,
+      "y": 634.6875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(234, 243, 251)",
+      "height": 27.1875,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 50,
+      "shadow": "none",
+      "width": 27.1875,
+      "x": 38.796875,
+      "y": 648.484375
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(229, 237, 244)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 70.59375,
+      "kind": "li",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 322,
+      "x": 25,
+      "y": 717.28125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(228, 220, 231)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(255, 250, 254)",
+      "height": 121,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 341,
+      "x": 25,
+      "y": 723
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.28)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 181.875,
+      "x": 130.328125,
+      "y": 788
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(216, 232, 243)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.8)",
+      "height": 34,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 34,
+      "x": 336,
+      "y": 20
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "disabled": false,
+      "height": 19.1875,
+      "href": "https://www.kaggle.com/learn/pandas",
+      "label": "Open provider course",
+      "role": "a",
+      "width": 152.125,
+      "x": 25,
+      "y": 144.1875
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "disabled": false,
+      "height": 28,
+      "href": null,
+      "label": "Overview",
+      "role": "tab",
+      "width": 157,
+      "x": 29,
+      "y": 183.375
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "disabled": false,
+      "height": 28,
+      "href": null,
+      "label": "Chapters",
+      "role": "tab",
+      "width": 157,
+      "x": 186,
+      "y": 183.375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Saved",
+      "role": "button",
+      "width": 97.4375,
+      "x": 25,
+      "y": 740
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/plan",
+      "label": "View plan",
+      "role": "a",
+      "width": 97.328125,
+      "x": 25,
+      "y": 790
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Edit learning plan",
+      "role": "button",
+      "width": 181.875,
+      "x": 130.328125,
+      "y": 788
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 34,
+      "href": null,
+      "label": "Close details",
+      "role": "button",
+      "width": 34,
+      "x": 336,
+      "y": 20
+    }
+  ],
+  "height": 844,
+  "icons": [
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "color": "rgb(50, 104, 137)",
+      "height": 14,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-external-link\" aria-hidden=\"true\"><path d=\"M15 3h6v6\"></path><path d=\"M10 14 21 3\"></path><path d=\"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6\"></path></svg>",
+      "width": 14,
+      "x": 163.125,
+      "y": 146.78125
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(47, 36, 48)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"></path></svg>",
+      "width": 16,
+      "x": 41,
+      "y": 750
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-arrow-right\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"m12 5 7 7-7 7\"></path></svg>",
+      "width": 16,
+      "x": 275.203125,
+      "y": 800
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x size-4\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg>",
+      "width": 16,
+      "x": 345,
+      "y": 29
+    }
+  ],
+  "images": [],
+  "overlay": true,
+  "scrollY": 1635,
+  "texts": [
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "KAGGLE LEARN",
+      "width": 101.5625,
+      "x": 25,
+      "y": 25
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 20,
+      "fontWeight": "600",
+      "height": 24,
+      "letterSpacing": "normal",
+      "lineHeight": "27.5px",
+      "text": "Pandas",
+      "width": 71.421875,
+      "x": 25,
+      "y": 49.5
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(156, 95, 120)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "15.4px",
+      "text": "In learning plan",
+      "width": 80.703125,
+      "x": 119.46875,
+      "y": 55.34375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Kaggle Learn",
+      "width": 87.78125,
+      "x": 25,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "·",
+      "width": 4.046875,
+      "x": 116.71875,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "beginner",
+      "width": 58.6875,
+      "x": 124.703125,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "·",
+      "width": 4.046875,
+      "x": 187.328125,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "English",
+      "width": 47.734375,
+      "x": 195.3125,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "·",
+      "width": 7.984375,
+      "x": 246.984375,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "4h",
+      "width": 17.328125,
+      "x": 254.96875,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.2px",
+      "text": "Open provider course",
+      "width": 131.734375,
+      "x": 25,
+      "y": 146.1875
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Overview",
+      "width": 63.53125,
+      "x": 75.734375,
+      "y": 188.375
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Chapters",
+      "width": 61.109375,
+      "x": 233.9375,
+      "y": 188.375
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20.48px",
+      "text": "Preview the course structure. Choose what to",
+      "width": 276.21875,
+      "x": 25,
+      "y": 249.375
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20.48px",
+      "text": "include when you plan your learning.",
+      "width": 222.5625,
+      "x": 25,
+      "y": 269.84375
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "1",
+      "width": 5.703125,
+      "x": 49.53125,
+      "y": 323.203125
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Creating, Reading and Writing",
+      "width": 197.53125,
+      "x": 78.78125,
+      "y": 320.109375
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "Duration not stated",
+      "width": 108.3125,
+      "x": 78.78125,
+      "y": 344.109375
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "2",
+      "width": 8.546875,
+      "x": 48.109375,
+      "y": 405.796875
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Indexing, Selecting & Assigning",
+      "width": 207.671875,
+      "x": 78.78125,
+      "y": 402.703125
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "Duration not stated",
+      "width": 108.3125,
+      "x": 78.78125,
+      "y": 426.703125
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "3",
+      "width": 8.65625,
+      "x": 48.0625,
+      "y": 488.390625
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Summary Functions and Maps",
+      "width": 200.375,
+      "x": 78.78125,
+      "y": 485.296875
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "Duration not stated",
+      "width": 108.3125,
+      "x": 78.78125,
+      "y": 509.296875
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "4",
+      "width": 9.046875,
+      "x": 47.859375,
+      "y": 570.984375
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Grouping and Sorting",
+      "width": 141.265625,
+      "x": 78.78125,
+      "y": 567.890625
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "Duration not stated",
+      "width": 108.3125,
+      "x": 78.78125,
+      "y": 591.890625
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "5",
+      "width": 8.3125,
+      "x": 48.234375,
+      "y": 653.578125
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Data Types and Missing Values",
+      "width": 206.1875,
+      "x": 78.78125,
+      "y": 650.484375
+    },
+    {
+      "clip": {
+        "height": 594.8125,
+        "width": 341,
+        "x": 25,
+        "y": 128.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "Duration not stated",
+      "width": 108.3125,
+      "x": 78.78125,
+      "y": 674.484375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Saved",
+      "width": 41.4375,
+      "x": 65,
+      "y": 749
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "View plan",
+      "width": 65.328125,
+      "x": 41,
+      "y": 799
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Edit learning plan",
+      "width": 115.875,
+      "x": 151.328125,
+      "y": 799
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Close",
+      "width": 47.4375,
+      "x": 352,
+      "y": 46
+    }
+  ],
+  "url": "http://127.0.0.1:4173/learning-centre",
+  "viewportHeight": 844,
+  "width": 390,
+  "name": "chapters-mobile",
+  "screenshot": "chapters-mobile.jpg"
+}

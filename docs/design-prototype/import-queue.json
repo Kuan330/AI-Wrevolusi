@@ -1,0 +1,260 @@
+[
+  {
+    "stem": "arrange-start-desktop",
+    "name": "CURRENT \u00b7 D17 \u00b7 Choose when to learn",
+    "x": 0,
+    "y": 12500
+  },
+  {
+    "stem": "chapters-start-desktop",
+    "name": "CURRENT \u00b7 D18 \u00b7 Course chapters before planning",
+    "x": 1600,
+    "y": 12500
+  },
+  {
+    "stem": "conflict-review-desktop",
+    "name": "CURRENT \u00b7 D19 \u00b7 Review the overlap",
+    "x": 3200,
+    "y": 12500
+  },
+  {
+    "stem": "content-start-desktop",
+    "name": "CURRENT \u00b7 D20 \u00b7 Choose learning content",
+    "x": 4800,
+    "y": 12500
+  },
+  {
+    "stem": "course-start-desktop",
+    "name": "CURRENT \u00b7 D21 \u00b7 Course before planning",
+    "x": 6400,
+    "y": 12500
+  },
+  {
+    "stem": "help-accepted-desktop",
+    "name": "CURRENT \u00b7 D22 \u00b7 Help request accepted",
+    "x": 0,
+    "y": 13700
+  },
+  {
+    "stem": "help-declined-desktop",
+    "name": "CURRENT \u00b7 D23 \u00b7 Help request declined",
+    "x": 1600,
+    "y": 13700
+  },
+  {
+    "stem": "help-draft-desktop",
+    "name": "CURRENT \u00b7 D24 \u00b7 Request draft saved",
+    "x": 3200,
+    "y": 13700
+  },
+  {
+    "stem": "help-request-desktop",
+    "name": "CURRENT \u00b7 D25 \u00b7 Prepare a help request",
+    "x": 4800,
+    "y": 13700
+  },
+  {
+    "stem": "help-status-desktop",
+    "name": "CURRENT \u00b7 D26 \u00b7 Review the saved request",
+    "x": 6400,
+    "y": 13700
+  },
+  {
+    "stem": "help-waiting-desktop",
+    "name": "CURRENT \u00b7 D27 \u00b7 Waiting for a reply",
+    "x": 0,
+    "y": 14900
+  },
+  {
+    "stem": "plan-completed-desktop",
+    "name": "CURRENT \u00b7 D28 \u00b7 Completed learning progress",
+    "x": 1600,
+    "y": 14900
+  },
+  {
+    "stem": "plan-conflict-desktop",
+    "name": "CURRENT \u00b7 D29 \u00b7 Work and care conflict",
+    "x": 3200,
+    "y": 14900
+  },
+  {
+    "stem": "plan-empty-desktop",
+    "name": "CURRENT \u00b7 D30 \u00b7 My Plan before scheduling",
+    "x": 4800,
+    "y": 14900
+  },
+  {
+    "stem": "plan-resolved-desktop",
+    "name": "CURRENT \u00b7 D31 \u00b7 Conflict resolved",
+    "x": 6400,
+    "y": 14900
+  },
+  {
+    "stem": "resources-start-desktop",
+    "name": "CURRENT \u00b7 D32 \u00b7 Learning Resources before planning",
+    "x": 0,
+    "y": 16100
+  },
+  {
+    "stem": "routine-start-desktop",
+    "name": "CURRENT \u00b7 D33 \u00b7 Set a new study routine",
+    "x": 1600,
+    "y": 16100
+  },
+  {
+    "stem": "search-mode-desktop",
+    "name": "CURRENT \u00b7 D34 \u00b7 Search by job title",
+    "x": 3200,
+    "y": 16100
+  },
+  {
+    "stem": "search-results-desktop",
+    "name": "CURRENT \u00b7 D35 \u00b7 Occupation search results",
+    "x": 4800,
+    "y": 16100
+  },
+  {
+    "stem": "skills-signed-desktop",
+    "name": "CURRENT \u00b7 D36 \u00b7 Skills in the example account",
+    "x": 6400,
+    "y": 16100
+  },
+  {
+    "stem": "task-editor-desktop",
+    "name": "CURRENT \u00b7 D37 \u00b7 Edit a task",
+    "x": 0,
+    "y": 17300
+  },
+  {
+    "stem": "arrange-start-mobile",
+    "name": "CURRENT \u00b7 M17 \u00b7 Choose when to learn",
+    "x": 0,
+    "y": 19000
+  },
+  {
+    "stem": "chapters-start-mobile",
+    "name": "CURRENT \u00b7 M18 \u00b7 Course chapters before planning",
+    "x": 500,
+    "y": 19000
+  },
+  {
+    "stem": "conflict-review-mobile",
+    "name": "CURRENT \u00b7 M19 \u00b7 Review the overlap",
+    "x": 1000,
+    "y": 19000
+  },
+  {
+    "stem": "content-start-mobile",
+    "name": "CURRENT \u00b7 M20 \u00b7 Choose learning content",
+    "x": 1500,
+    "y": 19000
+  },
+  {
+    "stem": "course-start-mobile",
+    "name": "CURRENT \u00b7 M21 \u00b7 Course before planning",
+    "x": 2000,
+    "y": 19000
+  },
+  {
+    "stem": "help-accepted-mobile",
+    "name": "CURRENT \u00b7 M22 \u00b7 Help request accepted",
+    "x": 2500,
+    "y": 19000
+  },
+  {
+    "stem": "help-declined-mobile",
+    "name": "CURRENT \u00b7 M23 \u00b7 Help request declined",
+    "x": 3000,
+    "y": 19000
+  },
+  {
+    "stem": "help-draft-mobile",
+    "name": "CURRENT \u00b7 M24 \u00b7 Request draft saved",
+    "x": 3500,
+    "y": 19000
+  },
+  {
+    "stem": "help-request-mobile",
+    "name": "CURRENT \u00b7 M25 \u00b7 Prepare a help request",
+    "x": 0,
+    "y": 20000
+  },
+  {
+    "stem": "help-status-mobile",
+    "name": "CURRENT \u00b7 M26 \u00b7 Review the saved request",
+    "x": 500,
+    "y": 20000
+  },
+  {
+    "stem": "help-waiting-mobile",
+    "name": "CURRENT \u00b7 M27 \u00b7 Waiting for a reply",
+    "x": 1000,
+    "y": 20000
+  },
+  {
+    "stem": "plan-completed-mobile",
+    "name": "CURRENT \u00b7 M28 \u00b7 Completed learning progress",
+    "x": 1500,
+    "y": 20000
+  },
+  {
+    "stem": "plan-conflict-mobile",
+    "name": "CURRENT \u00b7 M29 \u00b7 Work and care conflict",
+    "x": 2000,
+    "y": 20000
+  },
+  {
+    "stem": "plan-empty-mobile",
+    "name": "CURRENT \u00b7 M30 \u00b7 My Plan before scheduling",
+    "x": 2500,
+    "y": 20000
+  },
+  {
+    "stem": "plan-resolved-mobile",
+    "name": "CURRENT \u00b7 M31 \u00b7 Conflict resolved",
+    "x": 3000,
+    "y": 20000
+  },
+  {
+    "stem": "resources-start-mobile",
+    "name": "CURRENT \u00b7 M32 \u00b7 Learning Resources before planning",
+    "x": 3500,
+    "y": 20000
+  },
+  {
+    "stem": "routine-error-mobile",
+    "name": "CURRENT \u00b7 M33 \u00b7 Missing study days",
+    "x": 0,
+    "y": 21000
+  },
+  {
+    "stem": "routine-start-mobile",
+    "name": "CURRENT \u00b7 M34 \u00b7 Set a new study routine",
+    "x": 500,
+    "y": 21000
+  },
+  {
+    "stem": "search-mode-mobile",
+    "name": "CURRENT \u00b7 M35 \u00b7 Search by job title",
+    "x": 1000,
+    "y": 21000
+  },
+  {
+    "stem": "search-results-mobile",
+    "name": "CURRENT \u00b7 M36 \u00b7 Occupation search results",
+    "x": 1500,
+    "y": 21000
+  },
+  {
+    "stem": "skills-signed-mobile",
+    "name": "CURRENT \u00b7 M37 \u00b7 Skills in the example account",
+    "x": 2000,
+    "y": 21000
+  },
+  {
+    "stem": "task-editor-mobile",
+    "name": "CURRENT \u00b7 M38 \u00b7 Edit a task",
+    "x": 2500,
+    "y": 21000
+  }
+]

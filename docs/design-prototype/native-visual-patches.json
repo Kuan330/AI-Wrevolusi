@@ -1,0 +1,285 @@
+[
+  {
+    "file": "plan-mobile-current-progress-text.svg",
+    "target": "plan-mobile",
+    "mode": "current",
+    "x": 40,
+    "y": 439,
+    "width": 295,
+    "height": 37,
+    "completed": 0,
+    "planned": 8,
+    "source_date": "2026-10-12",
+    "baselines_in_original_frame": [
+      453.714,
+      471.714
+    ],
+    "id": "23:20"
+  },
+  {
+    "file": "plan-completed-mobile-current-progress-text.svg",
+    "target": "plan-completed-mobile",
+    "mode": "current",
+    "x": 40,
+    "y": 439,
+    "width": 295,
+    "height": 37,
+    "completed": 1,
+    "planned": 8,
+    "source_date": "2026-10-12",
+    "baselines_in_original_frame": [
+      453.714,
+      471.714
+    ],
+    "id": "23:31"
+  },
+  {
+    "file": "plan-conflict-mobile-current-progress-text.svg",
+    "target": "plan-conflict-mobile",
+    "mode": "current",
+    "x": 40,
+    "y": 439,
+    "width": 295,
+    "height": 37,
+    "completed": 0,
+    "planned": 8,
+    "source_date": "2026-10-12",
+    "baselines_in_original_frame": [
+      453.714,
+      471.714
+    ],
+    "id": "23:42"
+  },
+  {
+    "file": "plan-resolved-mobile-current-progress-text.svg",
+    "target": "plan-resolved-mobile",
+    "mode": "current",
+    "x": 40,
+    "y": 439,
+    "width": 295,
+    "height": 37,
+    "completed": 0,
+    "planned": 8,
+    "source_date": "2026-10-12",
+    "baselines_in_original_frame": [
+      453.714,
+      471.714
+    ],
+    "id": "23:53"
+  },
+  {
+    "file": "help-draft-mobile-current-progress-text.svg",
+    "target": "help-draft-mobile",
+    "mode": "current",
+    "x": 40,
+    "y": 439,
+    "width": 295,
+    "height": 37,
+    "completed": 0,
+    "planned": 8,
+    "source_date": "2026-10-12",
+    "baselines_in_original_frame": [
+      453.714,
+      471.714
+    ],
+    "id": "23:64"
+  },
+  {
+    "file": "exposure-mobile-current-wrapped-word-text.svg",
+    "target": "exposure-mobile",
+    "mode": "current",
+    "x": 40,
+    "y": 3047,
+    "width": 313,
+    "height": 40,
+    "family": "wrapped-word",
+    "source_text": "Start with a task you do often or find time-consuming.",
+    "fragments": [
+      "Start with a task you do often or find time-",
+      "consuming."
+    ],
+    "baselines_in_original_frame": [
+      3061.589,
+      3081.589
+    ],
+    "id": "23:75"
+  },
+  {
+    "file": "help-accepted-mobile-current-wrapped-word-text.svg",
+    "target": "help-accepted-mobile",
+    "mode": "current",
+    "x": 35,
+    "y": 560,
+    "width": 331,
+    "height": 44,
+    "family": "wrapped-word",
+    "source_text": "“Prototype example: school pickup” on 2026-09-16,",
+    "fragments": [
+      "“Prototype example: school pickup” on 2026-09-",
+      "16,",
+      "18:15–19:00 (Asia/Kuala_Lumpur)? Please"
+    ],
+    "baselines_in_original_frame": [
+      574.552,
+      597.942,
+      597.942
+    ],
+    "id": "23:101"
+  },
+  {
+    "file": "help-declined-mobile-current-wrapped-word-text.svg",
+    "target": "help-declined-mobile",
+    "mode": "current",
+    "x": 35,
+    "y": 1106,
+    "width": 331,
+    "height": 44,
+    "family": "wrapped-word",
+    "source_text": "“Prototype example: school pickup” on 2026-09-16,",
+    "fragments": [
+      "“Prototype example: school pickup” on 2026-09-",
+      "16,",
+      "18:15–19:00 (Asia/Kuala_Lumpur)? Please"
+    ],
+    "baselines_in_original_frame": [
+      1120.505,
+      1143.896,
+      1143.896
+    ],
+    "id": "23:128"
+  },
+  {
+    "file": "help-status-mobile-current-wrapped-word-text.svg",
+    "target": "help-status-mobile",
+    "mode": "current",
+    "x": 35,
+    "y": 1106,
+    "width": 331,
+    "height": 44,
+    "family": "wrapped-word",
+    "source_text": "“Prototype example: school pickup” on 2026-09-16,",
+    "fragments": [
+      "“Prototype example: school pickup” on 2026-09-",
+      "16,",
+      "18:15–19:00 (Asia/Kuala_Lumpur)? Please"
+    ],
+    "baselines_in_original_frame": [
+      1120.505,
+      1143.896,
+      1143.896
+    ],
+    "id": "23:155"
+  },
+  {
+    "file": "help-waiting-mobile-current-wrapped-word-text.svg",
+    "target": "help-waiting-mobile",
+    "mode": "current",
+    "x": 35,
+    "y": 1106,
+    "width": 331,
+    "height": 44,
+    "family": "wrapped-word",
+    "source_text": "“Prototype example: school pickup” on 2026-09-16,",
+    "fragments": [
+      "“Prototype example: school pickup” on 2026-09-",
+      "16,",
+      "18:15–19:00 (Asia/Kuala_Lumpur)? Please"
+    ],
+    "baselines_in_original_frame": [
+      1120.505,
+      1143.896,
+      1143.896
+    ],
+    "id": "23:182"
+  },
+  {
+    "file": "skills-desktop-current-wrapped-word-text.svg",
+    "target": "skills-desktop",
+    "mode": "current",
+    "x": 546,
+    "y": 350,
+    "width": 215,
+    "height": 49,
+    "family": "wrapped-word",
+    "source_text": "Motivation and self-awareness",
+    "fragments": [
+      "Motivation and self-",
+      "awareness"
+    ],
+    "baselines_in_original_frame": [
+      371.343,
+      385.906
+    ],
+    "id": "23:209"
+  },
+  {
+    "file": "skills-signed-desktop-current-wrapped-word-text.svg",
+    "target": "skills-signed-desktop",
+    "mode": "current",
+    "x": 546,
+    "y": 350,
+    "width": 215,
+    "height": 49,
+    "family": "wrapped-word",
+    "source_text": "Motivation and self-awareness",
+    "fragments": [
+      "Motivation and self-",
+      "awareness"
+    ],
+    "baselines_in_original_frame": [
+      371.343,
+      385.906
+    ],
+    "id": "23:259"
+  },
+  {
+    "kind": "form",
+    "target": "activity-desktop",
+    "id": "23:309"
+  },
+  {
+    "kind": "form",
+    "target": "activity-mobile",
+    "id": "23:324"
+  },
+  {
+    "kind": "form",
+    "target": "content-desktop",
+    "id": "23:339"
+  },
+  {
+    "kind": "form",
+    "target": "content-mobile",
+    "id": "23:355"
+  },
+  {
+    "kind": "form",
+    "target": "focus-desktop",
+    "id": "23:371"
+  },
+  {
+    "kind": "form",
+    "target": "focus-mobile",
+    "id": "23:399"
+  },
+  {
+    "kind": "form",
+    "target": "routine-desktop",
+    "id": "23:427"
+  },
+  {
+    "kind": "form",
+    "target": "routine-mobile",
+    "id": "23:443"
+  },
+  {
+    "kind": "form",
+    "target": "sign-in-desktop",
+    "id": "23:459"
+  },
+  {
+    "kind": "form",
+    "target": "sign-in-mobile",
+    "id": "23:469"
+  }
+]

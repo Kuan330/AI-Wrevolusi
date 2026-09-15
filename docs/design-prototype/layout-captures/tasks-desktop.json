@@ -1,0 +1,1821 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 1000,
+      "kind": "body",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 1440,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 1000,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 1440,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.45)",
+      "height": 65,
+      "kind": "header",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 1440,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(214, 234, 247)",
+      "height": 36,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(79, 145, 186, 0.14) 0px 4px 12px 0px",
+      "width": 66.984375,
+      "x": 352.28125,
+      "y": 14
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 74.734375,
+      "x": 1341.265625,
+      "y": 14
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(201, 149, 137)",
+      "height": 40,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(201, 149, 137, 0.28) 0px 4px 16px 0px",
+      "width": 170.640625,
+      "x": 695.640625,
+      "y": 85
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.28)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(61, 43, 54, 0.06) 0px 4px 12px 0px",
+      "width": 157.71875,
+      "x": 874.28125,
+      "y": 85
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.76)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 770,
+      "kind": "section",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.12) 0px 14px 34px 0px",
+      "width": 624,
+      "x": 408,
+      "y": 210
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.9)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "fill": "rgb(255, 255, 255)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(61, 43, 54, 0.08) 0px 2px 10px 0px",
+      "width": 146.1875,
+      "x": 730.6875,
+      "y": 231
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "fill": "rgb(79, 145, 186)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(79, 145, 186, 0.28) 0px 4px 16px 0px",
+      "width": 126.125,
+      "x": 884.875,
+      "y": 231
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 82,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "rgba(61, 43, 54, 0.08) 0px 10px 24px 0px",
+      "width": 567,
+      "x": 429,
+      "y": 283
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 891,
+      "y": 304
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 939,
+      "y": 304
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 82,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "rgba(61, 43, 54, 0.08) 0px 10px 24px 0px",
+      "width": 567,
+      "x": 429,
+      "y": 377
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 891,
+      "y": 398
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 939,
+      "y": 398
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 74,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "rgba(61, 43, 54, 0.08) 0px 10px 24px 0px",
+      "width": 567,
+      "x": 429,
+      "y": 471
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(214, 234, 247)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 891,
+      "y": 487
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 939,
+      "y": 488
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 106,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "rgba(61, 43, 54, 0.08) 0px 10px 24px 0px",
+      "width": 567,
+      "x": 429,
+      "y": 557
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 891,
+      "y": 590
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 939,
+      "y": 590
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 74,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "rgba(61, 43, 54, 0.08) 0px 10px 24px 0px",
+      "width": 567,
+      "x": 429,
+      "y": 675
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 891,
+      "y": 692
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 939,
+      "y": 692
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 74,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "rgba(61, 43, 54, 0.08) 0px 10px 24px 0px",
+      "width": 567,
+      "x": 429,
+      "y": 761
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 891,
+      "y": 778
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 939,
+      "y": 778
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 82,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "rgba(61, 43, 54, 0.08) 0px 10px 24px 0px",
+      "width": 567,
+      "x": 429,
+      "y": 847
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 891,
+      "y": 868
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 40,
+      "x": 939,
+      "y": 868
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.92) 58%)",
+      "borderColor": "rgb(79, 145, 186)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 582,
+      "x": 429,
+      "y": 859
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.28)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(61, 43, 54, 0.06) 0px 4px 12px 0px",
+      "width": 157.71875,
+      "x": 853.28125,
+      "y": 919
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/",
+      "label": "AI-Wrevolusi home",
+      "role": "a",
+      "width": 158.078125,
+      "x": 24,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/profile",
+      "label": "Work Profile",
+      "role": "a",
+      "width": 110.203125,
+      "x": 214.078125,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/profile/tasks",
+      "label": "Tasks",
+      "role": "a",
+      "width": 66.984375,
+      "x": 352.28125,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Log in or create an account",
+      "role": "button",
+      "width": 74.734375,
+      "x": 1341.265625,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 40,
+      "href": "/profile",
+      "label": "Change occupation",
+      "role": "a",
+      "width": 170.640625,
+      "x": 695.640625,
+      "y": 85
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Explore AI impact",
+      "role": "button",
+      "width": 157.71875,
+      "x": 874.28125,
+      "y": 85
+    },
+    {
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Select tasks",
+      "role": "button",
+      "width": 146.1875,
+      "x": 730.6875,
+      "y": 231
+    },
+    {
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Add a task",
+      "role": "button",
+      "width": 126.125,
+      "x": 884.875,
+      "y": 231
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Edit task",
+      "role": "button",
+      "width": 40,
+      "x": 891,
+      "y": 304
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Delete task",
+      "role": "button",
+      "width": 40,
+      "x": 939,
+      "y": 304
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Edit task",
+      "role": "button",
+      "width": 40,
+      "x": 891,
+      "y": 398
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Delete task",
+      "role": "button",
+      "width": 40,
+      "x": 939,
+      "y": 398
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Edit task",
+      "role": "button",
+      "width": 40,
+      "x": 891,
+      "y": 487
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Delete task",
+      "role": "button",
+      "width": 40,
+      "x": 939,
+      "y": 488
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Edit task",
+      "role": "button",
+      "width": 40,
+      "x": 891,
+      "y": 590
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Delete task",
+      "role": "button",
+      "width": 40,
+      "x": 939,
+      "y": 590
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Edit task",
+      "role": "button",
+      "width": 40,
+      "x": 891,
+      "y": 692
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Delete task",
+      "role": "button",
+      "width": 40,
+      "x": 939,
+      "y": 692
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Edit task",
+      "role": "button",
+      "width": 40,
+      "x": 891,
+      "y": 778
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Delete task",
+      "role": "button",
+      "width": 40,
+      "x": 939,
+      "y": 778
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Edit task",
+      "role": "button",
+      "width": 40,
+      "x": 891,
+      "y": 868
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Delete task",
+      "role": "button",
+      "width": 40,
+      "x": 939,
+      "y": 868
+    },
+    {
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Scroll to see more tasks",
+      "role": "button",
+      "width": 582,
+      "x": 429,
+      "y": 859
+    },
+    {
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Explore AI impact",
+      "role": "button",
+      "width": 157.71875,
+      "x": 853.28125,
+      "y": 919
+    }
+  ],
+  "height": 1000,
+  "icons": [
+    {
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-list-checks h-4 w-4\" aria-hidden=\"true\"><path d=\"M13 5h8\"></path><path d=\"M13 12h8\"></path><path d=\"M13 19h8\"></path><path d=\"m3 17 2 2 4-4\"></path><path d=\"m3 7 2 2 4-4\"></path></svg>",
+      "width": 16,
+      "x": 751.6875,
+      "y": 243
+    },
+    {
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "color": "rgb(255, 255, 255)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus h-4 w-4\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"M12 5v14\"></path></svg>",
+      "width": 16,
+      "x": 900.875,
+      "y": 243
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-trash2 lucide-trash-2 h-4 w-4\" aria-hidden=\"true\"><path d=\"M10 11v6\"></path><path d=\"M14 11v6\"></path><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"></path><path d=\"M3 6h18\"></path><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"></path></svg>",
+      "width": 16,
+      "x": 951,
+      "y": 316
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-trash2 lucide-trash-2 h-4 w-4\" aria-hidden=\"true\"><path d=\"M10 11v6\"></path><path d=\"M14 11v6\"></path><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"></path><path d=\"M3 6h18\"></path><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"></path></svg>",
+      "width": 16,
+      "x": 951,
+      "y": 410
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-trash2 lucide-trash-2 h-4 w-4\" aria-hidden=\"true\"><path d=\"M10 11v6\"></path><path d=\"M14 11v6\"></path><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"></path><path d=\"M3 6h18\"></path><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"></path></svg>",
+      "width": 16,
+      "x": 951,
+      "y": 500
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-trash2 lucide-trash-2 h-4 w-4\" aria-hidden=\"true\"><path d=\"M10 11v6\"></path><path d=\"M14 11v6\"></path><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"></path><path d=\"M3 6h18\"></path><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"></path></svg>",
+      "width": 16,
+      "x": 951,
+      "y": 602
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-trash2 lucide-trash-2 h-4 w-4\" aria-hidden=\"true\"><path d=\"M10 11v6\"></path><path d=\"M14 11v6\"></path><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"></path><path d=\"M3 6h18\"></path><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"></path></svg>",
+      "width": 16,
+      "x": 951,
+      "y": 704
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-trash2 lucide-trash-2 h-4 w-4\" aria-hidden=\"true\"><path d=\"M10 11v6\"></path><path d=\"M14 11v6\"></path><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"></path><path d=\"M3 6h18\"></path><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"></path></svg>",
+      "width": 16,
+      "x": 951,
+      "y": 790
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-trash2 lucide-trash-2 h-4 w-4\" aria-hidden=\"true\"><path d=\"M10 11v6\"></path><path d=\"M14 11v6\"></path><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"></path><path d=\"M3 6h18\"></path><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"></path></svg>",
+      "width": 16,
+      "x": 951,
+      "y": 880
+    },
+    {
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down h-4 w-4\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"></path></svg>",
+      "width": 16,
+      "x": 712,
+      "y": 877.0084228515625
+    }
+  ],
+  "images": [
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "height": 36,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/logo-mark.svg",
+      "width": 41.265625,
+      "x": 24,
+      "y": 14
+    },
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "height": 20,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/icons/icon-edit.svg",
+      "width": 20,
+      "x": 901,
+      "y": 314
+    },
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "height": 20,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/icons/icon-edit.svg",
+      "width": 20,
+      "x": 901,
+      "y": 408
+    },
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "height": 20,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/icons/icon-edit.svg",
+      "width": 20,
+      "x": 901,
+      "y": 497
+    },
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "height": 20,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/icons/icon-edit.svg",
+      "width": 20,
+      "x": 901,
+      "y": 600
+    },
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "height": 20,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/icons/icon-edit.svg",
+      "width": 20,
+      "x": 901,
+      "y": 702
+    },
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "height": 20,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/icons/icon-edit.svg",
+      "width": 20,
+      "x": 901,
+      "y": 788
+    },
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "height": 20,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/icons/icon-edit.svg",
+      "width": 20,
+      "x": 901,
+      "y": 878
+    }
+  ],
+  "overlay": false,
+  "scrollY": 0,
+  "texts": [
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 43, 54)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "-0.45px",
+      "lineHeight": "27px",
+      "text": "AI-Wrevolusi",
+      "width": 106.8125,
+      "x": 75.265625,
+      "y": 21.5
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Work Profile",
+      "width": 82.203125,
+      "x": 228.078125,
+      "y": 23.5
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Tasks",
+      "width": 38.984375,
+      "x": 366.28125,
+      "y": 23.5
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Log in",
+      "width": 40.734375,
+      "x": 1358.265625,
+      "y": 23
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "32px",
+      "text": "Your tasks",
+      "width": 122.0625,
+      "x": 408,
+      "y": 90
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(255, 255, 255)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Change occupation",
+      "width": 130.640625,
+      "x": 715.640625,
+      "y": 96
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Explore AI impact",
+      "width": 115.71875,
+      "x": 895.28125,
+      "y": 96
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "SERVICE AND SALES WORKERS → SALES WORKERS → SHOP SALESPERSONS → SHOP",
+      "width": 583.625,
+      "x": 408,
+      "y": 138
+    },
+    {
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "SUPERVISORS",
+      "width": 96.640625,
+      "x": 408,
+      "y": 158
+    },
+    {
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Select tasks",
+      "width": 80.1875,
+      "x": 775.6875,
+      "y": 242
+    },
+    {
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "fill": "rgb(255, 255, 255)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Add a task",
+      "width": 70.125,
+      "x": 924.875,
+      "y": 242
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Planning and preparing work schedules and assigning staff to",
+      "width": 407.984375,
+      "x": 446,
+      "y": 303
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "specific duties;",
+      "width": 100.625,
+      "x": 446,
+      "y": 327
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Instructing staff on sales procedures, including how to handle",
+      "width": 407.5,
+      "x": 446,
+      "y": 397
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "difficult or complex cases;",
+      "width": 174.375,
+      "x": 446,
+      "y": 421
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Ensuring that customers receive prompt service;",
+      "width": 321.203125,
+      "x": 446,
+      "y": 499
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Participating in and providing advice to managers on",
+      "width": 347.890625,
+      "x": 446,
+      "y": 577
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "interviewing, hiring, training, evaluating, promoting and",
+      "width": 363.515625,
+      "x": 446,
+      "y": 601
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "dismissing staff, and resolving staff grievances;",
+      "width": 314.640625,
+      "x": 446,
+      "y": 625
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Examining returned goods and deciding on appropriate action;",
+      "width": 412.859375,
+      "x": 446,
+      "y": 703
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Taking inventory of goods for sale and ordering new stock;",
+      "width": 389.375,
+      "x": 446,
+      "y": 789
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Ensuring that goods and services are correctly priced and",
+      "width": 383.5625,
+      "x": 446,
+      "y": 867
+    },
+    {
+      "clip": {
+        "height": 616,
+        "width": 582,
+        "x": 429,
+        "y": 283
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "displayed;",
+      "width": 67.53125,
+      "x": 446,
+      "y": 891
+    },
+    {
+      "clip": {
+        "height": 770,
+        "width": 624,
+        "x": 408,
+        "y": 210
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Explore AI impact",
+      "width": 115.71875,
+      "x": 874.28125,
+      "y": 930
+    }
+  ],
+  "url": "http://127.0.0.1:4173/profile/tasks",
+  "viewportHeight": 1000,
+  "width": 1440,
+  "name": "tasks-desktop",
+  "screenshot": "tasks-desktop.jpg"
+}

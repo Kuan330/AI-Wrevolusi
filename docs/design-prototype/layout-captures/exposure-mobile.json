@@ -1,0 +1,3328 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 3192.46875,
+      "kind": "body",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 3192.46875,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.45)",
+      "height": 65,
+      "kind": "header",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 36,
+      "x": 16,
+      "y": 14
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 74.734375,
+      "x": 284.265625,
+      "y": 14
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(201, 223, 239)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 20,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 50,
+      "shadow": "none",
+      "width": 20,
+      "x": 302.96875,
+      "y": 142.59375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 98.8125,
+      "x": 16,
+      "y": 198.59375
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.28)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 36,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 103,
+      "x": 122.8125,
+      "y": 198.59375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 1131.875,
+      "kind": "section",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.1) 0px 14px 34px 0px",
+      "width": 343,
+      "x": 16,
+      "y": 271.59375
+    },
+    {
+      "background": false,
+      "backgroundImage": "radial-gradient(circle at 0px 0px, rgba(158, 201, 228, 0.3), rgba(0, 0, 0, 0) 44%), linear-gradient(155deg, rgba(255, 255, 255, 0.42), rgba(234, 243, 251, 0.32))",
+      "borderColor": "rgba(255, 255, 255, 0.84)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 518.6875,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 341,
+      "x": 17,
+      "y": 883.78125
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(228, 220, 231, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 117,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 293,
+      "x": 41,
+      "y": 1140.46875
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(228, 220, 231, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 121,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 293,
+      "x": 41,
+      "y": 1257.46875
+    },
+    {
+      "background": true,
+      "backgroundImage": "radial-gradient(at 46% 48%, rgba(158, 201, 228, 0.14), rgba(0, 0, 0, 0) 44%), radial-gradient(at 61% 52%, rgba(232, 160, 176, 0.13), rgba(0, 0, 0, 0) 39%), none",
+      "borderColor": "rgba(255, 255, 255, 0.84)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgba(255, 255, 255, 0.32)",
+      "height": 611.1875,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 341,
+      "x": 17,
+      "y": 272.59375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.9)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgba(255, 255, 255, 0.68)",
+      "height": 229.5,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "rgba(61, 43, 54, 0.05) 0px 5px 14px 0px",
+      "width": 293,
+      "x": 41,
+      "y": 404.28125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgba(127, 114, 128, 0.12)",
+      "height": 14,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 251,
+      "x": 62,
+      "y": 510.78125
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(232, 160, 176) 0%, rgb(199, 160, 200) 42%, rgb(126, 179, 217) 78%, rgb(79, 145, 186) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 14,
+        "width": 251,
+        "x": 62,
+        "y": 510.78125
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 14,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(79, 145, 186, 0.28) 0px 2px 10px 0px",
+      "width": 90.4375,
+      "x": 62,
+      "y": 510.78125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(216, 232, 243)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgba(234, 243, 251, 0.4)",
+      "height": 51,
+      "kind": "details",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 293,
+      "x": 41,
+      "y": 653.78125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(186, 212, 228)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 38,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 201.1875,
+      "x": 41,
+      "y": 724.78125
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(228, 220, 231, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 73,
+      "kind": "p",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 293,
+      "x": 41,
+      "y": 786.78125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.84)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.78)",
+      "height": 1146.5,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "rgba(61, 43, 54, 0.1) 0px 14px 34px 0px",
+      "width": 343,
+      "x": 16,
+      "y": 1423.46875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(216, 232, 243)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(245, 250, 255)",
+      "height": 161,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "none",
+      "width": 293,
+      "x": 41,
+      "y": 1595.96875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(255, 255, 255)",
+      "height": 24,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 79.0625,
+      "x": 239.9375,
+      "y": 1612.96875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgba(79, 145, 186, 0.2)",
+      "height": 6,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 263,
+      "x": 56,
+      "y": 1694.96875
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(232, 160, 176) 0%, rgb(199, 160, 200) 42%, rgb(126, 179, 217) 78%, rgb(79, 145, 186) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 6,
+        "width": 263,
+        "x": 56,
+        "y": 1694.96875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 6,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 263,
+      "x": 56,
+      "y": 1694.96875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(79, 145, 186, 0.5)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 16,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 16,
+      "x": 56,
+      "y": 1689.96875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(79, 145, 186, 0.5)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 16,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 16,
+      "x": 303,
+      "y": 1689.96875
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 134,
+      "kind": "article",
+      "opacity": 1,
+      "radius": 14,
+      "shadow": "none",
+      "width": 283,
+      "x": 41,
+      "y": 1804.96875
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 110,
+      "kind": "article",
+      "opacity": 1,
+      "radius": 14,
+      "shadow": "none",
+      "width": 283,
+      "x": 41,
+      "y": 1942.96875
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 134,
+      "kind": "article",
+      "opacity": 1,
+      "radius": 14,
+      "shadow": "none",
+      "width": 283,
+      "x": 41,
+      "y": 2056.96875
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 158,
+      "kind": "article",
+      "opacity": 1,
+      "radius": 14,
+      "shadow": "none",
+      "width": 283,
+      "x": 41,
+      "y": 2194.96875
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 110,
+      "kind": "article",
+      "opacity": 1,
+      "radius": 14,
+      "shadow": "none",
+      "width": 283,
+      "x": 41,
+      "y": 2356.96875
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 206,
+      "kind": "article",
+      "opacity": 1,
+      "radius": 14,
+      "shadow": "none",
+      "width": 283,
+      "x": 41,
+      "y": 2470.96875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.84)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.78)",
+      "height": 546.5,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "rgba(61, 43, 54, 0.1) 0px 14px 34px 0px",
+      "width": 343,
+      "x": 16,
+      "y": 2589.96875
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 546.5,
+        "width": 343,
+        "x": 16,
+        "y": 2589.96875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 290,
+      "kind": "ol",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "none",
+      "width": 293,
+      "x": 41,
+      "y": 2741.46875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgba(255, 255, 255, 0.85)",
+      "height": 32,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 32,
+      "x": 57,
+      "y": 2757.46875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgba(255, 255, 255, 0.85)",
+      "height": 32,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 32,
+      "x": 57,
+      "y": 2854.46875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgba(255, 255, 255, 0.85)",
+      "height": 32,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 32,
+      "x": 57,
+      "y": 2951.46875
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Open menu",
+      "role": "button",
+      "width": 36,
+      "x": 16,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/",
+      "label": "AI-Wrevolusi home",
+      "role": "a",
+      "width": 158.078125,
+      "x": 64,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Log in or create an account",
+      "role": "button",
+      "width": 74.734375,
+      "x": 284.265625,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 20,
+      "href": null,
+      "label": "Occupation classification path",
+      "role": "button",
+      "width": 20,
+      "x": 302.96875,
+      "y": 142.59375
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/profile/tasks",
+      "label": "Edit tasks",
+      "role": "a",
+      "width": 98.8125,
+      "x": 16,
+      "y": 198.59375
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/skills",
+      "label": "View skills",
+      "role": "a",
+      "width": 103,
+      "x": 122.8125,
+      "y": 198.59375
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "disabled": false,
+      "height": 24,
+      "href": null,
+      "label": "ILO exposure categories",
+      "role": "button",
+      "width": 24,
+      "x": 160.796875,
+      "y": 1278.46875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "disabled": false,
+      "height": 38,
+      "href": "#task-breakdown",
+      "label": "View task breakdown",
+      "role": "a",
+      "width": 201.1875,
+      "x": 41,
+      "y": 724.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "disabled": false,
+      "height": 16,
+      "href": "https://www.ilo.org/publications/generative-ai-and-jobs-refined-global-index-occupational-exposure",
+      "label": "Gmyrek et al. 2025 · ILO Working Paper 140",
+      "role": "a",
+      "width": 263.109375,
+      "x": 41,
+      "y": 823.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "disabled": false,
+      "height": 16,
+      "href": "https://pgmyrek.github.io/2025_GenAI_scores_ISCO08/",
+      "label": "ISCO-08 open exposure data",
+      "role": "a",
+      "width": 181.515625,
+      "x": 41,
+      "y": 843.78125
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "disabled": false,
+      "height": 72,
+      "href": null,
+      "label": "Planning and preparing work schedules and assigning staff to specific duties;",
+      "role": "button",
+      "width": 249,
+      "x": 58,
+      "y": 1821.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "disabled": false,
+      "height": 16,
+      "href": null,
+      "label": "Exposure score and evidence",
+      "role": "button",
+      "width": 169.265625,
+      "x": 58,
+      "y": 1905.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "disabled": false,
+      "height": 48,
+      "href": null,
+      "label": "Ensuring that customers receive prompt service;",
+      "role": "button",
+      "width": 249,
+      "x": 58,
+      "y": 1959.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "disabled": false,
+      "height": 16,
+      "href": null,
+      "label": "Exposure score and evidence",
+      "role": "button",
+      "width": 169.265625,
+      "x": 58,
+      "y": 2019.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "disabled": false,
+      "height": 72,
+      "href": null,
+      "label": "Ensuring that goods and services are correctly priced and displayed;",
+      "role": "button",
+      "width": 249,
+      "x": 58,
+      "y": 2073.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "disabled": false,
+      "height": 16,
+      "href": null,
+      "label": "Exposure score and evidence",
+      "role": "button",
+      "width": 169.265625,
+      "x": 58,
+      "y": 2157.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "disabled": false,
+      "height": 96,
+      "href": null,
+      "label": "Instructing staff on sales procedures, including how to handle difficult or complex cases;",
+      "role": "button",
+      "width": 249,
+      "x": 58,
+      "y": 2211.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "disabled": false,
+      "height": 16,
+      "href": null,
+      "label": "Exposure score and evidence",
+      "role": "button",
+      "width": 169.265625,
+      "x": 58,
+      "y": 2319.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "disabled": false,
+      "height": 48,
+      "href": null,
+      "label": "Taking inventory of goods for sale and ordering new stock;",
+      "role": "button",
+      "width": 249,
+      "x": 58,
+      "y": 2373.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "disabled": false,
+      "height": 16,
+      "href": null,
+      "label": "Exposure score and evidence",
+      "role": "button",
+      "width": 169.265625,
+      "x": 58,
+      "y": 2433.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "disabled": false,
+      "height": 144,
+      "href": null,
+      "label": "Participating in and providing advice to managers on interviewing, hiring, training, evaluating, promoting and dismissing staff, and resolving staff grievances;",
+      "role": "button",
+      "width": 249,
+      "x": 58,
+      "y": 2487.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "disabled": false,
+      "height": 28,
+      "href": null,
+      "label": "Scroll down to more tasks",
+      "role": "button",
+      "width": 36,
+      "x": 169.5,
+      "y": 2516.96875
+    }
+  ],
+  "height": 3192,
+  "icons": [
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(60, 42, 53)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-menu size-4\" aria-hidden=\"true\"><path d=\"M4 5h16\"></path><path d=\"M4 12h16\"></path><path d=\"M4 19h16\"></path></svg>",
+      "width": 16,
+      "x": 26,
+      "y": 24
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 12,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-info\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 16v-4\"></path><path d=\"M12 8h.01\"></path></svg>",
+      "width": 12,
+      "x": 306.96875,
+      "y": 146.59375
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "color": "rgb(61, 95, 122)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-info size-4\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 16v-4\"></path><path d=\"M12 8h.01\"></path></svg>",
+      "width": 16,
+      "x": 164.796875,
+      "y": 1282.46875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "color": "rgb(47, 95, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-arrow-down size-4\" aria-hidden=\"true\"><path d=\"M12 5v14\"></path><path d=\"m19 12-7 7-7-7\"></path></svg>",
+      "width": 16,
+      "x": 209.1875,
+      "y": 735.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "color": "rgb(47, 95, 128)",
+      "height": 12,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-external-link size-3 shrink-0\" aria-hidden=\"true\"><path d=\"M15 3h6v6\"></path><path d=\"M10 14 21 3\"></path><path d=\"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6\"></path></svg>",
+      "width": 12,
+      "x": 292.109375,
+      "y": 825.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "color": "rgb(47, 95, 128)",
+      "height": 12,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-external-link size-3 shrink-0\" aria-hidden=\"true\"><path d=\"M15 3h6v6\"></path><path d=\"M10 14 21 3\"></path><path d=\"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6\"></path></svg>",
+      "width": 12,
+      "x": 210.515625,
+      "y": 845.78125
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 291,
+      "y": 1849.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 291,
+      "y": 1975.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 291,
+      "y": 2101.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 291,
+      "y": 2251.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 291,
+      "y": 2389.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down size-4\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"></path></svg>",
+      "width": 16,
+      "x": 179.5,
+      "y": 2522.96875
+    }
+  ],
+  "images": [
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "height": 36,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/logo-mark.svg",
+      "width": 41.265625,
+      "x": 64,
+      "y": 14
+    }
+  ],
+  "overlay": false,
+  "scrollY": 0,
+  "texts": [
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 43, 54)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "-0.45px",
+      "lineHeight": "27px",
+      "text": "AI-Wrevolusi",
+      "width": 106.8125,
+      "x": 115.265625,
+      "y": 21.5
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Log in",
+      "width": 40.734375,
+      "x": 301.265625,
+      "y": 23
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "28.8px",
+      "text": "How AI may change your",
+      "width": 288.546875,
+      "x": 16,
+      "y": 80
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "28.8px",
+      "text": "work",
+      "width": 57.96875,
+      "x": 16,
+      "y": 108.796875
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Explore your tasks in",
+      "width": 141.546875,
+      "x": 16,
+      "y": 143.59375
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": ", try",
+      "width": 25.921875,
+      "x": 322.96875,
+      "y": 143.59375
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "practical assistance and record what works for you.",
+      "width": 341.96875,
+      "x": 16,
+      "y": 163.59375
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "700",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "SHOP SUPERVISORS",
+      "width": 141.421875,
+      "x": 157.546875,
+      "y": 143.59375
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Edit tasks",
+      "width": 64.8125,
+      "x": 33,
+      "y": 207.59375
+    },
+    {
+      "clip": {
+        "height": 3192,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "View skills",
+      "width": 69,
+      "x": 139.8125,
+      "y": 207.59375
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "UNDERSTANDING AI EXPOSURE",
+      "width": 207.875,
+      "x": 41,
+      "y": 909.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 28,
+      "fontWeight": "600",
+      "height": 34,
+      "letterSpacing": "normal",
+      "lineHeight": "33.6px",
+      "text": "How to read your",
+      "width": 230.984375,
+      "x": 41,
+      "y": 940.28125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 28,
+      "fontWeight": "600",
+      "height": 34,
+      "letterSpacing": "normal",
+      "lineHeight": "33.6px",
+      "text": "score",
+      "width": 75.8125,
+      "x": 41,
+      "y": 973.875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Read the number",
+      "width": 115.34375,
+      "x": 41,
+      "y": 1045.46875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Higher scores indicate greater potential for",
+      "width": 283.546875,
+      "x": 41,
+      "y": 1075.46875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "your tasks to change with generative AI.",
+      "width": 265.34375,
+      "x": 41,
+      "y": 1099.46875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(90, 63, 108)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Know the limits",
+      "width": 103.46875,
+      "x": 41,
+      "y": 1162.46875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "The score does not predict whether or",
+      "width": 254.03125,
+      "x": 41,
+      "y": 1192.46875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "when you will lose your job.",
+      "width": 183.03125,
+      "x": 41,
+      "y": 1216.46875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "ILO classification",
+      "width": 115.796875,
+      "x": 41,
+      "y": 1281.46875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Your selected-task average is not an official",
+      "width": 290,
+      "x": 41,
+      "y": 1313.46875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "ILO occupation category.",
+      "width": 166.09375,
+      "x": 41,
+      "y": 1337.46875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "YOUR CONFIRMED TASKS",
+      "width": 168.390625,
+      "x": 41,
+      "y": 297.59375
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "27.6px",
+      "text": "Your task exposure at a",
+      "width": 271.046875,
+      "x": 41,
+      "y": 320.09375
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "27.6px",
+      "text": "glance",
+      "width": 77.9375,
+      "x": 41,
+      "y": 347.6875
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Your task mean score",
+      "width": 146.09375,
+      "x": 62,
+      "y": 426.28125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 30,
+      "fontWeight": "600",
+      "height": 36,
+      "letterSpacing": "normal",
+      "lineHeight": "37.5px",
+      "text": "0.36",
+      "width": 66.296875,
+      "x": 62,
+      "y": 457.28125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "/ 1.0",
+      "width": 30.734375,
+      "x": 132.296875,
+      "y": 472.28125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "· No GenAI",
+      "width": 60.984375,
+      "x": 73.46875,
+      "y": 534.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "automation potential",
+      "width": 115.5,
+      "x": 62,
+      "y": 554.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "700",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "0",
+      "width": 8.09375,
+      "x": 62,
+      "y": 534.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "· Full GenAI",
+      "width": 64.34375,
+      "x": 248.65625,
+      "y": 534.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "automation potential",
+      "width": 115.5,
+      "x": 197.5,
+      "y": 554.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "700",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "1",
+      "width": 5.1875,
+      "x": 240.09375,
+      "y": 534.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Based on 8 scored tasks.",
+      "width": 166.796875,
+      "x": 62,
+      "y": 591.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "How is this calculated?",
+      "width": 155.1875,
+      "x": 72.828125,
+      "y": 670.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(47, 95, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "View task breakdown",
+      "width": 143.1875,
+      "x": 58,
+      "y": 734.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Source",
+      "width": 40.171875,
+      "x": 41,
+      "y": 803.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(47, 95, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Gmyrek et al. 2025 · ILO Working Paper 140",
+      "width": 247.109375,
+      "x": 41,
+      "y": 823.78125
+    },
+    {
+      "clip": {
+        "height": 1131.875,
+        "width": 343,
+        "x": 16,
+        "y": 271.59375
+      },
+      "fill": "rgb(47, 95, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "ISCO-08 open exposure data",
+      "width": 165.515625,
+      "x": 41,
+      "y": 843.78125
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "600",
+      "height": 14,
+      "letterSpacing": "1.54px",
+      "lineHeight": "16.5px",
+      "text": "COMPARE YOUR TASKS",
+      "width": 155.296875,
+      "x": 41,
+      "y": 1449.46875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "-0.4px",
+      "lineHeight": "22px",
+      "text": "Your task exposure",
+      "width": 141.421875,
+      "x": 41,
+      "y": 1471.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Highest scores first. Select a task to see AI",
+      "width": 242.75,
+      "x": 41,
+      "y": 1500.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "guidance.",
+      "width": 55.859375,
+      "x": 41,
+      "y": 1520.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Filter by score",
+      "width": 95.125,
+      "x": 55.828125,
+      "y": 1564.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "1.44px",
+      "lineHeight": "16px",
+      "text": "FILTER BY TASK",
+      "width": 113.46875,
+      "x": 56,
+      "y": 1610.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "1.44px",
+      "lineHeight": "16px",
+      "text": "SCORE",
+      "width": 48.171875,
+      "x": 56,
+      "y": 1626.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Show scores from",
+      "width": 106.21875,
+      "x": 56,
+      "y": 1646.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "0.00",
+      "width": 25.5625,
+      "x": 162.21875,
+      "y": 1646.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "to",
+      "width": 14.390625,
+      "x": 56,
+      "y": 1662.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "1.00",
+      "width": 23.1875,
+      "x": 70.390625,
+      "y": 1662.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(47, 95, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "0.00",
+      "width": 26.53125,
+      "x": 249.9375,
+      "y": 1616.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(47, 95, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "–",
+      "width": 6,
+      "x": 276.46875,
+      "y": 1616.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(47, 95, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "1.00",
+      "width": 26.53125,
+      "x": 282.46875,
+      "y": 1616.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.5px",
+      "text": "· No GenAI automation",
+      "width": 116.9375,
+      "x": 66.515625,
+      "y": 1709.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.5px",
+      "text": "potential",
+      "width": 44.84375,
+      "x": 56,
+      "y": 1726.46875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.5px",
+      "text": "0",
+      "width": 7.421875,
+      "x": 56,
+      "y": 1709.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.5px",
+      "text": "· Full GenAI automation",
+      "width": 120.015625,
+      "x": 195.1875,
+      "y": 1709.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.5px",
+      "text": "potential",
+      "width": 44.84375,
+      "x": 187.34375,
+      "y": 1726.46875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.5px",
+      "text": "1",
+      "width": 4.75,
+      "x": 187.34375,
+      "y": 1709.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Showing",
+      "width": 52.328125,
+      "x": 41,
+      "y": 1776.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "8",
+      "width": 7.4375,
+      "x": 93.328125,
+      "y": 1776.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "of",
+      "width": 15.015625,
+      "x": 104.140625,
+      "y": 1776.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "8",
+      "width": 7.4375,
+      "x": 119.15625,
+      "y": 1776.96875
+    },
+    {
+      "clip": {
+        "height": 1146.5,
+        "width": 343,
+        "x": 16,
+        "y": 1423.46875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "tasks",
+      "width": 29.984375,
+      "x": 129.96875,
+      "y": 1776.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Planning and preparing work",
+      "width": 192.34375,
+      "x": 58,
+      "y": 1824.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "schedules and assigning staff to",
+      "width": 216.328125,
+      "x": 58,
+      "y": 1848.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "specific duties;",
+      "width": 102.265625,
+      "x": 58,
+      "y": 1872.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Exposure score and evidence",
+      "width": 169.265625,
+      "x": 58,
+      "y": 1905.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Ensuring that customers receive",
+      "width": 216.015625,
+      "x": 58,
+      "y": 1962.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "prompt service;",
+      "width": 105.53125,
+      "x": 58,
+      "y": 1986.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Exposure score and evidence",
+      "width": 169.265625,
+      "x": 58,
+      "y": 2019.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Ensuring that goods and",
+      "width": 162.890625,
+      "x": 58,
+      "y": 2076.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "services are correctly priced",
+      "width": 192,
+      "x": 58,
+      "y": 2100.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "and displayed;",
+      "width": 97.484375,
+      "x": 58,
+      "y": 2124.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Exposure score and evidence",
+      "width": 169.265625,
+      "x": 58,
+      "y": 2157.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Instructing staff on sales",
+      "width": 165.078125,
+      "x": 58,
+      "y": 2214.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "procedures, including how to",
+      "width": 194.4375,
+      "x": 58,
+      "y": 2238.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "handle difficult or complex",
+      "width": 177.953125,
+      "x": 58,
+      "y": 2262.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "cases;",
+      "width": 43.890625,
+      "x": 58,
+      "y": 2286.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Exposure score and evidence",
+      "width": 169.265625,
+      "x": 58,
+      "y": 2319.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Taking inventory of goods for",
+      "width": 196.734375,
+      "x": 58,
+      "y": 2376.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "sale and ordering new stock;",
+      "width": 192.78125,
+      "x": 58,
+      "y": 2400.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Exposure score and evidence",
+      "width": 169.265625,
+      "x": 58,
+      "y": 2433.96875
+    },
+    {
+      "clip": {
+        "height": 704,
+        "width": 293,
+        "x": 41,
+        "y": 1804.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Participating in and providing",
+      "width": 195.546875,
+      "x": 58,
+      "y": 2490.96875
+    },
+    {
+      "clip": {
+        "height": 546.5,
+        "width": 343,
+        "x": 16,
+        "y": 2589.96875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "600",
+      "height": 14,
+      "letterSpacing": "1.54px",
+      "lineHeight": "16.5px",
+      "text": "YOUR AI TASK GUIDE",
+      "width": 141.28125,
+      "x": 41,
+      "y": 2615.96875
+    },
+    {
+      "clip": {
+        "height": 546.5,
+        "width": 343,
+        "x": 16,
+        "y": 2589.96875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "-0.4px",
+      "lineHeight": "22px",
+      "text": "Select a task to explore AI assistance",
+      "width": 271.625,
+      "x": 41,
+      "y": 2638.46875
+    },
+    {
+      "clip": {
+        "height": 546.5,
+        "width": 343,
+        "x": 16,
+        "y": 2589.96875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Choose a task from your list, then click",
+      "width": 220.125,
+      "x": 41,
+      "y": 2667.46875
+    },
+    {
+      "clip": {
+        "height": 546.5,
+        "width": 343,
+        "x": 16,
+        "y": 2589.96875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": ".",
+      "width": 3.46875,
+      "x": 103.4375,
+      "y": 2687.46875
+    },
+    {
+      "clip": {
+        "height": 546.5,
+        "width": 343,
+        "x": 16,
+        "y": 2589.96875
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Explore AI",
+      "width": 58.703125,
+      "x": 264.5,
+      "y": 2667.46875
+    },
+    {
+      "clip": {
+        "height": 546.5,
+        "width": 343,
+        "x": 16,
+        "y": 2589.96875
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "assistance",
+      "width": 62.4375,
+      "x": 41,
+      "y": 2687.46875
+    },
+    {
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "01",
+      "width": 15.53125,
+      "x": 65.234375,
+      "y": 2765.46875
+    },
+    {
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Explore",
+      "width": 50.90625,
+      "x": 101,
+      "y": 2758.46875
+    },
+    {
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "See where AI could help and",
+      "width": 189.265625,
+      "x": 101,
+      "y": 2782.46875
+    },
+    {
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "which tools to consider.",
+      "width": 156.6875,
+      "x": 101,
+      "y": 2802.46875
+    },
+    {
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "02",
+      "width": 15.53125,
+      "x": 65.234375,
+      "y": 2862.46875
+    },
+    {
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Try",
+      "width": 22.46875,
+      "x": 101,
+      "y": 2855.46875
+    },
+    {
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Follow a practical plan and",
+      "width": 175.96875,
+      "x": 101,
+      "y": 2879.46875
+    },
+    {
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "check the output.",
+      "width": 115.734375,
+      "x": 101,
+      "y": 2899.46875
+    },
+    {
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "03",
+      "width": 15.53125,
+      "x": 65.234375,
+      "y": 2959.46875
+    },
+    {
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Compare",
+      "width": 61.890625,
+      "x": 101,
+      "y": 2952.46875
+    },
+    {
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Record your time and result to",
+      "width": 199.1875,
+      "x": 101,
+      "y": 2976.46875
+    },
+    {
+      "clip": {
+        "height": 290,
+        "width": 293,
+        "x": 41,
+        "y": 2741.46875
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "see what worked.",
+      "width": 117,
+      "x": 101,
+      "y": 2996.46875
+    },
+    {
+      "clip": {
+        "height": 546.5,
+        "width": 343,
+        "x": 16,
+        "y": 2589.96875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 35,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Start with a task you do often or find time-consuming.",
+      "width": 239.390625,
+      "x": 41,
+      "y": 3049.46875
+    },
+    {
+      "clip": {
+        "height": 546.5,
+        "width": 343,
+        "x": 16,
+        "y": 2589.96875
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "No timing information is needed to explore.",
+      "width": 246.671875,
+      "x": 41,
+      "y": 3093.46875
+    }
+  ],
+  "url": "http://127.0.0.1:4173/ai-exposure",
+  "viewportHeight": 844,
+  "width": 390,
+  "name": "exposure-mobile",
+  "screenshot": "exposure-mobile.jpg"
+}

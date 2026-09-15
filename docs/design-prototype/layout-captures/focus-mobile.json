@@ -1,0 +1,730 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "linear-gradient(130deg, rgb(245, 251, 255), rgb(252, 244, 248))",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 641,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 24,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px",
+      "width": 390,
+      "x": 0,
+      "y": 101.5
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(153, 198, 223)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(223, 238, 248)",
+      "height": 47,
+      "kind": "label",
+      "opacity": 1,
+      "radius": 14,
+      "shadow": "none",
+      "width": 162,
+      "x": 29,
+      "y": 248.5
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(214, 228, 238)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 47,
+      "kind": "label",
+      "opacity": 1,
+      "radius": 14,
+      "shadow": "none",
+      "width": 162,
+      "x": 199,
+      "y": 248.5
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(214, 228, 238)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 47,
+      "kind": "label",
+      "opacity": 1,
+      "radius": 14,
+      "shadow": "none",
+      "width": 162,
+      "x": 29,
+      "y": 303.5
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(214, 228, 238)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 47,
+      "kind": "label",
+      "opacity": 1,
+      "radius": 14,
+      "shadow": "none",
+      "width": 162,
+      "x": 199,
+      "y": 303.5
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 137.78125,
+      "x": 223.21875,
+      "y": 466.5
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(207, 224, 236)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(255, 255, 255)",
+      "height": 110,
+      "kind": "textarea",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 332,
+      "x": 29,
+      "y": 526.5
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(221, 229, 238)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 63,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 340,
+      "x": 25,
+      "y": 654.5
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 46,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 96.46875,
+      "x": 96.734375,
+      "y": 671.5
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "height": 46,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 159.796875,
+      "x": 205.203125,
+      "y": 671.5
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "disabled": false,
+      "height": 20,
+      "href": null,
+      "label": "",
+      "role": "input",
+      "width": 20,
+      "x": 42,
+      "y": 262
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "disabled": false,
+      "height": 20,
+      "href": null,
+      "label": "",
+      "role": "input",
+      "width": 20,
+      "x": 212,
+      "y": 262
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "disabled": false,
+      "height": 20,
+      "href": null,
+      "label": "",
+      "role": "input",
+      "width": 20,
+      "x": 42,
+      "y": 317
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "disabled": false,
+      "height": 20,
+      "href": null,
+      "label": "",
+      "role": "input",
+      "width": 20,
+      "x": 212,
+      "y": 317
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "AI suggest goal",
+      "role": "button",
+      "width": 137.78125,
+      "x": 223.21875,
+      "y": 466.5
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "disabled": false,
+      "height": 110,
+      "href": null,
+      "label": "Write a goal, or request an AI suggestion.",
+      "role": "textarea",
+      "width": 332,
+      "x": 29,
+      "y": 526.5
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 46,
+      "href": null,
+      "label": "Cancel",
+      "role": "button",
+      "width": 96.46875,
+      "x": 96.734375,
+      "y": 671.5
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 46,
+      "href": null,
+      "label": "Save and update",
+      "role": "button",
+      "width": 159.796875,
+      "x": 205.203125,
+      "y": 671.5
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 16,
+      "href": null,
+      "label": "Close",
+      "role": "button",
+      "width": 16,
+      "x": 357,
+      "y": 118.5
+    }
+  ],
+  "height": 844,
+  "icons": [
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(60, 42, 53)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x h-4 w-4\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg>",
+      "width": 16,
+      "x": 357,
+      "y": 118.5
+    }
+  ],
+  "images": [],
+  "overlay": true,
+  "scrollY": 884,
+  "texts": [
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "-0.45px",
+      "lineHeight": "18px",
+      "text": "Adjust your learning starting point",
+      "width": 280.75,
+      "x": 54.625,
+      "y": 124.5
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Analytical thinking",
+      "width": 121.078125,
+      "x": 29.15625,
+      "y": 151.5
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "· Confirm your foundation, then",
+      "width": 206.65625,
+      "x": 154.171875,
+      "y": 151.5
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "choose a practical goal.",
+      "width": 157.765625,
+      "x": 116.109375,
+      "y": 171.5
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Your current foundation",
+      "width": 179.265625,
+      "x": 29,
+      "y": 214.5
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Just starting",
+      "width": 82.40625,
+      "x": 70,
+      "y": 263.5
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "With support",
+      "width": 85.265625,
+      "x": 240,
+      "y": 263.5
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Independent",
+      "width": 83.359375,
+      "x": 70,
+      "y": 318.5
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Advanced",
+      "width": 66.96875,
+      "x": 240,
+      "y": 318.5
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(129, 119, 135)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "Your self-confirmed starting point, not an AI proficiency",
+      "width": 315.5,
+      "x": 29,
+      "y": 368.5
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(129, 119, 135)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "assessment.",
+      "width": 71.0625,
+      "x": 29,
+      "y": 392.5
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Related work experience",
+      "width": 187.046875,
+      "x": 45.9375,
+      "y": 428.5
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Learning goal",
+      "width": 103.3125,
+      "x": 29,
+      "y": 474.5
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "AI suggest goal",
+      "width": 103.78125,
+      "x": 240.21875,
+      "y": 475.5
+    },
+    {
+      "clip": {
+        "height": 448,
+        "width": 340,
+        "x": 25,
+        "y": 206.5
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 86,
+      "lineHeight": "21px",
+      "multiline": true,
+      "synthetic": true,
+      "text": "Prototype example: use evidence to improve my weekly sales reports.",
+      "width": 306,
+      "x": 42,
+      "y": 539.5
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Cancel",
+      "width": 46.46875,
+      "x": 121.734375,
+      "y": 685.5
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(255, 255, 255)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Save and update",
+      "width": 111.796875,
+      "x": 229.203125,
+      "y": 685.5
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Close",
+      "width": 42.9375,
+      "x": 364,
+      "y": 135.5
+    }
+  ],
+  "url": "http://127.0.0.1:4173/learning-centre",
+  "viewportHeight": 844,
+  "width": 390,
+  "name": "focus-mobile",
+  "screenshot": "focus-mobile.jpg"
+}

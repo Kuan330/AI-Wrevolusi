@@ -1,0 +1,483 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 426,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px",
+      "width": 384,
+      "x": 3,
+      "y": 209
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 62,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 334,
+      "x": 28,
+      "y": 268
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 62,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 334,
+      "x": 28,
+      "y": 338
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 62,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 334,
+      "x": 28,
+      "y": 408
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(79, 145, 186, 0.3)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(79, 145, 186, 0.1)",
+      "height": 62,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 334,
+      "x": 28,
+      "y": 478
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 62,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 334,
+      "x": 28,
+      "y": 548
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 62,
+      "href": "/ai-exposure",
+      "label": "AI Exposure\n\nUnderstand task-level AI change",
+      "role": "a",
+      "width": 334,
+      "x": 28,
+      "y": 268
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 62,
+      "href": "/skills",
+      "label": "Skills\n\nSee skills connected to tasks",
+      "role": "a",
+      "width": 334,
+      "x": 28,
+      "y": 338
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 62,
+      "href": "/learning-centre",
+      "label": "Learning Resources\n\nPlan what to learn next",
+      "role": "a",
+      "width": 334,
+      "x": 28,
+      "y": 408
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 62,
+      "href": "/plan",
+      "label": "My Plan\n\nMake room for learning and life",
+      "role": "a",
+      "width": 334,
+      "x": 28,
+      "y": 478
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 62,
+      "href": "/possibilities",
+      "label": "Possibilities\n\nExplore where your skills can take you",
+      "role": "a",
+      "width": 334,
+      "x": 28,
+      "y": 548
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 16,
+      "href": null,
+      "label": "Close",
+      "role": "button",
+      "width": 16,
+      "x": 354,
+      "y": 226
+    }
+  ],
+  "height": 844,
+  "icons": [
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(60, 42, 53)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x h-4 w-4\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg>",
+      "width": 16,
+      "x": 354,
+      "y": 226
+    }
+  ],
+  "images": [],
+  "overlay": true,
+  "scrollY": 0,
+  "texts": [
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "-0.45px",
+      "lineHeight": "18px",
+      "text": "Navigation",
+      "width": 89.125,
+      "x": 150.4375,
+      "y": 232
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "AI Exposure",
+      "width": 80.171875,
+      "x": 41,
+      "y": 282
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Understand task-level AI change",
+      "width": 184.84375,
+      "x": 41,
+      "y": 301
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Skills",
+      "width": 35,
+      "x": 41,
+      "y": 352
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "See skills connected to tasks",
+      "width": 164.390625,
+      "x": 41,
+      "y": 371
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Learning Resources",
+      "width": 133.109375,
+      "x": 41,
+      "y": 422
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Plan what to learn next",
+      "width": 129.5625,
+      "x": 41,
+      "y": 441
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "My Plan",
+      "width": 53.546875,
+      "x": 41,
+      "y": 492
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Make room for learning and life",
+      "width": 176.78125,
+      "x": 41,
+      "y": 511
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Possibilities",
+      "width": 79.25,
+      "x": 41,
+      "y": 562
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Explore where your skills can take you",
+      "width": 216.9375,
+      "x": 41,
+      "y": 581
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Close",
+      "width": 42.9375,
+      "x": 361,
+      "y": 243
+    }
+  ],
+  "url": "http://127.0.0.1:4173/plan",
+  "viewportHeight": 844,
+  "width": 390,
+  "name": "navigation-mobile",
+  "screenshot": "navigation-mobile.jpg"
+}

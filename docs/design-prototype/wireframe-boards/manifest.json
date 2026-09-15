@@ -1,0 +1,697 @@
+{
+  "method": "Wireframes derived from actual frontend captures at native screen dimensions",
+  "boards": [
+    {
+      "name": "desktop-main-pages",
+      "svg": "desktop-main-pages.svg",
+      "width": 4512.0,
+      "height": 9979.0,
+      "screenCount": 18,
+      "screens": [
+        {
+          "stem": "account-gate-desktop",
+          "x": 48.0,
+          "y": 210.0,
+          "width": 1440.0,
+          "height": 1001.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "exposure-desktop",
+          "x": 1536.0,
+          "y": 210.0,
+          "width": 1440.0,
+          "height": 1622.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "help-draft-desktop",
+          "x": 3024.0,
+          "y": 210.0,
+          "width": 1440.0,
+          "height": 1403.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "home-desktop",
+          "x": 48.0,
+          "y": 1309.0,
+          "width": 1440.0,
+          "height": 2577.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "occupation-desktop",
+          "x": 3024.0,
+          "y": 1711.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "occupation-selected-desktop",
+          "x": 1536.0,
+          "y": 1930.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "plan-completed-desktop",
+          "x": 3024.0,
+          "y": 2809.0,
+          "width": 1440.0,
+          "height": 1340.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "plan-conflict-desktop",
+          "x": 1536.0,
+          "y": 3028.0,
+          "width": 1440.0,
+          "height": 1380.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "plan-desktop",
+          "x": 48.0,
+          "y": 3984.0,
+          "width": 1440.0,
+          "height": 1317.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "plan-empty-desktop",
+          "x": 3024.0,
+          "y": 4247.0,
+          "width": 1440.0,
+          "height": 1286.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "plan-resolved-desktop",
+          "x": 1536.0,
+          "y": 4506.0,
+          "width": 1440.0,
+          "height": 1340.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "resources-desktop",
+          "x": 48.0,
+          "y": 5399.0,
+          "width": 1440.0,
+          "height": 1454.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "resources-start-desktop",
+          "x": 3024.0,
+          "y": 5631.0,
+          "width": 1440.0,
+          "height": 1454.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "search-mode-desktop",
+          "x": 1536.0,
+          "y": 5944.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "search-results-desktop",
+          "x": 48.0,
+          "y": 6951.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "skills-desktop",
+          "x": 1536.0,
+          "y": 7042.0,
+          "width": 1440.0,
+          "height": 2753.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "skills-signed-desktop",
+          "x": 3024.0,
+          "y": 7183.0,
+          "width": 1440.0,
+          "height": 2700.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "tasks-desktop",
+          "x": 48.0,
+          "y": 8049.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        }
+      ]
+    },
+    {
+      "name": "desktop-overlays",
+      "svg": "desktop-overlays.svg",
+      "width": 4512.0,
+      "height": 9305.0,
+      "screenCount": 22,
+      "screens": [
+        {
+          "stem": "activity-desktop",
+          "x": 48.0,
+          "y": 210.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "arrange-start-desktop",
+          "x": 1536.0,
+          "y": 210.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "chapters-desktop",
+          "x": 3024.0,
+          "y": 210.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "chapters-start-desktop",
+          "x": 48.0,
+          "y": 1308.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "complete-desktop",
+          "x": 1536.0,
+          "y": 1308.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "conflict-review-desktop",
+          "x": 3024.0,
+          "y": 1308.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "content-desktop",
+          "x": 48.0,
+          "y": 2406.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "content-start-desktop",
+          "x": 1536.0,
+          "y": 2406.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "course-desktop",
+          "x": 3024.0,
+          "y": 2406.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "course-start-desktop",
+          "x": 48.0,
+          "y": 3504.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "focus-desktop",
+          "x": 1536.0,
+          "y": 3504.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "help-accepted-desktop",
+          "x": 3024.0,
+          "y": 3504.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "help-declined-desktop",
+          "x": 48.0,
+          "y": 4602.0,
+          "width": 1440.0,
+          "height": 1313.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "help-request-desktop",
+          "x": 1536.0,
+          "y": 4602.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "help-status-desktop",
+          "x": 3024.0,
+          "y": 4602.0,
+          "width": 1440.0,
+          "height": 1451.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "help-waiting-desktop",
+          "x": 1536.0,
+          "y": 5700.0,
+          "width": 1440.0,
+          "height": 1403.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "routine-desktop",
+          "x": 48.0,
+          "y": 6013.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "routine-start-desktop",
+          "x": 3024.0,
+          "y": 6151.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "saved-desktop",
+          "x": 48.0,
+          "y": 7111.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "session-desktop",
+          "x": 1536.0,
+          "y": 7201.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "sign-in-desktop",
+          "x": 3024.0,
+          "y": 7249.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        },
+        {
+          "stem": "task-editor-desktop",
+          "x": 48.0,
+          "y": 8209.0,
+          "width": 1440.0,
+          "height": 1000.0,
+          "viewportHeight": 1000.0
+        }
+      ]
+    },
+    {
+      "name": "mobile-main-pages",
+      "svg": "mobile-main-pages.svg",
+      "width": 1362.0,
+      "height": 16854.0,
+      "screenCount": 18,
+      "screens": [
+        {
+          "stem": "account-gate-mobile",
+          "x": 48.0,
+          "y": 210.0,
+          "width": 390.0,
+          "height": 1057.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "exposure-mobile",
+          "x": 486.0,
+          "y": 210.0,
+          "width": 390.0,
+          "height": 3192.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "help-draft-mobile",
+          "x": 924.0,
+          "y": 210.0,
+          "width": 390.0,
+          "height": 1719.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "home-mobile",
+          "x": 48.0,
+          "y": 1365.0,
+          "width": 390.0,
+          "height": 5256.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "occupation-mobile",
+          "x": 924.0,
+          "y": 2027.0,
+          "width": 390.0,
+          "height": 927.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "occupation-selected-mobile",
+          "x": 924.0,
+          "y": 3052.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "plan-completed-mobile",
+          "x": 486.0,
+          "y": 3500.0,
+          "width": 390.0,
+          "height": 1633.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "plan-conflict-mobile",
+          "x": 924.0,
+          "y": 3994.0,
+          "width": 390.0,
+          "height": 1696.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "plan-empty-mobile",
+          "x": 486.0,
+          "y": 5231.0,
+          "width": 390.0,
+          "height": 1709.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "plan-mobile",
+          "x": 924.0,
+          "y": 5788.0,
+          "width": 390.0,
+          "height": 1633.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "plan-resolved-mobile",
+          "x": 48.0,
+          "y": 6719.0,
+          "width": 390.0,
+          "height": 1633.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "resources-mobile",
+          "x": 486.0,
+          "y": 7038.0,
+          "width": 390.0,
+          "height": 4514.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "resources-start-mobile",
+          "x": 924.0,
+          "y": 7519.0,
+          "width": 390.0,
+          "height": 4500.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "search-mode-mobile",
+          "x": 48.0,
+          "y": 8450.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "search-results-mobile",
+          "x": 48.0,
+          "y": 9392.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "skills-mobile",
+          "x": 48.0,
+          "y": 10334.0,
+          "width": 390.0,
+          "height": 5850.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "skills-signed-mobile",
+          "x": 486.0,
+          "y": 11650.0,
+          "width": 390.0,
+          "height": 5108.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "tasks-mobile",
+          "x": 924.0,
+          "y": 12117.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        }
+      ]
+    },
+    {
+      "name": "mobile-overlays",
+      "svg": "mobile-overlays.svg",
+      "width": 2238.0,
+      "height": 5829.0,
+      "screenCount": 24,
+      "screens": [
+        {
+          "stem": "activity-mobile",
+          "x": 48.0,
+          "y": 210.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "arrange-start-mobile",
+          "x": 486.0,
+          "y": 210.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "chapters-mobile",
+          "x": 924.0,
+          "y": 210.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "chapters-start-mobile",
+          "x": 1362.0,
+          "y": 210.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "complete-mobile",
+          "x": 1800.0,
+          "y": 210.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "conflict-review-mobile",
+          "x": 48.0,
+          "y": 1152.0,
+          "width": 390.0,
+          "height": 1124.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "content-mobile",
+          "x": 486.0,
+          "y": 1152.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "content-start-mobile",
+          "x": 924.0,
+          "y": 1152.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "course-mobile",
+          "x": 1362.0,
+          "y": 1152.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "course-start-mobile",
+          "x": 1800.0,
+          "y": 1152.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "focus-mobile",
+          "x": 48.0,
+          "y": 2374.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "help-accepted-mobile",
+          "x": 486.0,
+          "y": 2094.0,
+          "width": 390.0,
+          "height": 891.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "help-declined-mobile",
+          "x": 924.0,
+          "y": 2094.0,
+          "width": 390.0,
+          "height": 1433.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "help-request-mobile",
+          "x": 1362.0,
+          "y": 2094.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "help-status-mobile",
+          "x": 1800.0,
+          "y": 2094.0,
+          "width": 390.0,
+          "height": 1571.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "help-waiting-mobile",
+          "x": 48.0,
+          "y": 3316.0,
+          "width": 390.0,
+          "height": 1523.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "routine-error-mobile",
+          "x": 1362.0,
+          "y": 3036.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "routine-mobile",
+          "x": 486.0,
+          "y": 3083.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "routine-start-mobile",
+          "x": 924.0,
+          "y": 3625.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "saved-mobile",
+          "x": 1800.0,
+          "y": 3763.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "session-mobile",
+          "x": 1362.0,
+          "y": 3978.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "sign-in-mobile",
+          "x": 486.0,
+          "y": 4025.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "task-editor-mobile",
+          "x": 924.0,
+          "y": 4567.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        },
+        {
+          "stem": "navigation-mobile",
+          "x": 48.0,
+          "y": 4937.0,
+          "width": 390.0,
+          "height": 844.0,
+          "viewportHeight": 844.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6756 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 2700.390625,
+      "kind": "body",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 1425,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 2700.390625,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 1425,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.45)",
+      "height": 65,
+      "kind": "header",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 1425,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(214, 234, 247)",
+      "height": 36,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(79, 145, 186, 0.14) 0px 4px 12px 0px",
+      "width": 63,
+      "x": 350.25,
+      "y": 14
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.8)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 36,
+      "x": 1365,
+      "y": 14
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 98.8125,
+      "x": 1083,
+      "y": 103
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.28)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 36,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 112.6875,
+      "x": 1189.8125,
+      "y": 103
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 546,
+      "kind": "section",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.1) 0px 14px 34px 0px",
+      "width": 1180,
+      "x": 122.5,
+      "y": 194
+    },
+    {
+      "background": false,
+      "backgroundImage": "radial-gradient(circle at 0px 0px, rgba(158, 201, 228, 0.3), rgba(0, 0, 0, 0) 44%), linear-gradient(155deg, rgba(255, 255, 255, 0.42), rgba(234, 243, 251, 0.32))",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 544,
+      "kind": "aside",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "none",
+      "width": 390.84375,
+      "x": 123.5,
+      "y": 195
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.9)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.68)",
+      "height": 72.390625,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "rgba(61, 43, 54, 0.05) 0px 5px 14px 0px",
+      "width": 318.84375,
+      "x": 159.5,
+      "y": 527.5
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.84)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 56.6875,
+      "kind": "p",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 318.84375,
+      "x": 159.5,
+      "y": 646.3125
+    },
+    {
+      "background": true,
+      "backgroundImage": "radial-gradient(at 46% 48%, rgba(158, 201, 228, 0.14), rgba(0, 0, 0, 0) 44%), radial-gradient(at 61% 52%, rgba(232, 160, 176, 0.13), rgba(0, 0, 0, 0) 39%), none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.32)",
+      "height": 544,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 787.15625,
+      "x": 514.34375,
+      "y": 195
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "height": 10,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 10,
+      "x": 963.078125,
+      "y": 222
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(214, 228, 240)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.8)",
+      "height": 10,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 10,
+      "x": 1130.390625,
+      "y": 222
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgba(184, 220, 242, 0.28), rgba(244, 213, 223, 0.3))",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 400,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 50,
+      "shadow": "none",
+      "width": 608,
+      "x": 603.921875,
+      "y": 273
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 194.3125,
+      "x": 632.015625,
+      "y": 301.484375
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(100deg, rgb(214, 234, 247) 0%, rgb(236, 232, 244) 58%, rgb(245, 229, 233) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.35)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 36.796875,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(79, 145, 186, 0.14) 0px 5px 14px 0px, rgba(199, 160, 200, 0.11) 0px 0px 18px 0px",
+      "width": 219.09375,
+      "x": 836.71875,
+      "y": 291.09375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 117.609375,
+      "x": 1066.203125,
+      "y": 303.484375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 46.46875,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 182.34375,
+      "x": 547.921875,
+      "y": 351.359375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 46.46875,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 137.125,
+      "x": 740.65625,
+      "y": 343.359375
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(100deg, rgb(214, 234, 247) 0%, rgb(236, 232, 244) 58%, rgb(245, 229, 233) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.68)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 50.21875,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(79, 145, 186, 0.18) 0px 7px 18px 0px",
+      "width": 191.5625,
+      "x": 888.171875,
+      "y": 349.484375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 46.46875,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 177.796875,
+      "x": 1090.125,
+      "y": 346.359375
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(100deg, rgb(214, 234, 247) 0%, rgb(236, 232, 244) 58%, rgb(245, 229, 233) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.35)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 50.21875,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(79, 145, 186, 0.14) 0px 5px 14px 0px, rgba(199, 160, 200, 0.11) 0px 0px 18px 0px",
+      "width": 256,
+      "x": 581.03125,
+      "y": 413.296875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 107.109375,
+      "x": 847.421875,
+      "y": 414.40625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 125.734375,
+      "x": 964.921875,
+      "y": 424.40625
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(100deg, rgb(214, 234, 247) 0%, rgb(236, 232, 244) 58%, rgb(245, 229, 233) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.35)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 36.796875,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(79, 145, 186, 0.14) 0px 5px 14px 0px, rgba(199, 160, 200, 0.11) 0px 0px 18px 0px",
+      "width": 133.765625,
+      "x": 1101.046875,
+      "y": 415
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(100deg, rgb(214, 234, 247) 0%, rgb(236, 232, 244) 58%, rgb(245, 229, 233) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.35)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 50.21875,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(79, 145, 186, 0.14) 0px 5px 14px 0px, rgba(199, 160, 200, 0.11) 0px 0px 18px 0px",
+      "width": 230.1875,
+      "x": 547.921875,
+      "y": 477.109375
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(100deg, rgb(214, 234, 247) 0%, rgb(236, 232, 244) 58%, rgb(245, 229, 233) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.35)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 50.21875,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(79, 145, 186, 0.14) 0px 5px 14px 0px, rgba(199, 160, 200, 0.11) 0px 0px 18px 0px",
+      "width": 218.015625,
+      "x": 788.5,
+      "y": 469.109375
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(100deg, rgb(214, 234, 247) 0%, rgb(236, 232, 244) 58%, rgb(245, 229, 233) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.35)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 50.21875,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(79, 145, 186, 0.14) 0px 5px 14px 0px, rgba(199, 160, 200, 0.11) 0px 0px 18px 0px",
+      "width": 133.453125,
+      "x": 1016.90625,
+      "y": 479.109375
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(100deg, rgb(214, 234, 247) 0%, rgb(236, 232, 244) 58%, rgb(245, 229, 233) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.35)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 50.21875,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(79, 145, 186, 0.14) 0px 5px 14px 0px, rgba(199, 160, 200, 0.11) 0px 0px 18px 0px",
+      "width": 107.171875,
+      "x": 1160.75,
+      "y": 472.109375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 178.75,
+      "x": 570.875,
+      "y": 543.3125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 176.453125,
+      "x": 760.015625,
+      "y": 535.3125
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(100deg, rgb(214, 234, 247) 0%, rgb(236, 232, 244) 58%, rgb(245, 229, 233) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.35)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 36.796875,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(79, 145, 186, 0.14) 0px 5px 14px 0px, rgba(199, 160, 200, 0.11) 0px 0px 18px 0px",
+      "width": 174.96875,
+      "x": 946.859375,
+      "y": 542.921875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 112.734375,
+      "x": 1132.21875,
+      "y": 538.3125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 139.546875,
+      "x": 582.953125,
+      "y": 591.3125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 208.46875,
+      "x": 732.890625,
+      "y": 583.3125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 171.75,
+      "x": 951.75,
+      "y": 593.3125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 98.984375,
+      "x": 1133.890625,
+      "y": 586.3125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 255.296875,
+      "x": 619.234375,
+      "y": 636.90625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 121.921875,
+      "x": 884.921875,
+      "y": 628.90625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 0.76,
+      "radius": 999,
+      "shadow": "rgba(61, 43, 54, 0.04) 0px 3px 10px 0px",
+      "width": 179.359375,
+      "x": 1017.234375,
+      "y": 638.90625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 682.125,
+      "kind": "aside",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.1) 0px 14px 34px 0px",
+      "width": 362.125,
+      "x": 122.5,
+      "y": 884.5
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(100deg, rgba(214, 234, 247, 0.84), rgba(245, 229, 233, 0.62))",
+      "borderColor": "rgba(79, 145, 186, 0.2)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 64.375,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 13,
+      "shadow": "none",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 929.5
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 64.375,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 13,
+      "shadow": "none",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 999.46875
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 64.375,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 13,
+      "shadow": "none",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1069.4375
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 64.375,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 13,
+      "shadow": "none",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1139.40625
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 64.375,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 13,
+      "shadow": "none",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1209.375
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 64.375,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 13,
+      "shadow": "none",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1279.34375
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 64.375,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 13,
+      "shadow": "none",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1349.3125
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 64.375,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 13,
+      "shadow": "none",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1419.28125
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 64.375,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 13,
+      "shadow": "none",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1489.25
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 715.046875,
+      "kind": "article",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.1) 0px 14px 34px 0px",
+      "width": 801.859375,
+      "x": 500.625,
+      "y": 884.5
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(79, 145, 186, 0.16)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(234, 243, 251, 0.48)",
+      "height": 184.4375,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "none",
+      "width": 743.859375,
+      "x": 529.625,
+      "y": 1008
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.9)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 43.21875,
+      "kind": "li",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 709.859375,
+      "x": 546.625,
+      "y": 1081
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.9)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 43.21875,
+      "kind": "li",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 709.859375,
+      "x": 546.625,
+      "y": 1132.21875
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 67.890625,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 743.859375,
+      "x": 529.625,
+      "y": 1216.4375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(214, 228, 240, 0.88)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.62)",
+      "height": 28,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "none",
+      "width": 169.734375,
+      "x": 1103.75,
+      "y": 1256.328125
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgba(234, 243, 251, 0.74), rgba(249, 238, 242, 0.68))",
+      "borderColor": "rgba(214, 228, 240, 0.8)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 68.625,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 13,
+      "shadow": "none",
+      "width": 743.859375,
+      "x": 529.625,
+      "y": 1297.921875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.9)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.66)",
+      "height": 192,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 15,
+      "shadow": "rgba(61, 43, 54, 0.05) 0px 7px 18px 0px",
+      "width": 239.953125,
+      "x": 529.625,
+      "y": 1378.546875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.9)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.66)",
+      "height": 192,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 15,
+      "shadow": "rgba(61, 43, 54, 0.05) 0px 7px 18px 0px",
+      "width": 239.953125,
+      "x": 781.578125,
+      "y": 1378.546875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.9)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.66)",
+      "height": 192,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 15,
+      "shadow": "rgba(61, 43, 54, 0.05) 0px 7px 18px 0px",
+      "width": 239.953125,
+      "x": 1033.53125,
+      "y": 1378.546875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 872.46875,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.1) 0px 14px 34px 0px",
+      "width": 578,
+      "x": 122.5,
+      "y": 1763.921875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 58,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "none",
+      "width": 528,
+      "x": 147.5,
+      "y": 1897.390625
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(110deg, rgb(232, 244, 252), rgb(250, 237, 242))",
+      "borderColor": "rgb(186, 216, 233)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(66, 98, 126, 0.07) 0px 2px 5px 0px",
+      "width": 82,
+      "x": 580.5,
+      "y": 1910.390625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 58,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "none",
+      "width": 528,
+      "x": 147.5,
+      "y": 1965.390625
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(110deg, rgb(232, 244, 252), rgb(250, 237, 242))",
+      "borderColor": "rgb(186, 216, 233)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(66, 98, 126, 0.07) 0px 2px 5px 0px",
+      "width": 82,
+      "x": 580.5,
+      "y": 1978.390625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 58,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "none",
+      "width": 528,
+      "x": 147.5,
+      "y": 2033.390625
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(110deg, rgb(232, 244, 252), rgb(250, 237, 242))",
+      "borderColor": "rgb(186, 216, 233)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(66, 98, 126, 0.07) 0px 2px 5px 0px",
+      "width": 82,
+      "x": 580.5,
+      "y": 2046.390625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 58,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "none",
+      "width": 528,
+      "x": 147.5,
+      "y": 2101.390625
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(110deg, rgb(232, 244, 252), rgb(250, 237, 242))",
+      "borderColor": "rgb(186, 216, 233)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(66, 98, 126, 0.07) 0px 2px 5px 0px",
+      "width": 82,
+      "x": 580.5,
+      "y": 2114.390625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 58,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "none",
+      "width": 528,
+      "x": 147.5,
+      "y": 2169.390625
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(110deg, rgb(232, 244, 252), rgb(250, 237, 242))",
+      "borderColor": "rgb(186, 216, 233)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(66, 98, 126, 0.07) 0px 2px 5px 0px",
+      "width": 82,
+      "x": 580.5,
+      "y": 2182.390625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 58,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "none",
+      "width": 528,
+      "x": 147.5,
+      "y": 2237.390625
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(110deg, rgb(232, 244, 252), rgb(250, 237, 242))",
+      "borderColor": "rgb(186, 216, 233)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(66, 98, 126, 0.07) 0px 2px 5px 0px",
+      "width": 82,
+      "x": 580.5,
+      "y": 2250.390625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 58,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "none",
+      "width": 528,
+      "x": 147.5,
+      "y": 2305.390625
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(110deg, rgb(232, 244, 252), rgb(250, 237, 242))",
+      "borderColor": "rgb(186, 216, 233)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(66, 98, 126, 0.07) 0px 2px 5px 0px",
+      "width": 82,
+      "x": 580.5,
+      "y": 2318.390625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 58,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "none",
+      "width": 528,
+      "x": 147.5,
+      "y": 2373.390625
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(110deg, rgb(232, 244, 252), rgb(250, 237, 242))",
+      "borderColor": "rgb(186, 216, 233)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(66, 98, 126, 0.07) 0px 2px 5px 0px",
+      "width": 82,
+      "x": 580.5,
+      "y": 2386.390625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 58,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "none",
+      "width": 528,
+      "x": 147.5,
+      "y": 2441.390625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(219, 231, 237)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(237, 244, 247)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "none",
+      "width": 87.734375,
+      "x": 574.765625,
+      "y": 2454.390625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 58,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "none",
+      "width": 528,
+      "x": 147.5,
+      "y": 2509.390625
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(110deg, rgb(232, 244, 252), rgb(250, 237, 242))",
+      "borderColor": "rgb(186, 216, 233)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(66, 98, 126, 0.07) 0px 2px 5px 0px",
+      "width": 82,
+      "x": 580.5,
+      "y": 2522.390625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.82)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 872.46875,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.1) 0px 14px 34px 0px",
+      "width": 578,
+      "x": 724.5,
+      "y": 1763.921875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 69.59375,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "none",
+      "width": 528,
+      "x": 749.5,
+      "y": 1898.109375
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.28)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 228.34375,
+      "x": 1049.15625,
+      "y": 1987.703125
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/",
+      "label": "AI-Wrevolusi home",
+      "role": "a",
+      "width": 158.078125,
+      "x": 24,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/ai-exposure",
+      "label": "AI Exposure",
+      "role": "a",
+      "width": 108.171875,
+      "x": 214.078125,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/skills",
+      "label": "Skills",
+      "role": "a",
+      "width": 63,
+      "x": 350.25,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/learning-centre",
+      "label": "Learning Resources",
+      "role": "a",
+      "width": 161.109375,
+      "x": 441.25,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/plan",
+      "label": "My Plan",
+      "role": "a",
+      "width": 81.546875,
+      "x": 630.359375,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/possibilities",
+      "label": "Possibilities",
+      "role": "a",
+      "width": 107.25,
+      "x": 739.90625,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Account menu",
+      "role": "button",
+      "width": 36,
+      "x": 1365,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/profile/tasks",
+      "label": "Edit tasks",
+      "role": "a",
+      "width": 98.8125,
+      "x": 1083,
+      "y": 103
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/ai-exposure",
+      "label": "AI exposure",
+      "role": "a",
+      "width": 112.6875,
+      "x": 1189.8125,
+      "y": 103
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 28,
+      "href": null,
+      "label": "About the 26-skill framework",
+      "role": "button",
+      "width": 28,
+      "x": 282.53125,
+      "y": 617.484375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Resilience, flexibility and agility",
+      "role": "button",
+      "width": 194.3125,
+      "x": 632.015625,
+      "y": 301.484375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": false,
+      "height": 36.796875,
+      "href": null,
+      "label": "Leadership and social influence",
+      "role": "button",
+      "width": 219.09375,
+      "x": 836.71875,
+      "y": 291.09375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Creative thinking",
+      "role": "button",
+      "width": 117.609375,
+      "x": 1066.203125,
+      "y": 303.484375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 46.46875,
+      "href": null,
+      "label": "Motivation and self-awareness",
+      "role": "button",
+      "width": 182.34375,
+      "x": 547.921875,
+      "y": 351.359375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 46.46875,
+      "href": null,
+      "label": "Technological literacy",
+      "role": "button",
+      "width": 137.125,
+      "x": 740.65625,
+      "y": 343.359375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": false,
+      "height": 50.21875,
+      "href": null,
+      "label": "Empathy and active listening",
+      "role": "button",
+      "width": 191.5625,
+      "x": 888.171875,
+      "y": 349.484375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 46.46875,
+      "href": null,
+      "label": "Curiosity and lifelong learning",
+      "role": "button",
+      "width": 177.796875,
+      "x": 1090.125,
+      "y": 346.359375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": false,
+      "height": 50.21875,
+      "href": null,
+      "label": "Service orientation and customer service",
+      "role": "button",
+      "width": 256,
+      "x": 581.03125,
+      "y": 413.296875
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "AI and big data",
+      "role": "button",
+      "width": 107.109375,
+      "x": 847.421875,
+      "y": 414.40625
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Analytical thinking",
+      "role": "button",
+      "width": 125.734375,
+      "x": 964.921875,
+      "y": 424.40625
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": false,
+      "height": 36.796875,
+      "href": null,
+      "label": "Systems thinking",
+      "role": "button",
+      "width": 133.765625,
+      "x": 1101.046875,
+      "y": 415
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": false,
+      "height": 50.21875,
+      "href": null,
+      "label": "Resource management and operations",
+      "role": "button",
+      "width": 230.1875,
+      "x": 547.921875,
+      "y": 477.109375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": false,
+      "height": 50.21875,
+      "href": null,
+      "label": "Dependability and attention to detail",
+      "role": "button",
+      "width": 218.015625,
+      "x": 788.5,
+      "y": 469.109375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": false,
+      "height": 50.21875,
+      "href": null,
+      "label": "Talent management",
+      "role": "button",
+      "width": 133.453125,
+      "x": 1016.90625,
+      "y": 479.109375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": false,
+      "height": 50.21875,
+      "href": null,
+      "label": "Quality control",
+      "role": "button",
+      "width": 107.171875,
+      "x": 1160.75,
+      "y": 472.109375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Networks and cybersecurity",
+      "role": "button",
+      "width": 178.75,
+      "x": 570.875,
+      "y": 543.3125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Design and user experience",
+      "role": "button",
+      "width": 176.453125,
+      "x": 760.015625,
+      "y": 535.3125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": false,
+      "height": 36.796875,
+      "href": null,
+      "label": "Teaching and mentoring",
+      "role": "button",
+      "width": 174.96875,
+      "x": 946.859375,
+      "y": 542.921875
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Multi-lingualism",
+      "role": "button",
+      "width": 112.734375,
+      "x": 1132.21875,
+      "y": 538.3125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Marketing and media",
+      "role": "button",
+      "width": 139.546875,
+      "x": 582.953125,
+      "y": 591.3125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Reading, writing and mathematics",
+      "role": "button",
+      "width": 208.46875,
+      "x": 732.890625,
+      "y": 583.3125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Environmental stewardship",
+      "role": "button",
+      "width": 171.75,
+      "x": 951.75,
+      "y": 593.3125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Programming",
+      "role": "button",
+      "width": 98.984375,
+      "x": 1133.890625,
+      "y": 586.3125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Manual dexterity, endurance and precision",
+      "role": "button",
+      "width": 255.296875,
+      "x": 619.234375,
+      "y": 636.90625
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Global citizenship",
+      "role": "button",
+      "width": 121.921875,
+      "x": 884.921875,
+      "y": 628.90625
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Sensory-processing abilities",
+      "role": "button",
+      "width": 179.359375,
+      "x": 1017.234375,
+      "y": 638.90625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 64.375,
+      "href": null,
+      "label": "Empathy and active listening\nFound in 2 confirmed tasks",
+      "role": "button",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 929.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 64.375,
+      "href": null,
+      "label": "Talent management\nFound in 2 confirmed tasks",
+      "role": "button",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 999.46875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 64.375,
+      "href": null,
+      "label": "Service orientation and customer service\nFound in 2 confirmed tasks",
+      "role": "button",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1069.4375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 64.375,
+      "href": null,
+      "label": "Resource management and operations\nFound in 2 confirmed tasks",
+      "role": "button",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1139.40625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 64.375,
+      "href": null,
+      "label": "Dependability and attention to detail\nFound in 2 confirmed tasks",
+      "role": "button",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1209.375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 64.375,
+      "href": null,
+      "label": "Quality control\nFound in 2 confirmed tasks",
+      "role": "button",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1279.34375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 64.375,
+      "href": null,
+      "label": "Teaching and mentoring\nFound in 2 confirmed tasks",
+      "role": "button",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1349.3125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 64.375,
+      "href": null,
+      "label": "Leadership and social influence\nFound in 1 confirmed task",
+      "role": "button",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1419.28125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 64.375,
+      "href": null,
+      "label": "Systems thinking\nFound in 1 confirmed task",
+      "role": "button",
+      "width": 336.125,
+      "x": 135.5,
+      "y": 1489.25
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 28,
+      "href": null,
+      "label": "Sources and methodology for the external outlook",
+      "role": "button",
+      "width": 169.734375,
+      "x": 1103.75,
+      "y": 1256.328125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 26,
+      "href": "https://www.weforum.org/publications/the-future-of-jobs-report-2025/in-full/3-skills-outlook/",
+      "label": "Open WEF Skills outlook (new tab)",
+      "role": "a",
+      "width": 26,
+      "x": 344.9375,
+      "y": 1826.921875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Add AI and big data",
+      "role": "button",
+      "width": 82,
+      "x": 580.5,
+      "y": 1910.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Add Networks and cybersecurity",
+      "role": "button",
+      "width": 82,
+      "x": 580.5,
+      "y": 1978.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Add Technological literacy",
+      "role": "button",
+      "width": 82,
+      "x": 580.5,
+      "y": 2046.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Add Creative thinking",
+      "role": "button",
+      "width": 82,
+      "x": 580.5,
+      "y": 2114.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Add Resilience, flexibility and agility",
+      "role": "button",
+      "width": 82,
+      "x": 580.5,
+      "y": 2182.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Add Curiosity and lifelong learning",
+      "role": "button",
+      "width": 82,
+      "x": 580.5,
+      "y": 2250.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Add Leadership and social influence",
+      "role": "button",
+      "width": 82,
+      "x": 580.5,
+      "y": 2318.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Add Talent management",
+      "role": "button",
+      "width": 82,
+      "x": 580.5,
+      "y": 2386.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": true,
+      "height": 32,
+      "href": null,
+      "label": "Added Analytical thinking",
+      "role": "button",
+      "width": 87.734375,
+      "x": 574.765625,
+      "y": 2454.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Add Environmental stewardship",
+      "role": "button",
+      "width": 82,
+      "x": 580.5,
+      "y": 2522.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 16,
+      "href": "https://www.weforum.org/publications/the-future-of-jobs-report-2025/in-full/3-skills-outlook/",
+      "label": "Source: WEF · Future of Jobs Report 2025 ↗",
+      "role": "a",
+      "width": 272.796875,
+      "x": 147.5,
+      "y": 2592.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 30,
+      "href": null,
+      "label": "Remove Analytical thinking",
+      "role": "button",
+      "width": 27,
+      "x": 1237.5,
+      "y": 1917.90625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Restore my work skills",
+      "role": "button",
+      "width": 181.34375,
+      "x": 749.5,
+      "y": 1989.703125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Confirm and find courses →",
+      "role": "button",
+      "width": 228.34375,
+      "x": 1049.15625,
+      "y": 1987.703125
+    }
+  ],
+  "height": 2700,
+  "icons": [
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-user size-4\" aria-hidden=\"true\"><path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"></path><circle cx=\"12\" cy=\"7\" r=\"4\"></circle></svg>",
+      "width": 16,
+      "x": 1375,
+      "y": 24
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-info size-4\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 16v-4\"></path><path d=\"M12 8h.01\"></path></svg>",
+      "width": 16,
+      "x": 288.53125,
+      "y": 623.484375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right mt-1 size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 442.625,
+      "y": 945.6875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right mt-1 size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 442.625,
+      "y": 1015.65625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right mt-1 size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 442.625,
+      "y": 1085.625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right mt-1 size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 442.625,
+      "y": 1155.59375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right mt-1 size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 442.625,
+      "y": 1225.5625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right mt-1 size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 442.625,
+      "y": 1295.53125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right mt-1 size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 442.625,
+      "y": 1365.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right mt-1 size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 442.625,
+      "y": 1435.46875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right mt-1 size-4 shrink-0 text-[#7f7280]\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 442.625,
+      "y": 1505.4375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check mt-0.5 size-4 shrink-0 text-[#4f91ba]\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"></path></svg>",
+      "width": 16,
+      "x": 560.421875,
+      "y": 1095.1875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check mt-0.5 size-4 shrink-0 text-[#4f91ba]\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"></path></svg>",
+      "width": 16,
+      "x": 560.421875,
+      "y": 1146.40625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-info size-4\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 16v-4\"></path><path d=\"M12 8h.01\"></path></svg>",
+      "width": 16,
+      "x": 1246.09375,
+      "y": 1262.328125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 20,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-users size-5 text-[#4f91ba]\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><path d=\"M16 3.128a4 4 0 0 1 0 7.744\"></path><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"></path><circle cx=\"9\" cy=\"7\" r=\"4\"></circle></svg>",
+      "width": 20,
+      "x": 546.625,
+      "y": 1395.546875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 20,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-trending-up size-5 text-[#4f91ba]\" aria-hidden=\"true\"><path d=\"M16 7h6v6\"></path><path d=\"m22 7-8.5 8.5-5-5L2 17\"></path></svg>",
+      "width": 20,
+      "x": 798.578125,
+      "y": 1395.546875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(201, 149, 137)",
+      "height": 20,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-sparkles size-5 text-[#c99589]\" aria-hidden=\"true\"><path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\"></path><path d=\"M20 2v4\"></path><path d=\"M22 4h-4\"></path><circle cx=\"4\" cy=\"20\" r=\"2\"></circle></svg>",
+      "width": 20,
+      "x": 1050.53125,
+      "y": 1395.546875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 150, 188)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-external-link\" aria-hidden=\"true\"><path d=\"M15 3h6v6\"></path><path d=\"M10 14 21 3\"></path><path d=\"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6\"></path></svg>",
+      "width": 16,
+      "x": 349.9375,
+      "y": 1831.921875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(75, 141, 181)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"M12 5v14\"></path></svg>",
+      "width": 16,
+      "x": 597.859375,
+      "y": 1918.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(75, 141, 181)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"M12 5v14\"></path></svg>",
+      "width": 16,
+      "x": 597.859375,
+      "y": 1986.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(75, 141, 181)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"M12 5v14\"></path></svg>",
+      "width": 16,
+      "x": 597.859375,
+      "y": 2054.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(75, 141, 181)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"M12 5v14\"></path></svg>",
+      "width": 16,
+      "x": 597.859375,
+      "y": 2122.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(75, 141, 181)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"M12 5v14\"></path></svg>",
+      "width": 16,
+      "x": 597.859375,
+      "y": 2190.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(75, 141, 181)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"M12 5v14\"></path></svg>",
+      "width": 16,
+      "x": 597.859375,
+      "y": 2258.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(75, 141, 181)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"M12 5v14\"></path></svg>",
+      "width": 16,
+      "x": 597.859375,
+      "y": 2326.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(75, 141, 181)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"M12 5v14\"></path></svg>",
+      "width": 16,
+      "x": 597.859375,
+      "y": 2394.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(108, 142, 157)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"></path></svg>",
+      "width": 16,
+      "x": 587.765625,
+      "y": 2462.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(75, 141, 181)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"M12 5v14\"></path></svg>",
+      "width": 16,
+      "x": 597.859375,
+      "y": 2530.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(60, 42, 53)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg>",
+      "width": 16,
+      "x": 1243,
+      "y": 1924.90625
+    }
+  ],
+  "images": [
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "height": 36,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/logo-mark.svg",
+      "width": 41.265625,
+      "x": 24,
+      "y": 14
+    }
+  ],
+  "overlay": false,
+  "scrollY": 0,
+  "texts": [
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 43, 54)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "-0.45px",
+      "lineHeight": "27px",
+      "text": "AI-Wrevolusi",
+      "width": 106.8125,
+      "x": 75.265625,
+      "y": 21.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "AI Exposure",
+      "width": 80.171875,
+      "x": 228.078125,
+      "y": 23.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Skills",
+      "width": 35,
+      "x": 364.25,
+      "y": 23.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Learning Resources",
+      "width": 133.109375,
+      "x": 455.25,
+      "y": 23.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "My Plan",
+      "width": 53.546875,
+      "x": 644.359375,
+      "y": 23.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Possibilities",
+      "width": 79.25,
+      "x": 753.90625,
+      "y": 23.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "28.8px",
+      "text": "Skills connected to your work",
+      "width": 342.375,
+      "x": 122.5,
+      "y": 93.59375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "See the skills reflected across your confirmed tasks for SHOP SUPERVISORS, and how their value may change in the future.",
+      "width": 818.265625,
+      "x": 122.5,
+      "y": 134
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Edit tasks",
+      "width": 64.8125,
+      "x": 1100,
+      "y": 112
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "AI exposure",
+      "width": 78.6875,
+      "x": 1206.8125,
+      "y": 112
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "YOUR SKILL MAP",
+      "width": 112.796875,
+      "x": 159.5,
+      "y": 232
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 35.2,
+      "fontWeight": "600",
+      "height": 42,
+      "letterSpacing": "normal",
+      "lineHeight": "44px",
+      "text": "See the skills",
+      "width": 223.46875,
+      "x": 159.5,
+      "y": 260.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 35.2,
+      "fontWeight": "600",
+      "height": 42,
+      "letterSpacing": "normal",
+      "lineHeight": "44px",
+      "text": "reflected in your",
+      "width": 278.625,
+      "x": 159.5,
+      "y": 304.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 35.2,
+      "fontWeight": "600",
+      "height": 42,
+      "letterSpacing": "normal",
+      "lineHeight": "44px",
+      "text": "work.",
+      "width": 96.25,
+      "x": 159.5,
+      "y": 348.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "We compare your confirmed tasks with the",
+      "width": 284.265625,
+      "x": 159.5,
+      "y": 410.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "World Economic Forum's 26 core skills. Skills",
+      "width": 298.90625,
+      "x": 159.5,
+      "y": 434.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "supported by the work you shared are",
+      "width": 252.09375,
+      "x": 159.5,
+      "y": 458.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "highlighted.",
+      "width": 77.390625,
+      "x": 159.5,
+      "y": 482.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18.4,
+      "fontWeight": "700",
+      "height": 22,
+      "letterSpacing": "normal",
+      "lineHeight": "25.76px",
+      "text": "9",
+      "width": 11.96875,
+      "x": 176.5,
+      "y": 543.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18.4,
+      "fontWeight": "700",
+      "height": 22,
+      "letterSpacing": "normal",
+      "lineHeight": "25.76px",
+      "text": "of",
+      "width": 22.984375,
+      "x": 192.828125,
+      "y": 543.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18.4,
+      "fontWeight": "700",
+      "height": 22,
+      "letterSpacing": "normal",
+      "lineHeight": "25.76px",
+      "text": "26",
+      "width": 23.546875,
+      "x": 215.8125,
+      "y": 543.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 10.56,
+      "fontWeight": "400",
+      "height": 13,
+      "letterSpacing": "normal",
+      "lineHeight": "14.256px",
+      "text": "skills reflected",
+      "width": 72.1875,
+      "x": 176.5,
+      "y": 570.25
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18.4,
+      "fontWeight": "700",
+      "height": 22,
+      "letterSpacing": "normal",
+      "lineHeight": "25.76px",
+      "text": "8",
+      "width": 11.984375,
+      "x": 333.015625,
+      "y": 543.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 10.56,
+      "fontWeight": "400",
+      "height": 13,
+      "letterSpacing": "normal",
+      "lineHeight": "14.256px",
+      "text": "confirmed",
+      "width": 54.0625,
+      "x": 333.015625,
+      "y": 570.25
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 10.56,
+      "fontWeight": "400",
+      "height": 13,
+      "letterSpacing": "normal",
+      "lineHeight": "14.256px",
+      "text": "tasks",
+      "width": 26.390625,
+      "x": 387.078125,
+      "y": 570.25
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "Why these 26 skills?",
+      "width": 119.03125,
+      "x": 159.5,
+      "y": 623.484375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.52,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "17.856px",
+      "text": "Not highlighted does not mean you lack a skill. It may",
+      "width": 289.15625,
+      "x": 159.5,
+      "y": 668.3125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.52,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "17.856px",
+      "text": "simply not appear in the tasks you shared.",
+      "width": 229.953125,
+      "x": 159.5,
+      "y": 686.15625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Reflected in your tasks",
+      "width": 129.3125,
+      "x": 981.078125,
+      "y": 219
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Other framework skills",
+      "width": 127.515625,
+      "x": 1148.390625,
+      "y": 219
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Resilience, flexibility and agility",
+      "width": 167.375,
+      "x": 645.484375,
+      "y": 310.203125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "Leadership and social influence",
+      "width": 188.3125,
+      "x": 852.109375,
+      "y": 301.59375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Creative thinking",
+      "width": 90.671875,
+      "x": 1079.671875,
+      "y": 312.203125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 28.5625,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Motivation and self-awareness",
+      "width": 107.046875,
+      "x": 585.5625,
+      "y": 360.03125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Technological",
+      "width": 74.828125,
+      "x": 771.796875,
+      "y": 352.03125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "literacy",
+      "width": 39.265625,
+      "x": 789.578125,
+      "y": 366.59375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "Empathy and active",
+      "width": 116.828125,
+      "x": 925.53125,
+      "y": 358.796875
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "listening",
+      "width": 51.109375,
+      "x": 958.390625,
+      "y": 374.59375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Curiosity and lifelong",
+      "width": 113.71875,
+      "x": 1122.15625,
+      "y": 355.03125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "learning",
+      "width": 43.578125,
+      "x": 1157.234375,
+      "y": 369.59375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "Service orientation and customer",
+      "width": 197.828125,
+      "x": 610.109375,
+      "y": 422.609375
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "service",
+      "width": 44.203125,
+      "x": 686.921875,
+      "y": 438.40625
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "AI and big data",
+      "width": 80.171875,
+      "x": 860.890625,
+      "y": 423.125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Analytical thinking",
+      "width": 98.796875,
+      "x": 978.390625,
+      "y": 433.125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "Systems thinking",
+      "width": 102.984375,
+      "x": 1116.4375,
+      "y": 425.5
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "Resource management and",
+      "width": 162.109375,
+      "x": 581.953125,
+      "y": 486.421875
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "operations",
+      "width": 63.8125,
+      "x": 631.109375,
+      "y": 502.21875
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "Dependability and attention to",
+      "width": 178.859375,
+      "x": 808.078125,
+      "y": 478.421875
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "detail",
+      "width": 33.078125,
+      "x": 880.96875,
+      "y": 494.21875
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "Talent",
+      "width": 36.859375,
+      "x": 1065.203125,
+      "y": 488.421875
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "management",
+      "width": 78.078125,
+      "x": 1044.59375,
+      "y": 504.21875
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "Quality",
+      "width": 42.71875,
+      "x": 1192.96875,
+      "y": 481.421875
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "control",
+      "width": 42.046875,
+      "x": 1193.3125,
+      "y": 497.21875
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Networks and cybersecurity",
+      "width": 151.8125,
+      "x": 584.34375,
+      "y": 552.03125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Design and user experience",
+      "width": 149.515625,
+      "x": 773.484375,
+      "y": 544.03125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.16,
+      "fontWeight": "620",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "15.808px",
+      "text": "Teaching and mentoring",
+      "width": 144.1875,
+      "x": 962.25,
+      "y": 553.421875
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Multi-lingualism",
+      "width": 85.796875,
+      "x": 1145.6875,
+      "y": 547.03125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Marketing and media",
+      "width": 112.609375,
+      "x": 596.421875,
+      "y": 600.03125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Reading, writing and mathematics",
+      "width": 181.53125,
+      "x": 746.359375,
+      "y": 592.03125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Environmental stewardship",
+      "width": 144.8125,
+      "x": 965.21875,
+      "y": 602.03125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Programming",
+      "width": 72.046875,
+      "x": 1147.359375,
+      "y": 595.03125
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Manual dexterity, endurance and precision",
+      "width": 228.359375,
+      "x": 632.703125,
+      "y": 645.625
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Global citizenship",
+      "width": 94.984375,
+      "x": 898.390625,
+      "y": 637.625
+    },
+    {
+      "clip": {
+        "height": 476,
+        "width": 735.96875,
+        "x": 539.9375,
+        "y": 235
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "14.56px",
+      "text": "Sensory-processing abilities",
+      "width": 152.421875,
+      "x": 1030.703125,
+      "y": 647.625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "EVIDENCE FROM YOUR WORK",
+      "width": 195,
+      "x": 122.5,
+      "y": 765
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "32px",
+      "text": "Your identified skills",
+      "width": 234.359375,
+      "x": 122.5,
+      "y": 785.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Choose a skill to see the tasks connected to it, then explore what external research suggests about",
+      "width": 654.5,
+      "x": 122.5,
+      "y": 823.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "its future use.",
+      "width": 90.484375,
+      "x": 122.5,
+      "y": 847.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "reflected across your confirmed tasks",
+      "width": 215.296875,
+      "x": 191.6875,
+      "y": 903.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "700",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "9",
+      "width": 7.796875,
+      "x": 147.5,
+      "y": 903.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "700",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "skills",
+      "width": 30.1875,
+      "x": 158.125,
+      "y": 903.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Empathy and active listening",
+      "width": 191.671875,
+      "x": 148.5,
+      "y": 942.6875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Found in",
+      "width": 52.09375,
+      "x": 148.5,
+      "y": 965.6875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "2",
+      "width": 7.328125,
+      "x": 200.59375,
+      "y": 965.6875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "confirmed",
+      "width": 58.0625,
+      "x": 211.296875,
+      "y": 965.6875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "tasks",
+      "width": 29.984375,
+      "x": 272.734375,
+      "y": 965.6875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Talent management",
+      "width": 132.21875,
+      "x": 148.5,
+      "y": 1012.65625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Found in",
+      "width": 52.09375,
+      "x": 148.5,
+      "y": 1035.65625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "2",
+      "width": 7.328125,
+      "x": 200.59375,
+      "y": 1035.65625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "confirmed",
+      "width": 58.0625,
+      "x": 211.296875,
+      "y": 1035.65625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "tasks",
+      "width": 29.984375,
+      "x": 272.734375,
+      "y": 1035.65625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Service orientation and customer service",
+      "width": 275.28125,
+      "x": 148.5,
+      "y": 1082.625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Found in",
+      "width": 52.09375,
+      "x": 148.5,
+      "y": 1105.625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "2",
+      "width": 7.328125,
+      "x": 200.59375,
+      "y": 1105.625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "confirmed",
+      "width": 58.0625,
+      "x": 211.296875,
+      "y": 1105.625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "tasks",
+      "width": 29.984375,
+      "x": 272.734375,
+      "y": 1105.625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Resource management and operations",
+      "width": 258.015625,
+      "x": 148.5,
+      "y": 1152.59375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Found in",
+      "width": 52.09375,
+      "x": 148.5,
+      "y": 1175.59375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "2",
+      "width": 7.328125,
+      "x": 200.59375,
+      "y": 1175.59375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "confirmed",
+      "width": 58.0625,
+      "x": 211.296875,
+      "y": 1175.59375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "tasks",
+      "width": 29.984375,
+      "x": 272.734375,
+      "y": 1175.59375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Dependability and attention to detail",
+      "width": 241.40625,
+      "x": 148.5,
+      "y": 1222.5625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Found in",
+      "width": 52.09375,
+      "x": 148.5,
+      "y": 1245.5625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "2",
+      "width": 7.328125,
+      "x": 200.59375,
+      "y": 1245.5625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "confirmed",
+      "width": 58.0625,
+      "x": 211.296875,
+      "y": 1245.5625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "tasks",
+      "width": 29.984375,
+      "x": 272.734375,
+      "y": 1245.5625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Quality control",
+      "width": 97.875,
+      "x": 148.5,
+      "y": 1292.53125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Found in",
+      "width": 52.09375,
+      "x": 148.5,
+      "y": 1315.53125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "2",
+      "width": 7.328125,
+      "x": 200.59375,
+      "y": 1315.53125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "confirmed",
+      "width": 58.0625,
+      "x": 211.296875,
+      "y": 1315.53125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "tasks",
+      "width": 29.984375,
+      "x": 272.734375,
+      "y": 1315.53125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Teaching and mentoring",
+      "width": 162.265625,
+      "x": 148.5,
+      "y": 1362.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Found in",
+      "width": 52.09375,
+      "x": 148.5,
+      "y": 1385.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "2",
+      "width": 7.328125,
+      "x": 200.59375,
+      "y": 1385.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "confirmed",
+      "width": 58.0625,
+      "x": 211.296875,
+      "y": 1385.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "tasks",
+      "width": 29.984375,
+      "x": 272.734375,
+      "y": 1385.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Leadership and social influence",
+      "width": 212.109375,
+      "x": 148.5,
+      "y": 1432.46875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Found in",
+      "width": 52.09375,
+      "x": 148.5,
+      "y": 1455.46875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "1",
+      "width": 4.890625,
+      "x": 200.59375,
+      "y": 1455.46875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "confirmed",
+      "width": 58.0625,
+      "x": 208.859375,
+      "y": 1455.46875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "task",
+      "width": 23.65625,
+      "x": 270.296875,
+      "y": 1455.46875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Systems thinking",
+      "width": 114.78125,
+      "x": 148.5,
+      "y": 1502.4375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Found in",
+      "width": 52.09375,
+      "x": 148.5,
+      "y": 1525.4375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "1",
+      "width": 4.890625,
+      "x": 200.59375,
+      "y": 1525.4375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "confirmed",
+      "width": 58.0625,
+      "x": 208.859375,
+      "y": 1525.4375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "task",
+      "width": 23.65625,
+      "x": 270.296875,
+      "y": 1525.4375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "SELECTED SKILL",
+      "width": 110.171875,
+      "x": 529.625,
+      "y": 914.5
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "30px",
+      "text": "Empathy and active listening",
+      "width": 332.859375,
+      "x": 529.625,
+      "y": 934
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Working with others",
+      "width": 113.625,
+      "x": 529.625,
+      "y": 968
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "· identified from",
+      "width": 89.546875,
+      "x": 646.625,
+      "y": 968
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "2",
+      "width": 7.328125,
+      "x": 739.546875,
+      "y": 968
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "tasks",
+      "width": 29.984375,
+      "x": 750.25,
+      "y": 968
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Tasks connected to this skill",
+      "width": 188.375,
+      "x": 546.625,
+      "y": 1026
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "These are the confirmed tasks currently linked to this result.",
+      "width": 340.375,
+      "x": 546.625,
+      "y": 1051
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "18.85px",
+      "text": "Ensuring that customers receive prompt service;",
+      "width": 298.265625,
+      "x": 586.015625,
+      "y": 1094.1875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "18.85px",
+      "text": "Ensuring that goods and services are correctly priced and displayed;",
+      "width": 422.53125,
+      "x": 586.015625,
+      "y": 1145.40625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "EXTERNAL OUTLOOK",
+      "width": 138.5625,
+      "x": 529.625,
+      "y": 1240.828125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "What external research suggests",
+      "width": 255.515625,
+      "x": 529.625,
+      "y": 1262.328125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 10.88,
+      "fontWeight": "600",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.32px",
+      "text": "Sources & methodology",
+      "width": 125.359375,
+      "x": 1115.140625,
+      "y": 1263.171875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "700",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "Established and growing",
+      "width": 143.984375,
+      "x": 545.015625,
+      "y": 1316.921875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.24px",
+      "text": "This skill is already widely valued and expected to grow towards 2030.",
+      "width": 373.578125,
+      "x": 545.015625,
+      "y": 1338.3125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 9.76,
+      "fontWeight": "400",
+      "height": 11,
+      "letterSpacing": "normal",
+      "lineHeight": "14.152px",
+      "text": "Position based on current importance",
+      "width": 173.359375,
+      "x": 1084.734375,
+      "y": 1319.078125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 9.76,
+      "fontWeight": "400",
+      "height": 11,
+      "letterSpacing": "normal",
+      "lineHeight": "14.152px",
+      "text": "and future outlook.",
+      "width": 87.328125,
+      "x": 1170.765625,
+      "y": 1333.234375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 10.88,
+      "fontWeight": "600",
+      "height": 14,
+      "letterSpacing": "0.8704px",
+      "lineHeight": "16.32px",
+      "text": "VALUED TODAY",
+      "width": 94.28125,
+      "x": 578.625,
+      "y": 1396.546875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 21.6,
+      "fontWeight": "650",
+      "height": 26,
+      "letterSpacing": "normal",
+      "lineHeight": "24.84px",
+      "text": "50%",
+      "width": 49.9375,
+      "x": 578.625,
+      "y": 1423.65625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 9.92,
+      "fontWeight": "500",
+      "height": 12,
+      "letterSpacing": "normal",
+      "lineHeight": "13.888px",
+      "text": "of surveyed employers",
+      "width": 108.578125,
+      "x": 578.625,
+      "y": 1453.484375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "17.36px",
+      "text": "Consider this a core skill for",
+      "width": 147.3125,
+      "x": 578.625,
+      "y": 1478.765625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "17.36px",
+      "text": "their workforce in 2025.",
+      "width": 126.53125,
+      "x": 578.625,
+      "y": 1496.125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 10.88,
+      "fontWeight": "600",
+      "height": 14,
+      "letterSpacing": "0.8704px",
+      "lineHeight": "16.32px",
+      "text": "FUTURE USE BY 2030",
+      "width": 131.828125,
+      "x": 830.578125,
+      "y": 1396.546875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 21.6,
+      "fontWeight": "650",
+      "height": 26,
+      "letterSpacing": "normal",
+      "lineHeight": "24.84px",
+      "text": "+46 pts",
+      "width": 81.890625,
+      "x": 830.578125,
+      "y": 1423.65625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 9.92,
+      "fontWeight": "500",
+      "height": 12,
+      "letterSpacing": "normal",
+      "lineHeight": "13.888px",
+      "text": "High Growth",
+      "width": 59.109375,
+      "x": 830.578125,
+      "y": 1453.484375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 9.92,
+      "fontWeight": "500",
+      "height": 12,
+      "letterSpacing": "normal",
+      "lineHeight": "13.888px",
+      "text": "· net employer outlook",
+      "width": 105.75,
+      "x": 892.328125,
+      "y": 1453.484375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "17.36px",
+      "text": "More employers expect use of",
+      "width": 160.90625,
+      "x": 830.578125,
+      "y": 1478.765625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "17.36px",
+      "text": "this skill to increase than",
+      "width": 130.3125,
+      "x": 830.578125,
+      "y": 1496.125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "17.36px",
+      "text": "decrease by 2030.",
+      "width": 99.25,
+      "x": 830.578125,
+      "y": 1513.484375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 10.88,
+      "fontWeight": "600",
+      "height": 14,
+      "letterSpacing": "0.8704px",
+      "lineHeight": "16.32px",
+      "text": "WORKING WITH GENAI",
+      "width": 137.9375,
+      "x": 1082.53125,
+      "y": 1396.546875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16.8,
+      "fontWeight": "650",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "19.32px",
+      "text": "Very low capacity",
+      "width": 146.921875,
+      "x": 1082.53125,
+      "y": 1423.65625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 9.92,
+      "fontWeight": "500",
+      "height": 12,
+      "letterSpacing": "normal",
+      "lineHeight": "13.888px",
+      "text": "substitution capacity",
+      "width": 99.3125,
+      "x": 1082.53125,
+      "y": 1447.96875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "17.36px",
+      "text": "Research indicates limited GenAI",
+      "width": 173.75,
+      "x": 1082.53125,
+      "y": 1473.25
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "17.36px",
+      "text": "capacity to substitute the central",
+      "width": 173.515625,
+      "x": 1082.53125,
+      "y": 1490.609375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "17.36px",
+      "text": "activities associated with this",
+      "width": 154.59375,
+      "x": 1082.53125,
+      "y": 1507.96875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "17.36px",
+      "text": "skill.",
+      "width": 23.4375,
+      "x": 1082.53125,
+      "y": 1525.328125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(130, 121, 135)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "27.2px",
+      "text": "Plan your next skill move",
+      "width": 187.15625,
+      "x": 122.5,
+      "y": 1626.546875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 28,
+      "fontWeight": "650",
+      "height": 34,
+      "letterSpacing": "normal",
+      "lineHeight": "42px",
+      "text": "Choose skills to learn",
+      "width": 292.15625,
+      "x": 122.5,
+      "y": 1662.734375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(130, 121, 135)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "27.2px",
+      "text": "Start with skills reflected in your work, then add skills you want to develop. Drag skills across or use the add buttons.",
+      "width": 880.609375,
+      "x": 122.5,
+      "y": 1715.734375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 20,
+      "fontWeight": "600",
+      "height": 24,
+      "letterSpacing": "normal",
+      "lineHeight": "30px",
+      "text": "Explore growing skills",
+      "width": 210.5,
+      "x": 147.5,
+      "y": 1791.921875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(129, 119, 135)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "25.6px",
+      "text": "WEF · 2025–2030 Top 10",
+      "width": 189.4375,
+      "x": 147.5,
+      "y": 1829.125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(129, 119, 135)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20.48px",
+      "text": "Employer expectations of growing skill importance, not a personal skill assessment.",
+      "width": 504.5625,
+      "x": 147.5,
+      "y": 1858.921875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "AI and big data",
+      "width": 100.203125,
+      "x": 160.5,
+      "y": 1917.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(75, 141, 181)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Add",
+      "width": 23.265625,
+      "x": 621.859375,
+      "y": 1918.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Networks and cybersecurity",
+      "width": 189.765625,
+      "x": 160.5,
+      "y": 1985.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(75, 141, 181)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Add",
+      "width": 23.265625,
+      "x": 621.859375,
+      "y": 1986.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Technological literacy",
+      "width": 146.328125,
+      "x": 160.5,
+      "y": 2053.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(75, 141, 181)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Add",
+      "width": 23.265625,
+      "x": 621.859375,
+      "y": 2054.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Creative thinking",
+      "width": 113.34375,
+      "x": 160.5,
+      "y": 2121.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(75, 141, 181)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Add",
+      "width": 23.265625,
+      "x": 621.859375,
+      "y": 2122.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Resilience, flexibility and agility",
+      "width": 209.203125,
+      "x": 160.5,
+      "y": 2189.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(75, 141, 181)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Add",
+      "width": 23.265625,
+      "x": 621.859375,
+      "y": 2190.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Curiosity and lifelong learning",
+      "width": 200.34375,
+      "x": 160.5,
+      "y": 2257.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(75, 141, 181)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Add",
+      "width": 23.265625,
+      "x": 621.859375,
+      "y": 2258.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Leadership and social influence",
+      "width": 212.109375,
+      "x": 160.5,
+      "y": 2325.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(75, 141, 181)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Add",
+      "width": 23.265625,
+      "x": 621.859375,
+      "y": 2326.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Talent management",
+      "width": 132.21875,
+      "x": 160.5,
+      "y": 2393.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(75, 141, 181)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Add",
+      "width": 23.265625,
+      "x": 621.859375,
+      "y": 2394.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Analytical thinking",
+      "width": 123.484375,
+      "x": 160.5,
+      "y": 2461.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(108, 142, 157)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Added",
+      "width": 37.734375,
+      "x": 611.765625,
+      "y": 2462.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Environmental stewardship",
+      "width": 181,
+      "x": 160.5,
+      "y": 2529.890625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(75, 141, 181)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Add",
+      "width": 23.265625,
+      "x": 621.859375,
+      "y": 2530.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(70, 119, 149)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "Source: WEF · Future of Jobs Report 2025 ↗",
+      "width": 272.796875,
+      "x": 147.5,
+      "y": 2592.390625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 20,
+      "fontWeight": "600",
+      "height": 24,
+      "letterSpacing": "normal",
+      "lineHeight": "30px",
+      "text": "Your learning skills ·",
+      "width": 199.328125,
+      "x": 749.5,
+      "y": 1791.921875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 20,
+      "fontWeight": "600",
+      "height": 24,
+      "letterSpacing": "normal",
+      "lineHeight": "30px",
+      "text": "1",
+      "width": 8.46875,
+      "x": 948.828125,
+      "y": 1791.921875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(129, 119, 135)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "25.6px",
+      "text": "Drag to reorder your learning priorities. Removing a skill here keeps",
+      "width": 509.4375,
+      "x": 749.5,
+      "y": 1828.921875
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(129, 119, 135)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "25.6px",
+      "text": "your work profile unchanged.",
+      "width": 222.359375,
+      "x": 749.5,
+      "y": 1854.515625
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Analytical thinking",
+      "width": 123.484375,
+      "x": 762.5,
+      "y": 1913.109375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(129, 119, 135)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "17.6px",
+      "text": "Added from WEF",
+      "width": 88.609375,
+      "x": 762.5,
+      "y": 1938.109375
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Restore my work skills",
+      "width": 149.34375,
+      "x": 765.5,
+      "y": 1998.703125
+    },
+    {
+      "clip": {
+        "height": 2700,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Confirm and find courses →",
+      "width": 186.34375,
+      "x": 1070.15625,
+      "y": 1998.703125
+    }
+  ],
+  "url": "http://127.0.0.1:4173/skills",
+  "viewportHeight": 1000,
+  "width": 1440,
+  "name": "skills-signed-desktop",
+  "screenshot": "skills-signed-desktop.jpg"
+}

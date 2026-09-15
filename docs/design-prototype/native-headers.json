@@ -1,0 +1,182 @@
+[
+  {
+    "stem": "home-mobile",
+    "id": "23:479",
+    "position": "FIXED"
+  },
+  {
+    "stem": "account-gate-desktop",
+    "id": "23:567",
+    "position": "FIXED"
+  },
+  {
+    "stem": "account-gate-mobile",
+    "id": "23:708",
+    "position": "FIXED"
+  },
+  {
+    "stem": "exposure-desktop",
+    "id": "23:793",
+    "position": "FIXED"
+  },
+  {
+    "stem": "exposure-mobile",
+    "id": "23:934",
+    "position": "FIXED"
+  },
+  {
+    "stem": "help-draft-desktop",
+    "id": "23:1019",
+    "position": "FIXED"
+  },
+  {
+    "stem": "help-draft-mobile",
+    "id": "23:1142",
+    "position": "FIXED"
+  },
+  {
+    "stem": "home-desktop",
+    "id": "23:1229",
+    "position": "FIXED"
+  },
+  {
+    "stem": "occupation-desktop",
+    "id": "23:1351",
+    "position": "FIXED"
+  },
+  {
+    "stem": "occupation-mobile",
+    "id": "23:1432",
+    "position": "FIXED"
+  },
+  {
+    "stem": "occupation-selected-desktop",
+    "id": "23:1517",
+    "position": "FIXED"
+  },
+  {
+    "stem": "occupation-selected-mobile",
+    "id": "23:1598",
+    "position": "FIXED"
+  },
+  {
+    "stem": "plan-completed-desktop",
+    "id": "23:1683",
+    "position": "FIXED"
+  },
+  {
+    "stem": "plan-completed-mobile",
+    "id": "23:1806",
+    "position": "FIXED"
+  },
+  {
+    "stem": "plan-conflict-desktop",
+    "id": "23:1893",
+    "position": "FIXED"
+  },
+  {
+    "stem": "plan-conflict-mobile",
+    "id": "23:2016",
+    "position": "FIXED"
+  },
+  {
+    "stem": "plan-desktop",
+    "id": "23:2103",
+    "position": "FIXED"
+  },
+  {
+    "stem": "plan-empty-desktop",
+    "id": "23:2226",
+    "position": "FIXED"
+  },
+  {
+    "stem": "plan-empty-mobile",
+    "id": "23:2349",
+    "position": "FIXED"
+  },
+  {
+    "stem": "plan-mobile",
+    "id": "23:2436",
+    "position": "FIXED"
+  },
+  {
+    "stem": "plan-resolved-desktop",
+    "id": "23:2523",
+    "position": "FIXED"
+  },
+  {
+    "stem": "plan-resolved-mobile",
+    "id": "23:2646",
+    "position": "FIXED"
+  },
+  {
+    "stem": "resources-desktop",
+    "id": "23:2733",
+    "position": "FIXED"
+  },
+  {
+    "stem": "resources-mobile",
+    "id": "23:2856",
+    "position": "FIXED"
+  },
+  {
+    "stem": "resources-start-desktop",
+    "id": "23:2943",
+    "position": "FIXED"
+  },
+  {
+    "stem": "resources-start-mobile",
+    "id": "23:3066",
+    "position": "FIXED"
+  },
+  {
+    "stem": "search-mode-desktop",
+    "id": "23:3153",
+    "position": "FIXED"
+  },
+  {
+    "stem": "search-mode-mobile",
+    "id": "23:3234",
+    "position": "FIXED"
+  },
+  {
+    "stem": "search-results-desktop",
+    "id": "23:3319",
+    "position": "FIXED"
+  },
+  {
+    "stem": "search-results-mobile",
+    "id": "23:3400",
+    "position": "FIXED"
+  },
+  {
+    "stem": "skills-desktop",
+    "id": "23:3485",
+    "position": "FIXED"
+  },
+  {
+    "stem": "skills-mobile",
+    "id": "23:3626",
+    "position": "FIXED"
+  },
+  {
+    "stem": "skills-signed-desktop",
+    "id": "23:3711",
+    "position": "FIXED"
+  },
+  {
+    "stem": "skills-signed-mobile",
+    "id": "23:3834",
+    "position": "FIXED"
+  },
+  {
+    "stem": "tasks-desktop",
+    "id": "23:3921",
+    "position": "FIXED"
+  },
+  {
+    "stem": "tasks-mobile",
+    "id": "23:4012",
+    "position": "FIXED"
+  }
+]

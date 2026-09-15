@@ -1,0 +1,618 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 844,
+      "kind": "body",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 390,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 844,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 390,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.45)",
+      "height": 65,
+      "kind": "header",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 390,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 36,
+      "x": 16,
+      "y": 14
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 74.734375,
+      "x": 299.265625,
+      "y": 14
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.76)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 295,
+      "kind": "section",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.12) 0px 14px 34px 0px",
+      "width": 358,
+      "x": 16,
+      "y": 207.59375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(214, 234, 247)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 162.921875,
+      "x": 190.078125,
+      "y": 228.59375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.95)",
+      "height": 48,
+      "kind": "input",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 316,
+      "x": 37,
+      "y": 300.59375
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 89,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 316,
+      "x": 37,
+      "y": 392.59375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 0.5,
+      "radius": 9999,
+      "shadow": "rgba(79, 145, 186, 0.28) 0px 4px 16px 0px",
+      "width": 184.859375,
+      "x": 168.140625,
+      "y": 441.59375
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Open menu",
+      "role": "button",
+      "width": 36,
+      "x": 16,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/",
+      "label": "AI-Wrevolusi home",
+      "role": "a",
+      "width": 158.078125,
+      "x": 64,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Log in or create an account",
+      "role": "button",
+      "width": 74.734375,
+      "x": 299.265625,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Back to category filters",
+      "role": "button",
+      "width": 162.921875,
+      "x": 190.078125,
+      "y": 228.59375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 48,
+      "href": null,
+      "label": "Search occupations by job title",
+      "role": "input",
+      "width": 316,
+      "x": 37,
+      "y": 300.59375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": true,
+      "height": 40,
+      "href": null,
+      "label": "Confirm and continue",
+      "role": "button",
+      "width": 184.859375,
+      "x": 168.140625,
+      "y": 441.59375
+    }
+  ],
+  "height": 844,
+  "icons": [
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(60, 42, 53)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-menu size-4\" aria-hidden=\"true\"><path d=\"M4 5h16\"></path><path d=\"M4 12h16\"></path><path d=\"M4 19h16\"></path></svg>",
+      "width": 16,
+      "x": 26,
+      "y": 24
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(112, 92, 103)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-search absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"></path><circle cx=\"11\" cy=\"11\" r=\"8\"></circle></svg>",
+      "width": 16,
+      "x": 49,
+      "y": 316.59375
+    }
+  ],
+  "images": [
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "height": 36,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/logo-mark.svg",
+      "width": 41.265625,
+      "x": 64,
+      "y": 14
+    }
+  ],
+  "overlay": false,
+  "scrollY": 0,
+  "texts": [
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 43, 54)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "-0.45px",
+      "lineHeight": "27px",
+      "text": "AI-Wrevolusi",
+      "width": 106.8125,
+      "x": 115.265625,
+      "y": 21.5
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Log in",
+      "width": 40.734375,
+      "x": 316.265625,
+      "y": 23
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "28.8px",
+      "text": "Find the occupation that",
+      "width": 281.375,
+      "x": 16,
+      "y": 88
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "28.8px",
+      "text": "matches your work",
+      "width": 222.265625,
+      "x": 16,
+      "y": 116.796875
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Search by job title, or browse by field of work.",
+      "width": 304.234375,
+      "x": 16,
+      "y": 151.59375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Search by job title",
+      "width": 120.09375,
+      "x": 37,
+      "y": 229.59375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Type and see matching",
+      "width": 132.078125,
+      "x": 37,
+      "y": 252.59375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "occupations instantly.",
+      "width": 123.75,
+      "x": 37,
+      "y": 268.59375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Back to category filters",
+      "width": 134.921875,
+      "x": 204.078125,
+      "y": 236.59375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 16.8,
+      "lineHeight": "20px",
+      "multiline": false,
+      "synthetic": true,
+      "text": "Search by job title",
+      "width": 258,
+      "x": 78,
+      "y": 316.19375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Type at least 2 characters to search.",
+      "width": 206.71875,
+      "x": 37,
+      "y": 360.59375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "No occupation selected yet.",
+      "width": 185.28125,
+      "x": 37,
+      "y": 410.59375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(255, 255, 255)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Confirm and continue",
+      "width": 144.859375,
+      "x": 188.140625,
+      "y": 452.59375
+    }
+  ],
+  "url": "http://127.0.0.1:4173/profile",
+  "viewportHeight": 844,
+  "width": 390,
+  "name": "search-mode-mobile",
+  "screenshot": "search-mode-mobile.jpg"
+}

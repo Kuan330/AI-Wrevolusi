@@ -1,0 +1,2333 @@
+{
+  "method": "Captured items intersecting the top 64 pixels; clip at 64 pixels",
+  "headers": [
+    {
+      "originalStem": "account-gate-desktop",
+      "svg": "account-gate-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-account-gate-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-account-gate-desktop-2-Work-Profile",
+        "sticky-hit-account-gate-desktop-3-Tasks",
+        "sticky-hit-account-gate-desktop-4-AI-Exposure",
+        "sticky-hit-account-gate-desktop-5-Skills",
+        "sticky-hit-account-gate-desktop-6-Learning-Resources",
+        "sticky-hit-account-gate-desktop-7-My-Plan",
+        "sticky-hit-account-gate-desktop-8-Possibilities",
+        "sticky-hit-account-gate-desktop-9-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-account-gate-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-account-gate-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-account-gate-desktop-2-Work-Profile",
+          "originalId": "hit-account-gate-desktop-2-Work-Profile",
+          "label": "Work Profile",
+          "href": "/profile",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 110.203125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-account-gate-desktop-3-Tasks",
+          "originalId": "hit-account-gate-desktop-3-Tasks",
+          "label": "Tasks",
+          "href": "/profile/tasks",
+          "x": 352.28125,
+          "y": 14.0,
+          "width": 66.984375,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-account-gate-desktop-4-AI-Exposure",
+          "originalId": "hit-account-gate-desktop-4-AI-Exposure",
+          "label": "AI Exposure",
+          "href": "/ai-exposure",
+          "x": 447.265625,
+          "y": 14.0,
+          "width": 108.171875,
+          "height": 36.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-account-gate-desktop-5-Skills",
+          "originalId": "hit-account-gate-desktop-5-Skills",
+          "label": "Skills",
+          "href": "/skills",
+          "x": 583.4375,
+          "y": 14.0,
+          "width": 63.0,
+          "height": 36.0
+        },
+        {
+          "index": 6,
+          "id": "sticky-hit-account-gate-desktop-6-Learning-Resources",
+          "originalId": "hit-account-gate-desktop-6-Learning-Resources",
+          "label": "Learning Resources",
+          "href": "/learning-centre",
+          "x": 674.4375,
+          "y": 14.0,
+          "width": 161.109375,
+          "height": 36.0
+        },
+        {
+          "index": 7,
+          "id": "sticky-hit-account-gate-desktop-7-My-Plan",
+          "originalId": "hit-account-gate-desktop-7-My-Plan",
+          "label": "My Plan",
+          "href": "/plan",
+          "x": 863.546875,
+          "y": 14.0,
+          "width": 81.546875,
+          "height": 36.0
+        },
+        {
+          "index": 8,
+          "id": "sticky-hit-account-gate-desktop-8-Possibilities",
+          "originalId": "hit-account-gate-desktop-8-Possibilities",
+          "label": "Possibilities",
+          "href": "/possibilities",
+          "x": 973.09375,
+          "y": 14.0,
+          "width": 107.25,
+          "height": 36.0
+        },
+        {
+          "index": 9,
+          "id": "sticky-hit-account-gate-desktop-9-Log-in-or-create-an-account",
+          "originalId": "hit-account-gate-desktop-9-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 1326.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "account-gate-mobile",
+      "svg": "account-gate-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-account-gate-mobile-1-Open-menu",
+        "sticky-hit-account-gate-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-account-gate-mobile-3-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-account-gate-mobile-1-Open-menu",
+          "originalId": "hit-account-gate-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-account-gate-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-account-gate-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-account-gate-mobile-3-Log-in-or-create-an-account",
+          "originalId": "hit-account-gate-mobile-3-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 284.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "exposure-desktop",
+      "svg": "exposure-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-exposure-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-exposure-desktop-2-Work-Profile",
+        "sticky-hit-exposure-desktop-3-Tasks",
+        "sticky-hit-exposure-desktop-4-AI-Exposure",
+        "sticky-hit-exposure-desktop-5-Skills",
+        "sticky-hit-exposure-desktop-6-Learning-Resources",
+        "sticky-hit-exposure-desktop-7-My-Plan",
+        "sticky-hit-exposure-desktop-8-Possibilities",
+        "sticky-hit-exposure-desktop-9-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-exposure-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-exposure-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-exposure-desktop-2-Work-Profile",
+          "originalId": "hit-exposure-desktop-2-Work-Profile",
+          "label": "Work Profile",
+          "href": "/profile",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 110.203125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-exposure-desktop-3-Tasks",
+          "originalId": "hit-exposure-desktop-3-Tasks",
+          "label": "Tasks",
+          "href": "/profile/tasks",
+          "x": 352.28125,
+          "y": 14.0,
+          "width": 66.984375,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-exposure-desktop-4-AI-Exposure",
+          "originalId": "hit-exposure-desktop-4-AI-Exposure",
+          "label": "AI Exposure",
+          "href": "/ai-exposure",
+          "x": 447.265625,
+          "y": 14.0,
+          "width": 108.171875,
+          "height": 36.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-exposure-desktop-5-Skills",
+          "originalId": "hit-exposure-desktop-5-Skills",
+          "label": "Skills",
+          "href": "/skills",
+          "x": 583.4375,
+          "y": 14.0,
+          "width": 63.0,
+          "height": 36.0
+        },
+        {
+          "index": 6,
+          "id": "sticky-hit-exposure-desktop-6-Learning-Resources",
+          "originalId": "hit-exposure-desktop-6-Learning-Resources",
+          "label": "Learning Resources",
+          "href": "/learning-centre",
+          "x": 674.4375,
+          "y": 14.0,
+          "width": 161.109375,
+          "height": 36.0
+        },
+        {
+          "index": 7,
+          "id": "sticky-hit-exposure-desktop-7-My-Plan",
+          "originalId": "hit-exposure-desktop-7-My-Plan",
+          "label": "My Plan",
+          "href": "/plan",
+          "x": 863.546875,
+          "y": 14.0,
+          "width": 81.546875,
+          "height": 36.0
+        },
+        {
+          "index": 8,
+          "id": "sticky-hit-exposure-desktop-8-Possibilities",
+          "originalId": "hit-exposure-desktop-8-Possibilities",
+          "label": "Possibilities",
+          "href": "/possibilities",
+          "x": 973.09375,
+          "y": 14.0,
+          "width": 107.25,
+          "height": 36.0
+        },
+        {
+          "index": 9,
+          "id": "sticky-hit-exposure-desktop-9-Log-in-or-create-an-account",
+          "originalId": "hit-exposure-desktop-9-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 1326.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "exposure-mobile",
+      "svg": "exposure-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-exposure-mobile-1-Open-menu",
+        "sticky-hit-exposure-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-exposure-mobile-3-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-exposure-mobile-1-Open-menu",
+          "originalId": "hit-exposure-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-exposure-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-exposure-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-exposure-mobile-3-Log-in-or-create-an-account",
+          "originalId": "hit-exposure-mobile-3-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 284.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "help-draft-desktop",
+      "svg": "help-draft-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-help-draft-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-help-draft-desktop-2-AI-Exposure",
+        "sticky-hit-help-draft-desktop-3-Skills",
+        "sticky-hit-help-draft-desktop-4-Learning-Resources",
+        "sticky-hit-help-draft-desktop-5-My-Plan",
+        "sticky-hit-help-draft-desktop-6-Possibilities",
+        "sticky-hit-help-draft-desktop-7-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-help-draft-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-help-draft-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-help-draft-desktop-2-AI-Exposure",
+          "originalId": "hit-help-draft-desktop-2-AI-Exposure",
+          "label": "AI Exposure",
+          "href": "/ai-exposure",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 108.171875,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-help-draft-desktop-3-Skills",
+          "originalId": "hit-help-draft-desktop-3-Skills",
+          "label": "Skills",
+          "href": "/skills",
+          "x": 350.25,
+          "y": 14.0,
+          "width": 63.0,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-help-draft-desktop-4-Learning-Resources",
+          "originalId": "hit-help-draft-desktop-4-Learning-Resources",
+          "label": "Learning Resources",
+          "href": "/learning-centre",
+          "x": 441.25,
+          "y": 14.0,
+          "width": 161.109375,
+          "height": 36.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-help-draft-desktop-5-My-Plan",
+          "originalId": "hit-help-draft-desktop-5-My-Plan",
+          "label": "My Plan",
+          "href": "/plan",
+          "x": 630.359375,
+          "y": 14.0,
+          "width": 81.546875,
+          "height": 36.0
+        },
+        {
+          "index": 6,
+          "id": "sticky-hit-help-draft-desktop-6-Possibilities",
+          "originalId": "hit-help-draft-desktop-6-Possibilities",
+          "label": "Possibilities",
+          "href": "/possibilities",
+          "x": 739.90625,
+          "y": 14.0,
+          "width": 107.25,
+          "height": 36.0
+        },
+        {
+          "index": 7,
+          "id": "sticky-hit-help-draft-desktop-7-Account-menu",
+          "originalId": "hit-help-draft-desktop-7-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 1365.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "help-draft-mobile",
+      "svg": "help-draft-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-help-draft-mobile-1-Open-menu",
+        "sticky-hit-help-draft-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-help-draft-mobile-3-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-help-draft-mobile-1-Open-menu",
+          "originalId": "hit-help-draft-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-help-draft-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-help-draft-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-help-draft-mobile-3-Account-menu",
+          "originalId": "hit-help-draft-mobile-3-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 323.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "home-desktop",
+      "svg": "home-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-home-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-home-desktop-2-How-it-works",
+        "sticky-hit-home-desktop-3-Sample-report",
+        "sticky-hit-home-desktop-4-Start-free-analysis",
+        "sticky-hit-home-desktop-5-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-home-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-home-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-home-desktop-2-How-it-works",
+          "originalId": "hit-home-desktop-2-How-it-works",
+          "label": "How it works",
+          "href": "#steps",
+          "x": 918.375,
+          "y": 21.5,
+          "width": 86.015625,
+          "height": 21.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-home-desktop-3-Sample-report",
+          "originalId": "hit-home-desktop-3-Sample-report",
+          "label": "Sample report",
+          "href": "#report",
+          "x": 1036.390625,
+          "y": 21.5,
+          "width": 93.40625,
+          "height": 21.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-home-desktop-4-Start-free-analysis",
+          "originalId": "hit-home-desktop-4-Start-free-analysis",
+          "label": "Start free analysis",
+          "href": "/profile",
+          "x": 1161.796875,
+          "y": 13.5,
+          "width": 157.203125,
+          "height": 37.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-home-desktop-5-Log-in-or-create-an-account",
+          "originalId": "hit-home-desktop-5-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 1351.0,
+          "y": 14.0,
+          "width": 50.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "home-mobile",
+      "svg": "home-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-home-mobile-1-AI-Wrevolusi-home",
+        "sticky-hit-home-mobile-2-Open-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-home-mobile-1-AI-Wrevolusi-home",
+          "originalId": "hit-home-mobile-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-home-mobile-2-Open-menu",
+          "originalId": "hit-home-mobile-2-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 311.0,
+          "y": 12.0,
+          "width": 40.0,
+          "height": 40.0
+        }
+      ]
+    },
+    {
+      "originalStem": "occupation-desktop",
+      "svg": "occupation-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-occupation-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-occupation-desktop-2-Work-Profile",
+        "sticky-hit-occupation-desktop-3-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-occupation-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-occupation-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-occupation-desktop-2-Work-Profile",
+          "originalId": "hit-occupation-desktop-2-Work-Profile",
+          "label": "Work Profile",
+          "href": "/profile",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 110.203125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-occupation-desktop-3-Log-in-or-create-an-account",
+          "originalId": "hit-occupation-desktop-3-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 1341.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "occupation-mobile",
+      "svg": "occupation-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-occupation-mobile-1-Open-menu",
+        "sticky-hit-occupation-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-occupation-mobile-3-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-occupation-mobile-1-Open-menu",
+          "originalId": "hit-occupation-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-occupation-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-occupation-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-occupation-mobile-3-Log-in-or-create-an-account",
+          "originalId": "hit-occupation-mobile-3-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 284.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "occupation-selected-desktop",
+      "svg": "occupation-selected-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-occupation-selected-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-occupation-selected-desktop-2-Work-Profile",
+        "sticky-hit-occupation-selected-desktop-3-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-occupation-selected-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-occupation-selected-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-occupation-selected-desktop-2-Work-Profile",
+          "originalId": "hit-occupation-selected-desktop-2-Work-Profile",
+          "label": "Work Profile",
+          "href": "/profile",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 110.203125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-occupation-selected-desktop-3-Log-in-or-create-an-account",
+          "originalId": "hit-occupation-selected-desktop-3-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 1341.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "occupation-selected-mobile",
+      "svg": "occupation-selected-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-occupation-selected-mobile-1-Open-menu",
+        "sticky-hit-occupation-selected-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-occupation-selected-mobile-3-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-occupation-selected-mobile-1-Open-menu",
+          "originalId": "hit-occupation-selected-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-occupation-selected-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-occupation-selected-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-occupation-selected-mobile-3-Log-in-or-create-an-account",
+          "originalId": "hit-occupation-selected-mobile-3-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 299.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "plan-completed-desktop",
+      "svg": "plan-completed-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-plan-completed-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-plan-completed-desktop-2-AI-Exposure",
+        "sticky-hit-plan-completed-desktop-3-Skills",
+        "sticky-hit-plan-completed-desktop-4-Learning-Resources",
+        "sticky-hit-plan-completed-desktop-5-My-Plan",
+        "sticky-hit-plan-completed-desktop-6-Possibilities",
+        "sticky-hit-plan-completed-desktop-7-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-plan-completed-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-plan-completed-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-plan-completed-desktop-2-AI-Exposure",
+          "originalId": "hit-plan-completed-desktop-2-AI-Exposure",
+          "label": "AI Exposure",
+          "href": "/ai-exposure",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 108.171875,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-plan-completed-desktop-3-Skills",
+          "originalId": "hit-plan-completed-desktop-3-Skills",
+          "label": "Skills",
+          "href": "/skills",
+          "x": 350.25,
+          "y": 14.0,
+          "width": 63.0,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-plan-completed-desktop-4-Learning-Resources",
+          "originalId": "hit-plan-completed-desktop-4-Learning-Resources",
+          "label": "Learning Resources",
+          "href": "/learning-centre",
+          "x": 441.25,
+          "y": 14.0,
+          "width": 161.109375,
+          "height": 36.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-plan-completed-desktop-5-My-Plan",
+          "originalId": "hit-plan-completed-desktop-5-My-Plan",
+          "label": "My Plan",
+          "href": "/plan",
+          "x": 630.359375,
+          "y": 14.0,
+          "width": 81.546875,
+          "height": 36.0
+        },
+        {
+          "index": 6,
+          "id": "sticky-hit-plan-completed-desktop-6-Possibilities",
+          "originalId": "hit-plan-completed-desktop-6-Possibilities",
+          "label": "Possibilities",
+          "href": "/possibilities",
+          "x": 739.90625,
+          "y": 14.0,
+          "width": 107.25,
+          "height": 36.0
+        },
+        {
+          "index": 7,
+          "id": "sticky-hit-plan-completed-desktop-7-Account-menu",
+          "originalId": "hit-plan-completed-desktop-7-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 1365.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "plan-completed-mobile",
+      "svg": "plan-completed-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-plan-completed-mobile-1-Open-menu",
+        "sticky-hit-plan-completed-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-plan-completed-mobile-3-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-plan-completed-mobile-1-Open-menu",
+          "originalId": "hit-plan-completed-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-plan-completed-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-plan-completed-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-plan-completed-mobile-3-Account-menu",
+          "originalId": "hit-plan-completed-mobile-3-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 323.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "plan-conflict-desktop",
+      "svg": "plan-conflict-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-plan-conflict-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-plan-conflict-desktop-2-AI-Exposure",
+        "sticky-hit-plan-conflict-desktop-3-Skills",
+        "sticky-hit-plan-conflict-desktop-4-Learning-Resources",
+        "sticky-hit-plan-conflict-desktop-5-My-Plan",
+        "sticky-hit-plan-conflict-desktop-6-Possibilities",
+        "sticky-hit-plan-conflict-desktop-7-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-plan-conflict-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-plan-conflict-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-plan-conflict-desktop-2-AI-Exposure",
+          "originalId": "hit-plan-conflict-desktop-2-AI-Exposure",
+          "label": "AI Exposure",
+          "href": "/ai-exposure",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 108.171875,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-plan-conflict-desktop-3-Skills",
+          "originalId": "hit-plan-conflict-desktop-3-Skills",
+          "label": "Skills",
+          "href": "/skills",
+          "x": 350.25,
+          "y": 14.0,
+          "width": 63.0,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-plan-conflict-desktop-4-Learning-Resources",
+          "originalId": "hit-plan-conflict-desktop-4-Learning-Resources",
+          "label": "Learning Resources",
+          "href": "/learning-centre",
+          "x": 441.25,
+          "y": 14.0,
+          "width": 161.109375,
+          "height": 36.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-plan-conflict-desktop-5-My-Plan",
+          "originalId": "hit-plan-conflict-desktop-5-My-Plan",
+          "label": "My Plan",
+          "href": "/plan",
+          "x": 630.359375,
+          "y": 14.0,
+          "width": 81.546875,
+          "height": 36.0
+        },
+        {
+          "index": 6,
+          "id": "sticky-hit-plan-conflict-desktop-6-Possibilities",
+          "originalId": "hit-plan-conflict-desktop-6-Possibilities",
+          "label": "Possibilities",
+          "href": "/possibilities",
+          "x": 739.90625,
+          "y": 14.0,
+          "width": 107.25,
+          "height": 36.0
+        },
+        {
+          "index": 7,
+          "id": "sticky-hit-plan-conflict-desktop-7-Account-menu",
+          "originalId": "hit-plan-conflict-desktop-7-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 1365.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "plan-conflict-mobile",
+      "svg": "plan-conflict-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-plan-conflict-mobile-1-Open-menu",
+        "sticky-hit-plan-conflict-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-plan-conflict-mobile-3-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-plan-conflict-mobile-1-Open-menu",
+          "originalId": "hit-plan-conflict-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-plan-conflict-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-plan-conflict-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-plan-conflict-mobile-3-Account-menu",
+          "originalId": "hit-plan-conflict-mobile-3-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 323.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "plan-desktop",
+      "svg": "plan-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-plan-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-plan-desktop-2-AI-Exposure",
+        "sticky-hit-plan-desktop-3-Skills",
+        "sticky-hit-plan-desktop-4-Learning-Resources",
+        "sticky-hit-plan-desktop-5-My-Plan",
+        "sticky-hit-plan-desktop-6-Possibilities",
+        "sticky-hit-plan-desktop-7-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-plan-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-plan-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-plan-desktop-2-AI-Exposure",
+          "originalId": "hit-plan-desktop-2-AI-Exposure",
+          "label": "AI Exposure",
+          "href": "/ai-exposure",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 108.171875,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-plan-desktop-3-Skills",
+          "originalId": "hit-plan-desktop-3-Skills",
+          "label": "Skills",
+          "href": "/skills",
+          "x": 350.25,
+          "y": 14.0,
+          "width": 63.0,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-plan-desktop-4-Learning-Resources",
+          "originalId": "hit-plan-desktop-4-Learning-Resources",
+          "label": "Learning Resources",
+          "href": "/learning-centre",
+          "x": 441.25,
+          "y": 14.0,
+          "width": 161.109375,
+          "height": 36.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-plan-desktop-5-My-Plan",
+          "originalId": "hit-plan-desktop-5-My-Plan",
+          "label": "My Plan",
+          "href": "/plan",
+          "x": 630.359375,
+          "y": 14.0,
+          "width": 81.546875,
+          "height": 36.0
+        },
+        {
+          "index": 6,
+          "id": "sticky-hit-plan-desktop-6-Possibilities",
+          "originalId": "hit-plan-desktop-6-Possibilities",
+          "label": "Possibilities",
+          "href": "/possibilities",
+          "x": 739.90625,
+          "y": 14.0,
+          "width": 107.25,
+          "height": 36.0
+        },
+        {
+          "index": 7,
+          "id": "sticky-hit-plan-desktop-7-Account-menu",
+          "originalId": "hit-plan-desktop-7-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 1365.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "plan-empty-desktop",
+      "svg": "plan-empty-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-plan-empty-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-plan-empty-desktop-2-AI-Exposure",
+        "sticky-hit-plan-empty-desktop-3-Skills",
+        "sticky-hit-plan-empty-desktop-4-Learning-Resources",
+        "sticky-hit-plan-empty-desktop-5-My-Plan",
+        "sticky-hit-plan-empty-desktop-6-Possibilities",
+        "sticky-hit-plan-empty-desktop-7-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-plan-empty-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-plan-empty-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-plan-empty-desktop-2-AI-Exposure",
+          "originalId": "hit-plan-empty-desktop-2-AI-Exposure",
+          "label": "AI Exposure",
+          "href": "/ai-exposure",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 108.171875,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-plan-empty-desktop-3-Skills",
+          "originalId": "hit-plan-empty-desktop-3-Skills",
+          "label": "Skills",
+          "href": "/skills",
+          "x": 350.25,
+          "y": 14.0,
+          "width": 63.0,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-plan-empty-desktop-4-Learning-Resources",
+          "originalId": "hit-plan-empty-desktop-4-Learning-Resources",
+          "label": "Learning Resources",
+          "href": "/learning-centre",
+          "x": 441.25,
+          "y": 14.0,
+          "width": 161.109375,
+          "height": 36.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-plan-empty-desktop-5-My-Plan",
+          "originalId": "hit-plan-empty-desktop-5-My-Plan",
+          "label": "My Plan",
+          "href": "/plan",
+          "x": 630.359375,
+          "y": 14.0,
+          "width": 81.546875,
+          "height": 36.0
+        },
+        {
+          "index": 6,
+          "id": "sticky-hit-plan-empty-desktop-6-Possibilities",
+          "originalId": "hit-plan-empty-desktop-6-Possibilities",
+          "label": "Possibilities",
+          "href": "/possibilities",
+          "x": 739.90625,
+          "y": 14.0,
+          "width": 107.25,
+          "height": 36.0
+        },
+        {
+          "index": 7,
+          "id": "sticky-hit-plan-empty-desktop-7-Account-menu",
+          "originalId": "hit-plan-empty-desktop-7-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 1365.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "plan-empty-mobile",
+      "svg": "plan-empty-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-plan-empty-mobile-1-Open-menu",
+        "sticky-hit-plan-empty-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-plan-empty-mobile-3-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-plan-empty-mobile-1-Open-menu",
+          "originalId": "hit-plan-empty-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-plan-empty-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-plan-empty-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-plan-empty-mobile-3-Account-menu",
+          "originalId": "hit-plan-empty-mobile-3-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 323.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "plan-mobile",
+      "svg": "plan-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-plan-mobile-1-Open-menu",
+        "sticky-hit-plan-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-plan-mobile-3-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-plan-mobile-1-Open-menu",
+          "originalId": "hit-plan-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-plan-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-plan-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-plan-mobile-3-Account-menu",
+          "originalId": "hit-plan-mobile-3-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 323.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "plan-resolved-desktop",
+      "svg": "plan-resolved-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-plan-resolved-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-plan-resolved-desktop-2-AI-Exposure",
+        "sticky-hit-plan-resolved-desktop-3-Skills",
+        "sticky-hit-plan-resolved-desktop-4-Learning-Resources",
+        "sticky-hit-plan-resolved-desktop-5-My-Plan",
+        "sticky-hit-plan-resolved-desktop-6-Possibilities",
+        "sticky-hit-plan-resolved-desktop-7-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-plan-resolved-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-plan-resolved-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-plan-resolved-desktop-2-AI-Exposure",
+          "originalId": "hit-plan-resolved-desktop-2-AI-Exposure",
+          "label": "AI Exposure",
+          "href": "/ai-exposure",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 108.171875,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-plan-resolved-desktop-3-Skills",
+          "originalId": "hit-plan-resolved-desktop-3-Skills",
+          "label": "Skills",
+          "href": "/skills",
+          "x": 350.25,
+          "y": 14.0,
+          "width": 63.0,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-plan-resolved-desktop-4-Learning-Resources",
+          "originalId": "hit-plan-resolved-desktop-4-Learning-Resources",
+          "label": "Learning Resources",
+          "href": "/learning-centre",
+          "x": 441.25,
+          "y": 14.0,
+          "width": 161.109375,
+          "height": 36.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-plan-resolved-desktop-5-My-Plan",
+          "originalId": "hit-plan-resolved-desktop-5-My-Plan",
+          "label": "My Plan",
+          "href": "/plan",
+          "x": 630.359375,
+          "y": 14.0,
+          "width": 81.546875,
+          "height": 36.0
+        },
+        {
+          "index": 6,
+          "id": "sticky-hit-plan-resolved-desktop-6-Possibilities",
+          "originalId": "hit-plan-resolved-desktop-6-Possibilities",
+          "label": "Possibilities",
+          "href": "/possibilities",
+          "x": 739.90625,
+          "y": 14.0,
+          "width": 107.25,
+          "height": 36.0
+        },
+        {
+          "index": 7,
+          "id": "sticky-hit-plan-resolved-desktop-7-Account-menu",
+          "originalId": "hit-plan-resolved-desktop-7-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 1365.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "plan-resolved-mobile",
+      "svg": "plan-resolved-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-plan-resolved-mobile-1-Open-menu",
+        "sticky-hit-plan-resolved-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-plan-resolved-mobile-3-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-plan-resolved-mobile-1-Open-menu",
+          "originalId": "hit-plan-resolved-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-plan-resolved-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-plan-resolved-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-plan-resolved-mobile-3-Account-menu",
+          "originalId": "hit-plan-resolved-mobile-3-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 323.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "resources-desktop",
+      "svg": "resources-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-resources-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-resources-desktop-2-AI-Exposure",
+        "sticky-hit-resources-desktop-3-Skills",
+        "sticky-hit-resources-desktop-4-Learning-Resources",
+        "sticky-hit-resources-desktop-5-My-Plan",
+        "sticky-hit-resources-desktop-6-Possibilities",
+        "sticky-hit-resources-desktop-7-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-resources-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-resources-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-resources-desktop-2-AI-Exposure",
+          "originalId": "hit-resources-desktop-2-AI-Exposure",
+          "label": "AI Exposure",
+          "href": "/ai-exposure",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 108.171875,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-resources-desktop-3-Skills",
+          "originalId": "hit-resources-desktop-3-Skills",
+          "label": "Skills",
+          "href": "/skills",
+          "x": 350.25,
+          "y": 14.0,
+          "width": 63.0,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-resources-desktop-4-Learning-Resources",
+          "originalId": "hit-resources-desktop-4-Learning-Resources",
+          "label": "Learning Resources",
+          "href": "/learning-centre",
+          "x": 441.25,
+          "y": 14.0,
+          "width": 161.109375,
+          "height": 36.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-resources-desktop-5-My-Plan",
+          "originalId": "hit-resources-desktop-5-My-Plan",
+          "label": "My Plan",
+          "href": "/plan",
+          "x": 630.359375,
+          "y": 14.0,
+          "width": 81.546875,
+          "height": 36.0
+        },
+        {
+          "index": 6,
+          "id": "sticky-hit-resources-desktop-6-Possibilities",
+          "originalId": "hit-resources-desktop-6-Possibilities",
+          "label": "Possibilities",
+          "href": "/possibilities",
+          "x": 739.90625,
+          "y": 14.0,
+          "width": 107.25,
+          "height": 36.0
+        },
+        {
+          "index": 7,
+          "id": "sticky-hit-resources-desktop-7-Account-menu",
+          "originalId": "hit-resources-desktop-7-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 1365.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "resources-mobile",
+      "svg": "resources-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-resources-mobile-1-Open-menu",
+        "sticky-hit-resources-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-resources-mobile-3-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-resources-mobile-1-Open-menu",
+          "originalId": "hit-resources-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-resources-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-resources-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-resources-mobile-3-Account-menu",
+          "originalId": "hit-resources-mobile-3-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 323.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "resources-start-desktop",
+      "svg": "resources-start-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-resources-start-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-resources-start-desktop-2-AI-Exposure",
+        "sticky-hit-resources-start-desktop-3-Skills",
+        "sticky-hit-resources-start-desktop-4-Learning-Resources",
+        "sticky-hit-resources-start-desktop-5-My-Plan",
+        "sticky-hit-resources-start-desktop-6-Possibilities",
+        "sticky-hit-resources-start-desktop-7-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-resources-start-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-resources-start-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-resources-start-desktop-2-AI-Exposure",
+          "originalId": "hit-resources-start-desktop-2-AI-Exposure",
+          "label": "AI Exposure",
+          "href": "/ai-exposure",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 108.171875,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-resources-start-desktop-3-Skills",
+          "originalId": "hit-resources-start-desktop-3-Skills",
+          "label": "Skills",
+          "href": "/skills",
+          "x": 350.25,
+          "y": 14.0,
+          "width": 63.0,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-resources-start-desktop-4-Learning-Resources",
+          "originalId": "hit-resources-start-desktop-4-Learning-Resources",
+          "label": "Learning Resources",
+          "href": "/learning-centre",
+          "x": 441.25,
+          "y": 14.0,
+          "width": 161.109375,
+          "height": 36.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-resources-start-desktop-5-My-Plan",
+          "originalId": "hit-resources-start-desktop-5-My-Plan",
+          "label": "My Plan",
+          "href": "/plan",
+          "x": 630.359375,
+          "y": 14.0,
+          "width": 81.546875,
+          "height": 36.0
+        },
+        {
+          "index": 6,
+          "id": "sticky-hit-resources-start-desktop-6-Possibilities",
+          "originalId": "hit-resources-start-desktop-6-Possibilities",
+          "label": "Possibilities",
+          "href": "/possibilities",
+          "x": 739.90625,
+          "y": 14.0,
+          "width": 107.25,
+          "height": 36.0
+        },
+        {
+          "index": 7,
+          "id": "sticky-hit-resources-start-desktop-7-Account-menu",
+          "originalId": "hit-resources-start-desktop-7-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 1365.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "resources-start-mobile",
+      "svg": "resources-start-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-resources-start-mobile-1-Open-menu",
+        "sticky-hit-resources-start-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-resources-start-mobile-3-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-resources-start-mobile-1-Open-menu",
+          "originalId": "hit-resources-start-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-resources-start-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-resources-start-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-resources-start-mobile-3-Account-menu",
+          "originalId": "hit-resources-start-mobile-3-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 323.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "search-mode-desktop",
+      "svg": "search-mode-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-search-mode-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-search-mode-desktop-2-Work-Profile",
+        "sticky-hit-search-mode-desktop-3-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-search-mode-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-search-mode-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-search-mode-desktop-2-Work-Profile",
+          "originalId": "hit-search-mode-desktop-2-Work-Profile",
+          "label": "Work Profile",
+          "href": "/profile",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 110.203125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-search-mode-desktop-3-Log-in-or-create-an-account",
+          "originalId": "hit-search-mode-desktop-3-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 1341.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "search-mode-mobile",
+      "svg": "search-mode-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-search-mode-mobile-1-Open-menu",
+        "sticky-hit-search-mode-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-search-mode-mobile-3-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-search-mode-mobile-1-Open-menu",
+          "originalId": "hit-search-mode-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-search-mode-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-search-mode-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-search-mode-mobile-3-Log-in-or-create-an-account",
+          "originalId": "hit-search-mode-mobile-3-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 299.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "search-results-desktop",
+      "svg": "search-results-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-search-results-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-search-results-desktop-2-Work-Profile",
+        "sticky-hit-search-results-desktop-3-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-search-results-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-search-results-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-search-results-desktop-2-Work-Profile",
+          "originalId": "hit-search-results-desktop-2-Work-Profile",
+          "label": "Work Profile",
+          "href": "/profile",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 110.203125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-search-results-desktop-3-Log-in-or-create-an-account",
+          "originalId": "hit-search-results-desktop-3-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 1341.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "search-results-mobile",
+      "svg": "search-results-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-search-results-mobile-1-Open-menu",
+        "sticky-hit-search-results-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-search-results-mobile-3-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-search-results-mobile-1-Open-menu",
+          "originalId": "hit-search-results-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-search-results-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-search-results-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-search-results-mobile-3-Log-in-or-create-an-account",
+          "originalId": "hit-search-results-mobile-3-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 299.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "skills-desktop",
+      "svg": "skills-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-skills-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-skills-desktop-2-Work-Profile",
+        "sticky-hit-skills-desktop-3-Tasks",
+        "sticky-hit-skills-desktop-4-AI-Exposure",
+        "sticky-hit-skills-desktop-5-Skills",
+        "sticky-hit-skills-desktop-6-Learning-Resources",
+        "sticky-hit-skills-desktop-7-My-Plan",
+        "sticky-hit-skills-desktop-8-Possibilities",
+        "sticky-hit-skills-desktop-9-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-skills-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-skills-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-skills-desktop-2-Work-Profile",
+          "originalId": "hit-skills-desktop-2-Work-Profile",
+          "label": "Work Profile",
+          "href": "/profile",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 110.203125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-skills-desktop-3-Tasks",
+          "originalId": "hit-skills-desktop-3-Tasks",
+          "label": "Tasks",
+          "href": "/profile/tasks",
+          "x": 352.28125,
+          "y": 14.0,
+          "width": 66.984375,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-skills-desktop-4-AI-Exposure",
+          "originalId": "hit-skills-desktop-4-AI-Exposure",
+          "label": "AI Exposure",
+          "href": "/ai-exposure",
+          "x": 447.265625,
+          "y": 14.0,
+          "width": 108.171875,
+          "height": 36.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-skills-desktop-5-Skills",
+          "originalId": "hit-skills-desktop-5-Skills",
+          "label": "Skills",
+          "href": "/skills",
+          "x": 583.4375,
+          "y": 14.0,
+          "width": 63.0,
+          "height": 36.0
+        },
+        {
+          "index": 6,
+          "id": "sticky-hit-skills-desktop-6-Learning-Resources",
+          "originalId": "hit-skills-desktop-6-Learning-Resources",
+          "label": "Learning Resources",
+          "href": "/learning-centre",
+          "x": 674.4375,
+          "y": 14.0,
+          "width": 161.109375,
+          "height": 36.0
+        },
+        {
+          "index": 7,
+          "id": "sticky-hit-skills-desktop-7-My-Plan",
+          "originalId": "hit-skills-desktop-7-My-Plan",
+          "label": "My Plan",
+          "href": "/plan",
+          "x": 863.546875,
+          "y": 14.0,
+          "width": 81.546875,
+          "height": 36.0
+        },
+        {
+          "index": 8,
+          "id": "sticky-hit-skills-desktop-8-Possibilities",
+          "originalId": "hit-skills-desktop-8-Possibilities",
+          "label": "Possibilities",
+          "href": "/possibilities",
+          "x": 973.09375,
+          "y": 14.0,
+          "width": 107.25,
+          "height": 36.0
+        },
+        {
+          "index": 9,
+          "id": "sticky-hit-skills-desktop-9-Log-in-or-create-an-account",
+          "originalId": "hit-skills-desktop-9-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 1326.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "skills-mobile",
+      "svg": "skills-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-skills-mobile-1-Open-menu",
+        "sticky-hit-skills-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-skills-mobile-3-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-skills-mobile-1-Open-menu",
+          "originalId": "hit-skills-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-skills-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-skills-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-skills-mobile-3-Log-in-or-create-an-account",
+          "originalId": "hit-skills-mobile-3-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 284.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "skills-signed-desktop",
+      "svg": "skills-signed-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-skills-signed-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-skills-signed-desktop-2-AI-Exposure",
+        "sticky-hit-skills-signed-desktop-3-Skills",
+        "sticky-hit-skills-signed-desktop-4-Learning-Resources",
+        "sticky-hit-skills-signed-desktop-5-My-Plan",
+        "sticky-hit-skills-signed-desktop-6-Possibilities",
+        "sticky-hit-skills-signed-desktop-7-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-skills-signed-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-skills-signed-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-skills-signed-desktop-2-AI-Exposure",
+          "originalId": "hit-skills-signed-desktop-2-AI-Exposure",
+          "label": "AI Exposure",
+          "href": "/ai-exposure",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 108.171875,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-skills-signed-desktop-3-Skills",
+          "originalId": "hit-skills-signed-desktop-3-Skills",
+          "label": "Skills",
+          "href": "/skills",
+          "x": 350.25,
+          "y": 14.0,
+          "width": 63.0,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-skills-signed-desktop-4-Learning-Resources",
+          "originalId": "hit-skills-signed-desktop-4-Learning-Resources",
+          "label": "Learning Resources",
+          "href": "/learning-centre",
+          "x": 441.25,
+          "y": 14.0,
+          "width": 161.109375,
+          "height": 36.0
+        },
+        {
+          "index": 5,
+          "id": "sticky-hit-skills-signed-desktop-5-My-Plan",
+          "originalId": "hit-skills-signed-desktop-5-My-Plan",
+          "label": "My Plan",
+          "href": "/plan",
+          "x": 630.359375,
+          "y": 14.0,
+          "width": 81.546875,
+          "height": 36.0
+        },
+        {
+          "index": 6,
+          "id": "sticky-hit-skills-signed-desktop-6-Possibilities",
+          "originalId": "hit-skills-signed-desktop-6-Possibilities",
+          "label": "Possibilities",
+          "href": "/possibilities",
+          "x": 739.90625,
+          "y": 14.0,
+          "width": 107.25,
+          "height": 36.0
+        },
+        {
+          "index": 7,
+          "id": "sticky-hit-skills-signed-desktop-7-Account-menu",
+          "originalId": "hit-skills-signed-desktop-7-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 1365.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "skills-signed-mobile",
+      "svg": "skills-signed-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-skills-signed-mobile-1-Open-menu",
+        "sticky-hit-skills-signed-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-skills-signed-mobile-3-Account-menu"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-skills-signed-mobile-1-Open-menu",
+          "originalId": "hit-skills-signed-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-skills-signed-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-skills-signed-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-skills-signed-mobile-3-Account-menu",
+          "originalId": "hit-skills-signed-mobile-3-Account-menu",
+          "label": "Account menu",
+          "href": null,
+          "x": 323.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "tasks-desktop",
+      "svg": "tasks-desktop.svg",
+      "width": 1440.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-tasks-desktop-1-AI-Wrevolusi-home",
+        "sticky-hit-tasks-desktop-2-Work-Profile",
+        "sticky-hit-tasks-desktop-3-Tasks",
+        "sticky-hit-tasks-desktop-4-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-tasks-desktop-1-AI-Wrevolusi-home",
+          "originalId": "hit-tasks-desktop-1-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 24.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-tasks-desktop-2-Work-Profile",
+          "originalId": "hit-tasks-desktop-2-Work-Profile",
+          "label": "Work Profile",
+          "href": "/profile",
+          "x": 214.078125,
+          "y": 14.0,
+          "width": 110.203125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-tasks-desktop-3-Tasks",
+          "originalId": "hit-tasks-desktop-3-Tasks",
+          "label": "Tasks",
+          "href": "/profile/tasks",
+          "x": 352.28125,
+          "y": 14.0,
+          "width": 66.984375,
+          "height": 36.0
+        },
+        {
+          "index": 4,
+          "id": "sticky-hit-tasks-desktop-4-Log-in-or-create-an-account",
+          "originalId": "hit-tasks-desktop-4-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 1341.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    },
+    {
+      "originalStem": "tasks-mobile",
+      "svg": "tasks-mobile.svg",
+      "width": 390.0,
+      "height": 64,
+      "headerHitIds": [
+        "sticky-hit-tasks-mobile-1-Open-menu",
+        "sticky-hit-tasks-mobile-2-AI-Wrevolusi-home",
+        "sticky-hit-tasks-mobile-3-Log-in-or-create-an-account"
+      ],
+      "controls": [
+        {
+          "index": 1,
+          "id": "sticky-hit-tasks-mobile-1-Open-menu",
+          "originalId": "hit-tasks-mobile-1-Open-menu",
+          "label": "Open menu",
+          "href": null,
+          "x": 16.0,
+          "y": 14.0,
+          "width": 36.0,
+          "height": 36.0
+        },
+        {
+          "index": 2,
+          "id": "sticky-hit-tasks-mobile-2-AI-Wrevolusi-home",
+          "originalId": "hit-tasks-mobile-2-AI-Wrevolusi-home",
+          "label": "AI-Wrevolusi home",
+          "href": "/",
+          "x": 64.0,
+          "y": 14.0,
+          "width": 158.078125,
+          "height": 36.0
+        },
+        {
+          "index": 3,
+          "id": "sticky-hit-tasks-mobile-3-Log-in-or-create-an-account",
+          "originalId": "hit-tasks-mobile-3-Log-in-or-create-an-account",
+          "label": "Log in or create an account",
+          "href": null,
+          "x": 299.265625,
+          "y": 14.0,
+          "width": 74.734375,
+          "height": 36.0
+        }
+      ]
+    }
+  ]
+}

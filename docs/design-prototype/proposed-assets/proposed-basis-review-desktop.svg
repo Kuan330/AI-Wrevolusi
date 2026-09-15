@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000">
+<title>Review a recommendation draft — proposed Iteration 2</title>
+<defs><linearGradient id="background" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#EEF8FC"/><stop offset="1" stop-color="#FDF0F5"/></linearGradient></defs>
+<rect x="0" y="0" width="1440" height="1000" rx="0" fill="url(#background)"/>
+<rect x="0" y="0" width="1440" height="64" rx="0" fill="#FFFFFF"/>
+<text x="32" y="41" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="650">AI-Wrevolusi</text>
+<text x="227" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">AI Exposure</text>
+<text x="365" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Skills</text>
+<rect x="436" y="13" width="153" height="38" rx="20" fill="#EDF5FA"/>
+<text x="450" y="38" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Learning Resources</text>
+<text x="651" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">My Plan</text>
+<text x="762" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Possibilities</text>
+<text x="1382" y="39" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="400">○</text>
+<rect x="0" y="64" width="1440" height="36" rx="0" fill="#FFF2DB"/>
+<text x="120" y="88" fill="#694B15" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700">PROPOSED ITERATION 2 — NOT CURRENT BEHAVIOUR</text>
+<text x="120" y="147" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="650">Review your learning focus</text>
+<text x="120" y="175" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="400">Review the draft before it is used for course advice. Your foundation and goal stay under your control.</text>
+<rect x="120" y="205" width="762" height="667" rx="24" fill="#FFFFFF" stroke="#D9DDE5"/>
+<rect x="148" y="229" width="160" height="26" rx="13" fill="#EAF4FA"/>
+<text x="159" y="247" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600">Analytical thinking</text>
+<rect x="321" y="229" width="195" height="26" rx="13" fill="#F5EDF7"/>
+<text x="332" y="247" fill="#735A7C" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600">Prototype example · Draft v2</text>
+<text x="148" y="296" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="600">Your current foundation</text>
+<rect x="148" y="314" width="337" height="43" rx="13" fill="#DCEEF8" stroke="#93BCD2"/>
+<text x="161" y="341" fill="#4F91BA" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="400">●</text>
+<text x="186" y="341" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Just starting</text>
+<rect x="497" y="314" width="357" height="43" rx="13" fill="#FBFCFE" stroke="#D9DDE5"/>
+<text x="510" y="341" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="400">○</text>
+<text x="535" y="341" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">With support</text>
+<rect x="148" y="367" width="337" height="43" rx="13" fill="#FBFCFE" stroke="#D9DDE5"/>
+<text x="161" y="394" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="400">○</text>
+<text x="186" y="394" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Independent</text>
+<rect x="497" y="367" width="357" height="43" rx="13" fill="#FBFCFE" stroke="#D9DDE5"/>
+<text x="510" y="394" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="400">○</text>
+<text x="535" y="394" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Advanced</text>
+<text x="148" y="436" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Your self-confirmed starting point, not an AI assessment of proficiency.</text>
+<text x="148" y="484" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="600">Relevant work experience</text>
+<text x="148" y="511" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">The draft uses these examples from your confirmed task list.</text>
+<rect x="148" y="529" width="706" height="88" rx="14" fill="#F4F9FC"/>
+<text x="168" y="560" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">✓ Prepare weekly sales reports</text>
+<text x="168" y="588" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">✓ Check sales records for errors</text>
+<text x="702" y="603" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="550">Review tasks →</text>
+<text x="148" y="660" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="600">Your learning goal</text>
+<rect x="684" y="635" width="170" height="36" rx="23" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="700" y="659" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="550">Request a new draft</text>
+<rect x="148" y="680" width="706" height="94" rx="12" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="162" y="705" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Use evidence to improve my weekly sales reports.</text>
+<text x="148" y="801" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Write your own goal or edit the draft. Only your confirmed wording is used.</text>
+<rect x="906" y="205" width="414" height="364" rx="24" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="934" y="248" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="600">What you are confirming</text>
+<text x="934" y="284" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Selected skill: Analytical thinking</text>
+<text x="934" y="317" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Foundation: Just starting</text>
+<text x="934" y="350" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Goal: Your edited wording</text>
+<text x="934" y="383" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Evidence: Your confirmed work tasks</text>
+<line x1="934" y1="404" x2="1292" y2="404" stroke="#D9DDE5"/>
+<text x="934" y="436" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Version 1 stays active until you confirm.</text>
+<text x="934" y="461" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Version 2 becomes the basis for new advice.</text>
+<text x="934" y="486" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Advice using version 1 will be marked old.</text>
+<rect x="906" y="590" width="414" height="205" rx="24" fill="#E9F4FA"/>
+<text x="934" y="634" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="600">Keep the choices you already made</text>
+<text x="934" y="671" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Your saved courses, chapter choices and</text>
+<text x="934" y="697" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">study times stay as you set them.</text>
+<text x="934" y="723" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">AI guidance will not replace these choices.</text>
+<rect x="966" y="829" width="158" height="44" rx="23" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="982" y="857" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Keep version 1</text>
+<rect x="1136" y="829" width="184" height="44" rx="23" fill="#3D5F7A"/>
+<text x="1152" y="857" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Confirm version 2</text>
+<text x="120" y="936" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="500">Proposed flow: review draft → confirm basis version → refresh course advice</text>
+<text x="120" y="962" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400">This design does not claim that either proposed AI service is implemented.</text>
+</svg>

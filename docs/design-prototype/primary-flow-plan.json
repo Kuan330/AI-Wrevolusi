@@ -1,0 +1,2421 @@
+{
+  "version": 1,
+  "date": "2026-09-15",
+  "status": "plan_only_not_wired_or_verified",
+  "sourceManifest": "screen-assets/manifest.json",
+  "idMeaning": "sourceControlIds are existing SVG layer IDs from the manifest, not Figma node IDs. Resolve them to imported Figma nodes by exact layer name. Never invent Figma node IDs.",
+  "fixtureModes": {
+    "unplanned": "/private/tmp/aiw-fidelity-unplanned.json",
+    "guest": "/private/tmp/aiw-fidelity-guest.json",
+    "planned": "/private/tmp/aiw-fidelity-planned.json",
+    "conflicted": "/private/tmp/aiw-fidelity-conflicted.json"
+  },
+  "mainSequence": [
+    "home",
+    "occupation",
+    "search-mode",
+    "search-results",
+    "occupation-selected",
+    "tasks",
+    "exposure",
+    "skills",
+    "skills-selected",
+    "account-gate",
+    "sign-in",
+    "resources-start",
+    "focus",
+    "resources-start",
+    "course-start",
+    "chapters-start",
+    "content-start",
+    "routine-start",
+    "plan",
+    "session",
+    "complete",
+    "session"
+  ],
+  "actionMeaning": {
+    "navigate": "Switch top-level screen and clear any open overlay.",
+    "open_overlay": "Open target over its named base using captured position/dimensions.",
+    "swap_overlay": "Replace current overlay while preserving the same base; do not stack drawers.",
+    "close_overlay": "Dismiss overlay to its correct current base.",
+    "prototype_handoff": "Show a labelled external handoff example; no automatic external navigation.",
+    "show_prepared_search_results": "Prepared example query/result transition, with no claim of arbitrary text input.",
+    "show_duplicate_schedule_notice": "Show the actual rejection and route edits to My Plan; capture required.",
+    "open_context_navigation": "Use the menu appropriate for current account/setup state."
+  },
+  "stateRules": [
+    "Guest analysis remains account-free. Account gate and sign-in precede signed-in learning resources.",
+    "The unplanned starting state preserves the manual goal and saved Pandas course but has no pending plan, choices, selected schedule or events.",
+    "Only unplanned routine may import successfully; existing scheduled course frames are review/edit examples.",
+    "Pandas is already saved in the starting fixture. Save/remove requires separately captured unsaved/removed states; no silent count changes.",
+    "Current blank sign-in fields and current unselected Analytical thinking state require the explicit guards recorded on their edges.",
+    "Do not wire disabled controls or controls outside the captured visible area. Check layout-capture disabled/clip data before applying a link.",
+    "Controls absent from this plan remain unwired and should be disclosed in the review note.",
+    "Use native overlay crop coordinates and screen viewport heights from the manifest.",
+    "Future E7–E9 concepts must not appear as current main-flow destinations."
+  ],
+  "edges": [
+    {
+      "sourceStem": "home-desktop",
+      "selector": {
+        "label": "Start free analysis",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-home-desktop-4-Start-free-analysis",
+        "hit-home-desktop-6-Start-free-analysis"
+      ],
+      "action": "navigate",
+      "targetStem": "occupation-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "occupation-desktop",
+      "selector": {
+        "label": "Search by job title instead",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-occupation-desktop-4-Search-by-job-title-instead"
+      ],
+      "action": "navigate",
+      "targetStem": "search-mode-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "search-mode-desktop",
+      "selector": {
+        "label": "Shop supervisor",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "show_prepared_search_results",
+      "targetStem": "search-results-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "note": "Resolve the actual search input by its captured label or role. Use a labelled sample query; no real text entry is claimed by a static Figma transition.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "search-results-desktop",
+      "selector": {
+        "label": "SHOP SUPERVISORS",
+        "match": "contains"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "occupation-selected-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "note": "Resolve the occupation result button, not plain title text."
+    },
+    {
+      "sourceStem": "occupation-selected-desktop",
+      "selector": {
+        "label": "Back to category filters",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-occupation-selected-desktop-4-Back-to-category-filters"
+      ],
+      "action": "navigate",
+      "targetStem": "occupation-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "occupation-selected-desktop",
+      "selector": {
+        "label": "Confirm and continue",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-occupation-selected-desktop-6-Confirm-and-continue"
+      ],
+      "action": "navigate",
+      "targetStem": "tasks-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "tasks-desktop",
+      "selector": {
+        "label": "Change occupation",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-tasks-desktop-5-Change-occupation"
+      ],
+      "action": "navigate",
+      "targetStem": "occupation-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "tasks-desktop",
+      "selector": {
+        "label": "Explore AI impact",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-tasks-desktop-6-Explore-AI-impact",
+        "hit-tasks-desktop-24-Explore-AI-impact"
+      ],
+      "action": "navigate",
+      "targetStem": "exposure-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Prepared reference-data analysis result; not a live AI API call."
+    },
+    {
+      "sourceStem": "exposure-desktop",
+      "selector": {
+        "label": "Edit tasks",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-exposure-desktop-11-Edit-tasks"
+      ],
+      "action": "navigate",
+      "targetStem": "tasks-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "exposure-desktop",
+      "selector": {
+        "label": "View skills",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-exposure-desktop-12-View-skills"
+      ],
+      "action": "navigate",
+      "targetStem": "skills-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "skills-desktop",
+      "selector": {
+        "label": "Edit tasks",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-skills-desktop-10-Edit-tasks"
+      ],
+      "action": "navigate",
+      "targetStem": "tasks-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "skills-desktop",
+      "selector": {
+        "label": "AI exposure",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-skills-desktop-11-AI-exposure"
+      ],
+      "action": "navigate",
+      "targetStem": "exposure-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "skills-desktop",
+      "selector": {
+        "label": "Add Analytical thinking",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-skills-desktop-58-Add-Analytical-thinking"
+      ],
+      "action": "navigate",
+      "targetStem": "skills-selected-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Existing capture shows this skill unselected. Capture selected state before showing resources for Analytical thinking.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "skills-desktop",
+      "selector": {
+        "label": "Confirm and find courses →",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-skills-desktop-71-Confirm-and-find-courses"
+      ],
+      "action": "navigate",
+      "targetStem": "account-gate-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "guard": "Only for the current captured skill set. Do not claim Analytical thinking was selected on this branch."
+    },
+    {
+      "sourceStem": "skills-selected-desktop",
+      "selector": {
+        "label": "Confirm and find courses →",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "account-gate-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label"
+    },
+    {
+      "sourceStem": "account-gate-desktop",
+      "selector": {
+        "label": "Log in / Create account",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-account-gate-desktop-10-Log-in-Create-account"
+      ],
+      "action": "open_overlay",
+      "targetStem": "sign-in-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "account-gate-desktop"
+    },
+    {
+      "sourceStem": "account-gate-desktop",
+      "selector": {
+        "label": "Log in or create an account",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-account-gate-desktop-9-Log-in-or-create-an-account"
+      ],
+      "action": "open_overlay",
+      "targetStem": "sign-in-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "account-gate-desktop"
+    },
+    {
+      "sourceStem": "sign-in-desktop",
+      "selector": {
+        "label": "Close",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-sign-in-desktop-6-Close"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "account-gate-desktop"
+    },
+    {
+      "sourceStem": "sign-in-desktop",
+      "selector": {
+        "label": "Log in",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-sign-in-desktop-4-Log-in"
+      ],
+      "action": "navigate",
+      "targetStem": "resources-start-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "This transition changes the example from guest to signed-in. It sends no credentials.",
+      "guard": "Use visibly labelled sample credentials or an explicit prototype-only continuation annotation. Current captured fields are blank; real authentication must not be implied.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "resources-start-desktop",
+      "selector": {
+        "label": "Adjust",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "open_overlay",
+      "targetStem": "focus-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop"
+    },
+    {
+      "sourceStem": "focus-desktop",
+      "selector": {
+        "label": "Save and update",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-focus-desktop-8-Save-and-update"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-start-desktop",
+      "guard": "Use the already displayed valid manual goal and foundation. This static example does not accept arbitrary new input."
+    },
+    {
+      "sourceStem": "focus-desktop",
+      "selector": {
+        "label": "Cancel",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-focus-desktop-7-Cancel"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-start-desktop"
+    },
+    {
+      "sourceStem": "focus-desktop",
+      "selector": {
+        "label": "Close",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-focus-desktop-9-Close"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-start-desktop"
+    },
+    {
+      "sourceStem": "resources-start-desktop",
+      "selector": {
+        "label": "View details",
+        "match": "exact",
+        "occurrence": 0
+      },
+      "sourceControlIds": [],
+      "action": "open_overlay",
+      "targetStem": "course-start-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop",
+      "note": "First View details must belong to Pandas in the captured unplanned example.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "course-start-desktop",
+      "selector": {
+        "label": "Chapters",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "chapters-start-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "chapters-start-desktop",
+      "selector": {
+        "label": "Overview",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "course-start-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "course-start-desktop",
+      "selector": {
+        "label": "Plan learning",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "content-start-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "course-start-desktop",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop"
+    },
+    {
+      "sourceStem": "course-start-desktop",
+      "selector": {
+        "label": "Open provider course",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "prototype_handoff",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "note": "Show provider destination only. Do not open an external site during the main Figma journey."
+    },
+    {
+      "sourceStem": "chapters-start-desktop",
+      "selector": {
+        "label": "Plan learning",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "content-start-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "chapters-start-desktop",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop"
+    },
+    {
+      "sourceStem": "chapters-start-desktop",
+      "selector": {
+        "label": "Open provider course",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "prototype_handoff",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "note": "Show provider destination only. Do not open an external site during the main Figma journey."
+    },
+    {
+      "sourceStem": "content-start-desktop",
+      "selector": {
+        "label": "Back",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "course-start-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "content-start-desktop",
+      "selector": {
+        "label": "Continue",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "routine-start-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop",
+      "guard": "Entire course selected. Destination shows the labelled sample routine: Mon/Wed, 18:30–19:00, valid current/future start date. If the current UI opens Schedule later first, capture an intermediate Arrange time state rather than silently preselecting routine.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "content-start-desktop",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop"
+    },
+    {
+      "sourceStem": "routine-start-desktop",
+      "selector": {
+        "label": "Back",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "content-start-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "routine-start-desktop",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop"
+    },
+    {
+      "sourceStem": "routine-start-desktop",
+      "selector": {
+        "label": "Import into My Plan",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "plan-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "guard": "Use only the unplanned source fixture. Positive course duration 240 minutes, Mon/Wed, 18:30–19:00 and valid start date. Result: eight 30-minute Pandas sessions."
+    },
+    {
+      "sourceStem": "resources-start-desktop",
+      "selector": {
+        "label": "Open My Plan",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "plan-empty-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "guard": "Before import, My Plan must contain no dated Pandas sessions. A populated plan is not an honest target for this button.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "resources-start-desktop",
+      "selector": {
+        "label": "Edit skills",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "skills-selected-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "resources-start-desktop",
+      "selector": {
+        "label": "Review your skills →",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "skills-selected-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "resources-start-desktop",
+      "selector": {
+        "label": "Saved courses · 1",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "open_overlay",
+      "targetStem": "saved-start-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "resources-start-desktop",
+      "selector": {
+        "label": "Saved courses · 1. Drag",
+        "match": "contains"
+      },
+      "sourceControlIds": [],
+      "action": "open_overlay",
+      "targetStem": "saved-start-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "saved-start-desktop",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop"
+    },
+    {
+      "sourceStem": "saved-start-desktop",
+      "selector": {
+        "label": "Plan learning",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "content-start-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-desktop",
+      "note": "Resolve the actual unscheduled-course action label after capture; do not copy scheduled Edit learning plan wording.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "plan-desktop",
+      "selector": {
+        "label": "Pandas 18:30–19:00",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-plan-desktop-67-Pandas-18-3019-00"
+      ],
+      "action": "open_overlay",
+      "targetStem": "session-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "plan-desktop"
+    },
+    {
+      "sourceStem": "session-desktop",
+      "selector": {
+        "label": "Mark complete",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-session-desktop-5-Mark-complete"
+      ],
+      "action": "swap_overlay",
+      "targetStem": "complete-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "plan-desktop",
+      "note": "Update the underlying plan progress to 1/8 in the prototype or provide a matching plan-completed frame before closing."
+    },
+    {
+      "sourceStem": "complete-desktop",
+      "selector": {
+        "label": "Undo completion",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-complete-desktop-5-Undo-completion"
+      ],
+      "action": "swap_overlay",
+      "targetStem": "session-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "plan-desktop",
+      "note": "Restore underlying plan progress to 0/8."
+    },
+    {
+      "sourceStem": "session-desktop",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-session-desktop-7-Close-details"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "plan-desktop"
+    },
+    {
+      "sourceStem": "complete-desktop",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-complete-desktop-7-Close-details"
+      ],
+      "action": "navigate",
+      "targetStem": "plan-completed-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "guard": "Requires a captured/verified 1/8 plan state or equivalent prototype state. Do not close onto the original 0/8 plan.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "plan-completed-desktop",
+      "selector": {
+        "label": "Pandas 18:30–19:00",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "open_overlay",
+      "targetStem": "complete-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "plan-completed-desktop"
+    },
+    {
+      "sourceStem": "plan-desktop",
+      "selector": {
+        "label": "Choose courses",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-plan-desktop-8-Choose-courses"
+      ],
+      "action": "navigate",
+      "targetStem": "resources-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Use scheduled resources after import; never reset to resources-start."
+    },
+    {
+      "sourceStem": "plan-desktop",
+      "selector": {
+        "label": "Explore learning resources",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-plan-desktop-10-Explore-learning-resources"
+      ],
+      "action": "navigate",
+      "targetStem": "resources-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "session-desktop",
+      "selector": {
+        "label": "View in Learning Resources →",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-session-desktop-6-View-in-Learning-Resources"
+      ],
+      "action": "navigate",
+      "targetStem": "resources-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "complete-desktop",
+      "selector": {
+        "label": "View in Learning Resources →",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-complete-desktop-6-View-in-Learning-Resources"
+      ],
+      "action": "navigate",
+      "targetStem": "resources-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "resources-desktop",
+      "selector": {
+        "label": "View details",
+        "match": "exact",
+        "occurrence": 0
+      },
+      "sourceControlIds": [
+        "hit-resources-desktop-20-View-details"
+      ],
+      "action": "open_overlay",
+      "targetStem": "course-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-desktop"
+    },
+    {
+      "sourceStem": "course-desktop",
+      "selector": {
+        "label": "Chapters",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-course-desktop-3-Chapters"
+      ],
+      "action": "swap_overlay",
+      "targetStem": "chapters-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-desktop"
+    },
+    {
+      "sourceStem": "chapters-desktop",
+      "selector": {
+        "label": "Overview",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-chapters-desktop-2-Overview"
+      ],
+      "action": "swap_overlay",
+      "targetStem": "course-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-desktop"
+    },
+    {
+      "sourceStem": "course-desktop",
+      "selector": {
+        "label": "View plan",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-course-desktop-5-View-plan"
+      ],
+      "action": "navigate",
+      "targetStem": "plan-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "course-desktop",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-course-desktop-7-Close-details"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-desktop"
+    },
+    {
+      "sourceStem": "course-desktop",
+      "selector": {
+        "label": "Edit learning plan",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-course-desktop-6-Edit-learning-plan"
+      ],
+      "action": "show_duplicate_schedule_notice",
+      "targetStem": "duplicate-plan-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-desktop",
+      "note": "Existing scheduled course must direct changes to My Plan. Never wire its Import button to successful duplicate scheduling.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "chapters-desktop",
+      "selector": {
+        "label": "View plan",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-chapters-desktop-5-View-plan"
+      ],
+      "action": "navigate",
+      "targetStem": "plan-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "chapters-desktop",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-chapters-desktop-7-Close-details"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-desktop"
+    },
+    {
+      "sourceStem": "chapters-desktop",
+      "selector": {
+        "label": "Edit learning plan",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-chapters-desktop-6-Edit-learning-plan"
+      ],
+      "action": "show_duplicate_schedule_notice",
+      "targetStem": "duplicate-plan-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-desktop",
+      "note": "Existing scheduled course must direct changes to My Plan. Never wire its Import button to successful duplicate scheduling.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "plan-desktop",
+      "selector": {
+        "label": "Add activity",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-plan-desktop-12-Add-activity"
+      ],
+      "action": "open_overlay",
+      "targetStem": "activity-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "plan-desktop"
+    },
+    {
+      "sourceStem": "activity-desktop",
+      "selector": {
+        "label": "Close",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-activity-desktop-9-Close"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "plan-desktop"
+    },
+    {
+      "sourceStem": "home-desktop",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-home-desktop-1-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "occupation-desktop",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-occupation-desktop-1-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "occupation-selected-desktop",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-occupation-selected-desktop-1-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "tasks-desktop",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-tasks-desktop-1-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "exposure-desktop",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-exposure-desktop-1-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "skills-desktop",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-skills-desktop-1-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "account-gate-desktop",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-account-gate-desktop-1-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "resources-start-desktop",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "home-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "resources-desktop",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-resources-desktop-1-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "plan-desktop",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-plan-desktop-1-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-desktop",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "home-mobile",
+      "selector": {
+        "label": "Start free analysis",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-home-mobile-3-Start-free-analysis"
+      ],
+      "action": "navigate",
+      "targetStem": "occupation-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "occupation-mobile",
+      "selector": {
+        "label": "Search by job title instead",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-occupation-mobile-4-Search-by-job-title-instead"
+      ],
+      "action": "navigate",
+      "targetStem": "search-mode-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "search-mode-mobile",
+      "selector": {
+        "label": "Shop supervisor",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "show_prepared_search_results",
+      "targetStem": "search-results-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "note": "Resolve the actual search input by its captured label or role. Use a labelled sample query; no real text entry is claimed by a static Figma transition.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "search-results-mobile",
+      "selector": {
+        "label": "SHOP SUPERVISORS",
+        "match": "contains"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "occupation-selected-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "note": "Resolve the occupation result button, not plain title text."
+    },
+    {
+      "sourceStem": "occupation-selected-mobile",
+      "selector": {
+        "label": "Back to category filters",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-occupation-selected-mobile-4-Back-to-category-filters"
+      ],
+      "action": "navigate",
+      "targetStem": "occupation-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "occupation-selected-mobile",
+      "selector": {
+        "label": "Confirm and continue",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-occupation-selected-mobile-6-Confirm-and-continue"
+      ],
+      "action": "navigate",
+      "targetStem": "tasks-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "tasks-mobile",
+      "selector": {
+        "label": "Change occupation",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-tasks-mobile-4-Change-occupation"
+      ],
+      "action": "navigate",
+      "targetStem": "occupation-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "tasks-mobile",
+      "selector": {
+        "label": "Explore AI impact",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-tasks-mobile-5-Explore-AI-impact",
+        "hit-tasks-mobile-15-Explore-AI-impact"
+      ],
+      "action": "navigate",
+      "targetStem": "exposure-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Prepared reference-data analysis result; not a live AI API call."
+    },
+    {
+      "sourceStem": "exposure-mobile",
+      "selector": {
+        "label": "Edit tasks",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-exposure-mobile-5-Edit-tasks"
+      ],
+      "action": "navigate",
+      "targetStem": "tasks-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "exposure-mobile",
+      "selector": {
+        "label": "View skills",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-exposure-mobile-6-View-skills"
+      ],
+      "action": "navigate",
+      "targetStem": "skills-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "skills-mobile",
+      "selector": {
+        "label": "Edit tasks",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-skills-mobile-4-Edit-tasks"
+      ],
+      "action": "navigate",
+      "targetStem": "tasks-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "skills-mobile",
+      "selector": {
+        "label": "AI exposure",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-skills-mobile-5-AI-exposure"
+      ],
+      "action": "navigate",
+      "targetStem": "exposure-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "skills-mobile",
+      "selector": {
+        "label": "Add Analytical thinking",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-skills-mobile-45-Add-Analytical-thinking"
+      ],
+      "action": "navigate",
+      "targetStem": "skills-selected-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Existing capture shows this skill unselected. Capture selected state before showing resources for Analytical thinking.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "skills-mobile",
+      "selector": {
+        "label": "Confirm and find courses →",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-skills-mobile-58-Confirm-and-find-courses"
+      ],
+      "action": "navigate",
+      "targetStem": "account-gate-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "guard": "Only for the current captured skill set. Do not claim Analytical thinking was selected on this branch."
+    },
+    {
+      "sourceStem": "skills-selected-mobile",
+      "selector": {
+        "label": "Confirm and find courses →",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "account-gate-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label"
+    },
+    {
+      "sourceStem": "account-gate-mobile",
+      "selector": {
+        "label": "Log in / Create account",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-account-gate-mobile-4-Log-in-Create-account"
+      ],
+      "action": "open_overlay",
+      "targetStem": "sign-in-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "account-gate-mobile"
+    },
+    {
+      "sourceStem": "account-gate-mobile",
+      "selector": {
+        "label": "Log in or create an account",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-account-gate-mobile-3-Log-in-or-create-an-account"
+      ],
+      "action": "open_overlay",
+      "targetStem": "sign-in-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "account-gate-mobile"
+    },
+    {
+      "sourceStem": "sign-in-mobile",
+      "selector": {
+        "label": "Close",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-sign-in-mobile-6-Close"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "account-gate-mobile"
+    },
+    {
+      "sourceStem": "sign-in-mobile",
+      "selector": {
+        "label": "Log in",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-sign-in-mobile-4-Log-in"
+      ],
+      "action": "navigate",
+      "targetStem": "resources-start-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "This transition changes the example from guest to signed-in. It sends no credentials.",
+      "guard": "Use visibly labelled sample credentials or an explicit prototype-only continuation annotation. Current captured fields are blank; real authentication must not be implied.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "resources-start-mobile",
+      "selector": {
+        "label": "Adjust",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "open_overlay",
+      "targetStem": "focus-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile"
+    },
+    {
+      "sourceStem": "focus-mobile",
+      "selector": {
+        "label": "Save and update",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-focus-mobile-8-Save-and-update"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-start-mobile",
+      "guard": "Use the already displayed valid manual goal and foundation. This static example does not accept arbitrary new input."
+    },
+    {
+      "sourceStem": "focus-mobile",
+      "selector": {
+        "label": "Cancel",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-focus-mobile-7-Cancel"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-start-mobile"
+    },
+    {
+      "sourceStem": "focus-mobile",
+      "selector": {
+        "label": "Close",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-focus-mobile-9-Close"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-start-mobile"
+    },
+    {
+      "sourceStem": "resources-start-mobile",
+      "selector": {
+        "label": "View details",
+        "match": "exact",
+        "occurrence": 0
+      },
+      "sourceControlIds": [],
+      "action": "open_overlay",
+      "targetStem": "course-start-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile",
+      "note": "First View details must belong to Pandas in the captured unplanned example.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "course-start-mobile",
+      "selector": {
+        "label": "Chapters",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "chapters-start-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "chapters-start-mobile",
+      "selector": {
+        "label": "Overview",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "course-start-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "course-start-mobile",
+      "selector": {
+        "label": "Plan learning",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "content-start-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "course-start-mobile",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile"
+    },
+    {
+      "sourceStem": "course-start-mobile",
+      "selector": {
+        "label": "Open provider course",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "prototype_handoff",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "note": "Show provider destination only. Do not open an external site during the main Figma journey."
+    },
+    {
+      "sourceStem": "chapters-start-mobile",
+      "selector": {
+        "label": "Plan learning",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "content-start-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "chapters-start-mobile",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile"
+    },
+    {
+      "sourceStem": "chapters-start-mobile",
+      "selector": {
+        "label": "Open provider course",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "prototype_handoff",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "note": "Show provider destination only. Do not open an external site during the main Figma journey."
+    },
+    {
+      "sourceStem": "content-start-mobile",
+      "selector": {
+        "label": "Back",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "course-start-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "content-start-mobile",
+      "selector": {
+        "label": "Continue",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "routine-start-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile",
+      "guard": "Entire course selected. Destination shows the labelled sample routine: Mon/Wed, 18:30–19:00, valid current/future start date. If the current UI opens Schedule later first, capture an intermediate Arrange time state rather than silently preselecting routine.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "content-start-mobile",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile"
+    },
+    {
+      "sourceStem": "routine-start-mobile",
+      "selector": {
+        "label": "Back",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "content-start-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "routine-start-mobile",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile"
+    },
+    {
+      "sourceStem": "routine-start-mobile",
+      "selector": {
+        "label": "Import into My Plan",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "plan-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "guard": "Use only the unplanned source fixture. Positive course duration 240 minutes, Mon/Wed, 18:30–19:00 and valid start date. Result: eight 30-minute Pandas sessions."
+    },
+    {
+      "sourceStem": "resources-start-mobile",
+      "selector": {
+        "label": "Open My Plan",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "plan-empty-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "guard": "Before import, My Plan must contain no dated Pandas sessions. A populated plan is not an honest target for this button.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "resources-start-mobile",
+      "selector": {
+        "label": "Edit skills",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "skills-selected-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "resources-start-mobile",
+      "selector": {
+        "label": "Review your skills →",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "skills-selected-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "resources-start-mobile",
+      "selector": {
+        "label": "Saved courses · 1",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "open_overlay",
+      "targetStem": "saved-start-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "resources-start-mobile",
+      "selector": {
+        "label": "Saved courses · 1. Drag",
+        "match": "contains"
+      },
+      "sourceControlIds": [],
+      "action": "open_overlay",
+      "targetStem": "saved-start-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "saved-start-mobile",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile"
+    },
+    {
+      "sourceStem": "saved-start-mobile",
+      "selector": {
+        "label": "Plan learning",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "swap_overlay",
+      "targetStem": "content-start-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "resources-start-mobile",
+      "note": "Resolve the actual unscheduled-course action label after capture; do not copy scheduled Edit learning plan wording.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "plan-mobile",
+      "selector": {
+        "label": "Pandas 18:30–19:00",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-plan-mobile-54-Pandas-18-3019-00"
+      ],
+      "action": "open_overlay",
+      "targetStem": "session-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "plan-mobile"
+    },
+    {
+      "sourceStem": "session-mobile",
+      "selector": {
+        "label": "Mark complete",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-session-mobile-5-Mark-complete"
+      ],
+      "action": "swap_overlay",
+      "targetStem": "complete-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "plan-mobile",
+      "note": "Update the underlying plan progress to 1/8 in the prototype or provide a matching plan-completed frame before closing."
+    },
+    {
+      "sourceStem": "complete-mobile",
+      "selector": {
+        "label": "Undo completion",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-complete-mobile-5-Undo-completion"
+      ],
+      "action": "swap_overlay",
+      "targetStem": "session-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "plan-mobile",
+      "note": "Restore underlying plan progress to 0/8."
+    },
+    {
+      "sourceStem": "session-mobile",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-session-mobile-7-Close-details"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "plan-mobile"
+    },
+    {
+      "sourceStem": "complete-mobile",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-complete-mobile-7-Close-details"
+      ],
+      "action": "navigate",
+      "targetStem": "plan-completed-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "guard": "Requires a captured/verified 1/8 plan state or equivalent prototype state. Do not close onto the original 0/8 plan.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "plan-completed-mobile",
+      "selector": {
+        "label": "Pandas 18:30–19:00",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "open_overlay",
+      "targetStem": "complete-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "baseStem": "plan-completed-mobile"
+    },
+    {
+      "sourceStem": "plan-mobile",
+      "selector": {
+        "label": "Choose courses",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-plan-mobile-4-Choose-courses"
+      ],
+      "action": "navigate",
+      "targetStem": "resources-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Use scheduled resources after import; never reset to resources-start."
+    },
+    {
+      "sourceStem": "plan-mobile",
+      "selector": {
+        "label": "Explore learning resources",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-plan-mobile-6-Explore-learning-resources"
+      ],
+      "action": "navigate",
+      "targetStem": "resources-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "session-mobile",
+      "selector": {
+        "label": "View in Learning Resources →",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-session-mobile-6-View-in-Learning-Resources"
+      ],
+      "action": "navigate",
+      "targetStem": "resources-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "complete-mobile",
+      "selector": {
+        "label": "View in Learning Resources →",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-complete-mobile-6-View-in-Learning-Resources"
+      ],
+      "action": "navigate",
+      "targetStem": "resources-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "resources-mobile",
+      "selector": {
+        "label": "View details",
+        "match": "exact",
+        "occurrence": 0
+      },
+      "sourceControlIds": [
+        "hit-resources-mobile-16-View-details"
+      ],
+      "action": "open_overlay",
+      "targetStem": "course-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-mobile"
+    },
+    {
+      "sourceStem": "course-mobile",
+      "selector": {
+        "label": "Chapters",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-course-mobile-3-Chapters"
+      ],
+      "action": "swap_overlay",
+      "targetStem": "chapters-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-mobile"
+    },
+    {
+      "sourceStem": "chapters-mobile",
+      "selector": {
+        "label": "Overview",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-chapters-mobile-2-Overview"
+      ],
+      "action": "swap_overlay",
+      "targetStem": "course-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-mobile"
+    },
+    {
+      "sourceStem": "course-mobile",
+      "selector": {
+        "label": "View plan",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-course-mobile-5-View-plan"
+      ],
+      "action": "navigate",
+      "targetStem": "plan-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "course-mobile",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-course-mobile-7-Close-details"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-mobile"
+    },
+    {
+      "sourceStem": "course-mobile",
+      "selector": {
+        "label": "Edit learning plan",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-course-mobile-6-Edit-learning-plan"
+      ],
+      "action": "show_duplicate_schedule_notice",
+      "targetStem": "duplicate-plan-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-mobile",
+      "note": "Existing scheduled course must direct changes to My Plan. Never wire its Import button to successful duplicate scheduling.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "chapters-mobile",
+      "selector": {
+        "label": "View plan",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-chapters-mobile-5-View-plan"
+      ],
+      "action": "navigate",
+      "targetStem": "plan-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control"
+    },
+    {
+      "sourceStem": "chapters-mobile",
+      "selector": {
+        "label": "Close details",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-chapters-mobile-7-Close-details"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-mobile"
+    },
+    {
+      "sourceStem": "chapters-mobile",
+      "selector": {
+        "label": "Edit learning plan",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-chapters-mobile-6-Edit-learning-plan"
+      ],
+      "action": "show_duplicate_schedule_notice",
+      "targetStem": "duplicate-plan-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "resources-mobile",
+      "note": "Existing scheduled course must direct changes to My Plan. Never wire its Import button to successful duplicate scheduling.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "plan-mobile",
+      "selector": {
+        "label": "Add activity",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-plan-mobile-8-Add-activity"
+      ],
+      "action": "open_overlay",
+      "targetStem": "activity-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "plan-mobile"
+    },
+    {
+      "sourceStem": "activity-mobile",
+      "selector": {
+        "label": "Close",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-activity-mobile-9-Close"
+      ],
+      "action": "close_overlay",
+      "targetStem": null,
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "baseStem": "plan-mobile"
+    },
+    {
+      "sourceStem": "home-mobile",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-home-mobile-1-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "occupation-mobile",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-occupation-mobile-2-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "occupation-selected-mobile",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-occupation-selected-mobile-2-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "tasks-mobile",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-tasks-mobile-2-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "exposure-mobile",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-exposure-mobile-2-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "skills-mobile",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-skills-mobile-2-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "account-gate-mobile",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-account-gate-mobile-2-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "resources-start-mobile",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "navigate",
+      "targetStem": "home-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "resources-mobile",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-resources-mobile-2-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "plan-mobile",
+      "selector": {
+        "label": "AI-Wrevolusi home",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-plan-mobile-2-AI-Wrevolusi-home"
+      ],
+      "action": "navigate",
+      "targetStem": "home-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Figma review returns to the landing frame; signed-in frontend logo routing may redirect to analysis."
+    },
+    {
+      "sourceStem": "occupation-mobile",
+      "selector": {
+        "label": "Open menu",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-occupation-mobile-1-Open-menu"
+      ],
+      "action": "open_context_navigation",
+      "targetStem": "navigation-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Resolve a matching menu capture for guest or signed-in state. Menu options depend on account/setup state.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "tasks-mobile",
+      "selector": {
+        "label": "Open menu",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-tasks-mobile-1-Open-menu"
+      ],
+      "action": "open_context_navigation",
+      "targetStem": "navigation-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Resolve a matching menu capture for guest or signed-in state. Menu options depend on account/setup state.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "exposure-mobile",
+      "selector": {
+        "label": "Open menu",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-exposure-mobile-1-Open-menu"
+      ],
+      "action": "open_context_navigation",
+      "targetStem": "navigation-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Resolve a matching menu capture for guest or signed-in state. Menu options depend on account/setup state.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "skills-mobile",
+      "selector": {
+        "label": "Open menu",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-skills-mobile-1-Open-menu"
+      ],
+      "action": "open_context_navigation",
+      "targetStem": "navigation-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Resolve a matching menu capture for guest or signed-in state. Menu options depend on account/setup state.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "account-gate-mobile",
+      "selector": {
+        "label": "Open menu",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-account-gate-mobile-1-Open-menu"
+      ],
+      "action": "open_context_navigation",
+      "targetStem": "navigation-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Resolve a matching menu capture for guest or signed-in state. Menu options depend on account/setup state.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "resources-start-mobile",
+      "selector": {
+        "label": "Open menu",
+        "match": "exact"
+      },
+      "sourceControlIds": [],
+      "action": "open_context_navigation",
+      "targetStem": "navigation-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "await_capture_and_resolve_by_label",
+      "note": "Resolve a matching menu capture for guest or signed-in state. Menu options depend on account/setup state.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "resources-mobile",
+      "selector": {
+        "label": "Open menu",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-resources-mobile-1-Open-menu"
+      ],
+      "action": "open_context_navigation",
+      "targetStem": "navigation-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Resolve a matching menu capture for guest or signed-in state. Menu options depend on account/setup state.",
+      "targetResolution": "await_capture"
+    },
+    {
+      "sourceStem": "plan-mobile",
+      "selector": {
+        "label": "Open menu",
+        "match": "exact"
+      },
+      "sourceControlIds": [
+        "hit-plan-mobile-1-Open-menu"
+      ],
+      "action": "open_context_navigation",
+      "targetStem": "navigation-mobile",
+      "targetFigmaNodeId": null,
+      "resolution": "resolved_asset_control",
+      "note": "Resolve a matching menu capture for guest or signed-in state. Menu options depend on account/setup state.",
+      "targetResolution": "await_capture"
+    }
+  ],
+  "pendingScreens": [
+    "chapters-start-desktop",
+    "chapters-start-mobile",
+    "content-start-desktop",
+    "content-start-mobile",
+    "course-start-desktop",
+    "course-start-mobile",
+    "duplicate-plan-desktop",
+    "duplicate-plan-mobile",
+    "navigation-mobile",
+    "plan-completed-desktop",
+    "plan-completed-mobile",
+    "plan-empty-desktop",
+    "plan-empty-mobile",
+    "resources-start-desktop",
+    "resources-start-mobile",
+    "routine-start-desktop",
+    "routine-start-mobile",
+    "saved-start-desktop",
+    "saved-start-mobile",
+    "search-mode-desktop",
+    "search-mode-mobile",
+    "search-results-desktop",
+    "search-results-mobile",
+    "skills-selected-desktop",
+    "skills-selected-mobile"
+  ],
+  "verification": [
+    "Confirm each known sourceControlId exists once in the matching imported frame.",
+    "Resolve pending sources from the refreshed manifest by label, role and occurrence; do not reuse old scheduled source IDs.",
+    "Inspect actual settled mobile and desktop screenshots, then click the entire sequence separately at both sizes.",
+    "Check close/back never exposes a different account state or the wrong 0/8 versus 1/8 progress count.",
+    "Check duplicate scheduling shows a rejection, no external message is sent, and integration stays pending visual approval."
+  ]
+}

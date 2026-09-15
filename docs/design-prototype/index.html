@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="AI-Wrevolusi Iteration 2 clickable design review. Example work, learning and care journeys for review." />
+    <title>AI-Wrevolusi · Design review</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="review-toolbar" aria-label="Design review tools">
+      <div class="review-label"><span class="review-dot" aria-hidden="true"></span>Iteration 2 <span aria-hidden="true">·</span> Design review</div>
+      <div class="review-actions">
+        <button id="wireframe-toggle" type="button" aria-pressed="false">Wireframes</button>
+        <button id="journey-toggle" type="button" aria-expanded="false" aria-controls="journey-panel">Journey map</button>
+        <button id="reset-demo" type="button">Reset example</button>
+      </div>
+    </div>
+    <header class="site-header">
+      <a class="brand" href="#home" data-go="home" aria-label="AI-Wrevolusi home"><span class="brand-mark" aria-hidden="true">w<span>·</span></span><span>AI-Wrevolusi<small>Build on what you know.</small></span></a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="#home" data-go="home">My work</a>
+        <a href="#skills" data-go="skills">My skills</a>
+        <a href="#catalogue" data-go="catalogue">Learning</a>
+        <a href="#calendar" data-go="calendar">My Plan</a>
+        <a href="#career" data-go="career">Possibilities</a>
+      </nav>
+    </header>
+    <div class="app-shell">
+      <aside id="journey-panel" class="journey-panel" aria-label="Prototype journey" hidden>
+        <p class="section-label">Explore the design</p>
+        <h2>Your journey, step by step</h2>
+        <p class="body-copy">Choose a screen to review. Example choices help you try the experience.</p>
+        <div id="journey-links" class="journey-links"></div>
+      </aside>
+      <main id="main" tabindex="-1">
+        <div class="panel empty"><p class="section-label">Design prototype</p><h1>Preparing your next step…</h1><p>The clickable journey will appear here.</p></div>
+      </main>
+    </div>
+    <footer class="site-footer"><span>AI-Wrevolusi</span><p>Prototype examples · no real AI or messages</p><a href="requirements-and-review.md">Requirements and feedback</a></footer>
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+    <noscript><p class="notice">Enable JavaScript to explore this design prototype. The requirement and review document remains available from the footer.</p></noscript>
+    <script src="data.js"></script>
+    <script src="prototype.js"></script>
+  </body>
+</html>

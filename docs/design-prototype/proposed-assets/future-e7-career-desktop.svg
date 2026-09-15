@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000">
+<title>E7 career exploration — future concept</title>
+<defs><linearGradient id="background" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#EEF8FC"/><stop offset="1" stop-color="#FDF0F5"/></linearGradient></defs>
+<rect x="0" y="0" width="1440" height="1000" rx="0" fill="url(#background)"/>
+<rect x="0" y="0" width="1440" height="64" rx="0" fill="#FFFFFF"/>
+<text x="32" y="41" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="650">AI-Wrevolusi</text>
+<text x="227" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">AI Exposure</text>
+<text x="365" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Skills</text>
+<text x="450" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Learning Resources</text>
+<text x="651" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">My Plan</text>
+<rect x="748" y="13" width="115" height="38" rx="20" fill="#EDF5FA"/>
+<text x="762" y="38" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Possibilities</text>
+<text x="1382" y="39" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="400">○</text>
+<rect x="0" y="64" width="1440" height="36" rx="0" fill="#F0E9F7"/>
+<text x="120" y="88" fill="#644D7A" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700">FUTURE CONCEPT — NOT COMMITTED</text>
+<text x="120" y="148" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="650">Explore possibilities at your pace</text>
+<text x="120" y="180" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="400">Start with the work you already know. Choose one direction to explore, without making a commitment.</text>
+<rect x="120" y="215" width="355" height="667" rx="24" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="148" y="258" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="650">YOUR STARTING POINT</text>
+<text x="148" y="300" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="600">Sales supervisor</text>
+<rect x="148" y="320" width="140" height="26" rx="13" fill="#F5EDF7"/>
+<text x="159" y="338" fill="#735A7C" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600">Prototype example</text>
+<text x="148" y="382" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="600">Experience you can build on</text>
+<text x="148" y="416" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Customer relationships</text>
+<text x="148" y="447" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Coordinating a small team</text>
+<text x="148" y="478" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Preparing sales reports</text>
+<text x="148" y="543" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="600">Skill you are developing</text>
+<rect x="148" y="565" width="160" height="26" rx="13" fill="#EAF4FA"/>
+<text x="159" y="583" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600">Analytical thinking</text>
+<text x="148" y="650" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">You can correct this starting point.</text>
+<text x="148" y="675" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">These examples do not assess your</text>
+<text x="148" y="700" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">ability or predict employment.</text>
+<rect x="148" y="790" width="196" height="44" rx="23" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="164" y="818" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Review my experience</text>
+<rect x="499" y="215" width="821" height="667" rx="24" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="527" y="258" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="600">Choose a direction to learn about</text>
+<text x="527" y="288" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Example directions for a conversation, not ranked job matches.</text>
+<rect x="527" y="316" width="765" height="99" rx="17" fill="#EBF5FB" stroke="#91BCD4"/>
+<text x="548" y="350" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="600">Sales operations</text>
+<text x="548" y="380" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Explore how teams organise sales processes and use records.</text>
+<text x="1250" y="365" fill="#4F91BA" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="400">●</text>
+<rect x="527" y="432" width="765" height="99" rx="17" fill="#FCFCFE" stroke="#D9DDE5"/>
+<text x="548" y="466" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="600">Customer success</text>
+<text x="548" y="496" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Explore how teams support customers and keep relationships.</text>
+<text x="1250" y="481" fill="#4F91BA" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="400">○</text>
+<rect x="527" y="548" width="765" height="99" rx="17" fill="#FCFCFE" stroke="#D9DDE5"/>
+<text x="548" y="582" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="600">Business reporting</text>
+<text x="548" y="612" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Explore how teams turn work records into useful explanations.</text>
+<text x="1250" y="597" fill="#4F91BA" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="400">○</text>
+<text x="527" y="703" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="600">For this direction, explore</text>
+<text x="527" y="733" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Process improvement · Clear reporting · Working with data</text>
+<text x="527" y="760" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Check real role descriptions and requirements before deciding.</text>
+<rect x="1042" y="801" width="250" height="44" rx="23" fill="#3D5F7A"/>
+<text x="1058" y="829" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Explore skills for this direction</text>
+<text x="120" y="937" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="500">E7 · Exploration only. These examples are not career advice, verified vacancies or an employment prediction.</text>
+</svg>

@@ -1,0 +1,646 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1000,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 734,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px",
+      "width": 512,
+      "x": 464,
+      "y": 133
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(79, 145, 186)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgba(255, 255, 255, 0.9)",
+      "height": 96,
+      "kind": "textarea",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(79, 145, 186, 0.2) 0px 0px 0px 2px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+      "width": 462,
+      "x": 489,
+      "y": 266
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 209.46875,
+      "x": 489,
+      "y": 412
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgba(255, 255, 255, 0.95)",
+      "height": 48,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 462,
+      "x": 489,
+      "y": 540
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(217, 210, 223)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgba(255, 255, 255, 0.9)",
+      "height": 96,
+      "kind": "textarea",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 462,
+      "x": 489,
+      "y": 660
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(79, 145, 186, 0.28)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgba(255, 255, 255, 0.88)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 80.46875,
+      "x": 736.71875,
+      "y": 806
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(79, 145, 186)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 125.8125,
+      "x": 825.1875,
+      "y": 806
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "disabled": false,
+      "height": 96,
+      "href": null,
+      "label": "",
+      "role": "textarea",
+      "width": 462,
+      "x": 489,
+      "y": 266
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Find closest standard task",
+      "role": "button",
+      "width": 209.46875,
+      "x": 489,
+      "y": 412
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "disabled": false,
+      "height": 48,
+      "href": null,
+      "label": "Task frequency (optional)",
+      "role": "combobox",
+      "width": 462,
+      "x": 489,
+      "y": 540
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "disabled": false,
+      "height": 1,
+      "href": null,
+      "label": "Not specified\nDaily\nSeveral times a week\nWeekly\nOccasionally",
+      "role": "select",
+      "width": 1,
+      "x": 488,
+      "y": 587
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "disabled": false,
+      "height": 96,
+      "href": null,
+      "label": "",
+      "role": "textarea",
+      "width": 462,
+      "x": 489,
+      "y": 660
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Cancel",
+      "role": "button",
+      "width": 80.46875,
+      "x": 736.71875,
+      "y": 806
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Save changes",
+      "role": "button",
+      "width": 125.8125,
+      "x": 825.1875,
+      "y": 806
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "disabled": false,
+      "height": 16,
+      "href": null,
+      "label": "Close",
+      "role": "button",
+      "width": 16,
+      "x": 943,
+      "y": 150
+    }
+  ],
+  "height": 1000,
+  "icons": [
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "color": "rgb(60, 42, 53)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down h-4 w-4 opacity-50\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"></path></svg>",
+      "width": 16,
+      "x": 918,
+      "y": 556
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "color": "rgb(60, 42, 53)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x h-4 w-4\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg>",
+      "width": 16,
+      "x": 943,
+      "y": 150
+    }
+  ],
+  "images": [],
+  "overlay": true,
+  "scrollY": 0,
+  "texts": [
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "-0.45px",
+      "lineHeight": "18px",
+      "text": "Edit task",
+      "width": 70.609375,
+      "x": 489,
+      "y": 156
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Describe what you do. You can add timing information later, when",
+      "width": 434.40625,
+      "x": 489,
+      "y": 183
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(112, 92, 103)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "you record an AI trial.",
+      "width": 141.4375,
+      "x": 489,
+      "y": 203
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Task description",
+      "width": 112.0625,
+      "x": 489,
+      "y": 239
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 76,
+      "lineHeight": "20px",
+      "multiline": true,
+      "synthetic": true,
+      "text": "Planning and preparing work schedules and assigning staff to specific duties;",
+      "width": 436,
+      "x": 502,
+      "y": 277
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Standard task check",
+      "width": 138.40625,
+      "x": 489,
+      "y": 385
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Find closest standard task",
+      "width": 175.46875,
+      "x": 506,
+      "y": 421
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Compare your wording with the occupation's standard task list. Suggestions",
+      "width": 431.890625,
+      "x": 489,
+      "y": 458
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "need your review before they count.",
+      "width": 205.046875,
+      "x": 489,
+      "y": 478
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Task frequency (optional)",
+      "width": 173.421875,
+      "x": 489,
+      "y": 513
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Not specified",
+      "width": 88.28125,
+      "x": 506,
+      "y": 555
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "How often you do this task, rather than how long it takes.",
+      "width": 322.421875,
+      "x": 489,
+      "y": 598
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Anything specific about how you do this task? (optional)",
+      "width": 379.765625,
+      "x": 489,
+      "y": 633
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "For example, the software you use, what you produce, or special requirements.",
+      "width": 447.890625,
+      "x": 489,
+      "y": 772
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Cancel",
+      "width": 46.46875,
+      "x": 753.71875,
+      "y": 815
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(255, 255, 255)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Save changes",
+      "width": 93.8125,
+      "x": 841.1875,
+      "y": 815
+    },
+    {
+      "clip": {
+        "height": 734,
+        "width": 512,
+        "x": 464,
+        "y": 133
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Close",
+      "width": 42.9375,
+      "x": 950,
+      "y": 167
+    }
+  ],
+  "url": "http://127.0.0.1:4173/profile/tasks",
+  "viewportHeight": 1000,
+  "width": 1440,
+  "name": "task-editor-desktop",
+  "screenshot": "task-editor-desktop.jpg"
+}

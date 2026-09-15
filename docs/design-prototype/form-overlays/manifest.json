@@ -1,0 +1,671 @@
+{
+  "method": "Transparent native form glyph patches; place at 0,0 in the existing corresponding Figma frame",
+  "screens": [
+    {
+      "stem": "activity-desktop",
+      "svg": "activity-desktop.svg",
+      "width": 512.0,
+      "height": 593.6875,
+      "overlayBounds": {
+        "x": 464.0,
+        "y": 203.15625,
+        "width": 512.0,
+        "height": 593.6875
+      },
+      "controls": [
+        {
+          "index": 6,
+          "id": "hit-activity-desktop-6-input",
+          "glyphId": "patch-hit-activity-desktop-6-input",
+          "inputType": "checkbox",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 25.0,
+          "y": 459.6875,
+          "width": 13.0,
+          "height": 13.0
+        },
+        {
+          "index": 7,
+          "id": "hit-activity-desktop-7-input",
+          "glyphId": "patch-hit-activity-desktop-7-input",
+          "inputType": "checkbox",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 25.0,
+          "y": 489.6875,
+          "width": 13.0,
+          "height": 13.0
+        }
+      ]
+    },
+    {
+      "stem": "activity-mobile",
+      "svg": "activity-mobile.svg",
+      "width": 390.0,
+      "height": 593.6875,
+      "overlayBounds": {
+        "x": 0.0,
+        "y": 125.15625,
+        "width": 390.0,
+        "height": 593.6875
+      },
+      "controls": [
+        {
+          "index": 6,
+          "id": "hit-activity-mobile-6-input",
+          "glyphId": "patch-hit-activity-mobile-6-input",
+          "inputType": "checkbox",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 25.0,
+          "y": 459.6875,
+          "width": 13.0,
+          "height": 13.0
+        },
+        {
+          "index": 7,
+          "id": "hit-activity-mobile-7-input",
+          "glyphId": "patch-hit-activity-mobile-7-input",
+          "inputType": "checkbox",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 25.0,
+          "y": 489.6875,
+          "width": 13.0,
+          "height": 13.0
+        }
+      ]
+    },
+    {
+      "stem": "arrange-start-desktop",
+      "svg": "arrange-start-desktop.svg",
+      "width": 760.0,
+      "height": 1000.0,
+      "overlayBounds": {
+        "x": 680.0,
+        "y": 0.0,
+        "width": 760.0,
+        "height": 1000.0
+      },
+      "controls": [
+        {
+          "index": 1,
+          "id": "hit-arrange-start-desktop-1-input",
+          "glyphId": "patch-hit-arrange-start-desktop-1-input",
+          "inputType": "radio",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 50.0,
+          "y": 303.328125,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 2,
+          "id": "hit-arrange-start-desktop-2-input",
+          "glyphId": "patch-hit-arrange-start-desktop-2-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 50.0,
+          "y": 393.515625,
+          "width": 20.0,
+          "height": 20.0
+        }
+      ]
+    },
+    {
+      "stem": "arrange-start-mobile",
+      "svg": "arrange-start-mobile.svg",
+      "width": 390.0,
+      "height": 844.0,
+      "overlayBounds": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 390.0,
+        "height": 844.0
+      },
+      "controls": [
+        {
+          "index": 1,
+          "id": "hit-arrange-start-mobile-1-input",
+          "glyphId": "patch-hit-arrange-start-mobile-1-input",
+          "inputType": "radio",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 324.203125,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 2,
+          "id": "hit-arrange-start-mobile-2-input",
+          "glyphId": "patch-hit-arrange-start-mobile-2-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 423.984375,
+          "width": 20.0,
+          "height": 20.0
+        }
+      ]
+    },
+    {
+      "stem": "content-desktop",
+      "svg": "content-desktop.svg",
+      "width": 760.0,
+      "height": 1000.0,
+      "overlayBounds": {
+        "x": 680.0,
+        "y": 0.0,
+        "width": 760.0,
+        "height": 1000.0
+      },
+      "controls": [
+        {
+          "index": 1,
+          "id": "hit-content-desktop-1-input",
+          "glyphId": "patch-hit-content-desktop-1-input",
+          "inputType": "radio",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 50.0,
+          "y": 303.328125,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 2,
+          "id": "hit-content-desktop-2-input",
+          "glyphId": "patch-hit-content-desktop-2-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 50.0,
+          "y": 393.515625,
+          "width": 20.0,
+          "height": 20.0
+        }
+      ]
+    },
+    {
+      "stem": "content-mobile",
+      "svg": "content-mobile.svg",
+      "width": 390.0,
+      "height": 844.0,
+      "overlayBounds": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 390.0,
+        "height": 844.0
+      },
+      "controls": [
+        {
+          "index": 1,
+          "id": "hit-content-mobile-1-input",
+          "glyphId": "patch-hit-content-mobile-1-input",
+          "inputType": "radio",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 314.609375,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 2,
+          "id": "hit-content-mobile-2-input",
+          "glyphId": "patch-hit-content-mobile-2-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 404.796875,
+          "width": 20.0,
+          "height": 20.0
+        }
+      ]
+    },
+    {
+      "stem": "content-start-desktop",
+      "svg": "content-start-desktop.svg",
+      "width": 760.0,
+      "height": 1000.0,
+      "overlayBounds": {
+        "x": 680.0,
+        "y": 0.0,
+        "width": 760.0,
+        "height": 1000.0
+      },
+      "controls": [
+        {
+          "index": 1,
+          "id": "hit-content-start-desktop-1-input",
+          "glyphId": "patch-hit-content-start-desktop-1-input",
+          "inputType": "radio",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 50.0,
+          "y": 303.328125,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 2,
+          "id": "hit-content-start-desktop-2-input",
+          "glyphId": "patch-hit-content-start-desktop-2-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 50.0,
+          "y": 393.515625,
+          "width": 20.0,
+          "height": 20.0
+        }
+      ]
+    },
+    {
+      "stem": "content-start-mobile",
+      "svg": "content-start-mobile.svg",
+      "width": 390.0,
+      "height": 844.0,
+      "overlayBounds": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 390.0,
+        "height": 844.0
+      },
+      "controls": [
+        {
+          "index": 1,
+          "id": "hit-content-start-mobile-1-input",
+          "glyphId": "patch-hit-content-start-mobile-1-input",
+          "inputType": "radio",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 314.609375,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 2,
+          "id": "hit-content-start-mobile-2-input",
+          "glyphId": "patch-hit-content-start-mobile-2-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 404.796875,
+          "width": 20.0,
+          "height": 20.0
+        }
+      ]
+    },
+    {
+      "stem": "focus-desktop",
+      "svg": "focus-desktop.svg",
+      "width": 512.0,
+      "height": 617.0,
+      "overlayBounds": {
+        "x": 464.0,
+        "y": 191.5,
+        "width": 512.0,
+        "height": 617.0
+      },
+      "controls": [
+        {
+          "index": 1,
+          "id": "hit-focus-desktop-1-input",
+          "glyphId": "patch-hit-focus-desktop-1-input",
+          "inputType": "radio",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 160.5,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 2,
+          "id": "hit-focus-desktop-2-input",
+          "glyphId": "patch-hit-focus-desktop-2-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 273.0,
+          "y": 160.5,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 3,
+          "id": "hit-focus-desktop-3-input",
+          "glyphId": "patch-hit-focus-desktop-3-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 215.5,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 4,
+          "id": "hit-focus-desktop-4-input",
+          "glyphId": "patch-hit-focus-desktop-4-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 273.0,
+          "y": 215.5,
+          "width": 20.0,
+          "height": 20.0
+        }
+      ]
+    },
+    {
+      "stem": "focus-mobile",
+      "svg": "focus-mobile.svg",
+      "width": 390.0,
+      "height": 641.0,
+      "overlayBounds": {
+        "x": 0.0,
+        "y": 101.5,
+        "width": 390.0,
+        "height": 641.0
+      },
+      "controls": [
+        {
+          "index": 1,
+          "id": "hit-focus-mobile-1-input",
+          "glyphId": "patch-hit-focus-mobile-1-input",
+          "inputType": "radio",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 160.5,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 2,
+          "id": "hit-focus-mobile-2-input",
+          "glyphId": "patch-hit-focus-mobile-2-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 212.0,
+          "y": 160.5,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 3,
+          "id": "hit-focus-mobile-3-input",
+          "glyphId": "patch-hit-focus-mobile-3-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 215.5,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 4,
+          "id": "hit-focus-mobile-4-input",
+          "glyphId": "patch-hit-focus-mobile-4-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 212.0,
+          "y": 215.5,
+          "width": 20.0,
+          "height": 20.0
+        }
+      ]
+    },
+    {
+      "stem": "routine-desktop",
+      "svg": "routine-desktop.svg",
+      "width": 760.0,
+      "height": 1000.0,
+      "overlayBounds": {
+        "x": 680.0,
+        "y": 0.0,
+        "width": 760.0,
+        "height": 1000.0
+      },
+      "controls": [
+        {
+          "index": 1,
+          "id": "hit-routine-desktop-1-input",
+          "glyphId": "patch-hit-routine-desktop-1-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 50.0,
+          "y": 303.328125,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 2,
+          "id": "hit-routine-desktop-2-input",
+          "glyphId": "patch-hit-routine-desktop-2-input",
+          "inputType": "radio",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 50.0,
+          "y": 393.515625,
+          "width": 20.0,
+          "height": 20.0
+        }
+      ]
+    },
+    {
+      "stem": "routine-mobile",
+      "svg": "routine-mobile.svg",
+      "width": 390.0,
+      "height": 844.0,
+      "overlayBounds": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 390.0,
+        "height": 844.0
+      },
+      "controls": [
+        {
+          "index": 1,
+          "id": "hit-routine-mobile-1-input",
+          "glyphId": "patch-hit-routine-mobile-1-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 324.203125,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 2,
+          "id": "hit-routine-mobile-2-input",
+          "glyphId": "patch-hit-routine-mobile-2-input",
+          "inputType": "radio",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 433.578125,
+          "width": 20.0,
+          "height": 20.0
+        }
+      ]
+    },
+    {
+      "stem": "routine-start-desktop",
+      "svg": "routine-start-desktop.svg",
+      "width": 760.0,
+      "height": 1000.0,
+      "overlayBounds": {
+        "x": 680.0,
+        "y": 0.0,
+        "width": 760.0,
+        "height": 1000.0
+      },
+      "controls": [
+        {
+          "index": 1,
+          "id": "hit-routine-start-desktop-1-input",
+          "glyphId": "patch-hit-routine-start-desktop-1-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 50.0,
+          "y": 303.328125,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 2,
+          "id": "hit-routine-start-desktop-2-input",
+          "glyphId": "patch-hit-routine-start-desktop-2-input",
+          "inputType": "radio",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 50.0,
+          "y": 393.515625,
+          "width": 20.0,
+          "height": 20.0
+        }
+      ]
+    },
+    {
+      "stem": "routine-start-mobile",
+      "svg": "routine-start-mobile.svg",
+      "width": 390.0,
+      "height": 844.0,
+      "overlayBounds": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 390.0,
+        "height": 844.0
+      },
+      "controls": [
+        {
+          "index": 1,
+          "id": "hit-routine-start-mobile-1-input",
+          "glyphId": "patch-hit-routine-start-mobile-1-input",
+          "inputType": "radio",
+          "checked": false,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 324.203125,
+          "width": 20.0,
+          "height": 20.0
+        },
+        {
+          "index": 2,
+          "id": "hit-routine-start-mobile-2-input",
+          "glyphId": "patch-hit-routine-start-mobile-2-input",
+          "inputType": "radio",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 42.0,
+          "y": 433.578125,
+          "width": 20.0,
+          "height": 20.0
+        }
+      ]
+    },
+    {
+      "stem": "sign-in-desktop",
+      "svg": "sign-in-desktop.svg",
+      "width": 512.0,
+      "height": 438.0,
+      "overlayBounds": {
+        "x": 464.0,
+        "y": 281.0,
+        "width": 512.0,
+        "height": 438.0
+      },
+      "controls": [
+        {
+          "index": 3,
+          "id": "hit-sign-in-desktop-3-input",
+          "glyphId": "patch-hit-sign-in-desktop-3-input",
+          "inputType": "checkbox",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 25.0,
+          "y": 285.0,
+          "width": 13.0,
+          "height": 13.0
+        }
+      ]
+    },
+    {
+      "stem": "sign-in-mobile",
+      "svg": "sign-in-mobile.svg",
+      "width": 390.0,
+      "height": 478.0,
+      "overlayBounds": {
+        "x": 0.0,
+        "y": 183.0,
+        "width": 390.0,
+        "height": 478.0
+      },
+      "controls": [
+        {
+          "index": 3,
+          "id": "hit-sign-in-mobile-3-input",
+          "glyphId": "patch-hit-sign-in-mobile-3-input",
+          "inputType": "checkbox",
+          "checked": true,
+          "accentColor": "#4f91ba",
+          "basis": "confirmed source screenshot for legacy capture",
+          "x": 25.0,
+          "y": 325.0,
+          "width": 13.0,
+          "height": 13.0
+        }
+      ]
+    }
+  ]
+}

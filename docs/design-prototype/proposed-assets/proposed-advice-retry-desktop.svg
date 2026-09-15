@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000">
+<title>Outdated course advice and retry — proposed Iteration 2</title>
+<defs><linearGradient id="background" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#EEF8FC"/><stop offset="1" stop-color="#FDF0F5"/></linearGradient></defs>
+<rect x="0" y="0" width="1440" height="1000" rx="0" fill="url(#background)"/>
+<rect x="0" y="0" width="1440" height="64" rx="0" fill="#FFFFFF"/>
+<text x="32" y="41" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="650">AI-Wrevolusi</text>
+<text x="227" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">AI Exposure</text>
+<text x="365" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Skills</text>
+<rect x="436" y="13" width="153" height="38" rx="20" fill="#EDF5FA"/>
+<text x="450" y="38" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Learning Resources</text>
+<text x="651" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">My Plan</text>
+<text x="762" y="38" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Possibilities</text>
+<text x="1382" y="39" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="400">○</text>
+<rect x="0" y="64" width="1440" height="36" rx="0" fill="#FFF2DB"/>
+<text x="120" y="88" fill="#694B15" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700">PROPOSED ITERATION 2 — NOT CURRENT BEHAVIOUR</text>
+<text x="120" y="146" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="650">Learning Resources</text>
+<text x="120" y="174" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="400">Choose a course, review its information, and make room for learning.</text>
+<rect x="120" y="203" width="440" height="662" rx="22" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="146" y="242" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="650">YOUR LEARNING FOCUS</text>
+<text x="146" y="281" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="23" font-weight="600">Analytical thinking</text>
+<rect x="146" y="305" width="181" height="26" rx="13" fill="#EAF4FA"/>
+<text x="157" y="323" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600">Confirmed basis · Version 2</text>
+<text x="146" y="366" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="600">Your goal</text>
+<text x="146" y="395" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="400">Use evidence to improve my</text>
+<text x="146" y="420" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="400">weekly sales reports.</text>
+<text x="146" y="470" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="600">Your choices are kept</text>
+<text x="146" y="503" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Saved course: Pandas</text>
+<text x="146" y="534" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Selected content: Entire course</text>
+<text x="146" y="565" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Study times: No change</text>
+<rect x="146" y="603" width="170" height="44" rx="23" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="162" y="631" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Review my focus</text>
+<rect x="146" y="693" width="388" height="141" rx="16" fill="#F0F7FB"/>
+<text x="166" y="723" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400">Proposed change</text>
+<text x="166" y="749" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400">Generated advice with version tracking</text>
+<text x="166" y="775" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400">would replace current template guidance.</text>
+<text x="166" y="801" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400">This is a design example, not a live result.</text>
+<rect x="588" y="203" width="732" height="662" rx="22" fill="#FFFFFF" stroke="#D9DDE5"/>
+<text x="617" y="244" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="600">Pandas</text>
+<text x="617" y="271" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Catalogue course · Course facts and advice are separate</text>
+<line x1="617" y1="293" x2="1290" y2="293" stroke="#D9DDE5"/>
+<rect x="617" y="310" width="208" height="26" rx="13" fill="#FFF2DB"/>
+<text x="628" y="328" fill="#694B15" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600">Outdated · Based on version 1</text>
+<text x="617" y="366" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="600">Your learning focus has changed</text>
+<text x="617" y="395" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">You confirmed version 2. The previous advice below is kept for reference.</text>
+<text x="617" y="419" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">It has not been updated to use your new goal.</text>
+<rect x="617" y="440" width="674" height="106" rx="15" fill="#FFF2F4" stroke="#E8BEC5"/>
+<text x="637" y="471" fill="#9B4556" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="600">The advice update failed</text>
+<text x="637" y="497" fill="#834957" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Try again. Your confirmed details, chapter choices and schedule are kept.</text>
+<text x="637" y="520" fill="#834957" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">An update never replaces your choices without your review.</text>
+<text x="617" y="588" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="600">Previous advice · Prototype example</text>
+<text x="617" y="617" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">Practise checking a small sales table. Compare an AI suggestion with</text>
+<text x="617" y="641" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="400">the original records before using it in a weekly report.</text>
+<line x1="617" y1="663" x2="1291" y2="663" stroke="#D9DDE5"/>
+<text x="617" y="693" fill="#2F2430" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="600">Advice sources</text>
+<text x="617" y="720" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Work task: Check sales records for errors</text>
+<text x="617" y="744" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Course source: Catalogue entry · Provider version: Unknown</text>
+<text x="617" y="768" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400">Chapter reference: Not available · Confirm with the provider</text>
+<text x="617" y="820" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400">Practical guidance is not a guarantee of course suitability.</text>
+<rect x="1143" y="890" width="177" height="44" rx="23" fill="#3D5F7A"/>
+<text x="1159" y="918" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="550">Retry advice</text>
+<text x="120" y="924" fill="#3D5F7A" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="500">Proposed recovery: Retry advice → Updating advice → Advice ready, or retry after another failure</text>
+<text x="120" y="954" fill="#706976" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400">No provider facts, chapter references, AI output or service availability are presented as independently verified.</text>
+</svg>

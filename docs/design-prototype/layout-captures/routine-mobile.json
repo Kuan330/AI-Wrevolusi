@@ -1,0 +1,1330 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 250, 254, 0.95)",
+      "height": 844,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(61, 43, 54, 0.16) -16px 0px 40px 0px",
+      "width": 390,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(244, 225, 233)",
+      "height": 25.390625,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "none",
+      "width": 100.703125,
+      "x": 109.46875,
+      "y": 50.34375
+    },
+    {
+      "background": false,
+      "backgroundImage": "none",
+      "borderColor": "rgb(220, 229, 238)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 97.375,
+      "kind": "label",
+      "opacity": 1,
+      "radius": 14,
+      "shadow": "none",
+      "width": 322,
+      "x": 25,
+      "y": 285.515625
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(110deg, rgb(226, 240, 250), rgb(248, 237, 241))",
+      "borderColor": "rgb(188, 217, 234)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 97.375,
+      "kind": "label",
+      "opacity": 1,
+      "radius": 14,
+      "shadow": "none",
+      "width": 322,
+      "x": 25,
+      "y": 394.890625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(217, 210, 223)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgba(255, 255, 255, 0.9)",
+      "height": 44,
+      "kind": "input",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 256,
+      "x": 25,
+      "y": 541.265625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(79, 145, 186)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 49.421875,
+      "x": 25,
+      "y": 634.265625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 47.21875,
+      "x": 80.8125,
+      "y": 634.265625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(79, 145, 186)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 49.90625,
+      "x": 134.421875,
+      "y": 634.265625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 48.28125,
+      "x": 190.71875,
+      "y": 634.265625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 40.53125,
+      "x": 245.390625,
+      "y": 634.265625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 44.65625,
+      "x": 292.3125,
+      "y": 634.265625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 48.203125,
+      "x": 25,
+      "y": 672.65625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(228, 220, 231)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(255, 250, 254)",
+      "height": 73,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 341,
+      "x": 25,
+      "y": 771
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(79, 145, 186, 0.28)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(214, 234, 247)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 239.9375,
+      "x": 126.0625,
+      "y": 788
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(216, 232, 243)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.8)",
+      "height": 34,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 34,
+      "x": 336,
+      "y": 20
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "disabled": false,
+      "height": 20,
+      "href": null,
+      "label": "",
+      "role": "input",
+      "width": 20,
+      "x": 42,
+      "y": 324.203125
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "disabled": false,
+      "height": 20,
+      "href": null,
+      "label": "",
+      "role": "input",
+      "width": 20,
+      "x": 42,
+      "y": 433.578125
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "disabled": false,
+      "height": 44,
+      "href": null,
+      "label": "",
+      "role": "input",
+      "width": 256,
+      "x": 25,
+      "y": 541.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Mon",
+      "role": "button",
+      "width": 49.421875,
+      "x": 25,
+      "y": 634.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Tue",
+      "role": "button",
+      "width": 47.21875,
+      "x": 80.8125,
+      "y": 634.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Wed",
+      "role": "button",
+      "width": 49.90625,
+      "x": 134.421875,
+      "y": 634.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Thu",
+      "role": "button",
+      "width": 48.28125,
+      "x": 190.71875,
+      "y": 634.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Fri",
+      "role": "button",
+      "width": 40.53125,
+      "x": 245.390625,
+      "y": 634.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Sat",
+      "role": "button",
+      "width": 44.65625,
+      "x": 292.3125,
+      "y": 634.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Sun",
+      "role": "button",
+      "width": 48.203125,
+      "x": 25,
+      "y": 672.65625
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Back",
+      "role": "button",
+      "width": 89.0625,
+      "x": 25,
+      "y": 790
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Import into My Plan",
+      "role": "button",
+      "width": 239.9375,
+      "x": 126.0625,
+      "y": 788
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 34,
+      "href": null,
+      "label": "Close details",
+      "role": "button",
+      "width": 34,
+      "x": 336,
+      "y": 20
+    }
+  ],
+  "height": 844,
+  "icons": [
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 14,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-arrow-right\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"m12 5 7 7-7 7\"></path></svg>",
+      "width": 14,
+      "x": 141.203125,
+      "y": 146.1875
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "color": "rgb(47, 36, 48)",
+      "height": 20,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-clock3 lucide-clock-3\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 6v6h4\"></path></svg>",
+      "width": 15.28125,
+      "x": 74,
+      "y": 324.203125
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "color": "rgb(47, 36, 48)",
+      "height": 20,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-calendar-days\" aria-hidden=\"true\"><path d=\"M8 2v3\"></path><path d=\"M16 2v3\"></path><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M3 9h18\"></path><path d=\"M8 13h.01\"></path><path d=\"M12 13h.01\"></path><path d=\"M16 13h.01\"></path><path d=\"M8 17h.01\"></path><path d=\"M12 17h.01\"></path><path d=\"M16 17h.01\"></path></svg>",
+      "width": 18.890625,
+      "x": 74,
+      "y": 433.578125
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(47, 36, 48)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-arrow-left\" aria-hidden=\"true\"><path d=\"m12 19-7-7 7-7\"></path><path d=\"M19 12H5\"></path></svg>",
+      "width": 16,
+      "x": 41,
+      "y": 800
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-arrow-right\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"m12 5 7 7-7 7\"></path></svg>",
+      "width": 16,
+      "x": 306.9375,
+      "y": 800
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(127, 114, 128)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x size-4\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg>",
+      "width": 16,
+      "x": 345,
+      "y": 29
+    }
+  ],
+  "images": [],
+  "overlay": true,
+  "scrollY": 1635,
+  "texts": [
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "PLAN YOUR LEARNING",
+      "width": 148.671875,
+      "x": 25,
+      "y": 25
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 20,
+      "fontWeight": "600",
+      "height": 24,
+      "letterSpacing": "normal",
+      "lineHeight": "27.5px",
+      "text": "Pandas",
+      "width": 71.421875,
+      "x": 25,
+      "y": 49.5
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(156, 95, 120)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "500",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "15.4px",
+      "text": "In learning plan",
+      "width": 80.703125,
+      "x": 119.46875,
+      "y": 55.34375
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Kaggle Learn",
+      "width": 87.78125,
+      "x": 25,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "·",
+      "width": 4.046875,
+      "x": 116.71875,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "beginner",
+      "width": 58.6875,
+      "x": 124.703125,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "·",
+      "width": 4.046875,
+      "x": 187.328125,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "English",
+      "width": 47.734375,
+      "x": 195.3125,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "·",
+      "width": 7.984375,
+      "x": 246.984375,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "4h",
+      "width": 17.328125,
+      "x": 254.96875,
+      "y": 87
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "1 · Choose content",
+      "width": 105.015625,
+      "x": 25,
+      "y": 145.1875
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "2 · Arrange time",
+      "width": 92.75,
+      "x": 166.390625,
+      "y": 145.1875
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 19.2,
+      "fontWeight": "600",
+      "height": 24,
+      "letterSpacing": "normal",
+      "lineHeight": "28.8px",
+      "text": "When would you like to learn?",
+      "width": 277.046875,
+      "x": 25,
+      "y": 188.1875
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20.48px",
+      "text": "Choose a weekly preference here. Confirm exact",
+      "width": 296.265625,
+      "x": 25,
+      "y": 226.578125
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20.48px",
+      "text": "times and check conflicts in My Plan.",
+      "width": 224.40625,
+      "x": 25,
+      "y": 247.046875
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "700",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Schedule later",
+      "width": 98.421875,
+      "x": 101.28125,
+      "y": 304.515625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.2px",
+      "text": "Keep this course in My Plan, without",
+      "width": 205.90625,
+      "x": 101.28125,
+      "y": 329.515625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.2px",
+      "text": "choosing dates.",
+      "width": 90.09375,
+      "x": 101.28125,
+      "y": 348.703125
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "700",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Set a weekly routine",
+      "width": 138.234375,
+      "x": 104.890625,
+      "y": 413.890625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.2px",
+      "text": "A starting point you can adjust in My",
+      "width": 207,
+      "x": 104.890625,
+      "y": 438.890625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.2px",
+      "text": "Plan.",
+      "width": 27.859375,
+      "x": 104.890625,
+      "y": 458.078125
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Start date",
+      "width": 64.546875,
+      "x": 25,
+      "y": 514.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 16.8,
+      "lineHeight": "20px",
+      "multiline": false,
+      "synthetic": true,
+      "text": "2026-09-15",
+      "width": 230,
+      "x": 38,
+      "y": 554.865625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Preferred study days",
+      "width": 138.46875,
+      "x": 25,
+      "y": 603.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(255, 255, 255)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Mon",
+      "width": 25.421875,
+      "x": 37,
+      "y": 642.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Tue",
+      "width": 21.21875,
+      "x": 93.8125,
+      "y": 642.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(255, 255, 255)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Wed",
+      "width": 25.90625,
+      "x": 146.421875,
+      "y": 642.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Thu",
+      "width": 22.28125,
+      "x": 203.71875,
+      "y": 642.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Fri",
+      "width": 14.53125,
+      "x": 258.390625,
+      "y": 642.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Sat",
+      "width": 18.65625,
+      "x": 305.3125,
+      "y": 642.265625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Sun",
+      "width": 22.203125,
+      "x": 38,
+      "y": 680.65625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Study time",
+      "width": 70.6875,
+      "x": 25,
+      "y": 734.65625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "From",
+      "width": 38.34375,
+      "x": 25,
+      "y": 755.65625
+    },
+    {
+      "clip": {
+        "height": 592.8125,
+        "width": 341,
+        "x": 25,
+        "y": 178.1875
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "To",
+      "width": 18.671875,
+      "x": 193,
+      "y": 755.65625
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Back",
+      "width": 33.0625,
+      "x": 65,
+      "y": 799
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Import into My Plan",
+      "width": 129.8125,
+      "x": 169.125,
+      "y": 799
+    },
+    {
+      "clip": {
+        "height": 844,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Close",
+      "width": 47.4375,
+      "x": 352,
+      "y": 46
+    }
+  ],
+  "url": "http://127.0.0.1:4173/learning-centre",
+  "viewportHeight": 844,
+  "width": 390,
+  "name": "routine-mobile",
+  "screenshot": "routine-mobile.jpg"
+}

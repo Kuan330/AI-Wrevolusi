@@ -1,0 +1,1200 @@
+[
+  {
+    "source": "focus-desktop",
+    "control": "hit-focus-desktop-8-Save-and-update",
+    "nodeId": "9:1380",
+    "action": "Close overlay",
+    "verified": "Figma interaction panel shows Click Close overlay"
+  },
+  {
+    "source": "resources-desktop",
+    "control": "hit-resources-desktop-14-Adjust",
+    "nodeId": "11:363",
+    "action": "Open overlay",
+    "destination": "focus-desktop",
+    "position": "Centered",
+    "backgroundOpacity": 80,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "home-desktop",
+    "control": "hit-home-desktop-6-Start-free-analysis",
+    "nodeId": "11:1330",
+    "action": "Navigate to",
+    "destination": "occupation-desktop",
+    "destinationId": "11:1728",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "focus-desktop",
+    "control": "hit-focus-desktop-7-Cancel",
+    "nodeId": "9:1375",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "focus-desktop",
+    "control": "hit-focus-desktop-9-Close",
+    "nodeId": "9:1385",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "home-mobile",
+    "control": "hit-home-mobile-3-Start-free-analysis",
+    "nodeId": "11:10234",
+    "action": "Navigate to",
+    "destination": "occupation-mobile",
+    "destinationId": "11:10856",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "tasks-desktop",
+    "control": "hit-tasks-desktop-24-Explore-AI-impact",
+    "nodeId": "11:2664",
+    "action": "Navigate to",
+    "destination": "exposure-desktop",
+    "destinationId": "11:3631",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "tasks-mobile",
+    "control": "hit-tasks-mobile-15-Explore-AI-impact",
+    "nodeId": "11:11377",
+    "action": "Navigate to",
+    "destination": "exposure-mobile",
+    "destinationId": "11:12409",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "exposure-desktop",
+    "control": "hit-exposure-desktop-12-View-skills",
+    "nodeId": "11:3114",
+    "action": "Navigate to",
+    "destination": "skills-desktop",
+    "destinationId": "11:5791",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "exposure-mobile",
+    "control": "hit-exposure-mobile-6-View-skills",
+    "nodeId": "11:11802",
+    "action": "Navigate to",
+    "destination": "skills-mobile",
+    "destinationId": "11:14640",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "occupation-desktop",
+    "control": "hit-occupation-desktop-4-Search-by-job-title-instead",
+    "nodeId": "11:1866",
+    "action": "Navigate to",
+    "destination": "search-mode-desktop",
+    "destinationId": "12:33801",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "search-mode-desktop",
+    "control": "hit-search-mode-desktop-5-Search-occupations-by-job-title",
+    "nodeId": "12:33909",
+    "action": "Navigate to",
+    "destination": "search-results-desktop",
+    "destinationId": "12:33976",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "search-results-desktop",
+    "control": "hit-search-results-desktop-6-SHOP-SUPERVISORS-SHOP-SUPERVISORS---SERVICE-AND-SALES-WORKERS-SALES-WOR",
+    "nodeId": "12:34095",
+    "action": "Navigate to",
+    "destination": "occupation-selected-desktop",
+    "destinationId": "11:1998",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "occupation-selected-desktop",
+    "control": "hit-occupation-selected-desktop-6-Confirm-and-continue",
+    "nodeId": "11:2111",
+    "action": "Navigate to",
+    "destination": "tasks-desktop",
+    "destinationId": "11:2188",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "skills-desktop",
+    "control": "hit-skills-desktop-71-Confirm-and-find-courses",
+    "nodeId": "11:4759",
+    "action": "Navigate to",
+    "destination": "account-gate-desktop",
+    "destinationId": "11:5792",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "account-gate-desktop",
+    "control": "hit-account-gate-desktop-10-Log-in-Create-account",
+    "nodeId": "11:5948",
+    "action": "Open overlay",
+    "destination": "sign-in-desktop",
+    "destinationId": "11:6100",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "sign-in-desktop",
+    "control": "hit-sign-in-desktop-4-Log-in",
+    "nodeId": "11:6156",
+    "action": "Navigate to",
+    "destination": "skills-signed-desktop",
+    "destinationId": "12:36090",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "skills-signed-desktop",
+    "control": "hit-skills-signed-desktop-61-Confirm-and-find-courses",
+    "nodeId": "12:35153",
+    "action": "Navigate to",
+    "destination": "resources-start-desktop",
+    "destinationId": "12:33358",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "resources-start-desktop",
+    "control": "hit-resources-start-desktop-20-View-details",
+    "nodeId": "12:33001",
+    "action": "Open overlay",
+    "destination": "course-start-desktop",
+    "destinationId": "12:20956",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "course-start-desktop",
+    "control": "hit-course-start-desktop-3-Chapters",
+    "nodeId": "12:21042",
+    "action": "Swap overlay",
+    "destination": "chapters-start-desktop",
+    "destinationId": "12:20110",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "chapters-start-desktop",
+    "control": "hit-chapters-start-desktop-2-Overview",
+    "nodeId": "12:20246",
+    "action": "Swap overlay",
+    "destination": "course-start-desktop",
+    "destinationId": "12:20956",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "course-start-desktop",
+    "control": "hit-course-start-desktop-5-Plan-learning",
+    "nodeId": "12:21052",
+    "action": "Swap overlay",
+    "destination": "content-start-desktop",
+    "destinationId": "12:20733",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "chapters-start-desktop",
+    "control": "hit-chapters-start-desktop-5-Plan-learning",
+    "nodeId": "12:20261",
+    "action": "Swap overlay",
+    "destination": "content-start-desktop",
+    "destinationId": "12:20733",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "content-start-desktop",
+    "control": "hit-content-start-desktop-4-Continue",
+    "nodeId": "12:20829",
+    "action": "Swap overlay",
+    "destination": "arrange-start-desktop",
+    "destinationId": "12:19890",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "arrange-start-desktop",
+    "control": "hit-arrange-start-desktop-2-input",
+    "nodeId": "12:19993",
+    "action": "Swap overlay",
+    "destination": "routine-start-desktop",
+    "destinationId": "12:33359",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "routine-start-desktop",
+    "control": "hit-routine-start-desktop-14-Import-into-My-Plan",
+    "nodeId": "12:33599",
+    "action": "Navigate to",
+    "destination": "plan-desktop",
+    "destinationId": "11:9269",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "plan-desktop",
+    "control": "hit-plan-desktop-67-Pandas-18-3019-00",
+    "nodeId": "11:8472",
+    "action": "Open overlay",
+    "destination": "session-desktop",
+    "destinationId": "11:9270",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "session-desktop",
+    "control": "hit-session-desktop-5-Mark-complete",
+    "nodeId": "11:9367",
+    "action": "Swap overlay",
+    "destination": "complete-desktop",
+    "destinationId": "11:9549",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "complete-desktop",
+    "control": "hit-complete-desktop-7-Close-details",
+    "nodeId": "11:9657",
+    "action": "Navigate to",
+    "destination": "plan-completed-desktop",
+    "destinationId": "12:26690",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "plan-completed-desktop",
+    "control": "hit-plan-completed-desktop-64-Pandas-18-3019-00",
+    "nodeId": "12:25918",
+    "action": "Open overlay",
+    "destination": "complete-desktop",
+    "destinationId": "11:9549",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "complete-desktop",
+    "control": "hit-complete-desktop-5-Undo-completion",
+    "nodeId": "11:9647",
+    "action": "Swap overlay",
+    "destination": "session-desktop",
+    "destinationId": "11:9270",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "session-desktop",
+    "control": "hit-session-desktop-7-Close-details",
+    "nodeId": "11:9377",
+    "action": "Navigate to",
+    "destination": "plan-desktop",
+    "destinationId": "11:9269",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "search-mode-desktop",
+    "control": "hit-search-mode-desktop-4-Back-to-category-filters",
+    "nodeId": "12:33904",
+    "action": "Navigate to",
+    "destination": "occupation-desktop",
+    "destinationId": "11:1728",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "search-results-desktop",
+    "control": "hit-search-results-desktop-4-Back-to-category-filters",
+    "nodeId": "12:34085",
+    "action": "Navigate to",
+    "destination": "occupation-desktop",
+    "destinationId": "11:1728",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "occupation-selected-desktop",
+    "control": "hit-occupation-selected-desktop-4-Back-to-category-filters",
+    "nodeId": "11:2101",
+    "action": "Navigate to",
+    "destination": "occupation-desktop",
+    "destinationId": "11:1728",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "tasks-desktop",
+    "control": "hit-tasks-desktop-5-Change-occupation",
+    "nodeId": "11:2569",
+    "action": "Navigate to",
+    "destination": "occupation-desktop",
+    "destinationId": "11:1728",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "exposure-desktop",
+    "control": "hit-exposure-desktop-11-Edit-tasks",
+    "nodeId": "11:3109",
+    "action": "Navigate to",
+    "destination": "tasks-desktop",
+    "destinationId": "11:2188",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "skills-desktop",
+    "control": "hit-skills-desktop-11-AI-exposure",
+    "nodeId": "11:4459",
+    "action": "Navigate to",
+    "destination": "exposure-desktop",
+    "destinationId": "11:3631",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "sign-in-desktop",
+    "control": "hit-sign-in-desktop-6-Close",
+    "nodeId": "11:6166",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "resources-start-desktop",
+    "control": "hit-resources-start-desktop-14-Adjust",
+    "nodeId": "12:32971",
+    "action": "Open overlay",
+    "destination": "focus-desktop",
+    "destinationId": "9:1273",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "content-start-desktop",
+    "control": "hit-content-start-desktop-3-Back",
+    "nodeId": "12:20824",
+    "action": "Swap overlay",
+    "destination": "course-start-desktop",
+    "destinationId": "12:20956",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "arrange-start-desktop",
+    "control": "hit-arrange-start-desktop-3-Back",
+    "nodeId": "12:19998",
+    "action": "Swap overlay",
+    "destination": "content-start-desktop",
+    "destinationId": "12:20733",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "routine-start-desktop",
+    "control": "hit-routine-start-desktop-13-Back",
+    "nodeId": "12:33594",
+    "action": "Swap overlay",
+    "destination": "content-start-desktop",
+    "destinationId": "12:20733",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "routine-start-desktop",
+    "control": "hit-routine-start-desktop-1-input",
+    "nodeId": "12:33531",
+    "action": "Swap overlay",
+    "destination": "arrange-start-desktop",
+    "destinationId": "12:19890",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "course-start-desktop",
+    "control": "hit-course-start-desktop-6-Close-details",
+    "nodeId": "12:21057",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "chapters-start-desktop",
+    "control": "hit-chapters-start-desktop-6-Close-details",
+    "nodeId": "12:20266",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "content-start-desktop",
+    "control": "hit-content-start-desktop-5-Close-details",
+    "nodeId": "12:20834",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "arrange-start-desktop",
+    "control": "hit-arrange-start-desktop-5-Close-details",
+    "nodeId": "12:20008",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "routine-start-desktop",
+    "control": "hit-routine-start-desktop-15-Close-details",
+    "nodeId": "12:33604",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "resources-start-desktop",
+    "control": "hit-resources-start-desktop-9-Open-My-Plan",
+    "nodeId": "12:32946",
+    "action": "Navigate to",
+    "destination": "plan-empty-desktop",
+    "destinationId": "12:30718",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "plan-empty-desktop",
+    "control": "hit-plan-empty-desktop-8-Choose-courses",
+    "nodeId": "12:29546",
+    "action": "Navigate to",
+    "destination": "resources-start-desktop",
+    "destinationId": "12:33358",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "resources-start-desktop",
+    "control": "hit-resources-start-desktop-8-Edit-skills",
+    "nodeId": "12:32941",
+    "action": "Navigate to",
+    "destination": "skills-signed-desktop",
+    "destinationId": "12:36090",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "resources-start-desktop",
+    "control": "hit-resources-start-desktop-10-Review-your-skills",
+    "nodeId": "12:32951",
+    "action": "Navigate to",
+    "destination": "skills-signed-desktop",
+    "destinationId": "12:36090",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "plan-conflict-desktop",
+    "control": "hit-plan-conflict-desktop-66-Prototype-example-school-pickup-18-1519-00",
+    "nodeId": "12:27804",
+    "action": "Open overlay",
+    "destination": "conflict-review-desktop",
+    "destinationId": "12:20438",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "conflict-review-desktop",
+    "control": "hit-conflict-review-desktop-6-Prepare-a-request",
+    "nodeId": "12:20563",
+    "action": "Open overlay",
+    "destination": "help-request-desktop",
+    "destinationId": "12:23893",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-request-desktop",
+    "control": "hit-help-request-desktop-3-Save-request-draft",
+    "nodeId": "12:23942",
+    "action": "Navigate to",
+    "destination": "help-draft-desktop",
+    "destinationId": "12:23892",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-draft-desktop",
+    "control": "hit-help-draft-desktop-66-Prototype-example-school-pickup-18-1519-00",
+    "nodeId": "12:23035",
+    "action": "Open overlay",
+    "destination": "help-status-desktop",
+    "destinationId": "12:24430",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-status-desktop",
+    "control": "hit-help-status-desktop-7-I-sent-the-request",
+    "nodeId": "12:24180",
+    "action": "Swap overlay",
+    "destination": "help-waiting-desktop",
+    "destinationId": "12:24844",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-waiting-desktop",
+    "control": "hit-help-waiting-desktop-6-They-accepted",
+    "nodeId": "12:24599",
+    "action": "Swap overlay",
+    "destination": "help-accepted-desktop",
+    "destinationId": "12:21269",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-waiting-desktop",
+    "control": "hit-help-waiting-desktop-7-They-cannot-help",
+    "nodeId": "12:24604",
+    "action": "Swap overlay",
+    "destination": "help-declined-desktop",
+    "destinationId": "12:21921",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-accepted-desktop",
+    "control": "hit-help-accepted-desktop-6-Close-details",
+    "nodeId": "12:21391",
+    "action": "Navigate to",
+    "destination": "plan-resolved-desktop",
+    "destinationId": "12:32642",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "plan-resolved-desktop",
+    "control": "hit-plan-resolved-desktop-65-Prototype-example-school-pickup-18-1519-00",
+    "nodeId": "12:31815",
+    "action": "Open overlay",
+    "destination": "help-accepted-desktop",
+    "destinationId": "12:21269",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-accepted-desktop",
+    "control": "hit-help-accepted-desktop-4-Clear-request-take-responsibility-back",
+    "nodeId": "12:21381",
+    "action": "Navigate to",
+    "destination": "plan-conflict-desktop",
+    "destinationId": "12:28656",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-declined-desktop",
+    "control": "hit-help-declined-desktop-6-Prepare-another-request",
+    "nodeId": "12:21696",
+    "action": "Open overlay",
+    "destination": "help-request-desktop",
+    "destinationId": "12:23893",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-status-desktop",
+    "control": "hit-help-status-desktop-8-Edit-draft",
+    "nodeId": "12:24185",
+    "action": "Open overlay",
+    "destination": "help-request-desktop",
+    "destinationId": "12:23893",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-request-desktop",
+    "control": "hit-help-request-desktop-4-Close",
+    "nodeId": "12:23947",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "conflict-review-desktop",
+    "control": "hit-conflict-review-desktop-7-Close-details",
+    "nodeId": "12:20568",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-status-desktop",
+    "control": "hit-help-status-desktop-12-Close-details",
+    "nodeId": "12:24205",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-status-desktop",
+    "control": "hit-help-status-desktop-10-Clear-request-take-responsibility-back",
+    "nodeId": "12:24195",
+    "action": "Navigate to",
+    "destination": "plan-conflict-desktop",
+    "destinationId": "12:28656",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-waiting-desktop",
+    "control": "hit-help-waiting-desktop-9-Clear-request-take-responsibility-back",
+    "nodeId": "12:24614",
+    "action": "Navigate to",
+    "destination": "plan-conflict-desktop",
+    "destinationId": "12:28656",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-declined-desktop",
+    "control": "hit-help-declined-desktop-8-Clear-request-take-responsibility-back",
+    "nodeId": "12:21706",
+    "action": "Navigate to",
+    "destination": "plan-conflict-desktop",
+    "destinationId": "12:28656",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "occupation-mobile",
+    "control": "hit-occupation-mobile-4-Search-by-job-title-instead",
+    "nodeId": "11:10704",
+    "action": "Navigate to",
+    "destination": "search-mode-mobile",
+    "destinationId": "12:47218",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "search-mode-mobile",
+    "control": "hit-search-mode-mobile-5-Search-occupations-by-job-title",
+    "nodeId": "12:47335",
+    "action": "Navigate to",
+    "destination": "search-results-mobile",
+    "destinationId": "12:47407",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "search-results-mobile",
+    "control": "hit-search-results-mobile-6-SHOP-SUPERVISORS-SHOP-SUPERVISORS---SERVICE-AND-SALES-WORKERS-SALES-WORK",
+    "nodeId": "12:47535",
+    "action": "Navigate to",
+    "destination": "occupation-selected-mobile",
+    "destinationId": "11:10857",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "occupation-selected-mobile",
+    "control": "hit-occupation-selected-mobile-6-Confirm-and-continue",
+    "nodeId": "11:10979",
+    "action": "Navigate to",
+    "destination": "tasks-mobile",
+    "destinationId": "11:11071",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "skills-mobile",
+    "control": "hit-skills-mobile-58-Confirm-and-find-courses",
+    "nodeId": "11:13433",
+    "action": "Navigate to",
+    "destination": "account-gate-mobile",
+    "destinationId": "11:14928",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "account-gate-mobile",
+    "control": "hit-account-gate-mobile-4-Log-in-Create-account",
+    "nodeId": "11:14776",
+    "action": "Open overlay",
+    "destination": "sign-in-mobile",
+    "destinationId": "11:14929",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "sign-in-mobile",
+    "control": "hit-sign-in-mobile-4-Log-in",
+    "nodeId": "11:14985",
+    "action": "Navigate to",
+    "destination": "skills-signed-mobile",
+    "destinationId": "12:49606",
+    "verified": "Native Figma interaction panel corrected and read back"
+  },
+  {
+    "source": "skills-signed-mobile",
+    "control": "hit-skills-signed-mobile-50-Confirm-and-find-courses",
+    "nodeId": "12:48509",
+    "action": "Navigate to",
+    "destination": "resources-start-mobile",
+    "destinationId": "12:46444",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "resources-start-mobile",
+    "control": "hit-resources-start-mobile-16-View-details",
+    "nodeId": "12:45557",
+    "action": "Open overlay",
+    "destination": "course-start-mobile",
+    "destinationId": "12:37346",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "course-start-mobile",
+    "control": "hit-course-start-mobile-3-Chapters",
+    "nodeId": "12:37432",
+    "action": "Swap overlay",
+    "destination": "chapters-start-mobile",
+    "destinationId": "12:36508",
+    "verified": "Native Figma interaction panel corrected and read back"
+  },
+  {
+    "source": "chapters-start-mobile",
+    "control": "hit-chapters-start-mobile-2-Overview",
+    "nodeId": "12:36644",
+    "action": "Swap overlay",
+    "destination": "course-start-mobile",
+    "destinationId": "12:37346",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "course-start-mobile",
+    "control": "hit-course-start-mobile-5-Plan-learning",
+    "nodeId": "12:37442",
+    "action": "Swap overlay",
+    "destination": "content-start-mobile",
+    "destinationId": "12:37118",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "chapters-start-mobile",
+    "control": "hit-chapters-start-mobile-5-Plan-learning",
+    "nodeId": "12:36659",
+    "action": "Swap overlay",
+    "destination": "content-start-mobile",
+    "destinationId": "12:37118",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "content-start-mobile",
+    "control": "hit-content-start-mobile-4-Continue",
+    "nodeId": "12:37214",
+    "action": "Swap overlay",
+    "destination": "arrange-start-mobile",
+    "destinationId": "12:36278",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "arrange-start-mobile",
+    "control": "hit-arrange-start-mobile-2-input",
+    "nodeId": "12:36381",
+    "action": "Swap overlay",
+    "destination": "routine-start-mobile",
+    "destinationId": "12:46832",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "routine-start-mobile",
+    "control": "hit-routine-start-mobile-12-Import-into-My-Plan",
+    "nodeId": "12:47031",
+    "action": "Navigate to",
+    "destination": "plan-mobile",
+    "destinationId": "11:19113",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "plan-mobile",
+    "control": "hit-plan-mobile-54-Pandas-18-3019-00",
+    "nodeId": "11:18731",
+    "action": "Open overlay",
+    "destination": "session-mobile",
+    "destinationId": "11:19114",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "session-mobile",
+    "control": "hit-session-mobile-5-Mark-complete",
+    "nodeId": "11:19211",
+    "action": "Swap overlay",
+    "destination": "complete-mobile",
+    "verified": "Native Figma interaction readback"
+  },
+  {
+    "source": "complete-mobile",
+    "control": "hit-complete-mobile-7-Close-details",
+    "nodeId": "11:19511",
+    "action": "Navigate to",
+    "destination": "plan-completed-mobile",
+    "destinationId": "12:41603",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "plan-completed-mobile",
+    "control": "hit-plan-completed-mobile-54-Pandas-18-3019-00",
+    "nodeId": "12:41221",
+    "action": "Open overlay",
+    "destination": "complete-mobile",
+    "destinationId": "11:19403",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "complete-mobile",
+    "control": "hit-complete-mobile-5-Undo-completion",
+    "nodeId": "11:19501",
+    "action": "Swap overlay",
+    "destination": "session-mobile",
+    "destinationId": "11:19114",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "session-mobile",
+    "control": "hit-session-mobile-7-Close-details",
+    "nodeId": "11:19221",
+    "action": "Navigate to",
+    "destination": "plan-mobile",
+    "destinationId": "11:19113",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "search-mode-mobile",
+    "control": "hit-search-mode-mobile-4-Back-to-category-filters",
+    "nodeId": "12:47330",
+    "action": "Navigate to",
+    "destination": "occupation-mobile",
+    "destinationId": "11:10856",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "search-results-mobile",
+    "control": "hit-search-results-mobile-4-Back-to-category-filters",
+    "nodeId": "12:47525",
+    "action": "Navigate to",
+    "destination": "occupation-mobile",
+    "destinationId": "11:10856",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "occupation-selected-mobile",
+    "control": "hit-occupation-selected-mobile-4-Back-to-category-filters",
+    "nodeId": "11:10969",
+    "action": "Navigate to",
+    "destination": "occupation-mobile",
+    "destinationId": "11:10856",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "tasks-mobile",
+    "control": "hit-tasks-mobile-4-Change-occupation",
+    "nodeId": "11:11322",
+    "action": "Navigate to",
+    "destination": "occupation-mobile",
+    "destinationId": "11:10856",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "exposure-mobile",
+    "control": "hit-exposure-mobile-5-Edit-tasks",
+    "nodeId": "11:11797",
+    "action": "Navigate to",
+    "destination": "tasks-mobile",
+    "destinationId": "11:11071",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "skills-mobile",
+    "control": "hit-skills-mobile-5-AI-exposure",
+    "nodeId": "11:13168",
+    "action": "Navigate to",
+    "destination": "exposure-mobile",
+    "destinationId": "11:12409",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "sign-in-mobile",
+    "control": "hit-sign-in-mobile-6-Close",
+    "nodeId": "11:14995",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "resources-start-mobile",
+    "control": "hit-resources-start-mobile-10-Adjust",
+    "nodeId": "12:45527",
+    "action": "Open overlay",
+    "destination": "focus-mobile",
+    "destinationId": "11:16496",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "focus-mobile",
+    "control": "hit-focus-mobile-8-Save-and-update",
+    "nodeId": "11:16603",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "focus-mobile",
+    "control": "hit-focus-mobile-7-Cancel",
+    "nodeId": "11:16598",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "focus-mobile",
+    "control": "hit-focus-mobile-9-Close",
+    "nodeId": "11:16608",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "content-start-mobile",
+    "control": "hit-content-start-mobile-3-Back",
+    "nodeId": "12:37209",
+    "action": "Swap overlay",
+    "destination": "course-start-mobile",
+    "destinationId": "12:37346",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "arrange-start-mobile",
+    "control": "hit-arrange-start-mobile-3-Back",
+    "nodeId": "12:36386",
+    "action": "Swap overlay",
+    "destination": "content-start-mobile",
+    "destinationId": "12:37118",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "routine-start-mobile",
+    "control": "hit-routine-start-mobile-11-Back",
+    "nodeId": "12:47026",
+    "action": "Swap overlay",
+    "destination": "content-start-mobile",
+    "destinationId": "12:37118",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "routine-start-mobile",
+    "control": "hit-routine-start-mobile-1-input",
+    "nodeId": "12:46973",
+    "action": "Swap overlay",
+    "destination": "arrange-start-mobile",
+    "destinationId": "12:36278",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "course-start-mobile",
+    "control": "hit-course-start-mobile-6-Close-details",
+    "nodeId": "12:37447",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "chapters-start-mobile",
+    "control": "hit-chapters-start-mobile-6-Close-details",
+    "nodeId": "12:36664",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "content-start-mobile",
+    "control": "hit-content-start-mobile-5-Close-details",
+    "nodeId": "12:37219",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "arrange-start-mobile",
+    "control": "hit-arrange-start-mobile-5-Close-details",
+    "nodeId": "12:36396",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "routine-start-mobile",
+    "control": "hit-routine-start-mobile-13-Close-details",
+    "nodeId": "12:47036",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "resources-start-mobile",
+    "control": "hit-resources-start-mobile-5-Open-My-Plan",
+    "nodeId": "12:45502",
+    "action": "Navigate to",
+    "destination": "plan-empty-mobile",
+    "destinationId": "12:43938",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "plan-empty-mobile",
+    "control": "hit-plan-empty-mobile-4-Choose-courses",
+    "nodeId": "12:43226",
+    "action": "Navigate to",
+    "destination": "resources-start-mobile",
+    "destinationId": "12:46444",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "resources-start-mobile",
+    "control": "hit-resources-start-mobile-4-Edit-skills",
+    "nodeId": "12:45497",
+    "action": "Navigate to",
+    "destination": "skills-signed-mobile",
+    "destinationId": "12:49606",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "resources-start-mobile",
+    "control": "hit-resources-start-mobile-6-Review-your-skills",
+    "nodeId": "12:45507",
+    "action": "Navigate to",
+    "destination": "skills-signed-mobile",
+    "destinationId": "12:49606",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "plan-conflict-mobile",
+    "control": "hit-plan-conflict-mobile-53-Prototype-example-school-pickup-18-1519-00",
+    "nodeId": "12:42290",
+    "action": "Open overlay",
+    "destination": "conflict-review-mobile",
+    "destinationId": "23:4435",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-request-mobile",
+    "control": "hit-help-request-mobile-3-Save-request-draft",
+    "nodeId": "12:39559",
+    "action": "Navigate to",
+    "destination": "help-draft-mobile",
+    "destinationId": "12:39509",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-draft-mobile",
+    "control": "hit-help-draft-mobile-56-Prototype-example-school-pickup-18-1519-00",
+    "nodeId": "12:39052",
+    "action": "Open overlay",
+    "destination": "help-status-mobile",
+    "destinationId": "12:40091",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-status-mobile",
+    "control": "hit-help-status-mobile-7-I-sent-the-request",
+    "nodeId": "12:39808",
+    "action": "Swap overlay",
+    "destination": "help-waiting-mobile",
+    "destinationId": "12:40538",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-waiting-mobile",
+    "control": "hit-help-waiting-mobile-6-They-accepted",
+    "nodeId": "12:40260",
+    "action": "Swap overlay",
+    "destination": "help-accepted-mobile",
+    "destinationId": "12:37913",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-waiting-mobile",
+    "control": "hit-help-waiting-mobile-7-They-cannot-help",
+    "nodeId": "12:40265",
+    "action": "Swap overlay",
+    "destination": "help-declined-mobile",
+    "destinationId": "12:38335",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-accepted-mobile",
+    "control": "hit-help-accepted-mobile-6-Close-details",
+    "nodeId": "12:37751",
+    "action": "Navigate to",
+    "destination": "plan-resolved-mobile",
+    "destinationId": "12:45025",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "plan-resolved-mobile",
+    "control": "hit-plan-resolved-mobile-52-Prototype-example-school-pickup-18-1519-00",
+    "nodeId": "12:44608",
+    "action": "Open overlay",
+    "destination": "help-accepted-mobile",
+    "destinationId": "12:37913",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-accepted-mobile",
+    "control": "hit-help-accepted-mobile-4-Clear-request-take-responsibility-back",
+    "nodeId": "12:37741",
+    "action": "Navigate to",
+    "destination": "plan-conflict-mobile",
+    "destinationId": "12:42732",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-declined-mobile",
+    "control": "hit-help-declined-mobile-6-Prepare-another-request",
+    "nodeId": "12:38077",
+    "action": "Open overlay",
+    "destination": "help-request-mobile",
+    "destinationId": "12:39510",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-status-mobile",
+    "control": "hit-help-status-mobile-8-Edit-draft",
+    "nodeId": "12:39813",
+    "action": "Open overlay",
+    "destination": "help-request-mobile",
+    "destinationId": "12:39510",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-request-mobile",
+    "control": "hit-help-request-mobile-4-Close",
+    "nodeId": "12:39564",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "archive-conflict-review-mobile",
+    "control": "hit-conflict-review-mobile-6-Close-details",
+    "nodeId": "12:36950",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-status-mobile",
+    "control": "hit-help-status-mobile-12-Close-details",
+    "nodeId": "12:39833",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-status-mobile",
+    "control": "hit-help-status-mobile-10-Clear-request-take-responsibility-back",
+    "nodeId": "12:39823",
+    "action": "Navigate to",
+    "destination": "plan-conflict-mobile",
+    "destinationId": "12:42732",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-waiting-mobile",
+    "control": "hit-help-waiting-mobile-9-Clear-request-take-responsibility-back",
+    "nodeId": "12:40275",
+    "action": "Navigate to",
+    "destination": "plan-conflict-mobile",
+    "destinationId": "12:42732",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "help-declined-mobile",
+    "control": "hit-help-declined-mobile-8-Clear-request-take-responsibility-back",
+    "nodeId": "12:38087",
+    "action": "Navigate to",
+    "destination": "plan-conflict-mobile",
+    "destinationId": "12:42732",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "conflict-review-mobile",
+    "control": "hit-conflict-review-mobile-6-Prepare-a-request",
+    "nodeId": "23:4232",
+    "action": "Open overlay",
+    "destination": "help-request-mobile",
+    "destinationId": "12:39510",
+    "verified": "Native Figma interaction panel"
+  },
+  {
+    "source": "conflict-review-mobile",
+    "control": "hit-conflict-review-mobile-8-Close-details",
+    "nodeId": "23:4242",
+    "action": "Close overlay",
+    "destination": null,
+    "verified": "Native Figma interaction panel"
+  }
+]

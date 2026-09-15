@@ -1,0 +1,992 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 1057,
+      "kind": "body",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 1057,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.45)",
+      "height": 65,
+      "kind": "header",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 36,
+      "x": 16,
+      "y": 14
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 74.734375,
+      "x": 284.265625,
+      "y": 14
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.8)",
+      "height": 839,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 24,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.1) 0px 8px 10px -6px",
+      "width": 343,
+      "x": 16,
+      "y": 162
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 837,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 341,
+      "x": 17,
+      "y": 163
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.28)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 221.84375,
+      "x": 41,
+      "y": 422
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 146,
+      "kind": "li",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "none",
+      "width": 293,
+      "x": 41,
+      "y": 538
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(234, 243, 251)",
+      "height": 36,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 36,
+      "x": 62,
+      "y": 559
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 146,
+      "kind": "li",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "none",
+      "width": 293,
+      "x": 41,
+      "y": 696
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(234, 243, 251)",
+      "height": 36,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 36,
+      "x": 62,
+      "y": 717
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgba(255, 255, 255, 0.7)",
+      "height": 122,
+      "kind": "li",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "none",
+      "width": 293,
+      "x": 41,
+      "y": 854
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(234, 243, 251)",
+      "height": 36,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 36,
+      "x": 62,
+      "y": 875
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Open menu",
+      "role": "button",
+      "width": 36,
+      "x": 16,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/",
+      "label": "AI-Wrevolusi home",
+      "role": "a",
+      "width": 158.078125,
+      "x": 64,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Log in or create an account",
+      "role": "button",
+      "width": 74.734375,
+      "x": 284.265625,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Log in / Create account",
+      "role": "button",
+      "width": 221.84375,
+      "x": 41,
+      "y": 422
+    }
+  ],
+  "height": 1057,
+  "icons": [
+    {
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(60, 42, 53)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-menu size-4\" aria-hidden=\"true\"><path d=\"M4 5h16\"></path><path d=\"M4 12h16\"></path><path d=\"M4 19h16\"></path></svg>",
+      "width": 16,
+      "x": 26,
+      "y": 24
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-arrow-right size-4\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"m12 5 7 7-7 7\"></path></svg>",
+      "width": 16,
+      "x": 225.84375,
+      "y": 434
+    }
+  ],
+  "images": [
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "height": 36,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/logo-mark.svg",
+      "width": 41.265625,
+      "x": 64,
+      "y": 14
+    }
+  ],
+  "overlay": false,
+  "scrollY": 0,
+  "texts": [
+    {
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 43, 54)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "-0.45px",
+      "lineHeight": "27px",
+      "text": "AI-Wrevolusi",
+      "width": 106.8125,
+      "x": 115.265625,
+      "y": 21.5
+    },
+    {
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Log in",
+      "width": 40.734375,
+      "x": 301.265625,
+      "y": 23
+    },
+    {
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "28.8px",
+      "text": "Learning Resources",
+      "width": 230.65625,
+      "x": 16,
+      "y": 85.59375
+    },
+    {
+      "clip": {
+        "height": 1057,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Your next step, at your own pace.",
+      "width": 221.828125,
+      "x": 16,
+      "y": 126
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "1.2px",
+      "lineHeight": "16px",
+      "text": "YOUR PERSONAL LEARNING SPACE",
+      "width": 241.21875,
+      "x": 41,
+      "y": 187
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 30,
+      "fontWeight": "600",
+      "height": 36,
+      "letterSpacing": "normal",
+      "lineHeight": "37.5px",
+      "text": "Turn a skill into your",
+      "width": 291.484375,
+      "x": 41,
+      "y": 219
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 30,
+      "fontWeight": "600",
+      "height": 36,
+      "letterSpacing": "normal",
+      "lineHeight": "37.5px",
+      "text": "next learning step",
+      "width": 260.625,
+      "x": 41,
+      "y": 256.5
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "28px",
+      "text": "Choose a learning theme on the Skills page",
+      "width": 286.515625,
+      "x": 41,
+      "y": 319
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "28px",
+      "text": "to explore relevant resources and build your",
+      "width": 290.8125,
+      "x": 41,
+      "y": 347
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "28px",
+      "text": "own plan.",
+      "width": 63.9375,
+      "x": 41,
+      "y": 375
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Log in / Create account",
+      "width": 155.84375,
+      "x": 62,
+      "y": 433
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Save your choices and return to them later. No",
+      "width": 263.078125,
+      "x": 41,
+      "y": 474
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "email required.",
+      "width": 84.21875,
+      "x": 41,
+      "y": 490
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "0",
+      "width": 9.25,
+      "x": 72.40625,
+      "y": 568
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "1",
+      "width": 5.9375,
+      "x": 81.65625,
+      "y": 568
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Choose a skill",
+      "width": 107.015625,
+      "x": 114,
+      "y": 561
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Find a skill you want to",
+      "width": 150.578125,
+      "x": 114,
+      "y": 594
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "develop and save a learning",
+      "width": 185.265625,
+      "x": 114,
+      "y": 618
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "theme.",
+      "width": 45.484375,
+      "x": 114,
+      "y": 642
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "0",
+      "width": 9.25,
+      "x": 71,
+      "y": 726
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "2",
+      "width": 8.734375,
+      "x": 80.25,
+      "y": 726
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Explore resources",
+      "width": 139.578125,
+      "x": 114,
+      "y": 719
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Compare relevant content",
+      "width": 171.65625,
+      "x": 114,
+      "y": 752
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "and choose what fits your",
+      "width": 171.203125,
+      "x": 114,
+      "y": 776
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "goal.",
+      "width": 32.40625,
+      "x": 114,
+      "y": 800
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "0",
+      "width": 9.25,
+      "x": 70.921875,
+      "y": 884
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "600",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "3",
+      "width": 8.90625,
+      "x": 80.171875,
+      "y": 884
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Save your next step",
+      "width": 152.65625,
+      "x": 114,
+      "y": 877
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Keep a shortlist and bring it",
+      "width": 181.09375,
+      "x": 114,
+      "y": 910
+    },
+    {
+      "clip": {
+        "height": 839,
+        "width": 343,
+        "x": 16,
+        "y": 162
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "into My Plan.",
+      "width": 85.46875,
+      "x": 114,
+      "y": 934
+    }
+  ],
+  "url": "http://127.0.0.1:4173/learning-centre",
+  "viewportHeight": 844,
+  "width": 390,
+  "name": "account-gate-mobile",
+  "screenshot": "account-gate-mobile.jpg"
+}

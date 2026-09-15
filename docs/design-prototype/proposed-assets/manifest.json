@@ -1,0 +1,52 @@
+{
+  "status": "proposed design assets only",
+  "source_documents": [
+    "../requirements-and-review.md",
+    "../current-frontend-map.md"
+  ],
+  "application_integration": "pending visual approval",
+  "assets": [
+    {
+      "file": "proposed-basis-review-desktop.svg",
+      "title": "Review a recommendation draft \u2014 proposed Iteration 2",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "proposed-basis-review-mobile.svg",
+      "title": "Review a recommendation draft \u2014 proposed Iteration 2",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "proposed-advice-retry-desktop.svg",
+      "title": "Outdated course advice and retry \u2014 proposed Iteration 2",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "proposed-advice-retry-mobile.svg",
+      "title": "Outdated course advice and retry \u2014 proposed Iteration 2",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "future-e7-career-desktop.svg",
+      "title": "E7 career exploration \u2014 future concept",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "future-e8-updates-empty-desktop.svg",
+      "title": "E8 sourced AI updates \u2014 future concept",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "future-e9-language-care-desktop.svg",
+      "title": "E9 language and care mode \u2014 future concept",
+      "width": 1440,
+      "height": 1000
+    }
+  ]
+}

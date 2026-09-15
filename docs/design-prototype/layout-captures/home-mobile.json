@@ -1,0 +1,1918 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 5229.515625,
+      "kind": "body",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 5229.515625,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.12)",
+      "height": 65,
+      "kind": "nav",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.76)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.25)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 40,
+      "x": 311,
+      "y": 12
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(238, 244, 248)",
+      "height": 1051.75,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": false,
+      "backgroundImage": "url(\"http://127.0.0.1:4173/images/carousel/slide-02.png\")",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 1051.75,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.78) 34%, rgba(255, 255, 255, 0.34) 58%, rgba(255, 255, 255, 0.08) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 1051.75,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(199, 149, 139, 0.15)",
+      "height": 30,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 100,
+      "shadow": "none",
+      "width": 294.40625,
+      "x": 24,
+      "y": 96
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(199, 149, 139)",
+      "height": 41,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 100,
+      "shadow": "rgba(199, 149, 139, 0.3) 0px 4px 16px 0px",
+      "width": 165.203125,
+      "x": 24,
+      "y": 422.75
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.85)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.72)",
+      "height": 333,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.12) 0px 14px 34px 0px",
+      "width": 327,
+      "x": 24,
+      "y": 563.75
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0.05)",
+      "height": 6,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 3,
+      "shadow": "none",
+      "width": 269,
+      "x": 53,
+      "y": 721.75
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(199, 149, 139), rgb(79, 145, 186))",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 6,
+        "width": 269,
+        "x": 53,
+        "y": 721.75
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 6,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 3,
+      "shadow": "none",
+      "width": 174.84375,
+      "x": 53,
+      "y": 721.75
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.35)",
+      "height": 59,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 269,
+      "x": 53,
+      "y": 808.75
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(47, 36, 48)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(47, 36, 48, 0.22)",
+      "height": 8,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "none",
+      "width": 8,
+      "x": 159.5,
+      "y": 1015.75
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(47, 36, 48)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "height": 9.199951171875,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "none",
+      "width": 9.199996948242188,
+      "x": 174.89999389648438,
+      "y": 1015.1500244140624
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(47, 36, 48)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(47, 36, 48, 0.22)",
+      "height": 8,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "none",
+      "width": 8,
+      "x": 191.5,
+      "y": 1015.75
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(47, 36, 48)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(47, 36, 48, 0.22)",
+      "height": 8,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "none",
+      "width": 8,
+      "x": 207.5,
+      "y": 1015.75
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.76)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.54)",
+      "height": 170.46875,
+      "kind": "article",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.12) 0px 14px 34px 0px",
+      "width": 327,
+      "x": 24,
+      "y": 1280.125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(199, 149, 139, 0.3)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1280.125
+      },
+      "fill": "rgba(249, 224, 228, 0.62)",
+      "height": 38,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 38,
+      "x": 43,
+      "y": 1303.125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.76)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.54)",
+      "height": 170.46875,
+      "kind": "article",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.12) 0px 14px 34px 0px",
+      "width": 327,
+      "x": 24,
+      "y": 1466.59375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(79, 145, 186, 0.2)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1466.59375
+      },
+      "fill": "rgba(234, 243, 251, 0.82)",
+      "height": 38,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 38,
+      "x": 43,
+      "y": 1489.59375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.76)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.54)",
+      "height": 170.46875,
+      "kind": "article",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.12) 0px 14px 34px 0px",
+      "width": 327,
+      "x": 24,
+      "y": 1653.0625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(199, 149, 139, 0.3)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1653.0625
+      },
+      "fill": "rgba(249, 224, 228, 0.62)",
+      "height": 38,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 38,
+      "x": 43,
+      "y": 1676.0625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.76)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.54)",
+      "height": 170.46875,
+      "kind": "article",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.12) 0px 14px 34px 0px",
+      "width": 327,
+      "x": 24,
+      "y": 1839.53125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(79, 145, 186, 0.2)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1839.53125
+      },
+      "fill": "rgba(234, 243, 251, 0.82)",
+      "height": 38,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 38,
+      "x": 43,
+      "y": 1862.53125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.76)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.54)",
+      "height": 170.46875,
+      "kind": "article",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.12) 0px 14px 34px 0px",
+      "width": 327,
+      "x": 24,
+      "y": 2026
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(199, 149, 139, 0.3)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 2026
+      },
+      "fill": "rgba(249, 224, 228, 0.62)",
+      "height": 38,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "none",
+      "width": 38,
+      "x": 43,
+      "y": 2049
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.76)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.42)",
+      "height": 285.625,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 18,
+      "shadow": "rgba(61, 43, 54, 0.08) 0px 8px 24px 0px",
+      "width": 327,
+      "x": 24,
+      "y": 2212.46875
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/",
+      "label": "AI-Wrevolusi home",
+      "role": "a",
+      "width": 158.078125,
+      "x": 24,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Open menu",
+      "role": "button",
+      "width": 40,
+      "x": 311,
+      "y": 12
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 41,
+      "href": "/profile",
+      "label": "Start free analysis",
+      "role": "a",
+      "width": 165.203125,
+      "x": 24,
+      "y": 422.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 8,
+      "href": null,
+      "label": "Show slide 1: Malaysian professional woman working with AI tools",
+      "role": "tab",
+      "width": 8,
+      "x": 159.5,
+      "y": 1015.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 9.199951171875,
+      "href": null,
+      "label": "Show slide 2: Malaysian professional woman reviewing changing work tasks",
+      "role": "tab",
+      "width": 9.199996948242188,
+      "x": 174.89999389648438,
+      "y": 1015.1500244140624
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 8,
+      "href": null,
+      "label": "Show slide 3: Malaysian women professionals collaborating in an office",
+      "role": "tab",
+      "width": 8,
+      "x": 191.5,
+      "y": 1015.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 8,
+      "href": null,
+      "label": "Show slide 4: Malaysian professional woman planning her next career step",
+      "role": "tab",
+      "width": 8,
+      "x": 207.5,
+      "y": 1015.75
+    }
+  ],
+  "height": 5256,
+  "icons": [
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(47, 36, 48)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-menu h-4 w-4\" aria-hidden=\"true\"><path d=\"M4 5h16\"></path><path d=\"M4 12h16\"></path><path d=\"M4 19h16\"></path></svg>",
+      "width": 16,
+      "x": 323,
+      "y": 24
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(87, 74, 85)",
+      "height": 16,
+      "markup": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"8\" r=\"7\" stroke=\"#4F91BA\" stroke-width=\"1.5\"></circle><path d=\"M5 8l2 2 4-4\" stroke=\"#4F91BA\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg>",
+      "width": 16,
+      "x": 132.8125,
+      "y": 936.5
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(87, 74, 85)",
+      "height": 16,
+      "markup": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"8\" r=\"7\" stroke=\"#4F91BA\" stroke-width=\"1.5\"></circle><path d=\"M5 8l2 2 4-4\" stroke=\"#4F91BA\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg>",
+      "width": 16,
+      "x": 92.828125,
+      "y": 988
+    }
+  ],
+  "images": [
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "height": 36,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/logo-mark.svg",
+      "width": 41.265625,
+      "x": 24,
+      "y": 14
+    }
+  ],
+  "overlay": false,
+  "scrollY": 0,
+  "texts": [
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 43, 54)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "-0.45px",
+      "lineHeight": "27px",
+      "text": "AI-Wrevolusi",
+      "width": 106.8125,
+      "x": 75.265625,
+      "y": 21.5
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(139, 94, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "0.5px",
+      "lineHeight": "18px",
+      "text": "Designed for women's career development",
+      "width": 266.40625,
+      "x": 38,
+      "y": 103
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 28,
+      "fontWeight": "600",
+      "height": 34,
+      "letterSpacing": "normal",
+      "lineHeight": "37.8px",
+      "text": "AI is changing your",
+      "width": 259.40625,
+      "x": 24,
+      "y": 147
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 28,
+      "fontWeight": "600",
+      "height": 34,
+      "letterSpacing": "normal",
+      "lineHeight": "37.8px",
+      "text": "work,",
+      "width": 76.5625,
+      "x": 24,
+      "y": 184.796875
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 28,
+      "fontWeight": "600",
+      "height": 34,
+      "letterSpacing": "normal",
+      "lineHeight": "37.8px",
+      "text": "but change is not only",
+      "width": 298.453125,
+      "x": 24,
+      "y": 222.59375
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 28,
+      "fontWeight": "600",
+      "height": 34,
+      "letterSpacing": "normal",
+      "lineHeight": "37.8px",
+      "text": "risk.",
+      "width": 58.875,
+      "x": 24,
+      "y": 260.390625
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "27.2px",
+      "text": "In about 5 minutes, see how tasks may",
+      "width": 292.765625,
+      "x": 24,
+      "y": 316.1875
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "27.2px",
+      "text": "change, where you are strong, and what to",
+      "width": 323.65625,
+      "x": 24,
+      "y": 343.375
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "27.2px",
+      "text": "grow next.",
+      "width": 79.78125,
+      "x": 24,
+      "y": 370.5625
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(255, 255, 255)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Start free analysis",
+      "width": 121.203125,
+      "x": 46,
+      "y": 434.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "No CV upload - Results stay with you",
+      "width": 210.546875,
+      "x": 24,
+      "y": 478.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Task-change snapshot",
+      "width": 152.46875,
+      "x": 53,
+      "y": 594.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 42,
+      "fontWeight": "700",
+      "height": 51,
+      "letterSpacing": "normal",
+      "lineHeight": "42px",
+      "text": "6",
+      "width": 27.296875,
+      "x": 53,
+      "y": 614.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "500",
+      "height": 21,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "everyday tasks may be",
+      "width": 197.75,
+      "x": 53,
+      "y": 667.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "500",
+      "height": 21,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "changing",
+      "width": 79.921875,
+      "x": 53,
+      "y": 685.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "4 suit AI-assisted productivity",
+      "width": 183.640625,
+      "x": 68,
+      "y": 746.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "2 need a new way of working",
+      "width": 180.53125,
+      "x": 68,
+      "y": 774.25
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "Your edge:",
+      "width": 70.359375,
+      "x": 67,
+      "y": 819.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "600",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "judgement and",
+      "width": 94.046875,
+      "x": 137.359375,
+      "y": 819.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "600",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "collaboration",
+      "width": 82.15625,
+      "x": 67,
+      "y": 839.25
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "No CV upload",
+      "width": 85.359375,
+      "x": 156.8125,
+      "y": 935.75
+    },
+    {
+      "clip": {
+        "height": 1051.75,
+        "width": 375,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "Based on your actual tasks",
+      "width": 165.328125,
+      "x": 116.828125,
+      "y": 987.25
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "36px",
+      "text": "Understand Your Work.",
+      "width": 271.078125,
+      "x": 51.953125,
+      "y": 1088.75
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "36px",
+      "text": "Know What to Do Next.",
+      "width": 268.4375,
+      "x": 53.28125,
+      "y": 1124.75
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "23.1px",
+      "text": "AI is changing work — but not every task, and",
+      "width": 303.65625,
+      "x": 35.671875,
+      "y": 1168.75
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "23.1px",
+      "text": "not every skill, in the same way. Start from the",
+      "width": 305.1875,
+      "x": 34.90625,
+      "y": 1191.84375
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "23.1px",
+      "text": "work you actually do, and we’ll take it step by",
+      "width": 299.6875,
+      "x": 37.65625,
+      "y": 1214.9375
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "23.1px",
+      "text": "step to a plan that fits your real life.",
+      "width": 232.453125,
+      "x": 71.265625,
+      "y": 1238.03125
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1280.125
+      },
+      "fill": "rgb(139, 94, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "700",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "01",
+      "width": 14.375,
+      "x": 54.8125,
+      "y": 1313.375
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1280.125
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "21.6px",
+      "text": "Record your real work.",
+      "width": 174.578125,
+      "x": 43,
+      "y": 1361.125
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1280.125
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.44px",
+      "text": "Choose an occupation and adjust its tasks to",
+      "width": 253.921875,
+      "x": 43,
+      "y": 1394.71875
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1280.125
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.44px",
+      "text": "match your working day.",
+      "width": 139.484375,
+      "x": 43,
+      "y": 1414.15625
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1466.59375
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "700",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "02",
+      "width": 16.953125,
+      "x": 53.515625,
+      "y": 1499.84375
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1466.59375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "21.6px",
+      "text": "See where AI may change tasks.",
+      "width": 250.734375,
+      "x": 43,
+      "y": 1547.59375
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1466.59375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.44px",
+      "text": "Review task-level evidence for AI assistance,",
+      "width": 254.90625,
+      "x": 43,
+      "y": 1581.1875
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1466.59375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.44px",
+      "text": "reshaping or human-led work.",
+      "width": 170.875,
+      "x": 43,
+      "y": 1600.625
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1653.0625
+      },
+      "fill": "rgb(139, 94, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "700",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "03",
+      "width": 17.15625,
+      "x": 53.421875,
+      "y": 1686.3125
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1653.0625
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "21.6px",
+      "text": "Make your skills visible.",
+      "width": 183.796875,
+      "x": 43,
+      "y": 1734.0625
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1653.0625
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.44px",
+      "text": "Connect your work to skills whose value can grow,",
+      "width": 287.015625,
+      "x": 43,
+      "y": 1767.65625
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1653.0625
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.44px",
+      "text": "stay steady or shift.",
+      "width": 111.359375,
+      "x": 43,
+      "y": 1787.09375
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1839.53125
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "700",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "04",
+      "width": 17.5625,
+      "x": 53.21875,
+      "y": 1872.78125
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1839.53125
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "21.6px",
+      "text": "Explore your next options.",
+      "width": 202.171875,
+      "x": 43,
+      "y": 1920.53125
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1839.53125
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.44px",
+      "text": "Find occupations where your current strengths",
+      "width": 265.875,
+      "x": 43,
+      "y": 1954.125
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 1839.53125
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.44px",
+      "text": "can transfer.",
+      "width": 71.09375,
+      "x": 43,
+      "y": 1973.5625
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 2026
+      },
+      "fill": "rgb(139, 94, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13,
+      "fontWeight": "700",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "19.5px",
+      "text": "05",
+      "width": 16.859375,
+      "x": 53.5625,
+      "y": 2059.25
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 2026
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "21.6px",
+      "text": "Build a plan that fits your life.",
+      "width": 224.109375,
+      "x": 43,
+      "y": 2107
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 2026
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.44px",
+      "text": "Turn your choices into practical learning steps",
+      "width": 262.203125,
+      "x": 43,
+      "y": 2140.59375
+    },
+    {
+      "clip": {
+        "height": 170.46875,
+        "width": 327,
+        "x": 24,
+        "y": 2026
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.44px",
+      "text": "around your real constraints.",
+      "width": 162.5625,
+      "x": 43,
+      "y": 2160.03125
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "700",
+      "height": 15,
+      "letterSpacing": "1.68px",
+      "lineHeight": "18px",
+      "text": "EVIDENCE BEHIND THE FLOW",
+      "width": 214.265625,
+      "x": 47,
+      "y": 2232.46875
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.5px",
+      "text": "Three references keep the journey grounded in your",
+      "width": 271.34375,
+      "x": 47,
+      "y": 2254.46875
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.5px",
+      "text": "work and current research.",
+      "width": 140.8125,
+      "x": 47,
+      "y": 2270.96875
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "700",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "MASCO",
+      "width": 45.9375,
+      "x": 61,
+      "y": 2301.46875
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "15.95px",
+      "text": "Malaysia's official occupation classification helps",
+      "width": 256.09375,
+      "x": 61,
+      "y": 2321.46875
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "15.95px",
+      "text": "anchor your work profile.",
+      "width": 130.71875,
+      "x": 61,
+      "y": 2337.40625
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "700",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "ILO",
+      "width": 19.0625,
+      "x": 61,
+      "y": 2364.34375
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "15.95px",
+      "text": "Task-level evidence shows where generative AI",
+      "width": 247.03125,
+      "x": 61,
+      "y": 2384.34375
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "15.95px",
+      "text": "may change work.",
+      "width": 95.5625,
+      "x": 61,
+      "y": 2400.28125
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "700",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "WEF",
+      "width": 26.796875,
+      "x": 61,
+      "y": 2427.21875
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "15.95px",
+      "text": "Future of Jobs 2025 informs the skills and",
+      "width": 218.5625,
+      "x": 61,
+      "y": 2447.21875
+    },
+    {
+      "clip": {
+        "height": 5256,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "15.95px",
+      "text": "opportunity view.",
+      "width": 89.765625,
+      "x": 61,
+      "y": 2463.15625
+    }
+  ],
+  "url": "http://127.0.0.1:4173/",
+  "viewportHeight": 844,
+  "width": 390,
+  "name": "home-mobile",
+  "screenshot": "home-mobile.jpg"
+}

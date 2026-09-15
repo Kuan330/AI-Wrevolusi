@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="295" height="37" viewBox="0 0 295 37">
+<title>plan-resolved-mobile — progress text repair — wireframe</title>
+<desc>Place at x 40, y 439 inside the matching original frame. Opaque background hides only the bad progress text line. Text remains editable.</desc>
+<rect x="0" y="0" width="295" height="37" fill="#f3f3f3"/>
+<line x1="1" y1="0" x2="1" y2="37" stroke="#a0a0a0" stroke-width="1"/>
+<line x1="294" y1="0" x2="294" y2="37" stroke="#a0a0a0" stroke-width="1"/>
+<text x="1.000" y="14.714" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#333333">0</text>
+<text x="8.578" y="14.714" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#333333">/</text>
+<text x="12.906" y="14.714" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#333333">8</text>
+<text x="23.719" y="14.714" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#333333">sessions completed · Last scheduled:</text>
+<text x="239.766" y="14.714" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#333333">2026-10-</text>
+<text x="1.000" y="32.714" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#333333">12</text>
+</svg>

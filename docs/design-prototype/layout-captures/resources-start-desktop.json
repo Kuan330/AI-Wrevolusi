@@ -1,0 +1,2463 @@
+{
+  "boxes": [
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 1454.234375,
+      "kind": "body",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 1425,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 1454.234375,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 1425,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.7)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.45)",
+      "height": 65,
+      "kind": "header",
+      "opacity": 1,
+      "radius": 0,
+      "shadow": "none",
+      "width": 1425,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(214, 234, 247)",
+      "height": 36,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "rgba(79, 145, 186, 0.14) 0px 4px 12px 0px",
+      "width": 161.109375,
+      "x": 441.25,
+      "y": 14
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.8)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "none",
+      "width": 36,
+      "x": 1365,
+      "y": 14
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 40,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 104.609375,
+      "x": 1050.578125,
+      "y": 101
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(90deg, rgb(234, 243, 251) 0%, rgb(245, 243, 248) 48%, rgb(248, 236, 239) 100%)",
+      "borderColor": "rgba(79, 145, 186, 0.28)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 40,
+      "kind": "a",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 135.3125,
+      "x": 1167.1875,
+      "y": 101
+    },
+    {
+      "background": false,
+      "backgroundImage": "radial-gradient(circle at 0px 0px, rgba(158, 201, 228, 0.25), rgba(0, 0, 0, 0) 45%), linear-gradient(120deg, rgba(255, 255, 255, 0.78), rgba(248, 236, 239, 0.533))",
+      "borderColor": "rgba(255, 255, 255, 0.84)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 300.234375,
+      "kind": "section",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.08) 0px 14px 34px 0px",
+      "width": 1180,
+      "x": 122.5,
+      "y": 190
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgba(255, 255, 255, 0.6)",
+      "height": 189.59375,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "none",
+      "width": 432.796875,
+      "x": 836.6875,
+      "y": 245.3125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 180.375,
+      "x": 1065.8125,
+      "y": 373.90625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.84)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(255, 255, 255)",
+      "height": 888,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 315.265625,
+      "x": 122.5,
+      "y": 510.234375
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(110deg, rgb(220, 238, 249), rgb(248, 237, 241))",
+      "borderColor": "rgb(197, 220, 234)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 70.78125,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 262.265625,
+      "x": 143.5,
+      "y": 647.671875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.84)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgba(255, 255, 255, 0.78)",
+      "height": 187.5,
+      "kind": "section",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.08) 0px 14px 34px 0px",
+      "width": 817.734375,
+      "x": 463.765625,
+      "y": 512.234375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(201, 149, 137)",
+      "height": 40,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 9999,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 82.734375,
+      "x": 1181.765625,
+      "y": 529.484375
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(120deg, rgb(224, 239, 248), rgb(248, 234, 240))",
+      "borderColor": "rgba(255, 255, 255, 0.79)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 44,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 50,
+      "shadow": "none",
+      "width": 44,
+      "x": 850.625,
+      "y": 613.234375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.84)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgba(255, 255, 255, 0.78)",
+      "height": 82,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 20,
+      "shadow": "rgba(61, 43, 54, 0.08) 0px 14px 34px 0px",
+      "width": 817.734375,
+      "x": 463.765625,
+      "y": 715.734375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(217, 210, 223)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(255, 255, 255)",
+      "height": 48,
+      "kind": "input",
+      "opacity": 1,
+      "radius": 16,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+      "width": 469.984375,
+      "x": 480.765625,
+      "y": 732.734375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgba(255, 255, 255, 0.95)",
+      "height": 48,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 155,
+      "x": 962.75,
+      "y": 732.734375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(252, 243, 245)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+      "width": 134.75,
+      "x": 1129.75,
+      "y": 738.734375
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.84)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(255, 255, 255)",
+      "height": 298.21875,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 817.734375,
+      "x": 463.765625,
+      "y": 850.203125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(177, 209, 228)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(220, 236, 246)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 88,
+      "x": 1172.5,
+      "y": 871.203125
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(217, 231, 242)",
+      "height": 22,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 73.796875,
+      "x": 484.765625,
+      "y": 942.984375
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(100deg, rgba(234, 243, 251, 0.6), rgba(248, 236, 239, 0.533))",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 43.203125,
+      "kind": "p",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 775.734375,
+      "x": 484.765625,
+      "y": 1035.421875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.84)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(255, 255, 255)",
+      "height": 298.21875,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 12,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 817.734375,
+      "x": 463.765625,
+      "y": 1164.421875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(214, 229, 239)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(237, 244, 250)",
+      "height": 32,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 88,
+      "x": 1172.5,
+      "y": 1185.421875
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(217, 231, 242)",
+      "height": 22,
+      "kind": "div",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 73.796875,
+      "x": 484.765625,
+      "y": 1257.203125
+    },
+    {
+      "background": false,
+      "backgroundImage": "linear-gradient(100deg, rgba(234, 243, 251, 0.6), rgba(248, 236, 239, 0.533))",
+      "borderColor": "rgb(202, 215, 226)",
+      "borderWidth": 0,
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgba(0, 0, 0, 0)",
+      "height": 43.203125,
+      "kind": "p",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "none",
+      "width": 775.734375,
+      "x": 484.765625,
+      "y": 1349.640625
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgba(255, 255, 255, 0.65)",
+      "borderWidth": 1,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "height": 36,
+      "kind": "button",
+      "opacity": 1,
+      "radius": 10,
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+      "width": 56,
+      "x": 1368,
+      "y": 550
+    },
+    {
+      "background": true,
+      "backgroundImage": "none",
+      "borderColor": "rgb(255, 255, 255)",
+      "borderWidth": 2,
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(239, 173, 192)",
+      "height": 22,
+      "kind": "span",
+      "opacity": 1,
+      "radius": 999,
+      "shadow": "none",
+      "width": 22,
+      "x": 1405,
+      "y": 547
+    }
+  ],
+  "controls": [
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/",
+      "label": "AI-Wrevolusi home",
+      "role": "a",
+      "width": 158.078125,
+      "x": 24,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/ai-exposure",
+      "label": "AI Exposure",
+      "role": "a",
+      "width": 108.171875,
+      "x": 214.078125,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/skills",
+      "label": "Skills",
+      "role": "a",
+      "width": 63,
+      "x": 350.25,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/learning-centre",
+      "label": "Learning Resources",
+      "role": "a",
+      "width": 161.109375,
+      "x": 441.25,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/plan",
+      "label": "My Plan",
+      "role": "a",
+      "width": 81.546875,
+      "x": 630.359375,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": "/possibilities",
+      "label": "Possibilities",
+      "role": "a",
+      "width": 107.25,
+      "x": 739.90625,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Account menu",
+      "role": "button",
+      "width": 36,
+      "x": 1365,
+      "y": 14
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 40,
+      "href": "/skills#skill-directions",
+      "label": "Edit skills",
+      "role": "a",
+      "width": 104.609375,
+      "x": 1050.578125,
+      "y": 101
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 40,
+      "href": "/plan",
+      "label": "Open My Plan",
+      "role": "a",
+      "width": 135.3125,
+      "x": 1167.1875,
+      "y": 101
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 21,
+      "href": "/skills",
+      "label": "Review your skills →",
+      "role": "a",
+      "width": 133.84375,
+      "x": 859.96875,
+      "y": 391.40625
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Saved courses · 1",
+      "role": "button",
+      "width": 180.375,
+      "x": 1065.8125,
+      "y": 373.90625
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "disabled": false,
+      "height": 70.78125,
+      "href": null,
+      "label": "Analytical thinking\n7 courses · Selected for learning",
+      "role": "button",
+      "width": 262.265625,
+      "x": 143.5,
+      "y": 647.671875
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Clear skill selection",
+      "role": "button",
+      "width": 161.6875,
+      "x": 143.5,
+      "y": 718.453125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "disabled": false,
+      "height": 40,
+      "href": null,
+      "label": "Adjust",
+      "role": "button",
+      "width": 82.734375,
+      "x": 1181.765625,
+      "y": 529.484375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "disabled": false,
+      "height": 48,
+      "href": null,
+      "label": "Search courses, providers or keywords",
+      "role": "input",
+      "width": 469.984375,
+      "x": 480.765625,
+      "y": 732.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "disabled": false,
+      "height": 48,
+      "href": null,
+      "label": "Search",
+      "role": "button",
+      "width": 44,
+      "x": 902.75,
+      "y": 732.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "disabled": false,
+      "height": 48,
+      "href": null,
+      "label": "Level",
+      "role": "combobox",
+      "width": 155,
+      "x": 962.75,
+      "y": 732.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "More filters",
+      "role": "button",
+      "width": 134.75,
+      "x": 1129.75,
+      "y": 738.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Saved",
+      "role": "button",
+      "width": 88,
+      "x": 1172.5,
+      "y": 871.203125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "View details",
+      "role": "button",
+      "width": 137.03125,
+      "x": 1123.46875,
+      "y": 1091.421875
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "disabled": false,
+      "height": 32,
+      "href": null,
+      "label": "Save",
+      "role": "button",
+      "width": 88,
+      "x": 1172.5,
+      "y": 1185.421875
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "disabled": false,
+      "height": 36,
+      "href": null,
+      "label": "Saved courses · 1. Drag to move, or use arrow keys to reposition.",
+      "role": "button",
+      "width": 56,
+      "x": 1368,
+      "y": 550
+    }
+  ],
+  "height": 1454,
+  "icons": [
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-user size-4\" aria-hidden=\"true\"><path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"></path><circle cx=\"12\" cy=\"7\" r=\"4\"></circle></svg>",
+      "width": 16,
+      "x": 1375,
+      "y": 24
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(255, 255, 255)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-bookmark\" aria-hidden=\"true\"><path d=\"M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z\"></path></svg>",
+      "width": 16,
+      "x": 1210.1875,
+      "y": 385.90625
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "color": "rgb(60, 42, 53)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-right size-4 shrink-0\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg>",
+      "width": 16,
+      "x": 379.171875,
+      "y": 675.0625
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "color": "rgb(79, 150, 188)",
+      "height": 22,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-arrow-right\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"m12 5 7 7-7 7\"></path></svg>",
+      "width": 22,
+      "x": 861.625,
+      "y": 624.234375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 20,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-search\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"></path><circle cx=\"11\" cy=\"11\" r=\"8\"></circle></svg>",
+      "width": 20,
+      "x": 914.75,
+      "y": 746.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "color": "rgb(47, 36, 48)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down h-4 w-4 opacity-50\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"></path></svg>",
+      "width": 16,
+      "x": 1084.75,
+      "y": 748.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "color": "rgb(47, 36, 48)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"></path></svg>",
+      "width": 16,
+      "x": 1231.5,
+      "y": 748.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "color": "rgb(53, 97, 124)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-bookmark\" aria-hidden=\"true\"><path d=\"M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z\"></path></svg>",
+      "width": 16,
+      "x": 1186.734375,
+      "y": 879.203125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "color": "rgb(79, 145, 186)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-arrow-right\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"m12 5 7 7-7 7\"></path></svg>",
+      "width": 16,
+      "x": 1228.5,
+      "y": 1101.421875
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "color": "rgb(53, 97, 124)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-bookmark\" aria-hidden=\"true\"><path d=\"M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z\"></path></svg>",
+      "width": 16,
+      "x": 1190.453125,
+      "y": 1193.421875
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "color": "rgb(255, 255, 255)",
+      "height": 16,
+      "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-bookmark\" aria-hidden=\"true\"><path d=\"M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z\"></path></svg>",
+      "width": 16,
+      "x": 1388,
+      "y": 560
+    }
+  ],
+  "images": [
+    {
+      "alt": "Image",
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "height": 36,
+      "objectFit": "contain",
+      "objectPosition": "50% 50%",
+      "src": "http://127.0.0.1:4173/images/logo-mark.svg",
+      "width": 41.265625,
+      "x": 24,
+      "y": 14
+    }
+  ],
+  "overlay": false,
+  "scrollY": 0,
+  "texts": [
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 43, 54)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "-0.45px",
+      "lineHeight": "27px",
+      "text": "AI-Wrevolusi",
+      "width": 106.8125,
+      "x": 75.265625,
+      "y": 21.5
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "AI Exposure",
+      "width": 80.171875,
+      "x": 228.078125,
+      "y": 23.5
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Skills",
+      "width": 35,
+      "x": 364.25,
+      "y": 23.5
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Learning Resources",
+      "width": 133.109375,
+      "x": 455.25,
+      "y": 23.5
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "My Plan",
+      "width": 53.546875,
+      "x": 644.359375,
+      "y": 23.5
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Possibilities",
+      "width": 79.25,
+      "x": 753.90625,
+      "y": 23.5
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 24,
+      "fontWeight": "600",
+      "height": 29,
+      "letterSpacing": "normal",
+      "lineHeight": "28.8px",
+      "text": "Learning Resources",
+      "width": 230.65625,
+      "x": 122.5,
+      "y": 93.59375
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Find a course for the skills you want to grow, then make room for learning at your own pace.",
+      "width": 607.96875,
+      "x": 122.5,
+      "y": 134
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Edit skills",
+      "width": 62.609375,
+      "x": 1071.578125,
+      "y": 112
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Open My Plan",
+      "width": 93.3125,
+      "x": 1188.1875,
+      "y": 112
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "18.7px",
+      "text": "SMALL STEPS. PRACTICAL PROGRESS.",
+      "width": 256.515625,
+      "x": 155.5,
+      "y": 225
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 32,
+      "fontWeight": "600",
+      "height": 39,
+      "letterSpacing": "normal",
+      "lineHeight": "43.2px",
+      "text": "Choose your skill.",
+      "width": 275.875,
+      "x": 155.5,
+      "y": 254.875
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 32,
+      "fontWeight": "600",
+      "height": 39,
+      "letterSpacing": "normal",
+      "lineHeight": "43.2px",
+      "text": "Find your next learning step.",
+      "width": 441.078125,
+      "x": 155.5,
+      "y": 298.0625
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "27.2px",
+      "text": "Explore learning resources, choose the chapters that matter to you, and set a",
+      "width": 582.453125,
+      "x": 155.5,
+      "y": 358.25
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "400",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "27.2px",
+      "text": "weekly pace that fits your life.",
+      "width": 226.234375,
+      "x": 155.5,
+      "y": 385.4375
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.2px",
+      "text": "courses in the catalogue",
+      "width": 148.765625,
+      "x": 182.484375,
+      "y": 437.625
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18.4,
+      "fontWeight": "700",
+      "height": 22,
+      "letterSpacing": "normal",
+      "lineHeight": "27.6px",
+      "text": "15",
+      "width": 19.390625,
+      "x": 155.5,
+      "y": 431.625
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.2px",
+      "text": "focus skills",
+      "width": 67.125,
+      "x": 370.78125,
+      "y": 437.625
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(50, 104, 137)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18.4,
+      "fontWeight": "700",
+      "height": 22,
+      "letterSpacing": "normal",
+      "lineHeight": "27.6px",
+      "text": "1",
+      "width": 7.9375,
+      "x": 355.25,
+      "y": 431.625
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Your learning, your choice",
+      "width": 202.703125,
+      "x": 857.6875,
+      "y": 276.3125
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "23.8px",
+      "text": "Save a course first, or open its details to choose chapters",
+      "width": 380.109375,
+      "x": 857.6875,
+      "y": 309.3125
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "23.8px",
+      "text": "and study days.",
+      "width": 104.859375,
+      "x": 857.6875,
+      "y": 333.109375
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Review your skills →",
+      "width": 133.84375,
+      "x": 859.96875,
+      "y": 393.40625
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(255, 255, 255)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Saved courses ·",
+      "width": 110.5625,
+      "x": 1085.8125,
+      "y": 384.90625
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(255, 255, 255)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "1",
+      "width": 5.8125,
+      "x": 1196.375,
+      "y": 384.90625
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "MY FOCUS SKILL",
+      "width": 112.484375,
+      "x": 143.5,
+      "y": 532.234375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 20,
+      "fontWeight": "600",
+      "height": 24,
+      "letterSpacing": "normal",
+      "lineHeight": "27px",
+      "text": "Choose a skill",
+      "width": 133.78125,
+      "x": 143.5,
+      "y": 556.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20.48px",
+      "text": "See courses related to the skill you want to",
+      "width": 259.390625,
+      "x": 143.5,
+      "y": 592.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20.48px",
+      "text": "grow.",
+      "width": 33.125,
+      "x": 143.5,
+      "y": 613.203125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "700",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Analytical thinking",
+      "width": 128.3125,
+      "x": 154.09375,
+      "y": 663.265625
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.8px",
+      "text": "7",
+      "width": 6.34375,
+      "x": 154.09375,
+      "y": 688.0625
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.8px",
+      "text": "courses ·",
+      "width": 51.84375,
+      "x": 163.578125,
+      "y": 688.0625
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.8px",
+      "text": "Selected for learning",
+      "width": 110.203125,
+      "x": 215.421875,
+      "y": 688.0625
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 315.265625,
+        "x": 122.5,
+        "y": 510.234375
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Clear skill selection",
+      "width": 129.6875,
+      "x": 159.5,
+      "y": 727.453125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "YOUR LEARNING FOCUS",
+      "width": 158.484375,
+      "x": 480.765625,
+      "y": 530.234375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "height": 20,
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "text": "Analytical thinking",
+      "width": 143.890625,
+      "x": 480.765625,
+      "y": 547.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(255, 255, 255)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "Adjust",
+      "width": 42.734375,
+      "x": 1201.765625,
+      "y": 540.484375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(130, 120, 135)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.2px",
+      "text": "Current foundation",
+      "width": 114.078125,
+      "x": 598.65625,
+      "y": 616.234375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Just starting",
+      "width": 82.40625,
+      "x": 614.484375,
+      "y": 641.234375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(130, 120, 135)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "19.2px",
+      "text": "Next learning goal",
+      "width": 110.359375,
+      "x": 1034.375,
+      "y": 605.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "Prototype example: use evidence to improve my",
+      "width": 318.125,
+      "x": 930.5,
+      "y": 630.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "21px",
+      "text": "weekly sales reports.",
+      "width": 140.140625,
+      "x": 1019.484375,
+      "y": 651.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 16.8,
+      "lineHeight": "20px",
+      "multiline": false,
+      "synthetic": true,
+      "text": "Search courses, providers or keywords…",
+      "width": 399.984375,
+      "x": 493.765625,
+      "y": 748.334375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "400",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "All levels",
+      "width": 58.203125,
+      "x": 979.75,
+      "y": 747.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(47, 36, 48)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "More filters",
+      "width": 76.75,
+      "x": 1146.75,
+      "y": 747.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20.48px",
+      "text": "7 of 7 courses for Analytical thinking",
+      "width": 220.8125,
+      "x": 463.765625,
+      "y": 815.734375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "KAGGLE LEARN",
+      "width": 101.5625,
+      "x": 484.765625,
+      "y": 879.953125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(53, 97, 124)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Saved",
+      "width": 35.515625,
+      "x": 1210.734375,
+      "y": 879.203125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "normal",
+      "lineHeight": "27px",
+      "text": "Pandas",
+      "width": 64.28125,
+      "x": 484.765625,
+      "y": 912.59375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "beginner",
+      "width": 51.796875,
+      "x": 495.765625,
+      "y": 945.984375
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.8px",
+      "text": "4h",
+      "width": 13.859375,
+      "x": 571.359375,
+      "y": 946.578125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.8px",
+      "text": "English",
+      "width": 38.1875,
+      "x": 598.015625,
+      "y": 946.578125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.8px",
+      "text": "Self-paced",
+      "width": 58.453125,
+      "x": 649,
+      "y": 946.578125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13.6,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "22.44px",
+      "text": "Reading, filtering, grouping and merging tabular data (DataFrames) across 6 lessons — the most common data-tidying",
+      "width": 759.921875,
+      "x": 484.765625,
+      "y": 980.78125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13.6,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "22.44px",
+      "text": "toolkit beyond Excel. Provider states about 4 hours to the certificate.",
+      "width": 439.640625,
+      "x": 484.765625,
+      "y": 1003.203125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13.6,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "22.44px",
+      "text": "Related through course topics in our catalogue.",
+      "width": 304.15625,
+      "x": 498.359375,
+      "y": 1048.8125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12.8,
+      "fontWeight": "400",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "20.48px",
+      "text": "Free registration required",
+      "width": 152.890625,
+      "x": 484.765625,
+      "y": 1103.1875
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "height": 17,
+      "letterSpacing": "normal",
+      "lineHeight": "20px",
+      "text": "View details",
+      "width": 81.03125,
+      "x": 1139.46875,
+      "y": 1100.421875
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(79, 145, 186)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "700",
+      "height": 14,
+      "letterSpacing": "1.43px",
+      "lineHeight": "16.5px",
+      "text": "KAGGLE LEARN",
+      "width": 101.5625,
+      "x": 484.765625,
+      "y": 1194.171875
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(53, 97, 124)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "500",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "Save",
+      "width": 28.09375,
+      "x": 1214.453125,
+      "y": 1193.421875
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "600",
+      "height": 21,
+      "letterSpacing": "normal",
+      "lineHeight": "27px",
+      "text": "Data Visualization",
+      "width": 156.671875,
+      "x": 484.765625,
+      "y": 1226.8125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(60, 42, 53)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "height": 15,
+      "letterSpacing": "normal",
+      "lineHeight": "16px",
+      "text": "beginner",
+      "width": 51.796875,
+      "x": 495.765625,
+      "y": 1260.203125
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.8px",
+      "text": "4h",
+      "width": 13.859375,
+      "x": 571.359375,
+      "y": 1260.796875
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.8px",
+      "text": "English",
+      "width": 38.1875,
+      "x": 598.015625,
+      "y": 1260.796875
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(127, 114, 128)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11.2,
+      "fontWeight": "400",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "16.8px",
+      "text": "Self-paced",
+      "width": 58.453125,
+      "x": 649,
+      "y": 1260.796875
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13.6,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "22.44px",
+      "text": "Plot lines, bars and heatmaps with Seaborn across 8 lessons, ending with a final project. Provider states about 4 hours",
+      "width": 760.84375,
+      "x": 484.765625,
+      "y": 1295
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(87, 74, 85)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13.6,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "22.44px",
+      "text": "to the certificate.",
+      "width": 109.359375,
+      "x": 484.765625,
+      "y": 1317.421875
+    },
+    {
+      "clip": {
+        "height": 888,
+        "width": 840.734375,
+        "x": 461.765625,
+        "y": 510.234375
+      },
+      "fill": "rgb(61, 95, 122)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 13.6,
+      "fontWeight": "400",
+      "height": 16,
+      "letterSpacing": "normal",
+      "lineHeight": "22.44px",
+      "text": "Related through course topics in our catalogue.",
+      "width": 304.15625,
+      "x": 498.359375,
+      "y": 1363.03125
+    },
+    {
+      "clip": {
+        "height": 1454,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "fill": "rgb(84, 36, 58)",
+      "fontFamily": "Inter, Outfit, system-ui, sans-serif",
+      "fontSize": 11,
+      "fontWeight": "600",
+      "height": 14,
+      "letterSpacing": "normal",
+      "lineHeight": "18px",
+      "text": "1",
+      "width": 4.65625,
+      "x": 1413.671875,
+      "y": 551
+    }
+  ],
+  "url": "http://127.0.0.1:4173/learning-centre",
+  "viewportHeight": 1000,
+  "width": 1440,
+  "name": "resources-start-desktop",
+  "screenshot": "resources-start-desktop.jpg"
+}
