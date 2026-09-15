@@ -17,7 +17,3 @@
 .exposure-score-panel__number {
   @apply text-2xl font-semibold text-[#2f2430];
 }
-
-.exposure-score-panel__scale {
-  @apply ml-1 text-xs;
-}

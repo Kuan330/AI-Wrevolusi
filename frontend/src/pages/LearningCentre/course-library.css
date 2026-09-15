@@ -984,6 +984,19 @@
   margin-top: 20px;
 }
 
+.library-intro-link {
+  display: inline-block;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #467795;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .learning-default-card {
   margin-top: -1.25rem;
   display: grid;

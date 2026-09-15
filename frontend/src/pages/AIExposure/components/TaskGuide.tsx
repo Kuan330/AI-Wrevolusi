@@ -248,7 +248,7 @@ export default function TaskGuide(props: {
                   onClick: () => setDetails(true),
                 } satisfies Partial<ComponentProps<typeof Button>>)}
               >
-                Exposure score and evidence
+                Detail
               </Button>
             </TabsContent>
             <TabsContent

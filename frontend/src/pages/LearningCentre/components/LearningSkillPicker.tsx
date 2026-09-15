@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { ExternalLink, Plus, Check, X, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppButton } from "@/components/ui/app-button";
 import { toast } from "sonner";
-import type { SkillEvidence } from "../lib/skillProfile";
+import type { SkillEvidence } from "@/pages/Skills/lib/skillProfile";
 import {
   growingSkills,
   readLearningSkills,
@@ -12,11 +11,17 @@ import {
   reconcileLearningSkills,
   skillKey,
   type LearningSkill,
-} from "../learningSkills";
+} from "@/pages/Skills/learningSkills";
 import "../learning-skills.css";
-type Props = { evidence: SkillEvidence[] };
+
+type Props = {
+  evidence: SkillEvidence[];
+  onSaved?: () => void;
+  onCancel?: () => void;
+};
+
 export default function LearningSkillPicker(props: Props) {
-  const { evidence } = props;
+  const { evidence, onSaved, onCancel } = props;
   const work = evidence.map(({ skill }) => ({
     id: skillKey(skill.core_skill),
     name: skill.core_skill,
@@ -36,7 +41,7 @@ export default function LearningSkillPicker(props: Props) {
   const [error, setError] = useState(initial.error);
   const [dragged, setDragged] = useState<LearningSkill | null>(null);
   const [target, setTarget] = useState<string | null>(null);
-  const navigate = useNavigate();
+
   function add(skill: LearningSkill, before?: string) {
     setSelected((current) => {
       if (before === skill.id) return current;
@@ -51,6 +56,7 @@ export default function LearningSkillPicker(props: Props) {
       return next;
     });
   }
+
   function move(index: number, delta: number) {
     setSelected((current) => {
       const next = [...current];
@@ -60,6 +66,7 @@ export default function LearningSkillPicker(props: Props) {
       return next;
     });
   }
+
   function remove(skill: LearningSkill, index: number) {
     setSelected((current) => current.filter((item) => item.id !== skill.id));
     toast("Removed from learning skills", {
@@ -75,20 +82,21 @@ export default function LearningSkillPicker(props: Props) {
       },
     });
   }
+
   return (
     <section
       id="skill-directions"
       tabIndex={-1}
       className="learning-skill-picker scroll-mt-24"
     >
-      <p className="skills-eyebrow">Plan your next skill move</p>
+      <p className="learning-skill-eyebrow">Plan your next skill move</p>
       <h2>Choose skills to learn</h2>
       <p>
         Start with skills reflected in your work, then add skills you want to
         develop. Drag skills across or use the add buttons.
       </p>
       <div className="learning-skill-columns">
-        <div className="skills-glass-card learning-skill-panel">
+        <div className="learning-skill-glass learning-skill-panel">
           <h3>Explore growing skills</h3>
           <p className="learning-wef-source">
             WEF · 2025–2030 Top 10
@@ -148,7 +156,7 @@ export default function LearningSkillPicker(props: Props) {
           </a>
         </div>
         <div
-          className={`skills-glass-card learning-skill-panel ${dragged ? "accepts-drop" : ""}`}
+          className={`learning-skill-glass learning-skill-panel ${dragged ? "accepts-drop" : ""}`}
           onDragOver={(event) => {
             if (dragged) {
               event.preventDefault();
@@ -259,20 +267,27 @@ export default function LearningSkillPicker(props: Props) {
             >
               Restore my work skills
             </Button>
-            <AppButton
-              tone="gradient"
-              disabled={!selected.length || !!initial.error}
-              onClick={() => {
-                try {
-                  saveLearningSkills(selected);
-                  navigate("/learning-centre");
-                } catch {
-                  setError("Could not save your skills. Please try again.");
-                }
-              }}
-            >
-              Confirm and find courses →
-            </AppButton>
+            <div className="flex flex-wrap items-center gap-2">
+              {onCancel ? (
+                <Button type="button" variant="outline" onClick={onCancel}>
+                  Cancel
+                </Button>
+              ) : null}
+              <AppButton
+                tone="gradient"
+                disabled={!selected.length || !!initial.error}
+                onClick={() => {
+                  try {
+                    saveLearningSkills(selected);
+                    onSaved?.();
+                  } catch {
+                    setError("Could not save your skills. Please try again.");
+                  }
+                }}
+              >
+                Confirm and find courses →
+              </AppButton>
+            </div>
           </div>
         </div>
       </div>

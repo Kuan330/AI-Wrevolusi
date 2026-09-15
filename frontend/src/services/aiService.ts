@@ -74,6 +74,16 @@ export interface OccupationSuggestionsResponse {
   needs_user_confirmation: boolean;
 }
 
+export interface TaskAssistRequest {
+  task_text: string;
+  user_message: string;
+  notes?: string;
+}
+
+export interface TaskAssistResponse {
+  reply: string;
+}
+
 export const aiService = {
   taskMatch: (request: TaskMatchRequest, signal?: AbortSignal) =>
     api.post<TaskMatchResponse, TaskMatchRequest>(
@@ -91,6 +101,12 @@ export const aiService = {
   occupationSuggestions: (request: OccupationSuggestionsRequest) =>
     api.post<OccupationSuggestionsResponse, OccupationSuggestionsRequest>(
       "/ai/occupation-suggestions",
+      request,
+      AI_REQUEST_TIMEOUT_MS,
+    ),
+  taskAssist: (request: TaskAssistRequest) =>
+    api.post<TaskAssistResponse, TaskAssistRequest>(
+      "/ai/task-assist",
       request,
       AI_REQUEST_TIMEOUT_MS,
     ),

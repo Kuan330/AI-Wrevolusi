@@ -109,7 +109,7 @@ const TaskList = (props: TaskListProps) => {
                 <p className="task-list__name">{task.wording}</p>
                 <Button {...buttonProps2}>
                   <Info {...infoProps3} />
-                  Details
+                  Detail
                 </Button>
               </div>
             </article>

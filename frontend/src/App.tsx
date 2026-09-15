@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
+import { MessageHost } from "@/components/ui/message";
 import AppRoutes from "@/routes";
 
 const App = () => {
@@ -6,6 +7,7 @@ const App = () => {
     <>
       <AppRoutes />
       <Toaster />
+      <MessageHost />
     </>
   );
 };

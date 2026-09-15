@@ -19,7 +19,6 @@ import Home from "@/pages/Home/Home";
 import LearningCentre from "@/pages/LearningCentre/LearningCentre";
 import Possibilities from "@/pages/Possibilities/Possibilities";
 import Plan from "@/pages/Plan/Plan";
-import Skills from "@/pages/Skills/Skills";
 import WorkProfile from "@/pages/WorkProfile/WorkProfile";
 import ProfileTasks from "@/pages/WorkProfile/ProfileTasks";
 
@@ -58,7 +57,12 @@ const AppRoutes = () => {
           <Route element={<MainLayout />}>
             <Route element={<RequireConfirmedAnalysis />}>
               <Route path={ROUTES.aiExposure} element={<AIExposure />} />
-              <Route path={ROUTES.skills} element={<Skills />} />
+              <Route
+                path="/skills"
+                element={
+                  <Navigate to={`${ROUTES.learningCentre}#skill-directions`} replace />
+                }
+              />
             </Route>
             <Route
               path={ROUTES.learningCentre}
