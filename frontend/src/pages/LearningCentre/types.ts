@@ -22,10 +22,14 @@ export type CourseChoice = {
   chapters: number[];
   weekdays: number[];
   minutesPerDay: number;
+  estimatedMinutes?: number;
+  startTime?: string;
+  endTime?: string;
   scheduleMode?: "later" | "routine";
   startDate?: string;
 };
 export type RecommendationBasis = {
+  level?: "starting" | "supported" | "independent" | "advanced";
   tasks: string;
   goals: string;
   have: string;
@@ -36,6 +40,7 @@ export type PendingCourse = {
   addedAt: string;
 };
 export type LibraryState = {
+  workContext?: string;
   version: 1;
   skillId: string;
   saved: string[];

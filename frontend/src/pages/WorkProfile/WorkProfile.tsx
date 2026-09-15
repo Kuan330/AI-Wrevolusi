@@ -36,7 +36,6 @@ const WorkProfile = () => {
     [
       ROUTES.task,
       ROUTES.aiExposure,
-      ROUTES.skills,
       ROUTES.learningCentre,
       ROUTES.plan,
       ROUTES.possibilities,

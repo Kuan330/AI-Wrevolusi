@@ -31,7 +31,7 @@ export default function CourseCard(props: CourseCardProps) {
           {saved ? "Saved" : "Save"}
         </Button>
       </div>
-      <h3>{course.title}</h3>
+      <h3>{course.title} {scheduled && <span className="course-import-badge">In learning plan</span>}</h3>
       <div className="library-tags">
         <Badge variant="secondary">
           {course.level === "unknown" ? "Level not stated" : course.level}

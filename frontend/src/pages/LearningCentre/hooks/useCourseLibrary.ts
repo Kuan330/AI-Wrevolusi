@@ -1,3 +1,5 @@
+import { localPlanRepository } from "@/services/planService";
+import { scheduleCourses } from "@/pages/Plan/scheduleCourses";
 import { toast } from "sonner";
 import { accountStorage } from "@/services/accountStorage";
 import { useState } from "react";
@@ -5,11 +7,12 @@ import { courses, focusSkills } from "../catalogue";
 import { readLibrary, saveLibrary, emptyLibrary } from "../lib/libraryStorage";
 import {
   defaultChoice,
+  selectedMinutes,
   validateChoice,
   durationLabel,
   estimateLabel,
 } from "../lib/coursePlanning";
-import { readSelections, saveSelections } from "../resources";
+import { resources, readSelections, saveSelections } from "../resources";
 import type { Course, CourseChoice, LibraryState } from "../types";
 export function useCourseLibrary() {
   const [initial] = useState(() => {
@@ -77,10 +80,10 @@ export function useCourseLibrary() {
         },
       );
   }
-  function addToPlan(
+  async function addToPlan(
     ids: string[],
     override?: { courseId: string; choice: CourseChoice },
-  ): boolean {
+  ): Promise<boolean> {
     if (initial.error) return false;
     const items = courses.filter((course) => ids.includes(course.id));
     if (!items.length) {
@@ -95,6 +98,12 @@ export function useCourseLibrary() {
         setNotice(`${course.title}: ${error}`);
         return false;
       }
+    }
+    const repository = localPlanRepository();
+    const plan = await repository.load();
+    for (const course of items) {
+      if (plan.events.some(event => event.resourceId === `epic5-${course.id}`))
+        throw new Error(`${course.title} already has a learning plan. Open My Plan to change its scheduled sessions.`);
     }
     const pending = new Map(
       state.pending.map((entry) => [entry.courseId, entry]),
@@ -122,12 +131,21 @@ export function useCourseLibrary() {
           .map((chapter) => chapter.title),
         weekdays: choice.weekdays,
         minutesPerDay: choice.minutesPerDay,
+        startTime: choice.startTime,
+        endTime: choice.endTime,
+        totalMinutes: selectedMinutes(course, choice) ?? choice.estimatedMinutes ?? null,
         scheduleMode: choice.scheduleMode,
         startDate:
           choice.scheduleMode === "routine" ? choice.startDate : undefined,
       });
     });
     try {
+      const routine = items.filter(course => selectedChoice(course).scheduleMode === 'routine');
+      if (routine.length) {
+        const batch = scheduleCourses(routine.map(course => selections.get(`epic5-${course.id}`)!), resources, plan.events);
+        if (!batch.events.length) throw new Error(batch.issues.join(' ') || 'No available time was found. Adjust your study days or time.');
+        await repository.save({ ...plan, events: [...plan.events, ...batch.events] }, plan.revision);
+      }
       saveSelections([...selections.values()]);
       if (
         update({
@@ -145,9 +163,8 @@ export function useCourseLibrary() {
         return true;
       }
       return false;
-    } catch {
-      setNotice("Could not add courses to Plan. Please try again.");
-      return false;
+    } catch (error) {
+      throw error instanceof Error ? error : new Error("Could not add courses to Plan. Please try again.");
     }
   }
   function exportSaved(ids: string[]) {
@@ -189,7 +206,7 @@ export function useCourseLibrary() {
     const planner = JSON.parse(
       accountStorage.getItem("aiwrevolusi.planner.v1") ?? "{}",
     );
-    scheduledIds = Array.isArray(planner.events)
+    scheduledIds = planner.context === (accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "") && Array.isArray(planner.events)
       ? planner.events.flatMap((event: { resourceId?: string }) =>
           event.resourceId?.startsWith("epic5-")
             ? [event.resourceId.slice(6)]

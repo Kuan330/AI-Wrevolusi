@@ -22,6 +22,22 @@ export default function ContextStudyAdvice(props: Props) {
   return (
     <section className="library-tip">
       <h3>{hasContext ? "Apply this course to your work" : "Study tip"}</h3>
+      {context.level && (
+        <p>
+          {
+            {
+              starting:
+                "Start with one introductory concept and a small guided example.",
+              supported:
+                "Use an example first, then repeat the task without step-by-step help.",
+              independent:
+                "Choose a more complex case and check the quality of your result.",
+              advanced:
+                "Focus on refining your method, handling exceptions, or coaching someone else.",
+            }[context.level]
+          }
+        </p>
+      )}
       {hasContext ? (
         <>
           <p>

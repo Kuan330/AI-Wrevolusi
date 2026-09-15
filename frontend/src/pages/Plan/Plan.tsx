@@ -1,6 +1,14 @@
+import ConflictMessage, { WhatsAppIcon } from "./ConflictMessage";
+import { Drawer, DrawerContent, DrawerTitle, DrawerDescription, DrawerBody } from "@/components/ui/drawer";
+import PlanCourseDrawer from "./PlanCourseDrawer";
+import { courses } from "@/pages/LearningCentre/catalogue";
+import { AppButton } from "@/components/ui/app-button";
+import { readLibrary } from "@/pages/LearningCentre/lib/libraryStorage";
+import { TimePicker } from "@/components/ui/time-picker";
 import { learningSession } from "@/pages/LearningCentre/lib/learningSession";
 import type { ComponentProps } from "react";
-import JourneyIntro from "@/components/account/JourneyIntro";
+import WeekCalendar from "./WeekCalendar";
+import { scheduleCourses } from "./scheduleCourses";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
@@ -8,7 +16,6 @@ import {
   ArrowRight,
   BookOpen,
   CalendarDays,
-  Check,
   ChevronLeft,
   ChevronRight,
   Clock3,
@@ -16,7 +23,6 @@ import {
   MessageCircle,
   Plus,
   Trash2,
-  X,
 } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
 import {
@@ -29,6 +35,7 @@ import { ROUTES } from "@/constants/routes";
 import {
   resources,
   readSelections,
+  saveSelections,
   type Selection,
 } from "@/pages/LearningCentre/resources";
 import { demoResources, demoSelections } from "@/pages/LearningCentre/demoData";
@@ -80,15 +87,23 @@ function PlanContent(props: { demo: boolean }) {
   const [notice, setNotice] = useState("");
   const [week, setWeek] = useState(monday(dateKey(new Date())));
   const [selectedId, setSelectedId] = useState("");
+  const [courseOpen, setCourseOpen] = useState(false);
   const [editor, setEditor] = useState<PlanEvent | null>(null);
   const [repeat, setRepeat] = useState(false);
+  const [savedCourseIds] = useState(() => { try { return readLibrary().saved.slice().reverse(); } catch { return []; } });
+  const [workOpen, setWorkOpen] = useState(false);
+  const [workDays, setWorkDays] = useState([0, 1, 2, 3, 4]);
+  const [workStart, setWorkStart] = useState('09:00');
+  const [workEnd, setWorkEnd] = useState('17:00');
+  const [workFrom, setWorkFrom] = useState(dateKey(new Date()));
+  const [workTo, setWorkTo] = useState(addDays(dateKey(new Date()), 83));
   const [formError, setFormError] = useState("");
   const [helper, setHelper] = useState("");
   const [message, setMessage] = useState("");
   const [requestOpen, setRequestOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const catalogue = demo ? demoResources : resources;
-  const [shortlist] = useState<Selection[]>(() =>
+  const [shortlist, setShortlist] = useState<Selection[]>(() =>
     demo
       ? Array.isArray(location.state?.shortlist)
         ? location.state.shortlist.filter(
@@ -102,24 +117,39 @@ function PlanContent(props: { demo: boolean }) {
     let active = true;
     repository
       .load()
-      .then((data) => {
+      .then(async (data) => {
         if (active) {
           setState(data);
           setSelectedId(data.events.find((e) => e.kind === "care")?.id || "");
-          const requestedId = new URLSearchParams(location.search).get("resource");
-          const selection = shortlist.find(item => item.resourceId === requestedId);
-          const resource = catalogue.find(item => item.id === requestedId);
+          const requestedId = new URLSearchParams(location.search).get(
+            "resource",
+          );
+          const selection = (demo ? demoSelections : readSelections()).find(
+            (item) => item.resourceId === requestedId,
+          );
+          const resource = catalogue.find((item) => item.id === requestedId);
           if (selection && resource) {
-            const existing = data.events.find(event => event.resourceId === resource.id);
+            const existing = data.events.filter(event => event.resourceId === resource.id).sort((a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start))[0];
             if (existing) {
               setWeek(monday(existing.date));
               setSelectedId(existing.id);
-              setNotice("This course already has scheduled sessions. Review them before adding more.");
+              setNotice(
+                `${resource.title} · ${data.events.filter(event => event.resourceId === resource.id).length} sessions in your calendar, starting ${existing.date} at ${existing.start}.`,
+              );
             } else {
-              const draft = learningSession(resource, selection, dateKey(new Date()));
-              setWeek(monday(draft.date));
-              setEditor(draft);
-              setNotice("Review your preferred date and session length. Choose an exact time before saving.");
+              if (selection.startTime && selection.endTime && selection.scheduleMode === "routine") {
+                const batch = scheduleCourses([selection], catalogue, data.events);
+                if (batch.events.length && active) {
+                  const saved = await repository.save({ ...data, events: [...data.events, ...batch.events] }, data.revision);
+                  if (!active) return;
+                  setState(saved);
+                  setWeek(monday(batch.events[0].date));
+                  setSelectedId(batch.events[0].id);
+                }
+                if (active) setNotice([`${batch.events.length} learning sessions imported.`, ...batch.issues].join(' '));
+              } else {
+                setNotice('Choose study days and times to import your course, or add individual sessions.');
+              }
             }
           }
         }
@@ -133,7 +163,7 @@ function PlanContent(props: { demo: boolean }) {
     return () => {
       active = false;
     };
-  }, [repository, location.search, shortlist, catalogue]);
+  }, [repository, location.search, catalogue, demo]);
   async function commit(events: PlanEvent[]) {
     setBusy(true);
     setError("");
@@ -158,12 +188,17 @@ function PlanContent(props: { demo: boolean }) {
   const selectedConflicts = selected
     ? state.events.filter((e) => overlaps(selected, e))
     : [];
-  const learning = visible.filter((e) => e.kind === "learning");
   function newEvent(resourceId?: string) {
     const resource = catalogue.find((r) => r.id === resourceId);
     setFormError("");
     setRepeat(false);
-    setEditor(learningSession(resource, shortlist.find(item => item.resourceId === resourceId), week < dateKey(new Date()) ? dateKey(new Date()) : week));
+    setEditor(
+      learningSession(
+        resource,
+        shortlist.find((item) => item.resourceId === resourceId),
+        week < dateKey(new Date()) ? dateKey(new Date()) : week,
+      ),
+    );
   }
   async function saveEvent() {
     if (!editor) return;
@@ -206,6 +241,7 @@ function PlanContent(props: { demo: boolean }) {
   }
   function openRequest() {
     if (!selected) return;
+    setCourseOpen(false);
     const name = selected.assistance?.name || "";
     setHelper(name);
     setMessage(
@@ -264,9 +300,34 @@ function PlanContent(props: { demo: boolean }) {
       setNotice("Copy unavailable. Select and copy the message text below.");
     }
   }
+  const savedQueue = savedCourseIds.map(id => {
+    const resource = catalogue.find(item => item.id === `epic5-${id}`);
+    if (!resource || state.events.some(event => event.resourceId === resource.id)) return null;
+    return shortlist.find(item => item.resourceId === resource.id) ?? { resourceId: resource.id, themeTitle: resource.title, skillName: '', addedAt: '', weekdays: [], scheduleMode: 'routine' as const };
+  }).filter((item): item is Selection => !!item);
+  function updatePreference(resourceId: string, patch: Partial<Selection>) {
+    const previous = shortlist.find(item => item.resourceId === resourceId) ?? savedQueue.find(item => item.resourceId === resourceId);
+    if (!previous) return;
+    const next = shortlist.filter(item => item.resourceId !== resourceId).concat({ ...previous, ...patch });
+    try { if (!demo) saveSelections(next); setShortlist(next); }
+    catch { setError('Could not save study times. Please try again.'); }
+  }
+  const courseTasks = state.events.filter(event => event.kind === 'learning' && courses.some(course => `epic5-${course.id}` === event.resourceId));
+  const completedCourseTasks = courseTasks.filter(event => event.completed).length;
+  const courseProgress = courses.flatMap(course => {
+    const tasks = courseTasks.filter(event => event.resourceId === `epic5-${course.id}`);
+    if (!tasks.length) return [];
+    const preference = shortlist.find(item => item.resourceId === `epic5-${course.id}`);
+    const total = preference?.totalMinutes === undefined ? course.durationMin : preference.totalMinutes;
+    const daily = preference?.startTime && preference.endTime
+      ? (Number(preference.endTime.slice(0,2)) * 60 + Number(preference.endTime.slice(3))) - (Number(preference.startTime.slice(0,2)) * 60 + Number(preference.startTime.slice(3)))
+      : Math.max(...tasks.map(duration));
+    return [{ title: course.title, total, daily, days: total && daily > 0 ? Math.ceil(total / daily) : null,
+      done: tasks.filter(event => event.completed).length, count: tasks.length,
+      finish: tasks.map(event => event.date).sort().at(-1) }];
+  });
   const busyOrLoading = busy || loading;
-  if (!demo && !loading && !error && !state.events.length && !shortlist.length)
-    return <JourneyIntro kind="plan" />;
+
   const dialogProps1 = {
     open: !!editor,
     onOpenChange: (open) => {
@@ -289,13 +350,10 @@ function PlanContent(props: { demo: boolean }) {
         title="My Plan"
         description="Make room for learning, everyday life and the people who matter."
         actions={
-          <button
-            className="pl-primary"
-            disabled={busyOrLoading || !!error}
-            onClick={() => newEvent()}
-          >
-            <Plus size={16} /> Add an activity
-          </button>
+          <div className="flex flex-wrap items-center gap-4">
+          <AppButton tone="outline" variant="outline" asChild><Link to={ROUTES.learningCentre}>Choose courses</Link></AppButton>
+          <AppButton tone="gradient" asChild><Link to={ROUTES.possibilities}>Explore possibilities</Link></AppButton>
+          </div>
         }
       />
       {demo && (
@@ -307,49 +365,12 @@ function PlanContent(props: { demo: boolean }) {
           <Link to={`${ROUTES.plan}?demo=0`}>Exit demo</Link>
         </div>
       )}
-      <div className="pl-summary">
-        <div>
-          <BookOpen />
-          <span>
-            <strong>{learning.reduce((n, e) => n + duration(e), 0)} min</strong>
-            learning planned
-          </span>
-        </div>
-        <div>
-          <Check />
-          <span>
-            <strong>
-              {learning
-                .filter((e) => e.completed)
-                .reduce((n, e) => n + duration(e), 0)}{" "}
-              min
-            </strong>
-            completed this week
-          </span>
-        </div>
-        <div className={pairs.length ? "pl-warning" : ""}>
-          <AlertTriangle />
-          <span>
-            <strong>
-              {pairs.length} {pairs.length === 1 ? "conflict" : "conflicts"}
-            </strong>
-            need your attention
-          </span>
-        </div>
-        <div>
-          <MessageCircle />
-          <span>
-            <strong>
-              {
-                state.events.filter((e) => e.assistance?.status === "pending")
-                  .length
-              }{" "}
-              requests
-            </strong>
-            waiting for a reply
-          </span>
-        </div>
-      </div>
+      <section className="pl-task-progress" aria-label="Course task progress">
+        <div><div><p className="pl-kicker">COURSE LEARNING ONLY</p><h2>Course plan progress</h2></div><strong>{completedCourseTasks} / {courseTasks.length}<small>learning sessions completed</small></strong></div>
+        <progress aria-label="Completed course tasks" value={completedCourseTasks} max={Math.max(1, courseTasks.length)} />
+        <p className="pl-muted">Work and personal activities are excluded.</p>
+        <div className="pl-course-progress-breakdown">{courseProgress.map(course => <div key={course.title}><strong>{course.title}</strong><span>{course.days ? `${course.days} study days · ${course.total} min ÷ ${course.daily} min/day` : 'Study duration not available'}</span><small>{course.done}/{course.count} sessions completed · Last scheduled: {course.finish}</small></div>)}</div>
+      </section>
       {error && (
         <div className="pl-error" role="alert">
           {error}{" "}
@@ -365,25 +386,26 @@ function PlanContent(props: { demo: boolean }) {
         <div className="pl-layout">
           <aside className="pl-sidebar pl-panel">
             <p className="pl-kicker">YOUR NEXT STEPS</p>
-            <h2>Learning to schedule</h2>
+            <h2>Recently saved · {savedQueue.length}</h2>
             <p className="pl-muted">
-              Bring one resource into your week. You can split it into shorter
-              sessions.
+              Choose a time for your saved courses.
             </p>
-            {shortlist.length ? (
-              shortlist.map((s) => {
+            {savedQueue.length ? (
+              savedQueue.map((s) => {
                 const r = catalogue.find((r) => r.id === s.resourceId);
                 if (!r) return null;
                 const scheduled = state.events
                   .filter((e) => e.resourceId === r.id)
                   .reduce((n, e) => n + duration(e), 0);
+                const total = s.totalMinutes === undefined ? r.minutes : s.totalMinutes;
+                if (total && scheduled >= total) return null;
                 return (
                   <article className="pl-resource" key={r.id}>
-                    <span>{s.skillName}</span>
+                    {s.skillName && <span>{s.skillName}</span>}
                     <h3>{r.title}</h3>
                     <p>
-                      {r.minutes
-                        ? `${r.minutes} min · example duration`
+                      {total
+                        ? `${total} min selected`
                         : "Confirm duration with provider"}
                     </p>
                     {s.chapterNames?.length ? (
@@ -398,7 +420,9 @@ function PlanContent(props: { demo: boolean }) {
                         </ul>
                       </details>
                     ) : null}
-                    {s.scheduleMode === "routine" && s.startDate ? <p>Preferred start: {s.startDate}</p> : null}
+                    {s.scheduleMode === "routine" && s.startDate ? (
+                      <p>Preferred start: {s.startDate}</p>
+                    ) : null}
                     {s.weekdays?.length && s.minutesPerDay ? (
                       <p>
                         {s.weekdays
@@ -409,9 +433,12 @@ function PlanContent(props: { demo: boolean }) {
                               ],
                           )
                           .join(", ")}{" "}
-                        · {s.minutesPerDay} min/day preferred
+                        · {s.startTime && s.endTime ? `${s.startTime}–${s.endTime}` : `${s.minutesPerDay} min/day preferred`}
                       </p>
                     ) : null}
+                    <div className="pl-work-days">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day,index) => <button key={day} aria-pressed={s.weekdays?.includes(index) ?? false} onClick={() => updatePreference(s.resourceId, { weekdays: s.weekdays?.includes(index) ? s.weekdays.filter(item => item !== index) : [...(s.weekdays ?? []), index] })}>{day}</button>)}</div>
+                    <div className="pl-form-row"><label>From<TimePicker compact label="Study start time" value={s.startTime ?? ''} onChange={value => updatePreference(s.resourceId, { startTime: value })} /></label><label>To<TimePicker compact label="Study end time" value={s.endTime ?? ''} onChange={value => updatePreference(s.resourceId, { endTime: value })} /></label></div>
+                    {!total && <label>Planned minutes<input type="number" min="1" value={s.totalMinutes ?? ''} onChange={event => updatePreference(s.resourceId, { totalMinutes: Number(event.target.value) })} /></label>}
                     {scheduled > 0 && (
                       <p>{scheduled} min scheduled across your plan</p>
                     )}
@@ -427,9 +454,17 @@ function PlanContent(props: { demo: boolean }) {
             ) : (
               <div className="pl-empty">
                 <BookOpen />
-                <p>Your selected resources will appear here.</p>
+                <p>No saved courses waiting to be scheduled.</p>
               </div>
             )}
+            {!!savedQueue.length && <button className="pl-primary" disabled={busyOrLoading} onClick={async () => {
+              const batch = scheduleCourses(savedQueue, catalogue, state.events);
+              if (batch.events.length) {
+                if (!await commit([...state.events, ...batch.events])) return;
+                setWeek(monday(batch.events[0].date));
+              }
+              setNotice([`${batch.events.length} sessions imported.`, ...batch.issues].join(' '));
+            }}>Import course schedule</button>}
             <Link
               {...({
                 className: "pl-link",
@@ -448,6 +483,7 @@ function PlanContent(props: { demo: boolean }) {
             </div>
           </aside>
           <main className="pl-calendar pl-panel">
+            <div className="pl-calendar-tools"><button className="pl-work-button" disabled={busyOrLoading} onClick={() => { setFormError(''); setWorkOpen(true); }}>Set work hours</button><button className="pl-primary" disabled={busyOrLoading} onClick={() => newEvent()}><Plus size={16} /> Add activity</button></div>
             <div className="pl-weekbar">
               <div>
                 <p className="pl-kicker">YOUR WEEK AT A GLANCE</p>
@@ -493,115 +529,30 @@ function PlanContent(props: { demo: boolean }) {
                   {pairs.length === 1 ? "pair" : "pairs"} this week
                 </span>
                 <button
-                  onClick={() =>
-                    setSelectedId(
-                      (pairs[0].find((e) => e.shareable) || pairs[0][0]).id,
-                    )
-                  }
+                  onClick={() => { setSelectedId((pairs[0].find((e) => e.shareable) || pairs[0][0]).id); setCourseOpen(true); }}
                 >
                   Review
                 </button>
               </div>
             )}
-            <div className="pl-days">
-              {days.map((day) => (
-                <section
-                  className={`pl-day ${day === dateKey(new Date()) ? "today" : ""}`}
-                  key={day}
-                >
-                  <header>
-                    <span>
-                      {new Date(`${day}T12:00:00`).toLocaleDateString("en-GB", {
-                        weekday: "short",
-                      })}
-                    </span>
-                    <strong>{new Date(`${day}T12:00:00`).getDate()}</strong>
-                  </header>
-                  <div className="pl-day-events">
-                    {visible
-                      .filter((e) => e.date === day)
-                      .sort((a, b) => a.start.localeCompare(b.start))
-                      .map((e) => {
-                        const conflict = pairs.some((pair) =>
-                          pair.some((x) => x.id === e.id),
-                        );
-                        return (
-                          <button
-                            className={`pl-event ${e.kind} ${selectedId === e.id ? "selected" : ""} ${e.completed ? "completed" : ""}`}
-                            key={e.id}
-                            onClick={() => setSelectedId(e.id)}
-                          >
-                            <span>
-                              {e.start}–{e.end}
-                            </span>
-                            <strong>{e.title}</strong>
-                            <small>{labels[e.kind]}</small>
-                            {conflict && (
-                              <em>
-                                <AlertTriangle size={12} /> Overlap
-                              </em>
-                            )}
-                            {e.assistance && (
-                              <small>
-                                {e.assistance.status === "accepted"
-                                  ? `${e.assistance.name} · confirmed`
-                                  : e.assistance.status === "pending"
-                                    ? "Awaiting reply"
-                                    : e.assistance.status === "draft"
-                                      ? "Request draft"
-                                      : "Help unavailable"}
-                              </small>
-                            )}
-                            {e.completed && <small>✓ Completed</small>}
-                          </button>
-                        );
-                      })}
-                    <button
-                      className="pl-add-day"
-                      aria-label={`Add activity on ${day}`}
-                      onClick={() => {
-                        setFormError("");
-                        setRepeat(false);
-                        setEditor({
-                          id: crypto.randomUUID(),
-                          title: "",
-                          kind: "personal",
-                          date: day,
-                          start: "18:30",
-                          end: "19:00",
-                          flexible: false,
-                          shareable: false,
-                          completed: false,
-                        });
-                      }}
-                    >
-                      <Plus size={14} />
-                    </button>
-                  </div>
-                </section>
-              ))}
-            </div>
-            <p className="pl-calendar-note">
-              Activities are ordered by start time. Card height does not
-              represent duration.
-            </p>
+            <WeekCalendar days={days} events={visible} selectedId={selectedId} onSelect={id => { setSelectedId(id); setCourseOpen(true); }} onAdd={(date, start) => {
+              setFormError(''); setRepeat(false);
+              const hour = Number(start.slice(0, 2));
+              setEditor({ id: crypto.randomUUID(), title: '', kind: 'personal', date, start, end: hour === 23 ? '23:59' : `${String(hour + 1).padStart(2, '0')}:00`, flexible: false, shareable: false, completed: false });
+            }} />
           </main>
-          <aside className="pl-detail pl-panel">
+          <Drawer open={courseOpen && !!selected && !courses.some(course => `epic5-${course.id}` === selected.resourceId)} onOpenChange={open => setCourseOpen(open)}>
+          <DrawerContent className="activity-drawer sm:max-w-xl"><DrawerBody className="pl-detail">
             <p className="pl-kicker">ACTIVITY & SUPPORT</p>
             {selected ? (
               <>
                 <div className="pl-detail-heading">
-                  <h2>{selected.title}</h2>
-                  <button
-                    aria-label="Close activity"
-                    onClick={() => setSelectedId("")}
-                  >
-                    <X size={16} />
-                  </button>
+                  <DrawerTitle>{selected.title}</DrawerTitle>
+
                 </div>
-                <p className="pl-detail-date">
-                  {readable(selected.date)} · {selected.start}–{selected.end}
-                </p>
+                <DrawerDescription className="pl-detail-date">
+                  {selected.date} · {selected.start}–{selected.end}
+                </DrawerDescription>
                 <div className="pl-tags">
                   <span>{labels[selected.kind]}</span>
                   <span>
@@ -642,10 +593,12 @@ function PlanContent(props: { demo: boolean }) {
                       ))}
                   </div>
                 )}
+                {selectedConflicts.length > 0 && <ConflictMessage key={selected.id} event={selected} conflicts={selectedConflicts} />}
                 <div className="pl-detail-actions">
                   <button
                     disabled={busyOrLoading}
                     onClick={() => {
+                      setCourseOpen(false);
                       setEditor({ ...selected });
                       setRepeat(false);
                       setFormError("");
@@ -653,7 +606,7 @@ function PlanContent(props: { demo: boolean }) {
                   >
                     Edit activity
                   </button>
-                  {selected.kind === "learning" && (
+                  {selected && (
                     <button
                       disabled={busyOrLoading}
                       onClick={() =>
@@ -751,12 +704,12 @@ function PlanContent(props: { demo: boolean }) {
                         {selected.assistance.status === "draft" && (
                           <>
                             <a
-                              className="pl-whatsapp"
+                              className="pl-whatsapp-action"
                               href={whatsappLink(selected.assistance.message)}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              Open WhatsApp <ArrowRight size={14} />
+                              <WhatsAppIcon /> Open WhatsApp
                             </a>
                             <p>
                               Choose the intended person and send in WhatsApp.
@@ -838,7 +791,7 @@ function PlanContent(props: { demo: boolean }) {
                 <button
                   className="pl-delete"
                   disabled={busyOrLoading}
-                  onClick={() => setDeleteOpen(true)}
+                  onClick={() => { setCourseOpen(false); setDeleteOpen(true); }}
                 >
                   <Trash2 size={14} /> Delete activity
                 </button>
@@ -853,7 +806,7 @@ function PlanContent(props: { demo: boolean }) {
                 </p>
               </div>
             )}
-          </aside>
+          </DrawerBody></DrawerContent></Drawer>
         </div>
       )}
       <p className="pl-footer">
@@ -862,6 +815,23 @@ function PlanContent(props: { demo: boolean }) {
           : "Your plan is saved to your account."}{" "}
         WhatsApp delivery and replies are not tracked automatically.
       </p>
+      {courseOpen && selected && courses.some(course => `epic5-${course.id}` === selected.resourceId) && <PlanCourseDrawer conflicts={selectedConflicts} selectedEvent={selected} busy={busyOrLoading} onComplete={event => commit(state.events.map(item => item.id === event.id ? { ...item, completed: !item.completed } : item))} course={courses.find(course => `epic5-${course.id}` === selected.resourceId)!} events={state.events.filter(event => event.resourceId === selected.resourceId)} onClose={() => setCourseOpen(false)} onEdit={event => { setCourseOpen(false); setFormError(''); setRepeat(false); setEditor({ ...event }); }} />}
+      <Dialog open={workOpen} onOpenChange={setWorkOpen}><DialogContent className="pl-modal"><DialogTitle>Set work hours</DialogTitle><DialogDescription>Choose weekdays and the date range for your recurring work schedule.</DialogDescription>
+        <div className="pl-work-days">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day,index) => <button key={day} aria-pressed={workDays.includes(index)} onClick={() => setWorkDays(workDays.includes(index) ? workDays.filter(item => item !== index) : [...workDays,index])}>{day}</button>)}</div>
+        <div className="pl-form-row"><label>From<TimePicker value={workStart} onChange={value => setWorkStart(value)} /></label><label>To<TimePicker value={workEnd} onChange={value => setWorkEnd(value)} /></label></div>
+        <div className="pl-form-row"><label>Start date<input type="date" value={workFrom} onChange={e => setWorkFrom(e.target.value)} /></label><label>Through<input type="date" value={workTo} min={workFrom} onChange={e => setWorkTo(e.target.value)} /></label></div>
+        {formError && <p role="alert">{formError}</p>}<button className="pl-primary" disabled={busyOrLoading} onClick={async () => {
+          if (!workDays.length || !workFrom || !workTo || workTo < workFrom || !workStart || !workEnd || workEnd <= workStart) { setFormError('Choose work days, a valid date range and an end time after the start.'); return; }
+          if (workTo > addDays(workFrom, 365)) { setFormError('Choose a date range of up to one year.'); return; }
+          const additions: PlanEvent[] = [];
+          for (let date = workFrom; date <= workTo; date = addDays(date, 1)) {
+            if (!workDays.includes((new Date(`${date}T12:00:00`).getDay() + 6) % 7)) continue;
+            if (state.events.some(e => e.kind === 'work' && e.date === date && e.start === workStart && e.end === workEnd)) continue;
+            additions.push({id: crypto.randomUUID(), title: 'Work', kind: 'work', date, start: workStart, end: workEnd, flexible: false, shareable: false, completed: false});
+          }
+          if (await commit([...state.events, ...additions])) { setWorkOpen(false); setWeek(monday(workFrom)); }
+        }}>Save work hours</button>
+      </DialogContent></Dialog>
       <Dialog {...dialogProps1}>
         <DialogContent className="pl-modal">
           <DialogTitle>
@@ -926,25 +896,11 @@ function PlanContent(props: { demo: boolean }) {
               <div className="pl-form-row">
                 <label>
                   Start
-                  <input
-                    required
-                    type="time"
-                    value={editor.start}
-                    onChange={(e) =>
-                      setEditor({ ...editor, start: e.target.value })
-                    }
-                  />
+                  <TimePicker label="Start time" value={editor.start} onChange={value => setEditor({ ...editor, start: value })} />
                 </label>
                 <label>
                   End
-                  <input
-                    required
-                    type="time"
-                    value={editor.end}
-                    onChange={(e) =>
-                      setEditor({ ...editor, end: e.target.value })
-                    }
-                  />
+                  <TimePicker label="End time" value={editor.end} onChange={value => setEditor({ ...editor, end: value })} />
                 </label>
               </div>
               <label className="pl-check">

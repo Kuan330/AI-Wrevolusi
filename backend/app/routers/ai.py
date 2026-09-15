@@ -8,6 +8,7 @@ from app.schemas.occupation_ai import (
     OccupationSuggestionsResponse,
 )
 from app.schemas.skill_matching import SkillMatchRequest, SkillMatchResponse
+from app.schemas.task_assist import TaskAssistRequest, TaskAssistResponse
 from app.services.ai_gateway import AIGateway, default_ai_gateway
 from app.services.ai_matching import (
     MINIMUM_TASK_MATCH_WORDS,
@@ -21,6 +22,7 @@ from app.services.occupation_ai import (
     deterministic_suggest_occupations,
 )
 from app.services.skill_matching import match_skills_response
+from app.services.task_assist import deterministic_task_assist, suggest_task_assist
 
 
 
@@ -184,3 +186,13 @@ def skill_match(
         post_validate=lambda response: _retain_task_evidence(response, request.task_text),
     )
     return result.value
+
+
+@router.post('/task-assist', response_model=TaskAssistResponse)
+async def task_assist(request: TaskAssistRequest) -> TaskAssistResponse:
+    """One-shot workplace task assistance reply for the chat dialog."""
+
+    try:
+        return await suggest_task_assist(request)
+    except Exception:
+        return deterministic_task_assist(request)

@@ -29,3 +29,9 @@ async def analyse_skill_directions(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=str(exc),
         ) from exc
+
+from app.services.learning_goal import LearningGoalRequest, LearningGoalResponse, suggest_learning_goal
+
+@router.post('/learning-goal', response_model=LearningGoalResponse)
+async def learning_goal(request: LearningGoalRequest) -> LearningGoalResponse:
+    return await suggest_learning_goal(request)

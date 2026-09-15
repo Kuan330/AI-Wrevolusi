@@ -13,19 +13,36 @@ import {
   ILO_OCCUPATION_EXPOSURE_OPEN_DATA,
   ILO_OCCUPATION_EXPOSURE_SOURCE,
 } from "@/pages/Analysis/lib/dataSources";
+import { occupationBandFromPotential } from "@/pages/Analysis/lib/occupationBands";
+import OccupationName from "./OccupationName";
+
 type OccupationScoreCardProps = {
   score: number | null;
+  potential25: string | null;
+  title: string;
+  path: string[];
   onOpenDetails: () => void;
 };
 
 const OccupationScoreCard = (props: OccupationScoreCardProps) => {
-  const { score: rawScore, onOpenDetails } = props;
+  const {
+    score: rawScore,
+    potential25,
+    title,
+    path,
+    onOpenDetails,
+  } = props;
   const score =
     typeof rawScore === "number" && Number.isFinite(rawScore)
       ? Math.min(1, Math.max(0, rawScore))
       : null;
   const percent = score == null ? null : Math.round(score * 100);
+  const band = occupationBandFromPotential(potential25);
 
+  const occupationNameProps = {
+    title,
+    path,
+  } satisfies Partial<ComponentProps<typeof OccupationName>>;
   const infoProps1 = {
     className: "occupation-score__info-icon",
     "aria-hidden": "true",
@@ -38,6 +55,7 @@ const OccupationScoreCard = (props: OccupationScoreCardProps) => {
     className: "occupation-score__source-icon",
     "aria-hidden": "true",
   } satisfies Partial<ComponentProps<typeof ExternalLink>>;
+
   return (
     <Card className="analysis-card occupation-score__card">
       <CardHeader className="occupation-score__header">
@@ -47,12 +65,23 @@ const OccupationScoreCard = (props: OccupationScoreCardProps) => {
               Occupational AI exposure
             </p>
             <CardTitle className="occupation-score__title">
-              What the exposure score means
+              <OccupationName {...occupationNameProps} />
             </CardTitle>
+            {path.length > 0 && (
+              <p className="occupation-score__path">{path.join(" → ")}</p>
+            )}
           </div>
+          <button
+            type="button"
+            aria-label="More information about the exposure score"
+            className="occupation-score__info-button"
+            onClick={onOpenDetails}
+          >
+            <Info {...infoProps1} />
+          </button>
         </div>
         <CardDescription className="occupation-score__description">
-          A relative 0–1 index of how much the assessed tasks may be affected by
+          A relative 0–1 index of how much this occupation may be affected by
           generative AI.
         </CardDescription>
       </CardHeader>
@@ -64,14 +93,6 @@ const OccupationScoreCard = (props: OccupationScoreCardProps) => {
             </span>
             <span className="occupation-score__scale">/ 1.0</span>
           </p>
-          <button
-            type="button"
-            aria-label="More information about the exposure score"
-            className="occupation-score__info-button"
-            onClick={onOpenDetails}
-          >
-            <Info {...infoProps1} />
-          </button>
         </div>
         {percent != null ? (
           <>
@@ -82,7 +103,7 @@ const OccupationScoreCard = (props: OccupationScoreCardProps) => {
               } satisfies Partial<ComponentProps<typeof GradientBar>>)}
             />
             <div className="occupation-score__legend">
-              <span>Occupation mean score · higher means more AI impact</span>
+              <span>Exposure index · higher means more AI impact</span>
               <span className="occupation-score__legend-end">Low → High</span>
             </div>
           </>
@@ -90,6 +111,17 @@ const OccupationScoreCard = (props: OccupationScoreCardProps) => {
           <p className="occupation-score__unavailable">
             An occupational mean score is not available for this analysis.
           </p>
+        )}
+        {band && (
+          <div className="occupation-score__band">
+            <p
+              className="occupation-score__band-label"
+              style={{ color: band.ink }}
+            >
+              {band.label}
+            </p>
+            <p className="occupation-score__band-copy">{band.description}</p>
+          </div>
         )}
         <p className="occupation-score__sources">
           <span className="occupation-score__source-label">Source</span>

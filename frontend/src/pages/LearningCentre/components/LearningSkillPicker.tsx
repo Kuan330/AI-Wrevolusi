@@ -1,28 +1,38 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { GripVertical, Plus, Check, X, ArrowUp, ArrowDown } from "lucide-react";
+import { ExternalLink, Plus, Check, X, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppButton } from "@/components/ui/app-button";
 import { toast } from "sonner";
-import type { SkillEvidence } from "../lib/skillProfile";
+import type { SkillEvidence } from "@/pages/Skills/lib/skillProfile";
 import {
   growingSkills,
   readLearningSkills,
   saveLearningSkills,
+  reconcileLearningSkills,
   skillKey,
   type LearningSkill,
-} from "../learningSkills";
+} from "@/pages/Skills/learningSkills";
 import "../learning-skills.css";
-type Props = { evidence: SkillEvidence[] };
+
+type Props = {
+  evidence: SkillEvidence[];
+  onSaved?: () => void;
+  onCancel?: () => void;
+};
+
 export default function LearningSkillPicker(props: Props) {
-  const { evidence } = props;
+  const { evidence, onSaved, onCancel } = props;
   const work = evidence.map(({ skill }) => ({
     id: skillKey(skill.core_skill),
     name: skill.core_skill,
+    source: "work" as const,
   }));
   const [initial] = useState(() => {
     try {
-      return { skills: readLearningSkills() ?? work, error: "" };
+      return {
+        skills: reconcileLearningSkills(readLearningSkills(), work),
+        error: "",
+      };
     } catch (error) {
       return { skills: work, error: String(error) };
     }
@@ -31,7 +41,7 @@ export default function LearningSkillPicker(props: Props) {
   const [error, setError] = useState(initial.error);
   const [dragged, setDragged] = useState<LearningSkill | null>(null);
   const [target, setTarget] = useState<string | null>(null);
-  const navigate = useNavigate();
+
   function add(skill: LearningSkill, before?: string) {
     setSelected((current) => {
       if (before === skill.id) return current;
@@ -46,6 +56,7 @@ export default function LearningSkillPicker(props: Props) {
       return next;
     });
   }
+
   function move(index: number, delta: number) {
     setSelected((current) => {
       const next = [...current];
@@ -55,6 +66,7 @@ export default function LearningSkillPicker(props: Props) {
       return next;
     });
   }
+
   function remove(skill: LearningSkill, index: number) {
     setSelected((current) => current.filter((item) => item.id !== skill.id));
     toast("Removed from learning skills", {
@@ -70,22 +82,33 @@ export default function LearningSkillPicker(props: Props) {
       },
     });
   }
+
   return (
     <section
       id="skill-directions"
       tabIndex={-1}
       className="learning-skill-picker scroll-mt-24"
     >
-      <p className="skills-eyebrow">Plan your next skill move</p>
+      <p className="learning-skill-eyebrow">Plan your next skill move</p>
       <h2>Choose skills to learn</h2>
       <p>
         Start with skills reflected in your work, then add skills you want to
         develop. Drag skills across or use the add buttons.
       </p>
       <div className="learning-skill-columns">
-        <div className="skills-glass-card learning-skill-panel">
+        <div className="learning-skill-glass learning-skill-panel">
           <h3>Explore growing skills</h3>
-          <p>WEF · 2025–2030 Top 10</p>
+          <p className="learning-wef-source">
+            WEF · 2025–2030 Top 10
+            <a
+              href="https://www.weforum.org/publications/the-future-of-jobs-report-2025/in-full/3-skills-outlook/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open WEF Skills outlook (new tab)"
+            >
+              <ExternalLink size={16} aria-hidden="true" />
+            </a>
+          </p>
           <small>
             Employer expectations of growing skill importance, not a personal
             skill assessment.
@@ -108,12 +131,12 @@ export default function LearningSkillPicker(props: Props) {
                     setTarget(null);
                   }}
                 >
-                  <GripVertical size={16} />
                   <span>{skill.name}</span>
                   <Button
                     size="sm"
-                    variant="ghost"
-                    aria-label={`Add ${skill.name}`}
+                    variant="outline"
+                    className="learning-skill-add"
+                    aria-label={`${added ? "Added" : "Add"} ${skill.name}`}
                     disabled={added}
                     onClick={() => add(skill)}
                   >
@@ -133,7 +156,7 @@ export default function LearningSkillPicker(props: Props) {
           </a>
         </div>
         <div
-          className={`skills-glass-card learning-skill-panel ${dragged ? "accepts-drop" : ""}`}
+          className={`learning-skill-glass learning-skill-panel ${dragged ? "accepts-drop" : ""}`}
           onDragOver={(event) => {
             if (dragged) {
               event.preventDefault();
@@ -156,7 +179,7 @@ export default function LearningSkillPicker(props: Props) {
             {selected.map((skill, index) => (
               <div
                 key={skill.id}
-                className={`learning-skill-item ${target === skill.id ? "is-drop-target" : ""}`}
+                className={`learning-skill-item learning-skill-sortable ${dragged?.id === skill.id ? "is-dragging" : ""} ${target === skill.id ? "is-drop-target" : ""}`}
                 draggable
                 onDragStart={(event) => {
                   setDragged(skill);
@@ -182,13 +205,14 @@ export default function LearningSkillPicker(props: Props) {
                   setTarget(null);
                 }}
               >
-                <GripVertical size={16} />
                 <span>
                   {skill.name}
                   <small>
                     {work.some((item) => item.id === skill.id)
                       ? "From your work"
-                      : "Added from WEF"}
+                      : skill.source === "wef"
+                        ? "Added from WEF"
+                        : "Selected for learning"}
                   </small>
                 </span>
                 <div className="learning-skill-actions">
@@ -196,6 +220,7 @@ export default function LearningSkillPicker(props: Props) {
                     size="icon"
                     variant="ghost"
                     disabled={index === 0}
+                    className="learning-skill-sort"
                     aria-label={`Move ${skill.name} up`}
                     onClick={() => move(index, -1)}
                   >
@@ -205,6 +230,7 @@ export default function LearningSkillPicker(props: Props) {
                     size="icon"
                     variant="ghost"
                     disabled={index === selected.length - 1}
+                    className="learning-skill-sort"
                     aria-label={`Move ${skill.name} down`}
                     onClick={() => move(index, 1)}
                   >
@@ -227,39 +253,45 @@ export default function LearningSkillPicker(props: Props) {
               Add skills from the left, or restore your work skills.
             </p>
           )}
-          <Button
-            variant="link"
-            onClick={() =>
-              setSelected((current) => [
-                ...current,
-                ...work.filter(
-                  (skill) => !current.some((item) => item.id === skill.id),
-                ),
-              ])
-            }
-          >
-            Restore my work skills
-          </Button>
+          <div className="learning-skill-panel-actions">
+            <Button
+              variant="link"
+              onClick={() =>
+                setSelected((current) => [
+                  ...current,
+                  ...work.filter(
+                    (skill) => !current.some((item) => item.id === skill.id),
+                  ),
+                ])
+              }
+            >
+              Restore my work skills
+            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              {onCancel ? (
+                <Button type="button" variant="outline" onClick={onCancel}>
+                  Cancel
+                </Button>
+              ) : null}
+              <AppButton
+                tone="gradient"
+                disabled={!selected.length || !!initial.error}
+                onClick={() => {
+                  try {
+                    saveLearningSkills(selected);
+                    onSaved?.();
+                  } catch {
+                    setError("Could not save your skills. Please try again.");
+                  }
+                }}
+              >
+                Confirm and find courses →
+              </AppButton>
+            </div>
+          </div>
         </div>
       </div>
       {error && <p role="alert">{error}</p>}
-      <div className="skills-glass-card learning-skill-footer">
-        <span>{selected.length} skills selected</span>
-        <AppButton
-          tone="gradient"
-          disabled={!selected.length || !!initial.error}
-          onClick={() => {
-            try {
-              saveLearningSkills(selected);
-              navigate("/learning-centre");
-            } catch {
-              setError("Could not save your skills. Please try again.");
-            }
-          }}
-        >
-          Confirm and find courses →
-        </AppButton>
-      </div>
     </section>
   );
 }

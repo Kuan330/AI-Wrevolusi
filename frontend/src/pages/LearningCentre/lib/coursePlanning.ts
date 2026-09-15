@@ -35,11 +35,14 @@ export function estimateLabel(course: Course, choice: CourseChoice): string {
   if (choice.scheduleMode === "later") return "Schedule later in My Plan.";
   if (!choice.weekdays.length)
     return "Choose study days to estimate your pace.";
-  const minutes = selectedMinutes(course, choice);
-  if (minutes === null)
-    return "Selected content duration is unknown; weeks cannot be estimated.";
+  const minutes = selectedMinutes(course, choice) ?? choice.estimatedMinutes;
+  if (!minutes)
+    return "Enter total learning minutes to calculate your study days.";
   if (minutes === 0) return "Choose at least one chapter.";
-  return `About ${Math.ceil(minutes / (choice.weekdays.length * choice.minutesPerDay))} weeks at ${choice.weekdays.length} days/week × ${choice.minutesPerDay} min/day. Estimate only.`;
+  if (!Number.isFinite(choice.minutesPerDay) || choice.minutesPerDay <= 0)
+    return "Choose a valid study time to calculate your study days.";
+  const days = Math.ceil(minutes / choice.minutesPerDay);
+  return `${days} study ${days === 1 ? 'day' : 'days'} · ${minutes} min total ÷ ${choice.minutesPerDay} min/day. Scheduled on your selected weekdays from the start date; the final session uses only the remaining time.`;
 }
 export function validateChoice(
   course: Course,
@@ -54,5 +57,10 @@ export function validateChoice(
     (!choice.startDate || !/^\d{4}-\d{2}-\d{2}$/.test(choice.startDate))
   )
     return "Choose a start date for your weekly routine.";
+  if (choice.scheduleMode === "routine" && (choice.startTime || choice.endTime)) {
+    const valid = /^([01]\d|2[0-3]):[0-5]\d$/;
+    if (!valid.test(choice.startTime ?? "") || !valid.test(choice.endTime ?? "") || choice.endTime! <= choice.startTime!)
+      return "Choose an end time later than the start time on the same day.";
+  }
   return null;
 }

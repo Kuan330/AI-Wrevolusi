@@ -1,6 +1,6 @@
 import type { PlanEvent } from "@/pages/Plan/planModel";
 import type { Resource, Selection } from "../resources";
-import { addDays } from "@/pages/Plan/planModel";
+import { addDays, mins, timeString } from "@/pages/Plan/planModel";
 /** Produces an editable session, never a saved calendar event. */
 export function learningSession(
   resource: Resource | undefined,
@@ -23,15 +23,16 @@ export function learningSession(
       }
     }
   }
+  const start = selection?.startTime || "18:30";
   const length = selection?.minutesPerDay ?? 30;
-  const endMinutes = 18 * 60 + 30 + length;
+  const endMinutes = mins(start) + length;
   return {
     id: crypto.randomUUID(),
     title: resource?.title ?? "",
     kind: resource ? "learning" : "personal",
     date,
-    start: "18:30",
-    end: `${String(Math.floor(endMinutes / 60)).padStart(2, "0")}:${String(endMinutes % 60).padStart(2, "0")}`,
+    start,
+    end: selection?.endTime || timeString(Math.min(endMinutes, 1439)),
     flexible: !!resource,
     shareable: false,
     resourceId: resource?.id,

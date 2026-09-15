@@ -27,7 +27,7 @@ export type CourseDetailDrawerProps = {
   startPlanning: boolean;
   onClose: () => void;
   onSave: () => void;
-  onCommit: (choice: CourseChoice) => boolean;
+  onCommit: (choice: CourseChoice) => boolean | Promise<boolean>;
 };
 export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
   const {
@@ -64,7 +64,7 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
           <p className="library-kicker">
             {planning ? "Plan your learning" : course.provider}
           </p>
-          <DrawerTitle>{course.title}</DrawerTitle>
+          <DrawerTitle>{course.title} {scheduled && <span className="course-import-badge">In learning plan</span>}</DrawerTitle>
           <DrawerDescription>
             {course.provider} ·{" "}
             {course.level === "unknown" ? "Level not stated" : course.level} ·{" "}

@@ -4,6 +4,10 @@
   gap: 1.25rem;
 }
 
+.exposure-page__header h1 {
+  font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.75rem);
+}
+
 .exposure-page__actions {
   display: flex;
   flex-wrap: wrap;
@@ -260,57 +264,344 @@
   }
 }
 
-/* The task list and guide share the application's AnalysisCard and form controls. */
-.exposure-workspace {
+/* Dashboard: left stack (compare + skill cloud) + right task list */
+.exposure-dashboard {
   display: grid;
   align-items: start;
   gap: 1.25rem;
   min-width: 0;
 }
-.exposure-workspace > * {
+
+.exposure-dashboard__main,
+.exposure-dashboard__tasks {
   min-width: 0;
-}
-.exposure-score-intro {
   display: grid;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
-.exposure-task {
-  cursor: pointer;
-  border: 1px solid transparent;
-  border-radius: 14px;
+
+.exposure-dashboard__tasks {
+  align-content: start;
+}
+
+.exposure-dashboard__tasks .exposure-task-list {
+  height: auto;
+  padding-bottom: 0;
+}
+
+.exposure-dashboard__tasks .exposure-task-list > .analysis-card__content {
+  padding-bottom: 0;
+}
+
+.exposure-skill-cloud {
+  padding: 1.1rem 1.25rem 1rem;
+}
+
+.exposure-skill-cloud__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.exposure-skill-cloud__header-aside {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+  min-width: min(18rem, 100%);
+  min-height: 3.4rem;
+}
+
+.exposure-skill-cloud__filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  min-height: 1.35rem;
+  max-width: 100%;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  color: #3d5f7a;
+}
+
+.exposure-skill-cloud__filter-row.is-placeholder {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.exposure-skill-cloud__filter-label {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 15.5rem;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.exposure-skill-cloud__filter-skill {
+  display: inline-block;
+  min-width: 0;
+  max-width: 10.5rem;
+  overflow: hidden;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.exposure-skill-cloud__title {
+  margin-top: 0.45rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #2f2430;
+}
+
+.exposure-skill-cloud__copy {
+  margin-top: 0.55rem;
+  max-width: 34rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #574a55;
+}
+
+.exposure-skill-cloud__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.85rem 1.25rem;
+  font-size: 0.75rem;
+  color: #7f7280;
+}
+
+.exposure-skill-cloud__legend-dot {
+  display: inline-block;
+  width: 0.625rem;
+  height: 0.625rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+}
+
+.exposure-skill-cloud__legend-dot.is-matched {
+  background: linear-gradient(90deg, #e8a0b0 0%, #c7a0c8 42%, #7eb3d9 78%, #4f91ba 100%);
+  box-shadow: 0 0 0 2px rgba(232, 160, 176, 0.18);
+}
+
+.exposure-skill-cloud__legend-dot.is-other {
+  border: 1px solid #d6e4f0;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.exposure-skill-cloud__clear {
+  flex-shrink: 0;
+  border: 0;
   background: transparent;
-  padding: 1rem;
+  color: #326889;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.exposure-skill-cloud__clear:focus-visible {
+  outline: 2px solid #4f91ba;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.exposure-skill-cloud__visual {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  overflow: visible;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+  margin-top: 0.55rem;
+  padding: 0.85rem 0 0.35rem;
+}
+
+.exposure-skill-cloud__glow {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  width: min(44rem, 94%);
+  height: 14rem;
+  border-radius: 50%;
+  background: linear-gradient(90deg, rgba(184, 220, 242, 0.28), rgba(244, 213, 223, 0.3));
+  filter: blur(38px);
+  transform: translate(-50%, -50%);
+}
+
+.exposure-skill-cloud__shape {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 46rem;
+  margin-inline: auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.exposure-skill-cloud__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.7rem;
+  width: auto;
+  max-width: 100%;
+  padding-inline: 0;
+}
+
+/* Soft cloud stagger — lighter padding so the cloud reads wider. */
+.exposure-skill-cloud__row.is-row-1 {
+  padding-inline: 0.85rem;
+}
+
+.exposure-skill-cloud__row.is-row-2 {
+  padding-inline: 0.2rem;
+}
+
+.exposure-skill-cloud__row.is-row-3 {
+  padding-inline: 0;
+}
+
+.exposure-skill-cloud__row.is-row-4 {
+  padding-inline: 0.25rem;
+}
+
+.exposure-skill-cloud__row.is-row-5 {
+  padding-inline: 0.1rem;
+}
+
+.exposure-skill-cloud__row.is-row-6 {
+  padding-inline: 0.95rem;
+}
+
+.exposure-skill-cloud__skill {
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  min-height: 1.9rem;
+  max-width: 16rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(214, 228, 240, 0.82);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.42rem 0.78rem;
+  color: #7f7280;
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: center;
+  overflow-wrap: anywhere;
+  box-shadow: 0 3px 10px rgba(61, 43, 54, 0.04);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.exposure-skill-cloud__skill.is-muted,
+.exposure-skill-cloud__skill[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.76;
+}
+
+.exposure-skill-cloud__skill.is-matched {
+  z-index: 1;
+  min-height: 2.15rem;
+  border-color: rgba(79, 145, 186, 0.35);
+  background: linear-gradient(100deg, #d6eaf7 0%, #ece8f4 58%, #f5e5e9 100%);
+  color: #2f5f80;
+  cursor: pointer;
+  padding: 0.48rem 0.9rem;
+  font-size: 0.74rem;
+  font-weight: 620;
+  box-shadow:
+    0 5px 14px rgba(79, 145, 186, 0.14),
+    0 0 18px rgba(199, 160, 200, 0.11);
+}
+
+.exposure-skill-cloud__skill.is-matched:hover,
+.exposure-skill-cloud__skill.is-active {
+  z-index: 2;
+  border-color: rgba(79, 145, 186, 0.68);
+  box-shadow: 0 7px 18px rgba(79, 145, 186, 0.18);
+  transform: translateY(-2px);
+}
+
+.exposure-skill-cloud__skill.is-active {
+  outline: 2px solid rgba(79, 145, 186, 0.16);
+  outline-offset: 2px;
+}
+
+.exposure-task {
+  border: 1px solid #d6e4f0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.65rem 0.8rem 0.55rem;
   color: #2f2430;
   overflow-wrap: anywhere;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
 }
-.exposure-task:hover,
-.exposure-task:focus-within {
-  border-color: #d1e3ee;
-  background: rgba(234, 243, 251, 0.45);
+
+.exposure-task.is-openable {
+  cursor: pointer;
 }
+
+.exposure-task.is-openable:hover,
+.exposure-task.is-openable:focus-visible {
+  border-color: rgba(79, 145, 186, 0.45);
+  background: linear-gradient(100deg, #d6eaf7 0%, #ece8f4 58%, #f5e5e9 100%);
+  box-shadow: 0 3px 10px rgba(79, 145, 186, 0.08);
+}
+
+.exposure-task.is-openable:focus-visible {
+  outline: 2px solid rgba(79, 145, 186, 0.45);
+  outline-offset: 2px;
+}
+
+.exposure-task__title {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.35rem;
+}
+
+.exposure-task__detail-btn {
+  display: inline-flex !important;
+  height: 1.7rem !important;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px !important;
+  border-color: #c9dfef !important;
+  background: linear-gradient(
+    100deg,
+    rgba(214, 234, 247, 0.85) 0%,
+    rgba(248, 236, 239, 0.7) 100%
+  ) !important;
+  color: #2f5f80 !important;
+  font-size: 0.75rem !important;
+  font-weight: 600;
+  padding-inline: 0.7rem !important;
+}
+
 .exposure-task.is-selected {
   border-color: #c5dcea;
   background: linear-gradient(110deg, #dceef9, #f8edf1);
-}
-.exposure-task__select {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  text-align: left;
-  color: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.5rem;
-  cursor: pointer;
-}
-.exposure-task__select:focus-visible {
-  outline: 2px solid #4f91ba;
-  outline-offset: 4px;
-  border-radius: 4px;
 }
 .task-guide {
   scroll-margin-top: 6rem;
@@ -362,19 +653,56 @@
   font-variant-numeric: tabular-nums;
 }
 @media (min-width: 1024px) {
-  .exposure-workspace {
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-    gap: 1.5rem;
+  .exposure-dashboard {
+    /* Wider right task column; sticky beside Skills in your work. */
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, 28rem);
+    gap: 1.35rem;
+    align-items: start;
   }
-  .exposure-score-intro {
-    grid-template-columns: 1.2fr 1fr;
-    gap: 2.5rem;
+
+  .exposure-dashboard__main {
+    align-content: start;
+    min-width: 0;
+  }
+
+  .exposure-dashboard__tasks {
+    position: sticky;
+    top: 5.5rem;
+    z-index: 5;
+    align-self: start;
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 6.25rem);
+    max-height: calc(100vh - 6.25rem);
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .exposure-dashboard__tasks .exposure-task-list.analysis-card,
+  .exposure-dashboard__tasks .analysis-card.exposure-task-list {
+    display: flex;
+    height: 100%;
+    max-height: none;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+
+  .exposure-dashboard__tasks .exposure-task-list > .analysis-card__content {
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+
+  .exposure-dashboard__tasks .exposure-task-scroll {
+    flex: 1 1 auto;
+    max-height: none;
+    min-height: 0;
   }
 }
 
 .exposure-task-scroll {
-  /* Keep a consistent window (roughly five compact cards) after filtering. */
-  max-height: 44rem;
+  max-height: 28rem;
   overflow-y: auto;
   scrollbar-gutter: stable;
   overscroll-behavior-y: contain;
@@ -434,12 +762,14 @@
   display: inline-flex;
   width: 1.75rem;
   height: 1.75rem;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   border-radius: 50%;
   background: #ffffffd9;
   color: #4f91ba;
   font-size: 0.75rem;
+  line-height: 1;
+  text-align: center;
   flex-shrink: 0;
 }
 .guide-tools {
@@ -458,24 +788,21 @@
 }
 
 @media (min-width: 1024px) {
-  .exposure-workspace {
-    align-items: start;
-  }
-  .exposure-workspace > .analysis-card {
-    height: auto;
-    max-height: 960px;
+  .exposure-dashboard__tasks .exposure-task-list > .analysis-card__content {
     min-height: 0;
   }
-  .exposure-workspace .analysis-card__header {
+
+  .exposure-dashboard__tasks
+    .exposure-task-list
+    > .analysis-card__content
+    > :not(.exposure-task-scroll) {
     flex-shrink: 0;
   }
-  .exposure-task-list > .analysis-card__content > :not(.exposure-task-scroll) {
-    flex-shrink: 0;
-  }
-  .exposure-task-list .exposure-task-scroll {
-    flex: 0 1 auto;
+
+  .exposure-dashboard__tasks .exposure-task-list .exposure-task-scroll {
+    flex: 1 1 auto;
     min-height: 0;
-    max-height: 29rem;
+    max-height: none;
   }
 
   .task-guide > .analysis-card__content {

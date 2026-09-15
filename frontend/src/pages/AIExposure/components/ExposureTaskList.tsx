@@ -1,7 +1,7 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, MouseEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import TaskDetailsDrawer from "@/pages/Analysis/components/TaskDetailsDrawer";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ScoreRangeSlider from "@/components/ui/score-range-slider";
 import AnalysisCard from "@/pages/Analysis/components/AnalysisCard";
@@ -12,20 +12,25 @@ import {
 } from "@/pages/Analysis/lib/taskScore";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
+import { formatScorePercent } from "@/pages/Analysis/lib/scorePercent";
 import { cn } from "@/lib/utils";
-import { formatMinutes } from "../lib/taskPractice";
 
 type Props = {
   tasks: ProfileTask[];
   assessments: ConfirmedTaskExposureAssessment[];
-  selectedId: string | null;
-  onSelect: (id: string) => void;
   range: TaskScoreRange;
   onRangeChange: (range: TaskScoreRange) => void;
+  skillFilterLabel?: string | null;
 };
+
 export default function ExposureTaskList(props: Props) {
-  const { tasks, assessments, selectedId, onSelect, range, onRangeChange } =
-    props;
+  const {
+    tasks,
+    assessments,
+    range,
+    onRangeChange,
+    skillFilterLabel = null,
+  } = props;
   const listRef = useRef<HTMLDivElement>(null);
   const [canScrollDown, setCanScrollDown] = useState(false);
   useEffect(() => {
@@ -69,8 +74,11 @@ export default function ExposureTaskList(props: Props) {
   const analysisCardProps1 = {
     eyebrow: "Compare your tasks",
     title: "Your task exposure",
-    description: "Highest scores first. Select a task to see AI guidance.",
+    description: skillFilterLabel
+      ? `Highest scores first. Showing tasks linked to ${skillFilterLabel}.`
+      : "Highest scores first. Select a skill on the left to filter tasks.",
     className: "exposure-task-list",
+    id: "exposure-task-list-card",
   } satisfies Partial<ComponentProps<typeof AnalysisCard>>;
   const scoreRangeSliderProps2 = {
     value: range,
@@ -87,7 +95,9 @@ export default function ExposureTaskList(props: Props) {
       <details open className="guide-disclosure mb-5">
         <summary>
           Filter by score
-          {fullRange ? "" : ` · ${range[0].toFixed(2)}–${range[1].toFixed(2)}`}
+          {fullRange
+            ? ""
+            : ` · ${formatScorePercent(range[0])}–${formatScorePercent(range[1])}`}
         </summary>
         <div className="mt-3">
           <ScoreRangeSlider {...scoreRangeSliderProps2} />
@@ -95,69 +105,53 @@ export default function ExposureTaskList(props: Props) {
       </details>
       <p className="mb-3 text-xs text-[#7f7280]" aria-live="polite">
         Showing {visible.length} of {tasks.length} tasks
+        {skillFilterLabel ? ` · ${skillFilterLabel}` : ""}
       </p>
       <div
         ref={listRef}
-        className="exposure-task-scroll analysis-list-scroll space-y-1"
+        className="exposure-task-scroll analysis-list-scroll space-y-1.5"
         role="region"
         aria-label="Assessed tasks"
         tabIndex={0}
       >
         {visible.map(({ task, score }) => {
-          const trials = task.practice?.trials ?? [];
-          const latest = trials.find(
-            (trial) => trial.taskWording === task.wording,
-          );
-          const chevronRightProps3 = {
-            className: "size-4 shrink-0 text-[#7f7280]",
-            "aria-hidden": "true",
-          } satisfies Partial<ComponentProps<typeof ChevronRight>>;
+          const openDetails = () => setDetailsId(task.id);
           const buttonProps4 = {
-            variant: "link",
-            className: "h-auto p-0 text-xs text-[#326889]",
-            onClick: () => setDetailsId(task.id),
+            type: "button",
+            variant: "outline",
+            size: "sm",
+            className: "exposure-task__detail-btn ml-auto",
+            onClick: (event: MouseEvent<HTMLButtonElement>) => {
+              event.stopPropagation();
+              openDetails();
+            },
             "aria-haspopup": "dialog",
           } satisfies Partial<ComponentProps<typeof Button>>;
           return (
             <article
               key={task.id}
-              onClick={(event) => {
-                // Evidence opens independently of task selection.
-                if ((event.target as HTMLElement).closest("button, a")) return;
-                if (window.getSelection()?.toString()) return;
-                onSelect(task.id);
+              className="exposure-task is-openable"
+              role="button"
+              tabIndex={0}
+              aria-haspopup="dialog"
+              aria-label={`Open details for ${task.wording}`}
+              onClick={openDetails}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  openDetails();
+                }
               }}
-              className={cn(
-                "exposure-task",
-                task.id === selectedId && "is-selected",
-              )}
             >
-              <h3>
-                <button
-                  type="button"
-                  className="exposure-task__select"
-                  aria-controls="task-guide"
-                  aria-pressed={task.id === selectedId}
-                  onClick={() => onSelect(task.id)}
-                >
-                  <span className="min-w-0 flex-1">{task.wording}</span>
-                  <ChevronRight {...chevronRightProps3} />
-                </button>
-              </h3>
+              <h3 className="exposure-task__title">{task.wording}</h3>
               {score == null && (
-                <p className="mt-3 text-xs text-[#7f7280]">
+                <p className="mt-1.5 text-xs text-[#7f7280]">
                   No reliable exposure score available.
                 </p>
               )}
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                <Button {...buttonProps4}>Exposure score and evidence</Button>
+              <div className="mt-1.5 flex flex-wrap items-center justify-end gap-2">
+                <Button {...buttonProps4}>Detail</Button>
               </div>
-              {latest && (
-                <p className="mt-3 text-xs text-[#7f7280]">
-                  Latest trial: {formatMinutes(latest.minutes)} min ·{" "}
-                  {trials.length} recorded
-                </p>
-              )}
             </article>
           );
         })}
@@ -196,7 +190,9 @@ export default function ExposureTaskList(props: Props) {
         <div className="py-6 text-sm text-[#7f7280]">
           <p>
             {tasks.length
-              ? "No tasks match this range."
+              ? skillFilterLabel
+                ? "No tasks match this skill and score range."
+                : "No tasks match this range."
               : "Add a task in your profile to get started."}
           </p>
           {tasks.length > 0 && (
@@ -206,7 +202,7 @@ export default function ExposureTaskList(props: Props) {
                 onClick: () => onRangeChange([0, 1]),
               } satisfies Partial<ComponentProps<typeof Button>>)}
             >
-              Show all tasks
+              Show all scores
             </Button>
           )}
         </div>

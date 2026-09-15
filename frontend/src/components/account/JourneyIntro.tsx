@@ -21,11 +21,11 @@ const content = {
     name: "Learning Resources",
     title: "Turn a skill into your next learning step",
     description:
-      "Choose a learning theme on the Skills page to explore relevant resources and build your own plan.",
+      "Choose skills you want to grow, then explore relevant resources and build your own plan.",
     steps: [
       [
         "Choose a skill",
-        "Find a skill you want to develop and save a learning theme.",
+        "Find a skill you want to develop and save it for learning.",
       ],
       [
         "Explore resources",
@@ -34,7 +34,7 @@ const content = {
       ["Save your next step", "Keep a shortlist and bring it into My Plan."],
     ],
     action: "Choose a skill",
-    path: ROUTES.skills,
+    path: ROUTES.learningCentre,
   },
   plan: {
     name: "My Plan",
@@ -89,7 +89,7 @@ export default function JourneyIntro(props: {
       path = hasTasks ? ROUTES.task : ROUTES.workProfile;
     } else if (kind === "plan") {
       action = "Choose a skill";
-      path = ROUTES.skills;
+      path = ROUTES.learningCentre;
     }
   }
   const [authOpen, setAuthOpen] = useState(false);
@@ -141,7 +141,8 @@ export default function JourneyIntro(props: {
                   >
                     <Link
                       to={
-                        path === ROUTES.skills
+                        path === ROUTES.learningCentre &&
+                        (action === "Choose a skill" || kind === "resources")
                           ? `${path}#skill-directions`
                           : path
                       }
