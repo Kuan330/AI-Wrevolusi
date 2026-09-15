@@ -4,7 +4,9 @@ from app.main import create_app
 from app.routers.ai import get_task_match_provider
 from app.schemas.ai_matching import TaskMatchResponse
 from app.services.ai_matching import (
+    MINIMUM_TASK_MATCH_WORDS,
     TaskMatchProviderResult,
+    count_task_text_words_for_matching,
     enforce_task_match_contract,
 )
 
@@ -65,7 +67,7 @@ def test_task_match_returns_empty_candidate_and_question_when_nothing_fits() -> 
             '/api/v1/ai/task-match',
             json={
                 'occupation_code': '5222',
-                'user_task': 'Repair satellites in deep space',
+                'user_task': 'Repair satellites in deep space orbits',
                 'candidates': CANDIDATES,
             },
         )
@@ -75,6 +77,89 @@ def test_task_match_returns_empty_candidate_and_question_when_nothing_fits() -> 
     assert payload.candidate_id == ''
     assert payload.confidence < 0.5
     assert payload.clarifying_question
+    assert payload.status == 'no_match'
+
+
+def test_shared_word_count_rule_matches_the_documented_examples() -> None:
+    examples = [
+        ('', 0),
+        ('   ...  ', 0),
+        ('the and of', 0),
+        ('shop supervisor', 2),
+        ('Managing a small team of staff', 4),
+        ('manage shifts and tasks', 3),
+        ('I manage the shop', 3),
+        ('Open the store, serve customers, and close registers', 6),
+        ('负责管理团队排班并跟进客户投诉处理', 1),
+        ('管理 team 的任务', 3),
+    ]
+
+    for value, expected in examples:
+        assert count_task_text_words_for_matching(value) == expected, value
+    assert MINIMUM_TASK_MATCH_WORDS == 5
+
+
+def test_task_match_below_the_word_gate_selects_nothing_and_skips_the_matcher() -> None:
+    application = create_app('/api')
+
+    class ExplodingProvider:
+        def match_task(self, *_args, **_kwargs):
+            raise AssertionError('the matcher must not run below the word gate')
+
+    application.dependency_overrides[get_task_match_provider] = (
+        lambda: ExplodingProvider()
+    )
+    try:
+        with TestClient(application) as client:
+            response = client.post(
+                '/api/v1/ai/task-match',
+                json={
+                    'occupation_code': '5222',
+                    'user_task': 'Prepare a report',
+                    'candidates': CANDIDATES,
+                },
+            )
+    finally:
+        application.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    payload = TaskMatchResponse.model_validate(response.json())
+    assert payload.status == 'needs_more_input'
+    assert payload.candidate_id == ''
+    assert payload.confidence == 0.0
+    assert payload.matched_concepts == []
+    assert payload.clarifying_question
+
+
+def test_task_match_at_the_word_threshold_runs_the_matcher() -> None:
+    application = create_app('/api')
+    application.dependency_overrides[get_task_match_provider] = lambda: FixedProvider(
+        TaskMatchProviderResult(
+            candidate_id='task-1',
+            confidence=0.9,
+            matched_concepts=['report'],
+            unmatched_concepts=[],
+            reason='Threshold boundary run.',
+        )
+    )
+
+    try:
+        with TestClient(application) as client:
+            response = client.post(
+                '/api/v1/ai/task-match',
+                json={
+                    'occupation_code': '5222',
+                    'user_task': 'Prepare weekly sales report data',
+                    'candidates': CANDIDATES,
+                },
+            )
+    finally:
+        application.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    payload = TaskMatchResponse.model_validate(response.json())
+    assert payload.status == 'matched'
+    assert payload.candidate_id == 'task-1'
 
 
 def test_contract_rejects_a_provider_candidate_id_not_in_the_request() -> None:
@@ -128,7 +213,7 @@ def test_route_enforces_the_candidate_allowlist_after_provider_output() -> None:
                 '/api/v1/ai/task-match',
                 json={
                     'occupation_code': '5222',
-                    'user_task': 'Prepare a report',
+                    'user_task': 'Prepare a weekly report for the sales team',
                     'candidates': CANDIDATES,
                 },
             )
@@ -157,7 +242,7 @@ def test_route_enforces_the_confidence_floor_after_provider_output() -> None:
                 '/api/v1/ai/task-match',
                 json={
                     'occupation_code': '5222',
-                    'user_task': 'Prepare a report',
+                    'user_task': 'Prepare a weekly report for the sales team',
                     'candidates': CANDIDATES,
                 },
             )

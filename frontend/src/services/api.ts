@@ -33,6 +33,17 @@ const request = async <T>(
 ): Promise<T> => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const externalSignal = init?.signal ?? null;
+  const relayExternalAbort = () => controller.abort();
+  if (externalSignal) {
+    if (externalSignal.aborted) {
+      controller.abort();
+    } else {
+      externalSignal.addEventListener("abort", relayExternalAbort, {
+        once: true,
+      });
+    }
+  }
 
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -69,16 +80,28 @@ const request = async <T>(
     throw error;
   } finally {
     clearTimeout(timer);
+    externalSignal?.removeEventListener("abort", relayExternalAbort);
   }
 };
 
 export const api = {
-  get: <T>(path: string) => request<T>(path, { method: "GET" }),
-  post: <T, TBody = unknown>(path: string, payload?: TBody, timeoutMs?: number) =>
-    request<T>(path, {
-      method: "POST",
-      body: payload ? JSON.stringify(payload) : undefined,
-    }, timeoutMs),
+  get: <T>(path: string, signal?: AbortSignal) =>
+    request<T>(path, { method: "GET", signal }),
+  post: <T, TBody = unknown>(
+    path: string,
+    payload?: TBody,
+    timeoutMs?: number,
+    signal?: AbortSignal,
+  ) =>
+    request<T>(
+      path,
+      {
+        method: "POST",
+        body: payload ? JSON.stringify(payload) : undefined,
+        signal,
+      },
+      timeoutMs,
+    ),
   patch: <T, TBody = unknown>(path: string, payload?: TBody) =>
     request<T>(path, {
       method: "PATCH",

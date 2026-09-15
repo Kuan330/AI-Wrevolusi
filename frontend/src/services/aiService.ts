@@ -23,6 +23,7 @@ export interface TaskMatchResponse {
   unmatched_concepts: string[];
   reason: string;
   clarifying_question: string | null;
+  status: "matched" | "no_match" | "needs_more_input";
   needs_user_confirmation: boolean;
 }
 
@@ -74,11 +75,12 @@ export interface OccupationSuggestionsResponse {
 }
 
 export const aiService = {
-  taskMatch: (request: TaskMatchRequest) =>
+  taskMatch: (request: TaskMatchRequest, signal?: AbortSignal) =>
     api.post<TaskMatchResponse, TaskMatchRequest>(
       "/ai/task-match",
       request,
       AI_REQUEST_TIMEOUT_MS,
+      signal,
     ),
   skillMatch: (request: SkillMatchRequest) =>
     api.post<SkillMatchResponse, SkillMatchRequest>(

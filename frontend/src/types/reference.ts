@@ -4,6 +4,12 @@ export interface ReferenceOccupation {
   parent_code: string | null;
   title: string;
   description: string | null;
+  /** Search results only: relevance ranking supplied by the API. */
+  confidence?: number;
+  /** Search results only: terms that produced the match. */
+  evidence?: string[];
+  /** Search results only: "direct" substring hit or token-level "fuzzy" recall. */
+  match_type?: "direct" | "fuzzy";
 }
 
 export interface ReferenceTask {

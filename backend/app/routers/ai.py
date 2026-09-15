@@ -10,8 +10,10 @@ from app.schemas.occupation_ai import (
 from app.schemas.skill_matching import SkillMatchRequest, SkillMatchResponse
 from app.services.ai_gateway import AIGateway, default_ai_gateway
 from app.services.ai_matching import (
+    MINIMUM_TASK_MATCH_WORDS,
     DeterministicTaskMatchProvider,
     TaskMatchProvider,
+    count_task_text_words_for_matching,
     enforce_task_match_contract,
 )
 from app.services.occupation_ai import (
@@ -55,7 +57,30 @@ def task_match(
     provider: TaskMatchProvider = Depends(get_task_match_provider),
     gateway: AIGateway = Depends(get_ai_gateway),
 ) -> TaskMatchResponse:
-    """Match a user task only against the candidates included in the request."""
+    """Match a user task only against the candidates included in the request.
+
+    The task editor calls this automatically while the user types, so requests
+    below the shared minimum word count are answered with an explicit
+    ``needs_more_input`` status instead of a forced match.
+    """
+
+    if count_task_text_words_for_matching(request.user_task) < MINIMUM_TASK_MATCH_WORDS:
+        return TaskMatchResponse(
+            candidate_id='',
+            confidence=0.0,
+            matched_concepts=[],
+            unmatched_concepts=[],
+            reason=(
+                'The task description has fewer than '
+                f'{MINIMUM_TASK_MATCH_WORDS} meaningful words, so it was not '
+                'matched against the standard tasks yet.'
+            ),
+            clarifying_question=(
+                f'Keep typing — matching starts after {MINIMUM_TASK_MATCH_WORDS} '
+                'words. Describe the main steps you perform.'
+            ),
+            status='needs_more_input',
+        )
 
     result = gateway.run_structured(
         operation='task-match',
@@ -81,7 +106,10 @@ def task_match(
         ),
         prefer_local_on_provider_failure=True,
     )
-    return enforce_task_match_contract(result.value, request.candidates)
+    response = enforce_task_match_contract(result.value, request.candidates)
+    return response.model_copy(
+        update={'status': 'matched' if response.candidate_id else 'no_match'}
+    )
 
 
 @router.post(
