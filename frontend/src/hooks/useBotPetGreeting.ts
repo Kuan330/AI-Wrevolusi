@@ -2,25 +2,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   composeGreeting,
   pickActionLine,
+  BOT_PET_SPEECH_MS,
   type BotPetAction,
   type BotPetPage,
 } from "@/components/common/botPetGreetings";
-
-/** How long the bubble stays visible. */
-const SHOW_MS = 4000;
 
 type Options = {
   /** Action-driven tip (e.g. My Plan check-in). Wins over the random greeting. */
   priority?: string | null;
   /** Wait until true before showing (e.g. plan data finished loading). */
   ready?: boolean;
-  /** Skip the entry greeting (e.g. My Plan uses the daily-brief panel instead). */
+  /** Skip the entry greeting (e.g. while the daily-brief tour is active). */
   skipEntry?: boolean;
 };
 
 /**
  * Entry greeting on mount, plus `say(action)` for success tips.
- * Auto-hides after ~4s, or on first scroll / pointer down.
+ * Auto-hides after 4s. Click the bubble to dismiss; click the pet for another tip.
  */
 export function useBotPetGreeting(page: BotPetPage, options: Options = {}) {
   const { priority = null, ready = true, skipEntry = false } = options;
@@ -29,33 +27,42 @@ export function useBotPetGreeting(page: BotPetPage, options: Options = {}) {
   const hideTimer = useRef<number | undefined>(undefined);
   const entryDone = useRef(false);
 
-  const clearHideListeners = useRef<(() => void) | null>(null);
-
-  const showForAWhile = useCallback((text: string) => {
-    clearHideListeners.current?.();
-    if (hideTimer.current) window.clearTimeout(hideTimer.current);
-    setSpeech(text);
-    const hide = () => setSpeech(null);
-    hideTimer.current = window.setTimeout(hide, SHOW_MS);
-    window.addEventListener("scroll", hide, { once: true, capture: true });
-    window.addEventListener("pointerdown", hide, { once: true });
-    clearHideListeners.current = () => {
-      window.removeEventListener("scroll", hide, true);
-      window.removeEventListener("pointerdown", hide);
-    };
+  const clearTimer = useCallback(() => {
+    if (hideTimer.current !== undefined) {
+      window.clearTimeout(hideTimer.current);
+      hideTimer.current = undefined;
+    }
   }, []);
 
+  const dismiss = useCallback(() => {
+    clearTimer();
+    setSpeech(null);
+  }, [clearTimer]);
+
+  const showForAWhile = useCallback(
+    (text: string) => {
+      clearTimer();
+      setSpeech(text);
+      hideTimer.current = window.setTimeout(() => {
+        hideTimer.current = undefined;
+        setSpeech(null);
+      }, BOT_PET_SPEECH_MS);
+    },
+    [clearTimer],
+  );
+
+  // Entry greeting — do not clear the hide timer in this effect's cleanup;
+  // otherwise a later ready/skipEntry change kills the 4s timer while speech stays.
   useEffect(() => {
     if (!ready || entryDone.current || skipEntry) return;
     entryDone.current = true;
     if (!greetingRef.current) greetingRef.current = composeGreeting(page);
     const text = (priority && priority.trim()) || greetingRef.current;
     showForAWhile(text);
-    return () => {
-      if (hideTimer.current) window.clearTimeout(hideTimer.current);
-      clearHideListeners.current?.();
-    };
   }, [page, priority, ready, skipEntry, showForAWhile]);
+
+  // Clear only when the page unmounts.
+  useEffect(() => () => clearTimer(), [clearTimer]);
 
   const say = useCallback(
     (action: BotPetAction) => {
@@ -64,5 +71,10 @@ export function useBotPetGreeting(page: BotPetPage, options: Options = {}) {
     [showForAWhile],
   );
 
-  return { speech, say };
+  /** Another non-flow tip (time opener + page context). */
+  const nudge = useCallback(() => {
+    showForAWhile(composeGreeting(page));
+  }, [page, showForAWhile]);
+
+  return { speech, say, dismiss, nudge };
 }

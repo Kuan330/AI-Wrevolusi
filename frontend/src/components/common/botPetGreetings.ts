@@ -1,3 +1,6 @@
+/** How long a short BotPet tip stays visible. */
+export const BOT_PET_SPEECH_MS = 4000;
+
 /** Page keys for BotPet entry greetings. */
 export type BotPetPage = "plan" | "learning" | "possibilities";
 

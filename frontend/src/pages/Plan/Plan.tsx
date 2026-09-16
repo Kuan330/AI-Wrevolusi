@@ -196,7 +196,8 @@ export default function Plan() {
   const briefTourPending =
     Boolean(briefKey) && briefKey !== null && !hasSeenBriefTour(briefKey);
   // Brief tour first; once finished for this variant, normal Plan entry tips apply.
-  const { speech: petSpeech, say: sayPet } = useBotPetGreeting("plan", {
+  const { speech: petSpeech, say: sayPet, dismiss: dismissPet, nudge: nudgePet } =
+    useBotPetGreeting("plan", {
     ready: planReady && !briefLoading,
     skipEntry:
       briefLoading ||
@@ -862,6 +863,8 @@ export default function Plan() {
           petSpeech ?? (briefLoading ? "Preparing your briefing…" : null)
         }
         tour={petTour}
+        onSpeechDismiss={dismissPet}
+        onPetTap={petTour ? undefined : nudgePet}
       />
 
       <Drawer
