@@ -8,6 +8,12 @@ AI-Wrevolusi monorepo for FIT5120, including:
 - `db/`: reference-table schema, seed, and verification scripts
 - `docs/`: ERD and data-management documentation
 
+## Project guides
+
+- [Local setup and testing](docs/local-testing.md)
+- [Vercel deployment](docs/deployment.md)
+- [Reference-data management](docs/iteration1_data_management.md)
+
 ## Python dependency management
 
 The backend and repository Python tools use [uv](https://docs.astral.sh/uv/).
@@ -86,6 +92,9 @@ uv run --project backend --group database python db/seed_reference.py --init
 See `docs/iteration1_data_management.md` before promoting reference data.
 
 ## Deploy to Vercel
+
+See the complete [deployment guide](docs/deployment.md) for environment
+separation, Preview verification, Production promotion, and rollback.
 
 The repository deploys as one Vercel Services project:
 

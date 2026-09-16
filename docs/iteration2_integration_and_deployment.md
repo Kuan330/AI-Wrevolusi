@@ -4,6 +4,12 @@ How to configure, run, and verify the Iteration 2 AI backend locally and on
 Vercel. All AI features are optional: **without configuration everything still
 works on the deterministic path.**
 
+Use the canonical [local testing guide](local-testing.md) for setup, ports, and
+test commands. Use the canonical [deployment guide](deployment.md) for Vercel
+environment separation, Preview verification, Production promotion, and
+rollback. This document covers only the Iteration 2 AI-provider settings and
+checks.
+
 ---
 
 ## 1. Environment variables
@@ -38,23 +44,9 @@ Notes:
 
 ## 2. Local run
 
-```bash
-# Terminal 1 — backend
-cd backend
-uv run uvicorn app.main:app --reload
-
-# Terminal 2 — frontend
-cd frontend
-npm run dev
-```
-
-- Backend: http://127.0.0.1:8000 (docs at `/docs`)
-- Frontend: http://127.0.0.1:5173 (proxies `/api` to the backend)
-
-Windows note: use `start_project.local.bat` in the repository root to launch
-both at once. The first backend start can take tens of seconds while Python
-imports resolve (OneDrive-hosted working copy); the frontend may briefly show
-`ECONNREFUSED` until port 8000 is listening.
+Follow [Local testing](local-testing.md). Configure the optional `AI_*`
+variables from section 1 before starting the backend when provider behavior is
+part of the test.
 
 ---
 
@@ -107,19 +99,16 @@ curl -s -X POST http://127.0.0.1:8000/api/v1/ai/skill-match \
 
 ### 3.3 Test suites and build
 
-```bash
-cd backend && uv run pytest -q                            # expect: 101 passed
-# tests/conftest.py pins the provider chain off, so the suite never calls out
-# even when the local .env configures a provider.
-cd frontend && npm run build                              # expect: build success
-```
+Run the complete commands in [Local testing](local-testing.md). The backend
+suite pins provider and database startup paths off, so automated tests remain
+offline even when the local `.env` enables them.
 
 ---
 
 ## 4. Vercel deployment
 
-The repository deploys as one Vercel Services project (`/` frontend, `/api`
-backend). For Iteration 2:
+Follow [Deployment](deployment.md) for the shared deployment process. For the
+Iteration 2 provider specifically:
 
 1. Add the `AI_*` variables from section 1 under **Preview and Production**
    environment variables (values are secrets; never commit them).
