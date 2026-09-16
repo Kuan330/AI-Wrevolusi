@@ -77,6 +77,72 @@
   pointer-events: none;
   animation: bot-pet-speech-in 0.4s ease;
 }
+.bot-pet__speech--tour {
+  --bot-speech-width: 14.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: var(--bot-speech-width);
+  max-width: min(18rem, calc(100vw - 9.5rem));
+  padding: 0.7rem 0.85rem 0.65rem;
+  pointer-events: auto;
+  cursor: default;
+  touch-action: manipulation;
+}
+.bot-pet__speech-text {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  line-height: 1.35;
+  min-height: calc(1.35em * 3);
+  max-height: calc(1.35em * 3);
+  white-space: pre-line;
+  font-weight: 600;
+}
+.bot-pet__speech-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+.bot-pet__speech-meta {
+  margin-right: auto;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #8fa6b8;
+}
+.bot-pet__speech-btn {
+  appearance: none;
+  margin: 0;
+  padding: 0.28rem 0.65rem;
+  border: 0;
+  border-radius: 999px;
+  background: #eaf3fb;
+  color: #3d5f7a;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.bot-pet__speech-btn:hover {
+  background: #dceaf6;
+}
+.bot-pet__speech-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.bot-pet__speech-btn--primary {
+  background: #4f7894;
+  color: #fff;
+}
+.bot-pet__speech-btn--primary:hover:not(:disabled) {
+  background: #3d607b;
+}
 .bot-pet__speech::before,
 .bot-pet__speech::after {
   content: "";

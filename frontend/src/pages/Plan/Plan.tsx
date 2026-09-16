@@ -1,5 +1,5 @@
 import type { MouseEvent } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Check,
@@ -10,6 +10,7 @@ import BotPet from "@/components/common/BotPet";
 import DataTable from "@/components/common/DataTable";
 import type { DataTableColumn } from "@/components/common/DataTable";
 import PageHeader from "@/components/common/PageHeader";
+import { useAccount } from "@/components/account/useAccount";
 import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
 import ExposureScorePie from "@/pages/AIExposure/components/ExposureScorePie";
 import {
@@ -35,38 +36,48 @@ import {
   readLibrary,
   saveLibrary,
 } from "@/pages/LearningCentre/lib/libraryStorage";
+import { readLearningSkills } from "@/pages/Skills/learningSkills";
 import {
   flushWorkspace,
   hasAccountWorkspace,
 } from "@/services/accountStorage";
+import { ApiError } from "@/services/api";
 import {
+  getLearningCalendar,
   postLearningCheckin,
+  postLearningDailyBrief,
   postLearningProgress,
+  type CalendarDay,
+  type DailyBriefResponse,
 } from "@/services/learningService";
 import {
   readPlanState,
   savePlanState,
   syncPlanWithLearningCourses,
-  type PlanChapter,
   type PlanCourse,
   type PlanDayChapterEntry,
   type PlanRecordDay,
   type PlanState,
 } from "@/pages/Plan/lib/planCourses";
+import {
+  buildBriefTourSteps,
+  briefTourStorageKey,
+  hasSeenBriefTour,
+  markBriefTourSeen,
+} from "./PlanDailyBrief";
 import "@/pages/LearningCentre/course-library.css";
 import "./learning-preview.css";
 
-type Chapter = PlanChapter;
 type Course = PlanCourse;
 type RecordDay = PlanRecordDay;
 type Preview = PlanState;
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const CHECKIN_HINT_KEY = "aiwrevolusi.planCheckinHint.v1";
-const CHECKIN_HINT = "Remember to check in today.";
 
 const dateKey = (d = new Date()) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+const localHour = (d = new Date()) => d.getHours();
 
 const emptyRecord = (): RecordDay => ({
   minutes: 0,
@@ -80,13 +91,25 @@ function dayHasProgress(r: RecordDay | undefined) {
   return Boolean(r && (r.checked || r.studied || (r.entries?.length ?? 0) > 0));
 }
 
-function shouldOfferCheckinHint(records: PlanState["records"]) {
-  if (Object.values(records).some(dayHasProgress)) return false;
+function monthRange(month: Date) {
+  const from = dateKey(new Date(month.getFullYear(), month.getMonth(), 1));
+  const to = dateKey(new Date(month.getFullYear(), month.getMonth() + 1, 0));
+  return { from, to };
+}
+
+function briefSkillsFromPlan(courses: PlanCourse[]) {
+  const fromCourses = courses
+    .map((c) => c.skillId)
+    .filter((id): id is string => Boolean(id));
+  let fromLearning: string[] = [];
   try {
-    return !localStorage.getItem(CHECKIN_HINT_KEY);
+    fromLearning = (readLearningSkills() ?? []).map((s) => s.id);
   } catch {
-    return true;
+    fromLearning = [];
   }
+  return [...new Set([...fromCourses, ...fromLearning])].map((skill_id) => ({
+    skill_id,
+  }));
 }
 
 function mergeDayEntries(
@@ -137,6 +160,7 @@ function courseStatus(c: Course) {
 
 export default function Plan() {
   const location = useLocation();
+  const { user } = useAccount();
   const [state, setState] = useState<Preview>(initial);
   const [today, setToday] = useState(dateKey);
   const [month, setMonth] = useState(
@@ -148,6 +172,17 @@ export default function Plan() {
   const [notice, setNotice] = useState("");
   const [removeId, setRemoveId] = useState<string | null>(null);
   const [coursesLoading, setCoursesLoading] = useState(true);
+  const [calendarDays, setCalendarDays] = useState<Record<string, CalendarDay>>(
+    {},
+  );
+  const [streakDays, setStreakDays] = useState(0);
+  const [brief, setBrief] = useState<DailyBriefResponse | null>(null);
+  const [briefLoading, setBriefLoading] = useState(false);
+  const [briefStep, setBriefStep] = useState(0);
+  const [briefTourOpen, setBriefTourOpen] = useState(false);
+  /** After finishing today's brief once this visit, don't chain into entry greeting. */
+  const [briefFinishedSession, setBriefFinishedSession] = useState(false);
+  const [checkInBusy, setCheckInBusy] = useState(false);
   // The drawer opens programmatically, so Radix has no trigger to restore focus
   // to on close; remember the button that opened it instead.
   const detailOpener = useRef<HTMLButtonElement | null>(null);
@@ -157,24 +192,64 @@ export default function Plan() {
   const [rawPercent, setRawPercent] = useState<Record<string, string>>({});
 
   const planReady = !coursesLoading;
-  // Freeze the check-in decision once data is ready so marking localStorage
-  // does not flip priority mid-bubble and flash a random greeting.
-  const checkinPriorityRef = useRef<string | null | undefined>(undefined);
-  if (planReady && checkinPriorityRef.current === undefined) {
-    const offer = shouldOfferCheckinHint(state.records);
-    checkinPriorityRef.current = offer ? CHECKIN_HINT : null;
-    if (offer) {
-      try {
-        localStorage.setItem(CHECKIN_HINT_KEY, "1");
-      } catch {
-        /* Tip still shows once this visit when storage is unavailable. */
-      }
-    }
-  }
+  const briefKey = brief ? briefTourStorageKey(brief) : null;
+  const briefTourPending =
+    Boolean(briefKey) && briefKey !== null && !hasSeenBriefTour(briefKey);
+  // Brief tour first; once finished for this variant, normal Plan entry tips apply.
   const { speech: petSpeech, say: sayPet } = useBotPetGreeting("plan", {
-    priority: checkinPriorityRef.current ?? null,
-    ready: planReady,
+    ready: planReady && !briefLoading,
+    skipEntry:
+      briefLoading ||
+      briefTourOpen ||
+      briefTourPending ||
+      briefFinishedSession,
   });
+
+  const refreshCalendar = useCallback(async (targetMonth: Date) => {
+    if (!hasAccountWorkspace()) return;
+    const { from, to } = monthRange(targetMonth);
+    try {
+      const res = await getLearningCalendar(from, to);
+      const next: Record<string, CalendarDay> = {};
+      for (const day of res.days) next[day.day] = day;
+      setCalendarDays(next);
+      setStreakDays(res.streak_days);
+    } catch {
+      /* Keep local calendar lights when the API is unreachable. */
+    }
+  }, []);
+
+  const refreshBrief = useCallback(
+    async (courses: PlanCourse[], day = dateKey()) => {
+      if (!hasAccountWorkspace()) {
+        setBrief(null);
+        setBriefLoading(false);
+        return;
+      }
+      const skills = briefSkillsFromPlan(courses);
+      if (!skills.length) {
+        setBrief(null);
+        setBriefLoading(false);
+        return;
+      }
+      setBriefLoading(true);
+      try {
+        const next = await postLearningDailyBrief(
+          day,
+          localHour(),
+          user?.username?.trim() || null,
+          skills,
+        );
+        setBrief(next);
+        setStreakDays(next.streak_days);
+      } catch {
+        setBrief(null);
+      } finally {
+        setBriefLoading(false);
+      }
+    },
+    [user?.username],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -193,6 +268,36 @@ export default function Plan() {
       cancelled = true;
     };
   }, [location.key]);
+
+  useEffect(() => {
+    if (coursesLoading) return;
+    void refreshCalendar(month);
+  }, [coursesLoading, month, refreshCalendar]);
+
+  useEffect(() => {
+    if (coursesLoading) return;
+    void refreshBrief(state.courses, today);
+  }, [coursesLoading, state.courses, today, refreshBrief]);
+
+  useEffect(() => {
+    if (!brief || !briefKey) {
+      setBriefTourOpen(false);
+      return;
+    }
+    if (hasSeenBriefTour(briefKey)) {
+      setBriefTourOpen(false);
+      return;
+    }
+    setBriefStep(0);
+    setBriefTourOpen(true);
+    setBriefFinishedSession(false);
+  }, [brief, briefKey]);
+
+  function finishBriefTour() {
+    if (briefKey) markBriefTourSeen(briefKey);
+    setBriefTourOpen(false);
+    setBriefFinishedSession(true);
+  }
 
   useEffect(() => {
     const refresh = () => setToday(dateKey());
@@ -235,14 +340,32 @@ export default function Plan() {
       )
     : 0;
   const monthPrefix = dateKey(month).slice(0, 7);
-  const checkedDays = Object.entries(state.records).filter(
-    ([day, r]) => day.startsWith(monthPrefix) && dayHasProgress(r),
-  ).length;
+  const checkedDays = useMemo(() => {
+    const fromApi = Object.values(calendarDays).filter(
+      (d) => d.day.startsWith(monthPrefix) && d.checked_in,
+    ).length;
+    if (fromApi > 0 || Object.keys(calendarDays).length > 0) return fromApi;
+    return Object.entries(state.records).filter(
+      ([day, r]) => day.startsWith(monthPrefix) && Boolean(r.checked),
+    ).length;
+  }, [calendarDays, monthPrefix, state.records]);
   const viewRecord = recordDate ? state.records[recordDate] : undefined;
+  const viewApiDay = recordDate ? calendarDays[recordDate] : undefined;
   const viewEntries = viewRecord?.entries ?? [];
+  const viewChecked = viewApiDay
+    ? viewApiDay.checked_in
+    : Boolean(viewRecord?.checked);
+  const viewStudied = viewApiDay
+    ? viewApiDay.studied || viewApiDay.checked_in
+    : dayHasProgress(viewRecord);
   const inProgress = state.courses.filter(
     (c) => percent(c) > 0 && percent(c) < 100,
   ).length;
+
+  const briefSteps = useMemo(
+    () => (brief ? buildBriefTourSteps(brief) : []),
+    [brief],
+  );
 
   function openCourse(c: Course) {
     setCourseId(c.id);
@@ -276,6 +399,70 @@ export default function Plan() {
   function openRecord(day: string) {
     setRecordDate(day);
   }
+
+  async function handleCheckIn() {
+    if (checkInBusy) return;
+    setCheckInBusy(true);
+    try {
+      const res = await postLearningCheckin(today);
+      setStreakDays(res.streak_days);
+      message.success(
+        res.created
+          ? `Checked in · ${res.streak_days} day streak`
+          : `Already checked in · ${res.streak_days} day streak`,
+      );
+      sayPet("plan-record");
+      const previous = state.records[today] ?? emptyRecord();
+      save({
+        ...state,
+        records: {
+          ...state.records,
+          [today]: { ...previous, checked: true, studied: true },
+        },
+      });
+      await refreshCalendar(month);
+      await refreshBrief(state.courses, today);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 409) {
+        message.warning(
+          error.detail ||
+            "Log some chapter progress first, then check in.",
+        );
+      } else {
+        message.error("Could not check in. Please try again.");
+      }
+    } finally {
+      setCheckInBusy(false);
+    }
+  }
+
+  const briefTourStep = briefSteps[briefStep];
+  const petTour =
+    briefTourOpen && briefSteps.length > 0 && briefTourStep
+      ? {
+          text: briefTourStep.text,
+          step: briefStep,
+          total: briefSteps.length,
+          widthRem: briefTourStep.widthRem,
+          onNext: () => {
+            if (briefStep >= briefSteps.length - 1) {
+              finishBriefTour();
+              return;
+            }
+            setBriefStep((current) => current + 1);
+          },
+          onDismiss: finishBriefTour,
+          primaryLabel:
+            briefTourStep.action === "checkin" ? "Check in" : undefined,
+          onPrimary:
+            briefTourStep.action === "checkin"
+              ? () => {
+                  void handleCheckIn();
+                }
+              : undefined,
+          primaryBusy: checkInBusy,
+        }
+      : null;
 
   function updateProgress() {
     if (!course) return;
@@ -314,7 +501,8 @@ export default function Plan() {
             [day]: {
               ...previous,
               studied: true,
-              checked: true,
+              // Check-in is an explicit action; save only marks studied.
+              checked: previous.checked,
               entries: mergeDayEntries(previous.entries, bumps),
             },
           }
@@ -324,20 +512,17 @@ export default function Plan() {
     setCourseId(null);
     setToday(day);
     if (changed) {
-      message.success("Chapter progress saved and synced to your calendar.");
-      // One save both logs progress and checks in — pick either tip pool.
-      sayPet(Math.random() < 0.5 ? "plan-record" : "save-progress");
+      message.success("Chapter progress saved.");
+      sayPet("save-progress");
     } else {
       message.info("No changes to save.");
     }
     setNotice(
-      changed
-        ? "Chapter progress saved and synced to your calendar."
-        : "No changes to save.",
+      changed ? "Chapter progress saved." : "No changes to save.",
     );
 
     if (changed && hasAccountWorkspace() && course.skillId) {
-      const chapters = bumps.flatMap((entry) => {
+      const payload = bumps.flatMap((entry) => {
         const index = course.chapters.findIndex(
           (ch) => ch.title === entry.chapterTitle,
         );
@@ -351,13 +536,23 @@ export default function Plan() {
           },
         ];
       });
-      if (chapters.length) {
-        void postLearningProgress(day, chapters)
-          .then(() => postLearningCheckin(day))
+      if (payload.length) {
+        void postLearningProgress(day, payload)
+          .then(async (res) => {
+            if (res.rejected.length) {
+              message.warning(
+                "Some chapter values could not be saved. Progress only moves forward.",
+              );
+            }
+            await refreshCalendar(month);
+            await refreshBrief(nextCourses, day);
+          })
           .catch(() => {
-            /* Workspace blob already stores the day; learning tables are best-effort. */
+            /* Local mirror already kept; retry on next edit. */
           });
       }
+    } else if (changed) {
+      void refreshCalendar(month);
     }
   }
 
@@ -421,24 +616,10 @@ export default function Plan() {
       sortValue: (c) => percent(c),
       cell: (c) => {
         const s = courseStatus(c);
-        if (s.key === "finished") {
-          return (
-            <span className={cn("lp-status", `lp-status--${s.key}`)}>
-              {s.label}
-            </span>
-          );
-        }
         return (
-          <button
-            type="button"
-            className={cn("lp-status", `lp-status--${s.key}`)}
-            onClick={(e: MouseEvent<HTMLButtonElement>) => {
-              detailOpener.current = e.currentTarget;
-              openCourse(c);
-            }}
-          >
+          <span className={cn("lp-status", `lp-status--${s.key}`)}>
             {s.label}
-          </button>
+          </span>
         );
       },
     },
@@ -504,7 +685,9 @@ export default function Plan() {
                   <span> {checkedDays === 1 ? "day" : "days"}</span>
                 </strong>
                 <span>
-                  Progress logged ·{" "}
+                  {streakDays > 0
+                    ? `${streakDays}-day streak · `
+                    : null}
                   {month.toLocaleDateString("en", { month: "long" })}
                 </span>
               </div>
@@ -563,7 +746,14 @@ export default function Plan() {
                       new Date(month.getFullYear(), month.getMonth(), i + 1),
                     );
                     const r = state.records[day];
-                    const hasProgress = dayHasProgress(r);
+                    const apiDay = calendarDays[day];
+                    const checked = apiDay
+                      ? apiDay.checked_in
+                      : Boolean(r?.checked);
+                    const studied = apiDay
+                      ? apiDay.studied || apiDay.checked_in
+                      : dayHasProgress(r);
+                    const lit = checked || studied;
                     return (
                       <button
                         type="button"
@@ -571,15 +761,21 @@ export default function Plan() {
                         disabled={day > today}
                         className={cn(
                           day === today && "is-today",
-                          hasProgress && "studied",
-                          r?.checked && "checked",
+                          studied && !checked && "studied",
+                          checked && "checked",
                         )}
                         onClick={() => openRecord(day)}
-                        aria-label={`${day}${hasProgress ? ", has learning progress" : ""}`}
+                        aria-label={`${day}${
+                          checked
+                            ? ", checked in"
+                            : studied
+                              ? ", studied"
+                              : ""
+                        }`}
                         aria-current={day === today ? "date" : undefined}
                       >
                         <span className="lp-day-num">{i + 1}</span>
-                        {hasProgress ? (
+                        {lit ? (
                           <img
                             className="lp-day-star"
                             src="/images/icons/icon-star.svg"
@@ -595,8 +791,8 @@ export default function Plan() {
                 ))}
               </div>
                 <div className="lp-legend">
-                  <span>Progress logged</span>
-                  <span>Has chapter updates</span>
+                  <span>Checked in</span>
+                  <span>Studied · not checked in</span>
                 </div>
             </div>
           </section>
@@ -662,7 +858,10 @@ export default function Plan() {
       <BotPet
         storageKey="aiwrevolusi.botPetPosition.plan.v3"
         defaultAnchorRef={calendarRef}
-        speech={petSpeech}
+        speech={
+          petSpeech ?? (briefLoading ? "Preparing your briefing…" : null)
+        }
+        tour={petTour}
       />
 
       <Drawer
@@ -788,13 +987,20 @@ export default function Plan() {
         <DialogContent className="lp-modal lp-modal--day">
           <DialogTitle>Day progress · {recordDate}</DialogTitle>
           <DialogDescription>
-            View-only snapshot of chapter progress saved on this day.
+            {viewChecked
+              ? "Checked in for this day."
+              : viewStudied
+                ? "Chapter progress logged — check in when you are ready."
+                : "View-only snapshot of chapter progress saved on this day."}
           </DialogDescription>
           {viewEntries.length ? (
             <div className="lp-day-view">
               <p className="lp-day-view__summary">
                 {viewEntries.length} chapter
                 {viewEntries.length === 1 ? "" : "s"} logged
+                {viewApiDay?.chapters_touched
+                  ? ` · ${viewApiDay.chapters_touched} on server`
+                  : ""}
               </p>
               <ul className="lp-day-view__list">
                 {viewEntries.map((entry) => (
@@ -813,11 +1019,26 @@ export default function Plan() {
             </div>
           ) : (
             <p className="lp-day-view__empty">
-              No chapter progress was saved on this day yet. Open a course and
-              use Save progress to log today.
+              {viewStudied
+                ? "Progress is on the server for this day, but no local chapter list is stored yet."
+                : "No chapter progress was saved on this day yet. Open a course and use Save progress to log today."}
             </p>
           )}
           <div className="lp-day-view__foot">
+            {recordDate === today &&
+            !viewChecked &&
+            hasAccountWorkspace() ? (
+              <button
+                type="button"
+                className="soft-btn-blue"
+                disabled={checkInBusy}
+                onClick={() => {
+                  void handleCheckIn();
+                }}
+              >
+                {checkInBusy ? "Checking in…" : "Check in today"}
+              </button>
+            ) : null}
             <button
               type="button"
               className="soft-btn-blue"

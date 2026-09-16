@@ -14,6 +14,8 @@ type Options = {
   priority?: string | null;
   /** Wait until true before showing (e.g. plan data finished loading). */
   ready?: boolean;
+  /** Skip the entry greeting (e.g. My Plan uses the daily-brief panel instead). */
+  skipEntry?: boolean;
 };
 
 /**
@@ -21,7 +23,7 @@ type Options = {
  * Auto-hides after ~4s, or on first scroll / pointer down.
  */
 export function useBotPetGreeting(page: BotPetPage, options: Options = {}) {
-  const { priority = null, ready = true } = options;
+  const { priority = null, ready = true, skipEntry = false } = options;
   const greetingRef = useRef<string | null>(null);
   const [speech, setSpeech] = useState<string | null>(null);
   const hideTimer = useRef<number | undefined>(undefined);
@@ -44,7 +46,7 @@ export function useBotPetGreeting(page: BotPetPage, options: Options = {}) {
   }, []);
 
   useEffect(() => {
-    if (!ready || entryDone.current) return;
+    if (!ready || entryDone.current || skipEntry) return;
     entryDone.current = true;
     if (!greetingRef.current) greetingRef.current = composeGreeting(page);
     const text = (priority && priority.trim()) || greetingRef.current;
@@ -53,7 +55,7 @@ export function useBotPetGreeting(page: BotPetPage, options: Options = {}) {
       if (hideTimer.current) window.clearTimeout(hideTimer.current);
       clearHideListeners.current?.();
     };
-  }, [page, priority, ready, showForAWhile]);
+  }, [page, priority, ready, skipEntry, showForAWhile]);
 
   const say = useCallback(
     (action: BotPetAction) => {
