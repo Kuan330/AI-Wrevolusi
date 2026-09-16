@@ -1,3 +1,11 @@
+export type TaskAssistStatus = "available" | "pending" | "completed";
+
+export const canStartTaskAssist = (status: TaskAssistStatus) =>
+  status === "available";
+
+export const hasSavedTaskAssist = (status: TaskAssistStatus) =>
+  status === "completed";
+
 export const DEFAULT_TASK_ASSIST_QUESTION =
   "How can AI assist me in completing this task?";
 

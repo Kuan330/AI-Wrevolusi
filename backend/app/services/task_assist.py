@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 
-from app.schemas.task_assist import TaskAssistRequest, TaskAssistResponse
+from app.schemas.task_assist import TaskAssistResponse
 from app.services.ai_gateway import AIGateway
 
 SYSTEM_PROMPT = """You are a bounded workplace task-assistance tool.
@@ -45,10 +45,10 @@ def is_safe_task_assist_reply(reply: str) -> bool:
     return not any(pattern.search(reply) for pattern in _RESTRICTED_REPLY_PATTERNS)
 
 
-def deterministic_task_assist(request: TaskAssistRequest) -> TaskAssistResponse:
+def deterministic_task_assist(task_text: str) -> TaskAssistResponse:
     """Return safe, transparent guidance when no validated model reply is available."""
 
-    task = request.task_text.strip()
+    task = task_text.strip()
     snippet = task if len(task) <= 160 else f'{task[:157].rstrip()}…'
     reply = (
         f'For this task — “{snippet}” — start by describing the desired output and constraints '
@@ -60,17 +60,25 @@ def deterministic_task_assist(request: TaskAssistRequest) -> TaskAssistResponse:
 
 
 def suggest_task_assist(
-    request: TaskAssistRequest,
+    *,
+    task_text: str,
+    notes: str,
+    user_message: str,
     gateway: AIGateway,
 ) -> TaskAssistResponse:
-    """Generate one validated reply through the shared provider/fallback chain."""
+    """Generate one validated reply from the server-owned detail snapshot."""
 
+    payload = {
+        'task_text': task_text,
+        'notes': notes,
+        'user_message': user_message,
+    }
     result = gateway.run_structured(
         operation='task-assist',
-        payload=request.model_dump(mode='json'),
+        payload=payload,
         response_model=TaskAssistResponse,
-        local=lambda: deterministic_task_assist(request),
-        fallback=lambda: deterministic_task_assist(request),
+        local=lambda: deterministic_task_assist(task_text),
+        fallback=lambda: deterministic_task_assist(task_text),
         prefer_local_on_provider_failure=True,
         system_prompt=SYSTEM_PROMPT,
         request_timeout_s=20.0,
@@ -81,7 +89,7 @@ def suggest_task_assist(
         result.metadata.provider != 'local' and not result.metadata.used_fallback
     )
     if generated_by_model and not is_safe_task_assist_reply(result.value.reply):
-        return deterministic_task_assist(request)
+        return deterministic_task_assist(task_text)
     return result.value.model_copy(
         update={
             'generated_by_model': generated_by_model,

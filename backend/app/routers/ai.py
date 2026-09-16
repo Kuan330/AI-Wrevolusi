@@ -1,5 +1,10 @@
-from fastapi import APIRouter, Depends
+import uuid
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.concurrency import run_in_threadpool
+
+from app.db.session import get_db
 from app.models.user import User
 from app.schemas.ai_matching import TaskMatchRequest, TaskMatchResponse
 from app.schemas.occupation_ai import (
@@ -13,7 +18,12 @@ from app.schemas.skill_matching import (
     SkillMatchRequest,
     SkillMatchResponse,
 )
-from app.schemas.task_assist import TaskAssistRequest, TaskAssistResponse
+from app.schemas.task_assist import (
+    TaskAssistDetailBatchRequest,
+    TaskAssistDetailBatchResponse,
+    TaskAssistInteractionRead,
+    TaskAssistRequest,
+)
 from app.services.ai_gateway import AIGateway, default_ai_gateway
 from app.services.auth import get_current_user
 from app.services.ai_matching import (
@@ -28,7 +38,8 @@ from app.services.occupation_ai import (
     deterministic_suggest_occupations,
 )
 from app.services.skill_matching import MAX_SKILL_MATCHES, match_skills_response
-from app.services.task_assist import suggest_task_assist
+from app.services.task_assist import deterministic_task_assist, suggest_task_assist
+from app.services import task_assist_records
 
 
 
@@ -222,12 +233,113 @@ def skill_match(
     return result.value
 
 
-@router.post('/task-assist', response_model=TaskAssistResponse)
-def task_assist(
-    request: TaskAssistRequest,
-    _current_user: User = Depends(get_current_user),
-    gateway: AIGateway = Depends(get_ai_gateway),
-) -> TaskAssistResponse:
-    """Return one stateless, bounded answer about the current workplace task."""
+def _task_assist_read(row) -> TaskAssistInteractionRead:
+    return TaskAssistInteractionRead(
+        task_id=row.task_id,
+        status=row.status,
+        question=row.question,
+        reply=row.reply,
+        generated_by_model=row.generated_by_model,
+        needs_user_confirmation=row.needs_user_confirmation,
+        completed_at=row.completed_at,
+    )
 
-    return suggest_task_assist(request, gateway)
+
+@router.post(
+    '/task-assist/details',
+    response_model=TaskAssistDetailBatchResponse,
+)
+async def register_task_assist_details(
+    request: TaskAssistDetailBatchRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> TaskAssistDetailBatchResponse:
+    """Bind current profile-detail snapshots to the signed-in user."""
+
+    rows = await task_assist_records.register_details(
+        db,
+        current_user.id,
+        request.details,
+    )
+    return TaskAssistDetailBatchResponse(items=[_task_assist_read(row) for row in rows])
+
+
+@router.get(
+    '/task-assist/{task_id}',
+    response_model=TaskAssistInteractionRead,
+)
+async def get_task_assist_interaction(
+    task_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> TaskAssistInteractionRead:
+    """Return only this user's stored state and permanent first exchange."""
+
+    row = await task_assist_records.resolve_stale_pending(
+        db,
+        current_user.id,
+        task_id,
+    )
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Task detail not registered.',
+        )
+    return _task_assist_read(row)
+
+
+@router.post('/task-assist', response_model=TaskAssistInteractionRead)
+async def task_assist(
+    request: TaskAssistRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    gateway: AIGateway = Depends(get_ai_gateway),
+) -> TaskAssistInteractionRead:
+    """Generate and permanently store at most one answer for this user's detail."""
+
+    claim = await task_assist_records.claim_interaction(
+        db,
+        current_user.id,
+        request.task_id,
+        question=request.user_message,
+    )
+    if claim.outcome == 'missing':
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Task detail not registered.',
+        )
+    if claim.outcome == 'completed':
+        return _task_assist_read(claim.row)
+    if claim.outcome == 'pending':
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Task assistance is already being generated.',
+        )
+
+    assert claim.row is not None and claim.claim_token is not None
+    try:
+        response = await run_in_threadpool(
+            suggest_task_assist,
+            task_text=claim.row.task_text,
+            notes=claim.row.notes,
+            user_message=request.user_message,
+            gateway=gateway,
+        )
+    except Exception:
+        response = deterministic_task_assist(claim.row.task_text)
+
+    try:
+        completed = await task_assist_records.complete_interaction(
+            db,
+            current_user.id,
+            request.task_id,
+            claim.claim_token,
+            question=request.user_message,
+            response=response,
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail='Task assistance is pending recovery. Please reopen this detail shortly.',
+        ) from None
+    return _task_assist_read(completed)

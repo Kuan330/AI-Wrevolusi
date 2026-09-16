@@ -4,6 +4,7 @@ import { api } from "@/services/api";
 // allows a configured provider plus one bounded fallback attempt (20s each).
 const AI_REQUEST_TIMEOUT_MS = 25000;
 const TASK_ASSIST_TIMEOUT_MS = 45000;
+const TASK_ASSIST_STATE_TIMEOUT_MS = 10000;
 
 export interface TaskMatchCandidatePayload {
   id: string;
@@ -74,16 +75,35 @@ export interface OccupationSuggestionsResponse {
   needs_user_confirmation: boolean;
 }
 
-export interface TaskAssistRequest {
+export type TaskAssistStatus = "available" | "pending" | "completed";
+
+export interface TaskAssistDetailInput {
+  profile_task_id: string;
   task_text: string;
-  user_message: string;
   notes?: string;
 }
 
-export interface TaskAssistResponse {
-  reply: string;
-  generated_by_model: boolean;
+export interface TaskAssistDetailBatchRequest {
+  details: TaskAssistDetailInput[];
+}
+
+export interface TaskAssistRequest {
+  task_id: string;
+  user_message: string;
+}
+
+export interface TaskAssistInteraction {
+  task_id: string;
+  status: TaskAssistStatus;
+  question: string | null;
+  reply: string | null;
+  generated_by_model: boolean | null;
   needs_user_confirmation: boolean;
+  completed_at: string | null;
+}
+
+export interface TaskAssistDetailBatchResponse {
+  items: TaskAssistInteraction[];
 }
 
 export const aiService = {
@@ -106,8 +126,22 @@ export const aiService = {
       request,
       AI_REQUEST_TIMEOUT_MS,
     ),
+  registerTaskAssistDetails: (
+    request: TaskAssistDetailBatchRequest,
+    signal?: AbortSignal,
+  ) =>
+    api.post<TaskAssistDetailBatchResponse, TaskAssistDetailBatchRequest>(
+      "/ai/task-assist/details",
+      request,
+      TASK_ASSIST_STATE_TIMEOUT_MS,
+      signal,
+    ),
+  getTaskAssist: (taskId: string) =>
+    api.get<TaskAssistInteraction>(
+      `/ai/task-assist/${encodeURIComponent(taskId)}`,
+    ),
   taskAssist: (request: TaskAssistRequest, signal?: AbortSignal) =>
-    api.post<TaskAssistResponse, TaskAssistRequest>(
+    api.post<TaskAssistInteraction, TaskAssistRequest>(
       "/ai/task-assist",
       request,
       TASK_ASSIST_TIMEOUT_MS,

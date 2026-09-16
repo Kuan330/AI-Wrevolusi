@@ -1,88 +1,188 @@
-# One-shot Task Assist handover
+# Permanent single-use Task Assist handover
 
-Status: implemented and verified on `iteration-2-zhangxu`.
+Status: implemented on `iteration-2-zhangxu`; migration generated and verified offline, but not applied to a shared database in this work session.
 
-Live-provider probe through the real FastAPI route returned HTTP 200 in 7.89 seconds with `generated_by_model: true`, `needs_user_confirmation: true`, a 709-character task-specific reply, and content different from the deterministic fallback. Authentication was isolated with the same dependency override used by endpoint tests; provider and route code were real.
+## Product rule
 
-## User flow
+Task Assist is not a reopenable one-shot dialog. It is one permanent exchange per authenticated user and per Task Detail:
 
-`AI Exposure` → task `Detail` → `Chat with AI` opens a one-shot dialog. The input is pre-filled with exactly:
+1. A Detail is synchronized into the authenticated user's server-owned `tasks` row. The browser's `ProfileTask.id` is only an idempotent import key; the permanent boundary uses the server-generated task UUID.
+2. The user may submit one question. The default remains exactly:
 
 ```text
 How can AI assist me in completing this task?
 ```
 
-The learner may edit that question and submit once. After one validated response, the input and send button remain disabled until the dialog is closed and reopened. No conversation ID, history or follow-up messages are accepted or stored.
+3. The first model or explicit deterministic fallback reply is persisted permanently.
+4. Repeated POSTs, refreshes, sign-outs/sign-ins and other devices read the stored first question and answer. They do not call the model again.
+5. A completed Detail renders the saved exchange read-only. The `Chat with AI` entry, textarea and send button are not rendered.
+6. There is no conversation/thread/messages table and no follow-up endpoint.
 
-## Endpoint
+The uniqueness boundary is enforced by PostgreSQL, not by React state:
+
+```text
+UNIQUE (user_id, task_id)
+```
+
+## Data model and migration
+
+Migration: `backend/alembic/versions/0003_add_task_assist_interactions.py`
+
+Table: `task_assist_interactions`
+
+Important fields:
+
+- account ownership: `user_id`
+- stable Detail identity: `task_id`
+- registered context snapshot: `task_text`, `notes`
+- state machine: `available → pending → completed`
+- one persisted exchange: `question`, `reply`
+- provenance: `generated_by_model`, `needs_user_confirmation`
+- atomic claim: `claim_token`, `claimed_at`
+- audit timestamps: `created_at`, `updated_at`, `completed_at`
+
+Database constraints require a claim token/timestamp while pending and a complete question/reply/provenance/timestamp payload while completed. User deletion cascades to that user's records.
+
+`tasks.profile_task_id` stores the account-scoped browser import key under `UNIQUE(user_id, profile_task_id)`. Registration creates or reuses a real server-owned `tasks.id`; `task_assist_interactions.task_id` is a UUID foreign key to that row. Answer and read routes accept only the server UUID and also filter by authenticated `user_id`. Once completed, re-registration preserves the original saved context and exchange.
+
+## API
+
+All endpoints require `get_current_user` authentication.
+
+### Register/read Detail states
+
+```http
+POST /api/v1/ai/task-assist/details
+```
+
+```json
+{
+  "details": [
+    {
+      "profile_task_id": "stable-profile-import-key",
+      "task_text": "Prepare the weekly performance report.",
+      "notes": "Use the approved internal template."
+    }
+  ]
+}
+```
+
+The response contains one state per Detail and its server-generated UUID, for example `task_id: "5b8d..."`. Registration updates task context only before an answer is completed. The frontend must use this returned UUID for GET and answer POST calls; it must not reuse `profile_task_id` as the security identity.
+
+```http
+GET /api/v1/ai/task-assist/{task_id}
+```
+
+Returns only the current user's record. An unknown or another user's Detail returns `404`.
+
+### Consume the one question
 
 ```http
 POST /api/v1/ai/task-assist
-Cookie: access_token=<signed-in session>
-Content-Type: application/json
 ```
-
-Request:
 
 ```json
 {
-  "task_text": "Prepare the weekly performance report.",
-  "user_message": "How can AI assist me in completing this task?",
-  "notes": "Use the approved internal template."
+  "task_id": "server-generated-task-uuid",
+  "user_message": "How can AI assist me in completing this task?"
 }
 ```
 
-Response:
+The answer request intentionally cannot submit `task_text`, `notes`, `user_id`, history or messages. The service loads the registered account-owned context snapshot.
+
+Completed response:
 
 ```json
 {
+  "task_id": "server-generated-task-uuid",
+  "status": "completed",
+  "question": "How can AI assist me in completing this task?",
   "reply": "...",
   "generated_by_model": true,
-  "needs_user_confirmation": true
+  "needs_user_confirmation": true,
+  "completed_at": "2026-09-17T00:00:00Z"
 }
 ```
 
-`generated_by_model` is `false` when the provider is unavailable, times out, returns malformed or schema-invalid output, exceeds the output limit, or fails the deterministic safety check. The UI labels that case as fallback guidance rather than presenting it as a model response.
+A repeated POST returns that same stored record without calling the AI gateway. A concurrent request that sees an active claim returns `409`; an unregistered Detail returns `404`.
 
-## Boundaries and safety controls
+## Concurrency and failure behavior
 
-- Authentication is mandatory. Missing or invalid session cookies return `401` before a provider call.
-- Requests are strict: unknown fields are rejected. `task_text` is 1–4000 characters, `user_message` is 1–2000, and `notes` is 0–2000 after whitespace trimming.
-- The endpoint is stateless and accepts no `messages`, conversation or session-history field. Both gateway-level and provider-level response caches are disabled for Task Assist, so raw workplace context and replies are not retained in process memory by the AI cache.
-- Every request field is untrusted, user-controlled data. `user_message` is the one question but cannot override the system boundary; `task_text` and `notes` are context only. The system prompt tells the model to ignore attempts to reveal prompts, credentials or internal configuration, change scope, access another task or become a general chatbot.
-- Replies are structured and limited to 1200 characters. Empty, malformed, oversized, instruction/credential-like disclosures or high-risk replies fall back to deterministic guidance.
-- The model may suggest drafting, summarising, outlining and checking. It must not invent employer facts, predict job loss, assess the person, give definitive legal/medical/financial/hiring advice, claim certainty or claim that it executed an action.
-- Every result requires human confirmation. No reply is persisted or used to update a task automatically.
-- The shared AI gateway enforces its process-local request-per-minute budget. Task Assist additionally disables provider retries and bounds each provider attempt to 20 seconds. The browser allows 45 seconds for a configured provider plus one fallback attempt.
-- Logs and responses expose neither credentials nor raw provider error details.
+`claim_interaction()` performs one conditional `UPDATE ... RETURNING`:
 
-## Provider chain
+- only `available` can be claimed for a provider call;
+- the winning request stores a unique claim token and the exact submitted question before invoking the provider;
+- concurrent losers do not invoke the provider;
+- completion is accepted only from the current claim token;
+- `pending` is never reclaimed for another provider call;
+- if generation raises unexpectedly, the same winning request saves deterministic fallback guidance;
+- if a process disappears after claiming, authenticated GET polling converts a stale pending row to completed deterministic fallback without calling a provider;
+- a model-unavailable deterministic fallback is a visible answer and therefore counts as the one completed exchange.
 
-Task Assist uses `backend/app/services/ai_gateway.py` rather than the legacy `SKILL_LLM_*` direct `/chat/completions` request:
+## AI and privacy boundary
 
-1. configured `AI_*` provider, when available;
-2. built-in OpenCode Zen `/responses` fallback;
-3. deterministic local guidance.
+Task Assist still uses `backend/app/services/ai_gateway.py` with:
 
-The route reports provenance only as model versus fallback. It never exposes provider names, credentials or internal exception details.
+- configured provider → OpenCode Zen fallback → deterministic guidance;
+- per-provider timeout `20s`;
+- zero provider retries;
+- `request_cache_enabled=False`, disabling both gateway and provider caches for workplace text;
+- strict output schema and maximum 1200-character reply;
+- prompt/context isolation and output checks for prompt, credential and internal-configuration leakage;
+- explicit `generated_by_model` provenance and `needs_user_confirmation=true`.
 
-## Frontend resilience
+Persistence is limited to the account-owned Task Assist table. It is not the shared in-process AI cache.
 
-`TaskAssistDialog.tsx` aborts the active request on close, task context change (including same-ID wording or notes edits), replacement request or unmount. A monotonically increasing request ID plus a context key prevents an already-settled stale promise from writing into a reopened or edited dialog. Resets run before paint, completed replies are announced through a polite live region, intentional aborts are not shown as user-facing errors, and genuine failures remain retryable within the same turn.
+## Frontend terminal states
 
-## Tests
+`TaskDetailsDrawer.tsx` registers the selected Detail and waits for the backend state before exposing any AI action, avoiding a flash of a second-use button.
 
-- `backend/tests/test_task_assist.py`: provider success, all-field prompt boundary, no-cache privacy contract, per-request timeout/retry budget, unsafe and credential-like output rejection, provider failure fallback, strict request validation, multi-turn field rejection and authentication.
-- `frontend/tests/taskAssist.test.mjs`: exact default question, provenance labels, same-ID context edits, stale-result guard, single-turn/cancellation/accessibility source guards.
-- `backend/tests/test_ai_provider.py` and `backend/tests/test_ai_gateway.py`: shared gateway transport, per-request cache opt-out, retry, schema and fallback behavior.
+- `available`: render `Chat with AI`.
+- `pending`: the dialog publishes pending to its parent before POST so closing cannot resurrect the entry; the drawer then polls the authenticated GET endpoint and renders status only, with no input or send action. Stale rows finish as persisted deterministic fallback without a second provider call.
+- `completed`: render `Saved AI guidance` with the first question and answer inside the drawer's scroll region; render no `Chat with AI` button or dialog entry.
+- signed-out visitors do not mount or call the authenticated Task Assist feature.
+
+Immediately after the first successful response, `TaskAssistDialog.tsx` shows the saved exchange but no longer renders the form, textarea or send button. Closing it leaves only the read-only saved section in the Detail.
+
+## Verification
+
+Automated coverage:
+
+- Task Assist backend persistence/security suite: `21 passed`.
+- Complete backend suite in a clean worktree: `200 passed, 3 known unrelated failures` (skill-match contract/fallback baseline).
+- Task Assist frontend: `7/7 passed`; complete frontend tests in a clean worktree total `36 passed, 3 known unrelated taskOverview failures`; production build and lint pass (existing warnings only).
+
+- `backend/tests/test_task_assist.py`
+  - authenticated registration;
+  - server snapshot usage;
+  - first reply persistence;
+  - repeated POST does not call the provider;
+  - account isolation;
+  - concurrent requests invoke the provider at most once;
+  - strict request fields, no-cache privacy, safety filtering and fallback provenance.
+- `backend/tests/test_task_assist_persistence.py`
+  - unique/check constraints and migration chain.
+- `frontend/tests/taskAssist.test.mjs`
+  - exact default question;
+  - status gating;
+  - completed-state saved guidance;
+  - no second-turn textarea/send controls;
+  - task ID-only answer payload;
+  - cancellation/stale-response/accessibility guards.
+
+The Alembic upgrade and targeted downgrade were generated in offline PostgreSQL SQL mode and reviewed. A read-only live check found the shared database at revision `0002_catalogue_tables`, with `tasks` present and both `tasks.profile_task_id` and `task_assist_interactions` absent. Applying `0003_task_assist_once` remains a separately controlled database change and was not performed automatically.
 
 ## Relevant files
 
-- `backend/app/routers/ai.py`
-- `backend/app/schemas/task_assist.py`
+- `backend/app/models/task_assist.py`
+- `backend/app/services/task_assist_records.py`
 - `backend/app/services/task_assist.py`
-- `backend/app/services/ai_gateway.py`
+- `backend/app/schemas/task_assist.py`
+- `backend/app/routers/ai.py`
+- `backend/alembic/versions/0003_add_task_assist_interactions.py`
 - `backend/tests/test_task_assist.py`
+- `backend/tests/test_task_assist_persistence.py`
+- `frontend/src/pages/Analysis/components/TaskDetailsDrawer.tsx`
 - `frontend/src/pages/Analysis/components/TaskAssistDialog.tsx`
 - `frontend/src/pages/AIExposure/lib/taskAssistState.ts`
 - `frontend/src/services/aiService.ts`
