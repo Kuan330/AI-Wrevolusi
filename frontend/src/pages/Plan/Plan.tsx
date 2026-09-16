@@ -367,7 +367,6 @@ export default function Plan() {
       sortValue: (c) => c.title.toLowerCase(),
       cell: (c) => (
         <span className="lp-cell-course">
-          <span className="lp-chip" style={{ background: tone(c.id) }} />
           <span className="lp-cell-course__copy">
             <strong>{c.title}</strong>
             <small>{c.provider}</small>
