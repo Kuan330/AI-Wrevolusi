@@ -4,6 +4,7 @@ import { ArrowRight, Plus, X, Check } from "lucide-react";
 import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
 import { loadPossibilitiesData, type PossibilitiesData, skillGroup, directionMatch, type SkillGroup } from "./possibilitiesData";
 import PageHeader from "@/components/common/PageHeader";
+import BotPet from "@/components/common/BotPet";
 import "./exploration.css";
 
 const KEY = "aiwrevolusi.possibilities.courseExploration.v1";
@@ -20,6 +21,7 @@ export default function Possibilities() {
   const [choice, setChoice] = useState<Choice>(readChoice);
   const detailRef = useRef<HTMLElement>(null);
   const choicesRef = useRef<HTMLElement>(null);
+  const planbarRef = useRef<HTMLDivElement>(null);
   const [selectionVersion, setSelectionVersion] = useState(0);
   useEffect(() => {
     if (selectionVersion > 0) {
@@ -93,6 +95,7 @@ export default function Possibilities() {
         <div className="px-next-step"><div><h3>Take your next step</h3><p>Explore courses in Learning Resources and choose what to add to My Plan.</p></div><Link className="px-primary" to="/learning-centre">Explore learning resources <ArrowRight size={16} /></Link></div>
       </> : <div className="px-no-direction"><p className="px-eyebrow">03 · YOUR NEXT STEP</p><h2 id="journey-heading">Which direction would you like to explore?</h2><p>Choose a card above to see the strengths you can bring and the skills you could develop.</p></div>}
     </section>
-    {choice.themes.length > 0 && <div className="px-planbar" aria-label="Learning shortlist"><div><small>YOUR LEARNING LIST · THIS VISIT</small><div>{choice.themes.map(id => <button key={id} onClick={() => toggle(id)} aria-label={`Remove ${name(id)}`}>{name(id)}<X size={13} /></button>)}</div></div><Link to="/learning-centre">Browse learning resources <ArrowRight size={16} /></Link><p>Select courses in Learning Resources to add them to My Plan.</p></div>}
+    {choice.themes.length > 0 && <div className="px-planbar" ref={planbarRef} aria-label="Learning shortlist"><div><small>YOUR LEARNING LIST · THIS VISIT</small><div>{choice.themes.map(id => <button key={id} onClick={() => toggle(id)} aria-label={`Remove ${name(id)}`}>{name(id)}<X size={13} /></button>)}</div></div><Link to="/learning-centre">Browse learning resources <ArrowRight size={16} /></Link><p>Select courses in Learning Resources to add them to My Plan.</p></div>}
+    <BotPet avoidRef={planbarRef} avoidActive={choice.themes.length > 0} />
   </div>;
 }
