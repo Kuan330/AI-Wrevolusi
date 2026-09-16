@@ -8,6 +8,8 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
+import { BOT_PET_SPEECH_MS } from "@/components/common/botPetGreetings";
+
 import "./bot-pet.css";
 
 export type BotPetTour = {
@@ -44,6 +46,10 @@ type BotPetProps = {
   speech?: string | null;
   /** Multi-step briefing (Next / Done). Hidden while `speech` is set. */
   tour?: BotPetTour | null;
+  /** Click the speech cloud to dismiss a short tip (not used for the tour). */
+  onSpeechDismiss?: () => void;
+  /** Tap the pet (not a drag) for another short tip. Ignored while a tour is open. */
+  onPetTap?: () => void;
 };
 
 type Position = { x: number; y: number };
@@ -59,6 +65,8 @@ const GAP = 8;
 const ANCHOR_INSET = 8;
 const DEFAULT_W = 132;
 const DEFAULT_H = 143;
+/** Movement beyond this counts as a drag, not a tap. */
+const TAP_SLOP = 8;
 
 function petSize(root: HTMLElement | null): { w: number; h: number } {
   if (!root) return { w: DEFAULT_W, h: DEFAULT_H };
@@ -139,9 +147,12 @@ export default function BotPet({
   defaultAnchorRef,
   speech = null,
   tour = null,
+  onSpeechDismiss,
+  onPetTap,
 }: BotPetProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [waving, setWaving] = useState(true);
+  const [speechHidden, setSpeechHidden] = useState(false);
   const timer = useRef<number | undefined>(undefined);
   const isInline = placement === "inline";
   /** User-chosen left/top; null means stay on the default CSS corner. */
@@ -152,7 +163,24 @@ export default function BotPet({
     id: number;
     start: Position;
     origin: Position;
+    moved: boolean;
   } | null>(null);
+
+  useEffect(() => {
+    setSpeechHidden(false);
+  }, [speech]);
+
+  // Safety net: any short tip auto-hides after 4s even if the parent timer was cleared.
+  useEffect(() => {
+    if (!speech) return;
+    const id = window.setTimeout(() => {
+      setSpeechHidden(true);
+      onSpeechDismiss?.();
+    }, BOT_PET_SPEECH_MS);
+    return () => window.clearTimeout(id);
+    // Intentionally omit onSpeechDismiss — restart only when the tip text changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [speech]);
 
   const applyDefault = () => {
     const root = rootRef.current;
@@ -299,6 +327,7 @@ export default function BotPet({
       id: event.pointerId,
       start: { x: event.clientX, y: event.clientY },
       origin,
+      moved: false,
     };
     root.style.setProperty("--bot-pet-lift", "0px");
     setPosition(clamp(origin, root));
@@ -309,11 +338,17 @@ export default function BotPet({
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     const current = drag.current;
     if (!current || current.id !== event.pointerId) return;
+    const dx = event.clientX - current.start.x;
+    const dy = event.clientY - current.start.y;
+    if (!current.moved && dx * dx + dy * dy > TAP_SLOP * TAP_SLOP) {
+      current.moved = true;
+    }
+    if (!current.moved) return;
     setPosition(
       clamp(
         {
-          x: current.origin.x + event.clientX - current.start.x,
-          y: current.origin.y + event.clientY - current.start.y,
+          x: current.origin.x + dx,
+          y: current.origin.y + dy,
         },
         rootRef.current,
       ),
@@ -323,21 +358,30 @@ export default function BotPet({
   const endDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
     const current = drag.current;
     if (!current || current.id !== event.pointerId) return;
-    const next = clamp(
-      {
-        x: current.origin.x + event.clientX - current.start.x,
-        y: current.origin.y + event.clientY - current.start.y,
-      },
-      rootRef.current,
-    );
-    customised.current = true;
-    setPosition(next);
-    persist(next);
+    const wasTap = !current.moved;
+    if (current.moved) {
+      const next = clamp(
+        {
+          x: current.origin.x + event.clientX - current.start.x,
+          y: current.origin.y + event.clientY - current.start.y,
+        },
+        rootRef.current,
+      );
+      customised.current = true;
+      setPosition(next);
+      persist(next);
+    }
     drag.current = null;
     setDragging(false);
+    if (wasTap && !tour) onPetTap?.();
   };
 
   const showTour = !speech && tour && tour.total > 0;
+  const visibleSpeech = speech && !speechHidden ? speech : null;
+  const dismissSpeech = () => {
+    setSpeechHidden(true);
+    onSpeechDismiss?.();
+  };
   const lastStep = showTour && tour.step >= tour.total - 1;
   const tourLabel = showTour
     ? lastStep
@@ -351,8 +395,20 @@ export default function BotPet({
       ref={rootRef}
       aria-hidden={isInline ? true : undefined}
       role={isInline ? undefined : "img"}
-      aria-label={isInline ? undefined : "Companion character. Drag to move."}
-      title={isInline ? undefined : "Drag to move"}
+      aria-label={
+        isInline
+          ? undefined
+          : onPetTap
+            ? "Companion character. Tap for a tip, drag to move."
+            : "Companion character. Drag to move."
+      }
+      title={
+        isInline
+          ? undefined
+          : onPetTap
+            ? "Tap for a tip · drag to move"
+            : "Drag to move"
+      }
       style={
         !isInline && position
           ? { left: position.x, top: position.y, right: "auto", bottom: "auto" }
@@ -363,9 +419,19 @@ export default function BotPet({
       onPointerUp={isInline ? undefined : endDrag}
       onPointerCancel={isInline ? undefined : endDrag}
     >
-      {speech ? (
-        <p className="bot-pet__speech" role="status">
-          {speech}
+      {visibleSpeech ? (
+        <p
+          className="bot-pet__speech bot-pet__speech--dismissable"
+          role="status"
+          onPointerDown={(event) => {
+            event.stopPropagation();
+          }}
+          onClick={(event) => {
+            event.stopPropagation();
+            dismissSpeech();
+          }}
+        >
+          {visibleSpeech}
         </p>
       ) : showTour ? (
         <div

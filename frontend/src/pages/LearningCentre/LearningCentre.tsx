@@ -50,7 +50,8 @@ export default function LearningCentre() {
   const [seeded, setSeeded] = useState(false);
   /** Select the first skill after seeding when the list is empty. */
   const [activeId, setActiveId] = useState("");
-  const { speech: petSpeech, say: sayPet } = useBotPetGreeting("learning");
+  const { speech: petSpeech, say: sayPet, dismiss: dismissPet, nudge: nudgePet } =
+    useBotPetGreeting("learning");
 
   const workSkills = useMemo(() => {
     const evidence = buildSkillEvidence(analysis?.tasks ?? [], wefSkills);
@@ -351,6 +352,8 @@ export default function LearningCentre() {
         storageKey="aiwrevolusi.botPetPosition.learning.v4"
         defaultCorner="top-right"
         speech={petSpeech}
+        onSpeechDismiss={dismissPet}
+        onPetTap={nudgePet}
       />
     </div>
   );
