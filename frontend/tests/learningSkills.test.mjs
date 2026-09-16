@@ -6,7 +6,8 @@ const source=readFileSync(new URL('../src/pages/Skills/learningSkills.ts',import
 const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
 const m=await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
 test('confirmed skills preserve priority order and deduplicate',()=>{const skills=[m.growingSkills[3],m.growingSkills[0]];m.saveLearningSkills([...skills,skills[0]]);assert.deepEqual(m.readLearningSkills(),skills)});
-test('missing course association stays empty',()=>{assert.deepEqual(m.coursesForSkill('environmental-stewardship'),[])});
+// The bundled skill→course association map is gone: courses now carry their own
+// skill ids from the backend catalogue, so there is no local lookup left to test.
 test('invalid saved selection is not silently overwritten',()=>{globalThis.skillData='{"invalid":true}';assert.throws(()=>m.readLearningSkills());assert.equal(globalThis.skillData,'{"invalid":true}')});
 
 test('legacy skills from previous work are excluded',()=>{assert.deepEqual(m.reconcileLearningSkills([{id:'analytical-thinking',name:'Analytical thinking'}],[]),[])});

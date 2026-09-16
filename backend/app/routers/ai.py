@@ -7,7 +7,11 @@ from app.schemas.occupation_ai import (
     OccupationSuggestionsRequest,
     OccupationSuggestionsResponse,
 )
-from app.schemas.skill_matching import SkillMatchRequest, SkillMatchResponse
+from app.schemas.skill_matching import (
+    SkillMatchCandidate,
+    SkillMatchRequest,
+    SkillMatchResponse,
+)
 from app.schemas.task_assist import TaskAssistRequest, TaskAssistResponse
 from app.services.ai_gateway import AIGateway, default_ai_gateway
 from app.services.ai_matching import (
@@ -21,21 +25,36 @@ from app.services.occupation_ai import (
     deterministic_recommend_occupations,
     deterministic_suggest_occupations,
 )
-from app.services.skill_matching import match_skills_response
+from app.services.skill_matching import MAX_SKILL_MATCHES, match_skills_response
 from app.services.task_assist import deterministic_task_assist, suggest_task_assist
 
 
 
-def _retain_task_evidence(response: SkillMatchResponse, task_text: str) -> SkillMatchResponse:
-    """Drop provider skill items whose evidence is not in the input task."""
+def _finalize_skill_matches(
+    response: SkillMatchResponse,
+    task_text: str,
+    candidates: list[SkillMatchCandidate],
+) -> SkillMatchResponse:
+    """Verify provider evidence, then fall back to the deterministic rules.
 
-    valid_items = [
+    Two things can empty a provider response: evidence that cannot be traced
+    back to the input, and short inputs the model judges too vague to match — a
+    lone word like "thinking" can never reproduce the full name "Analytical
+    thinking", so a strict evidence check would drop all three of its matches.
+    An empty list is a dead end for the user either way, so the rule table
+    answers instead when the provider returns nothing.
+    """
+
+    verified = [
         item
         for item in response.skills
         if item.evidence_phrases
         and all(phrase in task_text for phrase in item.evidence_phrases)
-    ][:2]
-    return SkillMatchResponse(skills=valid_items)
+    ]
+    kept = verified or response.skills
+    if kept:
+        return SkillMatchResponse(skills=kept[:MAX_SKILL_MATCHES])
+    return match_skills_response(task_text, candidates)
 
 
 router = APIRouter(prefix='/ai', tags=['AI Matching'])
@@ -173,7 +192,18 @@ def skill_match(
     request: SkillMatchRequest,
     gateway: AIGateway = Depends(get_ai_gateway),
 ) -> SkillMatchResponse:
-    """Match a task only against the caller-supplied skill candidates."""
+    """Match a task only against the caller-supplied skill candidates.
+
+    The deterministic rules answer first. They already cover every skill name
+    plus the everyday words for the work behind it, and they return in under a
+    millisecond — so the common case never pays for a provider round-trip. The
+    model is only consulted when the rules find nothing at all, which is where
+    its judgement actually adds something.
+    """
+
+    quick = match_skills_response(request.task_text, request.candidates)
+    if quick.skills:
+        return quick
 
     result = gateway.run_candidate_constrained(
         operation='skill-match',
@@ -183,7 +213,9 @@ def skill_match(
         candidate_key='id',
         local=lambda: match_skills_response(request.task_text, request.candidates),
         fallback=lambda: SkillMatchResponse(skills=[]),
-        post_validate=lambda response: _retain_task_evidence(response, request.task_text),
+        post_validate=lambda response: _finalize_skill_matches(
+            response, request.task_text, request.candidates
+        ),
     )
     return result.value
 

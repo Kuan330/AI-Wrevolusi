@@ -1,6 +1,4 @@
 import { api } from "@/services/api";
-import { courses as fallbackCourses } from "@/pages/LearningCentre/catalogue";
-import { coursesForSkill } from "@/pages/Skills/learningSkills";
 import type { Course } from "@/pages/LearningCentre/types";
 
 /** Verified catalogue endpoints return DB level names; the page uses slugs. */
@@ -52,7 +50,6 @@ type PageCatalogueResponse = {
 
 export type CatalogueFetchResult = {
   courses: Course[];
-  source: "api" | "fallback";
   notice?: string;
 };
 
@@ -90,38 +87,23 @@ function mapCourse(item: ApiCourse): Course {
 }
 
 /**
- * Load the page-shaped catalogue for one skill (or the whole catalogue when
- * ``skillId`` is null). The verified catalogue is served by the backend; when
- * it is unreachable the page keeps working on the offline sample catalogue so
- * the Learning Resources page never renders an error-only state.
+ * Load the page-shaped catalogue for one skill, or the whole catalogue when
+ * ``skillId`` is null. The backend owns the catalogue, so a missing or
+ * unreachable endpoint surfaces as an error for the caller to report rather
+ * than falling back to bundled sample data.
  */
 export async function fetchPageCatalogue(
   skillId: string | null,
 ): Promise<CatalogueFetchResult> {
   const query = skillId ? `?skill=${encodeURIComponent(skillId)}` : "";
-  try {
-    const data = await api.get<PageCatalogueResponse>(
-      `/learning/courses${query}`,
-    );
-    if (data.found === false) {
-      return {
-        courses: [],
-        source: "api",
-        notice: "This skill does not have verified courses yet.",
-      };
-    }
-    return { courses: data.courses.map(mapCourse), source: "api" };
-  } catch {
-    const fallback = skillId
-      ? fallbackCourses.filter((course) =>
-          coursesForSkill(skillId).includes(course.id),
-        )
-      : fallbackCourses;
+  const data = await api.get<PageCatalogueResponse>(
+    `/learning/courses${query}`,
+  );
+  if (data.found === false) {
     return {
-      courses: fallback,
-      source: "fallback",
-      notice:
-        "Showing offline sample courses — the live catalogue is unavailable.",
+      courses: [],
+      notice: "This skill does not have verified courses yet.",
     };
   }
+  return { courses: data.courses.map(mapCourse) };
 }

@@ -13,8 +13,6 @@ import { Button } from "@/components/ui/button";
 import type { Course } from "../types";
 import { durationLabel } from "../lib/coursePlanning";
 import { courseLevelLabel } from "../lib/courseLevels";
-import { wefSkillsForCourse } from "../lib/courseWorkLinks";
-import SkillOutlookBadge from "./SkillOutlookBadge";
 
 export type CourseDetailDrawerProps = {
   course: Course;
@@ -22,13 +20,21 @@ export type CourseDetailDrawerProps = {
   saved: boolean;
   onClose: () => void;
   onSave: () => void;
-  /** Called when a badge popover adds or removes a learning skill. */
-  onSkillsChanged?: () => void;
 };
 
 export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
-  const { course, skillName, saved, onClose, onSave, onSkillsChanged } = props;
-  const buildSkills = useMemo(() => wefSkillsForCourse(course.id), [course.id]);
+  const { course, skillName, saved, onClose, onSave } = props;
+  // Providers publish outcomes as one semicolon-separated sentence, so only the
+  // first clause is capitalised and only the last one keeps its full stop.
+  // Normalise them into standalone list items.
+  const outcomes = useMemo(
+    () =>
+      course.outcomes
+        .map((item) => item.trim().replace(/[.;]+$/, ""))
+        .filter(Boolean)
+        .map((item) => item.charAt(0).toUpperCase() + item.slice(1)),
+    [course.outcomes],
+  );
   const sheetRef = useRef<HTMLDivElement>(null);
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const aboutIsLong = course.intro.length > 180;
@@ -84,22 +90,17 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
               </section>
 
               <section className="learning-course-skills">
-                <h3>Skills you’ll build</h3>
-                {buildSkills.length ? (
-                  <ul className="learning-course-skill-badges">
-                    {buildSkills.map((skill) => (
-                      <li key={skill.wef_skill_id}>
-                        <SkillOutlookBadge
-                          skill={skill}
-                          container={sheetRef}
-                          onSkillsChanged={onSkillsChanged}
-                        />
-                      </li>
+                <h3>What you’ll learn</h3>
+                {outcomes.length ? (
+                  <ul className="learning-course-outcomes">
+                    {outcomes.map((outcome) => (
+                      <li key={outcome}>{outcome}</li>
                     ))}
                   </ul>
                 ) : (
                   <p className="library-muted">
-                    No linked WEF skills are mapped for this course yet.
+                    The provider has not published learning outcomes for this
+                    course yet.
                   </p>
                 )}
                 {skillName ? (

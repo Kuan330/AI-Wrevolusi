@@ -13,13 +13,13 @@ CANDIDATES = [
 ]
 
 
-def test_match_skills_returns_no_more_than_two_candidate_skills() -> None:
+def test_match_skills_returns_no_more_than_three_candidate_skills() -> None:
     result = match_skills(
         "Provide customer service, prepare the budget, and check the invoice.",
         CANDIDATES,
     )
 
-    assert len(result) <= 2
+    assert len(result) <= 3
     assert {item.wef_skill_id for item in result} <= {candidate["id"] for candidate in CANDIDATES}
 
 
@@ -66,7 +66,7 @@ def test_skill_match_route_returns_the_compatible_response_shape() -> None:
     assert set(response.json()) == {"skills", "needs_user_confirmation"}
     assert response.json()["needs_user_confirmation"] is True
     parsed = SkillMatchResponse.model_validate(response.json())
-    assert len(parsed.skills) <= 2
+    assert len(parsed.skills) <= 3
     assert all(
         item.wef_skill_id in {candidate["id"] for candidate in CANDIDATES}
         for item in parsed.skills

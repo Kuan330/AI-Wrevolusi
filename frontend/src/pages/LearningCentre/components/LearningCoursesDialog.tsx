@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Bookmark, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -11,11 +12,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { AppButton } from "@/components/ui/app-button";
 import { ROUTES } from "@/constants/routes";
-import { courses } from "../catalogue";
+import { loadCourseDirectory } from "../lib/courseDirectory";
 import {
   courseLevelClassName,
   courseLevelLabel,
 } from "../lib/courseLevels";
+import type { Course } from "../types";
 
 export type LearningCoursesDialogProps = {
   open: boolean;
@@ -26,7 +28,34 @@ export type LearningCoursesDialogProps = {
 
 export default function LearningCoursesDialog(props: LearningCoursesDialogProps) {
   const { open, onOpenChange, saved, onRemove } = props;
-  const items = courses.filter((course) => saved.includes(course.id));
+  const [directory, setDirectory] = useState<Map<string, Course> | null>(null);
+  const [error, setError] = useState("");
+
+  // Saved ids point at backend courses, so resolve them against the live
+  // catalogue rather than a bundled list whose ids never matched.
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    loadCourseDirectory()
+      .then((next) => {
+        if (cancelled) return;
+        setDirectory(next);
+        setError("");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setError("Your saved courses could not be loaded. Please try again.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
+
+  const items = saved.flatMap((id) => {
+    const course = directory?.get(id);
+    return course ? [course] : [];
+  });
+  const loading = !directory && !error;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -38,7 +67,15 @@ export default function LearningCoursesDialog(props: LearningCoursesDialogProps)
           </DialogDescription>
         </DialogHeader>
         <div className="learning-courses-dialog__body">
-          {!items.length ? (
+          {loading ? (
+            <p className="library-muted" role="status">
+              Loading your courses…
+            </p>
+          ) : error ? (
+            <p className="library-muted" role="alert">
+              {error}
+            </p>
+          ) : !items.length ? (
             <div className="library-empty learning-courses-empty">
               <Bookmark className="mx-auto mb-3" />
               <p>No courses in your learning list yet.</p>

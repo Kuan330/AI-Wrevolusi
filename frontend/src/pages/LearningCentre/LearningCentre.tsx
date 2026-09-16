@@ -15,11 +15,12 @@ import { useCourseLibrary } from "./hooks/useCourseLibrary";
 import { fetchPageCatalogue } from "@/services/catalogueService";
 import type { Course } from "./types";
 import {
-  coursesForSkill,
   ensureLearningSkills,
   toLearningSkill,
   type LearningSkill,
 } from "@/pages/Skills/learningSkills";
+import { loadCourseDirectory } from "./lib/courseDirectory";
+import { rateWefSkills } from "./lib/skillStars";
 import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
 import { useLearningSkills } from "@/pages/Skills/useLearningSkills";
 import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
@@ -48,7 +49,7 @@ export default function LearningCentre() {
   const [skillsError, setSkillsError] = useState("");
   const [analysis] = useState(readConfirmedAnalysis);
   const [seeded, setSeeded] = useState(false);
-  /** Empty = show all courses (default). */
+  /** Select the first skill after seeding; empty also supports explicit Clear. */
   const [activeId, setActiveId] = useState("");
 
   const workSkills = useMemo(() => {
@@ -86,14 +87,22 @@ export default function LearningCentre() {
     if (!wefSkills.length || seeded) return;
     const next = ensureLearningSkills(workSkills);
     setSkills(next);
+    // Initialise once. Search links keep their whole-catalogue results, and
+    // later Clear actions must not immediately select the first skill again.
+    if (!params.get("q")) {
+      setActiveId(current => current || next[0]?.id || "");
+    }
     setSeeded(true);
-  }, [wefSkills.length, workSkills, seeded, setSkills]);
+  }, [wefSkills.length, workSkills, seeded, setSkills, params]);
 
   const focusSkills = skills.map((item: LearningSkill) => ({
     id: item.id,
     en: item.name,
-    hint: item.source === "work" ? "From your work" : undefined,
+    source: item.source,
   }));
+  // Star band comes from the whole WEF framework, so it is rated once here
+  // rather than per card.
+  const skillRatings = useMemo(() => rateWefSkills(wefSkills), [wefSkills]);
 
   useEffect(() => {
     if (!activeId) return;
@@ -104,9 +113,7 @@ export default function LearningCentre() {
 
   const skill = focusSkills.find((item) => item.id === activeId);
   const [pageCourses, setPageCourses] = useState<Course[]>([]);
-  const [catalogueSource, setCatalogueSource] = useState<"api" | "fallback">(
-    "api",
-  );
+  const [catalogueError, setCatalogueError] = useState("");
   const [catalogueNotice, setCatalogueNotice] = useState("");
   const [catalogueLoading, setCatalogueLoading] = useState(true);
 
@@ -118,6 +125,7 @@ export default function LearningCentre() {
     if (!searchActive && !activeId) {
       setPageCourses([]);
       setCatalogueNotice("");
+      setCatalogueError("");
       setCatalogueLoading(false);
       return;
     }
@@ -127,13 +135,15 @@ export default function LearningCentre() {
       .then((result) => {
         if (cancelled) return;
         setPageCourses(result.courses);
-        setCatalogueSource(result.source);
         setCatalogueNotice(result.notice ?? "");
+        setCatalogueError("");
         setCatalogueLoading(false);
       })
       .catch(() => {
         if (cancelled) return;
-        setCatalogueSource("fallback");
+        setCatalogueError(
+          "The course catalogue could not be loaded. Check your connection and try again.",
+        );
         setCatalogueLoading(false);
       });
     return () => {
@@ -158,32 +168,45 @@ export default function LearningCentre() {
     pageCourses.find((course) => course.id === detailId) ?? null;
   const addedIds = new Set(skills.map((item) => item.id));
 
-  const confirmRemoveSkill = () => {
+  const confirmRemoveSkill = async () => {
     if (!removeTarget) return;
-    const linked = coursesForSkill(removeTarget.id);
-    const remaining = skills.filter((item) => item.id !== removeTarget.id);
-    // Keep a course if another remaining skill still links to it.
-    const stillLinked = new Set(
-      remaining.flatMap((item) => coursesForSkill(item.id)),
+    const removedId = removeTarget.id;
+    const remainingIds = new Set(
+      skills.filter((item) => item.id !== removedId).map((item) => item.id),
     );
-    const dropCourses = linked.filter((id) => !stillLinked.has(id));
-    removeSkill(removeTarget.id);
-    if (dropCourses.length) {
-      removeSavedCourses(dropCourses);
-    }
-    if (activeId === removeTarget.id) setActiveId("");
+    removeSkill(removedId);
+    if (activeId === removedId) setActiveId("");
     setRemoveTarget(null);
+    // Drop courses that only the removed skill linked to. Links come from the
+    // backend catalogue, so this no longer depends on a bundled id map.
+    try {
+      const directory = await loadCourseDirectory();
+      const dropCourses = [...directory.values()]
+        .filter(
+          (course) =>
+            course.skills.includes(removedId) &&
+            !course.skills.some((id) => remainingIds.has(id)),
+        )
+        .map((course) => course.id);
+      if (dropCourses.length) {
+        removeSavedCourses(dropCourses);
+      }
+    } catch {
+      // Catalogue unreachable: leave the saved list untouched.
+    }
   };
 
   const sidebarProps = {
     activeId,
     skills: focusSkills,
+    ratings: skillRatings,
     onSelect: (skillId: string) => {
       setActiveId(skillId);
       setFilters({ ...emptyFilters });
     },
     onClear: () => setActiveId(""),
     onRemove: (id: string, name: string) => setRemoveTarget({ id, name }),
+    onAdd: () => setAddOpen(true),
   };
 
   const filterProps = {
@@ -244,10 +267,14 @@ export default function LearningCentre() {
                 Loading courses…
               </p>
             )}
+            {catalogueError && (
+              <p className="library-muted" role="alert">
+                {catalogueError}
+              </p>
+            )}
             {!catalogueLoading && catalogueNotice && (
               <p className="library-muted" role="status">
                 {catalogueNotice}
-                {catalogueSource === "fallback" ? " (offline sample data)" : ""}
               </p>
             )}
             <p className="library-muted" role="status">
@@ -316,7 +343,6 @@ export default function LearningCentre() {
           saved={state.saved.includes(detailCourse.id)}
           onClose={() => setDetailId(null)}
           onSave={() => toggleSave(detailCourse.id)}
-          onSkillsChanged={refresh}
         />
       )}
 
@@ -327,7 +353,6 @@ export default function LearningCentre() {
           if (!open) refresh();
         }}
         addedIds={addedIds}
-        workSkills={workSkills}
         onAdd={(name, source) => addSkill(name, source)}
       />
 
