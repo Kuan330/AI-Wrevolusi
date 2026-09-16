@@ -124,15 +124,19 @@
 /* Always-available entry point for adding a skill, so adding is no longer
    limited to the empty state. */
 .library-sidebar__add {
-  width: 1.55rem !important;
-  height: 1.55rem !important;
-  min-height: 1.55rem !important;
-  border-radius: 8px !important;
-  color: #326889 !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-height: 2.25rem !important;
+  border-radius: 50% !important;
+  border: 1px solid #9cc7e0 !important;
+  background: linear-gradient(135deg, #d2eafa, #f4dce7) !important;
+  box-shadow: 0 3px 8px #32688920;
+  color: #285c7c !important;
   flex-shrink: 0;
 }
 .library-sidebar__add:hover {
-  background: rgba(50, 104, 137, 0.1) !important;
+  background: linear-gradient(135deg, #bddff5, #edc5d8) !important;
+  box-shadow: 0 4px 12px #32688930;
 }
 .library-skill-list {
   display: grid;

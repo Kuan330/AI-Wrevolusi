@@ -71,3 +71,18 @@ def test_skill_match_route_returns_the_compatible_response_shape() -> None:
         item.wef_skill_id in {candidate["id"] for candidate in CANDIDATES}
         for item in parsed.skills
     )
+
+
+def test_fast_matching_does_not_call_model_for_unrelated_input() -> None:
+    from app.routers.ai import skill_match
+    from app.schemas.skill_matching import SkillMatchRequest
+
+    class NoModel:
+        def run_candidate_constrained(self, **kwargs):
+            raise AssertionError('Fast matching must not wait for a model')
+
+    response = skill_match(
+        SkillMatchRequest(task_text='zzzz unrelated banana', candidates=CANDIDATES, fast_only=True),
+        gateway=NoModel(),
+    )
+    assert response.skills == []

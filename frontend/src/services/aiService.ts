@@ -33,6 +33,7 @@ export interface SkillMatchCandidatePayload {
 }
 
 export interface SkillMatchRequest {
+  fast_only?: boolean;
   task_text: string;
   candidates: SkillMatchCandidatePayload[];
 }
@@ -92,11 +93,12 @@ export const aiService = {
       AI_REQUEST_TIMEOUT_MS,
       signal,
     ),
-  skillMatch: (request: SkillMatchRequest) =>
+  skillMatch: (request: SkillMatchRequest, signal?: AbortSignal) =>
     api.post<SkillMatchResponse, SkillMatchRequest>(
       "/ai/skill-match",
       request,
-      AI_REQUEST_TIMEOUT_MS,
+      request.fast_only ? 5000 : AI_REQUEST_TIMEOUT_MS,
+      signal,
     ),
   occupationSuggestions: (request: OccupationSuggestionsRequest) =>
     api.post<OccupationSuggestionsResponse, OccupationSuggestionsRequest>(

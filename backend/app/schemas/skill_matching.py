@@ -25,6 +25,7 @@ class SkillMatchRequest(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
+    fast_only: bool = False
     task_text: str = Field(min_length=1, max_length=2000)
     candidates: list[SkillMatchCandidate] = Field(default_factory=list, max_length=100)
 

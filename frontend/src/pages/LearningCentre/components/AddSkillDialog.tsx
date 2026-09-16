@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,13 +28,14 @@ type SearchState = "idle" | "searching" | "done" | "error";
 
 /** Wait for a pause in typing before asking the matcher. The rules answer
     instantly, so this is only here to avoid a request per keystroke. */
-const SEARCH_DEBOUNCE_MS = 400;
+const SEARCH_DEBOUNCE_MS = 200;
 /** Below this length there is nothing meaningful to match on. */
 const MIN_QUERY_LENGTH = 2;
 
 export default function AddSkillDialog(props: AddSkillDialogProps) {
   const { open, onOpenChange, addedIds, onAdd } = props;
   const [wefSkills, setWefSkills] = useState<WefSkill[]>([]);
+  const cache = useRef(new Map<string, SkillMatchItem[]>());
   const [query, setQuery] = useState("");
   const [matches, setMatches] = useState<SkillMatchItem[]>([]);
   const [state, setState] = useState<SearchState>("idle");
@@ -53,7 +54,7 @@ export default function AddSkillDialog(props: AddSkillDialogProps) {
         );
       })
       .catch(() => {
-        if (!cancelled) setWefSkills([]);
+        if (!cancelled) { setWefSkills([]); setState("error"); }
       });
     return () => {
       cancelled = true;
@@ -75,20 +76,28 @@ export default function AddSkillDialog(props: AddSkillDialogProps) {
     const text = query.trim();
     if (text.length < MIN_QUERY_LENGTH || !wefSkills.length) return;
     let cancelled = false;
+    const controller = new AbortController();
+    const cacheKey = JSON.stringify([text.toLowerCase(), wefSkills.map(s => [s.wef_skill_id, s.core_skill])]);
     const timer = window.setTimeout(() => {
       if (cancelled) return;
+      const cached = cache.current.get(cacheKey);
+      if (cached) { setMatches(cached); setState("done"); return; }
       setState("searching");
       void aiService
         .skillMatch({
+          fast_only: true,
           task_text: text,
           candidates: wefSkills.map((skill) => ({
             id: skill.wef_skill_id,
             skill: skill.core_skill,
           })),
-        })
+        }, controller.signal)
         .then((response) => {
           if (cancelled) return;
-          setMatches(response.skills);
+          const next = response.skills.slice(0, 3);
+          if (cache.current.size >= 100) cache.current.clear();
+          cache.current.set(cacheKey, next);
+          setMatches(next);
           setState("done");
         })
         .catch(() => {
@@ -100,6 +109,7 @@ export default function AddSkillDialog(props: AddSkillDialogProps) {
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
+      controller.abort();
     };
   }, [query, wefSkills, open]);
 
@@ -115,15 +125,18 @@ export default function AddSkillDialog(props: AddSkillDialogProps) {
           <DialogTitle>Add a skill</DialogTitle>
           <DialogDescription>
             Type the skill's name, or describe what you do with it. Your wording
-            is matched against the 26 WEF core skills as you type.
+            is matched against the 26 WEF core skills. Choose from up to three related skills.
           </DialogDescription>
         </DialogHeader>
         <div className="px-5 py-4">
           <Input
             value={query}
+            maxLength={2000}
             onChange={(event) => {
               const value = event.target.value;
               setQuery(value);
+              setMatches([]);
+              setState(value.trim().length >= MIN_QUERY_LENGTH ? "searching" : "idle");
               // Clearing the box drops the results immediately instead of
               // waiting for the debounce to notice.
               if (value.trim().length < MIN_QUERY_LENGTH) {
@@ -150,8 +163,7 @@ export default function AddSkillDialog(props: AddSkillDialogProps) {
               </p>
             ) : matches.length === 0 ? (
               <p className="py-8 text-center text-sm text-[#7f7280]">
-                Nothing in the WEF framework matches that wording. Try the skill's
-                own name, or a word you would use at work.
+                No matching skills found. Try a skill name or describe a work activity more specifically.
               </p>
             ) : (
               matches.map((match) => {
