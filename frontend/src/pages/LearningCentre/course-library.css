@@ -744,9 +744,10 @@
 .learning-courses-dialog {
   display: flex !important;
   flex-direction: column !important;
-  width: min(44rem, calc(100vw - 2rem)) !important;
-  max-width: 44rem !important;
-  max-height: min(28rem, 72vh) !important;
+  width: min(32rem, calc(100vw - 2rem)) !important;
+  max-width: 32rem !important;
+  height: min(40rem, 86vh) !important;
+  max-height: min(40rem, 86vh) !important;
   gap: 0 !important;
   overflow: hidden !important;
   padding: 0 !important;

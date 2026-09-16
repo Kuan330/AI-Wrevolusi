@@ -25,14 +25,12 @@ export function readLibrary(): LibraryState {
       "Saved courses could not be read. Your saved data has not been overwritten.",
     );
   const context = accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "";
-  if (state.workContext !== context) {
-    return { ...state, workContext: context, saved: [], choices: {}, basis: {} };
-  }
-  // Saved ids belong to the backend catalogue, which is not available
-  // synchronously here. Validating them against a bundled list used to wipe
-  // every saved course on reload, so ids are kept as-is and resolved against
-  // the live catalogue where they are displayed.
+  // Keep the learning list across analysis refreshes. Profile/occupation changes
+  // still clear it explicitly in writeUserProfile / saveLearningSkills.
   if (typeof state.skillId !== "string") state.skillId = "";
+  if (state.workContext !== context) {
+    state.workContext = context;
+  }
   for (const choice of [
     ...Object.values(state.choices),
     ...state.pending.map((entry) => entry.choice),
