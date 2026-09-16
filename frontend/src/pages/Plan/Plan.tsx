@@ -107,6 +107,7 @@ export default function Plan() {
   // The drawer opens programmatically, so Radix has no trigger to restore focus
   // to on close; remember the button that opened it instead.
   const detailOpener = useRef<HTMLButtonElement | null>(null);
+  const calendarRef = useRef<HTMLDivElement | null>(null);
   // Raw text of a chapter's percent field while it is being typed, so the value
   // is clamped on commit instead of fighting the caret on every keystroke.
   const [rawPercent, setRawPercent] = useState<Record<string, string>>({});
@@ -384,7 +385,7 @@ export default function Plan() {
                 <h2>Learning calendar</h2>
               </div>
             </div>
-            <div className="lp-mini-month">
+            <div className="lp-mini-month" ref={calendarRef}>
               <div className="lp-month">
                 <button
                   type="button"
@@ -516,7 +517,10 @@ export default function Plan() {
         </section>
       </div>
 
-      <BotPet />
+      <BotPet
+        storageKey="aiwrevolusi.botPetPosition.plan.v1"
+        defaultAnchorRef={calendarRef}
+      />
 
       <Drawer
         open={!!course}
@@ -703,7 +707,7 @@ export default function Plan() {
         <DialogContent className="lp-modal">
           <DialogTitle>Remove this course from your plan?</DialogTitle>
           <DialogDescription>
-            It will also leave Learning courses. Daily notes on My Plan stay.
+            It will leave your learning list too. Daily notes on My Plan stay.
           </DialogDescription>
           <button className="lp-outline" onClick={() => setRemoveId(null)}>
             Keep course

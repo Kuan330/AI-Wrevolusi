@@ -24,6 +24,12 @@
   z-index: 40;
 }
 
+.bot-pet--top-right {
+  top: calc(4rem + 1.15rem);
+  right: var(--bot-pet-right);
+  bottom: auto;
+}
+
 /* Native sprite cell is 192x208 (6 frames x 192px). Scale the element instead of
    resizing it so the steps() math stays on whole pixels. */
 .bot-pet__sprite {

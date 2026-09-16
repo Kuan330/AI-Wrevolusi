@@ -7,10 +7,9 @@ import SkillSidebar from "./components/SkillSidebar";
 import CourseFilters, { emptyFilters } from "./components/CourseFilters";
 import CourseCard from "./components/CourseCard";
 import CourseDetailDrawer from "./components/CourseDetailDrawer";
-import FloatingLearningCourses from "./components/FloatingLearningCourses";
-import LearningCoursesDialog from "./components/LearningCoursesDialog";
 import AddSkillDialog from "./components/AddSkillDialog";
 import RemoveSkillDialog from "./components/RemoveSkillDialog";
+import BotPet from "@/components/common/BotPet";
 import { useCourseLibrary } from "./hooks/useCourseLibrary";
 import { fetchPageCatalogue } from "@/services/catalogueService";
 import type { Course } from "./types";
@@ -38,7 +37,6 @@ export default function LearningCentre() {
     ...emptyFilters,
     query: params.get("q") ?? "",
   });
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [removeTarget, setRemoveTarget] = useState<{
@@ -217,18 +215,6 @@ export default function LearningCentre() {
 
   const headerProps = {
     title: "Learning Resources",
-    actions: (
-      <div className="flex flex-wrap items-center gap-3">
-        <Button
-          type="button"
-          variant="ghost"
-          className="learning-courses-trigger h-10 rounded-full px-5 font-semibold"
-          onClick={() => setDrawerOpen(true)}
-        >
-          Learning courses · {state.saved.length}
-        </Button>
-      </div>
-    ),
     description:
       "Browse courses for skills reflected in your work, or add skills you want to grow.",
   };
@@ -321,20 +307,6 @@ export default function LearningCentre() {
         </div>
       )}
 
-      {focusSkills.length > 0 && (
-        <FloatingLearningCourses
-          count={state.saved.length}
-          onOpen={() => setDrawerOpen(true)}
-        />
-      )}
-
-      <LearningCoursesDialog
-        open={drawerOpen}
-        onOpenChange={setDrawerOpen}
-        saved={state.saved}
-        onRemove={toggleSave}
-      />
-
       {detailCourse && (
         <CourseDetailDrawer
           key={detailCourse.id}
@@ -363,6 +335,11 @@ export default function LearningCentre() {
           if (!open) setRemoveTarget(null);
         }}
         onConfirm={confirmRemoveSkill}
+      />
+
+      <BotPet
+        storageKey="aiwrevolusi.botPetPosition.learning.v1"
+        defaultCorner="top-right"
       />
     </div>
   );

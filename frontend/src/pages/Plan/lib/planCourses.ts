@@ -134,8 +134,8 @@ export function catalogueToPlanCourse(
 }
 
 /**
- * Keep My Plan courses aligned with Learning courses (Add to learning).
- * Progress is preserved for courses that remain in the learning list.
+ * Keep My Plan courses aligned with courses added from Learning Resources.
+ * Progress is preserved for courses that remain in the list.
  */
 export async function syncPlanWithLearningCourses(
   savedIds: string[] = readLibrary().saved,
@@ -160,7 +160,7 @@ export async function syncPlanWithLearningCourses(
   return next;
 }
 
-/** @deprecated Prefer syncPlanWithLearningCourses — Learning plan navigates after sync. */
+/** @deprecated Prefer syncPlanWithLearningCourses. */
 export async function commitLearningCoursesToPlan(
   savedIds: string[] = readLibrary().saved,
 ): Promise<PlanState> {

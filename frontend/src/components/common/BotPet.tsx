@@ -15,6 +15,15 @@ type BotPetProps = {
   avoidActive?: boolean;
   /** `inline` sits in normal flow (e.g. under the calendar); default is fixed corner. */
   placement?: "fixed" | "inline";
+  /** localStorage key so each page can remember its own spot. */
+  storageKey?: string;
+  /** Starting corner before the user drags (or when nothing is saved). */
+  defaultCorner?: "bottom-right" | "top-right";
+  /**
+   * When set (and nothing is saved yet), place the pet at this element's
+   * bottom-right instead of the viewport corner.
+   */
+  defaultAnchorRef?: RefObject<HTMLElement | null>;
 };
 
 type Position = { x: number; y: number };
@@ -25,8 +34,9 @@ const CLEARANCE = 12;
 /** How long the arrival greeting waves for. */
 const GREETING_MS = 2200;
 
-const POSITION_KEY = "aiwrevolusi.botPetPosition.v1";
+const DEFAULT_POSITION_KEY = "aiwrevolusi.botPetPosition.v1";
 const GAP = 8;
+const ANCHOR_INSET = 8;
 const DEFAULT_W = 132;
 const DEFAULT_H = 143;
 
@@ -50,24 +60,62 @@ function clamp(position: Position, root: HTMLElement | null): Position {
   };
 }
 
-function persist(position: Position) {
-  try {
-    localStorage.setItem(POSITION_KEY, JSON.stringify(position));
-  } catch {
-    /* Keep dragging available when storage is disabled. */
+function cornerPosition(
+  corner: "bottom-right" | "top-right",
+  root: HTMLElement | null,
+): Position {
+  const { w, h } = petSize(root);
+  const styles = root ? window.getComputedStyle(root) : null;
+  const right =
+    Number.parseFloat(styles?.getPropertyValue("--bot-pet-right") ?? "") || 22;
+  const base =
+    Number.parseFloat(styles?.getPropertyValue("--bot-pet-base") ?? "") || 18;
+  if (corner === "top-right") {
+    return clamp(
+      {
+        x: window.innerWidth - w - right,
+        y: 64 + 18,
+      },
+      root,
+    );
   }
+  return clamp(
+    {
+      x: window.innerWidth - w - right,
+      y: window.innerHeight - h - base,
+    },
+    root,
+  );
+}
+
+function anchorBottomRight(
+  anchor: HTMLElement,
+  root: HTMLElement | null,
+): Position {
+  const { w, h } = petSize(root);
+  const box = anchor.getBoundingClientRect();
+  return clamp(
+    {
+      x: box.right - w - ANCHOR_INSET,
+      y: box.bottom - h - ANCHOR_INSET,
+    },
+    root,
+  );
 }
 
 /**
- * The `deepseek酱` bot companion, pinned to the bottom-right of a page.
+ * The `deepseek酱` bot companion.
  *
- * Fixed placement is draggable; the last spot is remembered in localStorage.
- * Until the user moves it, CSS keeps the default corner so `avoidRef` lift still works.
+ * Fixed placement is draggable; the last spot is remembered per `storageKey`.
+ * Until the user moves it, it sits on `defaultCorner` or `defaultAnchorRef`.
  */
 export default function BotPet({
   avoidRef,
   avoidActive = false,
   placement = "fixed",
+  storageKey = DEFAULT_POSITION_KEY,
+  defaultCorner = "bottom-right",
+  defaultAnchorRef,
 }: BotPetProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [waving, setWaving] = useState(true);
@@ -76,11 +124,26 @@ export default function BotPet({
   /** User-chosen left/top; null means stay on the default CSS corner. */
   const [position, setPosition] = useState<Position | null>(null);
   const [dragging, setDragging] = useState(false);
+  const customised = useRef(false);
   const drag = useRef<{
     id: number;
     start: Position;
     origin: Position;
   } | null>(null);
+
+  const applyDefault = () => {
+    const root = rootRef.current;
+    const anchor = defaultAnchorRef?.current;
+    if (anchor) {
+      setPosition(anchorBottomRight(anchor, root));
+      return;
+    }
+    if (defaultCorner === "top-right") {
+      setPosition(cornerPosition("top-right", root));
+      return;
+    }
+    setPosition(null);
+  };
 
   useEffect(() => {
     timer.current = window.setTimeout(() => setWaving(false), GREETING_MS);
@@ -90,28 +153,58 @@ export default function BotPet({
   useEffect(() => {
     if (isInline) return;
     try {
-      const saved = JSON.parse(localStorage.getItem(POSITION_KEY) ?? "null");
+      const saved = JSON.parse(localStorage.getItem(storageKey) ?? "null");
       if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
+        customised.current = true;
         setPosition(clamp(saved, rootRef.current));
+        return;
       }
     } catch {
       /* Position storage is optional. */
     }
-  }, [isInline]);
+    customised.current = false;
+    // Wait a frame so anchor layout (calendar) has settled.
+    const id = window.requestAnimationFrame(() => applyDefault());
+    return () => window.cancelAnimationFrame(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- apply from latest props on key/corner/anchor change
+  }, [isInline, storageKey, defaultCorner, defaultAnchorRef]);
 
   useEffect(() => {
-    if (isInline || !position) return;
-    const resize = () =>
-      setPosition((current) =>
-        current ? clamp(current, rootRef.current) : current,
-      );
-    window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
-  }, [isInline, position]);
+    if (isInline) return;
+    const onResize = () => {
+      if (customised.current) {
+        setPosition((current) =>
+          current ? clamp(current, rootRef.current) : current,
+        );
+        return;
+      }
+      applyDefault();
+    };
+    window.addEventListener("resize", onResize);
+    const anchor = defaultAnchorRef?.current;
+    const observer =
+      !customised.current &&
+      anchor &&
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(onResize)
+        : null;
+    if (anchor) observer?.observe(anchor);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      observer?.disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInline, defaultAnchorRef, position]);
 
-  // Lift the pet clear of a sticky bar — only while still on the default corner.
+  // Lift the pet clear of a sticky bar — only while still on the CSS corner.
   useEffect(() => {
-    if (isInline || position) return;
+    if (
+      isInline ||
+      position ||
+      defaultCorner !== "bottom-right" ||
+      defaultAnchorRef
+    )
+      return;
     const root = rootRef.current;
     const avoid = avoidRef?.current;
     if (!root || !avoid || !avoidActive) {
@@ -157,7 +250,22 @@ export default function BotPet({
       observer?.disconnect();
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [avoidRef, avoidActive, isInline, position]);
+  }, [
+    avoidRef,
+    avoidActive,
+    isInline,
+    position,
+    defaultCorner,
+    defaultAnchorRef,
+  ]);
+
+  const persist = (next: Position) => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(next));
+    } catch {
+      /* Keep dragging available when storage is disabled. */
+    }
+  };
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (isInline || event.button !== 0) return;
@@ -199,6 +307,7 @@ export default function BotPet({
       },
       rootRef.current,
     );
+    customised.current = true;
     setPosition(next);
     persist(next);
     drag.current = null;
@@ -207,7 +316,7 @@ export default function BotPet({
 
   return (
     <div
-      className={`bot-pet${isInline ? " bot-pet--inline" : ""}${dragging ? " is-dragging" : ""}`}
+      className={`bot-pet${isInline ? " bot-pet--inline" : ""}${!isInline && !position && defaultCorner === "top-right" ? " bot-pet--top-right" : ""}${dragging ? " is-dragging" : ""}`}
       ref={rootRef}
       aria-hidden={isInline ? true : undefined}
       role={isInline ? undefined : "img"}

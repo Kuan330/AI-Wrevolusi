@@ -33,7 +33,7 @@ export default function CourseCard(props: CourseCardProps) {
           onClick={onSave}
         >
           <Bookmark size={16} fill={saved ? "currentColor" : "none"} />{" "}
-          {saved ? "Added" : "Add to learning"}
+          {saved ? "Added" : "Add to My Plan"}
         </Button>
       </div>
       <h3>{course.title}</h3>
