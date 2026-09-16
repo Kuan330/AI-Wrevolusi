@@ -1,19 +1,33 @@
-/* Shared corner companion. The pet overlays page content, so it must never
-   intercept a click — see BotPet.tsx. */
+/* Shared corner companion — fixed mode is draggable. */
 .bot-pet {
-  /* Base geometry lives in custom properties so the component can measure the
-     space it needs when lifting itself clear of a sticky bar. */
+  /* Fallback corner before JS applies left/top. */
   --bot-pet-height: 143px;
   --bot-pet-base: 18px;
+  --bot-pet-right: 22px;
   --bot-pet-lift: 0px;
   position: fixed;
-  right: 22px;
+  right: var(--bot-pet-right);
   bottom: calc(var(--bot-pet-base) + var(--bot-pet-lift));
   z-index: 20;
   width: 132px;
   height: var(--bot-pet-height);
-  pointer-events: none;
-  transition: bottom 0.2s ease;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transition: bottom 0.2s ease, right 0.2s ease;
+}
+
+.bot-pet.is-dragging {
+  cursor: grabbing;
+  transition: none;
+  z-index: 40;
+}
+
+.bot-pet--top-right {
+  top: calc(4rem + 1.15rem);
+  right: var(--bot-pet-right);
+  bottom: auto;
 }
 
 /* Native sprite cell is 192x208 (6 frames x 192px). Scale the element instead of
@@ -28,6 +42,7 @@
   background-repeat: no-repeat;
   background-size: 1152px 208px;
   animation: bot-pet-play 1.1s steps(6) infinite;
+  pointer-events: none;
 }
 
 .bot-pet__sprite.is-waving {
@@ -52,14 +67,29 @@
   }
 }
 
+.bot-pet--inline {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  margin: 12px 0 0 auto;
+  z-index: 1;
+  pointer-events: none;
+  cursor: default;
+  touch-action: auto;
+  user-select: auto;
+}
+
 @media (max-width: 700px) {
   .bot-pet {
     --bot-pet-height: 104px;
     --bot-pet-base: 10px;
-    right: 10px;
+    --bot-pet-right: 10px;
     width: 96px;
   }
   .bot-pet__sprite {
     transform: scale(0.5);
+  }
+  .bot-pet--inline {
+    right: auto;
   }
 }

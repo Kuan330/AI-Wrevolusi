@@ -161,7 +161,7 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
             onClick={onSave}
           >
             {saved ? <Trash2 size={16} /> : <Bookmark size={16} />}
-            {saved ? "Remove" : "Add to learning"}
+            {saved ? "Remove" : "Add to My Plan"}
           </Button>
         </div>
       </DrawerContent>

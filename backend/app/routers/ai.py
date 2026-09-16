@@ -215,7 +215,7 @@ def skill_match(
     """
 
     quick = match_skills_response(request.task_text, request.candidates)
-    if quick.skills:
+    if quick.skills or request.fast_only:
         return quick
 
     result = gateway.run_candidate_constrained(

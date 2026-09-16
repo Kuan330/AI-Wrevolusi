@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 import { useState } from "react";
+import { syncPlanWithLearningCourses } from "@/pages/Plan/lib/planCourses";
 import { readLibrary, saveLibrary, emptyLibrary } from "../lib/libraryStorage";
 import type { LibraryState } from "../types";
 
@@ -33,33 +34,51 @@ export function useCourseLibrary() {
       return false;
     }
   }
+
+  async function syncPlan(savedIds: string[]) {
+    try {
+      await syncPlanWithLearningCourses(savedIds);
+    } catch {
+      setNotice(
+        "Course saved, but My Plan could not be updated. Open My Plan to retry.",
+      );
+    }
+  }
+
   function toggleSave(courseId: string) {
     const wasSaved = state.saved.includes(courseId);
+    const nextSaved = wasSaved
+      ? state.saved.filter((id) => id !== courseId)
+      : [...state.saved, courseId];
     const changed = update({
       ...state,
-      saved: wasSaved
-        ? state.saved.filter((id) => id !== courseId)
-        : [...state.saved, courseId],
+      saved: nextSaved,
     });
-    if (changed)
-      toast(wasSaved ? "Removed from learning courses" : "Added to learning", {
-        action: {
-          label: "Undo",
-          onClick: () => {
-            try {
-              const latest = readLibrary();
+    if (!changed) return;
+    void syncPlan(nextSaved);
+    toast(wasSaved ? "Removed from My Plan" : "Added to My Plan", {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          try {
+            const latest = readLibrary();
+            const undone = wasSaved
+              ? [...new Set([...latest.saved, courseId])]
+              : latest.saved.filter((id) => id !== courseId);
+            if (
               update({
                 ...latest,
-                saved: wasSaved
-                  ? [...new Set([...latest.saved, courseId])]
-                  : latest.saved.filter((id) => id !== courseId),
-              });
-            } catch {
-              setNotice("Could not undo. Please try again.");
+                saved: undone,
+              })
+            ) {
+              void syncPlan(undone);
             }
-          },
+          } catch {
+            setNotice("Could not undo. Please try again.");
+          }
         },
-      });
+      },
+    });
   }
 
   /** Drop courses from the learning list (e.g. when their skill is removed). */
@@ -68,7 +87,9 @@ export function useCourseLibrary() {
     const drop = new Set(courseIds);
     const nextSaved = state.saved.filter((id) => !drop.has(id));
     if (nextSaved.length === state.saved.length) return false;
-    return update({ ...state, saved: nextSaved });
+    const changed = update({ ...state, saved: nextSaved });
+    if (changed) void syncPlan(nextSaved);
+    return changed;
   }
 
   return {

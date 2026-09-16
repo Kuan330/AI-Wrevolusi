@@ -131,9 +131,10 @@ export default function SkillSidebar(props: SkillSidebarProps) {
           variant="ghost"
           className="library-sidebar__add"
           aria-label="Add a skill"
+          title="Add a skill"
           onClick={onAdd}
         >
-          <Plus className="size-4" />
+          <Plus className="size-5" strokeWidth={2.5} aria-hidden />
         </Button>
         {activeId ? (
           <Button
