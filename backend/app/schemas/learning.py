@@ -115,10 +115,18 @@ class Recommendation(BaseModel):
 
 
 class BriefSkillInput(BaseModel):
-    """One selected skill as the client's catalogue describes it."""
+    """One selected skill.
+
+    Only ``skill_id`` is required. The chapter total, name and importance now come
+    from the server-side catalogue, so the older ``total_chapters`` /
+    ``skill_name`` / ``importance_pct`` fields are accepted but ignored for any
+    value the server can resolve itself. This keeps an older client working while
+    removing its ability to influence progress or ranking.
+    """
 
     skill_id: str = Field(min_length=1, max_length=120)
-    total_chapters: int = Field(ge=0, le=2000)
+    # Deprecated: retained only for backward compatibility; ignored by the server.
+    total_chapters: int | None = Field(default=None, ge=0, le=2000)
     skill_name: str | None = Field(default=None, max_length=120)
     importance_pct: int | None = Field(default=None, ge=0, le=100)
 

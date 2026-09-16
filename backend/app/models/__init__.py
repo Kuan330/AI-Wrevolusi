@@ -1,4 +1,5 @@
 from app.models.account import Account
+from app.models.catalogue import CatalogueChapter, CatalogueCourse
 from app.models.capability import Capability
 from app.models.learning import DailyBrief, LearningCheckin, LearningProgress
 from app.models.occupation import Occupation
@@ -17,6 +18,8 @@ __all__ = [
     'Preparation',
     'Schedule',
     'Account',
+    'CatalogueCourse',
+    'CatalogueChapter',
     'LearningProgress',
     'LearningCheckin',
     'DailyBrief',

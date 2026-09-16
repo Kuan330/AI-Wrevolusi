@@ -127,6 +127,34 @@ def client(monkeypatch):
     ):
         monkeypatch.setattr(learning_router.records, name, getattr(store, name))
 
+    async def fake_catalogue_scope(_db):
+        return {'ai-and-big-data': {'WEF-11-B-01': {0, 1, 2}, 'c2': {0}}}
+
+    monkeypatch.setattr(learning_router.catalogue_service, 'load_catalogue_scope', fake_catalogue_scope)
+
+    async def fake_skill_catalogue(_db):
+        # The server-side catalogue is the source of truth for chapter totals and
+        # importance; the client's numbers must never override these.
+        return {
+            'ai-and-big-data': {
+                'skill_name': 'AI and big data',
+                'total_chapters': 2,
+                'importance_pct': 88,
+            },
+            'creative-thinking': {
+                'skill_name': 'Creative thinking',
+                'total_chapters': 4,
+                'importance_pct': 57,
+            },
+            'leadership-and-social-influence': {
+                'skill_name': 'Leadership and social influence',
+                'total_chapters': 3,
+                'importance_pct': 61,
+            },
+        }
+
+    monkeypatch.setattr(learning_router.catalogue_service, 'load_skill_catalogue', fake_skill_catalogue)
+
     class FakeUser:
         id = 'user-1'
         email = 'learner@example.com'
@@ -141,13 +169,13 @@ def client(monkeypatch):
         yield test_client
 
 
-def body_chapters(skill_id='ai-and-big-data', value=5, chapter=0):
+def body_chapters(skill_id='ai-and-big-data', value=5, chapter=0, course_id='WEF-11-B-01'):
     return {
         'local_date': TODAY.isoformat(),
         'chapters': [
             {
                 'skill_id': skill_id,
-                'course_id': 'c2',
+                'course_id': course_id,
                 'chapter_index': chapter,
                 'value': value,
             }
@@ -191,6 +219,29 @@ def test_resending_the_same_value_is_not_an_error(client):
 def test_a_value_above_the_scale_is_refused_by_validation(client):
     response = client.post('/api/v1/learning/progress', json=body_chapters(value=11))
     assert response.status_code == 422
+
+
+def test_progress_rejects_a_skill_course_or_chapter_outside_the_verified_catalogue(client):
+    response = client.post(
+        '/api/v1/learning/progress',
+        json={
+            'local_date': TODAY.isoformat(),
+            'chapters': [
+                body_chapters(skill_id='missing')['chapters'][0],
+                body_chapters(course_id='missing')['chapters'][0],
+                body_chapters(chapter=99)['chapters'][0],
+            ],
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()['accepted'] == 0
+    assert [item['reason'] for item in response.json()['rejected']] == [
+        'unknown_scope',
+        'unknown_scope',
+        'unknown_scope',
+    ]
+    assert client.store.upsert_calls == 0
 
 
 def test_a_future_date_is_refused(client):
@@ -396,3 +447,64 @@ def test_a_stored_model_brief_is_returned_unchanged_on_the_next_visit(client):
     payload = response.json()
     assert payload['cached'] is True
     assert payload['summary'] == stored_payload['summary']
+
+
+# --- catalogue is the source of truth for chapter totals and importance --------
+
+
+def test_summary_uses_catalogue_chapter_counts_not_the_client_numbers(client):
+    """A client cannot inflate or shrink progress by sending its own totals."""
+
+    client.post('/api/v1/learning/progress', json=body_chapters(value=5))
+
+    response = client.post(
+        '/api/v1/learning/summary',
+        json={
+            'local_date': TODAY.isoformat(),
+            'skills': [
+                # The catalogue says two chapters; the client claims 999.
+                {'skill_id': 'ai-and-big-data', 'total_chapters': 999},
+            ],
+        },
+    )
+
+    assert response.status_code == 200
+    skill = response.json()['skills'][0]
+    # 5 of 2*10 = 0.25, which is only possible when the catalogue total wins.
+    assert skill['total_chapters'] == 2
+    assert skill['progress'] == 0.25
+
+
+def test_summary_accepts_a_skill_id_without_any_client_metadata(client):
+    response = client.post(
+        '/api/v1/learning/summary',
+        json={'local_date': TODAY.isoformat(), 'skills': [{'skill_id': 'ai-and-big-data'}]},
+    )
+
+    assert response.status_code == 200
+    skill = response.json()['skills'][0]
+    assert skill['total_chapters'] == 2
+    assert skill['is_candidate'] is True
+
+
+def test_brief_uses_catalogue_importance_for_tie_breaking(client):
+    """Importance comes from the catalogue, so the client cannot steer ranking."""
+
+    response = client.post(
+        '/api/v1/learning/daily-brief',
+        json={
+            'local_date': TODAY.isoformat(),
+            'local_hour': 9,
+            'skills': [
+                # All three have equal progress (0), so importance decides.
+                {'skill_id': 'creative-thinking', 'importance_pct': 1},
+                {'skill_id': 'leadership-and-social-influence', 'importance_pct': 1},
+                {'skill_id': 'ai-and-big-data', 'importance_pct': 1},
+            ],
+        },
+    )
+
+    assert response.status_code == 200
+    recommended = [item['skill_id'] for item in response.json()['recommendations']]
+    # The catalogue stub ranks ai-and-big-data highest; the client's flat 1s are ignored.
+    assert recommended[0] == 'ai-and-big-data'

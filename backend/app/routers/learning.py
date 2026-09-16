@@ -9,6 +9,7 @@ always comes from the auth cookie, never from the request body.
 from datetime import date, datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
@@ -24,6 +25,7 @@ from app.schemas.learning import (
     ProgressUpdateRequest,
     ProgressUpdateResponse,
     Recommendation,
+    RejectedChapter,
     SkillSummary,
     SummaryRequest,
     SummaryResponse,
@@ -31,6 +33,8 @@ from app.schemas.learning import (
 from app.services import learning_records as records
 from app.services.ai_gateway import AIGateway, default_ai_gateway
 from app.services.auth import get_current_user
+from app.services import catalogue as catalogue_service
+from app.services.catalogue import build_bot_catalogue
 from app.services.daily_brief import (
     BriefFacts,
     build_brief,
@@ -73,6 +77,28 @@ def _check_local_date(value: date) -> None:
         )
 
 
+@router.get('/catalogue')
+async def catalogue_for_bot(db: AsyncSession = Depends(get_db)) -> list[dict]:
+    """Return the verified catalogue in the shape needed by the daily brief Bot."""
+
+    result = await db.execute(
+        text(
+            'SELECT s.wef_skill_id, s.core_skill, '
+            's.core_skill_importance_2025_pct, c.course_code, c.title AS course_title, '
+            'c.provider, c.url AS course_url, c.level, c.course_no, '
+            'COUNT(ch.id) AS chapter_count '
+            'FROM ref_wef_skills AS s '
+            'JOIN catalogue_courses AS c ON c.skill_id = s.wef_skill_id '
+            'LEFT JOIN catalogue_chapters AS ch ON ch.course_id = c.id '
+            'GROUP BY s.wef_skill_id, s.core_skill, '
+            's.core_skill_importance_2025_pct, c.course_code, c.title, c.provider, '
+            'c.url, c.level, c.course_no '
+            'ORDER BY s.wef_skill_id, c.level, c.course_no, c.course_code'
+        )
+    )
+    return build_bot_catalogue(result.mappings().all())
+
+
 @router.post('/progress', response_model=ProgressUpdateResponse)
 async def update_progress(
     payload: ProgressUpdateRequest,
@@ -87,13 +113,39 @@ async def update_progress(
 
     _check_local_date(payload.local_date)
 
-    accepted, rejected = await records.upsert_progress(
-        db,
-        current_user.id,
-        local_date=payload.local_date,
-        chapters=payload.chapters,
+    scope = await catalogue_service.load_catalogue_scope(db)
+    valid_chapters = []
+    scope_rejections = []
+    for item in payload.chapters:
+        if catalogue_service.validate_catalogue_scope(
+            scope,
+            skill_id=item.skill_id,
+            course_id=item.course_id,
+            chapter_index=item.chapter_index,
+        ):
+            valid_chapters.append(item)
+        else:
+            scope_rejections.append(
+                RejectedChapter(
+                    course_id=item.course_id,
+                    chapter_index=item.chapter_index,
+                    reason='unknown_scope',
+                )
+            )
+
+    accepted, rejected = ([], [])
+    if valid_chapters:
+        accepted, rejected = await records.upsert_progress(
+            db,
+            current_user.id,
+            local_date=payload.local_date,
+            chapters=valid_chapters,
+        )
+    return ProgressUpdateResponse(
+        accepted=len(accepted),
+        updated=accepted,
+        rejected=[*scope_rejections, *rejected],
     )
-    return ProgressUpdateResponse(accepted=len(accepted), updated=accepted, rejected=rejected)
 
 
 @router.post('/checkin', response_model=CheckinResponse)
@@ -201,11 +253,15 @@ async def summary(
     for item in values:
         by_skill.setdefault(item.skill_id, []).append(item)
 
+    # Chapter totals and display names come from the server-side catalogue, never
+    # from the request: a client cannot inflate or shrink its own progress.
+    catalogue = await catalogue_service.load_skill_catalogue(db)
+
     rollups = [
         rollup_skill(
             skill_id=item.skill_id,
-            skill_name=item.skill_name or item.skill_id,
-            total_chapters=item.total_chapters,
+            skill_name=_catalogue_name(catalogue, item.skill_id, item.skill_name),
+            total_chapters=_catalogue_chapters(catalogue, item.skill_id),
             values=by_skill.get(item.skill_id, []),
             today=payload.local_date,
         )
@@ -259,14 +315,18 @@ async def daily_brief(
     for item in values:
         by_skill.setdefault(item.skill_id, []).append(item)
 
+    # The server owns chapter totals and importance; the request only names the
+    # selected skills. This keeps recommendation ranking out of the client's hands.
+    catalogue = await catalogue_service.load_skill_catalogue(db)
+
     rollups = [
         rollup_skill(
             skill_id=item.skill_id,
-            skill_name=item.skill_name or item.skill_id,
-            total_chapters=item.total_chapters,
+            skill_name=_catalogue_name(catalogue, item.skill_id, item.skill_name),
+            total_chapters=_catalogue_chapters(catalogue, item.skill_id),
             values=by_skill.get(item.skill_id, []),
             today=payload.local_date,
-            importance_pct=item.importance_pct,
+            importance_pct=_catalogue_importance(catalogue, item.skill_id),
         )
         for item in payload.skills
     ]
@@ -341,6 +401,28 @@ def _recommendations_from_text(text, rollups) -> list[Recommendation]:
         )
         for skill in rollups
     ]
+
+
+def _catalogue_entry(catalogue: dict, skill_id: str) -> dict:
+    return catalogue.get(skill_id, {}) if catalogue else {}
+
+
+def _catalogue_chapters(catalogue: dict, skill_id: str) -> int:
+    """Chapter total for a skill, from the database catalogue.
+
+    A skill that is not in the catalogue reports ``0`` chapters, which the rollup
+    marks ``is_candidate: false`` — it is simply never recommended.
+    """
+
+    return int(_catalogue_entry(catalogue, skill_id).get('total_chapters') or 0)
+
+
+def _catalogue_importance(catalogue: dict, skill_id: str) -> int | None:
+    return _catalogue_entry(catalogue, skill_id).get('importance_pct')
+
+
+def _catalogue_name(catalogue: dict, skill_id: str, fallback: str | None) -> str:
+    return _catalogue_entry(catalogue, skill_id).get('skill_name') or fallback or skill_id
 
 
 def _response_from_stored(stored, streak: int, checked_today: bool) -> DailyBriefResponse:
