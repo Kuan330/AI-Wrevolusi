@@ -1,5 +1,4 @@
 import type { ComponentProps } from "react";
-import "./exposure-score-panel.css";
 
 import { GradientBar } from "@/components/ui/gradient-bar";
 import { formatScorePercent, scoreToPercent } from "@/pages/Analysis/lib/scorePercent";

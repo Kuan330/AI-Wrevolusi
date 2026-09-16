@@ -1,6 +1,5 @@
 import type { ComponentProps } from "react";
 import { useState } from "react";
-import "./TaskDetailsDrawer.css";
 
 import TaskAssistDialog from "@/pages/Analysis/components/TaskAssistDialog";
 import TaskRelatedSkills from "@/pages/Analysis/components/TaskRelatedSkills";
