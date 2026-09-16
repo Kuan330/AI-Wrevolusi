@@ -5,6 +5,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type RefObject,
 } from "react";
+import { createPortal } from "react-dom";
 
 import "./bot-pet.css";
 
@@ -71,10 +72,11 @@ function cornerPosition(
   const base =
     Number.parseFloat(styles?.getPropertyValue("--bot-pet-base") ?? "") || 18;
   if (corner === "top-right") {
+    // Fully below sticky nav (4rem), in the page-header band.
     return clamp(
       {
         x: window.innerWidth - w - right,
-        y: 64 + 18,
+        y: 64 + 28,
       },
       root,
     );
@@ -314,7 +316,7 @@ export default function BotPet({
     setDragging(false);
   };
 
-  return (
+  const node = (
     <div
       className={`bot-pet${isInline ? " bot-pet--inline" : ""}${!isInline && !position && defaultCorner === "top-right" ? " bot-pet--top-right" : ""}${dragging ? " is-dragging" : ""}`}
       ref={rootRef}
@@ -335,4 +337,8 @@ export default function BotPet({
       <span className={`bot-pet__sprite${waving ? " is-waving" : ""}`} />
     </div>
   );
+
+  // Fixed pets portal to body so page overflow/stacking never clips them.
+  if (isInline || typeof document === "undefined") return node;
+  return createPortal(node, document.body);
 }

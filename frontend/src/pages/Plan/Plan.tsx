@@ -34,11 +34,20 @@ import {
   saveLibrary,
 } from "@/pages/LearningCentre/lib/libraryStorage";
 import {
+  flushWorkspace,
+  hasAccountWorkspace,
+} from "@/services/accountStorage";
+import {
+  postLearningCheckin,
+  postLearningProgress,
+} from "@/services/learningService";
+import {
   readPlanState,
   savePlanState,
   syncPlanWithLearningCourses,
   type PlanChapter,
   type PlanCourse,
+  type PlanDayChapterEntry,
   type PlanRecordDay,
   type PlanState,
 } from "@/pages/Plan/lib/planCourses";
@@ -60,7 +69,26 @@ const emptyRecord = (): RecordDay => ({
   note: "",
   studied: false,
   checked: false,
+  entries: [],
 });
+
+function dayHasProgress(r: RecordDay | undefined) {
+  return Boolean(r && (r.checked || r.studied || (r.entries?.length ?? 0) > 0));
+}
+
+function mergeDayEntries(
+  existing: PlanDayChapterEntry[] | undefined,
+  next: PlanDayChapterEntry[],
+): PlanDayChapterEntry[] {
+  const map = new Map<string, PlanDayChapterEntry>();
+  for (const entry of existing ?? []) {
+    map.set(`${entry.courseId}::${entry.chapterTitle}`, entry);
+  }
+  for (const entry of next) {
+    map.set(`${entry.courseId}::${entry.chapterTitle}`, entry);
+  }
+  return [...map.values()];
+}
 
 function initial(): Preview {
   return readPlanState();
@@ -68,6 +96,11 @@ function initial(): Preview {
 
 function persist(next: Preview) {
   savePlanState(next);
+  if (hasAccountWorkspace()) {
+    void flushWorkspace().catch(() => {
+      /* Local mirror already kept; workspace retry happens on next edit. */
+    });
+  }
 }
 
 const percent = (c: Course) =>
@@ -99,8 +132,6 @@ export default function Plan() {
   const [courseId, setCourseId] = useState<string | null>(null);
   const [draft, setDraft] = useState<number[]>([]);
   const [recordDate, setRecordDate] = useState<string | null>(null);
-  const [minutes, setMinutes] = useState("25");
-  const [note, setNote] = useState("");
   const [notice, setNotice] = useState("");
   const [removeId, setRemoveId] = useState<string | null>(null);
   const [coursesLoading, setCoursesLoading] = useState(true);
@@ -172,8 +203,10 @@ export default function Plan() {
     : 0;
   const monthPrefix = dateKey(month).slice(0, 7);
   const checkedDays = Object.entries(state.records).filter(
-    ([day, r]) => day.startsWith(monthPrefix) && r.checked,
+    ([day, r]) => day.startsWith(monthPrefix) && dayHasProgress(r),
   ).length;
+  const viewRecord = recordDate ? state.records[recordDate] : undefined;
+  const viewEntries = viewRecord?.entries ?? [];
   const inProgress = state.courses.filter(
     (c) => percent(c) > 0 && percent(c) < 100,
   ).length;
@@ -208,46 +241,84 @@ export default function Plan() {
   }
 
   function openRecord(day: string) {
-    const r = state.records[day];
     setRecordDate(day);
-    setMinutes(String(r?.minutes ?? 25));
-    setNote(r?.note ?? "");
   }
 
   function updateProgress() {
     if (!course) return;
-    const changed = draft.some((v, i) => v > course.chapters[i].value);
+    const bumps: PlanDayChapterEntry[] = course.chapters.flatMap((ch, i) => {
+      const next = draft[i] ?? ch.value;
+      if (next <= ch.value) return [];
+      return [
+        {
+          courseId: course.id,
+          courseTitle: course.title,
+          chapterTitle: ch.title,
+          percent: next * 10,
+        },
+      ];
+    });
+    const changed = bumps.length > 0;
     const day = dateKey();
-    save({
+    const previous = state.records[day] ?? emptyRecord();
+    const nextCourses = state.courses.map((c) =>
+      c.id === course.id
+        ? {
+            ...c,
+            chapters: c.chapters.map((ch, i) => ({
+              ...ch,
+              value: Math.max(ch.value, draft[i]),
+            })),
+          }
+        : c,
+    );
+    const nextState: Preview = {
       ...state,
-      courses: state.courses.map((c) =>
-        c.id === course.id
-          ? {
-              ...c,
-              chapters: c.chapters.map((ch, i) => ({
-                ...ch,
-                value: Math.max(ch.value, draft[i]),
-              })),
-            }
-          : c,
-      ),
+      courses: nextCourses,
       records: changed
         ? {
             ...state.records,
             [day]: {
-              ...(state.records[day] ?? emptyRecord()),
+              ...previous,
               studied: true,
+              checked: true,
+              entries: mergeDayEntries(previous.entries, bumps),
             },
           }
         : state.records,
-    });
+    };
+    save(nextState);
     setCourseId(null);
     setToday(day);
     setNotice(
       changed
-        ? "Chapter progress saved. You can now check in for today."
+        ? "Chapter progress saved and synced to your calendar."
         : "No changes to save.",
     );
+
+    if (changed && hasAccountWorkspace() && course.skillId) {
+      const chapters = bumps.flatMap((entry) => {
+        const index = course.chapters.findIndex(
+          (ch) => ch.title === entry.chapterTitle,
+        );
+        if (index < 0 || !course.skillId) return [];
+        return [
+          {
+            skill_id: course.skillId,
+            course_id: course.id,
+            chapter_index: index,
+            value: Math.round(entry.percent / 10),
+          },
+        ];
+      });
+      if (chapters.length) {
+        void postLearningProgress(day, chapters)
+          .then(() => postLearningCheckin(day))
+          .catch(() => {
+            /* Workspace blob already stores the day; learning tables are best-effort. */
+          });
+      }
+    }
   }
 
   const offset = (month.getDay() + 6) % 7;
@@ -310,10 +381,24 @@ export default function Plan() {
       sortValue: (c) => percent(c),
       cell: (c) => {
         const s = courseStatus(c);
+        if (s.key === "finished") {
+          return (
+            <span className={cn("lp-status", `lp-status--${s.key}`)}>
+              {s.label}
+            </span>
+          );
+        }
         return (
-          <span className={cn("lp-status", `lp-status--${s.key}`)}>
+          <button
+            type="button"
+            className={cn("lp-status", `lp-status--${s.key}`)}
+            onClick={(e: MouseEvent<HTMLButtonElement>) => {
+              detailOpener.current = e.currentTarget;
+              openCourse(c);
+            }}
+          >
             {s.label}
-          </span>
+          </button>
         );
       },
     },
@@ -332,7 +417,7 @@ export default function Plan() {
               openCourse(c);
             }}
           >
-            Detail
+            Record
           </button>
           <button
             type="button"
@@ -368,13 +453,21 @@ export default function Plan() {
               meta={`${overall}% complete`}
               variant="tasks"
             />
-            <article className="lp-stats-card">
-              <Check size={15} />
-              <strong>{checkedDays} days</strong>
-              <span>
-                Check-ins ·{" "}
-                {month.toLocaleDateString("en", { month: "long" })}
-              </span>
+            <article className="lp-stats-card lp-stats-card--checkins">
+              <div className="lp-stats-card__icon" aria-hidden="true">
+                <Check size={18} />
+              </div>
+              <div className="lp-stats-card__body">
+                <p className="lp-kicker">Check-ins this month</p>
+                <strong>
+                  {checkedDays}
+                  <span> {checkedDays === 1 ? "day" : "days"}</span>
+                </strong>
+                <span>
+                  Progress logged ·{" "}
+                  {month.toLocaleDateString("en", { month: "long" })}
+                </span>
+              </div>
             </article>
           </div>
 
@@ -425,37 +518,45 @@ export default function Plan() {
                 {Array.from({ length: offset }, (_, i) => (
                   <span key={`lead${i}`} />
                 ))}
-                {Array.from({ length: dayCount }, (_, i) => {
-                  const day = dateKey(
-                    new Date(month.getFullYear(), month.getMonth(), i + 1),
-                  );
-                  const r = state.records[day];
-                  return (
-                    <button
-                      type="button"
-                      key={day}
-                      disabled={day > today}
-                      className={cn(
-                        day === today && "is-today",
-                        r?.checked ? "checked" : r?.studied ? "studied" : "",
-                      )}
-                      onClick={() => openRecord(day)}
-                      aria-label={`${day}${r?.checked ? ", checked in" : r?.studied ? ", learning recorded" : ""}`}
-                      aria-current={day === today ? "date" : undefined}
-                    >
-                      {i + 1}
-                      {r?.minutes ? <small>{r.minutes} min</small> : null}
-                    </button>
-                  );
-                })}
+                  {Array.from({ length: dayCount }, (_, i) => {
+                    const day = dateKey(
+                      new Date(month.getFullYear(), month.getMonth(), i + 1),
+                    );
+                    const r = state.records[day];
+                    const hasProgress = dayHasProgress(r);
+                    return (
+                      <button
+                        type="button"
+                        key={day}
+                        disabled={day > today}
+                        className={cn(
+                          day === today && "is-today",
+                          hasProgress && "studied",
+                          r?.checked && "checked",
+                        )}
+                        onClick={() => openRecord(day)}
+                        aria-label={`${day}${hasProgress ? ", has learning progress" : ""}`}
+                        aria-current={day === today ? "date" : undefined}
+                      >
+                        <span className="lp-day-num">
+                          {i + 1}
+                          {hasProgress ? (
+                            <span className="lp-day-star" aria-hidden="true">
+                              🌟
+                            </span>
+                          ) : null}
+                        </span>
+                      </button>
+                    );
+                  })}
                 {Array.from({ length: trailing }, (_, i) => (
                   <span key={`trail${i}`} />
                 ))}
               </div>
-              <div className="lp-legend">
-                <span>Checked in</span>
-                <span>Learned, not checked in</span>
-              </div>
+                <div className="lp-legend">
+                  <span>Progress logged</span>
+                  <span>Has chapter updates</span>
+                </div>
             </div>
           </section>
         </aside>
@@ -502,7 +603,7 @@ export default function Plan() {
                     className="lp-mini lp-mini--blue"
                     onClick={() => openRecord(dateKey())}
                   >
-                    Record learning
+                    View today
                   </button>
                   <Link
                     to={ROUTES.learningCentre}
@@ -642,59 +743,47 @@ export default function Plan() {
           if (!v) setRecordDate(null);
         }}
       >
-        <DialogContent className="lp-modal">
-          <DialogTitle>Learning record · {recordDate}</DialogTitle>
+        <DialogContent className="lp-modal lp-modal--day">
+          <DialogTitle>Day progress · {recordDate}</DialogTitle>
           <DialogDescription>
-            Keep a note of what you learned. Saving a note does not mark
-            chapters complete or check you in.
+            View-only snapshot of chapter progress saved on this day.
           </DialogDescription>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!recordDate) return;
-              const value = Number(minutes);
-              if (!Number.isInteger(value) || value < 0 || value > 1440) return;
-              save({
-                ...state,
-                records: {
-                  ...state.records,
-                  [recordDate]: {
-                    ...(state.records[recordDate] ?? emptyRecord()),
-                    minutes: value,
-                    note: note.trim(),
-                  },
-                },
-              });
-              setRecordDate(null);
-              setNotice("Learning record saved.");
-            }}
-          >
-            <label>
-              Learning time (minutes)
-              <input
-                type="number"
-                required
-                min={0}
-                max={1440}
-                step={1}
-                value={minutes}
-                onChange={(e) => setMinutes(e.target.value)}
-              />
-            </label>
-            <label>
-              What did you learn?
-              <textarea
-                rows={4}
-                maxLength={2000}
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="A small discovery, a useful idea, or something to revisit…"
-              />
-            </label>
-            <button className="lp-primary" type="submit">
-              Save learning record
+          {viewEntries.length ? (
+            <div className="lp-day-view">
+              <p className="lp-day-view__summary">
+                {viewEntries.length} chapter
+                {viewEntries.length === 1 ? "" : "s"} logged
+              </p>
+              <ul className="lp-day-view__list">
+                {viewEntries.map((entry) => (
+                  <li
+                    key={`${entry.courseId}-${entry.chapterTitle}`}
+                    className="lp-day-view__item"
+                  >
+                    <div>
+                      <strong>{entry.chapterTitle}</strong>
+                      <small>{entry.courseTitle}</small>
+                    </div>
+                    <span>{entry.percent}%</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="lp-day-view__empty">
+              No chapter progress was saved on this day yet. Open a course and
+              use Save progress to log today.
+            </p>
+          )}
+          <div className="lp-day-view__foot">
+            <button
+              type="button"
+              className="lp-mini lp-mini--blue"
+              onClick={() => setRecordDate(null)}
+            >
+              Close
             </button>
-          </form>
+          </div>
         </DialogContent>
       </Dialog>
 

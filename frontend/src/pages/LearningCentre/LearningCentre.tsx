@@ -339,7 +339,7 @@ export default function LearningCentre() {
       />
 
       <BotPet
-        storageKey="aiwrevolusi.botPetPosition.learning.v1"
+        storageKey="aiwrevolusi.botPetPosition.learning.v2"
         defaultCorner="top-right"
       />
     </div>

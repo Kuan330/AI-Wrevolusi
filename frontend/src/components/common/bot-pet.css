@@ -8,7 +8,7 @@
   position: fixed;
   right: var(--bot-pet-right);
   bottom: calc(var(--bot-pet-base) + var(--bot-pet-lift));
-  z-index: 20;
+  z-index: 50;
   width: 132px;
   height: var(--bot-pet-height);
   pointer-events: auto;
@@ -21,11 +21,11 @@
 .bot-pet.is-dragging {
   cursor: grabbing;
   transition: none;
-  z-index: 40;
+  z-index: 60;
 }
 
 .bot-pet--top-right {
-  top: calc(4rem + 1.15rem);
+  top: calc(4rem + 1.75rem);
   right: var(--bot-pet-right);
   bottom: auto;
 }

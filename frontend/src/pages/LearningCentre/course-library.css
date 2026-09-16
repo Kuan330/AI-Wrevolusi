@@ -1393,6 +1393,27 @@ main:has(> .course-library) {
   width: 155px;
   flex-shrink: 0;
 }
+.library-more-filters {
+  flex-shrink: 0;
+  height: 2.5rem !important;
+  border-radius: 999px !important;
+  border: 1px solid #c5dcea !important;
+  background: linear-gradient(180deg, #f7fbfe 0%, #eaf3fb 100%) !important;
+  color: #35617c !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 14px rgba(79, 145, 186, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+.library-more-filters:hover {
+  background: linear-gradient(180deg, #eaf3fb 0%, #dceef9 100%) !important;
+  border-color: #a9cce0 !important;
+  color: #2f5f80 !important;
+}
+.library-more-filters[aria-expanded="true"] {
+  background: linear-gradient(180deg, #f8ecef 0%, #eaf3fb 100%) !important;
+  border-color: #c9b0c0 !important;
+  color: #5f4a58 !important;
+}
 .library-extra-filters {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
