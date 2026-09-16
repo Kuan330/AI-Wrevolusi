@@ -15,7 +15,7 @@ export type DataTableColumn<Row> = {
   cell: (row: Row) => ReactNode;
   /** Column width such as "28%". Omit to share the remaining space evenly. */
   width?: string;
-  align?: "start" | "end";
+  align?: "start" | "center" | "end";
   /** Supply to make this column sortable. */
   sortValue?: (row: Row) => number | string;
   headerClassName?: string;
@@ -110,6 +110,7 @@ export default function DataTable<Row>(props: DataTableProps<Row>) {
                     scope="col"
                     className={cn(
                       "dt-th",
+                      column.align === "center" && "dt-th--center",
                       column.align === "end" && "dt-th--end",
                       column.headerClassName,
                     )}
@@ -148,6 +149,7 @@ export default function DataTable<Row>(props: DataTableProps<Row>) {
                     key={column.id}
                     className={cn(
                       "dt-td",
+                      column.align === "center" && "dt-td--center",
                       column.align === "end" && "dt-td--end",
                       column.cellClassName,
                     )}

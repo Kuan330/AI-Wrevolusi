@@ -40,6 +40,14 @@
   white-space: nowrap;
 }
 
+.dt-th--center {
+  text-align: center;
+}
+
+.dt-th--center .dt-sort {
+  justify-content: center;
+}
+
 .dt-th--end {
   text-align: right;
 }
@@ -90,6 +98,10 @@
 
 .dt-table tbody tr:last-child .dt-td {
   border-bottom: 0;
+}
+
+.dt-td--center {
+  text-align: center;
 }
 
 .dt-td--end {

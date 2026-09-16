@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Bookmark, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { AppButton } from "@/components/ui/app-button";
 import { ROUTES } from "@/constants/routes";
+import { commitLearningCoursesToPlan } from "@/pages/Plan/lib/planCourses";
 import { loadCourseDirectory } from "../lib/courseDirectory";
 import {
   courseLevelClassName,
@@ -28,8 +29,10 @@ export type LearningCoursesDialogProps = {
 
 export default function LearningCoursesDialog(props: LearningCoursesDialogProps) {
   const { open, onOpenChange, saved, onRemove } = props;
+  const navigate = useNavigate();
   const [directory, setDirectory] = useState<Map<string, Course> | null>(null);
   const [error, setError] = useState("");
+  const [committing, setCommitting] = useState(false);
 
   // Saved ids point at backend courses, so resolve them against the live
   // catalogue rather than a bundled list whose ids never matched.
@@ -57,13 +60,31 @@ export default function LearningCoursesDialog(props: LearningCoursesDialogProps)
   });
   const loading = !directory && !error;
 
+  async function goToLearningPlan() {
+    if (committing) return;
+    setCommitting(true);
+    setError("");
+    try {
+      await commitLearningCoursesToPlan(saved);
+      onOpenChange(false);
+      navigate(ROUTES.plan);
+    } catch {
+      setError(
+        "Those courses could not be added to your plan. Please try again.",
+      );
+    } finally {
+      setCommitting(false);
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="learning-courses-dialog">
         <DialogHeader className="learning-courses-dialog__header space-y-1 text-left">
           <DialogTitle>Learning courses</DialogTitle>
-          <DialogDescription>
-            Courses you chose to learn. Remove any you no longer need.
+          <DialogDescription className="sr-only">
+            Courses in your learning list. Open Learning plan to track them on
+            My Plan.
           </DialogDescription>
         </DialogHeader>
         <div className="learning-courses-dialog__body">
@@ -120,13 +141,13 @@ export default function LearningCoursesDialog(props: LearningCoursesDialogProps)
           >
             Cancel
           </Button>
-          <AppButton tone="gradient" asChild>
-            <Link
-              to={ROUTES.plan}
-              onClick={() => onOpenChange(false)}
-            >
-              Learning plan
-            </Link>
+          <AppButton
+            tone="gradient"
+            type="button"
+            disabled={!items.length || committing}
+            onClick={() => void goToLearningPlan()}
+          >
+            {committing ? "Adding…" : "Learning plan"}
           </AppButton>
         </DialogFooter>
       </DialogContent>
