@@ -3,6 +3,11 @@
 This module intentionally contains no network or model call.  Rules describe
 observable task phrases, and every returned identifier/evidence phrase is
 constrained by the request's candidate list and task text.
+
+The rule table covers all 26 WEF core skills.  Each rule lists phrases a person
+might actually write — either the skill's own name, or the everyday words for
+the work that uses it — so both "inventory" and "I keep track of stock and deal
+with suppliers" land on Resource management and operations.
 """
 
 from __future__ import annotations
@@ -20,7 +25,7 @@ from app.schemas.skill_matching import (
 )
 
 
-MAX_SKILL_MATCHES = 2
+MAX_SKILL_MATCHES = 3
 MINIMUM_SKILL_MATCH_CONFIDENCE = 0.50
 
 
@@ -33,20 +38,38 @@ class SkillRule:
 
 # IDs are only rule hints.  They become eligible output only when the same ID
 # is present in the caller-provided candidates.
+#
+# Every rule lists the distinctive words of its own skill name first, then the
+# everyday words for the work that uses it. The name words matter because people
+# search with fragments — "thinking" has to reach Analytical, Creative and
+# Systems thinking, since a partial name is a normal way to search.
 SKILL_RULES: tuple[SkillRule, ...] = (
-    SkillRule(10, ("customer service", "customer", "service", "prompt service", "advising"), 0.90),
-    SkillRule(7, ("active listening", "listen", "empathy", "understand customer"), 0.84),
-    SkillRule(16, ("instructing staff", "instruct", "train", "teach", "mentoring"), 0.88),
-    SkillRule(9, ("hiring", "interviewing", "evaluating staff", "promoting staff", "dismissing staff"), 0.86),
-    SkillRule(3, ("work schedules", "schedule", "assigning staff", "supervising"), 0.84),
-    SkillRule(13, ("inventory", "stock levels", "ordering new stock", "operations"), 0.82),
-    SkillRule(14, ("safety", "stock", "packing", "wrapping", "attention to detail"), 0.76),
-    SkillRule(21, ("budget", "financial transactions", "invoice", "payment", "cash register", "records"), 0.82),
-    SkillRule(15, ("quality", "returned goods", "safety procedures", "quality control"), 0.82),
-    SkillRule(12, ("appropriate action", "systems thinking", "recurring causes"), 0.78),
-    SkillRule(1, ("product mix", "determining prices", "financial", "budgeting"), 0.76),
-    SkillRule(18, ("displaying goods", "design", "user experience"), 0.76),
-    SkillRule(24, ("wrapping", "packing", "stacking", "manual dexterity"), 0.78),
+    SkillRule(1, ("analytical", "analytical thinking", "thinking", "analyse", "analyze", "analysis", "problem solving", "reasoning"), 0.88),
+    SkillRule(2, ("resilience", "resilient", "flexibility", "agility", "adapt to change", "working under pressure", "cope with change"), 0.84),
+    SkillRule(3, ("leadership", "leading a team", "lead a team", "managing a team", "supervising staff", "assigning staff", "work schedules", "delegating"), 0.88),
+    SkillRule(4, ("creative", "creative thinking", "creativity", "thinking", "innovation", "brainstorming", "new ideas"), 0.86),
+    SkillRule(5, ("motivation", "self-motivated", "self-awareness", "take initiative", "working independently", "reflect on"), 0.80),
+    SkillRule(6, ("technological literacy", "technological", "literacy", "digital tools", "software", "spreadsheets", "excel", "computer skills"), 0.86),
+    SkillRule(7, ("empathy", "empathetic", "active listening", "listening", "understand customer", "compassion"), 0.86),
+    SkillRule(8, ("curiosity", "curious", "lifelong learning", "continuous learning", "upskilling", "self-development"), 0.82),
+    SkillRule(9, ("talent management", "talent", "hiring", "recruiting", "interviewing staff", "evaluating staff", "promoting staff", "onboarding"), 0.88),
+    SkillRule(10, ("customer service", "prompt service", "advising", "customer", "client", "complaint", "after-sales"), 0.90),
+    SkillRule(11, ("artificial intelligence", "generative ai", "machine learning", "big data", "data analytics", "data science", "ai"), 0.88),
+    SkillRule(12, ("systems thinking", "systems", "thinking", "root cause", "recurring causes", "interconnected"), 0.82),
+    SkillRule(13, ("resource management", "operations", "inventory", "stock levels", "ordering new stock", "supplier", "procurement", "logistics"), 0.86),
+    SkillRule(14, ("dependability", "attention to detail", "dependable", "reliability", "accuracy", "checking work", "thoroughness"), 0.84),
+    SkillRule(15, ("quality control", "quality", "quality assurance", "quality checks", "inspection", "audit", "compliance", "safety"), 0.86),
+    SkillRule(16, ("teaching", "teach", "mentor", "mentoring", "coach", "coaching", "training", "instructing staff"), 0.88),
+    SkillRule(17, ("cybersecurity", "network security", "it security", "firewall", "data protection", "networks"), 0.86),
+    SkillRule(18, ("design", "user experience", "usability", "prototyping", "wireframe", "user research", "displaying goods"), 0.82),
+    SkillRule(19, ("multi-lingualism", "multilingual", "language", "bilingual", "translating"), 0.84),
+    SkillRule(20, ("marketing", "media", "campaigns", "social media", "advertising", "brand", "content creation"), 0.86),
+    SkillRule(21, ("reading", "writing", "report writing", "documentation", "mathematics", "numeracy", "calculations", "budget", "financial transactions", "invoice", "payment", "records"), 0.80),
+    SkillRule(22, ("environmental", "environmental stewardship", "stewardship", "sustainability", "sustainable", "carbon footprint", "recycling", "esg"), 0.86),
+    SkillRule(23, ("programming", "coding", "software development", "python", "javascript", "sql", "writing code"), 0.88),
+    SkillRule(24, ("manual dexterity", "manual", "dexterity", "precision", "hand tools", "assembling", "stacking", "packing"), 0.80),
+    SkillRule(25, ("global citizenship", "citizenship", "diversity", "inclusion", "cross-cultural"), 0.80),
+    SkillRule(26, ("sensory", "sensory-processing", "colour detection", "colour matching"), 0.78),
 )
 
 
@@ -57,9 +80,18 @@ def _candidate_value(candidate: SkillMatchCandidate | Mapping[str, Any], key: st
 
 
 def _whole_phrase_match(task_text: str, phrase: str) -> str | None:
-    """Return the exact source substring matching a case-insensitive phrase."""
+    """Return the exact source substring matching a case-insensitive phrase.
 
-    match = re.search(re.escape(phrase), task_text, flags=re.IGNORECASE)
+    Word boundaries matter here: without them a short rule phrase like ``ai``
+    would fire inside unrelated words such as "email" or "training".
+
+    Only the plural form is tolerated automatically, because people write
+    "suppliers" far more often than "supplier". Every other inflection is
+    spelled out in the rule table instead, so matching stays predictable.
+    """
+
+    pattern = rf"\b{re.escape(phrase)}(?:s|es)?\b"
+    match = re.search(pattern, task_text, flags=re.IGNORECASE)
     return match.group(0) if match else None
 
 
@@ -78,7 +110,7 @@ def match_skills(
     task_text: str,
     candidates: Sequence[SkillMatchCandidate | Mapping[str, Any]],
 ) -> list[SkillMatchItem]:
-    """Return at most two reliable matches from the supplied candidate allowlist."""
+    """Return the strongest matches, at most three, from the candidate allowlist."""
 
     if not task_text.strip():
         return []
@@ -104,10 +136,11 @@ def match_skills(
                 evidence_phrases=evidence,
             )
         )
-        if len(matches) == MAX_SKILL_MATCHES:
-            break
 
-    return matches
+    # Strongest signal first. Ordered by the rule table instead, the suggestions
+    # a user sees would depend on where a rule happens to sit in the file.
+    matches.sort(key=lambda item: item.confidence, reverse=True)
+    return matches[:MAX_SKILL_MATCHES]
 
 
 def match_skills_response(

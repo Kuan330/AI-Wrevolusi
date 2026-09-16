@@ -61,7 +61,9 @@ class SkillMatchResponse(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    skills: list[SkillMatchItem] = Field(default_factory=list, max_length=2)
+    # Kept in step with MAX_SKILL_MATCHES in app.services.skill_matching; this
+    # layer cannot import that module without a cycle.
+    skills: list[SkillMatchItem] = Field(default_factory=list, max_length=3)
     needs_user_confirmation: bool = Field(
         default=True,
         description=(

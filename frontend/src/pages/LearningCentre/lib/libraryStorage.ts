@@ -1,11 +1,10 @@
 import { accountStorage } from "@/services/accountStorage";
-import { courses, focusSkills } from "../catalogue";
 import type { LibraryState } from "../types";
 const KEY = "aiwrevolusi.courseLibrary.v1";
 export const emptyLibrary = (): LibraryState => ({
   version: 1,
   workContext: accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "",
-  skillId: focusSkills[0].id,
+  skillId: "",
   saved: [],
   choices: {},
   basis: {},
@@ -29,11 +28,11 @@ export function readLibrary(): LibraryState {
   if (state.workContext !== context) {
     return { ...state, workContext: context, saved: [], choices: {}, basis: {} };
   }
-  const known = new Set(courses.map((course) => course.id));
-  state.saved = state.saved.filter((id) => known.has(id));
-  state.pending = state.pending.filter((entry) => known.has(entry.courseId));
-  if (!focusSkills.some((skill) => skill.id === state.skillId))
-    state.skillId = "";
+  // Saved ids belong to the backend catalogue, which is not available
+  // synchronously here. Validating them against a bundled list used to wipe
+  // every saved course on reload, so ids are kept as-is and resolved against
+  // the live catalogue where they are displayed.
+  if (typeof state.skillId !== "string") state.skillId = "";
   for (const choice of [
     ...Object.values(state.choices),
     ...state.pending.map((entry) => entry.choice),

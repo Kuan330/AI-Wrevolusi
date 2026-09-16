@@ -16,3 +16,6 @@ db/_dev_seed_statements.json
 node_modules/
 frontend/dist/
 .env.local
+
+# Local AI-tool memory
+.workbuddy/
