@@ -1,0 +1,5 @@
+.score-modal__content { @apply max-h-[min(85vh,52rem)] max-w-2xl overflow-y-auto border-white/80 bg-[#fffafe]/95 text-[#2f2430] shadow-[0_18px_48px_rgba(61,43,54,0.2)] backdrop-blur-xl; }
+.score-modal__header { @apply pr-8; }
+.score-modal__eyebrow { @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7f7280]; }
+.score-modal__title { @apply text-xl font-semibold; }
+.score-modal__description { @apply leading-6 text-[#7f7280]; }
