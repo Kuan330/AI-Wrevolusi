@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, Check, ChevronLeft, ChevronRight, Clock3, Sparkles, Trash2 } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import LearningCoursesDialog from '@/pages/LearningCentre/components/LearningCoursesDialog';
+import { useCourseLibrary } from '@/pages/LearningCentre/hooks/useCourseLibrary';
+import '@/pages/LearningCentre/course-library.css';
 import './learning-preview.css';
 
 type Chapter = { title: string; value: number };
@@ -36,6 +40,8 @@ export default function Plan() {
   const [note,setNote] = useState('');
   const [notice,setNotice] = useState('');
   const [removeId,setRemoveId] = useState<string|null>(null);
+  const [coursesOpen,setCoursesOpen] = useState(false);
+  const library = useCourseLibrary();
   useEffect(() => { const refresh=()=>setToday(dateKey()); window.addEventListener('focus',refresh); const timer=window.setInterval(refresh,60000); return ()=>{window.removeEventListener('focus',refresh);window.clearInterval(timer);}; },[]);
   function save(next: Preview) { setState(next); try { sessionStorage.setItem(KEY,JSON.stringify(next)); } catch { setNotice('Changes are available until you leave this page; browser storage is unavailable.'); } }
   const course=state.courses.find(c=>c.id===courseId);
@@ -58,7 +64,7 @@ export default function Plan() {
   const offset=(month.getDay()+6)%7;
   const dayCount=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();
   return <div className="lp-page">
-    <PageHeader title="My Plan" description="Small steps, steady progress. Make your learning journey your own." actions={<Link className="lp-primary" to="/learning-centre">Choose courses <ArrowRight size={16}/></Link>}/>
+    <PageHeader title="My Plan" description="Small steps, steady progress. Make your learning journey your own." actions={<Button type="button" variant="ghost" className="learning-courses-trigger h-10 rounded-full px-5 font-semibold" onClick={()=>setCoursesOpen(true)}>Learning courses · {library.state.saved.length}</Button>}/>
     <div className="lp-demo"><strong>Design preview</strong><span>Example courses, progress and AI guidance. Changes stay in this tab and do not update your account.</span></div>
     <div className="lp-stats"><article><BookOpen/><strong>{overall}%</strong><span>Overall chapter progress</span></article><article><Check/><strong>{checkedDays} days</strong><span>Check-ins · {month.toLocaleDateString('en',{month:'long'})}</span></article><article><Clock3/><strong>{totalMinutes} min</strong><span>Recorded learning time</span></article></div>
     <p className="lp-notice" role="status">{notice}</p>
@@ -71,5 +77,6 @@ export default function Plan() {
     <Dialog open={!!course} onOpenChange={v=>{if(!v)setCourseId(null);}}><DialogContent className="lp-modal"><DialogTitle>{course?.title}</DialogTitle><DialogDescription>Record each chapter from 0 to 10. Saved progress can only increase.</DialogDescription>{course?.chapters.map((ch,i)=><label className="lp-chapter" key={ch.title}><span>{i+1}. {ch.title}<strong>{draft[i]}/10</strong></span><input type="range" min={ch.value} max={10} step={1} value={draft[i]??ch.value} onChange={e=>setDraft(draft.map((v,n)=>n===i?Number(e.target.value):v))}/></label>)}<button className="lp-primary" onClick={updateProgress}>Save progress</button></DialogContent></Dialog>
     <Dialog open={!!recordDate} onOpenChange={v=>{if(!v)setRecordDate(null);}}><DialogContent className="lp-modal"><DialogTitle>Learning record · {recordDate}</DialogTitle><DialogDescription>Keep a note of what you learned. Saving a note does not mark chapters complete or check you in.</DialogDescription><form onSubmit={e=>{e.preventDefault();if(!recordDate)return;const value=Number(minutes);if(!Number.isInteger(value)||value<0||value>1440)return;save({...state,records:{...state.records,[recordDate]:{...(state.records[recordDate]??emptyRecord()),minutes:value,note:note.trim()}}});setRecordDate(null);setNotice('Learning record saved.');}}><label>Learning time (minutes)<input type="number" required min={0} max={1440} step={1} value={minutes} onChange={e=>setMinutes(e.target.value)}/></label><label>What did you learn?<textarea rows={4} maxLength={2000} value={note} onChange={e=>setNote(e.target.value)} placeholder="A small discovery, a useful idea, or something to revisit…"/></label><button className="lp-primary" type="submit">Save learning record</button></form></DialogContent></Dialog>
     <Dialog open={!!removeId} onOpenChange={v=>{if(!v)setRemoveId(null);}}><DialogContent className="lp-modal"><DialogTitle>Remove this example course?</DialogTitle><DialogDescription>Its chapter progress will be removed from this preview. Your daily notes and real account data will be kept.</DialogDescription><button className="lp-outline" onClick={()=>setRemoveId(null)}>Keep course</button><button className="lp-primary" onClick={()=>{save({...state,courses:state.courses.filter(c=>c.id!==removeId)});setRemoveId(null);setNotice('Example course removed.');}}>Remove course</button></DialogContent></Dialog>
+    <LearningCoursesDialog open={coursesOpen} onOpenChange={setCoursesOpen} saved={library.state.saved} onRemove={library.toggleSave} />
   </div>;
 }
