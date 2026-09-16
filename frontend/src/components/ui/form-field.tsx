@@ -54,12 +54,23 @@ export function NativeSelect(props: ComponentProps<"select">) {
 export function FormSelect(props: {
   value: string;
   onValueChange: (value: string) => void;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; className?: string }[];
   placeholder: string;
   required?: boolean;
   label: string;
+  triggerClassName?: string;
+  contentClassName?: string;
 }) {
-  const { value, onValueChange, options, placeholder, required, label } = props;
+  const {
+    value,
+    onValueChange,
+    options,
+    placeholder,
+    required,
+    label,
+    triggerClassName,
+    contentClassName,
+  } = props;
   // Radix reserves the empty string for clearing the selection.
   const emptyValue = "__unspecified__";
   const selectProps1 = {
@@ -69,14 +80,18 @@ export function FormSelect(props: {
   } satisfies Partial<ComponentProps<typeof Select>>;
   const selectTriggerProps2 = {
     "aria-label": label,
-    className:
+    className: cn(
       "h-12 rounded-xl border-white/80 bg-white/95 px-4 text-sm shadow-sm focus:border-primary focus:ring-4 focus:ring-primary/10",
+      triggerClassName,
+    ),
   } satisfies Partial<ComponentProps<typeof SelectTrigger>>;
   const selectContentProps3 = {
     sideOffset: 4,
     collisionPadding: 12,
-    className:
-      "z-[80] max-h-64 rounded-xl border-white/85 bg-white p-1 shadow-xl",
+    className: cn(
+      "z-[80] max-h-64 rounded-xl border-white/85 bg-white p-1.5 shadow-xl",
+      contentClassName,
+    ),
   } satisfies Partial<ComponentProps<typeof SelectContent>>;
   return (
     <Select {...selectProps1}>
@@ -89,8 +104,12 @@ export function FormSelect(props: {
             key={option.value}
             {...({
               value: option.value || emptyValue,
-              className:
-                "rounded-lg px-3 py-2 pr-8 text-sm focus:bg-primary/10 data-[state=checked]:bg-primary/10 data-[state=checked]:ring-1 data-[state=checked]:ring-inset data-[state=checked]:ring-primary/35",
+              className: cn(
+                option.className
+                  ? null
+                  : "rounded-lg px-3 py-2 pr-8 text-sm focus:bg-primary/10 data-[state=checked]:bg-primary/10 data-[state=checked]:ring-1 data-[state=checked]:ring-inset data-[state=checked]:ring-primary/35",
+                option.className,
+              ),
             } satisfies Partial<ComponentProps<typeof SelectItem>>)}
           >
             {option.label}

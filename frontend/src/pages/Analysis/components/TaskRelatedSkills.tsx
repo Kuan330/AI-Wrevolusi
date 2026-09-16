@@ -1,37 +1,19 @@
-import { useEffect, useState } from "react";
-
 import { Button } from "@/components/ui/button";
 import { skillsForTask } from "@/pages/Analysis/lib/matchSkills";
-import {
-  readLearningSkills,
-  saveLearningSkills,
-  skillKey,
-  type LearningSkill,
-} from "@/pages/Skills/learningSkills";
+import { useLearningSkills } from "@/pages/Skills/useLearningSkills";
 import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
+import { useEffect, useState } from "react";
 
 type TaskRelatedSkillsProps = {
   taskText: string;
 };
 
-const toLearningSkill = (skill: WefSkill): LearningSkill => ({
-  id: skillKey(skill.core_skill),
-  name: skill.core_skill,
-  source: "work",
-});
-
 const TaskRelatedSkills = (props: TaskRelatedSkillsProps) => {
   const { taskText } = props;
   const [wefSkills, setWefSkills] = useState<WefSkill[]>([]);
   const [loading, setLoading] = useState(true);
-  const [addedIds, setAddedIds] = useState<Set<string>>(() => {
-    try {
-      return new Set((readLearningSkills() ?? []).map((skill) => skill.id));
-    } catch {
-      return new Set();
-    }
-  });
+  const { isAdded, addSkill, removeSkill } = useLearningSkills();
 
   useEffect(() => {
     let cancelled = false;
@@ -53,20 +35,6 @@ const TaskRelatedSkills = (props: TaskRelatedSkillsProps) => {
 
   const related = skillsForTask(taskText, wefSkills);
 
-  const addSkill = (skill: WefSkill) => {
-    const learning = toLearningSkill(skill);
-    if (addedIds.has(learning.id)) return;
-    let existing: LearningSkill[] = [];
-    try {
-      existing = readLearningSkills() ?? [];
-    } catch {
-      existing = [];
-    }
-    const next = [...existing.filter((item) => item.id !== learning.id), learning];
-    saveLearningSkills(next);
-    setAddedIds(new Set(next.map((item) => item.id)));
-  };
-
   if (loading) {
     return <p className="task-details__ai-note">Loading related skills…</p>;
   }
@@ -84,28 +52,37 @@ const TaskRelatedSkills = (props: TaskRelatedSkillsProps) => {
       ) : (
         <ul className="task-details__related-list">
           {related.map((skill) => {
-            const learning = toLearningSkill(skill);
-            const alreadyAdded = addedIds.has(learning.id);
+            const alreadyAdded = isAdded(skill.core_skill);
             return (
               <li key={skill.wef_skill_id} className="task-details__related-item">
                 <div className="min-w-0">
-                  <p className="task-details__related-name">{skill.core_skill}</p>
-                  {alreadyAdded ? (
-                    <p className="task-details__related-status">
-                      Already added to Learning Centre
-                    </p>
-                  ) : null}
+                  <p className="task-details__related-name">
+                    <span>{skill.core_skill}</span>
+                    {alreadyAdded ? (
+                      <span className="task-details__related-badge">Added</span>
+                    ) : null}
+                  </p>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="shrink-0"
-                  disabled={alreadyAdded}
-                  onClick={() => addSkill(skill)}
-                >
-                  {alreadyAdded ? "Added" : "Add to Learning Centre"}
-                </Button>
+                {alreadyAdded ? (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={() => removeSkill(skill.core_skill)}
+                  >
+                    Remove
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={() => addSkill(skill.core_skill, "work")}
+                  >
+                    Add to Learning Resources
+                  </Button>
+                )}
               </li>
             );
           })}

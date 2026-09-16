@@ -133,11 +133,11 @@ export default function AIExposure() {
         description="Compare occupation and task exposure, see skills in your work, then prioritise where to try AI."
         actions={
           <div className="exposure-page__actions">
-            <Button {...buttonPropsChange}>
-              <Link to={ROUTES.workProfile}>Change occupation</Link>
-            </Button>
             <Button {...buttonPropsEdit}>
               <Link to={ROUTES.task}>Edit tasks</Link>
+            </Button>
+            <Button {...buttonPropsChange}>
+              <Link to={ROUTES.workProfile}>Change occupation</Link>
             </Button>
           </div>
         }

@@ -4,20 +4,28 @@ import { Button } from "@/components/ui/button";
 
 type Position = { x: number; y: number };
 type Props = { count: number; onOpen: () => void };
-const KEY = "aiwrevolusi.savedCoursesPosition.v1";
+const KEY = "aiwrevolusi.learningCoursesPosition.v1";
 const SIZE = 56;
 const GAP = 16;
+
 function clamp(position: Position): Position {
   return {
     x: Math.max(GAP, Math.min(position.x, window.innerWidth - SIZE - GAP)),
     y: Math.max(GAP, Math.min(position.y, window.innerHeight - SIZE - GAP)),
   };
 }
+
 function initialPosition(): Position {
   try {
     const saved = JSON.parse(localStorage.getItem(KEY) ?? "null");
     if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y))
       return clamp(saved);
+    // Migrate previous saved-courses position if present.
+    const legacy = JSON.parse(
+      localStorage.getItem("aiwrevolusi.savedCoursesPosition.v1") ?? "null",
+    );
+    if (legacy && Number.isFinite(legacy.x) && Number.isFinite(legacy.y))
+      return clamp(legacy);
   } catch {
     /* Position storage is optional. */
   }
@@ -26,6 +34,7 @@ function initialPosition(): Position {
     y: window.innerHeight * 0.55,
   });
 }
+
 function persist(position: Position) {
   try {
     localStorage.setItem(KEY, JSON.stringify(position));
@@ -33,7 +42,9 @@ function persist(position: Position) {
     /* Keep dragging available when storage is disabled. */
   }
 }
-export default function FloatingSavedCourses(props: Props) {
+
+/** Floating entry to the learning courses list. */
+export default function FloatingLearningCourses(props: Props) {
   const { count, onOpen } = props;
   const [position, setPosition] = useState(initialPosition);
   const drag = useRef<{
@@ -43,17 +54,19 @@ export default function FloatingSavedCourses(props: Props) {
     moved: boolean;
   } | null>(null);
   const suppressClick = useRef(false);
+
   useEffect(() => {
     const resize = () => setPosition((current) => clamp(current));
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
   }, []);
+
   return (
     <Button
-      className="floating-saved-courses"
+      className="floating-learning-courses"
       style={{ left: position.x, top: position.y }}
-      aria-label={`Saved courses · ${count}. Drag to move, or use arrow keys to reposition.`}
-      title={`Saved courses · ${count} — drag to move`}
+      aria-label={`Learning courses · ${count}. Drag to move, or use arrow keys to reposition.`}
+      title={`Learning courses · ${count} — drag to move`}
       onPointerDown={(event) => {
         if (event.button !== 0) return;
         suppressClick.current = false;
@@ -120,7 +133,7 @@ export default function FloatingSavedCourses(props: Props) {
     >
       <Bookmark size={24} aria-hidden="true" />
       {count > 0 && (
-        <span className="floating-saved-count" aria-hidden="true">
+        <span className="floating-learning-count" aria-hidden="true">
           {count > 99 ? "99+" : count}
         </span>
       )}

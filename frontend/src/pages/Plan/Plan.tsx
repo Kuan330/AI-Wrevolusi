@@ -164,6 +164,14 @@ function PlanContent(props: { demo: boolean }) {
       active = false;
     };
   }, [repository, location.search, catalogue, demo]);
+  useEffect(() => {
+    if (loading || location.hash !== "#course-progress") return;
+    const node = document.getElementById("course-progress");
+    if (!node) return;
+    requestAnimationFrame(() => {
+      node.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [loading, location.hash]);
   async function commit(events: PlanEvent[]) {
     setBusy(true);
     setError("");
@@ -365,7 +373,11 @@ function PlanContent(props: { demo: boolean }) {
           <Link to={`${ROUTES.plan}?demo=0`}>Exit demo</Link>
         </div>
       )}
-      <section className="pl-task-progress" aria-label="Course task progress">
+      <section
+        id="course-progress"
+        className="pl-task-progress"
+        aria-label="Course task progress"
+      >
         <div><div><p className="pl-kicker">COURSE LEARNING ONLY</p><h2>Course plan progress</h2></div><strong>{completedCourseTasks} / {courseTasks.length}<small>learning sessions completed</small></strong></div>
         <progress aria-label="Completed course tasks" value={completedCourseTasks} max={Math.max(1, courseTasks.length)} />
         <p className="pl-muted">Work and personal activities are excluded.</p>

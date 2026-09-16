@@ -2,7 +2,6 @@ import type { ComponentProps } from "react";
 import { Sparkles, TrendingUp, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { message } from "@/components/ui/message";
 import {
   AI_CAPACITIES,
   aiCapacityFromCategory,
@@ -13,12 +12,7 @@ import {
   skillPosition,
   trendExplanation,
 } from "@/pages/Skills/lib/skillOutlook";
-import {
-  readLearningSkills,
-  saveLearningSkills,
-  skillKey,
-  type LearningSkill,
-} from "@/pages/Skills/learningSkills";
+import { useLearningSkills } from "@/pages/Skills/useLearningSkills";
 import { cn } from "@/lib/utils";
 import type { WefSkill } from "@/types/reference";
 import SkillOutlookInfo from "@/pages/Skills/components/SkillOutlookInfo";
@@ -30,24 +24,9 @@ type SkillOutlookSummaryProps = {
   compact?: boolean;
   showInfo?: boolean;
   showAddToLearning?: boolean;
-  /** Called after add (or when already added) so hosts can close hover UI */
+  /** Called after add/remove so hosts can close hover UI */
   onAddComplete?: () => void;
   className?: string;
-};
-
-const toLearningSkill = (skill: WefSkill): LearningSkill => ({
-  id: skillKey(skill.core_skill),
-  name: skill.core_skill,
-  source: "work",
-});
-
-const isLearningSkillAdded = (skill: WefSkill) => {
-  try {
-    const existing = readLearningSkills() ?? [];
-    return existing.some((item) => item.id === skillKey(skill.core_skill));
-  } catch {
-    return false;
-  }
 };
 
 const SkillOutlookSummary = (props: SkillOutlookSummaryProps) => {
@@ -59,6 +38,8 @@ const SkillOutlookSummary = (props: SkillOutlookSummaryProps) => {
     onAddComplete,
     className,
   } = props;
+  const { isAdded, addSkill, removeSkill } = useLearningSkills();
+  const added = isAdded(skill.core_skill);
   const capacity = AI_CAPACITIES.find(
     ({ id }) =>
       id === aiCapacityFromCategory(skill.genai_substitution_capacity_category),
@@ -77,27 +58,6 @@ const SkillOutlookSummary = (props: SkillOutlookSummaryProps) => {
     "aria-hidden": true,
   } satisfies Partial<ComponentProps<typeof Sparkles>>;
 
-  const addToLearning = () => {
-    if (isLearningSkillAdded(skill)) {
-      message.warning("This skill is already added");
-      onAddComplete?.();
-      return;
-    }
-    const learning = toLearningSkill(skill);
-    let existing: LearningSkill[] = [];
-    try {
-      existing = readLearningSkills() ?? [];
-    } catch {
-      existing = [];
-    }
-    saveLearningSkills([
-      ...existing.filter((item) => item.id !== learning.id),
-      learning,
-    ]);
-    message.success("Added successfully");
-    onAddComplete?.();
-  };
-
   return (
     <div
       className={cn(
@@ -111,7 +71,15 @@ const SkillOutlookSummary = (props: SkillOutlookSummaryProps) => {
           <p className="skills-kicker">External outlook</p>
           {compact ? (
             <p className="skill-outlook-summary__skill-name">
-              {skill.core_skill}
+              <span>{skill.core_skill}</span>
+              {showAddToLearning && added ? (
+                <span
+                  className="skill-outlook-summary__added-bubble"
+                  title="Added to Learning Resources"
+                >
+                  Added
+                </span>
+              ) : null}
             </p>
           ) : (
             <h4 className="mt-1 text-base font-semibold text-[#2f2430]">
@@ -195,19 +163,39 @@ const SkillOutlookSummary = (props: SkillOutlookSummaryProps) => {
 
       {showAddToLearning ? (
         <div className="skill-outlook-summary__actions">
-          <Button
-            type="button"
-            size="sm"
-            className="skill-outlook-summary__add-btn"
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              addToLearning();
-            }}
-            onPointerDown={(event) => event.stopPropagation()}
-          >
-            Add to Learning Resources
-          </Button>
+          {added ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="destructive"
+              className="skill-outlook-summary__remove-btn soft-btn-red"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                removeSkill(skill.core_skill);
+                onAddComplete?.();
+              }}
+              onPointerDown={(event) => event.stopPropagation()}
+            >
+              Remove
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="skill-outlook-summary__add-btn"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                addSkill(skill.core_skill, "work");
+                onAddComplete?.();
+              }}
+              onPointerDown={(event) => event.stopPropagation()}
+            >
+              Add to Learning Resources
+            </Button>
+          )}
         </div>
       ) : null}
     </div>

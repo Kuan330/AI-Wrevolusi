@@ -282,12 +282,16 @@
   padding-inline: 1rem;
   color: #fff !important;
   font-weight: 600;
-  box-shadow: 0 6px 16px rgba(79, 145, 186, 0.22);
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none;
 }
 
 .exposure-compare__cta:hover {
   filter: brightness(0.97);
   color: #fff !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 @media (max-width: 720px) {

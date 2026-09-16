@@ -24,10 +24,29 @@
 }
 
 .skill-outlook-summary__skill-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.5rem;
   margin-top: 0.2rem;
   font-size: 0.95rem;
   font-weight: 650;
   color: #2f2430;
+}
+
+.skill-outlook-summary__added-bubble {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(79, 145, 186, 0.35);
+  background: linear-gradient(100deg, #e8f4fc 0%, #f6eef5 100%);
+  padding: 0.12rem 0.55rem;
+  color: #2f5f80;
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  white-space: nowrap;
 }
 
 .skill-outlook-summary .skills-position-callout {
@@ -152,22 +171,59 @@
 }
 
 .skill-outlook-summary__actions {
-  display: grid;
-  gap: 0.3rem;
-  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 0.85rem;
+}
+
+.skill-outlook-summary__remove-btn {
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+  padding-inline: 1.15rem !important;
+  border-radius: 999px !important;
 }
 
 .skill-outlook-summary__add-btn {
-  width: 100%;
+  width: auto !important;
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+  padding-inline: 1.25rem !important;
   border: 0 !important;
   border-radius: 999px !important;
-  background: linear-gradient(
-    100deg,
-    rgba(232, 160, 176, 0.95) 0%,
-    rgba(126, 179, 217, 0.95) 100%
+  background-color: transparent !important;
+  background-image: linear-gradient(
+    90deg,
+    #e8a0b0 0%,
+    #c7a0c8 42%,
+    #7eb3d9 78%,
+    #4f91ba 100%
   ) !important;
   color: #fff !important;
-  font-weight: 600;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  backdrop-filter: none !important;
+}
+.skill-outlook-summary__add-btn:hover,
+.skill-outlook-summary__add-btn:focus-visible,
+.skill-outlook-summary__add-btn:active {
+  background-color: transparent !important;
+  background-image: linear-gradient(
+    90deg,
+    #e8a0b0 0%,
+    #c7a0c8 42%,
+    #7eb3d9 78%,
+    #4f91ba 100%
+  ) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: brightness(0.97) !important;
+  transform: none !important;
 }
 
 .skill-outlook-summary__add-btn:disabled {

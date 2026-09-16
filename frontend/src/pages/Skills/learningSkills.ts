@@ -2,7 +2,7 @@ import { accountStorage } from "@/services/accountStorage";
 export type LearningSkill = {
   id: string;
   name: string;
-  source?: "work" | "wef";
+  source?: "work" | "wef" | "custom";
 };
 export const skillKey = (name: string) =>
   name
@@ -95,7 +95,36 @@ export function reconcileLearningSkills(
   return saved.filter(
     (skill) =>
       current.has(skill.id) ||
-      (skill.source === "wef" &&
-        growingSkills.some((item) => item.id === skill.id)),
+      skill.source === "custom" ||
+      skill.source === "wef",
   );
+}
+
+/** Convert a skill name into a LearningSkill for storage. */
+export function toLearningSkill(
+  name: string,
+  source: LearningSkill["source"] = "work",
+): LearningSkill {
+  return { id: skillKey(name), name, source };
+}
+
+/**
+ * Return stored learning skills, or seed from work-reflected skills when empty.
+ * Seeds persist so Learning Resources and AI Impact stay in sync.
+ */
+export function ensureLearningSkills(work: LearningSkill[]): LearningSkill[] {
+  let saved: LearningSkill[] | null = null;
+  try {
+    saved = readLearningSkills();
+  } catch {
+    saved = null;
+  }
+  if (saved && saved.length > 0) {
+    return reconcileLearningSkills(saved, work);
+  }
+  if (work.length > 0) {
+    saveLearningSkills(work);
+    return work;
+  }
+  return [];
 }

@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import ExposureScorePanel from "@/components/ui/exposure-score-panel";
-import { EXPOSURE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
 import { taskScore } from "@/pages/Analysis/lib/taskScore";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
@@ -156,8 +155,8 @@ export default function TaskDetailsDrawer(props: {
               <div className="task-details__footer">
                 <Button
                   type="button"
+                  variant="ghost"
                   className="task-details__chat-btn"
-                  style={{ background: EXPOSURE_GRADIENT_CSS }}
                   onClick={() => setChatOpen(true)}
                 >
                   <MessageSquare className="size-4" aria-hidden />

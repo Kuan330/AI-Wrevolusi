@@ -59,9 +59,7 @@ const AppRoutes = () => {
               <Route path={ROUTES.aiExposure} element={<AIExposure />} />
               <Route
                 path="/skills"
-                element={
-                  <Navigate to={`${ROUTES.learningCentre}#skill-directions`} replace />
-                }
+                element={<Navigate to={ROUTES.learningCentre} replace />}
               />
             </Route>
             <Route

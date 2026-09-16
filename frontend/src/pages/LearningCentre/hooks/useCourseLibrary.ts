@@ -58,8 +58,8 @@ export function useCourseLibrary() {
     if (changed)
       toast(
         wasSaved
-          ? "Removed from saved courses. Your plan is unchanged."
-          : "Saved to your courses",
+          ? "Removed from learning courses"
+          : "Added to learning",
         {
           action: {
             label: "Undo",
@@ -79,6 +79,15 @@ export function useCourseLibrary() {
           },
         },
       );
+  }
+
+  /** Drop courses from the learning list (e.g. when their skill is removed). */
+  function removeSavedCourses(courseIds: string[]) {
+    if (!courseIds.length) return false;
+    const drop = new Set(courseIds);
+    const nextSaved = state.saved.filter((id) => !drop.has(id));
+    if (nextSaved.length === state.saved.length) return false;
+    return update({ ...state, saved: nextSaved });
   }
   async function addToPlan(
     ids: string[],
@@ -223,6 +232,7 @@ export function useCourseLibrary() {
     notice,
     choiceFor,
     toggleSave,
+    removeSavedCourses,
     addToPlan,
     exportSaved,
   };

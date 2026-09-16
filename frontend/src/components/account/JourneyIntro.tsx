@@ -139,14 +139,7 @@ export default function JourneyIntro(props: {
                       ComponentProps<typeof AppButton>
                     >)}
                   >
-                    <Link
-                      to={
-                        path === ROUTES.learningCentre &&
-                        (action === "Choose a skill" || kind === "resources")
-                          ? `${path}#skill-directions`
-                          : path
-                      }
-                    >
+                    <Link to={path}>
                       {action}
                       <ArrowRight className="size-4" />
                     </Link>

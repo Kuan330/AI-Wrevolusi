@@ -68,15 +68,31 @@
 }
 
 .task-details__related-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.45rem;
   font-size: 0.875rem;
   font-weight: 600;
   color: #2f2430;
 }
 
+.task-details__related-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(79, 145, 186, 0.35);
+  background: linear-gradient(100deg, #e8f4fc 0%, #f6eef5 100%);
+  padding: 0.1rem 0.5rem;
+  color: #2f5f80;
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
 .task-details__related-status {
-  margin-top: 0.2rem;
-  font-size: 0.7rem;
-  color: #7f7280;
+  display: none;
 }
 
 .task-details__detail-block {
@@ -115,12 +131,22 @@
   gap: 0.45rem;
   border: 0 !important;
   border-radius: 999px !important;
+  background: linear-gradient(
+    90deg,
+    #e8a0b0 0%,
+    #c7a0c8 42%,
+    #7eb3d9 78%,
+    #4f91ba 100%
+  ) !important;
   color: #fff !important;
   font-weight: 600;
-  box-shadow: 0 8px 18px rgba(79, 145, 186, 0.22);
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .task-details__chat-btn:hover {
   filter: brightness(0.97);
   color: #fff !important;
+  box-shadow: none !important;
+  transform: none !important;
 }

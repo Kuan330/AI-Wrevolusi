@@ -178,20 +178,7 @@
 
 .work-profile-page .profile-batch-btn,
 .profile-batch-btn {
-  background: #fff !important;
-  color: var(--wp-text-muted) !important;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 2px 10px rgba(61, 43, 54, 0.08);
-  font-weight: 400;
-}
-
-.work-profile-page .profile-batch-btn:hover:not(:disabled),
-.profile-batch-btn:hover:not(:disabled) {
-  background: var(--wp-hover) !important;
-  color: var(--wp-blue) !important;
-  border-color: rgba(79, 145, 186, 0.28);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(61, 43, 54, 0.1);
+  font-weight: 600;
 }
 
 .work-profile-page .profile-batch-btn:disabled,
@@ -210,104 +197,4 @@
   background: transparent;
   cursor: pointer;
   padding: 0;
-}
-
-.work-profile-page .profile-primary-btn,
-.profile-primary-btn {
-  background: var(--wp-brown) !important;
-  color: #fff !important;
-  box-shadow: 0 4px 16px rgba(201, 149, 137, 0.28);
-  border: none;
-}
-
-.work-profile-page .profile-primary-btn:hover,
-.profile-primary-btn:hover {
-  background: var(--wp-hover) !important;
-  color: var(--wp-blue) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.24);
-}
-
-.work-profile-page .profile-gradient-btn,
-.profile-gradient-btn {
-  background: linear-gradient(
-    90deg,
-    var(--wp-bg-start) 0%,
-    var(--wp-bg-mid) 48%,
-    var(--wp-bg-end) 100%
-  ) !important;
-  color: var(--wp-blue) !important;
-  border: 1px solid rgba(79, 145, 186, 0.28);
-  box-shadow: 0 4px 12px rgba(61, 43, 54, 0.06);
-}
-
-.work-profile-page .profile-gradient-btn:hover,
-.profile-gradient-btn:hover {
-  background: var(--wp-hover) !important;
-  filter: none;
-  color: var(--wp-blue) !important;
-}
-
-.work-profile-page .profile-outline-btn,
-.profile-outline-btn {
-  border: 1px solid rgba(79, 145, 186, 0.28);
-  background: rgba(255, 255, 255, 0.88);
-  color: var(--wp-blue);
-}
-
-.work-profile-page .profile-outline-btn:hover,
-.profile-outline-btn:hover {
-  background: var(--wp-hover);
-  color: var(--wp-blue);
-}
-
-.work-profile-page .profile-blue-btn,
-.profile-blue-btn {
-  background: var(--wp-blue) !important;
-  color: #fff !important;
-  border: none;
-  box-shadow: 0 4px 16px rgba(79, 145, 186, 0.28);
-}
-
-.work-profile-page .profile-blue-btn:hover,
-.profile-blue-btn:hover {
-  background: var(--wp-hover) !important;
-  color: var(--wp-blue) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.24);
-}
-
-.work-profile-page .profile-dialog-btn,
-.profile-dialog-btn {
-  background: var(--wp-blue) !important;
-  color: #fff !important;
-  border: none !important;
-  box-shadow: 0 4px 16px rgba(79, 145, 186, 0.28);
-  font-weight: 400;
-}
-
-.work-profile-page .profile-dialog-btn:hover,
-.profile-dialog-btn:hover {
-  background: var(--wp-hover) !important;
-  color: var(--wp-blue) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.24);
-}
-
-.work-profile-page .profile-dialog-cancel-btn,
-.profile-dialog-cancel-btn {
-  border: 1px solid rgba(79, 145, 186, 0.28) !important;
-  background: rgba(255, 255, 255, 0.88) !important;
-  color: var(--wp-blue) !important;
-  box-shadow: none;
-  font-weight: 400;
-}
-
-.work-profile-page .profile-dialog-cancel-btn:hover,
-.profile-dialog-cancel-btn:hover {
-  background: var(--wp-hover) !important;
-  color: var(--wp-blue) !important;
-  border-color: rgba(79, 145, 186, 0.28) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79, 145, 186, 0.24);
 }
