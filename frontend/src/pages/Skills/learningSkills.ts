@@ -86,6 +86,13 @@ const courseLinks: Record<string, string[]> = {
 };
 export const coursesForSkill = (id: string) => courseLinks[id] ?? [];
 
+/** WEF skill ids linked to a catalogue course (editorial map; not WEF recommendations). */
+export function skillIdsForCourse(courseId: string): string[] {
+  return Object.entries(courseLinks)
+    .filter(([, courseIds]) => courseIds.includes(courseId))
+    .map(([skillId]) => skillId);
+}
+
 export function reconcileLearningSkills(
   saved: LearningSkill[] | null,
   work: LearningSkill[],

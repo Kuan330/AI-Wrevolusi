@@ -1,3 +1,4 @@
+import { useMemo, useRef } from "react";
 import { Bookmark, ExternalLink, Trash2 } from "lucide-react";
 import {
   Drawer,
@@ -12,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import type { Course } from "../types";
 import { durationLabel } from "../lib/coursePlanning";
 import { courseLevelLabel } from "../lib/courseLevels";
+import { wefSkillsForCourse } from "../lib/courseWorkLinks";
+import SkillOutlookBadge from "./SkillOutlookBadge";
 
 export type CourseDetailDrawerProps = {
   course: Course;
@@ -19,10 +22,15 @@ export type CourseDetailDrawerProps = {
   saved: boolean;
   onClose: () => void;
   onSave: () => void;
+  /** Called when a badge popover adds or removes a learning skill. */
+  onSkillsChanged?: () => void;
 };
 
 export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
-  const { course, skillName, saved, onClose, onSave } = props;
+  const { course, skillName, saved, onClose, onSave, onSkillsChanged } = props;
+  const buildSkills = useMemo(() => wefSkillsForCourse(course.id), [course.id]);
+  const sheetRef = useRef<HTMLDivElement>(null);
+
   return (
     <Drawer
       open
@@ -30,7 +38,7 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
         if (!open) onClose();
       }}
     >
-      <DrawerContent className="learning-detail-drawer">
+      <DrawerContent ref={sheetRef} className="learning-detail-drawer">
         <DrawerHeader>
           <p className="library-kicker">{course.provider}</p>
           <DrawerTitle>{course.title}</DrawerTitle>
@@ -59,26 +67,48 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
                 <h3>About this course</h3>
                 <p>{course.intro}</p>
               </section>
-              <section>
-                <h3>What you will learn</h3>
-                <ul>
-                  {course.outcomes.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+
+              <section className="learning-course-skills">
+                <h3>Skills you’ll build</h3>
+                {buildSkills.length ? (
+                  <ul className="learning-course-skill-badges">
+                    {buildSkills.map((skill) => (
+                      <li key={skill.wef_skill_id}>
+                        <SkillOutlookBadge
+                          skill={skill}
+                          container={sheetRef}
+                          onSkillsChanged={onSkillsChanged}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="library-muted">
+                    No linked WEF skills are mapped for this course yet.
+                  </p>
+                )}
+                {skillName ? (
+                  <p className="learning-course-skills__focus">
+                    Currently browsing via focus skill:{" "}
+                    <strong>{skillName}</strong>
+                  </p>
+                ) : null}
               </section>
+
               <section>
                 <h3>Before you start</h3>
                 <p>{course.prereq}</p>
               </section>
-              {skillName ? (
-                <section className="learning-apply-box">
-                  <h3>Apply this course to your work</h3>
-                  <p>
-                    Linked to your focus skill: <strong>{skillName}</strong>
-                  </p>
-                </section>
-              ) : null}
+
+              <section className="learning-course-disclaimer">
+                <h3>What won’t change</h3>
+                <p>
+                  Completing this course will not automatically lower your ILO
+                  task exposure score. Exposure reflects how a task may be
+                  reshaped by AI; learning builds skills and next-step
+                  recommendations around that work.
+                </p>
+              </section>
             </TabsContent>
             <TabsContent value="chapters">
               <p className="library-muted my-4">
@@ -109,7 +139,7 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
         </DrawerBody>
         <div className="learning-drawer-actions">
           <Button
-            className={`library-save-button${saved ? " soft-btn-red" : " soft-btn-blue"}`}
+            className={`library-save-button learning-drawer-save${saved ? " is-saved" : ""}`}
             variant="ghost"
             aria-pressed={saved}
             onClick={onSave}

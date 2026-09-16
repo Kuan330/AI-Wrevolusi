@@ -283,6 +283,7 @@ export default function LearningCentre() {
           saved={state.saved.includes(detailCourse.id)}
           onClose={() => setDetailId(null)}
           onSave={() => toggleSave(detailCourse.id)}
+          onSkillsChanged={refresh}
         />
       )}
 
