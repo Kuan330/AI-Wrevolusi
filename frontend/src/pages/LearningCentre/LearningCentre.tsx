@@ -11,6 +11,7 @@ import AddSkillDialog from "./components/AddSkillDialog";
 import RemoveSkillDialog from "./components/RemoveSkillDialog";
 import BotPet from "@/components/common/BotPet";
 import { useCourseLibrary } from "./hooks/useCourseLibrary";
+import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
 import { fetchPageCatalogue } from "@/services/catalogueService";
 import type { Course } from "./types";
 import {
@@ -49,6 +50,7 @@ export default function LearningCentre() {
   const [seeded, setSeeded] = useState(false);
   /** Select the first skill after seeding when the list is empty. */
   const [activeId, setActiveId] = useState("");
+  const { speech: petSpeech, say: sayPet } = useBotPetGreeting("learning");
 
   const workSkills = useMemo(() => {
     const evidence = buildSkillEvidence(analysis?.tasks ?? [], wefSkills);
@@ -166,6 +168,13 @@ export default function LearningCentre() {
     pageCourses.find((course) => course.id === detailId) ?? null;
   const addedIds = new Set(skills.map((item) => item.id));
 
+  const onToggleSave = (courseId: string) => {
+    const wasSaved = state.saved.includes(courseId);
+    toggleSave(courseId);
+    if (!wasSaved) sayPet("add-course");
+    else sayPet("remove-item");
+  };
+
   const confirmRemoveSkill = async () => {
     if (!removeTarget) return;
     const removedId = removeTarget.id;
@@ -173,6 +182,7 @@ export default function LearningCentre() {
       skills.filter((item) => item.id !== removedId).map((item) => item.id),
     );
     removeSkill(removedId);
+    sayPet("remove-item");
     if (activeId === removedId) setActiveId("");
     setRemoveTarget(null);
     // Drop courses that only the removed skill linked to. Links come from the
@@ -297,7 +307,7 @@ export default function LearningCentre() {
                     key={course.id}
                     course={course}
                     saved={state.saved.includes(course.id)}
-                    onSave={() => toggleSave(course.id)}
+                    onSave={() => onToggleSave(course.id)}
                     onDetails={() => setDetailId(course.id)}
                   />
                 ))}
@@ -314,7 +324,7 @@ export default function LearningCentre() {
           skillName={skill?.en ?? ""}
           saved={state.saved.includes(detailCourse.id)}
           onClose={() => setDetailId(null)}
-          onSave={() => toggleSave(detailCourse.id)}
+          onSave={() => onToggleSave(detailCourse.id)}
         />
       )}
 
@@ -340,6 +350,7 @@ export default function LearningCentre() {
       <BotPet
         storageKey="aiwrevolusi.botPetPosition.learning.v4"
         defaultCorner="top-right"
+        speech={petSpeech}
       />
     </div>
   );

@@ -10,6 +10,7 @@ import BotPet from "@/components/common/BotPet";
 import DataTable from "@/components/common/DataTable";
 import type { DataTableColumn } from "@/components/common/DataTable";
 import PageHeader from "@/components/common/PageHeader";
+import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
 import ExposureScorePie from "@/pages/AIExposure/components/ExposureScorePie";
 import {
   Dialog,
@@ -79,6 +80,15 @@ function dayHasProgress(r: RecordDay | undefined) {
   return Boolean(r && (r.checked || r.studied || (r.entries?.length ?? 0) > 0));
 }
 
+function shouldOfferCheckinHint(records: PlanState["records"]) {
+  if (Object.values(records).some(dayHasProgress)) return false;
+  try {
+    return !localStorage.getItem(CHECKIN_HINT_KEY);
+  } catch {
+    return true;
+  }
+}
+
 function mergeDayEntries(
   existing: PlanDayChapterEntry[] | undefined,
   next: PlanDayChapterEntry[],
@@ -138,7 +148,6 @@ export default function Plan() {
   const [notice, setNotice] = useState("");
   const [removeId, setRemoveId] = useState<string | null>(null);
   const [coursesLoading, setCoursesLoading] = useState(true);
-  const [checkinHint, setCheckinHint] = useState<string | null>(null);
   // The drawer opens programmatically, so Radix has no trigger to restore focus
   // to on close; remember the button that opened it instead.
   const detailOpener = useRef<HTMLButtonElement | null>(null);
@@ -146,6 +155,26 @@ export default function Plan() {
   // Raw text of a chapter's percent field while it is being typed, so the value
   // is clamped on commit instead of fighting the caret on every keystroke.
   const [rawPercent, setRawPercent] = useState<Record<string, string>>({});
+
+  const planReady = !coursesLoading;
+  // Freeze the check-in decision once data is ready so marking localStorage
+  // does not flip priority mid-bubble and flash a random greeting.
+  const checkinPriorityRef = useRef<string | null | undefined>(undefined);
+  if (planReady && checkinPriorityRef.current === undefined) {
+    const offer = shouldOfferCheckinHint(state.records);
+    checkinPriorityRef.current = offer ? CHECKIN_HINT : null;
+    if (offer) {
+      try {
+        localStorage.setItem(CHECKIN_HINT_KEY, "1");
+      } catch {
+        /* Tip still shows once this visit when storage is unavailable. */
+      }
+    }
+  }
+  const { speech: petSpeech, say: sayPet } = useBotPetGreeting("plan", {
+    priority: checkinPriorityRef.current ?? null,
+    ready: planReady,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -164,20 +193,6 @@ export default function Plan() {
       cancelled = true;
     };
   }, [location.key]);
-
-  // Cloud tip on first visit only, and only while the calendar has no records.
-  useEffect(() => {
-    if (coursesLoading) return;
-    const hasRecord = Object.values(state.records).some(dayHasProgress);
-    if (hasRecord) return;
-    try {
-      if (localStorage.getItem(CHECKIN_HINT_KEY)) return;
-      localStorage.setItem(CHECKIN_HINT_KEY, "1");
-    } catch {
-      /* Still show once this visit when storage is unavailable. */
-    }
-    setCheckinHint(CHECKIN_HINT);
-  }, [coursesLoading, state.records]);
 
   useEffect(() => {
     const refresh = () => setToday(dateKey());
@@ -310,6 +325,8 @@ export default function Plan() {
     setToday(day);
     if (changed) {
       message.success("Chapter progress saved and synced to your calendar.");
+      // One save both logs progress and checks in — pick either tip pool.
+      sayPet(Math.random() < 0.5 ? "plan-record" : "save-progress");
     } else {
       message.info("No changes to save.");
     }
@@ -645,7 +662,7 @@ export default function Plan() {
       <BotPet
         storageKey="aiwrevolusi.botPetPosition.plan.v3"
         defaultAnchorRef={calendarRef}
-        speech={checkinHint}
+        speech={petSpeech}
       />
 
       <Drawer
@@ -852,6 +869,7 @@ export default function Plan() {
                 setRemoveId(null);
                 setNotice("Course removed from your plan.");
                 message.success("Course removed from your plan.");
+                sayPet("remove-item");
               }}
             >
               Remove course

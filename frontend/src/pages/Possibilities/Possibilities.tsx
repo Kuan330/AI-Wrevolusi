@@ -5,6 +5,7 @@ import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
 import { loadPossibilitiesData, type PossibilitiesData, skillGroup, directionMatch, type SkillGroup } from "./possibilitiesData";
 import PageHeader from "@/components/common/PageHeader";
 import BotPet from "@/components/common/BotPet";
+import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
 import "./exploration.css";
 
 const KEY = "aiwrevolusi.possibilities.courseExploration.v1";
@@ -23,6 +24,7 @@ export default function Possibilities() {
   const choicesRef = useRef<HTMLElement>(null);
   const planbarRef = useRef<HTMLDivElement>(null);
   const [selectionVersion, setSelectionVersion] = useState(0);
+  const { speech: petSpeech, say: sayPet } = useBotPetGreeting("possibilities");
   useEffect(() => {
     if (selectionVersion > 0) {
       detailRef.current?.focus({ preventScroll: true });
@@ -37,7 +39,17 @@ export default function Possibilities() {
     try { sessionStorage.setItem(KEY, JSON.stringify(next)); }
     catch { setError("Your choices work on this page but could not be kept for this browser session."); }
   }
-  function toggle(id: string) { update({ ...choice, themes: choice.themes.includes(id) ? choice.themes.filter(x => x !== id) : [...choice.themes, id] }); }
+  function toggle(id: string) {
+    const removing = choice.themes.includes(id);
+    update({
+      ...choice,
+      themes: removing
+        ? choice.themes.filter((x) => x !== id)
+        : [...choice.themes, id],
+    });
+    if (removing) sayPet("remove-item");
+    else sayPet("add-skill-chip");
+  }
   if (!data) return <div className="px-page"><p role={error ? "alert" : "status"}>{error || "Loading possibilities…"}</p></div>;
   const coverage = Math.round(data.currentRoleThemeIds.filter(id => data.currentThemeIds.includes(id)).length / Math.max(1, data.currentRoleThemeIds.length) * 100);
   const groups: { id: SkillGroup; label: string }[] = [{ id: "have", label: "Already have" }, { id: "learning", label: "Currently learning" }, { id: "planned", label: "Added to plan" }, { id: "missing", label: "Add to plan — tap to queue" }];
@@ -96,6 +108,10 @@ export default function Possibilities() {
       </> : <div className="px-no-direction"><p className="px-eyebrow">03 · YOUR NEXT STEP</p><h2 id="journey-heading">Which direction would you like to explore?</h2><p>Choose a card above to see the strengths you can bring and the skills you could develop.</p></div>}
     </section>
     {choice.themes.length > 0 && <div className="px-planbar" ref={planbarRef} aria-label="Learning shortlist"><div><small>YOUR LEARNING LIST · THIS VISIT</small><div>{choice.themes.map(id => <button key={id} onClick={() => toggle(id)} aria-label={`Remove ${name(id)}`}>{name(id)}<X size={13} /></button>)}</div></div><Link to="/learning-centre">Browse learning resources <ArrowRight size={16} /></Link><p>Select courses in Learning Resources to add them to My Plan.</p></div>}
-    <BotPet avoidRef={planbarRef} avoidActive={choice.themes.length > 0} />
+    <BotPet
+      avoidRef={planbarRef}
+      avoidActive={choice.themes.length > 0}
+      speech={petSpeech}
+    />
   </div>;
 }
