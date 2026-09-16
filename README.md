@@ -8,22 +8,28 @@ AI-Wrevolusi monorepo for FIT5120, including:
 - `db/`: reference-table schema, seed, and verification scripts
 - `docs/`: ERD and data-management documentation
 
-## Start Backend
+## Python dependency management
 
-Python 3.11 or newer is required.
+The backend and repository Python tools use [uv](https://docs.astral.sh/uv/).
+`backend/pyproject.toml` is the canonical dependency definition and
+`backend/uv.lock` records the exact resolved versions. The checked-in
+requirements files are compatibility exports generated from that lock; do not
+edit them directly.
+
+Python 3.12 is required and is selected by `backend/.python-version`.
+
+## Start Backend
 
 ```bash
 cd backend
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+uv sync
 ```
 
 Copy `backend/.env.example` to `backend/.env`, set a valid Neon development
 `DATABASE_URL`, and replace `JWT_SECRET_KEY`. Never commit either secret. Then run:
 
 ```bash
-uvicorn app.main:app --reload
+uv run uvicorn app.main:app --reload
 ```
 
 Backend will run at:
@@ -71,8 +77,10 @@ backend under `/api/v1/reference`:
 
 To initialize or refresh those tables against the development database:
 
+From the repository root:
+
 ```bash
-python3 db/seed_reference.py --init
+uv run --project backend --group database python db/seed_reference.py --init
 ```
 
 See `docs/iteration1_data_management.md` before promoting reference data.

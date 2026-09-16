@@ -7,9 +7,9 @@ Simulates:
   unit confirm -> ILO starter tasks + 2025 scores
 
 Run:
-  python3 db/test_user_queries.py
-  python3 db/test_user_queries.py --keyword supervisor
-  python3 db/test_user_queries.py --code 5222
+  uv run --project backend --group database python db/test_user_queries.py
+  uv run --project backend --group database python db/test_user_queries.py --keyword supervisor
+  uv run --project backend --group database python db/test_user_queries.py --code 5222
 """
 
 from __future__ import annotations

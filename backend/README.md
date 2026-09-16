@@ -15,16 +15,14 @@ FastAPI backend scaffold for AI-Wrevolusi with PostgreSQL/Neon, SQLAlchemy 2.0, 
 
 ```bash
 cd backend
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+uv sync
 cp .env.example .env  # if .env does not exist yet
 ```
 
 Set a real `DATABASE_URL` in `.env`, then start:
 
 ```bash
-uvicorn app.main:app --reload
+uv run uvicorn app.main:app --reload
 ```
 
 Backend URL:
@@ -36,11 +34,35 @@ Backend URL:
 
 ```bash
 cd backend
-alembic revision --autogenerate -m "init"
-alembic upgrade head
+uv run alembic revision --autogenerate -m "init"
+uv run alembic upgrade head
 ```
 
 Alembic reads `DATABASE_URL` from `.env`.
+
+## Dependency groups
+
+`pyproject.toml` is the canonical Python dependency definition and `uv.lock`
+pins the resolved versions. The default `dev` group provides Uvicorn, Alembic
+and pytest. Repository-level tools are opt-in so their heavier packages are not
+part of the deployed backend runtime:
+
+```bash
+# PostgreSQL / Neon seed and verification scripts
+uv run --project backend --group database python db/test_import.py --strict
+
+# Raw and reference-data processing
+uv run --project backend --group data python data/raw/clean_row_tables.py
+```
+
+The requirements files are generated compatibility exports. Regenerate them
+from the repository root after changing dependencies:
+
+```bash
+uv export --project backend --locked --no-dev --no-emit-project --no-hashes --output-file backend/requirements.txt
+uv export --project backend --locked --only-group database --no-hashes --output-file db/requirements.txt
+uv export --project backend --locked --only-group data --no-hashes --output-file data/raw/requirements.txt
+```
 
 ## API routing
 

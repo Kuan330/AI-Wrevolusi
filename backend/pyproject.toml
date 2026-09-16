@@ -1,7 +1,7 @@
 [project]
 name = "ai-wrevolusi-backend"
 version = "0.1.0"
-requires-python = ">=3.11"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "asyncpg",
     "email-validator",
@@ -13,6 +13,22 @@ dependencies = [
     "python-jose[cryptography]",
     "python-multipart",
     "sqlalchemy[asyncio]",
+]
+
+[dependency-groups]
+dev = [
+    "alembic",
+    "pytest",
+    "uvicorn",
+]
+database = [
+    "pandas>=2.0",
+    "psycopg[binary]>=3.1",
+]
+data = [
+    "openpyxl>=3.1",
+    "pandas>=2.0",
+    "pymupdf>=1.24",
 ]
 
 [build-system]

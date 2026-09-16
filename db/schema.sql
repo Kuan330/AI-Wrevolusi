@@ -1,5 +1,5 @@
 -- Iteration 1 schema for Neon / Postgres.
--- Apply: python3 db/seed_reference.py --init
+-- Apply: uv run --project backend --group database python db/seed_reference.py --init
 -- Reference tables are seeded from data/reference/*.csv.
 -- Business tables stay empty until the app writes them.
 

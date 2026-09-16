@@ -7,7 +7,7 @@ The username flow uses the existing Argon2 password hashing, signed tokens and H
 From `backend`, run:
 
 ```sh
-.venv/bin/python -m scripts.setup_accounts
+uv run python -m scripts.setup_accounts
 ```
 
 This creates missing account dependencies (`occupations`, `app_users`, `refresh_tokens`, `app_accounts`) without altering or deleting existing tables. It has been run for the current configured development database. Restart the backend when not using reload mode. Keep the existing frontend `/api` proxy to the backend.
@@ -33,7 +33,7 @@ The workspace stores work profile/analysis, selected learning themes, resource s
 
 - `npm run build` and `npm run lint` in frontend (existing unrelated lint and bundle-size warnings remain).
 - `node --test frontend/tests/*.test.mjs`: 14 tests including account separation and rejected sync preservation.
-- `python -m pytest tests/test_accounts.py tests/test_auth.py -q` in backend.
+- `uv run pytest tests/test_accounts.py tests/test_auth.py -q` in backend.
 - Real database checks: registration, duplicate username, password failure, case-insensitive login, cookies/logout, workspace persistence, revision conflicts and account isolation.
 - Browser checks at desktop and mobile widths: registration/import, conditional navigation, intro states, adding resources, scheduling an activity, save/reload, logout/login and saved direction.
 

@@ -147,7 +147,7 @@ Always point `.env` `DATABASE_URL` at the Neon **dev** branch while iterating. D
 2. Rebuild raw:
 
 ```bash
-python3 data/raw/clean_row_tables.py
+uv run --project backend --group data python data/raw/clean_row_tables.py
 ```
 
 Optional paths: `--ilo-source`, `--wef-source`. MASCO pilot extraction is encoded in that script (units `5221`–`5223`).
@@ -155,16 +155,18 @@ Optional paths: `--ilo-source`, `--wef-source`. MASCO pilot extraction is encode
 3. Rebuild reference CSVs (default = match then insert):
 
 ```bash
-python3 data/reference/import_from_raw.py
+uv run --project backend --group data python data/reference/import_from_raw.py
 ```
 
 4. Upsert lookup tables into Neon **dev**:
 
 ```bash
-python3 db/seed_reference.py
+uv run --project backend --group database python db/seed_reference.py
 ```
 
-First time on an empty database: `python3 db/seed_reference.py --init` (applies `db/schema.sql` then seeds).
+First time on an empty database:
+`uv run --project backend --group database python db/seed_reference.py --init`
+(applies `db/schema.sql` then seeds).
 
 5. Verify on **dev** (SQL Editor: branch `dev`, database `neondb`, schema `public`):
 
@@ -173,7 +175,7 @@ Paste `db/test_import.neon.sql`. Every row must have `ok = true`.
 6. Promote: put the **production** URI in `.env`, then:
 
 ```bash
-python3 db/seed_reference.py --init
+uv run --project backend --group database python db/seed_reference.py --init
 ```
 
 (`--init` is safe if tables already exist: `CREATE TABLE IF NOT EXISTS`. Lookup rows upsert. Business tables are not truncated.)
@@ -201,8 +203,8 @@ Neither script writes business tables.
 ### 7.4 Full rebuild (`--replace`)
 
 ```bash
-python3 data/reference/import_from_raw.py --replace
-python3 db/seed_reference.py --replace
+uv run --project backend --group data python data/reference/import_from_raw.py --replace
+uv run --project backend --group database python db/seed_reference.py --replace
 ```
 
 Rebuilds **lookup** tables from CSV. Use when a key was renamed and leftover rows would be wrong. Does **not** `TRUNCATE` users, profiles, or tasks.
@@ -251,11 +253,13 @@ After a clean seed, lookup tables should contain:
 
 | Step | Command |
 |---|---|
-| Raw from sources | `python3 data/raw/clean_row_tables.py` |
-| Raw → reference CSV | `python3 data/reference/import_from_raw.py` |
-| Create tables + seed Neon | `python3 db/seed_reference.py --init` |
-| Seed lookup only | `python3 db/seed_reference.py` |
-| Rebuild lookup from CSV | `python3 db/seed_reference.py --replace` |
+| Raw from sources | `uv run --project backend --group data python data/raw/clean_row_tables.py` |
+| Raw → reference CSV | `uv run --project backend --group data python data/reference/import_from_raw.py` |
+| Create tables + seed Neon | `uv run --project backend --group database python db/seed_reference.py --init` |
+| Seed lookup only | `uv run --project backend --group database python db/seed_reference.py` |
+| Rebuild lookup from CSV | `uv run --project backend --group database python db/seed_reference.py --replace` |
 | Check Neon (SQL Editor, **dev**) | `db/test_import.neon.sql` |
 
-Dependencies: `data/raw/requirements.txt` (pandas, openpyxl); `db/requirements.txt` (pandas, psycopg).
+Dependencies are declared in the `data` and `database` groups in
+`backend/pyproject.toml`. The requirements files are generated compatibility
+exports from `backend/uv.lock`.

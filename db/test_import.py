@@ -5,8 +5,8 @@ Compares row keys and field values. Extra DB rows (upsert keep) are reported
 as warnings unless --strict. Business tables must stay empty.
 
 Run:
-  python3 db/test_import.py
-  python3 db/test_import.py --strict
+  uv run --project backend --group database python db/test_import.py
+  uv run --project backend --group database python db/test_import.py --strict
 """
 
 from __future__ import annotations

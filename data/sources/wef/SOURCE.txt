@@ -27,6 +27,6 @@ Compiled table (hand-typed from the three figures)
   WEF_Future_of_Jobs_2025_skill_master_table.csv
 
 Cleaning
-  Run: python data/raw/clean_row_tables.py
+  Run: uv run --project backend --group data python data/raw/clean_row_tables.py
   Output: data/raw/wef_skill_master_raw.csv
   Rules are recorded in that script (WEF section of the module docstring).

@@ -1,9 +1,10 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Annotated
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
@@ -39,7 +40,10 @@ class Settings(BaseSettings):
     cookie_secure: bool = False
     cookie_samesite: str = 'lax'
 
-    cors_origins: list[str] = ['http://localhost:5173', 'http://127.0.0.1:5173']
+    cors_origins: Annotated[list[str], NoDecode] = [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+    ]
 
     skill_llm_base_url: str = 'https://openrouter.ai/api/v1'
     skill_llm_api_key: str | None = None

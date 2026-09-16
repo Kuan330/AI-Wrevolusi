@@ -1,11 +1,11 @@
 Reference (lookup) tables for the product.
 
 Refresh after raw CSV changes (match then insert):
-  python3 data/reference/import_from_raw.py
+  uv run --project backend --group data python data/reference/import_from_raw.py
 
 Same key: update fields from raw. New key in raw: insert.
 Key only in ref: keep (not deleted). Full rebuild:
-  python3 data/reference/import_from_raw.py --replace
+  uv run --project backend --group data python data/reference/import_from_raw.py --replace
 
 Match keys: occupations occupation_code; ILO (isco_08, task_id);
 WEF core_skill (existing wef_skill_id kept; new skills get max+1).
@@ -29,6 +29,6 @@ ILO tasks attach only to level=unit rows.
 Does not update data/business/ user tables.
 
 After reference CSV refresh, load lookup tables into Neon / Postgres:
-  python3 db/seed_reference.py --init    # first time (creates tables)
-  python3 db/seed_reference.py           # later updates
+  uv run --project backend --group database python db/seed_reference.py --init    # first time (creates tables)
+  uv run --project backend --group database python db/seed_reference.py           # later updates
 See db/README.txt.

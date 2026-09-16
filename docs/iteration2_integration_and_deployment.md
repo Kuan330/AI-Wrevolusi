@@ -41,7 +41,7 @@ Notes:
 ```bash
 # Terminal 1 — backend
 cd backend
-.venv/Scripts/python.exe -m uvicorn app.main:app --reload
+uv run uvicorn app.main:app --reload
 
 # Terminal 2 — frontend
 cd frontend
@@ -108,7 +108,7 @@ curl -s -X POST http://127.0.0.1:8000/api/v1/ai/skill-match \
 ### 3.3 Test suites and build
 
 ```bash
-cd backend && .venv/Scripts/python.exe -m pytest -q      # expect: 101 passed
+cd backend && uv run pytest -q                            # expect: 101 passed
 # tests/conftest.py pins the provider chain off, so the suite never calls out
 # even when the local .env configures a provider.
 cd frontend && npm run build                              # expect: build success

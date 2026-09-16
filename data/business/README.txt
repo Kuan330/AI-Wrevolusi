@@ -4,8 +4,8 @@ Live rows are written by the app into Postgres / Neon, not into these CSVs.
 These files are header-only schema sketches; db/schema.sql is the database contract.
 
 Lookup data is not here. Import from raw into data/reference/, then seed Neon:
-  python3 data/reference/import_from_raw.py
-  python3 db/seed_reference.py
+  uv run --project backend --group data python data/reference/import_from_raw.py
+  uv run --project backend --group database python db/seed_reference.py
 
 Route
   ref_occupations.occupation_code (level=unit)

@@ -1,5 +1,5 @@
 """Create the additive account tables; never alter or delete existing tables.
-Run from backend: python -m scripts.setup_accounts
+Run from backend: uv run python -m scripts.setup_accounts
 """
 import asyncio
 from app.db.session import engine

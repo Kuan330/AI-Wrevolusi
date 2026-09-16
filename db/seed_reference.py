@@ -5,9 +5,11 @@ Import mode: match then insert (upsert).
   - Same key in CSV and DB: update fields from CSV
   - Key only in CSV: insert
   - Key only in DB: keep (do not delete)
-Full rebuild of lookup tables: python db/seed_reference.py --replace
+Full rebuild of lookup tables:
+uv run --project backend --group database python db/seed_reference.py --replace
 
-Create tables first: python db/seed_reference.py --init
+Create tables first:
+uv run --project backend --group database python db/seed_reference.py --init
 
 Does not write users, work_profiles, or other business tables.
 """

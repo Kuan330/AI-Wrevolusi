@@ -127,11 +127,11 @@ propagate provider errors.
 
 ## 7. Test coverage
 
-Run with the backend virtual environment:
+Run with UV's locked backend environment:
 
 ```bash
 cd backend
-.venv/Scripts/python.exe -m pytest -q
+uv run pytest -q
 ```
 
 Current result: **88 passed** (0 failed), including:
