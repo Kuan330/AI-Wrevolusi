@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import SkillFrameworkInfo from "@/pages/Skills/components/SkillFrameworkInfo";
-import type { SkillEvidence } from "@/pages/Skills/lib/skillProfile";
+import type { SkillEvidence } from "@/features/skills/skillProfile";
 import type { WefSkill } from "@/types/reference";
 
 type SkillMapOverviewProps = {

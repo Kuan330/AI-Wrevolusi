@@ -1,10 +1,12 @@
-import { accountStorage } from "@/services/accountStorage";
-import { api } from "./api";
+import { accountStorage } from "@/infrastructure/storage/accountStorage";
+import { browserStorage } from "@/infrastructure/storage/browserStorage";
+import { STORAGE_KEYS } from "@/infrastructure/storage/keys";
+import { api } from "@/services/api";
 import {
   demoPlan,
   validateEvent,
   type PlanState,
-} from "@/pages/Plan/planModel";
+} from "@/features/planning/planModel";
 export interface PlanRepository {
   load(): Promise<PlanState>;
   save(state: PlanState, expectedRevision: number): Promise<PlanState>;
@@ -54,9 +56,9 @@ export const remotePlanRepository: PlanRepository = {
     ),
 };
 export function localPlanRepository(demo = false): PlanRepository {
-  const storage = demo ? localStorage : accountStorage;
-  const key = demo ? "aiwrevolusi.planner.demo.v1" : "aiwrevolusi.planner.v1";
-  const context = accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "";
+  const storage = demo ? browserStorage : accountStorage;
+  const key = demo ? STORAGE_KEYS.demoPlanner : STORAGE_KEYS.planner;
+  const context = accountStorage.getItem(STORAGE_KEYS.confirmedAnalysis) ?? "";
   const read = () => {
     const raw = storage.getItem(key);
     if (!raw)

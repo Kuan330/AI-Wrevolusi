@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { dateKey, mins, overlaps, type PlanEvent } from './planModel';
+import { dateKey, mins, overlaps, type PlanEvent } from "@/features/planning/planModel";
 export default function WeekCalendar({ days, events, selectedId, onSelect, onAdd }: { days: string[]; events: PlanEvent[]; selectedId: string; onSelect: (id: string) => void; onAdd: (date: string, time: string) => void }) {
   const hourHeight = 42;
   const firstHour = 0;

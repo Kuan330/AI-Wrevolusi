@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 
 import Navbar from "@/components/layout/Navbar";
-import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
+import { PAGE_GRADIENT_CSS } from "@/features/exposure/palette";
 
 const MainLayout = () => {
   return (

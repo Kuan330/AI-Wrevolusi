@@ -5,7 +5,7 @@ import { useId } from "react";
 
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
-import { EXPOSURE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
+import { EXPOSURE_GRADIENT_CSS } from "@/features/exposure/palette";
 
 type ScoreRangeSliderProps = {
   value: readonly [number, number];

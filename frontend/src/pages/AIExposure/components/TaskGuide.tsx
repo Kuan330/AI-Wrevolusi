@@ -11,14 +11,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import AnalysisCard from "@/pages/Analysis/components/AnalysisCard";
-import TaskDetailsDrawer from "@/pages/Analysis/components/TaskDetailsDrawer";
+import AnalysisCard from "@/features/exposure/components/AnalysisCard";
+import TaskDetailsDrawer from "@/features/exposure/components/TaskDetailsDrawer";
 import type {
   ProfileTask,
   TaskPractice as Practice,
-} from "@/pages/WorkProfile/types";
+} from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
-import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
+import { PAGE_GRADIENT_CSS } from "@/features/exposure/palette";
 import { taskGuidance } from "../lib/taskGuidance";
 import { formatMinutes, qualityLabels } from "../lib/taskPractice";
 import TaskPractice from "./TaskPractice";

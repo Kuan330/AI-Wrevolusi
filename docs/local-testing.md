@@ -7,7 +7,7 @@ AI-Wrevolusi frontend, backend, and data tools.
 
 - UV
 - Python 3.12; UV selects it from `backend/.python-version`
-- Node.js and npm
+- Node.js 24 and npm; `frontend/.nvmrc` records the required Node major
 - A Neon development connection string for database-backed checks
 
 Use a development database locally. Do not point local table creation, seed,
@@ -43,7 +43,7 @@ Install the frontend packages in another terminal:
 
 ```bash
 cd frontend
-npm install
+npm ci
 ```
 
 ## Start the application
@@ -129,9 +129,7 @@ Run the frontend checks:
 
 ```bash
 cd frontend
-npm run lint
-npm run build
-node --test tests/*.test.mjs
+npm run check
 ```
 
 Report warnings separately. Do not describe a check as passing if its command

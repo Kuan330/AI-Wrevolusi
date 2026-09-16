@@ -2,4 +2,4 @@ export {
   readSelectedOccupation,
   saveSelectedOccupation,
   type SelectedOccupation,
-} from "@/pages/WorkProfile/userProfile";
+} from "@/features/work-profile/userProfile";

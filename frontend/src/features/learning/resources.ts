@@ -1,6 +1,7 @@
 import { courses } from "./catalogue";
-import { accountStorage } from "@/services/accountStorage";
-import type { LearningCentreItem } from "@/pages/Skills/skillDirections";
+import { accountStorage } from "@/infrastructure/storage/accountStorage";
+import { STORAGE_KEYS } from "@/infrastructure/storage/keys";
+import type { LearningCentreItem } from "@/features/skills/skillDirections";
 
 export type Resource = {
   id: string;
@@ -127,10 +128,11 @@ export type Selection = {
   startDate?: string;
   scheduleMode?: "later" | "routine";
 };
-const KEY = "aiwrevolusi.learningResourceSelections.v1";
 export function readSelections(): Selection[] {
   try {
-    const value: unknown = JSON.parse(accountStorage.getItem(KEY) || "[]");
+    const value: unknown = JSON.parse(
+      accountStorage.getItem(STORAGE_KEYS.learningResourceSelections) || "[]",
+    );
     if (!Array.isArray(value)) return [];
     return value
       .filter(
@@ -153,5 +155,8 @@ export function readSelections(): Selection[] {
   }
 }
 export function saveSelections(items: Selection[]) {
-  accountStorage.setItem(KEY, JSON.stringify(items));
+  accountStorage.setItem(
+    STORAGE_KEYS.learningResourceSelections,
+    JSON.stringify(items),
+  );
 }

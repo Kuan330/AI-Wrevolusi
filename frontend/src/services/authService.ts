@@ -1,4 +1,6 @@
 import { ApiError, api } from "@/services/api";
+import { browserStorage } from "@/infrastructure/storage/browserStorage";
+import { STORAGE_KEYS } from "@/infrastructure/storage/keys";
 import type { AuthUser, LoginPayload, RegisterPayload } from "@/types/auth";
 
 interface TokenResponse {
@@ -13,15 +15,13 @@ interface DemoCredential {
   full_name: string;
 }
 
-const DEMO_CREDENTIAL_KEY = "aiwrevolusi.demo.credential";
-
 const getDemoCredential = (): DemoCredential => {
-  const rawValue = window.localStorage.getItem(DEMO_CREDENTIAL_KEY);
+  const rawValue = browserStorage.getItem(STORAGE_KEYS.demoCredential);
   if (rawValue) {
     try {
       return JSON.parse(rawValue) as DemoCredential;
     } catch {
-      window.localStorage.removeItem(DEMO_CREDENTIAL_KEY);
+      browserStorage.removeItem(STORAGE_KEYS.demoCredential);
     }
   }
 
@@ -30,7 +30,10 @@ const getDemoCredential = (): DemoCredential => {
     password: "DemoPass123!",
     full_name: "Christine Demo",
   };
-  window.localStorage.setItem(DEMO_CREDENTIAL_KEY, JSON.stringify(credential));
+  browserStorage.setItem(
+    STORAGE_KEYS.demoCredential,
+    JSON.stringify(credential),
+  );
   return credential;
 };
 

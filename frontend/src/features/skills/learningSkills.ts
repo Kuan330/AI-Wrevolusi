@@ -1,4 +1,5 @@
-import { accountStorage } from "@/services/accountStorage";
+import { accountStorage } from "@/infrastructure/storage/accountStorage";
+import { STORAGE_KEYS } from "@/infrastructure/storage/keys";
 export type LearningSkill = {
   id: string;
   name: string;
@@ -21,12 +22,11 @@ export const growingSkills: LearningSkill[] = [
   "Analytical thinking",
   "Environmental stewardship",
 ].map((name) => ({ id: skillKey(name), name, source: "wef" }));
-const KEY = "aiwrevolusi.learningSkills.v1";
 export function readLearningSkills(): LearningSkill[] | null {
-  const raw = accountStorage.getItem(KEY);
+  const raw = accountStorage.getItem(STORAGE_KEYS.learningSkills);
   if (!raw) return null;
   const stored = JSON.parse(raw);
-  const context = accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "";
+  const context = accountStorage.getItem(STORAGE_KEYS.confirmedAnalysis) ?? "";
   if (
     !Array.isArray(stored) &&
     stored?.version === 2 &&
@@ -51,23 +51,25 @@ export function readLearningSkills(): LearningSkill[] | null {
 }
 export function saveLearningSkills(skills: LearningSkill[]) {
   const nextContext =
-    accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "";
+    accountStorage.getItem(STORAGE_KEYS.confirmedAnalysis) ?? "";
   let previousContext = nextContext;
   try {
-    const previous = JSON.parse(accountStorage.getItem(KEY) ?? "null");
+    const previous = JSON.parse(
+      accountStorage.getItem(STORAGE_KEYS.learningSkills) ?? "null",
+    );
     previousContext =
       typeof previous?.context === "string" ? previous.context : nextContext;
   } catch {
     previousContext = nextContext;
   }
   accountStorage.setItem(
-    KEY,
+    STORAGE_KEYS.learningSkills,
     JSON.stringify({ version: 2, context: nextContext, skills }),
   );
   if (previousContext !== nextContext) {
-    accountStorage.removeItem("aiwrevolusi.courseLibrary.v1");
-    accountStorage.removeItem("aiwrevolusi.planner.v1");
-    accountStorage.removeItem("aiwrevolusi.learningResourceSelections.v1");
+    accountStorage.removeItem(STORAGE_KEYS.courseLibrary);
+    accountStorage.removeItem(STORAGE_KEYS.planner);
+    accountStorage.removeItem(STORAGE_KEYS.learningResourceSelections);
   }
 }
 // Editorial course associations based on catalogue topics; these are not WEF recommendations.

@@ -12,7 +12,7 @@ import { GradientBar } from "@/components/ui/gradient-bar";
 import {
   ILO_OCCUPATION_EXPOSURE_OPEN_DATA,
   ILO_OCCUPATION_EXPOSURE_SOURCE,
-} from "@/pages/Analysis/lib/dataSources";
+} from "@/features/exposure/dataSources";
 type OccupationScoreCardProps = {
   score: number | null;
   onOpenDetails: () => void;

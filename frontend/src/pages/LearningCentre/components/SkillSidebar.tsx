@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { coursesForSkill } from "@/pages/Skills/learningSkills";
+import { coursesForSkill } from "@/features/skills/learningSkills";
 export type SkillSidebarProps = {
   activeId: string;
   skills: { id: string; en: string; hint: string }[];

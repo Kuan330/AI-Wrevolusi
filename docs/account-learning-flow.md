@@ -31,7 +31,7 @@ The workspace stores work profile/analysis, selected learning themes, resource s
 
 ## Verification
 
-- `npm run build` and `npm run lint` in frontend (existing unrelated lint and bundle-size warnings remain).
+- `npm run check` in frontend (architecture boundaries, lint, tests, and build).
 - `node --test frontend/tests/*.test.mjs`: 14 tests including account separation and rejected sync preservation.
 - `uv run pytest tests/test_accounts.py tests/test_auth.py -q` in backend.
 - Real database checks: registration, duplicate username, password failure, case-insensitive login, cookies/logout, workspace persistence, revision conflicts and account isolation.

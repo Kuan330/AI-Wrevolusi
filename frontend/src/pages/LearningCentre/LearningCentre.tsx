@@ -11,14 +11,14 @@ import CourseCard from "./components/CourseCard";
 import CourseDetailDrawer from "./components/CourseDetailDrawer";
 import FloatingSavedCourses from "./components/FloatingSavedCourses";
 import SavedCoursesDrawer from "./components/SavedCoursesDrawer";
-import { courses } from "./catalogue";
+import { courses } from "@/features/learning/catalogue";
 import { useCourseLibrary } from "./hooks/useCourseLibrary";
 import {
   readLearningSkills,
   coursesForSkill,
-} from "@/pages/Skills/learningSkills";
-import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
-import type { CourseChoice, RecommendationBasis as Basis } from "./types";
+} from "@/features/skills/learningSkills";
+import { readConfirmedAnalysis } from "@/features/work-profile/userProfile";
+import type { CourseChoice, RecommendationBasis as Basis } from "@/features/learning/types";
 import "./course-library.css";
 export default function LearningCentre() {
   const library = useCourseLibrary();

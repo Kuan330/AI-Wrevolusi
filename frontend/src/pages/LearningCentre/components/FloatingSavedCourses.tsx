@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { browserStorage } from "@/infrastructure/storage/browserStorage";
+import { STORAGE_KEYS } from "@/infrastructure/storage/keys";
 
 type Position = { x: number; y: number };
 type Props = { count: number; onOpen: () => void };
-const KEY = "aiwrevolusi.savedCoursesPosition.v1";
 const SIZE = 56;
 const GAP = 16;
 function clamp(position: Position): Position {
@@ -15,7 +16,9 @@ function clamp(position: Position): Position {
 }
 function initialPosition(): Position {
   try {
-    const saved = JSON.parse(localStorage.getItem(KEY) ?? "null");
+    const saved = JSON.parse(
+      browserStorage.getItem(STORAGE_KEYS.savedCoursesPosition) ?? "null",
+    );
     if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y))
       return clamp(saved);
   } catch {
@@ -28,7 +31,10 @@ function initialPosition(): Position {
 }
 function persist(position: Position) {
   try {
-    localStorage.setItem(KEY, JSON.stringify(position));
+    browserStorage.setItem(
+      STORAGE_KEYS.savedCoursesPosition,
+      JSON.stringify(position),
+    );
   } catch {
     /* Keep dragging available when storage is disabled. */
   }

@@ -53,9 +53,8 @@ uv run --project backend --locked --all-groups \
   pytest -q backend/tests data/raw/test_masco_pdf.py
 
 cd frontend
-npm run lint
-npm run build
-node --test tests/*.test.mjs
+npm ci
+npm run check
 ```
 
 Also confirm:

@@ -16,14 +16,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { createTaskId } from "@/pages/WorkProfile/taskOptions";
+import { createTaskId } from "@/features/work-profile/taskOptions";
 import type {
   ProfileTask,
   TaskBaseline,
   TaskPractice,
   TaskTrial,
   TrialQuality,
-} from "@/pages/WorkProfile/types";
+} from "@/features/work-profile/types";
 import { matchingBaseline, parseMinutes } from "../lib/taskPractice";
 
 type Props = {

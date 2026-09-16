@@ -1,4 +1,4 @@
-import { IloOccupationExposure } from "@/pages/Analysis/lib/iloExposure";
+import { IloOccupationExposure } from "@/features/exposure/iloExposure";
 
 /** Shared design colors. Const maps stand in for enums (`erasableSyntaxOnly`). */
 

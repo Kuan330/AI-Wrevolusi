@@ -8,7 +8,7 @@ import {
   DrawerBody,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { courses } from "../catalogue";
+import { courses } from "@/features/learning/catalogue";
 export type SavedCoursesDrawerProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;

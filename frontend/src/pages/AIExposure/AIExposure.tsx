@@ -4,11 +4,11 @@ import { Link, Navigate } from "react-router-dom";
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
-import type { TaskScoreRange } from "@/pages/Analysis/lib/taskScore";
+import type { TaskScoreRange } from "@/features/exposure/taskScore";
 import {
   readConfirmedAnalysis,
   saveTaskPractice,
-} from "@/pages/WorkProfile/userProfile";
+} from "@/features/work-profile/userProfile";
 import ExposureScoreOverview from "./components/ExposureScoreOverview";
 import ExposureTaskList from "./components/ExposureTaskList";
 import TaskGuide from "./components/TaskGuide";

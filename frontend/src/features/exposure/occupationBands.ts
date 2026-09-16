@@ -1,11 +1,11 @@
-import { ILO_OCCUPATION_EXPOSURES } from "@/pages/Analysis/lib/iloExposure";
+import { ILO_OCCUPATION_EXPOSURES } from "@/features/exposure/iloExposure";
 import {
   OccupationBandColor,
   OccupationBandId,
   OccupationBandInk,
   OCCUPATION_BAND_COLOR,
   OCCUPATION_BAND_INK,
-} from "@/pages/Analysis/lib/palette";
+} from "@/features/exposure/palette";
 
 export { OccupationBandId, OccupationBandColor, OccupationBandInk, OCCUPATION_BAND_COLOR, OCCUPATION_BAND_INK };
 

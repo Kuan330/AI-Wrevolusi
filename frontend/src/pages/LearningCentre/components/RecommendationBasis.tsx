@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { api } from "@/services/api";
-import type { RecommendationBasis as Basis } from "../types";
+import type { RecommendationBasis as Basis } from "@/features/learning/types";
 export type RecommendationBasisProps = {
   skillName: string;
   value: Basis;

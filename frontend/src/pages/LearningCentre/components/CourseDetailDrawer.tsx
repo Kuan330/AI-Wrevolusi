@@ -12,8 +12,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { AppButton } from "@/components/ui/app-button";
 import { Link } from "react-router-dom";
-import type { Course, CourseChoice, RecommendationBasis } from "../types";
-import { durationLabel } from "../lib/coursePlanning";
+import type { Course, CourseChoice, RecommendationBasis } from "@/features/learning/types";
+import { durationLabel } from "@/features/learning/lib/coursePlanning";
 import ContextStudyAdvice from "./ContextStudyAdvice";
 import LearningPlanSteps from "./LearningPlanSteps";
 export type CourseDetailDrawerProps = {

@@ -1,4 +1,5 @@
-import { accountStorage } from "@/services/accountStorage";
+import { accountStorage } from "@/infrastructure/storage/accountStorage";
+import { STORAGE_KEYS } from "@/infrastructure/storage/keys";
 
 export const SKILL_DIRECTIONS = [
   "keep_building",
@@ -24,12 +25,10 @@ export type LearningCentreItem = LearningTheme & {
   added_at: string;
 };
 
-const LEARNING_CENTRE_KEY = "aiwrevolusi.learningCentre";
-
 export const readLearningCentreItems = (): LearningCentreItem[] => {
   try {
     const parsed = JSON.parse(
-      accountStorage.getItem(LEARNING_CENTRE_KEY) ?? "[]",
+      accountStorage.getItem(STORAGE_KEYS.learningCentre) ?? "[]",
     ) as unknown;
     return Array.isArray(parsed) ? (parsed as LearningCentreItem[]) : [];
   } catch {

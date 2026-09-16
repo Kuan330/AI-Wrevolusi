@@ -1,4 +1,5 @@
-import { accountStorage } from "@/services/accountStorage";
+import { accountStorage } from "@/infrastructure/storage/accountStorage";
+import { STORAGE_KEYS } from "@/infrastructure/storage/keys";
 export const skills = [
     { id: 'organisation', name: 'Organisation', learning: false, description: 'Bring people, tasks and timelines together so work can move forward.', evidence: ['Coordinate meeting times and agendas', 'Follow up on actions across a team'], contexts: ['Keeping project activities on track', 'Organising training sessions'], icon: 'calendar' },
     { id: 'communication', name: 'Communication', learning: false, description: 'Make information clear and adapt your message to the people receiving it.', evidence: ['Share updates with colleagues', 'Respond to everyday customer enquiries'], contexts: ['Explaining next steps to a customer', 'Keeping stakeholders informed'], icon: 'message' },
@@ -27,7 +28,7 @@ export const careers: Career[] = [
 ];
 export const skillById = (id: string) => skills.find(s => s.id === id)!;
 export function readSaved(): string[] { try {
-    const data: unknown = JSON.parse(accountStorage.getItem('aiwrevolusi.possibilities.saved') || '[]');
+    const data: unknown = JSON.parse(accountStorage.getItem(STORAGE_KEYS.possibilitiesSaved) || '[]');
     return Array.isArray(data) ? [...new Set(data.filter((id): id is string => typeof id === 'string' && careers.some(c => c.id === id)))] : [];
 }
 catch {

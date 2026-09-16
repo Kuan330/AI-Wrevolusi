@@ -1,17 +1,14 @@
-import { api } from "./api.ts";
+import { api } from "../../services/api.ts";
+import { browserStorage } from "./browserStorage.ts";
+import {
+  STORAGE_KEYS,
+  WORKSPACE_KEYS,
+  accountCacheKey,
+  isAccountCacheKey,
+} from "./keys.ts";
 
 type Workspace = { data: Record<string, string>; revision: number };
-export const workspaceKeys = [
-  "aiwrevolusi.userProfile",
-  "aiwrevolusi.confirmedAnalysis",
-  "aiwrevolusi.learningCentre",
-  "aiwrevolusi.learningResourceSelections.v1",
-  "aiwrevolusi.courseLibrary.v1",
-  "aiwrevolusi.learningSkills.v1",
-  "aiwrevolusi.planner.v1",
-  "aiwrevolusi.possibilities.saved",
-  "aiwrevolusi.possibilities.intent",
-];
+export const workspaceKeys: readonly string[] = WORKSPACE_KEYS;
 let userId: string | null = null;
 let workspace: Workspace = { data: {}, revision: 0 };
 let saving: Promise<void> | null = null;
@@ -24,8 +21,8 @@ const notify = () => {
 };
 const cache = () => {
   if (userId)
-    localStorage.setItem(
-      `aiwrevolusi.account.${userId}`,
+    browserStorage.setItem(
+      accountCacheKey(userId),
       JSON.stringify({ ...workspace, dirty }),
     );
 };
@@ -36,7 +33,7 @@ export function activateWorkspace(id: string | null, next?: Workspace) {
   dirty = false;
   syncError = "";
   if (id) {
-    const raw = localStorage.getItem(`aiwrevolusi.account.${id}`);
+    const raw = browserStorage.getItem(accountCacheKey(id));
     if (raw) {
       try {
         const pending = JSON.parse(raw);
@@ -55,10 +52,14 @@ export function activateWorkspace(id: string | null, next?: Workspace) {
 }
 /** Clear browser work after a successful logout; saved account work stays on the server. */
 export function clearWorkspaceOnLogout() {
-  for (const key of Object.keys(localStorage)) {
-    if (workspaceKeys.includes(key) || key.startsWith("aiwrevolusi.account.") ||
-        key === "aiwrevolusi.selectedOccupation" || key === "aiwrevolusi.demo.credential") {
-      localStorage.removeItem(key);
+  for (const key of browserStorage.keys()) {
+    if (
+      workspaceKeys.includes(key) ||
+      isAccountCacheKey(key) ||
+      key === STORAGE_KEYS.selectedOccupation ||
+      key === STORAGE_KEYS.demoCredential
+    ) {
+      browserStorage.removeItem(key);
     }
   }
   activateWorkspace(null);
@@ -100,11 +101,11 @@ export async function flushWorkspace(): Promise<void> {
 }
 export const accountStorage = {
   getItem(key: string): string | null {
-    return userId ? (workspace.data[key] ?? null) : localStorage.getItem(key);
+    return userId ? (workspace.data[key] ?? null) : browserStorage.getItem(key);
   },
   setItem(key: string, value: string) {
     if (!userId) {
-      localStorage.setItem(key, value);
+      browserStorage.setItem(key, value);
       notify();
       return;
     }
@@ -120,7 +121,7 @@ export const accountStorage = {
   },
   removeItem(key: string) {
     if (!userId) {
-      localStorage.removeItem(key);
+      browserStorage.removeItem(key);
       return;
     }
     if (!(key in workspace.data)) return;

@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 import { AccountContext as Context, type Account } from "./useAccount";
-import { clearSelectedOccupation } from "@/pages/WorkProfile/userProfile";
+import { clearSelectedOccupation } from "@/features/work-profile/userProfile";
 import { useEffect, useState, type ReactNode } from "react";
 import { api, ApiError } from "@/services/api";
 import { authService } from "@/services/authService";
@@ -11,7 +11,9 @@ import {
   flushWorkspace,
   workspaceKeys,
   syncError,
-} from "@/services/accountStorage";
+} from "@/infrastructure/storage/accountStorage";
+import { browserStorage } from "@/infrastructure/storage/browserStorage";
+import { STORAGE_KEYS, accountCacheKey } from "@/infrastructure/storage/keys";
 import { Button } from "@/components/ui/button";
 
 export function AccountProvider(props: { children: ReactNode }) {
@@ -91,8 +93,8 @@ export function AccountProvider(props: { children: ReactNode }) {
         Object.entries(guest).forEach(([key, value]) =>
           accountStorage.setItem(key, value),
         );
-      } else if (guest["aiwrevolusi.learningCentre"]) {
-        const key = "aiwrevolusi.learningCentre";
+      } else if (guest[STORAGE_KEYS.learningCentre]) {
+        const key = STORAGE_KEYS.learningCentre;
         const current = JSON.parse(accountStorage.getItem(key) ?? "[]");
         const incoming = JSON.parse(guest[key]);
         if (Array.isArray(current) && Array.isArray(incoming)) {
@@ -147,8 +149,8 @@ export function AccountProvider(props: { children: ReactNode }) {
             {...({
               variant: "link",
               onClick: () => {
-                const key = `aiwrevolusi.account.${user.id}`;
-                const copy = localStorage.getItem(key);
+                const key = accountCacheKey(user.id);
+                const copy = browserStorage.getItem(key);
                 if (copy) {
                   const url = URL.createObjectURL(
                     new Blob([copy], { type: "application/json" }),
@@ -159,7 +161,7 @@ export function AccountProvider(props: { children: ReactNode }) {
                   link.click();
                   setTimeout(() => URL.revokeObjectURL(url), 1000);
                 }
-                localStorage.removeItem(key);
+                browserStorage.removeItem(key);
                 setLoading(true);
                 setError("");
                 setAttempt((v) => v + 1);

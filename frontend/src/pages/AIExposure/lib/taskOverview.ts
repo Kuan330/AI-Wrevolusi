@@ -1,5 +1,5 @@
-import { taskScore } from "../../Analysis/lib/taskScore.ts";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+import { taskScore } from "../../../features/exposure/taskScore.ts";
+import type { ProfileTask } from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 
 /** Personal statistics use scored tasks only; missing evidence is never a zero. */

@@ -1,4 +1,4 @@
-import type { ProfileTask } from "../../WorkProfile/types";
+import type { ProfileTask } from "@/features/work-profile/types";
 
 type Guidance = {
   title: string;

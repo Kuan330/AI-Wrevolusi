@@ -1,4 +1,4 @@
-import type { LearningCentreItem } from "@/pages/Skills/skillDirections";
+import type { LearningCentreItem } from "@/features/skills/skillDirections";
 import type { Resource, Selection } from "./resources";
 
 export const demoThemes: LearningCentreItem[] = [

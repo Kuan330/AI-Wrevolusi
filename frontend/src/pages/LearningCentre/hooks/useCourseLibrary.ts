@@ -1,19 +1,20 @@
-import { localPlanRepository } from "@/services/planService";
-import { scheduleCourses } from "@/pages/Plan/scheduleCourses";
+import { localPlanRepository } from "@/features/planning/planRepository";
+import { scheduleCourses } from "@/features/planning/scheduleCourses";
 import { toast } from "sonner";
-import { accountStorage } from "@/services/accountStorage";
+import { accountStorage } from "@/infrastructure/storage/accountStorage";
+import { STORAGE_KEYS } from "@/infrastructure/storage/keys";
 import { useState } from "react";
-import { courses, focusSkills } from "../catalogue";
-import { readLibrary, saveLibrary, emptyLibrary } from "../lib/libraryStorage";
+import { courses, focusSkills } from "@/features/learning/catalogue";
+import { readLibrary, saveLibrary, emptyLibrary } from "@/features/learning/lib/libraryStorage";
 import {
   defaultChoice,
   selectedMinutes,
   validateChoice,
   durationLabel,
   estimateLabel,
-} from "../lib/coursePlanning";
-import { resources, readSelections, saveSelections } from "../resources";
-import type { Course, CourseChoice, LibraryState } from "../types";
+} from "@/features/learning/lib/coursePlanning";
+import { resources, readSelections, saveSelections } from "@/features/learning/resources";
+import type { Course, CourseChoice, LibraryState } from "@/features/learning/types";
 export function useCourseLibrary() {
   const [initial] = useState(() => {
     try {
@@ -204,9 +205,9 @@ export function useCourseLibrary() {
   let scheduledIds: string[] = [];
   try {
     const planner = JSON.parse(
-      accountStorage.getItem("aiwrevolusi.planner.v1") ?? "{}",
+      accountStorage.getItem(STORAGE_KEYS.planner) ?? "{}",
     );
-    scheduledIds = planner.context === (accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "") && Array.isArray(planner.events)
+    scheduledIds = planner.context === (accountStorage.getItem(STORAGE_KEYS.confirmedAnalysis) ?? "") && Array.isArray(planner.events)
       ? planner.events.flatMap((event: { resourceId?: string }) =>
           event.resourceId?.startsWith("epic5-")
             ? [event.resourceId.slice(6)]

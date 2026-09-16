@@ -5,7 +5,7 @@ import {
   UseTrendColor,
   UseTrendId,
   USE_TREND_COLOR,
-} from "@/pages/Analysis/lib/palette";
+} from "@/features/exposure/palette";
 
 export { AiCapacityId, UseTrendId };
 

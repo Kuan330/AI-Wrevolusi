@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import "./TaskDetailsDrawer.css";
 
-import AiSkillSuggestions from "@/pages/Analysis/components/AiSkillSuggestions";
+import AiSkillSuggestions from "@/features/exposure/components/AiSkillSuggestions";
 import {
   Drawer,
   DrawerBody,
@@ -11,8 +11,8 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import ExposureScorePanel from "@/components/ui/exposure-score-panel";
-import { taskScore } from "@/pages/Analysis/lib/taskScore";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+import { taskScore } from "@/features/exposure/taskScore";
+import type { ProfileTask } from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 
 const formatTaskAssessmentMatchLayer = (

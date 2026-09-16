@@ -7,7 +7,7 @@ import type {
   ProfileTask,
   TaskPractice as Practice,
   TaskTrial,
-} from "@/pages/WorkProfile/types";
+} from "@/features/work-profile/types";
 import {
   formatMinutes,
   qualityLabels,

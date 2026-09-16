@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
-import { accountStorage } from "@/services/accountStorage";
+import { accountStorage } from "@/infrastructure/storage/accountStorage";
+import { STORAGE_KEYS } from "@/infrastructure/storage/keys";
 import { useRef, useState, type CSSProperties } from "react";
 import {
   ArrowDown,
@@ -86,7 +87,7 @@ export default function Possibilities() {
     setSaved(next);
     try {
       accountStorage.setItem(
-        "aiwrevolusi.possibilities.saved",
+        STORAGE_KEYS.possibilitiesSaved,
         JSON.stringify(next),
       );
       setNotice(

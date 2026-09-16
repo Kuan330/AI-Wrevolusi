@@ -4,7 +4,7 @@ import { ExternalLink, Plus, Check, X, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppButton } from "@/components/ui/app-button";
 import { toast } from "sonner";
-import type { SkillEvidence } from "../lib/skillProfile";
+import type { SkillEvidence } from "@/features/skills/skillProfile";
 import {
   growingSkills,
   readLearningSkills,
@@ -12,7 +12,7 @@ import {
   reconcileLearningSkills,
   skillKey,
   type LearningSkill,
-} from "../learningSkills";
+} from "@/features/skills/learningSkills";
 import "../learning-skills.css";
 type Props = { evidence: SkillEvidence[] };
 export default function LearningSkillPicker(props: Props) {

@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import TaskDetailsDrawer from "@/pages/Analysis/components/TaskDetailsDrawer";
+import TaskDetailsDrawer from "@/features/exposure/components/TaskDetailsDrawer";
 import type { TaskOverview } from "../lib/taskOverview";
 
 type PriorityItem = TaskOverview["priorities"][number];

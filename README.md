@@ -13,6 +13,7 @@ AI-Wrevolusi monorepo for FIT5120, including:
 - [Local setup and testing](docs/local-testing.md)
 - [Vercel deployment](docs/deployment.md)
 - [Reference-data management](docs/iteration1_data_management.md)
+- [Frontend architecture](frontend/ARCHITECTURE.md)
 
 ## Python dependency management
 
@@ -49,7 +50,7 @@ Open a new terminal:
 
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 

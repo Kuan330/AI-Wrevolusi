@@ -1,11 +1,11 @@
-import { Toaster } from "@/components/ui/toaster";
 import AppRoutes from "@/routes";
+import { Toaster } from "sonner";
 
 const App = () => {
   return (
     <>
       <AppRoutes />
-      <Toaster />
+      <Toaster position="top-right" richColors />
     </>
   );
 };

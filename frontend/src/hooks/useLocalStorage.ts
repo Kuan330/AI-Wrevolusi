@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { browserStorage } from "@/infrastructure/storage/browserStorage";
 
 export const useLocalStorage = <T,>(key: string, initialValue: T) => {
   const [value, setValue] = useState<T>(() => {
-    const storedValue = window.localStorage.getItem(key);
+    const storedValue = browserStorage.getItem(key);
 
     if (!storedValue) {
       return initialValue;
@@ -16,7 +17,7 @@ export const useLocalStorage = <T,>(key: string, initialValue: T) => {
   });
 
   useEffect(() => {
-    window.localStorage.setItem(key, JSON.stringify(value));
+    browserStorage.setItem(key, JSON.stringify(value));
   }, [key, value]);
 
   return [value, setValue] as const;

@@ -4,14 +4,14 @@ import { useState } from "react";
 
 import EmptyState from "@/components/common/EmptyState";
 import { Button } from "@/components/ui/button";
-import TaskDetailsDrawer from "./TaskDetailsDrawer";
+import TaskDetailsDrawer from "@/features/exposure/components/TaskDetailsDrawer";
 import { cn } from "@/lib/utils";
 import {
   taskIsWithinScoreRange,
   taskScore,
   type TaskScoreRange,
-} from "@/pages/Analysis/lib/taskScore";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+} from "@/features/exposure/taskScore";
+import type { ProfileTask } from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 
 type TaskListProps = {

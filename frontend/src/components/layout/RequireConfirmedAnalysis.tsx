@@ -5,7 +5,7 @@ import { ROUTES } from "@/constants/routes";
 import {
   hasConfirmedAnalysis,
   readTaskWorkspace,
-} from "@/pages/WorkProfile/userProfile";
+} from "@/features/work-profile/userProfile";
 
 const RequireConfirmedAnalysis = () => {
   const location = useLocation();

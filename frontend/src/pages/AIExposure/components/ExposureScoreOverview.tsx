@@ -1,11 +1,11 @@
 import type { ComponentProps } from "react";
 import { ArrowDown, ExternalLink } from "lucide-react";
 import { GradientBar } from "@/components/ui/gradient-bar";
-import ExposureScoreExplanation from "@/pages/Analysis/components/ExposureScoreExplanation";
+import ExposureScoreExplanation from "@/features/exposure/components/ExposureScoreExplanation";
 import {
   ILO_OCCUPATION_EXPOSURE_OPEN_DATA,
   ILO_OCCUPATION_EXPOSURE_SOURCE,
-} from "@/pages/Analysis/lib/dataSources";
+} from "@/features/exposure/dataSources";
 import type { TaskOverview } from "@/pages/AIExposure/lib/taskOverview";
 
 const ExposureScoreOverview = (props: { overview: TaskOverview }) => {

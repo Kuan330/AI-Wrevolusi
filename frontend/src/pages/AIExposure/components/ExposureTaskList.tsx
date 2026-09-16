@@ -1,16 +1,16 @@
 import type { ComponentProps } from "react";
 import { useEffect, useRef, useState } from "react";
-import TaskDetailsDrawer from "@/pages/Analysis/components/TaskDetailsDrawer";
+import TaskDetailsDrawer from "@/features/exposure/components/TaskDetailsDrawer";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ScoreRangeSlider from "@/components/ui/score-range-slider";
-import AnalysisCard from "@/pages/Analysis/components/AnalysisCard";
+import AnalysisCard from "@/features/exposure/components/AnalysisCard";
 import {
   taskScore,
   taskIsWithinScoreRange,
   type TaskScoreRange,
-} from "@/pages/Analysis/lib/taskScore";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+} from "@/features/exposure/taskScore";
+import type { ProfileTask } from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 import { cn } from "@/lib/utils";
 import { formatMinutes } from "../lib/taskPractice";

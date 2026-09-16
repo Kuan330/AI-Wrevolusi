@@ -1,7 +1,7 @@
 import { InfoPopover } from "@/components/ui/info-popover";
 import { cn } from "@/lib/utils";
-import { ILO_EXPOSURE_METHOD_URL } from "@/pages/Analysis/lib/iloExposure";
-import { OCCUPATION_BANDS } from "@/pages/Analysis/lib/occupationBands";
+import { ILO_EXPOSURE_METHOD_URL } from "@/features/exposure/iloExposure";
+import { OCCUPATION_BANDS } from "@/features/exposure/occupationBands";
 
 /** Plain-language score guidance; classification details stay in one popover. */
 const ExposureScoreExplanation = (props: { className?: string }) => {

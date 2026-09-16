@@ -6,14 +6,14 @@ import ScoreRangeSlider from "@/components/ui/score-range-slider";
 import { cn } from "@/lib/utils";
 import AnalysisCard, {
   type TitleTone,
-} from "@/pages/Analysis/components/AnalysisCard";
+} from "@/features/exposure/components/AnalysisCard";
 import TaskList from "@/pages/Analysis/components/TaskList";
 import {
   taskIsWithinScoreRange,
   taskScore,
   type TaskScoreRange,
-} from "@/pages/Analysis/lib/taskScore";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+} from "@/features/exposure/taskScore";
+import type { ProfileTask } from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 
 type TaskListCardProps = {

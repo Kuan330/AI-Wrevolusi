@@ -5,9 +5,9 @@ import { cn } from "@/lib/utils";
 import {
   AI_CAPACITIES,
   aiCapacityFromCategory,
-} from "@/pages/Analysis/lib/skillAxes";
-import type { SkillEvidence } from "@/pages/Skills/lib/skillProfile";
-import { signedPoints } from "@/pages/Skills/lib/skillProfile";
+} from "@/features/exposure/skillAxes";
+import type { SkillEvidence } from "@/features/skills/skillProfile";
+import { signedPoints } from "@/features/skills/skillProfile";
 import SkillOutlookInfo from "@/pages/Skills/components/SkillOutlookInfo";
 
 type SkillDetailWorkspaceProps = {

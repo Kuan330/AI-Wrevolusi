@@ -9,8 +9,8 @@ import DeleteTaskDialog from "@/pages/WorkProfile/components/DeleteTaskDialog";
 import {
   optionLabel,
   TIME_SPENT_OPTIONS,
-} from "@/pages/WorkProfile/taskOptions";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+} from "@/features/work-profile/taskOptions";
+import type { ProfileTask } from "@/features/work-profile/types";
 
 type ProfileTaskListProps = {
   tasks: ProfileTask[];

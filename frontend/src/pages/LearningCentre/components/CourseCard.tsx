@@ -2,8 +2,8 @@ import { Bookmark, ArrowRight, CalendarCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { durationLabel } from "../lib/coursePlanning";
-import type { Course } from "../types";
+import { durationLabel } from "@/features/learning/lib/coursePlanning";
+import type { Course } from "@/features/learning/types";
 export type CourseCardProps = {
   course: Course;
   saved: boolean;

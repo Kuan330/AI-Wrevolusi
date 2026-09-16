@@ -1,11 +1,8 @@
-import { accountStorage } from "../../services/accountStorage.ts";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+import { accountStorage } from "../../infrastructure/storage/accountStorage.ts";
+import { STORAGE_KEYS } from "../../infrastructure/storage/keys.ts";
+import type { ProfileTask } from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 import type { ReferenceOccupation } from "@/types/reference";
-
-const PROFILE_KEY = "aiwrevolusi.userProfile";
-const OCCUPATION_KEY = "aiwrevolusi.selectedOccupation";
-const ANALYSIS_KEY = "aiwrevolusi.confirmedAnalysis";
 
 let transientSelectedOccupation: SelectedOccupation | null = null;
 
@@ -41,20 +38,24 @@ const parseJson = <T>(raw: string | null): T | null => {
 
 const readLegacyAnalysis = (): ConfirmedAnalysis | null => {
   const parsed =
-    parseJson<ConfirmedAnalysis>(accountStorage.getItem(ANALYSIS_KEY)) ?? null;
+    parseJson<ConfirmedAnalysis>(
+      accountStorage.getItem(STORAGE_KEYS.confirmedAnalysis),
+    ) ?? null;
   if (!parsed?.occupationTitle || !Array.isArray(parsed.tasks)) return null;
   return parsed;
 };
 
 export const readUserProfile = (): UserProfile => {
-  const stored = parseJson<UserProfile>(accountStorage.getItem(PROFILE_KEY));
+  const stored = parseJson<UserProfile>(
+    accountStorage.getItem(STORAGE_KEYS.userProfile),
+  );
   if (stored) {
     const cleaned: UserProfile = {
       tasks: Array.isArray(stored.tasks) ? stored.tasks : [],
       tasksOccupationCode: stored.tasksOccupationCode ?? null,
       analysis: stored.analysis ?? null,
     };
-    accountStorage.removeItem(OCCUPATION_KEY);
+    accountStorage.removeItem(STORAGE_KEYS.selectedOccupation);
 
     return cleaned;
   }
@@ -65,7 +66,7 @@ export const readUserProfile = (): UserProfile => {
     tasksOccupationCode: analysis?.occupationCode ?? null,
     analysis,
   };
-  accountStorage.removeItem(OCCUPATION_KEY);
+  accountStorage.removeItem(STORAGE_KEYS.selectedOccupation);
   return migrated;
 };
 
@@ -77,12 +78,12 @@ export const writeUserProfile = (patch: Partial<UserProfile>): UserProfile => {
     previous.tasksOccupationCode !== next.tasksOccupationCode ||
     JSON.stringify(previous.tasks) !== JSON.stringify(next.tasks)
   ) {
-    const rawLibrary = accountStorage.getItem("aiwrevolusi.courseLibrary.v1");
+    const rawLibrary = accountStorage.getItem(STORAGE_KEYS.courseLibrary);
     if (rawLibrary) {
       try {
         const library = JSON.parse(rawLibrary);
         accountStorage.setItem(
-          "aiwrevolusi.courseLibrary.v1",
+          STORAGE_KEYS.courseLibrary,
           JSON.stringify({
             ...library,
             saved: [],
@@ -91,19 +92,22 @@ export const writeUserProfile = (patch: Partial<UserProfile>): UserProfile => {
             workContext: next.analysis ? JSON.stringify(next.analysis) : "",
           }),
         );
-        accountStorage.removeItem("aiwrevolusi.planner.v1");
-        accountStorage.removeItem("aiwrevolusi.learningResourceSelections.v1");
+        accountStorage.removeItem(STORAGE_KEYS.planner);
+        accountStorage.removeItem(STORAGE_KEYS.learningResourceSelections);
       } catch {
-        accountStorage.removeItem("aiwrevolusi.courseLibrary.v1");
+        accountStorage.removeItem(STORAGE_KEYS.courseLibrary);
       }
     }
   }
-  accountStorage.setItem(PROFILE_KEY, JSON.stringify(next));
-  accountStorage.removeItem(OCCUPATION_KEY);
+  accountStorage.setItem(STORAGE_KEYS.userProfile, JSON.stringify(next));
+  accountStorage.removeItem(STORAGE_KEYS.selectedOccupation);
   if (next.analysis) {
-    accountStorage.setItem(ANALYSIS_KEY, JSON.stringify(next.analysis));
+    accountStorage.setItem(
+      STORAGE_KEYS.confirmedAnalysis,
+      JSON.stringify(next.analysis),
+    );
   } else {
-    accountStorage.removeItem(ANALYSIS_KEY);
+    accountStorage.removeItem(STORAGE_KEYS.confirmedAnalysis);
   }
   return next;
 };
@@ -117,7 +121,7 @@ export const readSelectedOccupation = (): SelectedOccupation | null =>
 
 export const clearSelectedOccupation = () => {
   transientSelectedOccupation = null;
-  accountStorage.removeItem(OCCUPATION_KEY);
+  accountStorage.removeItem(STORAGE_KEYS.selectedOccupation);
 };
 
 export const saveProfileTasks = (

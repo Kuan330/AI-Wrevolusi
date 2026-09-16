@@ -8,14 +8,14 @@ import { AppButton } from "@/components/ui/app-button";
 import { Radio } from "@/components/ui/radio";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/form-field";
-import type { Course, CourseChoice } from "../types";
+import type { Course, CourseChoice } from "@/features/learning/types";
 import {
   durationLabel,
   selectedMinutes,
   estimateLabel,
   validateChoice,
   weekdays,
-} from "../lib/coursePlanning";
+} from "@/features/learning/lib/coursePlanning";
 export type LearningPlanStepsProps = {
   course: Course;
   initialChoice: CourseChoice;

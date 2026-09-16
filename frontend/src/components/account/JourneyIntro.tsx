@@ -2,8 +2,8 @@ import type { ComponentProps } from "react";
 import {
   hasConfirmedAnalysis,
   readTaskWorkspace,
-} from "@/pages/WorkProfile/userProfile";
-import { readLearningCentreItems } from "@/pages/Skills/skillDirections";
+} from "@/features/work-profile/userProfile";
+import { readLearningCentreItems } from "@/features/skills/skillDirections";
 import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -13,7 +13,7 @@ import { AppButton } from "@/components/ui/app-button";
 import { useAccount } from "./useAccount";
 import { AuthDialog } from "./AuthDialog";
 import { ROUTES } from "@/constants/routes";
-import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
+import { PAGE_GRADIENT_CSS } from "@/features/exposure/palette";
 
 export type JourneyKind = "resources" | "plan" | "possibilities";
 const content = {

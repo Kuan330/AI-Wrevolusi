@@ -4,7 +4,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
-import { PAGE_GRADIENT_CSS, Palette } from "@/pages/Analysis/lib/palette";
+import { PAGE_GRADIENT_CSS, Palette } from "@/features/exposure/palette";
 
 const gradientPillVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-full font-semibold shadow-sm",

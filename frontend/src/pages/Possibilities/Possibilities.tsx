@@ -2,21 +2,22 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import JourneyIntro from "@/components/account/JourneyIntro";
 import { AppButton } from "@/components/ui/app-button";
-import { courses, focusSkills } from "@/pages/LearningCentre/catalogue";
-import { readSelections } from "@/pages/LearningCentre/resources";
-import { readLibrary } from "@/pages/LearningCentre/lib/libraryStorage";
-import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
+import { courses, focusSkills } from "@/features/learning/catalogue";
+import { readSelections } from "@/features/learning/resources";
+import { readLibrary } from "@/features/learning/lib/libraryStorage";
+import { buildSkillEvidence } from "@/features/skills/skillProfile";
 import {
   coursesForSkill,
   readLearningSkills,
   skillKey,
   type LearningSkill,
-} from "@/pages/Skills/learningSkills";
-import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
+} from "@/features/skills/learningSkills";
+import { readConfirmedAnalysis } from "@/features/work-profile/userProfile";
 import { ROUTES } from "@/constants/routes";
-import { accountStorage } from "@/services/accountStorage";
+import { accountStorage } from "@/infrastructure/storage/accountStorage";
+import { STORAGE_KEYS } from "@/infrastructure/storage/keys";
 import { referenceService } from "@/services/referenceService";
-import type { PlanState } from "@/pages/Plan/planModel";
+import type { PlanState } from "@/features/planning/planModel";
 import type { WefSkill } from "@/types/reference";
 import "./skill-possibilities.css";
 
@@ -77,12 +78,12 @@ const directions: Direction[] = [
   },
 ];
 
-const careerKey = "aiwrevolusi.possibilities.intent";
-
 function readPlan(): PlanState | null {
   try {
-    const state = JSON.parse(accountStorage.getItem("aiwrevolusi.planner.v1") ?? "null") as PlanState | null;
-    const context = accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "";
+    const state = JSON.parse(
+      accountStorage.getItem(STORAGE_KEYS.planner) ?? "null",
+    ) as PlanState | null;
+    const context = accountStorage.getItem(STORAGE_KEYS.confirmedAnalysis) ?? "";
     if (!state || state.version !== 1 || state.context !== context || !Array.isArray(state.events)) return null;
     return state;
   } catch {
@@ -104,7 +105,9 @@ function directionScore(direction: Direction, current: SkillItem[], building: Sk
 
 function savedDirection(): string {
   try {
-    const data = JSON.parse(accountStorage.getItem(careerKey) ?? "null");
+    const data = JSON.parse(
+      accountStorage.getItem(STORAGE_KEYS.possibilitiesIntent) ?? "null",
+    );
     return typeof data?.target === "string" ? data.target : "";
   } catch {
     return "";
@@ -114,11 +117,11 @@ function savedDirection(): string {
 function saveDirection(direction: Direction | null, currentRole: string) {
   try {
     if (!direction) {
-      accountStorage.removeItem(careerKey);
+      accountStorage.removeItem(STORAGE_KEYS.possibilitiesIntent);
       return;
     }
     accountStorage.setItem(
-      careerKey,
+      STORAGE_KEYS.possibilitiesIntent,
       JSON.stringify({
         version: 1,
         current: currentRole,

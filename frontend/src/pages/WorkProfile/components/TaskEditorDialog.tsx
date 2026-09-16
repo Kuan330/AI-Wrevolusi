@@ -10,8 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TIME_SPENT_OPTIONS } from "@/pages/WorkProfile/taskOptions";
-import type { TaskEditorValues } from "@/pages/WorkProfile/types";
+import { TIME_SPENT_OPTIONS } from "@/features/work-profile/taskOptions";
+import type { TaskEditorValues } from "@/features/work-profile/types";
 import { aiService } from "@/services/aiService";
 import { referenceService } from "@/services/referenceService";
 import { validateTaskTitle } from "@/utils/validation";

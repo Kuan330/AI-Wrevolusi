@@ -1,4 +1,4 @@
-import type { TaskBaseline, TaskTrial } from "../../WorkProfile/types";
+import type { TaskBaseline, TaskTrial } from "@/features/work-profile/types";
 
 export function parseMinutes(value: string): number | null {
   const minutes = Number(value);

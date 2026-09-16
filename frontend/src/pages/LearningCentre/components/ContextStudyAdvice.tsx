@@ -1,4 +1,4 @@
-import type { Course, RecommendationBasis } from "../types";
+import type { Course, RecommendationBasis } from "@/features/learning/types";
 type Props = {
   course: Course;
   context: RecommendationBasis;
