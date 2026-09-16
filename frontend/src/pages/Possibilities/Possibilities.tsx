@@ -4,7 +4,7 @@ import { ArrowRight, Plus, X, Check } from "lucide-react";
 import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
 import { loadPossibilitiesData, type PossibilitiesData, skillGroup, directionMatch, type SkillGroup } from "./possibilitiesData";
 import PageHeader from "@/components/common/PageHeader";
-import BotPet from "./components/BotPet";
+import BotPet from "@/components/common/BotPet";
 import "./exploration.css";
 
 const KEY = "aiwrevolusi.possibilities.courseExploration.v1";

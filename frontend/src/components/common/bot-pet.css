@@ -1,23 +1,24 @@
-.px-bot {
+/* Shared corner companion. The pet overlays page content, so it must never
+   intercept a click — see BotPet.tsx. */
+.bot-pet {
   /* Base geometry lives in custom properties so the component can measure the
      space it needs when lifting itself clear of a sticky bar. */
-  --px-bot-height: 143px;
-  --px-bot-base: 18px;
-  --px-bot-lift: 0px;
+  --bot-pet-height: 143px;
+  --bot-pet-base: 18px;
+  --bot-pet-lift: 0px;
   position: fixed;
   right: 22px;
-  bottom: calc(var(--px-bot-base) + var(--px-bot-lift));
+  bottom: calc(var(--bot-pet-base) + var(--bot-pet-lift));
   z-index: 20;
   width: 132px;
-  height: var(--px-bot-height);
-  /* The pet overlays page content, so it must never intercept a click. */
+  height: var(--bot-pet-height);
   pointer-events: none;
   transition: bottom 0.2s ease;
 }
 
 /* Native sprite cell is 192x208 (6 frames x 192px). Scale the element instead of
    resizing it so the steps() math stays on whole pixels. */
-.px-bot__sprite {
+.bot-pet__sprite {
   display: block;
   width: 192px;
   height: 208px;
@@ -26,14 +27,14 @@
   background-image: url("/images/bot/idle_strip.webp");
   background-repeat: no-repeat;
   background-size: 1152px 208px;
-  animation: px-bot-play 1.1s steps(6) infinite;
+  animation: bot-pet-play 1.1s steps(6) infinite;
 }
 
-.px-bot__sprite.is-waving {
+.bot-pet__sprite.is-waving {
   background-image: url("/images/bot/waving_strip.webp");
 }
 
-@keyframes px-bot-play {
+@keyframes bot-pet-play {
   from {
     background-position-x: 0;
   }
@@ -43,22 +44,22 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .px-bot__sprite {
+  .bot-pet__sprite {
     animation: none;
   }
-  .px-bot {
+  .bot-pet {
     transition: none;
   }
 }
 
 @media (max-width: 700px) {
-  .px-bot {
-    --px-bot-height: 104px;
-    --px-bot-base: 10px;
+  .bot-pet {
+    --bot-pet-height: 104px;
+    --bot-pet-base: 10px;
     right: 10px;
     width: 96px;
   }
-  .px-bot__sprite {
+  .bot-pet__sprite {
     transform: scale(0.5);
   }
 }

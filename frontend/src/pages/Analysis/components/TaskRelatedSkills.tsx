@@ -68,7 +68,7 @@ const TaskRelatedSkills = (props: TaskRelatedSkillsProps) => {
                     type="button"
                     variant="destructive"
                     size="sm"
-                    className="shrink-0"
+                    className="shrink-0 rounded-full"
                     onClick={() => removeSkill(skill.core_skill)}
                   >
                     Remove
@@ -77,7 +77,7 @@ const TaskRelatedSkills = (props: TaskRelatedSkillsProps) => {
                   <Button
                     type="button"
                     size="sm"
-                    className="shrink-0"
+                    className="shrink-0 rounded-full"
                     onClick={() => addSkill(skill.core_skill, "wef")}
                   >
                     Add to Learning Resources

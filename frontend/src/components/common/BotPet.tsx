@@ -16,7 +16,7 @@ const CLEARANCE = 12;
 const GREETING_MS = 2200;
 
 /**
- * The `deepseek酱` bot companion, pinned to the bottom-right of the page.
+ * The `deepseek酱` bot companion, pinned to the bottom-right of a page.
  *
  * Frames come from `/images/bot/*_strip.webp` (6 frames, 192x208 each). The
  * `waving` strip is already ping-ponged because the source atlas only draws four
@@ -24,8 +24,11 @@ const GREETING_MS = 2200;
  *
  * The pet is purely decorative: it never takes pointer events, so it can sit on
  * top of page content without swallowing clicks. It waves in greeting on
- * arrival; to make it interactive instead, give `.px-bot__sprite`
+ * arrival; to make it interactive instead, give `.bot-pet__sprite`
  * `pointer-events: auto` and drive `waving` from hover handlers.
+ *
+ * Pass `avoidRef` only when the page has a sticky bottom bar that the pet would
+ * otherwise cover; the lift is measured from real geometry, never a fixed offset.
  */
 export default function BotPet({
   avoidRef,
@@ -47,7 +50,7 @@ export default function BotPet({
     const root = rootRef.current;
     const avoid = avoidRef?.current;
     if (!root || !avoid || !avoidActive) {
-      root?.style.setProperty("--px-bot-lift", "0px");
+      root?.style.setProperty("--bot-pet-lift", "0px");
       return;
     }
 
@@ -56,10 +59,10 @@ export default function BotPet({
       frame = 0;
       const styles = window.getComputedStyle(root);
       const height =
-        Number.parseFloat(styles.getPropertyValue("--px-bot-height")) ||
+        Number.parseFloat(styles.getPropertyValue("--bot-pet-height")) ||
         root.offsetHeight;
       const base =
-        Number.parseFloat(styles.getPropertyValue("--px-bot-base")) || 0;
+        Number.parseFloat(styles.getPropertyValue("--bot-pet-base")) || 0;
       const bar = avoid.getBoundingClientRect();
       // Distances are measured up from the bottom edge of the viewport.
       const barTop = window.innerHeight - bar.top;
@@ -70,7 +73,7 @@ export default function BotPet({
       const lift = overlaps
         ? Math.max(0, Math.round(barTop + CLEARANCE - base))
         : 0;
-      root.style.setProperty("--px-bot-lift", `${lift}px`);
+      root.style.setProperty("--bot-pet-lift", `${lift}px`);
     };
     const schedule = () => {
       if (!frame) frame = window.requestAnimationFrame(measure);
@@ -93,8 +96,8 @@ export default function BotPet({
   }, [avoidRef, avoidActive]);
 
   return (
-    <div className="px-bot" ref={rootRef} aria-hidden="true">
-      <span className={`px-bot__sprite${waving ? " is-waving" : ""}`} />
+    <div className="bot-pet" ref={rootRef} aria-hidden="true">
+      <span className={`bot-pet__sprite${waving ? " is-waving" : ""}`} />
     </div>
   );
 }

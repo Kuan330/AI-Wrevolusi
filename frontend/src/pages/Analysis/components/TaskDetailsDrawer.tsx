@@ -18,6 +18,7 @@ import type { ProfileTask } from "@/pages/WorkProfile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 import { ChevronDown, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
+import "./TaskDetailsDrawer.css";
 
 const formatTaskAssessmentMatchLayer = (
   matchLayer: ConfirmedTaskExposureAssessment["match_layer"],
