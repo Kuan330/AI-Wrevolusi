@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 import math
+import re
 from collections.abc import Iterable, Mapping
 from typing import Literal
 
 SkillState = Literal['have', 'learning', 'shortlisted', 'missing']
+
+
+def slugify_skill_name(name: str) -> str:
+    return re.sub(r'-+', '-', re.sub(r'[^a-z0-9]+', '-', name.lower())).strip('-')
 
 
 def classify_skill_state(*, has_skill: bool, learning: bool, shortlisted: bool) -> SkillState:
@@ -124,5 +129,6 @@ __all__ = [
     'filter_allowed_directions',
     'occupation_required_skills',
     'recommend_occupations',
+    'slugify_skill_name',
     'validate_shortlist_ids',
 ]

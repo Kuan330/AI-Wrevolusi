@@ -1,8 +1,12 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { Popover } from "@base-ui/react/popover";
 import { cn } from "@/lib/utils";
 import type { SkillEvidence } from "@/pages/Skills/lib/skillProfile";
 import SkillOutlookSummary from "@/pages/Skills/components/SkillOutlookSummary";
+import {
+  readLearningSkills,
+  skillKey,
+} from "@/pages/Skills/learningSkills";
 import type { WefSkill } from "@/types/reference";
 import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
 
@@ -26,18 +30,21 @@ const CLOUD_SKILL_COUNT = CLOUD_ROW_LENGTHS.reduce(
   0,
 );
 
+type ChipTone = "matched" | "learning" | "muted";
+
 type SkillCloudChipProps = {
   skill: WefSkill;
-  matched: boolean;
+  tone: ChipTone;
   active: boolean;
   onSelect: (skillId: number | null) => void;
 };
 
 /** Uncontrolled hover popover; dismiss on click/add until the pointer leaves. */
 const SkillCloudChip = (props: SkillCloudChipProps) => {
-  const { skill, matched, active, onSelect } = props;
+  const { skill, tone, active, onSelect } = props;
   const actionsRef = useRef<Popover.Root.Actions | null>(null);
   const blockHoverUntilLeave = useRef(false);
+  const matched = tone === "matched";
 
   const dismissOutlook = () => {
     blockHoverUntilLeave.current = true;
@@ -61,9 +68,10 @@ const SkillCloudChip = (props: SkillCloudChipProps) => {
         type="button"
         className={cn(
           "exposure-skill-cloud__skill",
-          matched && "is-matched",
+          tone === "matched" && "is-matched",
+          tone === "learning" && "is-learning",
+          tone === "muted" && "is-muted",
           active && "is-active",
-          !matched && "is-muted",
         )}
         aria-pressed={matched ? active : undefined}
         aria-disabled={!matched}
@@ -104,11 +112,41 @@ const SkillCloudChip = (props: SkillCloudChipProps) => {
   );
 };
 
+function loadLearningSkillKeys(): Set<string> {
+  try {
+    return new Set((readLearningSkills() ?? []).map((skill) => skill.id));
+  } catch {
+    return new Set();
+  }
+}
+
 const ExposureSkillCloud = (props: ExposureSkillCloudProps) => {
   const { skills, evidence, selectedSkillId, onSelectSkill } = props;
-  const matchedSkillIds = new Set(
-    evidence.map(({ skill }) => skill.wef_skill_id),
+  const matchedSkillIds = useMemo(
+    () => new Set(evidence.map(({ skill }) => skill.wef_skill_id)),
+    [evidence],
   );
+  // Skills on the Learning Resources list that are not in current task evidence.
+  const learningKeys = useMemo(() => loadLearningSkillKeys(), []);
+  const learningSkillIds = useMemo(() => {
+    const ids = new Set<number>();
+    for (const skill of skills) {
+      if (
+        learningKeys.has(skillKey(skill.core_skill)) &&
+        !matchedSkillIds.has(skill.wef_skill_id)
+      ) {
+        ids.add(skill.wef_skill_id);
+      }
+    }
+    return ids;
+  }, [skills, learningKeys, matchedSkillIds]);
+
+  const chipTone = (skillId: number): ChipTone => {
+    if (matchedSkillIds.has(skillId)) return "matched";
+    if (learningSkillIds.has(skillId)) return "learning";
+    return "muted";
+  };
+
   const selectedEvidence = evidence.find(
     ({ skill }) => skill.wef_skill_id === selectedSkillId,
   );
@@ -140,8 +178,9 @@ const ExposureSkillCloud = (props: ExposureSkillCloudProps) => {
             See the skills reflected in your work.
           </h2>
           <p className="exposure-skill-cloud__copy">
-            Highlighted skills appear in your confirmed tasks. Hover for
-            external outlook. Select one to filter the task list.
+            Highlighted skills appear in your confirmed tasks. Blue marks skills
+            you added to learn. Hover for external outlook. Select a reflected
+            skill to filter the task list.
           </p>
         </div>
         <div className="exposure-skill-cloud__header-aside">
@@ -149,6 +188,10 @@ const ExposureSkillCloud = (props: ExposureSkillCloudProps) => {
             <span className="inline-flex items-center gap-2">
               <span className="exposure-skill-cloud__legend-dot is-matched" />
               Reflected in your tasks
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span className="exposure-skill-cloud__legend-dot is-learning" />
+              To learn
             </span>
             <span className="inline-flex items-center gap-2">
               <span className="exposure-skill-cloud__legend-dot is-other" />
@@ -205,7 +248,7 @@ const ExposureSkillCloud = (props: ExposureSkillCloudProps) => {
                 <SkillCloudChip
                   key={skill.wef_skill_id}
                   skill={skill}
-                  matched={matchedSkillIds.has(skill.wef_skill_id)}
+                  tone={chipTone(skill.wef_skill_id)}
                   active={selectedSkillId === skill.wef_skill_id}
                   onSelect={onSelectSkill}
                 />

@@ -2,12 +2,27 @@ import {
   useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type PointerEvent as ReactPointerEvent,
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
 
 import "./bot-pet.css";
+
+export type BotPetTour = {
+  text: string;
+  step: number;
+  total: number;
+  onNext: () => void;
+  onDismiss?: () => void;
+  /** Optional primary button (e.g. Check in) on the current step. */
+  primaryLabel?: string;
+  onPrimary?: () => void;
+  primaryBusy?: boolean;
+  /** Bubble width in rem — longer steps stretch sideways, not taller. */
+  widthRem?: number;
+};
 
 type BotPetProps = {
   /** An element the pet must stay clear of, such as a sticky bottom bar. */
@@ -27,6 +42,8 @@ type BotPetProps = {
   defaultAnchorRef?: RefObject<HTMLElement | null>;
   /** Optional cloud speech bubble shown to the left of the pet. */
   speech?: string | null;
+  /** Multi-step briefing (Next / Done). Hidden while `speech` is set. */
+  tour?: BotPetTour | null;
 };
 
 type Position = { x: number; y: number };
@@ -121,6 +138,7 @@ export default function BotPet({
   defaultCorner = "bottom-right",
   defaultAnchorRef,
   speech = null,
+  tour = null,
 }: BotPetProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [waving, setWaving] = useState(true);
@@ -319,6 +337,14 @@ export default function BotPet({
     setDragging(false);
   };
 
+  const showTour = !speech && tour && tour.total > 0;
+  const lastStep = showTour && tour.step >= tour.total - 1;
+  const tourLabel = showTour
+    ? lastStep
+      ? "Done"
+      : "Next"
+    : null;
+
   const node = (
     <div
       className={`bot-pet${isInline ? " bot-pet--inline" : ""}${!isInline && defaultCorner === "top-right" ? " bot-pet--top-right" : ""}${dragging ? " is-dragging" : ""}`}
@@ -341,6 +367,44 @@ export default function BotPet({
         <p className="bot-pet__speech" role="status">
           {speech}
         </p>
+      ) : showTour ? (
+        <div
+          className="bot-pet__speech bot-pet__speech--tour"
+          role="dialog"
+          aria-label={`Daily briefing, step ${tour.step + 1} of ${tour.total}`}
+          style={
+            tour.widthRem
+              ? ({
+                  "--bot-speech-width": `${tour.widthRem}rem`,
+                } as CSSProperties)
+              : undefined
+          }
+          onPointerDown={(event) => event.stopPropagation()}
+        >
+          <p className="bot-pet__speech-text">{tour.text}</p>
+          <div className="bot-pet__speech-actions">
+            <span className="bot-pet__speech-meta" aria-hidden="true">
+              {tour.step + 1}/{tour.total}
+            </span>
+            {tour.primaryLabel && tour.onPrimary ? (
+              <button
+                type="button"
+                className="bot-pet__speech-btn bot-pet__speech-btn--primary"
+                disabled={tour.primaryBusy}
+                onClick={tour.onPrimary}
+              >
+                {tour.primaryBusy ? "…" : tour.primaryLabel}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className="bot-pet__speech-btn"
+              onClick={lastStep ? (tour.onDismiss ?? tour.onNext) : tour.onNext}
+            >
+              {tourLabel}
+            </button>
+          </div>
+        </div>
       ) : null}
       <span className={`bot-pet__sprite${waving ? " is-waving" : ""}`} />
     </div>
