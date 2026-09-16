@@ -25,7 +25,9 @@
 }
 
 .bot-pet--top-right {
-  top: calc(4rem + 1.75rem);
+  /* Clear header avatar / language controls on the right. */
+  --bot-pet-right: 96px;
+  top: 0;
   right: var(--bot-pet-right);
   bottom: auto;
 }
@@ -49,6 +51,63 @@
   background-image: url("/images/bot/waving_strip.webp");
 }
 
+/* Soft cloud tip to the left of the pet (points toward the character). */
+.bot-pet__speech {
+  position: absolute;
+  right: calc(100% - 6px);
+  top: 12%;
+  z-index: 2;
+  max-width: 11.25rem;
+  margin: 0;
+  padding: 0.72rem 0.95rem 0.82rem;
+  border: 1px solid rgba(214, 228, 240, 0.95);
+  border-radius: 1.35rem;
+  background: linear-gradient(165deg, #ffffff 0%, #f7fbfe 100%);
+  color: #3d5f7a;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  box-shadow:
+    0 10px 24px rgba(61, 43, 54, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+  animation: bot-pet-speech-in 0.4s ease;
+}
+.bot-pet__speech::before,
+.bot-pet__speech::after {
+  content: "";
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid rgba(214, 228, 240, 0.95);
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(61, 43, 54, 0.06);
+}
+.bot-pet__speech::before {
+  right: -0.35rem;
+  bottom: 0.55rem;
+  width: 1.05rem;
+  height: 1.05rem;
+}
+.bot-pet__speech::after {
+  right: -0.85rem;
+  bottom: 0.35rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  background: linear-gradient(165deg, #ffffff 0%, #f7fbfe 100%);
+}
+
+@keyframes bot-pet-speech-in {
+  from {
+    opacity: 0;
+    transform: translateX(0.4rem) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
 @keyframes bot-pet-play {
   from {
     background-position-x: 0;
@@ -64,6 +123,9 @@
   }
   .bot-pet {
     transition: none;
+  }
+  .bot-pet__speech {
+    animation: none;
   }
 }
 
@@ -86,10 +148,18 @@
     --bot-pet-right: 10px;
     width: 96px;
   }
+  .bot-pet--top-right {
+    --bot-pet-right: 72px;
+  }
   .bot-pet__sprite {
     transform: scale(0.5);
   }
   .bot-pet--inline {
     right: auto;
+  }
+  .bot-pet__speech {
+    max-width: 8.5rem;
+    font-size: 0.7rem;
+    padding: 0.55rem 0.7rem 0.65rem;
   }
 }

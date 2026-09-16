@@ -1,0 +1,16 @@
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path
+    d="M10 2.4L11.95 7.05L17 7.7L13.25 11.1L14.3 16.1L10 13.55L5.7 16.1L6.75 11.1L3 7.7L8.05 7.05L10 2.4Z"
+    fill="url(#starGold)"
+    stroke="#C9922A"
+    stroke-width="0.9"
+    stroke-linejoin="round"
+  />
+  <defs>
+    <linearGradient id="starGold" x1="3" y1="2.4" x2="17" y2="16.1" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE08A"/>
+      <stop offset="0.55" stop-color="#F5C542"/>
+      <stop offset="1" stop-color="#E0A020"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -25,6 +25,8 @@ type BotPetProps = {
    * bottom-right instead of the viewport corner.
    */
   defaultAnchorRef?: RefObject<HTMLElement | null>;
+  /** Optional cloud speech bubble shown to the left of the pet. */
+  speech?: string | null;
 };
 
 type Position = { x: number; y: number };
@@ -57,7 +59,7 @@ function clamp(position: Position, root: HTMLElement | null): Position {
   const { w, h } = petSize(root);
   return {
     x: Math.max(GAP, Math.min(position.x, window.innerWidth - w - GAP)),
-    y: Math.max(GAP, Math.min(position.y, window.innerHeight - h - GAP)),
+    y: Math.max(0, Math.min(position.y, window.innerHeight - h - GAP)),
   };
 }
 
@@ -72,11 +74,11 @@ function cornerPosition(
   const base =
     Number.parseFloat(styles?.getPropertyValue("--bot-pet-base") ?? "") || 18;
   if (corner === "top-right") {
-    // Fully below sticky nav (4rem), in the page-header band.
+    // Flush with the top of the viewport (Learning Resources default).
     return clamp(
       {
         x: window.innerWidth - w - right,
-        y: 64 + 28,
+        y: 0,
       },
       root,
     );
@@ -118,6 +120,7 @@ export default function BotPet({
   storageKey = DEFAULT_POSITION_KEY,
   defaultCorner = "bottom-right",
   defaultAnchorRef,
+  speech = null,
 }: BotPetProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [waving, setWaving] = useState(true);
@@ -318,7 +321,7 @@ export default function BotPet({
 
   const node = (
     <div
-      className={`bot-pet${isInline ? " bot-pet--inline" : ""}${!isInline && !position && defaultCorner === "top-right" ? " bot-pet--top-right" : ""}${dragging ? " is-dragging" : ""}`}
+      className={`bot-pet${isInline ? " bot-pet--inline" : ""}${!isInline && defaultCorner === "top-right" ? " bot-pet--top-right" : ""}${dragging ? " is-dragging" : ""}`}
       ref={rootRef}
       aria-hidden={isInline ? true : undefined}
       role={isInline ? undefined : "img"}
@@ -334,6 +337,11 @@ export default function BotPet({
       onPointerUp={isInline ? undefined : endDrag}
       onPointerCancel={isInline ? undefined : endDrag}
     >
+      {speech ? (
+        <p className="bot-pet__speech" role="status">
+          {speech}
+        </p>
+      ) : null}
       <span className={`bot-pet__sprite${waving ? " is-waving" : ""}`} />
     </div>
   );

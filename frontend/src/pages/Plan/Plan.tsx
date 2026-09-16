@@ -17,6 +17,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { message } from "@/components/ui/message";
 import {
   Drawer,
   DrawerBody,
@@ -60,6 +61,8 @@ type RecordDay = PlanRecordDay;
 type Preview = PlanState;
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const CHECKIN_HINT_KEY = "aiwrevolusi.planCheckinHint.v1";
+const CHECKIN_HINT = "Remember to check in today.";
 
 const dateKey = (d = new Date()) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -135,6 +138,7 @@ export default function Plan() {
   const [notice, setNotice] = useState("");
   const [removeId, setRemoveId] = useState<string | null>(null);
   const [coursesLoading, setCoursesLoading] = useState(true);
+  const [checkinHint, setCheckinHint] = useState<string | null>(null);
   // The drawer opens programmatically, so Radix has no trigger to restore focus
   // to on close; remember the button that opened it instead.
   const detailOpener = useRef<HTMLButtonElement | null>(null);
@@ -160,6 +164,20 @@ export default function Plan() {
       cancelled = true;
     };
   }, [location.key]);
+
+  // Cloud tip on first visit only, and only while the calendar has no records.
+  useEffect(() => {
+    if (coursesLoading) return;
+    const hasRecord = Object.values(state.records).some(dayHasProgress);
+    if (hasRecord) return;
+    try {
+      if (localStorage.getItem(CHECKIN_HINT_KEY)) return;
+      localStorage.setItem(CHECKIN_HINT_KEY, "1");
+    } catch {
+      /* Still show once this visit when storage is unavailable. */
+    }
+    setCheckinHint(CHECKIN_HINT);
+  }, [coursesLoading, state.records]);
 
   useEffect(() => {
     const refresh = () => setToday(dateKey());
@@ -290,6 +308,11 @@ export default function Plan() {
     save(nextState);
     setCourseId(null);
     setToday(day);
+    if (changed) {
+      message.success("Chapter progress saved and synced to your calendar.");
+    } else {
+      message.info("No changes to save.");
+    }
     setNotice(
       changed
         ? "Chapter progress saved and synced to your calendar."
@@ -538,14 +561,15 @@ export default function Plan() {
                         aria-label={`${day}${hasProgress ? ", has learning progress" : ""}`}
                         aria-current={day === today ? "date" : undefined}
                       >
-                        <span className="lp-day-num">
-                          {i + 1}
-                          {hasProgress ? (
-                            <span className="lp-day-star" aria-hidden="true">
-                              🌟
-                            </span>
-                          ) : null}
-                        </span>
+                        <span className="lp-day-num">{i + 1}</span>
+                        {hasProgress ? (
+                          <img
+                            className="lp-day-star"
+                            src="/images/icons/icon-star.svg"
+                            alt=""
+                            aria-hidden="true"
+                          />
+                        ) : null}
                       </button>
                     );
                   })}
@@ -619,8 +643,9 @@ export default function Plan() {
       </div>
 
       <BotPet
-        storageKey="aiwrevolusi.botPetPosition.plan.v1"
+        storageKey="aiwrevolusi.botPetPosition.plan.v3"
         defaultAnchorRef={calendarRef}
+        speech={checkinHint}
       />
 
       <Drawer
@@ -778,7 +803,7 @@ export default function Plan() {
           <div className="lp-day-view__foot">
             <button
               type="button"
-              className="lp-mini lp-mini--blue"
+              className="soft-btn-blue"
               onClick={() => setRecordDate(null)}
             >
               Close
@@ -798,32 +823,40 @@ export default function Plan() {
           <DialogDescription>
             It will leave your learning list too. Daily notes on My Plan stay.
           </DialogDescription>
-          <button className="lp-outline" onClick={() => setRemoveId(null)}>
-            Keep course
-          </button>
-          <button
-            className="lp-primary"
-            onClick={() => {
-              if (!removeId) return;
-              save({
-                ...state,
-                courses: state.courses.filter((c) => c.id !== removeId),
-              });
-              try {
-                const library = readLibrary();
-                saveLibrary({
-                  ...library,
-                  saved: library.saved.filter((id) => id !== removeId),
+          <div className="lp-modal__actions">
+            <button
+              type="button"
+              className="soft-btn-gray"
+              onClick={() => setRemoveId(null)}
+            >
+              Keep course
+            </button>
+            <button
+              type="button"
+              className="soft-btn-blue"
+              onClick={() => {
+                if (!removeId) return;
+                save({
+                  ...state,
+                  courses: state.courses.filter((c) => c.id !== removeId),
                 });
-              } catch {
-                /* Plan removal still succeeds if the learning list cannot update. */
-              }
-              setRemoveId(null);
-              setNotice("Course removed from your plan.");
-            }}
-          >
-            Remove course
-          </button>
+                try {
+                  const library = readLibrary();
+                  saveLibrary({
+                    ...library,
+                    saved: library.saved.filter((id) => id !== removeId),
+                  });
+                } catch {
+                  /* Plan removal still succeeds if the learning list cannot update. */
+                }
+                setRemoveId(null);
+                setNotice("Course removed from your plan.");
+                message.success("Course removed from your plan.");
+              }}
+            >
+              Remove course
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

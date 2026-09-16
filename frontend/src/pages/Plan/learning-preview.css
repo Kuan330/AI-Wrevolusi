@@ -270,16 +270,19 @@ main:has(> .lp-page){
   align-items:center;
   justify-content:center;
   gap:8px;
-  border:0;
+  border:1px solid rgba(79,145,186,.42)!important;
   border-radius:999px;
   padding:10px 18px;
   font-size:12.5px;
   font-weight:600;
-  color:#fff;
-  background:linear-gradient(90deg,#e8a0b0 0%,#c7a0c8 42%,#7eb3d9 78%,#4f91ba 100%);
-  box-shadow:none;
+  color:#35617c!important;
+  background:linear-gradient(180deg,#f4f9fd 0%,#eaf3fb 100%)!important;
+  box-shadow:0 4px 14px rgba(79,145,186,.16),inset 0 1px 0 rgba(255,255,255,.75);
 }
-.lp-drawer-save:hover{filter:brightness(.97);color:#fff}
+.lp-drawer-save:hover{
+  background:linear-gradient(180deg,#eaf3fb 0%,#dceef9 100%)!important;
+  color:#2f5f80!important;
+}
 
 /* Today */
 .lp-today h2{font-size:15px;line-height:1.3;margin:0 0 5px}
@@ -330,8 +333,17 @@ main:has(> .lp-page){
   color:#8b7c95;
   text-align:left;
 }
-.lp-day-num{display:inline-flex;align-items:center;gap:2px}
-.lp-day-star{font-size:9px;line-height:1}
+.lp-day-num{position:relative;z-index:1;line-height:1.15}
+.lp-day-star{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:14px;
+  height:14px;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  display:block;
+}
 .lp-mini-grid>button small{font-size:9px;line-height:1.15;opacity:.8;font-weight:600}
 .lp-mini-grid>button.checked{background:#e7f2fa;color:#4f7894}
 .lp-mini-grid>button.studied{background:#faeaf2;color:#ac748e}
@@ -396,7 +408,7 @@ main:has(> .lp-page){
 button.lp-status{cursor:pointer;border:0}
 
 /* Dialogs */
-.lp-modal{background:#fdfafd!important;border-radius:20px!important;max-height:85vh;overflow-y:auto;color:#493b50}
+.lp-modal{background:linear-gradient(90deg,#eaf3fb 0%,#f5f3f8 48%,#f8ecef 100%)!important;border-radius:20px!important;max-height:85vh;overflow-y:auto;color:#493b50;border-color:rgba(255,255,255,.8)!important}
 .lp-modal--day{
   display:flex!important;
   flex-direction:column!important;
@@ -407,7 +419,20 @@ button.lp-status{cursor:pointer;border:0}
 .lp-modal--day > button[class*="absolute"]{z-index:2}
 .lp-modal label{display:block;font-size:13px;margin:18px 0}
 .lp-modal input:not([type=range]),.lp-modal textarea{display:block;width:100%;border:1px solid #dfd6e5;border-radius:9px;background:white;padding:10px;margin-top:8px}
-.lp-modal form>.lp-primary{width:100%;margin-top:8px}
+.lp-modal__actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:0.55rem;
+  margin-top:1.1rem;
+}
+.lp-modal__actions .soft-btn-gray,
+.lp-modal__actions .soft-btn-blue,
+.lp-day-view__foot .soft-btn-blue{
+  min-height:2.4rem;
+  padding:0.55rem 1.15rem;
+  font-size:0.875rem;
+}
 
 /* Table body fills panel; only rows scroll; footer stays put */
 .lp-courses-table.dt-card{

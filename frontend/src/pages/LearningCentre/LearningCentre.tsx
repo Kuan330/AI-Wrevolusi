@@ -47,7 +47,7 @@ export default function LearningCentre() {
   const [skillsError, setSkillsError] = useState("");
   const [analysis] = useState(readConfirmedAnalysis);
   const [seeded, setSeeded] = useState(false);
-  /** Select the first skill after seeding; empty also supports explicit Clear. */
+  /** Select the first skill after seeding when the list is empty. */
   const [activeId, setActiveId] = useState("");
 
   const workSkills = useMemo(() => {
@@ -86,7 +86,7 @@ export default function LearningCentre() {
     const next = ensureLearningSkills(workSkills);
     setSkills(next);
     // Initialise once. Search links keep their whole-catalogue results, and
-    // later Clear actions must not immediately select the first skill again.
+    // later deselection must not immediately select the first skill again.
     if (!params.get("q")) {
       setActiveId(current => current || next[0]?.id || "");
     }
@@ -202,7 +202,6 @@ export default function LearningCentre() {
       setActiveId(skillId);
       setFilters({ ...emptyFilters });
     },
-    onClear: () => setActiveId(""),
     onRemove: (id: string, name: string) => setRemoveTarget({ id, name }),
     onAdd: () => setAddOpen(true),
   };
@@ -339,7 +338,7 @@ export default function LearningCentre() {
       />
 
       <BotPet
-        storageKey="aiwrevolusi.botPetPosition.learning.v2"
+        storageKey="aiwrevolusi.botPetPosition.learning.v4"
         defaultCorner="top-right"
       />
     </div>

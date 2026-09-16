@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Check, Plus } from "lucide-react";
+import { AppButton } from "@/components/ui/app-button";
 import {
   Dialog,
   DialogContent,
@@ -183,12 +183,12 @@ export default function AddSkillDialog(props: AddSkillDialogProps) {
                         Matched on {match.evidence_phrases.join(", ")}
                       </p>
                     </div>
-                    <Button
+                    <AppButton
                       type="button"
                       size="sm"
-                      variant="outline"
+                      tone={added ? "accept" : "blue"}
                       disabled={added}
-                      className="shrink-0 rounded-full"
+                      className="h-8 shrink-0 px-3 text-xs"
                       onClick={() => {
                         onAdd(skill.core_skill, "wef");
                       }}
@@ -204,7 +204,7 @@ export default function AddSkillDialog(props: AddSkillDialogProps) {
                           Add
                         </>
                       )}
-                    </Button>
+                    </AppButton>
                   </div>
                 );
               })
@@ -215,14 +215,17 @@ export default function AddSkillDialog(props: AddSkillDialogProps) {
           <Link
             to={ROUTES.aiExposure}
             onClick={() => onOpenChange(false)}
-            className="inline-flex items-center gap-1 text-xs font-medium text-[#326889] hover:underline"
+            className="inline-flex items-center text-xs font-medium text-[#326889] hover:underline"
           >
             Browse every skill on AI Impact
-            <ArrowRight className="size-3.5" aria-hidden />
           </Link>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Done
-          </Button>
+          <AppButton
+            type="button"
+            tone="blue"
+            onClick={() => onOpenChange(false)}
+          >
+            close
+          </AppButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

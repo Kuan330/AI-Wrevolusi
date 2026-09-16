@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronRight, Plus, Trash2 } from "lucide-react";
+import { ChevronRight, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InfoPopover } from "@/components/ui/info-popover";
@@ -13,7 +13,6 @@ export type SkillSidebarProps = {
   /** WEF star rating per skill id. Skills outside the framework have no entry. */
   ratings: Map<string, SkillRating>;
   onSelect: (id: string) => void;
-  onClear: () => void;
   onRemove: (id: string, name: string) => void;
   /** Opens the add-skill dialog. Available at all times, not only when empty. */
   onAdd: () => void;
@@ -60,7 +59,6 @@ export default function SkillSidebar(props: SkillSidebarProps) {
     onSelect,
     skills: focusSkills,
     ratings,
-    onClear,
     onRemove,
     onAdd,
   } = props;
@@ -127,25 +125,13 @@ export default function SkillSidebar(props: SkillSidebarProps) {
         </InfoPopover>
         <Button
           type="button"
-          size="icon"
-          variant="ghost"
+          variant="link"
           className="library-sidebar__add"
-          aria-label="Add a skill"
-          title="Add a skill"
           onClick={onAdd}
         >
-          <Plus className="size-5" strokeWidth={2.5} aria-hidden />
+          <img src="/images/icons/icon-add.svg" alt="" aria-hidden="true" />
+          add skill
         </Button>
-        {activeId ? (
-          <Button
-            type="button"
-            variant="link"
-            className="library-sidebar__clear"
-            onClick={onClear}
-          >
-            Clear
-          </Button>
-        ) : null}
       </div>
       <div className="library-skill-list" tabIndex={0} aria-label="Skill list">
         {orderedSkills.map((skill) => {
