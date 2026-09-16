@@ -63,7 +63,8 @@ async def get_possibilities(
         role_row = (await db.execute(text('SELECT masco_code, title FROM occupations WHERE id=:id'), {'id': current_user.occupation_id})).mappings().one_or_none()
         if role_row:
             role = {'occupation_code': role_row['masco_code'], 'title': role_row['title']}
-    skill_items = [{'skill_id': i, 'skill_slug': str(row['core_skill']).lower().replace(' ', '-'), 'name': row['core_skill'], 'state': 'have' if i in owned else ('shortlisted' if i in shortlist else 'missing')} for i, row in skills.items()]
-    directions = [{k: v for k, v in row.items() if k != 'required_skill_ids'} | {'skills': [{'skill_id': i, 'skill_slug': str(skills[i]['core_skill']).lower().replace(' ', '-'), 'name': skills[i]['core_skill'], 'state': 'have' if i in owned else ('shortlisted' if i in shortlist else 'missing')} for i in row['required_skill_ids']]} for row in recommendations]
+    from app.services.possibilities import slugify_skill_name
+    skill_items = [{'skill_id': i, 'skill_slug': slugify_skill_name(str(row['core_skill'])), 'name': row['core_skill'], 'state': 'have' if i in owned else ('shortlisted' if i in shortlist else 'missing')} for i, row in skills.items()]
+    directions = [{k: v for k, v in row.items() if k != 'required_skill_ids'} | {'skills': [{'skill_id': i, 'skill_slug': slugify_skill_name(str(skills[i]['core_skill'])), 'name': skills[i]['core_skill'], 'state': 'have' if i in owned else ('shortlisted' if i in shortlist else 'missing')} for i in row['required_skill_ids']]} for row in recommendations]
     chosen_score = next((chosen_direction_score(owned, set(shortlist), set(row['required_skill_ids'])) for row in recommendations if row['occupation_code'] == chosen_code), None)
     return PossibilitiesResponse(disclaimer=DISCLAIMER, source='live', status='ready' if owned else 'needs_profile', current_role=role, skills=skill_items, directions=directions, chosen_direction_code=chosen_code, chosen_direction_coverage_pct=chosen_score if chosen_score is not None else None, shortlisted_skill_ids=shortlist)

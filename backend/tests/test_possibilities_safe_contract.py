@@ -12,6 +12,7 @@ from app.schemas.possibilities import (
 from app.services.possibilities import (
     classify_skill_state,
     filter_allowed_directions,
+    slugify_skill_name,
     validate_shortlist_ids,
 )
 
@@ -90,6 +91,11 @@ def test_shortlist_validator_rejects_non_integer_identifiers() -> None:
     for invalid in ([True], ['1'], [1.0], [0], [-1]):
         with pytest.raises(ValueError):
             validate_shortlist_ids(invalid, allowed_skill_ids={1}, limit=3)
+
+
+def test_skill_names_are_normalized_to_safe_slugs() -> None:
+    assert slugify_skill_name('Resilience, flexibility and agility') == 'resilience-flexibility-and-agility'
+    assert slugify_skill_name('Reading, writing and mathematics') == 'reading-writing-and-mathematics'
 
 
 def test_response_contract_rejects_demo_skill_ids_and_bounds_scores() -> None:
