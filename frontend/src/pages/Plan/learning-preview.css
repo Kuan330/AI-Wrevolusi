@@ -45,8 +45,7 @@
 .lp-cell-course__copy strong{display:block;font-size:13.5px;font-weight:600;color:#2f2430;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lp-cell-course__copy small{display:block;font-size:11.5px;color:#8c7e90;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lp-cell-progress{display:flex;align-items:center;gap:10px}
-.lp-bar{flex:1;height:6px;border-radius:20px;background:#eeeaf0;overflow:hidden}
-.lp-bar>span{display:block;height:100%}
+.lp-bar{flex:1;min-width:0}
 .lp-bar__value{font-size:12.5px;font-weight:600;color:#638ba9;min-width:36px}
 .lp-cell-muted{font-size:12.5px;color:#8c7e90}
 .lp-cell-actions{display:inline-flex;align-items:center;gap:8px}
@@ -63,29 +62,69 @@
 /* Course detail drawer.
    The drawer portals to document.body, so it sits outside .lp-page and needs its
    own cursor / focus-visible rules. */
-.lp-drawer button{cursor:pointer;transition:background .15s,border-color .15s}
+.lp-drawer button{cursor:pointer;transition:background .15s,border-color .15s,filter .15s}
 .lp-drawer button:focus-visible,.lp-drawer input:focus-visible{outline:3px solid #6096b5;outline-offset:3px}
-.lp-drawer-title{font-size:17px}
-.lp-drawer-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
-.lp-drawer-chapter{border:1px solid #efe9f0;border-radius:12px;background:#fff;padding:14px 16px}
+.lp-drawer-title{font-size:17px;color:#2f2430}
+.lp-drawer-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.lp-drawer-chapter{
+  border:1px solid rgba(234,221,228,.95);
+  border-radius:16px;
+  background:rgba(255,255,255,.72);
+  padding:14px 16px;
+  box-shadow:0 6px 18px rgba(61,43,54,.04);
+}
 .lp-drawer-chapter__head{display:flex;align-items:center;justify-content:space-between;gap:14px}
-.lp-drawer-chapter__name{display:inline-flex;align-items:center;gap:9px;min-width:0;font-size:13px;font-weight:500;color:#3d5f7a}
+.lp-drawer-chapter__name{display:inline-flex;align-items:center;gap:9px;min-width:0;font-size:13px;font-weight:600;color:#3d5f7a}
 .lp-drawer-chapter__field{display:inline-flex;align-items:center;gap:4px;flex-shrink:0;font-size:12px;color:#7391a8}
-.lp-drawer-chapter__input{width:64px;padding:6px 9px;border:1px solid #d4e1ec;border-radius:9px;background:#fff;color:#3d5f7a;font-size:13px;font-weight:600;text-align:right}
+.lp-drawer-chapter__input{
+  width:64px;
+  padding:6px 10px;
+  border:1px solid #c9dfef;
+  border-radius:999px;
+  background:linear-gradient(100deg,rgba(234,243,251,.92),rgba(248,236,239,.72));
+  color:#3d5f7a;
+  font-size:13px;
+  font-weight:600;
+  text-align:right;
+}
 .lp-drawer-chapter__input:read-only{border-color:#e9e3ec;background:#faf8fc;color:#a99aab}
-.lp-drawer-chapter__bar{margin-top:10px;height:6px;border-radius:20px;background:#eeeaf0;overflow:hidden}
-.lp-drawer-chapter__bar>span{display:block;height:100%;border-radius:20px;background:#7fa7c5;transition:width .18s ease}
-.lp-drawer-chapter__foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:9px}
+.lp-drawer-chapter__bar{margin-top:12px}
+.lp-drawer-chapter__foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
 .lp-drawer-chapter__hint{font-size:10.5px;color:#9b8ba3}
 .lp-drawer-chapter__done{display:inline-flex;align-items:center;border:1px solid #c8e2d3;border-radius:999px;background:#e8f4ec;padding:4px 11px;font-size:10.5px;font-weight:600;color:#54846a}
 /* Reached 100% in this draft but not saved yet: still editable, so the badge
    must not read as banked progress. */
 .lp-drawer-chapter__pending{display:inline-flex;align-items:center;border:1px dashed #c8dfef;border-radius:999px;background:#f2f8fd;padding:4px 11px;font-size:10.5px;font-weight:500;color:#4f7894}
-.lp-overall{margin-top:16px;padding:16px;border:1px solid #fff;border-radius:14px;background:linear-gradient(115deg,#e8f3fd,#fbedf3)}
-.lp-overall strong{display:block;font-size:28px;font-weight:600;line-height:1.1;color:#3d5f7a}
-.lp-overall>span{display:block;margin-top:2px;font-size:11.5px;color:#81738a}
+.lp-overall{
+  display:grid;
+  gap:12px;
+  margin-top:16px;
+  padding:16px;
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:16px;
+  background:linear-gradient(115deg,#eaf3fb,#f5f3f8 48%,#f8ecef);
+  box-shadow:0 8px 22px rgba(61,43,54,.05);
+}
+.lp-overall__copy{min-width:0}
+.lp-overall strong{display:block;font-size:28px;font-weight:600;line-height:1.1;color:#2f2430}
+.lp-overall__copy>span{display:block;margin-top:2px;font-size:11.5px;color:#81738a}
 .lp-drawer-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:16px;border-top:1px solid #efe9f0}
 .lp-drawer-meta{font-size:11.5px;color:#8c7e90}
+.lp-drawer-save{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  border:0;
+  border-radius:999px;
+  padding:10px 18px;
+  font-size:12.5px;
+  font-weight:600;
+  color:#fff;
+  background:linear-gradient(90deg,#e8a0b0 0%,#c7a0c8 42%,#7eb3d9 78%,#4f91ba 100%);
+  box-shadow:none;
+}
+.lp-drawer-save:hover{filter:brightness(.97);color:#fff}
 
 /* Today */
 .lp-today h2{font-size:15px;line-height:1.3;margin:0 0 5px}

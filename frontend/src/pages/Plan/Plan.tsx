@@ -29,6 +29,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { GradientBar } from "@/components/ui/gradient-bar";
 import { cn } from "@/lib/utils";
 import "@/pages/LearningCentre/course-library.css";
 import "./learning-preview.css";
@@ -49,7 +50,6 @@ type RecordDay = {
 type Preview = { courses: Course[]; records: Record<string, RecordDay> };
 
 const KEY = "aiwrevolusi.plan.learningPreview.v1";
-const TONES = ["#7fa7c5", "#c791aa", "#a294bd"];
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const dateKey = (d = new Date()) =>
@@ -241,8 +241,6 @@ export default function Plan() {
   const inProgress = state.courses.filter(
     (c) => percent(c) > 0 && percent(c) < 100,
   ).length;
-  const tone = (id: string) =>
-    TONES[Math.max(0, state.courses.findIndex((c) => c.id === id)) % TONES.length];
 
   function openCourse(c: Course) {
     setCourseId(c.id);
@@ -381,9 +379,12 @@ export default function Plan() {
       sortValue: (c) => percent(c),
       cell: (c) => (
         <span className="lp-cell-progress">
-          <span className="lp-bar">
-            <span style={{ width: `${percent(c)}%`, background: tone(c.id) }} />
-          </span>
+          <GradientBar
+            size="sm"
+            value={percent(c)}
+            className="lp-bar"
+            aria-label={`${c.title} progress ${percent(c)}%`}
+          />
           <span className="lp-bar__value">{percent(c)}%</span>
         </span>
       ),
@@ -392,6 +393,7 @@ export default function Plan() {
       id: "chapters",
       header: "Chapters",
       width: "13%",
+      align: "center",
       sortValue: (c) => doneCount(c),
       cell: (c) => (
         <span className="lp-cell-muted">
@@ -403,6 +405,7 @@ export default function Plan() {
       id: "status",
       header: "Status",
       width: "13%",
+      align: "center",
       sortValue: (c) => percent(c),
       cell: (c) => {
         const s = courseStatus(c);
@@ -417,7 +420,7 @@ export default function Plan() {
       id: "action",
       header: "Action",
       width: "20%",
-      align: "end",
+      align: "center",
       cell: (c) => (
         <span className="lp-cell-actions">
           <button
@@ -454,7 +457,7 @@ export default function Plan() {
             variant="ghost"
             className="learning-courses-trigger h-10 rounded-full px-5 font-semibold"
           >
-            <Link to="/learning-centre">+ ADD</Link>
+            <Link to="/learning-centre">Add course</Link>
           </Button>
         }
       />
@@ -765,7 +768,11 @@ export default function Plan() {
                           </span>
                         </div>
                         <div className="lp-drawer-chapter__bar">
-                          <span style={{ width: `${chapterPercent}%` }} />
+                          <GradientBar
+                            size="sm"
+                            value={chapterPercent}
+                            aria-label={`${ch.title} progress ${chapterPercent}%`}
+                          />
                         </div>
                         <div className="lp-drawer-chapter__foot">
                           <span className="lp-drawer-chapter__hint">
@@ -792,11 +799,18 @@ export default function Plan() {
                   })}
                 </ol>
                 <div className="lp-overall">
-                  <p className="lp-kicker">Overall progress</p>
-                  <strong>{draftPercent}%</strong>
-                  <span>
-                    {draftDone} of {course.chapters.length} chapters complete
-                  </span>
+                  <div className="lp-overall__copy">
+                    <p className="lp-kicker">Overall progress</p>
+                    <strong>{draftPercent}%</strong>
+                    <span>
+                      {draftDone} of {course.chapters.length} chapters complete
+                    </span>
+                  </div>
+                  <GradientBar
+                    size="sm"
+                    value={draftPercent}
+                    aria-label={`Overall progress ${draftPercent}%`}
+                  />
                 </div>
               </DrawerBody>
               <div className="lp-drawer-foot">
@@ -805,7 +819,7 @@ export default function Plan() {
                 </span>
                 <button
                   type="button"
-                  className="lp-primary"
+                  className="lp-drawer-save"
                   onClick={updateProgress}
                 >
                   Save progress
