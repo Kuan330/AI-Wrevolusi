@@ -1,4 +1,4 @@
-import { Bookmark, ArrowRight } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { durationLabel } from "../lib/coursePlanning";
@@ -53,7 +53,6 @@ export default function CourseCard(props: CourseCardProps) {
         </small>
         <Button variant="link" onClick={onDetails}>
           View details
-          <ArrowRight size={16} />
         </Button>
       </div>
     </Card>

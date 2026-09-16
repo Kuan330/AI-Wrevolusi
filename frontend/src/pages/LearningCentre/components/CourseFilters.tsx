@@ -89,6 +89,7 @@ export default function CourseFilters(props: CourseFiltersProps) {
         <div className="library-level">{levelSelect}</div>
         <Button
           variant="outline"
+          className="library-more-filters"
           aria-expanded={expanded}
           aria-controls={panelId}
           onClick={() => setExpanded(!expanded)}

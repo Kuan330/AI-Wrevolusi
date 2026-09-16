@@ -4,6 +4,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
 
 const Drawer = DialogPrimitive.Root;
 const DrawerTrigger = DialogPrimitive.Trigger;
@@ -31,16 +32,17 @@ const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >((props, ref) => {
-  const { className, children, ...restProps } = props;
+  const { className, children, style, ...restProps } = props;
   return (
     <DialogPrimitive.Portal>
       <DrawerOverlay />
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          "fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-xl flex-col gap-4 border-l border-white/80 bg-[#fffafe]/95 p-6 text-[#2f2430] shadow-[-16px_0_40px_rgba(61,43,54,0.16)] backdrop-blur-xl duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:p-8",
+          "fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-xl flex-col gap-4 border-l border-white/80 p-6 text-[#2f2430] shadow-[-16px_0_40px_rgba(61,43,54,0.16)] backdrop-blur-xl duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:p-8",
           className,
         )}
+        style={{ background: PAGE_GRADIENT_CSS, ...style }}
         {...restProps}
       >
         {children}

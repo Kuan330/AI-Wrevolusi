@@ -1,5 +1,5 @@
-import { toast } from "sonner";
 import { useState } from "react";
+import { message } from "@/components/ui/message";
 import { syncPlanWithLearningCourses } from "@/pages/Plan/lib/planCourses";
 import { readLibrary, saveLibrary, emptyLibrary } from "../lib/libraryStorage";
 import type { LibraryState } from "../types";
@@ -42,6 +42,9 @@ export function useCourseLibrary() {
       setNotice(
         "Course saved, but My Plan could not be updated. Open My Plan to retry.",
       );
+      message.error(
+        "Course saved, but My Plan could not be updated. Open My Plan to retry.",
+      );
     }
   }
 
@@ -54,31 +57,12 @@ export function useCourseLibrary() {
       ...state,
       saved: nextSaved,
     });
-    if (!changed) return;
+    if (!changed) {
+      message.error("Could not save your changes. Please try again.");
+      return;
+    }
     void syncPlan(nextSaved);
-    toast(wasSaved ? "Removed from My Plan" : "Added to My Plan", {
-      action: {
-        label: "Undo",
-        onClick: () => {
-          try {
-            const latest = readLibrary();
-            const undone = wasSaved
-              ? [...new Set([...latest.saved, courseId])]
-              : latest.saved.filter((id) => id !== courseId);
-            if (
-              update({
-                ...latest,
-                saved: undone,
-              })
-            ) {
-              void syncPlan(undone);
-            }
-          } catch {
-            setNotice("Could not undo. Please try again.");
-          }
-        },
-      },
-    });
+    message.success(wasSaved ? "Removed from My Plan" : "Added to My Plan");
   }
 
   /** Drop courses from the learning list (e.g. when their skill is removed). */

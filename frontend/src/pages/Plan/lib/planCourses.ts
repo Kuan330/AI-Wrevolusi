@@ -8,13 +8,25 @@ export type PlanCourse = {
   id: string;
   title: string;
   provider: string;
+  /** Catalogue skill slug used when syncing progress to `/learning/progress`. */
+  skillId?: string;
   chapters: PlanChapter[];
+};
+/** One chapter progress bump saved on a calendar day. */
+export type PlanDayChapterEntry = {
+  courseId: string;
+  courseTitle: string;
+  chapterTitle: string;
+  /** 0–100 */
+  percent: number;
 };
 export type PlanRecordDay = {
   minutes: number;
   note: string;
   studied: boolean;
   checked: boolean;
+  /** Chapter progress recorded on this day (view-only on the calendar). */
+  entries?: PlanDayChapterEntry[];
 };
 export type PlanState = {
   version: 1;
@@ -49,19 +61,37 @@ function isCourse(value: unknown): value is PlanCourse {
     typeof course.id === "string" &&
     typeof course.title === "string" &&
     typeof course.provider === "string" &&
+    (course.skillId === undefined || typeof course.skillId === "string") &&
     Array.isArray(course.chapters) &&
     course.chapters.every(isChapter)
+  );
+}
+
+function isDayEntry(value: unknown): value is PlanDayChapterEntry {
+  if (!value || typeof value !== "object") return false;
+  const entry = value as PlanDayChapterEntry;
+  return (
+    typeof entry.courseId === "string" &&
+    typeof entry.courseTitle === "string" &&
+    typeof entry.chapterTitle === "string" &&
+    Number.isFinite(entry.percent) &&
+    entry.percent >= 0 &&
+    entry.percent <= 100
   );
 }
 
 function isRecord(value: unknown): value is PlanRecordDay {
   if (!value || typeof value !== "object") return false;
   const record = value as PlanRecordDay;
+  const entriesOk =
+    record.entries === undefined ||
+    (Array.isArray(record.entries) && record.entries.every(isDayEntry));
   return (
     Number.isFinite(record.minutes) &&
     typeof record.note === "string" &&
     typeof record.studied === "boolean" &&
-    typeof record.checked === "boolean"
+    typeof record.checked === "boolean" &&
+    entriesOk
   );
 }
 
@@ -93,13 +123,26 @@ export function readPlanState(): PlanState {
   const current = parseState(accountStorage.getItem(KEY));
   if (current) return current;
 
+  // Migrate orphan browser copies (e.g. written before the key was synced).
+  const orphan =
+    typeof localStorage !== "undefined"
+      ? parseState(localStorage.getItem(KEY))
+      : null;
+  if (orphan) {
+    savePlanState(orphan);
+    return orphan;
+  }
+
   const legacy =
     parseState(accountStorage.getItem(LEGACY_KEY)) ??
     parseState(
       typeof sessionStorage !== "undefined"
         ? sessionStorage.getItem(LEGACY_KEY)
         : null,
-    );
+    ) ??
+    (typeof localStorage !== "undefined"
+      ? parseState(localStorage.getItem(LEGACY_KEY))
+      : null);
   if (legacy) {
     savePlanState(legacy);
     return legacy;
@@ -109,6 +152,12 @@ export function readPlanState(): PlanState {
 
 export function savePlanState(state: PlanState) {
   accountStorage.setItem(KEY, JSON.stringify(state));
+  // Always keep a local mirror so refresh works even if workspace sync lags.
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
+  } catch {
+    /* Storage may be unavailable in private mode. */
+  }
 }
 
 export function catalogueToPlanCourse(
@@ -124,6 +173,7 @@ export function catalogueToPlanCourse(
     id: course.id,
     title: course.title,
     provider: course.provider,
+    skillId: course.skills[0] || existing?.skillId,
     chapters: titles.map((title, index) => {
       const matched =
         existing?.chapters.find((chapter) => chapter.title === title) ??
