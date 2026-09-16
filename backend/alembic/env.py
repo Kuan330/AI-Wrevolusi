@@ -19,6 +19,7 @@ from app.models import (  # noqa: F401
     refresh_token,
     schedule,
     task,
+    task_assist,
     user,
 )
 
