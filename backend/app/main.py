@@ -11,6 +11,7 @@ from app.routers import (
     exposure,
     learning,
     occupations,
+    possibilities,
     preparation,
     reference,
     schedule,
@@ -46,6 +47,7 @@ def create_app(api_root: str = '/api') -> FastAPI:
     application.include_router(tasks.router, prefix=api_prefix)
     application.include_router(exposure.router, prefix=api_prefix)
     application.include_router(capabilities.router, prefix=api_prefix)
+    application.include_router(possibilities.router, prefix=api_prefix)
     application.include_router(preparation.router, prefix=api_prefix)
     application.include_router(schedule.router, prefix=api_prefix)
     application.include_router(reference.router, prefix=api_prefix)
