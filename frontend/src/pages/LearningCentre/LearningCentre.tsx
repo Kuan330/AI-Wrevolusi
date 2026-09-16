@@ -11,8 +11,9 @@ import FloatingLearningCourses from "./components/FloatingLearningCourses";
 import LearningCoursesDialog from "./components/LearningCoursesDialog";
 import AddSkillDialog from "./components/AddSkillDialog";
 import RemoveSkillDialog from "./components/RemoveSkillDialog";
-import { courses } from "./catalogue";
 import { useCourseLibrary } from "./hooks/useCourseLibrary";
+import { fetchPageCatalogue } from "@/services/catalogueService";
+import type { Course } from "./types";
 import {
   coursesForSkill,
   ensureLearningSkills,
@@ -102,12 +103,45 @@ export default function LearningCentre() {
   }, [focusSkills, activeId]);
 
   const skill = focusSkills.find((item) => item.id === activeId);
-  const matching =
-    !activeId || params.get("q")
-      ? courses
-      : courses.filter((course) =>
-          coursesForSkill(activeId).includes(course.id),
-        );
+  const [pageCourses, setPageCourses] = useState<Course[]>([]);
+  const [catalogueSource, setCatalogueSource] = useState<"api" | "fallback">(
+    "api",
+  );
+  const [catalogueNotice, setCatalogueNotice] = useState("");
+  const [catalogueLoading, setCatalogueLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    const searchActive = Boolean(params.get("q"));
+    // Courses only appear once a sidebar skill is selected; the search query
+    // is the one exception and covers the whole catalogue.
+    if (!searchActive && !activeId) {
+      setPageCourses([]);
+      setCatalogueNotice("");
+      setCatalogueLoading(false);
+      return;
+    }
+    setCatalogueLoading(true);
+    const skillId = searchActive ? null : activeId;
+    void fetchPageCatalogue(skillId)
+      .then((result) => {
+        if (cancelled) return;
+        setPageCourses(result.courses);
+        setCatalogueSource(result.source);
+        setCatalogueNotice(result.notice ?? "");
+        setCatalogueLoading(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setCatalogueSource("fallback");
+        setCatalogueLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeId, params.get("q")]);
+
+  const matching = pageCourses;
   const visible = matching.filter(
     (course) =>
       [course.title, course.provider, course.intro, ...course.outcomes]
@@ -120,7 +154,8 @@ export default function LearningCentre() {
       (!filters.language || course.language === filters.language) &&
       (!filters.registration || course.register === filters.registration),
   );
-  const detailCourse = courses.find((course) => course.id === detailId) ?? null;
+  const detailCourse =
+    pageCourses.find((course) => course.id === detailId) ?? null;
   const addedIds = new Set(skills.map((item) => item.id));
 
   const confirmRemoveSkill = () => {
@@ -204,50 +239,48 @@ export default function LearningCentre() {
             tabIndex={0}
           >
             <CourseFilters {...filterProps} />
+            {catalogueLoading && (
+              <p className="library-muted" role="status">
+                Loading courses…
+              </p>
+            )}
+            {!catalogueLoading && catalogueNotice && (
+              <p className="library-muted" role="status">
+                {catalogueNotice}
+                {catalogueSource === "fallback" ? " (offline sample data)" : ""}
+              </p>
+            )}
             <p className="library-muted" role="status">
               {skill
                 ? `${visible.length} of ${matching.length} courses for ${skill.en}`
                 : `${visible.length} of ${matching.length} courses in the catalogue`}
             </p>
             <div className="library-course-list">
-              <div className="library-course-list__col">
-                {visible
-                  .filter((_, index) => index % 2 === 0)
-                  .map((course) => (
-                    <CourseCard
-                      key={course.id}
-                      course={course}
-                      saved={state.saved.includes(course.id)}
-                      onSave={() => toggleSave(course.id)}
-                      onDetails={() => setDetailId(course.id)}
-                    />
-                  ))}
-              </div>
-              <div className="library-course-list__col">
-                {visible
-                  .filter((_, index) => index % 2 === 1)
-                  .map((course) => (
-                    <CourseCard
-                      key={course.id}
-                      course={course}
-                      saved={state.saved.includes(course.id)}
-                      onSave={() => toggleSave(course.id)}
-                      onDetails={() => setDetailId(course.id)}
-                    />
-                  ))}
-              </div>
+              {visible.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  saved={state.saved.includes(course.id)}
+                  onSave={() => toggleSave(course.id)}
+                  onDetails={() => setDetailId(course.id)}
+                />
+              ))}
             </div>
-            {!visible.length && (
+            {!visible.length && !catalogueLoading && (
               <div className="library-empty library-glass">
                 <h3>
                   {matching.length
                     ? "No courses match these filters"
-                    : "No matching courses yet"}
+                    : !skill && !params.get("q")
+                      ? "Select a skill to see its courses"
+                      : "No matching courses yet"}
                 </h3>
                 <p>
                   {matching.length
                     ? "Try another format, provider or search term."
-                    : "This skill stays in your learning list. The current catalogue has no linked courses yet."}
+                    : !skill && !params.get("q")
+                      ? "Choose a skill in the sidebar to browse its verified courses."
+                      : "This skill stays in your learning list. The current catalogue has no linked courses yet."}
                 </p>
                 <Button
                   variant="outline"
@@ -294,6 +327,7 @@ export default function LearningCentre() {
           if (!open) refresh();
         }}
         addedIds={addedIds}
+        workSkills={workSkills}
         onAdd={(name, source) => addSkill(name, source)}
       />
 

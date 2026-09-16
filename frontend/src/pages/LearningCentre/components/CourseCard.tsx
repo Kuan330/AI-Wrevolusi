@@ -45,7 +45,6 @@ export default function CourseCard(props: CourseCardProps) {
         <span>{course.language}</span>
         <span>{course.selfPaced ? "Self-paced" : "Scheduled course"}</span>
       </div>
-      <p className="learning-course-summary">{course.intro}</p>
       <div className="library-row">
         <small className="library-muted">
           {course.register === "required"

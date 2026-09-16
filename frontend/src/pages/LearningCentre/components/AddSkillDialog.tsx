@@ -12,7 +12,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/form-field";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { skillKey } from "@/pages/Skills/learningSkills";
+import {
+  skillKey,
+  type LearningSkill,
+} from "@/pages/Skills/learningSkills";
 import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
 
@@ -20,11 +23,13 @@ type AddSkillDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   addedIds: Set<string>;
-  onAdd: (name: string, source: "wef" | "custom") => boolean;
+  /** Skills decomposed from the user's confirmed work tasks. */
+  workSkills: LearningSkill[];
+  onAdd: (name: string, source: LearningSkill["source"]) => boolean;
 };
 
 export default function AddSkillDialog(props: AddSkillDialogProps) {
-  const { open, onOpenChange, addedIds, onAdd } = props;
+  const { open, onOpenChange, addedIds, workSkills, onAdd } = props;
   const [wefSkills, setWefSkills] = useState<WefSkill[]>([]);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
@@ -96,14 +101,69 @@ export default function AddSkillDialog(props: AddSkillDialogProps) {
         <DialogHeader className="border-b border-[#e8dff0] px-5 py-4">
           <DialogTitle>Add a skill</DialogTitle>
           <DialogDescription>
-            Choose from the WEF framework, or add a skill of your own.
+            Start from the skills reflected in your work, choose from the WEF
+            framework, or add a skill of your own.
           </DialogDescription>
         </DialogHeader>
-        <Tabs defaultValue="wef" className="px-5 py-4">
-          <TabsList className="mb-4 grid w-full grid-cols-2">
+        <Tabs
+          defaultValue={workSkills.length ? "work" : "wef"}
+          className="px-5 py-4"
+        >
+          <TabsList className="mb-4 grid w-full grid-cols-3">
+            <TabsTrigger value="work">
+              From your work ({workSkills.length})
+            </TabsTrigger>
             <TabsTrigger value="wef">WEF skills (26)</TabsTrigger>
             <TabsTrigger value="custom">Custom skill</TabsTrigger>
           </TabsList>
+          <TabsContent value="work" className="mt-0 space-y-3">
+            <div className="max-h-[22rem] space-y-1.5 overflow-y-auto pr-1">
+              {workSkills.length === 0 ? (
+                <p className="py-8 text-center text-sm text-[#7f7280]">
+                  No skills reflected in your work yet. Complete the work
+                  analysis first, or choose from the WEF framework.
+                </p>
+              ) : (
+                workSkills.map((skill) => {
+                  const added = addedIds.has(skill.id);
+                  return (
+                    <div
+                      key={skill.id}
+                      className="flex items-center gap-2 rounded-xl border border-[#e4edf5] bg-white/70 px-3 py-2.5"
+                    >
+                      <span className="min-w-0 flex-1 text-sm font-medium text-[#2f2430]">
+                        {skill.name}
+                      </span>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        disabled={added}
+                        className="shrink-0 rounded-full"
+                        onClick={() => {
+                          if (onAdd(skill.name, "work")) {
+                            /* keep dialog open so user can add more */
+                          }
+                        }}
+                      >
+                        {added ? (
+                          <>
+                            <Check className="size-3.5" aria-hidden />
+                            Added
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="size-3.5" aria-hidden />
+                            Add
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </TabsContent>
           <TabsContent value="wef" className="mt-0 space-y-3">
             <Input
               value={query}

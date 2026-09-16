@@ -67,6 +67,76 @@ def build_bot_catalogue(rows: Iterable[Mapping]) -> list[dict]:
     return list(grouped.values())
 
 
+PAGE_LEVEL_ORDER = {'Beginner': 0, 'Intermediate': 1, 'Advanced': 2}
+
+
+def build_page_catalogue(
+    course_rows: Iterable[Mapping],
+    chapter_rows: Iterable[Mapping],
+) -> list[dict]:
+    """Build the page-shaped course list with chapters attached.
+
+    Course rows carry the full verified metadata; chapter rows are attached by
+    course code. Courses come back easiest-first (Beginner -> Intermediate ->
+    Advanced, then course_no) so the Learning Resources page needs no
+    client-side sorting for its default order.
+    """
+
+    chapters_by_course: dict[str, list[dict]] = {}
+    for row in chapter_rows:
+        course_id = str(row.get('course_code') or '').strip()
+        chapter_order = row.get('chapter_order')
+        if not course_id or chapter_order is None:
+            continue
+        chapters_by_course.setdefault(course_id, []).append(
+            {
+                'order': int(chapter_order),
+                'title': str(row.get('title') or ''),
+                'duration_min': row.get('duration_min'),
+            }
+        )
+
+    courses: list[dict] = []
+    for row in course_rows:
+        course_id = str(row.get('course_code') or '').strip()
+        if not course_id:
+            continue
+        chapters = chapters_by_course.get(course_id, [])
+        chapters.sort(key=lambda item: item['order'])
+        courses.append(
+            {
+                'course_id': course_id,
+                'skill_id': skill_slug(str(row.get('core_skill') or '')),
+                'skill_name': str(row.get('core_skill') or ''),
+                'title': row.get('title'),
+                'provider': row.get('provider'),
+                'url': row.get('url'),
+                'level': row.get('level'),
+                'course_no': row.get('course_no'),
+                'language': row.get('language'),
+                'format': row.get('format'),
+                'self_paced': bool(row.get('self_paced')),
+                'duration_min': row.get('duration_min'),
+                'register': row.get('register'),
+                'description': row.get('course_description'),
+                'outcomes': row.get('outcomes'),
+                'prereq': row.get('prereq'),
+                'advice': row.get('advice'),
+                'chapter_count': int(row.get('chapter_count') or 0),
+                'chapters': chapters,
+            }
+        )
+
+    courses.sort(
+        key=lambda course: (
+            PAGE_LEVEL_ORDER.get(str(course['level'] or ''), 9),
+            int(course['course_no'] or 0),
+            course['course_id'],
+        )
+    )
+    return courses
+
+
 def build_catalogue_scope(rows: Iterable[Mapping]) -> dict[str, dict[str, set[int]]]:
     """Build ``skill -> course -> zero-based chapter indexes`` for validation."""
 

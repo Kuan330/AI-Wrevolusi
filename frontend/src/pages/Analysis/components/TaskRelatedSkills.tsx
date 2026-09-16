@@ -78,7 +78,7 @@ const TaskRelatedSkills = (props: TaskRelatedSkillsProps) => {
                     type="button"
                     size="sm"
                     className="shrink-0"
-                    onClick={() => addSkill(skill.core_skill, "work")}
+                    onClick={() => addSkill(skill.core_skill, "wef")}
                   >
                     Add to Learning Resources
                   </Button>

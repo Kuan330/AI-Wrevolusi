@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Bookmark, ExternalLink, Trash2 } from "lucide-react";
 import {
   Drawer,
@@ -30,6 +30,8 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
   const { course, skillName, saved, onClose, onSave, onSkillsChanged } = props;
   const buildSkills = useMemo(() => wefSkillsForCourse(course.id), [course.id]);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const [aboutExpanded, setAboutExpanded] = useState(false);
+  const aboutIsLong = course.intro.length > 180;
 
   return (
     <Drawer
@@ -43,8 +45,8 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
           <p className="library-kicker">{course.provider}</p>
           <DrawerTitle>{course.title}</DrawerTitle>
           <DrawerDescription>
-            {course.provider} · {courseLevelLabel(course.level)} ·{" "}
-            {course.language} · {durationLabel(course.durationMin)}
+            {courseLevelLabel(course.level)} · {course.language} ·{" "}
+            {durationLabel(course.durationMin)}
           </DrawerDescription>
         </DrawerHeader>
         <DrawerBody>
@@ -65,7 +67,20 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
             <TabsContent value="overview" className="learning-overview">
               <section>
                 <h3>About this course</h3>
-                <p>{course.intro}</p>
+                <p
+                  className={`learning-about${aboutExpanded ? " is-expanded" : ""}`}
+                >
+                  {course.intro}
+                </p>
+                {aboutIsLong && (
+                  <Button
+                    variant="link"
+                    size="sm"
+                    onClick={() => setAboutExpanded((value) => !value)}
+                  >
+                    {aboutExpanded ? "Show less" : "Show more"}
+                  </Button>
+                )}
               </section>
 
               <section className="learning-course-skills">

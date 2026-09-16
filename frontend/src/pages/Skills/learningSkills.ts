@@ -97,14 +97,15 @@ export function reconcileLearningSkills(
   saved: LearningSkill[] | null,
   work: LearningSkill[],
 ): LearningSkill[] {
-  if (!saved) return work;
-  const current = new Set(work.map((skill) => skill.id));
-  return saved.filter(
-    (skill) =>
-      current.has(skill.id) ||
-      skill.source === "custom" ||
-      skill.source === "wef",
-  );
+  // Work evidence is the default list, including skills without course mappings.
+  // Keep manually added skills, but use the current work source for overlaps.
+  const merged = new Map(work.map(skill => [skill.id, skill]));
+  for (const skill of saved ?? []) {
+    if (!merged.has(skill.id) && (skill.source === "custom" || skill.source === "wef")) {
+      merged.set(skill.id, skill);
+    }
+  }
+  return [...merged.values()];
 }
 
 /** Convert a skill name into a LearningSkill for storage. */
@@ -127,7 +128,9 @@ export function ensureLearningSkills(work: LearningSkill[]): LearningSkill[] {
     saved = null;
   }
   if (saved && saved.length > 0) {
-    return reconcileLearningSkills(saved, work);
+    const next = reconcileLearningSkills(saved, work);
+    if (JSON.stringify(next) !== JSON.stringify(saved)) saveLearningSkills(next);
+    return next;
   }
   if (work.length > 0) {
     saveLearningSkills(work);
