@@ -9,6 +9,7 @@ from app.db.base import Base, TimestampMixin
 
 if TYPE_CHECKING:
     from app.models.capability import Capability
+    from app.models.learning import LearningCheckin, LearningProgress
     from app.models.occupation import Occupation
     from app.models.preparation import Preparation
     from app.models.refresh_token import RefreshToken
@@ -38,3 +39,6 @@ class User(TimestampMixin, Base):
     capabilities: Mapped[list['Capability']] = relationship(back_populates='user', cascade='all, delete-orphan')
     preparations: Mapped[list['Preparation']] = relationship(back_populates='user', cascade='all, delete-orphan')
     schedules: Mapped[list['Schedule']] = relationship(back_populates='user', cascade='all, delete-orphan')
+    learning_progress: Mapped[list['LearningProgress']] = relationship(back_populates='user', cascade='all, delete-orphan')
+    learning_checkins: Mapped[list['LearningCheckin']] = relationship(back_populates='user', cascade='all, delete-orphan')
+    daily_briefs: Mapped[list['DailyBrief']] = relationship(back_populates='user', cascade='all, delete-orphan')

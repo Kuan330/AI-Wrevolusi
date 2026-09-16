@@ -1,0 +1,81 @@
+.app-message-host {
+  position: fixed;
+  top: 1.15rem;
+  left: 50%;
+  z-index: 90;
+  display: flex;
+  width: min(26rem, calc(100vw - 1.5rem));
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.45rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.app-message {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgba(214, 228, 240, 0.95);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0.7rem 0.9rem;
+  color: #2f2430;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  box-shadow: 0 10px 28px rgba(61, 43, 54, 0.12);
+  pointer-events: auto;
+  animation: app-message-in 0.22s ease;
+}
+
+.app-message__icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.app-message__content {
+  min-width: 0;
+}
+
+.app-message.is-success {
+  border-color: rgba(79, 145, 186, 0.35);
+  color: #2f5f80;
+}
+
+.app-message.is-success .app-message__icon {
+  color: #4f91ba;
+}
+
+.app-message.is-info .app-message__icon {
+  color: #4f91ba;
+}
+
+.app-message.is-warning {
+  border-color: rgba(201, 149, 137, 0.4);
+  color: #8a5a4a;
+}
+
+.app-message.is-warning .app-message__icon {
+  color: #c99589;
+}
+
+.app-message.is-error {
+  border-color: rgba(180, 80, 80, 0.35);
+  color: #8f3d3d;
+}
+
+.app-message.is-error .app-message__icon {
+  color: #c45a5a;
+}
+
+@keyframes app-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.45rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

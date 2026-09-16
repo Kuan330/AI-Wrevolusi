@@ -2,6 +2,7 @@ import type { ComponentProps } from "react";
 import "./exposure-score-panel.css";
 
 import { GradientBar } from "@/components/ui/gradient-bar";
+import { formatScorePercent, scoreToPercent } from "@/pages/Analysis/lib/scorePercent";
 import { cn } from "@/lib/utils";
 
 type ExposureScorePanelProps = {
@@ -15,10 +16,11 @@ const ExposureScorePanel = (props: ExposureScorePanelProps) => {
   if (score == null || !Number.isFinite(score)) return null;
 
   const clamped = Math.min(1, Math.max(0, score));
+  const percent = scoreToPercent(clamped);
 
   const gradientBarProps1 = {
-    value: clamped * 100,
-    "aria-label": `${title} ${clamped.toFixed(2)} out of 1`,
+    value: percent,
+    "aria-label": `${title} ${formatScorePercent(clamped)}`,
   } satisfies Partial<ComponentProps<typeof GradientBar>>;
   return (
     <section className={cn("exposure-score-panel", className)}>
@@ -26,9 +28,8 @@ const ExposureScorePanel = (props: ExposureScorePanelProps) => {
         <h3 className="exposure-score-panel__title">{title}</h3>
         <p className="exposure-score-panel__value">
           <strong className="exposure-score-panel__number">
-            {clamped.toFixed(2)}
+            {formatScorePercent(clamped)}
           </strong>
-          <span className="exposure-score-panel__scale">/ 1.0</span>
         </p>
       </div>
       <GradientBar {...gradientBarProps1} />

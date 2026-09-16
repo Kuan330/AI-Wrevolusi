@@ -20,7 +20,7 @@ import {
   readTaskWorkspace,
   hasConfirmedAnalysis,
   saveSelectedOccupation,
-} from "@/features/work-profile/userProfile";
+} from "@/pages/WorkProfile/userProfile";
 import type { ReferenceOccupation } from "@/types/reference";
 
 type WorkProfileMode = "search" | "filters";
@@ -36,7 +36,6 @@ const WorkProfile = () => {
     [
       ROUTES.task,
       ROUTES.aiExposure,
-      ROUTES.skills,
       ROUTES.learningCentre,
       ROUTES.plan,
       ROUTES.possibilities,

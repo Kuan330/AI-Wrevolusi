@@ -3,9 +3,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import ts from 'typescript';
 const url = source => 'data:text/javascript;base64,' + Buffer.from(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText).toString('base64');
-const model = url(readFileSync('src/features/planning/planModel.ts','utf8'));
-const source = readFileSync('src/features/planning/scheduleCourses.ts','utf8')
-  .replace("'./planModel'", JSON.stringify(model));
+const model = url(readFileSync('src/pages/Plan/planModel.ts','utf8'));
+const source = readFileSync('src/pages/Plan/scheduleCourses.ts','utf8').replace("'./planModel'", JSON.stringify(model));
 const { scheduleCourses } = await import(url(source));
 const course = { id:'c1', title:'Course', minutes:75 };
 const selection = { resourceId:'c1', weekdays:[0,1,2,3,4,5,6], startTime:'18:00', endTime:'18:30' };

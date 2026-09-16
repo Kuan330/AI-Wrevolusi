@@ -1,20 +1,19 @@
-import { localPlanRepository } from "@/features/planning/planRepository";
-import { scheduleCourses } from "@/features/planning/scheduleCourses";
+import { localPlanRepository } from "@/services/planService";
+import { scheduleCourses } from "@/pages/Plan/scheduleCourses";
 import { toast } from "sonner";
-import { accountStorage } from "@/infrastructure/storage/accountStorage";
-import { STORAGE_KEYS } from "@/infrastructure/storage/keys";
+import { accountStorage } from "@/services/accountStorage";
 import { useState } from "react";
-import { courses, focusSkills } from "@/features/learning/catalogue";
-import { readLibrary, saveLibrary, emptyLibrary } from "@/features/learning/lib/libraryStorage";
+import { courses, focusSkills } from "../catalogue";
+import { readLibrary, saveLibrary, emptyLibrary } from "../lib/libraryStorage";
 import {
   defaultChoice,
   selectedMinutes,
   validateChoice,
   durationLabel,
   estimateLabel,
-} from "@/features/learning/lib/coursePlanning";
-import { resources, readSelections, saveSelections } from "@/features/learning/resources";
-import type { Course, CourseChoice, LibraryState } from "@/features/learning/types";
+} from "../lib/coursePlanning";
+import { resources, readSelections, saveSelections } from "../resources";
+import type { Course, CourseChoice, LibraryState } from "../types";
 export function useCourseLibrary() {
   const [initial] = useState(() => {
     try {
@@ -59,8 +58,8 @@ export function useCourseLibrary() {
     if (changed)
       toast(
         wasSaved
-          ? "Removed from saved courses. Your plan is unchanged."
-          : "Saved to your courses",
+          ? "Removed from learning courses"
+          : "Added to learning",
         {
           action: {
             label: "Undo",
@@ -80,6 +79,15 @@ export function useCourseLibrary() {
           },
         },
       );
+  }
+
+  /** Drop courses from the learning list (e.g. when their skill is removed). */
+  function removeSavedCourses(courseIds: string[]) {
+    if (!courseIds.length) return false;
+    const drop = new Set(courseIds);
+    const nextSaved = state.saved.filter((id) => !drop.has(id));
+    if (nextSaved.length === state.saved.length) return false;
+    return update({ ...state, saved: nextSaved });
   }
   async function addToPlan(
     ids: string[],
@@ -205,9 +213,9 @@ export function useCourseLibrary() {
   let scheduledIds: string[] = [];
   try {
     const planner = JSON.parse(
-      accountStorage.getItem(STORAGE_KEYS.planner) ?? "{}",
+      accountStorage.getItem("aiwrevolusi.planner.v1") ?? "{}",
     );
-    scheduledIds = planner.context === (accountStorage.getItem(STORAGE_KEYS.confirmedAnalysis) ?? "") && Array.isArray(planner.events)
+    scheduledIds = planner.context === (accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "") && Array.isArray(planner.events)
       ? planner.events.flatMap((event: { resourceId?: string }) =>
           event.resourceId?.startsWith("epic5-")
             ? [event.resourceId.slice(6)]
@@ -224,6 +232,7 @@ export function useCourseLibrary() {
     notice,
     choiceFor,
     toggleSave,
+    removeSavedCourses,
     addToPlan,
     exportSaved,
   };

@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import { useRef, useState, type ReactNode } from "react";
 import { Popover } from "@base-ui/react/popover";
-import { PAGE_GRADIENT_CSS } from "@/features/exposure/palette";
+import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
 import { Info } from "lucide-react";
 
 /** An unfilled information trigger with hover, keyboard and touch access. */

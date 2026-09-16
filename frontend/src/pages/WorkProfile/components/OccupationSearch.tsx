@@ -86,6 +86,16 @@ const OccupationSearch = (props: OccupationSearchProps) => {
                         ? `${item.unit.title} - ${item.pathLabel}`
                         : item.unit.title}
                     </p>
+                    {item.unit.confidence !== undefined ? (
+                      <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                        {`Match confidence ${item.unit.confidence.toFixed(2)}`}
+                      </p>
+                    ) : null}
+                    {item.unit.evidence?.length ? (
+                      <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground/80">
+                        {item.unit.evidence.slice(0, 2).join(" · ")}
+                      </p>
+                    ) : null}
                   </button>
                 ))}
               </div>

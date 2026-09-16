@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import ExposureScoreExplanation from "@/features/exposure/components/ExposureScoreExplanation";
+import ExposureScoreExplanation from "@/pages/Analysis/components/ExposureScoreExplanation";
 export default function ScoreInfoModal(props: {
   open: boolean;
   onOpenChange: (open: boolean) => void;

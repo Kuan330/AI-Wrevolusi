@@ -2,9 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
-const source=readFileSync(new URL('../src/features/skills/learningSkills.ts',import.meta.url),'utf8')
-  .replace('import { accountStorage } from "@/infrastructure/storage/accountStorage";', 'const accountStorage = {getItem: (key) => key === "aiwrevolusi.confirmedAnalysis" ? "current-work" : globalThis.skillData ?? null, setItem: (_key, value) => {globalThis.skillData = value}, removeItem: () => {}};')
-  .replace('import { STORAGE_KEYS } from "@/infrastructure/storage/keys";', 'const STORAGE_KEYS = {confirmedAnalysis: "aiwrevolusi.confirmedAnalysis", learningSkills: "aiwrevolusi.learningSkills.v1", courseLibrary: "aiwrevolusi.courseLibrary.v1", planner: "aiwrevolusi.planner.v1", learningResourceSelections: "aiwrevolusi.learningResourceSelections.v1"};');
+const source=readFileSync(new URL('../src/pages/Skills/learningSkills.ts',import.meta.url),'utf8').replace('import { accountStorage } from "@/services/accountStorage";', 'const accountStorage = {getItem: (key) => key === "aiwrevolusi.confirmedAnalysis" ? "current-work" : globalThis.skillData ?? null, setItem: (_key, value) => {globalThis.skillData = value}};');
 const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
 const m=await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
 test('confirmed skills preserve priority order and deduplicate',()=>{const skills=[m.growingSkills[3],m.growingSkills[0]];m.saveLearningSkills([...skills,skills[0]]);assert.deepEqual(m.readLearningSkills(),skills)});

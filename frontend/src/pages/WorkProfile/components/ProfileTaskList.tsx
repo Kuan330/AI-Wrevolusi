@@ -4,13 +4,15 @@ import { ChevronDown, ListChecks, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Tooltip } from "@/components/ui/tooltip";
+import RemoveIconButton from "@/components/ui/remove-icon-button";
 import BatchDeleteTaskDialog from "@/pages/WorkProfile/components/BatchDeleteTaskDialog";
 import DeleteTaskDialog from "@/pages/WorkProfile/components/DeleteTaskDialog";
 import {
   optionLabel,
   TIME_SPENT_OPTIONS,
-} from "@/features/work-profile/taskOptions";
-import type { ProfileTask } from "@/features/work-profile/types";
+} from "@/pages/WorkProfile/taskOptions";
+import type { ProfileTask } from "@/pages/WorkProfile/types";
 
 type ProfileTaskListProps = {
   tasks: ProfileTask[];
@@ -160,8 +162,9 @@ const ProfileTaskList = (props: ProfileTaskListProps) => {
             <Button
               {...({
                 type: "button",
+                variant: "destructive",
                 className:
-                  "profile-batch-btn inline-flex h-10 items-center gap-2 rounded-full px-5 font-normal",
+                  "soft-btn-red inline-flex h-10 items-center gap-2 rounded-full px-5",
                 disabled: selectedTaskIds.length === 0,
                 onClick: () => setBatchDeleteOpen(true),
               } satisfies Partial<ComponentProps<typeof Button>>)}
@@ -276,29 +279,23 @@ const ProfileTaskList = (props: ProfileTaskListProps) => {
                       </p>
                       {!batchMode ? (
                         <div className="profile-icon-actions">
-                          <button
-                            type="button"
-                            className="profile-icon-btn"
-                            aria-label="Edit task"
-                            onClick={() => onEdit(task)}
-                          >
-                            <img src="/images/icons/icon-edit.svg" alt="" />
-                          </button>
-                          <button
-                            type="button"
-                            className="profile-icon-btn profile-icon-btn--delete"
-                            aria-label="Delete task"
-                            onClick={() => setDeleteTarget(task)}
-                          >
-                            <Trash2
-                              {...({
-                                className: "h-4 w-4",
-                                "aria-hidden": true,
-                              } satisfies Partial<
-                                ComponentProps<typeof Trash2>
-                              >)}
+                          <Tooltip title="Edit">
+                            <button
+                              type="button"
+                              className="profile-icon-btn"
+                              aria-label="Edit task"
+                              onClick={() => onEdit(task)}
+                            >
+                              <img src="/images/icons/icon-edit.svg" alt="" />
+                            </button>
+                          </Tooltip>
+                          <Tooltip title="Remove">
+                            <RemoveIconButton
+                              iconOnly
+                              aria-label="Remove task"
+                              onClick={() => setDeleteTarget(task)}
                             />
-                          </button>
+                          </Tooltip>
                         </div>
                       ) : null}
                     </div>

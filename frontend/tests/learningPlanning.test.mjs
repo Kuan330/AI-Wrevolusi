@@ -8,7 +8,7 @@ const planning = await import(
   moduleUrl(
     readFileSync(
       new URL(
-        "../src/features/learning/lib/coursePlanning.ts",
+        "../src/pages/LearningCentre/lib/coursePlanning.ts",
         import.meta.url,
       ),
       "utf8",
@@ -17,7 +17,7 @@ const planning = await import(
 );
 const model = moduleUrl(
   readFileSync(
-    new URL("../src/features/planning/planModel.ts", import.meta.url),
+    new URL("../src/pages/Plan/planModel.ts", import.meta.url),
     "utf8",
   ),
 );
@@ -25,13 +25,11 @@ const { learningSession } = await import(
   moduleUrl(
     readFileSync(
       new URL(
-        "../src/features/planning/learningSession.ts",
+        "../src/pages/LearningCentre/lib/learningSession.ts",
         import.meta.url,
       ),
       "utf8",
-    )
-      .replaceAll("@/features/planning/planModel", model)
-      .replace(/^import type .*$/gm, ""),
+    ).replaceAll("@/pages/Plan/planModel", model),
   )
 );
 const course = {

@@ -1,67 +1,113 @@
-import { useState } from "react";
-import { Bookmark, Gift } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { AppButton } from "@/components/ui/app-button";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import SkillSidebar from "./components/SkillSidebar";
 import CourseFilters, { emptyFilters } from "./components/CourseFilters";
-import RecommendationBasis from "./components/RecommendationBasis";
 import CourseCard from "./components/CourseCard";
 import CourseDetailDrawer from "./components/CourseDetailDrawer";
-import FloatingSavedCourses from "./components/FloatingSavedCourses";
-import SavedCoursesDrawer from "./components/SavedCoursesDrawer";
-import { courses } from "@/features/learning/catalogue";
+import FloatingLearningCourses from "./components/FloatingLearningCourses";
+import LearningCoursesDialog from "./components/LearningCoursesDialog";
+import AddSkillDialog from "./components/AddSkillDialog";
+import RemoveSkillDialog from "./components/RemoveSkillDialog";
+import { courses } from "./catalogue";
 import { useCourseLibrary } from "./hooks/useCourseLibrary";
 import {
-  readLearningSkills,
   coursesForSkill,
-} from "@/features/skills/learningSkills";
-import { readConfirmedAnalysis } from "@/features/work-profile/userProfile";
-import type { CourseChoice, RecommendationBasis as Basis } from "@/features/learning/types";
+  ensureLearningSkills,
+  toLearningSkill,
+  type LearningSkill,
+} from "@/pages/Skills/learningSkills";
+import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
+import { useLearningSkills } from "@/pages/Skills/useLearningSkills";
+import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
+import { referenceService } from "@/services/referenceService";
+import type { WefSkill } from "@/types/reference";
 import "./course-library.css";
+
 export default function LearningCentre() {
   const library = useCourseLibrary();
-  const {
-    state,
-    update,
-    notice,
-    choiceFor,
-    toggleSave,
-    addToPlan,
-    exportSaved,
-    scheduledIds,
-  } = library;
+  const { state, notice, toggleSave, removeSavedCourses } = library;
+  const { skills, setSkills, addSkill, removeSkill, refresh } =
+    useLearningSkills();
   const [params] = useSearchParams();
-  const [filters, setFilters] = useState({ ...emptyFilters, query: params.get("q") ?? "" });
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [detail, setDetail] = useState<{
-    id: string;
-    planning: boolean;
-  } | null>(null);
-  const detailCourse = courses.find((course) => course.id === detail?.id);
-  const plannedIds = state.pending.map((entry) => entry.courseId);
-  const [selection] = useState(() => {
-    try {
-      return { skills: readLearningSkills() ?? [], error: "" };
-    } catch {
-      return {
-        skills: [],
-        error: "Your learning skills could not be loaded. Please reload.",
-      };
-    }
+  const [filters, setFilters] = useState({
+    ...emptyFilters,
+    query: params.get("q") ?? "",
   });
-  const focusSkills = selection.skills.map((item) => ({
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [wefSkills, setWefSkills] = useState<WefSkill[]>([]);
+  const [skillsError, setSkillsError] = useState("");
+  const [analysis] = useState(readConfirmedAnalysis);
+  const [seeded, setSeeded] = useState(false);
+  /** Empty = show all courses (default). */
+  const [activeId, setActiveId] = useState("");
+
+  const workSkills = useMemo(() => {
+    const evidence = buildSkillEvidence(analysis?.tasks ?? [], wefSkills);
+    return evidence.map(({ skill }) =>
+      toLearningSkill(skill.core_skill, "work"),
+    );
+  }, [analysis?.tasks, wefSkills]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void referenceService
+      .wefSkills()
+      .then((rows) => {
+        if (cancelled) return;
+        setWefSkills(
+          [...rows].sort(
+            (left, right) => left.wef_skill_id - right.wef_skill_id,
+          ),
+        );
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setSkillsError(
+            "The skill framework could not be loaded. Please try again.",
+          );
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!wefSkills.length || seeded) return;
+    const next = ensureLearningSkills(workSkills);
+    setSkills(next);
+    setSeeded(true);
+  }, [wefSkills.length, workSkills, seeded, setSkills]);
+
+  const focusSkills = skills.map((item: LearningSkill) => ({
     id: item.id,
     en: item.name,
-    hint: "Selected for learning",
+    hint: item.source === "work" ? "From your work" : undefined,
   }));
-  const [activeId, setActiveId] = useState(focusSkills[0]?.id ?? "");
-  const [analysis] = useState(readConfirmedAnalysis);
+
+  useEffect(() => {
+    if (!activeId) return;
+    if (!focusSkills.some((item) => item.id === activeId)) {
+      setActiveId("");
+    }
+  }, [focusSkills, activeId]);
+
   const skill = focusSkills.find((item) => item.id === activeId);
-  const matching = params.get("q") ? courses : skill
-    ? courses.filter((course) => coursesForSkill(skill.id).includes(course.id))
-    : [];
+  const matching =
+    !activeId || params.get("q")
+      ? courses
+      : courses.filter((course) =>
+          coursesForSkill(activeId).includes(course.id),
+        );
   const visible = matching.filter(
     (course) =>
       [course.title, course.provider, course.intro, ...course.outcomes]
@@ -74,6 +120,26 @@ export default function LearningCentre() {
       (!filters.language || course.language === filters.language) &&
       (!filters.registration || course.register === filters.registration),
   );
+  const detailCourse = courses.find((course) => course.id === detailId) ?? null;
+  const addedIds = new Set(skills.map((item) => item.id));
+
+  const confirmRemoveSkill = () => {
+    if (!removeTarget) return;
+    const linked = coursesForSkill(removeTarget.id);
+    const remaining = skills.filter((item) => item.id !== removeTarget.id);
+    // Keep a course if another remaining skill still links to it.
+    const stillLinked = new Set(
+      remaining.flatMap((item) => coursesForSkill(item.id)),
+    );
+    const dropCourses = linked.filter((id) => !stillLinked.has(id));
+    removeSkill(removeTarget.id);
+    if (dropCourses.length) {
+      removeSavedCourses(dropCourses);
+    }
+    if (activeId === removeTarget.id) setActiveId("");
+    setRemoveTarget(null);
+  };
+
   const sidebarProps = {
     activeId,
     skills: focusSkills,
@@ -81,228 +147,164 @@ export default function LearningCentre() {
       setActiveId(skillId);
       setFilters({ ...emptyFilters });
     },
+    onClear: () => setActiveId(""),
+    onRemove: (id: string, name: string) => setRemoveTarget({ id, name }),
   };
+
   const filterProps = {
     value: filters,
     courses: matching,
     onChange: setFilters,
   };
-  const basis: Basis = state.basis[activeId] ?? {
-    tasks:
-      analysis?.tasks
-        .slice(0, 4)
-        .map((task) => task.wording)
-        .join("\n") ?? "",
-    goals: "",
-    have: "",
-  };
-  const basisProps = {
-    skillName: skill?.en ?? "",
-    value: basis,
-    onSave: (value: Basis) =>
-      update({ ...state, basis: { ...state.basis, [activeId]: value } }),
-  };
-  const drawerProps = {
-    open: drawerOpen,
-    onOpenChange: setDrawerOpen,
-    saved: state.saved,
-    onRemove: toggleSave,
-    onPlan: (id: string) => {
-      setDrawerOpen(false);
-      setDetail({ id, planning: true });
-    },
-    onExport: exportSaved,
-    plannedIds,
-  };
-  const detailProps = detailCourse
-    ? {
-        course: detailCourse,
-        context: basis,
-        skillName: skill?.en ?? "",
-        choice:
-          state.pending.find((entry) => entry.courseId === detailCourse.id)
-            ?.choice ?? choiceFor(detailCourse),
-        saved: state.saved.includes(detailCourse.id),
-        inPlan: plannedIds.includes(detailCourse.id),
-        scheduled: scheduledIds.includes(detailCourse.id),
-        startPlanning: detail?.planning ?? false,
-        onClose: () => setDetail(null),
-        onSave: () => toggleSave(detailCourse.id),
-        onCommit: (choice: CourseChoice) =>
-          addToPlan([detailCourse.id], { courseId: detailCourse.id, choice }),
-      }
-    : null;
+
   const headerProps = {
     title: "Learning Resources",
     actions: (
       <div className="flex flex-wrap items-center gap-3">
-        <AppButton tone="outline" variant="outline" asChild>
-          <Link to="/skills#skill-directions">
-            {focusSkills.length ? "Edit skills" : "Choose skills"}
-          </Link>
-        </AppButton>
-        <AppButton tone="gradient" asChild>
-          <Link to="/plan">Open My Plan</Link>
-        </AppButton>
+        <Button
+          type="button"
+          variant="ghost"
+          className="learning-courses-trigger h-10 rounded-full px-5 font-semibold"
+          onClick={() => setDrawerOpen(true)}
+        >
+          Learning courses · {state.saved.length}
+        </Button>
       </div>
     ),
     description:
-      "Find a course for the skills you want to grow, then make room for learning at your own pace.",
+      "Browse courses for skills reflected in your work, or add skills you want to grow.",
   };
+
   return (
     <div className="course-library">
       <PageHeader {...headerProps} />
-      {selection.error && <p role="alert">{selection.error}</p>}
+      {(skillsError || notice) && (
+        <p role="alert">{skillsError || notice}</p>
+      )}
+
       {!focusSkills.length ? (
-        <section className="learning-default-card library-glass">
-          <div className="learning-default-copy">
-            <p className="library-kicker">Ready when you are</p>
-            <h2>Find your next learning step</h2>
-            <p>
-              Choose a skill reflected in your work, then explore resources and
-              make room for learning at your own pace.
-            </p>
-            <AppButton tone="gradient" asChild>
-              <Link to="/skills#skill-directions">
-                Choose skills <span aria-hidden="true">→</span>
-              </Link>
-            </AppButton>
-          </div>
-          <ol className="learning-default-steps">
-            {[
-              ["Choose a skill", "Start with a skill you want to develop."],
-              ["Explore resources", "Compare relevant courses and chapters."],
-              ["Make a little time", "Arrange a session that fits your week."],
-            ].map(([title, description], index) => (
-              <li key={title}>
-                <span>0{index + 1}</span>
-                <div>
-                  <strong>{title}</strong>
-                  <p>{description}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+        <section className="learning-empty-skills library-glass">
+          <p className="library-kicker">Ready when you are</p>
+          <h2>Add skills to explore courses</h2>
+          <p>
+            Skills reflected in your work will appear here automatically when
+            available. You can also add skills from the WEF framework.
+          </p>
+          <AppButton tone="gradient" type="button" onClick={() => setAddOpen(true)}>
+            Add skill
+          </AppButton>
         </section>
       ) : (
-        <section className="library-intro library-glass">
-          <div>
-            <p className="library-kicker">Small steps. Practical progress.</p>
-            <h2>
-              Choose your skill.
-              <br />
-              Find your next learning step.
-            </h2>
-            <p>
-              Explore learning resources, choose the chapters that matter to
-              you, and set a weekly pace that fits your life.
+        <div className="library-layout">
+          <SkillSidebar {...sidebarProps} />
+          <div
+            className="library-results"
+            role="region"
+            aria-label="Course results"
+            tabIndex={0}
+          >
+            <CourseFilters {...filterProps} />
+            <p className="library-muted" role="status">
+              {skill
+                ? `${visible.length} of ${matching.length} courses for ${skill.en}`
+                : `${visible.length} of ${matching.length} courses in the catalogue`}
             </p>
-            <div className="library-intro-stats">
-              <span>
-                <strong>{courses.length}</strong> courses in the catalogue
-              </span>
-              <span>
-                <strong>{focusSkills.length}</strong> focus skills
-              </span>
-            </div>
-          </div>
-          <div className="library-intro-note">
-            <h3>Your learning, your choice</h3>
-            <p>
-              Save a course first, or open its details to choose chapters and
-              study days.
-            </p>
-            <div className="library-intro-actions">
-              <Link to="/skills">Review your skills →</Link>
-              <AppButton tone="blue" onClick={() => setDrawerOpen(true)}>
-                Saved courses · {state.saved.length}
-                <Bookmark size={16} />
-              </AppButton>
-            </div>
-          </div>
-        </section>
-      )}
-      {notice && (
-        <p className="library-notice" role="status">
-          {notice}
-        </p>
-      )}
-      {focusSkills.length > 0 && (
-        <>
-          <div className="library-layout">
-            <SkillSidebar {...sidebarProps} />
-            <div
-              className="library-results"
-              role="region"
-              aria-label="Course results"
-              tabIndex={0}
-            >
-              {skill && <RecommendationBasis key={skill.id} {...basisProps} />}
-              <CourseFilters {...filterProps} />
-              <p className="library-muted" role="status">
-                {skill
-                  ? `${visible.length} of ${matching.length} courses for ${skill.en}`
-                  : "Choose a focus skill to browse courses."}
-              </p>
-              <div className="library-course-list">
-                {visible.map((course) => {
-                  const cardProps = {
-                    course,
-                    saved: state.saved.includes(course.id),
-                    skillId: activeId,
-                    inPlan: plannedIds.includes(course.id),
-                    scheduled: scheduledIds.includes(course.id),
-                    onSave: () => toggleSave(course.id),
-                    onDetails: () =>
-                      setDetail({ id: course.id, planning: false }),
-                  };
-                  return <CourseCard key={course.id} {...cardProps} />;
-                })}
+            <div className="library-course-list">
+              <div className="library-course-list__col">
+                {visible
+                  .filter((_, index) => index % 2 === 0)
+                  .map((course) => (
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      saved={state.saved.includes(course.id)}
+                      onSave={() => toggleSave(course.id)}
+                      onDetails={() => setDetailId(course.id)}
+                    />
+                  ))}
               </div>
-              {skill && !visible.length && (
-                <div className="library-empty library-glass">
-                  <h3>
-                    {matching.length
-                      ? "No courses match these filters"
-                      : "No matching courses yet"}
-                  </h3>
-                  <p>
-                    {matching.length
-                      ? "Try another format, provider or search term."
-                      : "This skill stays in your learning list. The current catalogue has no linked courses yet."}
-                  </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => setFilters({ ...emptyFilters })}
-                  >
-                    Clear filters
-                  </Button>
-                </div>
-              )}
-              <div className="library-access">
-                <Gift size={20} aria-hidden="true" />
+              <div className="library-course-list__col">
+                {visible
+                  .filter((_, index) => index % 2 === 1)
+                  .map((course) => (
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      saved={state.saved.includes(course.id)}
+                      onSave={() => toggleSave(course.id)}
+                      onDetails={() => setDetailId(course.id)}
+                    />
+                  ))}
+              </div>
+            </div>
+            {!visible.length && (
+              <div className="library-empty library-glass">
+                <h3>
+                  {matching.length
+                    ? "No courses match these filters"
+                    : "No matching courses yet"}
+                </h3>
                 <p>
-                  <strong>Selected for free learning access</strong>
-                  <span>
-                    Some providers require a free account. This catalogue comes
-                    from the supplied reference; confirm current access and
-                    course details on the provider page.
-                  </span>
+                  {matching.length
+                    ? "Try another format, provider or search term."
+                    : "This skill stays in your learning list. The current catalogue has no linked courses yet."}
                 </p>
+                <Button
+                  variant="outline"
+                  onClick={() => setFilters({ ...emptyFilters })}
+                >
+                  Clear filters
+                </Button>
               </div>
-            </div>
+            )}
           </div>
-        </>
+        </div>
       )}
+
       {focusSkills.length > 0 && (
-        <FloatingSavedCourses
-          {...{ count: state.saved.length, onOpen: () => setDrawerOpen(true) }}
+        <FloatingLearningCourses
+          count={state.saved.length}
+          onOpen={() => setDrawerOpen(true)}
         />
       )}
-      <SavedCoursesDrawer {...drawerProps} />
-      {detailProps && (
-        <CourseDetailDrawer key={detailCourse!.id} {...detailProps} />
+
+      <LearningCoursesDialog
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        saved={state.saved}
+        onRemove={toggleSave}
+      />
+
+      {detailCourse && (
+        <CourseDetailDrawer
+          key={detailCourse.id}
+          course={detailCourse}
+          skillName={skill?.en ?? ""}
+          saved={state.saved.includes(detailCourse.id)}
+          onClose={() => setDetailId(null)}
+          onSave={() => toggleSave(detailCourse.id)}
+          onSkillsChanged={refresh}
+        />
       )}
+
+      <AddSkillDialog
+        open={addOpen}
+        onOpenChange={(open) => {
+          setAddOpen(open);
+          if (!open) refresh();
+        }}
+        addedIds={addedIds}
+        onAdd={(name, source) => addSkill(name, source)}
+      />
+
+      <RemoveSkillDialog
+        open={Boolean(removeTarget)}
+        skillName={removeTarget?.name ?? null}
+        onOpenChange={(open) => {
+          if (!open) setRemoveTarget(null);
+        }}
+        onConfirm={confirmRemoveSkill}
+      />
     </div>
   );
 }

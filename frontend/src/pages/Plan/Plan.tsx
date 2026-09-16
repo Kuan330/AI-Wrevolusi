@@ -1,23 +1,24 @@
 import ConflictMessage, { WhatsAppIcon } from "./ConflictMessage";
 import { Drawer, DrawerContent, DrawerTitle, DrawerDescription, DrawerBody } from "@/components/ui/drawer";
 import PlanCourseDrawer from "./PlanCourseDrawer";
-import { courses } from "@/features/learning/catalogue";
+import { courses } from "@/pages/LearningCentre/catalogue";
 import { AppButton } from "@/components/ui/app-button";
-import { readLibrary } from "@/features/learning/lib/libraryStorage";
+import { readLibrary } from "@/pages/LearningCentre/lib/libraryStorage";
 import { TimePicker } from "@/components/ui/time-picker";
-import { learningSession } from "@/features/planning/learningSession";
+import { learningSession } from "@/pages/LearningCentre/lib/learningSession";
 import type { ComponentProps } from "react";
 import WeekCalendar from "./WeekCalendar";
-import SavedCourseQueue from "./SavedCourseQueue";
-import { scheduleCourses } from "@/features/planning/scheduleCourses";
+import { scheduleCourses } from "./scheduleCourses";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   AlertTriangle,
   ArrowRight,
+  BookOpen,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  Clock3,
   Copy,
   MessageCircle,
   Plus,
@@ -36,9 +37,9 @@ import {
   readSelections,
   saveSelections,
   type Selection,
-} from "@/features/learning/resources";
-import { demoResources, demoSelections } from "@/features/learning/demoData";
-import { localPlanRepository } from "@/features/planning/planRepository";
+} from "@/pages/LearningCentre/resources";
+import { demoResources, demoSelections } from "@/pages/LearningCentre/demoData";
+import { localPlanRepository } from "@/services/planService";
 import {
   addDays,
   conflicts,
@@ -52,7 +53,7 @@ import {
   whatsappLink,
   type PlanEvent,
   type PlanState,
-} from "@/features/planning/planModel";
+} from "./planModel";
 import "./plan.css";
 const labels = {
   learning: "Learning",
@@ -163,6 +164,14 @@ function PlanContent(props: { demo: boolean }) {
       active = false;
     };
   }, [repository, location.search, catalogue, demo]);
+  useEffect(() => {
+    if (loading || location.hash !== "#course-progress") return;
+    const node = document.getElementById("course-progress");
+    if (!node) return;
+    requestAnimationFrame(() => {
+      node.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [loading, location.hash]);
   async function commit(events: PlanEvent[]) {
     setBusy(true);
     setError("");
@@ -311,16 +320,6 @@ function PlanContent(props: { demo: boolean }) {
     try { if (!demo) saveSelections(next); setShortlist(next); }
     catch { setError('Could not save study times. Please try again.'); }
   }
-  async function importCourseSchedule() {
-    const batch = scheduleCourses(savedQueue, catalogue, state.events);
-    if (batch.events.length) {
-      if (!(await commit([...state.events, ...batch.events]))) return;
-      setWeek(monday(batch.events[0].date));
-    }
-    setNotice(
-      [`${batch.events.length} sessions imported.`, ...batch.issues].join(" "),
-    );
-  }
   const courseTasks = state.events.filter(event => event.kind === 'learning' && courses.some(course => `epic5-${course.id}` === event.resourceId));
   const completedCourseTasks = courseTasks.filter(event => event.completed).length;
   const courseProgress = courses.flatMap(course => {
@@ -374,7 +373,11 @@ function PlanContent(props: { demo: boolean }) {
           <Link to={`${ROUTES.plan}?demo=0`}>Exit demo</Link>
         </div>
       )}
-      <section className="pl-task-progress" aria-label="Course task progress">
+      <section
+        id="course-progress"
+        className="pl-task-progress"
+        aria-label="Course task progress"
+      >
         <div><div><p className="pl-kicker">COURSE LEARNING ONLY</p><h2>Course plan progress</h2></div><strong>{completedCourseTasks} / {courseTasks.length}<small>learning sessions completed</small></strong></div>
         <progress aria-label="Completed course tasks" value={completedCourseTasks} max={Math.max(1, courseTasks.length)} />
         <p className="pl-muted">Work and personal activities are excluded.</p>
@@ -393,16 +396,104 @@ function PlanContent(props: { demo: boolean }) {
         <p>Loading your plan…</p>
       ) : (
         <div className="pl-layout">
-          <SavedCourseQueue
-            items={savedQueue}
-            catalogue={catalogue}
-            events={state.events}
-            disabled={busyOrLoading}
-            demo={demo}
-            onUpdatePreference={updatePreference}
-            onSchedule={newEvent}
-            onImport={() => void importCourseSchedule()}
-          />
+          <aside className="pl-sidebar pl-panel">
+            <p className="pl-kicker">YOUR NEXT STEPS</p>
+            <h2>Recently saved · {savedQueue.length}</h2>
+            <p className="pl-muted">
+              Choose a time for your saved courses.
+            </p>
+            {savedQueue.length ? (
+              savedQueue.map((s) => {
+                const r = catalogue.find((r) => r.id === s.resourceId);
+                if (!r) return null;
+                const scheduled = state.events
+                  .filter((e) => e.resourceId === r.id)
+                  .reduce((n, e) => n + duration(e), 0);
+                const total = s.totalMinutes === undefined ? r.minutes : s.totalMinutes;
+                if (total && scheduled >= total) return null;
+                return (
+                  <article className="pl-resource" key={r.id}>
+                    {s.skillName && <span>{s.skillName}</span>}
+                    <h3>{r.title}</h3>
+                    <p>
+                      {total
+                        ? `${total} min selected`
+                        : "Confirm duration with provider"}
+                    </p>
+                    {s.chapterNames?.length ? (
+                      <details>
+                        <summary>
+                          {s.chapterNames.length} selected chapters
+                        </summary>
+                        <ul>
+                          {s.chapterNames.map((name) => (
+                            <li key={name}>{name}</li>
+                          ))}
+                        </ul>
+                      </details>
+                    ) : null}
+                    {s.scheduleMode === "routine" && s.startDate ? (
+                      <p>Preferred start: {s.startDate}</p>
+                    ) : null}
+                    {s.weekdays?.length && s.minutesPerDay ? (
+                      <p>
+                        {s.weekdays
+                          .map(
+                            (day) =>
+                              ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][
+                                day
+                              ],
+                          )
+                          .join(", ")}{" "}
+                        · {s.startTime && s.endTime ? `${s.startTime}–${s.endTime}` : `${s.minutesPerDay} min/day preferred`}
+                      </p>
+                    ) : null}
+                    <div className="pl-work-days">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day,index) => <button key={day} aria-pressed={s.weekdays?.includes(index) ?? false} onClick={() => updatePreference(s.resourceId, { weekdays: s.weekdays?.includes(index) ? s.weekdays.filter(item => item !== index) : [...(s.weekdays ?? []), index] })}>{day}</button>)}</div>
+                    <div className="pl-form-row"><label>From<TimePicker compact label="Study start time" value={s.startTime ?? ''} onChange={value => updatePreference(s.resourceId, { startTime: value })} /></label><label>To<TimePicker compact label="Study end time" value={s.endTime ?? ''} onChange={value => updatePreference(s.resourceId, { endTime: value })} /></label></div>
+                    {!total && <label>Planned minutes<input type="number" min="1" value={s.totalMinutes ?? ''} onChange={event => updatePreference(s.resourceId, { totalMinutes: Number(event.target.value) })} /></label>}
+                    {scheduled > 0 && (
+                      <p>{scheduled} min scheduled across your plan</p>
+                    )}
+                    <button
+                      disabled={busyOrLoading}
+                      onClick={() => newEvent(r.id)}
+                    >
+                      Schedule a session <Plus size={14} />
+                    </button>
+                  </article>
+                );
+              })
+            ) : (
+              <div className="pl-empty">
+                <BookOpen />
+                <p>No saved courses waiting to be scheduled.</p>
+              </div>
+            )}
+            {!!savedQueue.length && <button className="pl-primary" disabled={busyOrLoading} onClick={async () => {
+              const batch = scheduleCourses(savedQueue, catalogue, state.events);
+              if (batch.events.length) {
+                if (!await commit([...state.events, ...batch.events])) return;
+                setWeek(monday(batch.events[0].date));
+              }
+              setNotice([`${batch.events.length} sessions imported.`, ...batch.issues].join(' '));
+            }}>Import course schedule</button>}
+            <Link
+              {...({
+                className: "pl-link",
+                to: `${ROUTES.learningCentre}${demo ? "" : "?demo=0"}`,
+              } satisfies Partial<ComponentProps<typeof Link>>)}
+            >
+              Explore learning resources <ArrowRight size={14} />
+            </Link>
+            <div className="pl-tip">
+              <Clock3 size={19} />
+              <h3>Leave a little breathing room</h3>
+              <p>
+                Keep time for rest and unexpected changes. An empty space does
+                not have to be filled.
+              </p>
+            </div>
+          </aside>
           <main className="pl-calendar pl-panel">
             <div className="pl-calendar-tools"><button className="pl-work-button" disabled={busyOrLoading} onClick={() => { setFormError(''); setWorkOpen(true); }}>Set work hours</button><button className="pl-primary" disabled={busyOrLoading} onClick={() => newEvent()}><Plus size={16} /> Add activity</button></div>
             <div className="pl-weekbar">

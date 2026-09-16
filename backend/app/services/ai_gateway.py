@@ -77,6 +77,7 @@ class AIGateway:
         fallback: Callable[[], Any],
         cache_key: str | None = None,
         prefer_local_on_provider_failure: bool = False,
+        system_prompt: str | None = None,
     ) -> GatewayResult[ModelT]:
         started = self._clock()
         key = cache_key or self._cache_key(operation, payload)
@@ -95,6 +96,7 @@ class AIGateway:
                             operation=operation,
                             payload=payload,
                             response_model=response_model,
+                            system_prompt=system_prompt,
                         ),
                         response_model,
                     )
@@ -149,6 +151,7 @@ class AIGateway:
         cache_key: str | None = None,
         prefer_local_on_provider_failure: bool = False,
         post_validate: Callable[[ModelT], ModelT] | None = None,
+        system_prompt: str | None = None,
     ) -> GatewayResult[ModelT]:
         """Validate output, remove unknown IDs, then apply a final validator."""
 
@@ -160,6 +163,7 @@ class AIGateway:
             fallback=fallback,
             cache_key=cache_key,
             prefer_local_on_provider_failure=prefer_local_on_provider_failure,
+            system_prompt=system_prompt,
         )
         constrained = self._constrain_result(
             result.value,
@@ -494,6 +498,7 @@ class OpenAICompatibleProvider:
         operation: str,
         payload: Any,
         response_model: type[ModelT],
+        system_prompt: str | None = None,
     ) -> Any:
         """Return parsed JSON that satisfies ``response_model`` or raise."""
         cache_key = self._cache_key(operation, payload)
@@ -501,7 +506,7 @@ class OpenAICompatibleProvider:
         if cached is not None:
             return cached
 
-        body = self._build_request_body(operation, payload, response_model)
+        body = self._build_request_body(operation, payload, response_model, system_prompt)
         last_error: Exception | None = None
         for attempt in range(self.max_retries + 1):
             if attempt > 0:
@@ -574,14 +579,23 @@ class OpenAICompatibleProvider:
         operation: str,
         payload: Any,
         response_model: type[ModelT],
+        system_prompt: str | None = None,
     ) -> dict[str, Any]:
         try:
             schema = response_model.model_json_schema()
         except Exception:  # noqa: BLE001 - the schema is prompt guidance only
             schema = {}
-        system_prompt = _SYSTEM_PROMPT_TEMPLATE.format(
-            schema=json.dumps(schema, sort_keys=True, default=str),
-        )
+        # Callers with their own footing (for example the daily brief, which
+        # writes prose rather than selecting candidates) can override the
+        # instructions. The schema is appended either way so structured output
+        # stays guaranteed. Plain substitution rather than ``str.format`` keeps a
+        # caller's prompt free to contain braces.
+        schema_text = json.dumps(schema, sort_keys=True, default=str)
+        template = system_prompt if system_prompt else _SYSTEM_PROMPT_TEMPLATE
+        if '{schema}' in template:
+            system_prompt = template.replace('{schema}', schema_text)
+        else:
+            system_prompt = f'{template}\n{schema_text}'
         request_payload = json.dumps(
             {'operation': operation, 'request': payload},
             sort_keys=True,

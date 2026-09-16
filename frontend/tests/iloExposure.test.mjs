@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { IloOccupationExposure, ILO_OCCUPATION_EXPOSURES, parseIloOccupationExposure, referenceOccupationCategory, countOccupationCategories } from '../src/features/exposure/iloExposure.ts';
+import { IloOccupationExposure, ILO_OCCUPATION_EXPOSURES, parseIloOccupationExposure, referenceOccupationCategory, countOccupationCategories } from '../src/pages/Analysis/lib/iloExposure.ts';
 
 test('accepts exactly the six published ILO occupation categories', () => {
   assert.deepEqual(Object.values(IloOccupationExposure), [

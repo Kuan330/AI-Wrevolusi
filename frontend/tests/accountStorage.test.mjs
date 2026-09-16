@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { accountStorage, activateWorkspace, flushWorkspace } from '../src/infrastructure/storage/accountStorage.ts';
+import { accountStorage, activateWorkspace, flushWorkspace } from '../src/services/accountStorage.ts';
 const memory = new Map();
 globalThis.localStorage = { getItem: key => memory.get(key) ?? null, setItem: (key, value) => memory.set(key, value), removeItem: key => memory.delete(key) };
 globalThis.window = new EventTarget();

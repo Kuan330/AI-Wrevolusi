@@ -1,5 +1,7 @@
 from app.models.account import Account
+from app.models.catalogue import CatalogueChapter, CatalogueCourse
 from app.models.capability import Capability
+from app.models.learning import DailyBrief, LearningCheckin, LearningProgress
 from app.models.occupation import Occupation
 from app.models.preparation import Preparation
 from app.models.refresh_token import RefreshToken
@@ -15,4 +17,10 @@ __all__ = [
     'Capability',
     'Preparation',
     'Schedule',
+    'Account',
+    'CatalogueCourse',
+    'CatalogueChapter',
+    'LearningProgress',
+    'LearningCheckin',
+    'DailyBrief',
 ]

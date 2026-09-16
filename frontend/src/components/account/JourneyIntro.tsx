@@ -2,8 +2,8 @@ import type { ComponentProps } from "react";
 import {
   hasConfirmedAnalysis,
   readTaskWorkspace,
-} from "@/features/work-profile/userProfile";
-import { readLearningCentreItems } from "@/features/skills/skillDirections";
+} from "@/pages/WorkProfile/userProfile";
+import { readLearningCentreItems } from "@/pages/Skills/skillDirections";
 import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -13,7 +13,7 @@ import { AppButton } from "@/components/ui/app-button";
 import { useAccount } from "./useAccount";
 import { AuthDialog } from "./AuthDialog";
 import { ROUTES } from "@/constants/routes";
-import { PAGE_GRADIENT_CSS } from "@/features/exposure/palette";
+import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
 
 export type JourneyKind = "resources" | "plan" | "possibilities";
 const content = {
@@ -21,11 +21,11 @@ const content = {
     name: "Learning Resources",
     title: "Turn a skill into your next learning step",
     description:
-      "Choose a learning theme on the Skills page to explore relevant resources and build your own plan.",
+      "Choose skills you want to grow, then explore relevant resources and build your own plan.",
     steps: [
       [
         "Choose a skill",
-        "Find a skill you want to develop and save a learning theme.",
+        "Find a skill you want to develop and save it for learning.",
       ],
       [
         "Explore resources",
@@ -34,7 +34,7 @@ const content = {
       ["Save your next step", "Keep a shortlist and bring it into My Plan."],
     ],
     action: "Choose a skill",
-    path: ROUTES.skills,
+    path: ROUTES.learningCentre,
   },
   plan: {
     name: "My Plan",
@@ -89,7 +89,7 @@ export default function JourneyIntro(props: {
       path = hasTasks ? ROUTES.task : ROUTES.workProfile;
     } else if (kind === "plan") {
       action = "Choose a skill";
-      path = ROUTES.skills;
+      path = ROUTES.learningCentre;
     }
   }
   const [authOpen, setAuthOpen] = useState(false);
@@ -139,13 +139,7 @@ export default function JourneyIntro(props: {
                       ComponentProps<typeof AppButton>
                     >)}
                   >
-                    <Link
-                      to={
-                        path === ROUTES.skills
-                          ? `${path}#skill-directions`
-                          : path
-                      }
-                    >
+                    <Link to={path}>
                       {action}
                       <ArrowRight className="size-4" />
                     </Link>

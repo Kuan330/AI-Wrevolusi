@@ -1,0 +1,370 @@
+/* Soft capsule buttons — system palette (fig. soft-pill kit) */
+
+:root {
+  --soft-blue: #4f91ba;
+  --soft-blue-text: #35617c;
+  --soft-blue-border: rgba(79, 145, 186, 0.42);
+  --soft-blue-bg-top: #f4f9fd;
+  --soft-blue-bg-bottom: #eaf3fb;
+  --soft-blue-glow: rgba(79, 145, 186, 0.16);
+
+  --soft-brown: #c99589;
+  --soft-brown-text: #8f6258;
+  --soft-brown-border: rgba(201, 149, 137, 0.45);
+  --soft-brown-bg-top: #fcf6f4;
+  --soft-brown-bg-bottom: #f8ecef;
+  --soft-brown-glow: rgba(201, 149, 137, 0.16);
+
+  --soft-red: #b42318;
+  --soft-red-text: #912018;
+  --soft-red-border: rgba(180, 35, 24, 0.35);
+  --soft-red-bg-top: #fff7f6;
+  --soft-red-bg-bottom: #fdeeee;
+  --soft-red-glow: rgba(180, 35, 24, 0.12);
+
+  --soft-green: #2e7d46;
+  --soft-green-text: #24653a;
+  --soft-green-border: rgba(46, 125, 70, 0.4);
+  --soft-green-bg-top: #f3faf5;
+  --soft-green-bg-bottom: #e6f5eb;
+  --soft-green-glow: rgba(46, 125, 70, 0.14);
+
+  --soft-gray: #574a55;
+  --soft-gray-text: #574a55;
+  --soft-gray-border: rgba(127, 114, 128, 0.35);
+  --soft-gray-bg-top: #faf9fa;
+  --soft-gray-bg-bottom: #f3f1f4;
+  --soft-gray-glow: rgba(61, 43, 54, 0.08);
+}
+
+.soft-btn,
+.soft-btn-blue,
+.soft-btn-brown,
+.soft-btn-red,
+.soft-btn-green,
+.soft-btn-gray,
+.soft-btn-gradient {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 999px !important;
+  border-width: 1px;
+  border-style: solid;
+  font-weight: 600;
+  line-height: 1.2;
+  box-shadow:
+    0 4px 14px var(--soft-blue-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.soft-btn:hover,
+.soft-btn-blue:hover,
+.soft-btn-brown:hover,
+.soft-btn-red:hover,
+.soft-btn-green:hover,
+.soft-btn-gray:hover,
+.soft-btn-gradient:hover {
+  transform: translateY(-1px);
+}
+
+.soft-btn:disabled,
+.soft-btn-blue:disabled,
+.soft-btn-brown:disabled,
+.soft-btn-red:disabled,
+.soft-btn-green:disabled,
+.soft-btn-gray:disabled,
+.soft-btn-gradient:disabled {
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Get started — blue */
+.soft-btn,
+.soft-btn-blue {
+  border-color: var(--soft-blue-border) !important;
+  background: linear-gradient(
+    180deg,
+    var(--soft-blue-bg-top) 0%,
+    var(--soft-blue-bg-bottom) 100%
+  ) !important;
+  color: var(--soft-blue-text) !important;
+  box-shadow:
+    0 4px 14px var(--soft-blue-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+.soft-btn:hover,
+.soft-btn-blue:hover {
+  background: linear-gradient(180deg, #eaf3fb 0%, #dceef9 100%) !important;
+  color: #2f5f80 !important;
+  box-shadow:
+    0 6px 16px rgba(79, 145, 186, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Edit — brown */
+.soft-btn-brown {
+  border-color: var(--soft-brown-border) !important;
+  background: linear-gradient(
+    180deg,
+    var(--soft-brown-bg-top) 0%,
+    var(--soft-brown-bg-bottom) 100%
+  ) !important;
+  color: var(--soft-brown-text) !important;
+  box-shadow:
+    0 4px 14px var(--soft-brown-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+.soft-btn-brown:hover {
+  background: linear-gradient(180deg, #f8ecef 0%, #f0ddd8 100%) !important;
+  color: #7a5148 !important;
+  box-shadow:
+    0 6px 16px rgba(201, 149, 137, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Remove — red */
+.soft-btn-red {
+  border-color: var(--soft-red-border) !important;
+  background: linear-gradient(
+    180deg,
+    var(--soft-red-bg-top) 0%,
+    var(--soft-red-bg-bottom) 100%
+  ) !important;
+  color: var(--soft-red) !important;
+  box-shadow:
+    0 4px 14px var(--soft-red-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+.soft-btn-red:hover {
+  background: linear-gradient(180deg, #fdeeee 0%, #f9e0df 100%) !important;
+  color: var(--soft-red-text) !important;
+  box-shadow:
+    0 6px 16px rgba(180, 35, 24, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Accept — green */
+.soft-btn-green {
+  border-color: var(--soft-green-border) !important;
+  background: linear-gradient(
+    180deg,
+    var(--soft-green-bg-top) 0%,
+    var(--soft-green-bg-bottom) 100%
+  ) !important;
+  color: var(--soft-green) !important;
+  box-shadow:
+    0 4px 14px var(--soft-green-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+.soft-btn-green:hover {
+  background: linear-gradient(180deg, #e6f5eb 0%, #d8efdf 100%) !important;
+  color: var(--soft-green-text) !important;
+  box-shadow:
+    0 6px 16px rgba(46, 125, 70, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Decline — gray */
+.soft-btn-gray {
+  border-color: var(--soft-gray-border) !important;
+  background: linear-gradient(
+    180deg,
+    var(--soft-gray-bg-top) 0%,
+    var(--soft-gray-bg-bottom) 100%
+  ) !important;
+  color: var(--soft-gray-text) !important;
+  box-shadow:
+    0 4px 14px var(--soft-gray-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+.soft-btn-gray:hover {
+  background: linear-gradient(180deg, #f3f1f4 0%, #ebe8ed 100%) !important;
+  color: #2f2430 !important;
+  box-shadow:
+    0 6px 16px rgba(61, 43, 54, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Brand gradient soft capsule */
+.soft-btn-gradient {
+  border-color: rgba(79, 145, 186, 0.28) !important;
+  background: linear-gradient(
+    100deg,
+    #eaf3fb 0%,
+    #f5f3f8 48%,
+    #f8ecef 100%
+  ) !important;
+  color: var(--soft-blue-text) !important;
+  box-shadow:
+    0 4px 14px rgba(61, 43, 54, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+.soft-btn-gradient:hover {
+  background: #d6eaf7 !important;
+  color: #2f5f80 !important;
+  box-shadow:
+    0 6px 16px rgba(79, 145, 186, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Map existing profile-* / AppButton tone classes */
+.profile-primary-btn,
+.work-profile-page .profile-primary-btn {
+  border: 1px solid var(--soft-brown-border) !important;
+  background: linear-gradient(
+    180deg,
+    var(--soft-brown-bg-top) 0%,
+    var(--soft-brown-bg-bottom) 100%
+  ) !important;
+  color: var(--soft-brown-text) !important;
+  box-shadow:
+    0 4px 14px var(--soft-brown-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+}
+.profile-primary-btn:hover,
+.work-profile-page .profile-primary-btn:hover {
+  background: linear-gradient(180deg, #f8ecef 0%, #f0ddd8 100%) !important;
+  color: #7a5148 !important;
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 16px rgba(201, 149, 137, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+.profile-blue-btn,
+.work-profile-page .profile-blue-btn,
+.profile-dialog-btn,
+.work-profile-page .profile-dialog-btn {
+  border: 1px solid var(--soft-blue-border) !important;
+  background: linear-gradient(
+    180deg,
+    var(--soft-blue-bg-top) 0%,
+    var(--soft-blue-bg-bottom) 100%
+  ) !important;
+  color: var(--soft-blue-text) !important;
+  box-shadow:
+    0 4px 14px var(--soft-blue-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+}
+.profile-blue-btn:hover,
+.work-profile-page .profile-blue-btn:hover,
+.profile-dialog-btn:hover,
+.work-profile-page .profile-dialog-btn:hover {
+  background: linear-gradient(180deg, #eaf3fb 0%, #dceef9 100%) !important;
+  color: #2f5f80 !important;
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 16px rgba(79, 145, 186, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+.profile-gradient-btn,
+.work-profile-page .profile-gradient-btn {
+  border: 1px solid rgba(79, 145, 186, 0.28) !important;
+  background: linear-gradient(
+    100deg,
+    #eaf3fb 0%,
+    #f5f3f8 48%,
+    #f8ecef 100%
+  ) !important;
+  color: var(--soft-blue-text) !important;
+  box-shadow:
+    0 4px 14px rgba(61, 43, 54, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+}
+.profile-gradient-btn:hover,
+.work-profile-page .profile-gradient-btn:hover {
+  background: #d6eaf7 !important;
+  filter: none;
+  color: #2f5f80 !important;
+  box-shadow:
+    0 6px 16px rgba(79, 145, 186, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+.profile-outline-btn,
+.work-profile-page .profile-outline-btn,
+.profile-dialog-cancel-btn,
+.work-profile-page .profile-dialog-cancel-btn,
+.profile-batch-btn,
+.work-profile-page .profile-batch-btn {
+  border: 1px solid var(--soft-gray-border) !important;
+  background: linear-gradient(
+    180deg,
+    var(--soft-gray-bg-top) 0%,
+    var(--soft-gray-bg-bottom) 100%
+  ) !important;
+  color: var(--soft-gray-text) !important;
+  box-shadow:
+    0 4px 14px var(--soft-gray-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+  font-weight: 600;
+}
+.profile-outline-btn:hover,
+.work-profile-page .profile-outline-btn:hover,
+.profile-dialog-cancel-btn:hover,
+.work-profile-page .profile-dialog-cancel-btn:hover,
+.profile-batch-btn:hover:not(:disabled),
+.work-profile-page .profile-batch-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #f3f1f4 0%, #ebe8ed 100%) !important;
+  color: #2f2430 !important;
+  border-color: var(--soft-gray-border) !important;
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 16px rgba(61, 43, 54, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Plan page legacy buttons */
+.pl-primary,
+.pl-work-button,
+.activity-drawer .pl-detail-actions button {
+  border-radius: 999px !important;
+  border: 1px solid var(--soft-blue-border) !important;
+  background: linear-gradient(
+    180deg,
+    var(--soft-blue-bg-top) 0%,
+    var(--soft-blue-bg-bottom) 100%
+  ) !important;
+  color: var(--soft-blue-text) !important;
+  font-weight: 600 !important;
+  box-shadow:
+    0 4px 14px var(--soft-blue-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+}
+.pl-primary:hover,
+.pl-work-button:hover,
+.activity-drawer .pl-detail-actions button:hover {
+  background: linear-gradient(180deg, #eaf3fb 0%, #dceef9 100%) !important;
+  color: #2f5f80 !important;
+}
+
+/* Icon-only remove: plain glyph; hover matches edit icon chip */
+.icon-remove-btn--icon-only {
+  height: 40px !important;
+  width: 40px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #b42318 !important;
+  transform: none !important;
+}
+.icon-remove-btn--icon-only:hover {
+  border: 0 !important;
+  background: #fdeeee !important;
+  box-shadow: none !important;
+  color: #912018 !important;
+  transform: translateY(-1px) !important;
+}
+.icon-remove-btn--icon-only:hover svg {
+  color: #912018;
+}

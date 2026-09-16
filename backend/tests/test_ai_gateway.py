@@ -201,7 +201,7 @@ def test_task_route_uses_the_shared_gateway_provider_before_contract_enforcement
                 '/api/v1/ai/task-match',
                 json={
                     'occupation_code': '5222',
-                    'user_task': 'Prepare the weekly sales report.',
+                    'user_task': 'Prepare the weekly sales report for review.',
                     'candidates': [
                         {'id': 'task-1', 'text': 'Prepare weekly sales reports.'},
                         {'id': 'task-2', 'text': 'Stock shelves and receive deliveries.'},

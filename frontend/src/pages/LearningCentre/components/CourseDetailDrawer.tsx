@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Bookmark, Check, ExternalLink, ArrowRight } from "lucide-react";
+import { useMemo, useRef } from "react";
+import { Bookmark, ExternalLink, Trash2 } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -10,48 +10,27 @@ import {
 } from "@/components/ui/drawer";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { AppButton } from "@/components/ui/app-button";
-import { Link } from "react-router-dom";
-import type { Course, CourseChoice, RecommendationBasis } from "@/features/learning/types";
-import { durationLabel } from "@/features/learning/lib/coursePlanning";
-import ContextStudyAdvice from "./ContextStudyAdvice";
-import LearningPlanSteps from "./LearningPlanSteps";
+import type { Course } from "../types";
+import { durationLabel } from "../lib/coursePlanning";
+import { courseLevelLabel } from "../lib/courseLevels";
+import { wefSkillsForCourse } from "../lib/courseWorkLinks";
+import SkillOutlookBadge from "./SkillOutlookBadge";
+
 export type CourseDetailDrawerProps = {
   course: Course;
-  context: RecommendationBasis;
   skillName: string;
-  choice: CourseChoice;
   saved: boolean;
-  inPlan: boolean;
-  scheduled: boolean;
-  startPlanning: boolean;
   onClose: () => void;
   onSave: () => void;
-  onCommit: (choice: CourseChoice) => boolean | Promise<boolean>;
+  /** Called when a badge popover adds or removes a learning skill. */
+  onSkillsChanged?: () => void;
 };
+
 export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
-  const {
-    course,
-    context,
-    skillName,
-    choice,
-    saved,
-    inPlan,
-    scheduled,
-    startPlanning,
-    onClose,
-    onSave,
-    onCommit,
-  } = props;
-  const [planning, setPlanning] = useState(startPlanning);
-  const planProps = {
-    course,
-    initialChoice: choice,
-    inPlan,
-    onBack: () => setPlanning(false),
-    onClose,
-    onCommit,
-  };
+  const { course, skillName, saved, onClose, onSave, onSkillsChanged } = props;
+  const buildSkills = useMemo(() => wefSkillsForCourse(course.id), [course.id]);
+  const sheetRef = useRef<HTMLDivElement>(null);
+
   return (
     <Drawer
       open
@@ -59,103 +38,116 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
         if (!open) onClose();
       }}
     >
-      <DrawerContent className="learning-detail-drawer">
+      <DrawerContent ref={sheetRef} className="learning-detail-drawer">
         <DrawerHeader>
-          <p className="library-kicker">
-            {planning ? "Plan your learning" : course.provider}
-          </p>
-          <DrawerTitle>{course.title} {scheduled && <span className="course-import-badge">In learning plan</span>}</DrawerTitle>
+          <p className="library-kicker">{course.provider}</p>
+          <DrawerTitle>{course.title}</DrawerTitle>
           <DrawerDescription>
-            {course.provider} ·{" "}
-            {course.level === "unknown" ? "Level not stated" : course.level} ·{" "}
+            {course.provider} · {courseLevelLabel(course.level)} ·{" "}
             {course.language} · {durationLabel(course.durationMin)}
           </DrawerDescription>
         </DrawerHeader>
-        {planning ? (
-          <LearningPlanSteps {...planProps} />
-        ) : (
-          <>
-            <DrawerBody>
-              <a
-                className="learning-provider-link"
-                href={course.url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Open provider course
-                <ExternalLink size={14} />
-              </a>
-              <Tabs defaultValue="overview">
-                <TabsList className="learning-detail-tabs">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="chapters">Chapters</TabsTrigger>
-                </TabsList>
-                <TabsContent value="overview" className="learning-overview">
-                  <section>
-                    <h3>About this course</h3>
-                    <p>{course.intro}</p>
-                  </section>
-                  <section>
-                    <h3>What you will learn</h3>
-                    <ul>
-                      {course.outcomes.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </section>
-                  <section>
-                    <h3>Before you start</h3>
-                    <p>{course.prereq}</p>
-                  </section>
-                  <ContextStudyAdvice {...{ course, context, skillName }} />
-                </TabsContent>
-                <TabsContent value="chapters">
-                  <p className="library-muted my-4">
-                    Preview the course structure. Choose what to include when
-                    you plan your learning.
+        <DrawerBody>
+          <a
+            className="learning-provider-link"
+            href={course.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open provider course
+            <ExternalLink size={14} />
+          </a>
+          <Tabs defaultValue="overview">
+            <TabsList className="learning-detail-tabs">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="chapters">Chapters</TabsTrigger>
+            </TabsList>
+            <TabsContent value="overview" className="learning-overview">
+              <section>
+                <h3>About this course</h3>
+                <p>{course.intro}</p>
+              </section>
+
+              <section className="learning-course-skills">
+                <h3>Skills you’ll build</h3>
+                {buildSkills.length ? (
+                  <ul className="learning-course-skill-badges">
+                    {buildSkills.map((skill) => (
+                      <li key={skill.wef_skill_id}>
+                        <SkillOutlookBadge
+                          skill={skill}
+                          container={sheetRef}
+                          onSkillsChanged={onSkillsChanged}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="library-muted">
+                    No linked WEF skills are mapped for this course yet.
                   </p>
-                  {course.chapters?.length ? (
-                    <ol className="learning-chapter-preview">
-                      {course.chapters.map((chapter, index) => (
-                        <li key={index}>
-                          <span className="learning-chapter-number">
-                            {index + 1}
-                          </span>
-                          <span>
-                            {chapter.title}
-                            <small>{durationLabel(chapter.min)}</small>
-                          </span>
-                        </li>
-                      ))}
-                    </ol>
-                  ) : (
-                    <p>
-                      Chapter list not published. This course can be added as a
-                      whole.
-                    </p>
-                  )}
-                </TabsContent>
-              </Tabs>
-            </DrawerBody>
-            <div className="learning-drawer-actions">
-              <Button variant="ghost" aria-pressed={saved} onClick={onSave}>
-                {saved ? <Check size={16} /> : <Bookmark size={16} />}
-                {saved ? "Saved" : "Save for later"}
-              </Button>
-              <div className="library-actions">
-                {scheduled && (
-                  <Button asChild variant="link">
-                    <Link to="/plan">View plan</Link>
-                  </Button>
                 )}
-                <AppButton tone="gradient" onClick={() => setPlanning(true)}>
-                  {inPlan || scheduled ? "Edit learning plan" : "Plan learning"}
-                  <ArrowRight size={16} />
-                </AppButton>
-              </div>
-            </div>
-          </>
-        )}
+                {skillName ? (
+                  <p className="learning-course-skills__focus">
+                    Currently browsing via focus skill:{" "}
+                    <strong>{skillName}</strong>
+                  </p>
+                ) : null}
+              </section>
+
+              <section>
+                <h3>Before you start</h3>
+                <p>{course.prereq}</p>
+              </section>
+
+              <section className="learning-course-disclaimer">
+                <h3>What won’t change</h3>
+                <p>
+                  Completing this course will not automatically lower your ILO
+                  task exposure score. Exposure reflects how a task may be
+                  reshaped by AI; learning builds skills and next-step
+                  recommendations around that work.
+                </p>
+              </section>
+            </TabsContent>
+            <TabsContent value="chapters">
+              <p className="library-muted my-4">
+                Preview the course structure from the provider.
+              </p>
+              {course.chapters?.length ? (
+                <ol className="learning-chapter-preview">
+                  {course.chapters.map((chapter, index) => (
+                    <li key={index}>
+                      <span className="learning-chapter-number">
+                        {index + 1}
+                      </span>
+                      <span>
+                        {chapter.title}
+                        <small>{durationLabel(chapter.min)}</small>
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p>
+                  Chapter list not published. This course can be added as a
+                  whole.
+                </p>
+              )}
+            </TabsContent>
+          </Tabs>
+        </DrawerBody>
+        <div className="learning-drawer-actions">
+          <Button
+            className={`library-save-button learning-drawer-save${saved ? " is-saved" : ""}`}
+            variant="ghost"
+            aria-pressed={saved}
+            onClick={onSave}
+          >
+            {saved ? <Trash2 size={16} /> : <Bookmark size={16} />}
+            {saved ? "Remove" : "Add to learning"}
+          </Button>
+        </div>
       </DrawerContent>
     </Drawer>
   );

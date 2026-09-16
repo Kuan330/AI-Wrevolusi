@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
-import { createTaskId } from "@/features/work-profile/taskOptions";
-import type { ProfileTask, TaskEditorValues } from "@/features/work-profile/types";
+import { createTaskId } from "@/pages/WorkProfile/taskOptions";
+import type { ProfileTask, TaskEditorValues } from "@/pages/WorkProfile/types";
 import {
   readProfileTasks,
   saveProfileTasks,
-} from "@/features/work-profile/userProfile";
+} from "@/pages/WorkProfile/userProfile";
 import { referenceService } from "@/services/referenceService";
 
 export const toProfileTask = (

@@ -166,8 +166,8 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     links: [
       { label: "Start free analysis" },
       { label: "Work profile (E1)" },
-      { label: "AI exposure (E2)" },
-      { label: "Skills (E3)" },
+      { label: "AI Impact (E2)" },
+      { label: "Learning resources (E3)" },
     ],
   },
   {

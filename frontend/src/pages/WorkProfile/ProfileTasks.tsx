@@ -9,11 +9,11 @@ import {
   readTaskWorkspace,
   saveConfirmedAnalysis,
   type SelectedOccupation,
-} from "@/features/work-profile/userProfile";
+} from "@/pages/WorkProfile/userProfile";
 import ProfileTaskList from "@/pages/WorkProfile/components/ProfileTaskList";
 import TaskEditorDialog from "@/pages/WorkProfile/components/TaskEditorDialog";
 import { useProfileTasks } from "@/pages/WorkProfile/hooks/useProfileTasks";
-import type { ProfileTask, TaskEditorValues } from "@/features/work-profile/types";
+import type { ProfileTask, TaskEditorValues } from "@/pages/WorkProfile/types";
 import { exposureService } from "@/services/exposureService";
 import { referenceService } from "@/services/referenceService";
 
