@@ -221,7 +221,7 @@ export default function LearningCentre() {
 
   return (
     <div className="course-library">
-      <PageHeader {...headerProps} />
+      <PageHeader {...headerProps} className="library-page-header" />
       {(skillsError || notice) && (
         <p role="alert">{skillsError || notice}</p>
       )}
@@ -268,18 +268,7 @@ export default function LearningCentre() {
                 ? `${visible.length} of ${matching.length} courses for ${skill.en}`
                 : `${visible.length} of ${matching.length} courses in the catalogue`}
             </p>
-            <div className="library-course-list">
-              {visible.map((course) => (
-                <CourseCard
-                  key={course.id}
-                  course={course}
-                  saved={state.saved.includes(course.id)}
-                  onSave={() => toggleSave(course.id)}
-                  onDetails={() => setDetailId(course.id)}
-                />
-              ))}
-            </div>
-            {!visible.length && !catalogueLoading && (
+            {!visible.length && !catalogueLoading ? (
               <div className="library-empty library-glass">
                 <h3>
                   {matching.length
@@ -301,6 +290,18 @@ export default function LearningCentre() {
                 >
                   Clear filters
                 </Button>
+              </div>
+            ) : (
+              <div className="library-course-list">
+                {visible.map((course) => (
+                  <CourseCard
+                    key={course.id}
+                    course={course}
+                    saved={state.saved.includes(course.id)}
+                    onSave={() => toggleSave(course.id)}
+                    onDetails={() => setDetailId(course.id)}
+                  />
+                ))}
               </div>
             )}
           </div>

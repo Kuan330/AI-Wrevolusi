@@ -1,12 +1,35 @@
+/* Learning Resources — lock to one viewport under the 4rem nav. */
+main:has(> .course-library) {
+  box-sizing: border-box;
+  height: calc(100dvh - 4rem);
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  overflow: hidden;
+}
 .course-library {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   min-width: 0;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding-bottom: 2rem;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  padding-bottom: 0;
+  overflow: hidden;
   color: #2f2430;
-  display: grid;
-  gap: 1.25rem;
+  gap: 0.65rem;
+}
+.library-page-header {
+  flex-shrink: 0;
+  padding-bottom: 0.55rem !important;
+}
+.library-page-header h1 {
+  min-height: 0 !important;
+  font-size: 1.35rem !important;
+}
+.course-library > [role="alert"] {
+  flex-shrink: 0;
+  margin: 0;
 }
 .library-glass {
   border: 1px solid #ffffffd6;
@@ -87,18 +110,20 @@
   margin-right: 0.25rem;
 }
 .library-layout {
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
-  grid-template-columns: minmax(230px, 0.75fr) minmax(0, 2fr);
-  gap: 1.5rem;
-  align-items: start;
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 2.1fr);
+  gap: 1rem;
+  align-items: stretch;
 }
 .library-sidebar {
   display: flex;
   flex-direction: column;
-  padding: 1.25rem;
-  position: sticky;
-  top: 6rem;
-  max-height: calc(100vh - 7rem);
+  padding: 1rem 1.1rem;
+  position: static;
+  height: 100%;
+  max-height: none;
   min-height: 0;
   overflow: hidden;
 }
@@ -137,7 +162,7 @@
 .library-skill-list {
   display: grid;
   align-content: start;
-  gap: 0.55rem;
+  gap: 0.7rem;
   margin-top: 1rem;
   flex: 1 1 auto;
   min-height: 0;
@@ -163,6 +188,7 @@
   display: flex;
   align-items: stretch;
   gap: 0;
+  min-height: 4.75rem;
   border: 1px solid rgba(214, 228, 240, 0.9);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.78);
@@ -219,7 +245,7 @@
   gap: 0.5rem;
   border: 0;
   background: transparent;
-  padding: 0.85rem 0.45rem 0.85rem 0.85rem;
+  padding: 1.05rem 0.5rem 1.05rem 1rem;
   text-align: left;
   color: inherit;
   cursor: pointer;
@@ -257,7 +283,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.45rem;
-  margin-top: 0.3rem;
+  margin-top: 0.45rem;
 }
 .library-skill-card__meta small {
   margin-top: 0;
@@ -328,13 +354,18 @@
   border-color: #c5dcea !important;
 }
 .library-results {
-  display: grid;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
 .library-filters,
 .library-basis {
-  padding: 1rem;
+  padding: 0.75rem 0.9rem;
+  flex-shrink: 0;
 }
 .library-search {
   display: flex;
@@ -405,17 +436,25 @@
   margin-top: 0.3rem;
 }
 .library-course-list {
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
   align-items: stretch;
-  gap: 1rem;
+  gap: 0.75rem;
   width: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.2rem;
+  scrollbar-width: thin;
+  scrollbar-color: #b7d5e6 transparent;
 }
 .library-course {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 1.25rem;
+  padding: 0.95rem 1.05rem;
   min-width: 0;
 }
 .library-course h3 {
@@ -684,6 +723,12 @@
   color: #326889;
 }
 .library-empty {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 2rem;
   text-align: center;
   color: #7f7280;
@@ -841,12 +886,23 @@
   justify-content: flex-end;
 }
 @media (max-width: 900px) {
+  main:has(> .course-library) {
+    height: auto;
+    overflow: auto;
+  }
+  .course-library {
+    height: auto;
+    overflow: visible;
+  }
   .library-layout,
   .library-intro {
     grid-template-columns: 1fr;
+    flex: none;
+    min-height: 0;
   }
   .library-sidebar {
     position: static;
+    height: auto;
     max-height: min(22rem, 50vh);
   }
   .library-skill-list {
@@ -854,6 +910,13 @@
   }
   .library-course-list {
     grid-template-columns: 1fr;
+    flex: none;
+    max-height: none;
+    overflow: visible;
+  }
+  .library-results {
+    height: auto;
+    overflow: visible;
   }
   .library-detail-columns {
     grid-template-columns: 1fr;
@@ -1437,30 +1500,19 @@
   color: #918694;
 }
 @media (min-width: 901px) {
-  .library-layout {
-    height: calc(100dvh - 112px);
-    min-height: 420px;
-    align-items: stretch;
-  }
   .library-layout > .library-sidebar,
   .library-results {
     height: 100%;
     min-height: 0;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #b7d5e6 transparent;
-    scrollbar-gutter: stable;
   }
-  .library-layout > .library-sidebar {
-    position: static;
-  }
-  .library-results {
-    display: flex;
-    flex-direction: column;
-    padding: 2px 10px 24px 2px;
-  }
-  .library-results > * {
+  .library-results > .library-muted,
+  .library-results > .library-filters {
     flex-shrink: 0;
+  }
+  .library-results > .library-empty {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
   }
 }
 @media (max-width: 540px) {
