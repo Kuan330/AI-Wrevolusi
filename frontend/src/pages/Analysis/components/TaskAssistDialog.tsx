@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,12 @@ import {
 import { ApiError } from "@/services/api";
 import { aiService } from "@/services/aiService";
 import type { ProfileTask } from "@/pages/WorkProfile/types";
-
-const DEFAULT_TEMPLATE = "How can AI assist me in completing this task?";
+import {
+  DEFAULT_TASK_ASSIST_QUESTION,
+  shouldApplyTaskAssistResult,
+  taskAssistContextKey,
+  taskAssistResponseLabel,
+} from "@/pages/AIExposure/lib/taskAssistState";
 
 type TaskAssistDialogProps = {
   open: boolean;
@@ -24,41 +28,86 @@ type TaskAssistDialogProps = {
 type ChatMessage = {
   role: "user" | "assistant";
   content: string;
+  generatedByModel?: boolean;
 };
 
-const TaskAssistDialog = (props: TaskAssistDialogProps) => {
+const TaskAssistDialogSession = (props: TaskAssistDialogProps) => {
   const { open, task, onOpenChange } = props;
-  const [input, setInput] = useState(DEFAULT_TEMPLATE);
+  const [input, setInput] = useState(DEFAULT_TASK_ASSIST_QUESTION);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const activeRequest = useRef<AbortController | null>(null);
+  const requestSequence = useRef(0);
+  const mountedRef = useRef(true);
   const completed = messages.some((item) => item.role === "assistant");
 
-  useEffect(() => {
-    if (!open) return;
-    setInput(DEFAULT_TEMPLATE);
-    setMessages([]);
-    setSending(false);
-    setError("");
-  }, [open, task?.id]);
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+      requestSequence.current += 1;
+      activeRequest.current?.abort();
+    },
+    [],
+  );
 
   const send = async () => {
     if (!task || !input.trim() || sending || completed) return;
     const userMessage = input.trim();
+    const requestContextKey = taskAssistContextKey(
+      task.id,
+      task.wording,
+      task.notes ?? "",
+    );
+    const requestId = requestSequence.current + 1;
+    requestSequence.current = requestId;
+    activeRequest.current?.abort();
+    const controller = new AbortController();
+    activeRequest.current = controller;
     setMessages([{ role: "user", content: userMessage }]);
     setSending(true);
     setError("");
     try {
-      const result = await aiService.taskAssist({
-        task_text: task.wording,
-        notes: task.notes ?? "",
-        user_message: userMessage,
-      });
+      const result = await aiService.taskAssist(
+        {
+          task_text: task.wording,
+          notes: task.notes ?? "",
+          user_message: userMessage,
+        },
+        controller.signal,
+      );
+      if (
+        !shouldApplyTaskAssistResult(
+          requestId,
+          requestSequence.current,
+          mountedRef.current && open,
+          requestContextKey,
+          requestContextKey,
+        )
+      ) {
+        return;
+      }
       setMessages([
         { role: "user", content: userMessage },
-        { role: "assistant", content: result.reply },
+        {
+          role: "assistant",
+          content: result.reply,
+          generatedByModel: result.generated_by_model,
+        },
       ]);
     } catch (err) {
+      if (
+        controller.signal.aborted ||
+        !shouldApplyTaskAssistResult(
+          requestId,
+          requestSequence.current,
+          mountedRef.current && open,
+          requestContextKey,
+          requestContextKey,
+        )
+      ) {
+        return;
+      }
       setError(
         err instanceof ApiError
           ? err.detail
@@ -68,7 +117,10 @@ const TaskAssistDialog = (props: TaskAssistDialogProps) => {
       );
       setMessages([{ role: "user", content: userMessage }]);
     } finally {
-      setSending(false);
+      if (requestId === requestSequence.current) {
+        activeRequest.current = null;
+        setSending(false);
+      }
     }
   };
 
@@ -85,7 +137,11 @@ const TaskAssistDialog = (props: TaskAssistDialogProps) => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-5 py-4">
+        <div
+          aria-live="polite"
+          aria-atomic="false"
+          className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-5 py-4"
+        >
           {messages.length === 0 ? (
             <p className="text-sm leading-6 text-[#7f7280]">
               Send the suggested prompt, or edit it first. This is a single-turn
@@ -101,15 +157,22 @@ const TaskAssistDialog = (props: TaskAssistDialogProps) => {
                   : "mr-8 rounded-2xl border border-[#eadde4] bg-white/80 px-3.5 py-2.5 text-sm leading-6 text-[#574a55]"
               }
             >
-              {message.content}
+              {message.role === "assistant" ? (
+                <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#7f7280]">
+                  {taskAssistResponseLabel(message.generatedByModel === true)}
+                </p>
+              ) : null}
+              <span>{message.content}</span>
             </div>
           ))}
           {sending ? (
-            <p className="text-xs text-[#7f7280]">Thinking…</p>
+            <p role="status" className="text-xs text-[#7f7280]">
+              Thinking…
+            </p>
           ) : null}
           {error ? (
             <div className="space-y-2">
-              <p className="text-sm text-[#a15b5b]">{error}</p>
+              <p role="alert" className="text-sm text-[#a15b5b]">{error}</p>
               <Button type="button" variant="outline" size="sm" onClick={() => void send()}>
                 Retry
               </Button>
@@ -133,6 +196,7 @@ const TaskAssistDialog = (props: TaskAssistDialogProps) => {
             value={input}
             onChange={(event) => setInput(event.target.value)}
             rows={2}
+            maxLength={2000}
             disabled={sending || completed}
             className="min-h-[2.75rem] flex-1 resize-none rounded-xl border border-[#d6e4f0] bg-white/90 px-3 py-2 text-sm text-[#2f2430] outline-none focus-visible:ring-2 focus-visible:ring-[#9ec9e4] disabled:opacity-60"
             aria-label="Message to AI"
@@ -149,6 +213,20 @@ const TaskAssistDialog = (props: TaskAssistDialogProps) => {
         </form>
       </DialogContent>
     </Dialog>
+  );
+};
+
+const TaskAssistDialog = (props: TaskAssistDialogProps) => {
+  const { open, task } = props;
+  const contextKey = task
+    ? taskAssistContextKey(task.id, task.wording, task.notes ?? "")
+    : "no-task";
+
+  return (
+    <TaskAssistDialogSession
+      key={`${open ? "open" : "closed"}:${contextKey}`}
+      {...props}
+    />
   );
 };
 

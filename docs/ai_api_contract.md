@@ -1,8 +1,8 @@
-# AI candidate-constrained API contract
+# AI API contract
 
-Status: implementation contract for the four JSON endpoints under `/api/v1/ai`.
+Status: implementation contract for the candidate-constrained endpoints and the one-shot Task Assist endpoint under `/api/v1/ai`.
 
-## Shared rules
+## Shared candidate-matching rules
 
 - The request `candidates` list is the complete allowlist. The service must not
   discover, synthesize, or return an identifier/code/skill outside that list.
@@ -119,6 +119,20 @@ Only supplied skill IDs may be returned; at most 2 skills are returned. Every
 `evidence_phrases` value must be an exact substring of the request's `task_text`.
 No reliable match returns `{"skills": []}`.
 
+### `POST /api/v1/ai/task-assist`
+
+This authenticated endpoint provides one stateless answer about the current task. It accepts only `task_text`, `user_message`, and optional `notes`; conversation history and unknown fields are rejected. The default frontend question is `How can AI assist me in completing this task?`.
+
+```json
+{
+  "reply": "...",
+  "generated_by_model": true,
+  "needs_user_confirmation": true
+}
+```
+
+Every request field is untrusted, user-controlled data; the one `user_message` question cannot override the system boundary, and task context/notes are never system instructions. Provider output is schema-validated, limited to 1200 characters, checked for high-risk or internal/credential-like disclosure and returned as plain text. Any provider, timeout, malformed-output or safety-validation failure returns deterministic guidance with `generated_by_model: false`. The endpoint never persists a conversation or changes task data, and it disables both gateway and provider response caches so workplace context is not retained by the AI cache. See `docs/backend_Ruiduo/handover/task-assist.md` for the complete boundary and frontend lifecycle.
+
 ## Validation and fallback expectations
 
 - Unknown request fields should be rejected where the endpoint schema declares a
@@ -126,7 +140,5 @@ No reliable match returns `{"skills": []}`.
 - Empty or unrelated candidate sets must not cause a fabricated result.
 - A provider exception or malformed provider payload must be contained at the
   endpoint boundary and converted to a safe empty/clarifying response.
-- Contract tests live in `backend/tests/test_ai_api_contract.py`; they verify
-  route registration, OpenAPI request/response schemas, allowlists, limits,
-  evidence substrings, no-fit behavior, malformed-body behavior, and provider
-  fallback without connecting to an external database.
+- Contract tests for the four candidate-matching endpoints live in `backend/tests/test_ai_api_contract.py`; they verify route registration, OpenAPI request/response schemas, allowlists, limits, evidence substrings, no-fit behavior, malformed-body behavior, and provider fallback without connecting to an external database.
+- Task Assist authentication, strict single-turn input, all-field prompt isolation, no-cache privacy, provider success/failure, safety rejection and transparent fallback are covered by `backend/tests/test_task_assist.py`; the per-request timeout/retry/cache overrides are covered in `backend/tests/test_ai_provider.py`.

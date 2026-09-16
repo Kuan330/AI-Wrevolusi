@@ -1,9 +1,9 @@
 import { api } from "@/services/api";
 
-// The backend commits to a deterministic answer when the provider is slow or
-// unavailable, so this timeout only needs to cover one provider round-trip
-// (backend default provider timeout is 20s).
+// Candidate matching stays within the normal short request budget. Task Assist
+// allows a configured provider plus one bounded fallback attempt (20s each).
 const AI_REQUEST_TIMEOUT_MS = 25000;
+const TASK_ASSIST_TIMEOUT_MS = 45000;
 
 export interface TaskMatchCandidatePayload {
   id: string;
@@ -82,6 +82,8 @@ export interface TaskAssistRequest {
 
 export interface TaskAssistResponse {
   reply: string;
+  generated_by_model: boolean;
+  needs_user_confirmation: boolean;
 }
 
 export const aiService = {
@@ -104,10 +106,11 @@ export const aiService = {
       request,
       AI_REQUEST_TIMEOUT_MS,
     ),
-  taskAssist: (request: TaskAssistRequest) =>
+  taskAssist: (request: TaskAssistRequest, signal?: AbortSignal) =>
     api.post<TaskAssistResponse, TaskAssistRequest>(
       "/ai/task-assist",
       request,
-      AI_REQUEST_TIMEOUT_MS,
+      TASK_ASSIST_TIMEOUT_MS,
+      signal,
     ),
 };

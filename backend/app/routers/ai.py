@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 
+from app.models.user import User
 from app.schemas.ai_matching import TaskMatchRequest, TaskMatchResponse
 from app.schemas.occupation_ai import (
     OccupationRecommendationsRequest,
@@ -14,6 +15,7 @@ from app.schemas.skill_matching import (
 )
 from app.schemas.task_assist import TaskAssistRequest, TaskAssistResponse
 from app.services.ai_gateway import AIGateway, default_ai_gateway
+from app.services.auth import get_current_user
 from app.services.ai_matching import (
     MINIMUM_TASK_MATCH_WORDS,
     DeterministicTaskMatchProvider,
@@ -26,7 +28,7 @@ from app.services.occupation_ai import (
     deterministic_suggest_occupations,
 )
 from app.services.skill_matching import MAX_SKILL_MATCHES, match_skills_response
-from app.services.task_assist import deterministic_task_assist, suggest_task_assist
+from app.services.task_assist import suggest_task_assist
 
 
 
@@ -221,10 +223,11 @@ def skill_match(
 
 
 @router.post('/task-assist', response_model=TaskAssistResponse)
-async def task_assist(request: TaskAssistRequest) -> TaskAssistResponse:
-    """One-shot workplace task assistance reply for the chat dialog."""
+def task_assist(
+    request: TaskAssistRequest,
+    _current_user: User = Depends(get_current_user),
+    gateway: AIGateway = Depends(get_ai_gateway),
+) -> TaskAssistResponse:
+    """Return one stateless, bounded answer about the current workplace task."""
 
-    try:
-        return await suggest_task_assist(request)
-    except Exception:
-        return deterministic_task_assist(request)
+    return suggest_task_assist(request, gateway)
