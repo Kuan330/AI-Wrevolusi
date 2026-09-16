@@ -48,7 +48,26 @@ npm ci
 
 ## Start the application
 
-Start the backend first:
+From the repository root, start both services with:
+
+```bash
+./dev
+```
+
+The command prefers frontend port 5173 and backend port 8000. If either port
+is occupied, it selects the next available port and prints the actual URLs.
+Press Ctrl+C once to stop both services.
+
+You can choose different starting ports while keeping automatic fallback:
+
+```bash
+./dev --frontend-port 5200 --backend-port 8100
+```
+
+### Start the services separately
+
+Use two terminals when you need to control each process independently. Start
+the backend first:
 
 ```bash
 cd backend
@@ -70,7 +89,7 @@ Default addresses:
 
 Vite proxies `/api` from port 5173 to port 8000.
 
-### Use alternative ports
+### Set alternative ports manually
 
 The defaults are configured strictly, so Vite does not silently choose another
 port. Explicit alternative ports are supported. For example:
@@ -83,7 +102,7 @@ CORS_ORIGINS=http://127.0.0.1:5174 \
 
 # Terminal 2
 cd frontend
-VITE_API_BASE_URL=http://127.0.0.1:8001/api/v1 \
+VITE_API_PROXY_TARGET=http://127.0.0.1:8001 \
   npm run dev -- --port 5174
 ```
 
@@ -91,7 +110,9 @@ Open `http://127.0.0.1:5174` for this alternative setup.
 
 ## Smoke checks
 
-With both services running:
+With both services running, use the URLs printed by `./dev`. The commands below
+show the default ports; replace them when automatic selection chose different
+ports:
 
 ```bash
 curl -fsS http://127.0.0.1:8000/api/healthz

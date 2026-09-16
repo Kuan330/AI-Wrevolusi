@@ -27,6 +27,18 @@ Python 3.12 is required and is selected by `backend/.python-version`.
 
 ## Start Backend
 
+To start the backend and frontend together on automatically selected ports:
+
+```bash
+./dev
+```
+
+The command prints the actual application and API URLs. See the
+[local testing guide](docs/local-testing.md) for options and separate-service
+commands.
+
+To start only the backend:
+
 ```bash
 cd backend
 uv sync
