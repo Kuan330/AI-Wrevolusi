@@ -14,7 +14,7 @@ export const buildSkillEvidence = (
   const tasksBySkillId = new Map<number, ProfileTask[]>();
 
   for (const task of tasks) {
-    for (const skill of skillsForTask(task.wording, skills)) {
+    for (const skill of skillsForTask(task.wording, skills, null)) {
       const supportingTasks = tasksBySkillId.get(skill.wef_skill_id) ?? [];
       if (!supportingTasks.some((item) => item.id === task.id)) {
         supportingTasks.push(task);

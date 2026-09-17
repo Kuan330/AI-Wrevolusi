@@ -77,12 +77,18 @@ test('completed details render saved guidance without any second-turn controls',
   assert.match(drawer, /hasSavedTaskAssist\(interaction\.status\)/);
   assert.match(drawer, /canStartTaskAssist\(interaction\.status\)/);
   assert.match(drawer, /Saved AI guidance/);
-  assert.match(drawer, /profile_task_id: task\.id/);
+  assert.match(drawer, /task_key: task\.id/);
   assert.match(drawer, /getTaskAssist/);
   assert.match(drawer, /setTimeout/);
   assert.match(drawer, /saved\.status === "available" && attempts < 6/);
+  assert.match(
+    drawer,
+    /interaction\?\.status === "completed" && chatOpen/,
+  );
+  assert.match(drawer, /setChatOpen\(false\)/);
   assert.match(dialog, /onStarted/);
-  assert.match(dialog, /task_id: interaction\.task_id/);
+  assert.match(dialog, /task_key: interaction\.task_key/);
+  assert.match(dialog, /onCompleted\(saved\);\s*onOpenChange\(false\)/);
   assert.ok(
     dialog.indexOf('onStarted(') < dialog.indexOf('aiService.taskAssist'),
     'parent pending state must be published before the request starts',
@@ -92,7 +98,7 @@ test('completed details render saved guidance without any second-turn controls',
   assert.doesNotMatch(dialog, /Close and reopen to ask again/);
   assert.match(dialog, /!completed \? \([\s\S]{0,120}<form/);
   assert.match(service, /registerTaskAssistDetails/);
-  assert.match(service, /profile_task_id: string/);
+  assert.match(service, /task_key: string/);
   assert.match(service, /getTaskAssist/);
   assert.match(service, /"\/ai\/task-assist\/details"/);
   assert.match(drawer, /useAccount/);

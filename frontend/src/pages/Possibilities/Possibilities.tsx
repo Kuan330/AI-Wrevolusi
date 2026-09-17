@@ -1,25 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Check, ChevronDown, Info, Plus } from "lucide-react";
-
+import { ArrowRight, Check, Plus } from "lucide-react";
+import { Popover } from "@base-ui/react/popover";
 import BotPet from "@/components/common/BotPet";
 import PageHeader from "@/components/common/PageHeader";
 import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
-import { readTaskWorkspace } from "@/pages/WorkProfile/userProfile";
-import { accountStorage, flushWorkspace } from "@/services/accountStorage";
 import { possibilitiesService } from "@/services/possibilitiesService";
-
+import { referenceService } from "@/services/referenceService";
+import { accountStorage, flushWorkspace } from "@/services/accountStorage";
+import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
+import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
+import SkillOutlookSummary from "@/pages/Skills/components/SkillOutlookSummary";
+import { useLearningSkills } from "@/pages/Skills/useLearningSkills";
+import {
+  readConfirmedAnalysis,
+  readTaskWorkspace,
+} from "@/pages/WorkProfile/userProfile";
+import type { WefSkill } from "@/types/reference";
 import {
   loadSavedPossibilities,
   possibilitiesProfilePath,
   toPossibilitiesData,
   type PossibilitiesData,
-  type PossibilityDirection,
 } from "./possibilitiesModel";
 import "./exploration.css";
 
 const DIRECTION_KEY = "aiwrevolusi.possibilities.chosenDirection";
-const SHORTLIST_KEY = "aiwrevolusi.possibilities.shortlist";
+const COMPANION_AVATAR = "/images/possibilities-companion.png";
 
 const readJson = <T,>(key: string, fallback: T): T => {
   try {
@@ -30,48 +37,183 @@ const readJson = <T,>(key: string, fallback: T): T => {
   }
 };
 
-function directionReason(direction: PossibilityDirection): string {
-  const owned = direction.skills.filter((skill) => skill.state === "have");
-  if (owned.length >= 2) {
-    return `Shared skills include ${owned[0].name.toLowerCase()} and ${owned[1].name.toLowerCase()}.`;
-  }
-  if (owned.length === 1) {
-    return `One shared skill detected: ${owned[0].name.toLowerCase()}.`;
-  }
-  return "No shared skills detected from the available task evidence.";
+/** Outlook card + add to Learning Resources — same pattern as AI Impact. */
+function BuildSkillChip({
+  skill,
+  added,
+  onChanged,
+  onAddedToLearning,
+}: {
+  skill: WefSkill;
+  added: boolean;
+  onChanged: () => void;
+  onAddedToLearning?: () => void;
+}) {
+  const actionsRef = useRef<Popover.Root.Actions | null>(null);
+
+  return (
+    <Popover.Root actionsRef={actionsRef}>
+      <Popover.Trigger
+        nativeButton
+        type="button"
+        className={`px-chip missing${added ? " is-learning" : ""}`}
+        aria-haspopup="dialog"
+        title={
+          added
+            ? "View outlook · already in Learning Resources"
+            : "View outlook · add to Learning Resources"
+        }
+      >
+        {skill.core_skill}
+        <Plus size={13} aria-hidden />
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Positioner
+          side="top"
+          align="center"
+          sideOffset={10}
+          collisionPadding={16}
+          className="z-[80]"
+        >
+          <Popover.Popup
+            initialFocus={false}
+            style={{ background: PAGE_GRADIENT_CSS }}
+            className="w-[min(42rem,calc(100vw-1.5rem))] max-h-[var(--available-height)] overflow-y-auto rounded-xl border border-[#dfd5e4] p-2.5 pb-2 shadow-xl outline-none"
+          >
+            <SkillOutlookSummary
+              skill={skill}
+              compact
+              showAddToLearning
+              onAddComplete={() => {
+                onChanged();
+                onAddedToLearning?.();
+                actionsRef.current?.close();
+              }}
+            />
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
+
+function JourneyCompanion({
+  currentTitle,
+  targetTitle,
+  sharedCount,
+  onExplore,
+}: {
+  currentTitle: string;
+  targetTitle: string | null;
+  sharedCount: number;
+  onExplore: () => void;
+}) {
+  return (
+    <aside className="px-companion">
+      <p className="px-eyebrow">Journey Companion</p>
+      <div className="px-companion-avatar">
+        <img
+          src={COMPANION_AVATAR}
+          alt="AI career companion"
+          width={280}
+          height={320}
+          decoding="async"
+        />
+      </div>
+      {targetTitle ? (
+        <>
+          <p className="px-companion-path">
+            <span>{currentTitle}</span>
+            <ArrowRight size={14} aria-hidden />
+            <span>{targetTitle}</span>
+          </p>
+          <p>{sharedCount} shared {sharedCount === 1 ? "skill" : "skills"} detected</p>
+          <div className="px-companion-story">
+            <h3>What this path suggests</h3>
+            <p>
+              Your confirmed tasks already overlap with skills used in{" "}
+              <strong>{targetTitle}</strong>. These are detected skill signals. Other requirements have not been assessed.
+            </p>
+            <ul>
+              <li>
+                <strong>{sharedCount} shared skills</strong> were detected from task wording.
+              </li>
+              <li>
+                When you are ready, open Learning Resources to turn a gap into a
+                small next step.
+              </li>
+            </ul>
+          </div>
+          <button className="px-primary px-companion-cta" type="button" onClick={onExplore}>
+            Explore learning resources
+          </button>
+        </>
+      ) : (
+        <div className="px-companion-story">
+          <h3>Pick a direction to begin</h3>
+          <p className="px-companion-empty">
+            Choose one of the roles below. Your companion will show how your
+            current experience connects, then guide you to skills and learning
+            steps for that path.
+          </p>
+        </div>
+      )}
+    </aside>
+  );
 }
 
 export default function Possibilities() {
   const navigate = useNavigate();
   const profilePath = possibilitiesProfilePath(readTaskWorkspace());
-  const savedDirection = readJson<{ occupation_code?: string } | null>(
-    DIRECTION_KEY,
-    null,
-  )?.occupation_code;
+  const analysis = readConfirmedAnalysis();
   const [data, setData] = useState<PossibilitiesData | null>(null);
+  const [wefSkills, setWefSkills] = useState<WefSkill[]>([]);
   const [selectedCode, setSelectedCode] = useState<string | null>(
-    savedDirection ?? null,
-  );
-  const [chosenCode, setChosenCode] = useState<string | null>(
-    savedDirection ?? null,
-  );
-  const [shortlist, setShortlist] = useState<number[]>(() =>
-    readJson<number[]>(SHORTLIST_KEY, []),
+    () => readJson<{ occupation_code?: string } | null>(DIRECTION_KEY, null)?.occupation_code ?? null,
   );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const pageReady =
-    !loading &&
-    !error &&
-    data !== null &&
-    data.status !== "needs_profile" &&
-    data.status !== "unavailable";
   const {
     speech: petSpeech,
     say: sayPet,
     dismiss: dismissPet,
     nudge: nudgePet,
-  } = useBotPetGreeting("possibilities", { ready: pageReady });
+  } = useBotPetGreeting("possibilities", { ready: !loading });
+
+  useEffect(() => {
+    let cancelled = false;
+    void referenceService
+      .wefSkills()
+      .then((rows) => {
+        if (!cancelled) {
+          setWefSkills(
+            [...rows].sort(
+              (left, right) => left.wef_skill_id - right.wef_skill_id,
+            ),
+          );
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setWefSkills([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const reflectedSkills = useMemo(
+    () => buildSkillEvidence(analysis?.tasks ?? [], wefSkills),
+    [analysis?.tasks, wefSkills],
+  );
+  const reflectedSkillIds = useMemo(
+    () => new Set(reflectedSkills.map(({ skill }) => skill.wef_skill_id)),
+    [reflectedSkills],
+  );
+  const wefById = useMemo(
+    () => new Map(wefSkills.map(skill => [skill.wef_skill_id, skill])),
+    [wefSkills],
+  );
+  const { isAdded, refresh: refreshLearningSkills } = useLearningSkills();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -81,38 +223,20 @@ export default function Possibilities() {
       get: possibilitiesService.getPossibilities,
       onSuccess: (response) => {
         const mapped = toPossibilitiesData(response);
-        const alternatives = mapped.directions.filter(
-          (direction) =>
-            direction.occupation_code !== mapped.currentRole?.occupation_code,
-        );
-        const serverChoice = alternatives.some(
-          (direction) =>
-            direction.occupation_code === response.chosen_direction_code,
-        )
-          ? response.chosen_direction_code
-          : null;
-
         setData(mapped);
         setError("");
         setLoading(false);
-        setSelectedCode((current) =>
-          alternatives.some(
-            (direction) => direction.occupation_code === current,
-          )
-            ? current
-            : (serverChoice ?? alternatives[0]?.occupation_code ?? null),
-        );
-        setChosenCode(serverChoice);
-        setShortlist(
-          response.shortlisted_skill_ids
-            .filter((id) => response.skills.some((skill) => skill.skill_id === id))
-            .slice(0, 60),
-        );
+        setSelectedCode(current => {
+          const candidate = current ?? response.chosen_direction_code;
+          return mapped.directions.some((direction: any) => direction.occupation_code === candidate)
+            ? candidate
+            : null;
+        });
       },
-      onError: (loadError) => {
+      onError: err => {
         setError(
-          loadError instanceof Error
-            ? loadError.message
+          err instanceof Error
+            ? err.message
             : "Could not save your work profile or load career exploration. Please try again.",
         );
         setLoading(false);
@@ -121,25 +245,15 @@ export default function Possibilities() {
     return () => controller.abort();
   }, []);
 
-  const choose = (direction: PossibilityDirection) => {
-    setChosenCode(direction.occupation_code);
-    accountStorage.setItem(
-      DIRECTION_KEY,
-      JSON.stringify({
-        occupation_code: direction.occupation_code,
-        title: direction.title,
-      }),
-    );
-  };
-
-  const toggleSkill = (id: number) => {
-    const added = shortlist.includes(id);
-    const next = added
-      ? shortlist.filter((value) => value !== id)
-      : [...shortlist, id];
-    setShortlist(next);
-    accountStorage.setItem(SHORTLIST_KEY, JSON.stringify(next));
-    if (!added) sayPet("add-skill-chip");
+  const choose = (code: string) => {
+    setSelectedCode(code);
+    const direction = data?.directions.find(item => item.occupation_code === code);
+    if (direction) {
+      accountStorage.setItem(
+        DIRECTION_KEY,
+        JSON.stringify({ occupation_code: code, title: direction.title }),
+      );
+    }
   };
 
   if (loading) {
@@ -149,7 +263,6 @@ export default function Possibilities() {
       </div>
     );
   }
-
   if (error || !data) {
     return (
       <div className="px-page">
@@ -158,207 +271,200 @@ export default function Possibilities() {
       </div>
     );
   }
-
   if (data.status === "needs_profile") {
     return (
       <div className="px-page">
-        <PageHeader
-          className="px-page-header"
-          title="Possibilities"
-          description="Explore directions based on your work profile."
-        />
-        <section className="px-empty-state">
+        <PageHeader title="Possibilities" description="Explore directions based on your work profile." />
+        <section className="px-no-direction">
           <h2>Complete your Work Profile</h2>
-          <p>
-            Confirm your current role and tasks first so we can show relevant
-            directions.
-          </p>
+          <p>Confirm your current role and tasks first so we can show relevant directions.</p>
           <Link className="px-primary" to={profilePath}>
-            Go to Work Profile <ArrowRight size={16} />
+            Go to Work Profile <ArrowRight size={15} />
           </Link>
         </section>
       </div>
     );
   }
-
   if (data.status === "unavailable") {
     return (
       <div className="px-page">
-        <p role="alert">
-          Possibilities are temporarily unavailable. Please try again later.
-        </p>
+        <p role="alert">Possibilities are temporarily unavailable. Please try again later.</p>
       </div>
     );
   }
 
-  const ownedProfileSkills = data.skills.filter((skill) => skill.state === "have");
-  const directions = data.directions.filter(
-    (direction) =>
-      direction.occupation_code !== data.currentRole?.occupation_code,
-  );
+  const selected = data.directions.find(item => item.occupation_code === selectedCode);
+  const currentTitle = data.currentRole?.title ?? "Your current role";
+  const sharedCount = selected?.skills.filter(skill => reflectedSkillIds.has(skill.skill_id)).length ?? 0;
+  const goLearning = () => {
+    if (!selected) return;
+    navigate(`/learning-centre?q=${encodeURIComponent(selected.title)}`);
+  };
 
   return (
     <div className="px-page">
       <PageHeader
-        className="px-page-header"
         title="Possibilities"
-        description="Explore where your skills could take you."
+        description="Grow in your current role, or explore where your experience could take you next."
       />
+      <div className="px-body">
+        <div className="px-main-col">
+          <section className="px-current">
+            <div className="px-current-intro">
+              <p className="px-eyebrow">YOUR STARTING POINT</p>
+              <h2>{currentTitle}</h2>
+              <p>These connections come from your confirmed Work Profile.</p>
+              <Link className="px-light" to={profilePath}>
+                Review work profile
+              </Link>
+              
+            </div>
+            <div className="px-current-skills">
+              <h3>Skills in your profile</h3>
+              <p className="px-chosen-hint">
+                Same skills marked as Reflected in your tasks on AI Impact.
+              </p>
+              <div className="px-chips">
+                {reflectedSkills.length > 0 ? (
+                  reflectedSkills.map(({ skill }) => (
+                    <span className="px-chip have" key={skill.wef_skill_id}>
+                      {skill.core_skill}
+                    </span>
+                  ))
+                ) : (
+                  <p className="px-chosen-hint">
+                    No reflected skills yet. Confirm tasks in your Work Profile
+                    to see them here.
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
 
-      <section className="px-current" aria-label="Current role">
-        <div className="px-current-copy">
-          <p>
-            Current role <span aria-hidden="true">·</span>{" "}
-            <strong>{data.currentRole?.title ?? "Your current role"}</strong>
-          </p>
-          <div className="px-chips" aria-label="Skills reflected in your work">
-            {ownedProfileSkills.map((skill) => (
-              <span className="px-chip have" key={skill.skill_id}>
-                {skill.name}
-              </span>
-            ))}
-          </div>
-        </div>
-        <Link to={profilePath}>
-          Review profile <ArrowRight size={17} />
-        </Link>
-      </section>
-
-      <section className="px-directions" aria-labelledby="directions-title">
-        <h2 id="directions-title">Explore directions</h2>
-        {directions.length > 0 ? (
-          <div className="px-direction-list">
-            {directions.map((direction) => {
-              const expanded = direction.occupation_code === selectedCode;
-              const ownedSkills = direction.skills.filter(
-                (skill) => skill.state === "have",
-              );
-              const growthSkills = direction.skills.filter(
-                (skill) => skill.state !== "have",
-              );
-              const selectedLearningSkill =
-                growthSkills.find((skill) => shortlist.includes(skill.skill_id)) ??
-                growthSkills[0];
-
-              return (
-                <article
-                  className={`px-direction ${expanded ? "is-expanded" : ""}`}
-                  key={direction.occupation_code}
-                >
-                  <button
-                    type="button"
-                    className="px-direction-summary"
-                    aria-expanded={expanded}
-                    onClick={() =>
-                      setSelectedCode(expanded ? null : direction.occupation_code)
-                    }
+          <section className="px-options">
+            <p className="px-eyebrow">EXPLORE OTHER DIRECTIONS</p>
+            <h2>Where could you go next?</h2>
+            <div className="px-direction-grid">
+              {data.directions.slice(0, 3).map((direction, index) => {
+                const chosen = selected?.occupation_code === direction.occupation_code;
+                const sharedCount = direction.skills.filter(skill => reflectedSkillIds.has(skill.skill_id)).length;
+                return (
+                  <article
+                    className={`px-direction-card px-accent-${index} ${chosen ? "is-chosen" : ""}`}
+                    key={direction.occupation_code}
                   >
+                    {direction.area ? <p className="px-eyebrow">{direction.area}</p> : null}
                     <h3>{direction.title}</h3>
-                    <div className="px-score">
-                      <strong>{ownedSkills.length}</strong>
-                      <span>shared {ownedSkills.length === 1 ? "skill" : "skills"} detected</span>
+                    <div className="px-card-score">
+                      <strong>
+                        {sharedCount}
+                      </strong>
+                      <span>SHARED {sharedCount === 1 ? "SKILL" : "SKILLS"} DETECTED</span>
                     </div>
-                    <p>{directionReason(direction)}</p>
-                    <ChevronDown size={22} aria-hidden="true" />
-                  </button>
+                    <p className="px-direction-description">{direction.description}</p>
+                    <button
+                      className={chosen ? "px-primary" : "px-outline"}
+                      type="button"
+                      onClick={() => choose(direction.occupation_code)}
+                    >
+                      {chosen ? "Chosen direction" : "Explore this direction"}
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
 
-                  {expanded && (
-                    <div className="px-direction-detail">
-                      <section>
-                        <h4>Skills you bring</h4>
-                        <div className="px-chips">
-                          {ownedSkills.length > 0 ? (
-                            ownedSkills.map((skill) => (
-                              <span className="px-chip have" key={skill.skill_id}>
-                                {skill.name}
-                              </span>
-                            ))
-                          ) : (
-                            <p>No shared skills were detected yet.</p>
-                          )}
-                        </div>
-                      </section>
-
-                      <section>
-                        <h4>Skills to build</h4>
-                        {growthSkills.length > 0 ? (
-                          <div className="px-chips">
-                            {growthSkills.map((skill) => {
-                              const added = shortlist.includes(skill.skill_id);
+          {selected ? (
+            <section className="px-chosen" aria-labelledby="px-chosen-title">
+              <p className="px-eyebrow">03 · MY CHOSEN DIRECTION</p>
+              <h2 id="px-chosen-title">Your path to {selected.title}</h2>
+              <p className="px-chosen-lead">
+                {selected.area
+                  ? `${selected.area} · exploratory skill overlap from your confirmed work profile.`
+                  : "Exploratory skill overlap from your confirmed work profile and ILO task evidence."}
+              </p>
+              {selected.description ? (
+                <p className="px-chosen-copy">{selected.description}</p>
+              ) : null}
+              {selected.skills.length > 0 ? (
+                <div className="px-chosen-skills">
+                  <div className="px-skill-split">
+                    <div>
+                      <h3>Skills you bring</h3>
+                      <div className="px-chips px-chips--path">
+                        {selected.skills
+                          .filter(skill => reflectedSkillIds.has(skill.skill_id))
+                          .map(skill => (
+                            <span className="px-chip have" key={skill.skill_id}>
+                              <Check size={13} aria-hidden />
+                              {skill.name}
+                            </span>
+                          ))}
+                      </div>
+                      {selected.skills.every(
+                        skill => !reflectedSkillIds.has(skill.skill_id),
+                      ) ? (
+                        <p className="px-chosen-hint">No overlapping skills yet for this direction.</p>
+                      ) : null}
+                    </div>
+                    <div>
+                      <h3>Skills to build</h3>
+                      <p className="px-chosen-hint">
+                        Open a skill to see its outlook and add it to Learning Resources.
+                      </p>
+                      <div className="px-chips px-chips--path">
+                        {selected.skills
+                          .filter(skill => !reflectedSkillIds.has(skill.skill_id))
+                          .map(skill => {
+                            const wef = wefById.get(skill.skill_id);
+                            if (!wef) {
                               return (
-                                <button
-                                  type="button"
-                                  className={`px-chip ${added ? "planned" : "missing"}`}
-                                  aria-pressed={added}
-                                  key={skill.skill_id}
-                                  onClick={() => toggleSkill(skill.skill_id)}
-                                >
+                                <span className="px-chip missing" key={skill.skill_id}>
                                   {skill.name}
-                                  {added ? <Check size={14} /> : <Plus size={14} />}
-                                </button>
+                                  <Plus size={13} aria-hidden />
+                                </span>
                               );
-                            })}
-                          </div>
-                        ) : (
-                          <p>Other skill requirements have not been assessed.</p>
-                        )}
-
-                        <div className="px-detail-actions">
-                          <button
-                            type="button"
-                            className="px-primary"
-                            aria-pressed={chosenCode === direction.occupation_code}
-                            onClick={() => choose(direction)}
-                          >
-                            {chosenCode === direction.occupation_code ? (
-                              <>
-                                <Check size={17} /> Direction chosen
-                              </>
-                            ) : (
-                              "Choose this direction"
-                            )}
-                          </button>
-                          {selectedLearningSkill && (
-                            <button
-                              type="button"
-                              className="px-text-action"
-                              onClick={() =>
-                                navigate(
-                                  `/learning-centre?q=${encodeURIComponent(selectedLearningSkill.name)}`,
-                                )
-                              }
-                            >
-                              Find courses for these skills <ArrowRight size={16} />
-                            </button>
-                          )}
-                        </div>
-                      </section>
+                            }
+                            return (
+                              <BuildSkillChip
+                                key={skill.skill_id}
+                                skill={wef}
+                                added={isAdded(wef.core_skill)}
+                                onChanged={refreshLearningSkills}
+                                onAddedToLearning={() => sayPet("add-skill-chip")}
+                              />
+                            );
+                          })}
+                      </div>
+                      {selected.skills.every(skill =>
+                        reflectedSkillIds.has(skill.skill_id),
+                      ) ? (
+                        <p className="px-chosen-hint">Other skill requirements have not been assessed.</p>
+                      ) : null}
                     </div>
-                  )}
-                </article>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="px-empty-state">
-            <h2>No alternative directions yet</h2>
-            <p>
-              Add more detail to your confirmed tasks so we can find useful
-              connections.
-            </p>
-          </div>
-        )}
-      </section>
+                  </div>
+                </div>
+              ) : null}
+              <button className="px-primary" type="button" onClick={goLearning}>
+                Explore learning resources
+              </button>
+            </section>
+          ) : null}
+        </div>
 
-      <p className="px-disclaimer">
-        <Info size={17} /> Shared skills are inferred from task wording. Specialist skills,
-        qualifications and experience have not been assessed. These suggestions do not
-        indicate job readiness or hiring probability.
-      </p>
+        <JourneyCompanion
+          currentTitle={currentTitle}
+          targetTitle={selected?.title ?? null}
+          sharedCount={sharedCount}
+          onExplore={goLearning}
+        />
+      </div>
 
+      <p className="px-chosen-hint">Shared skills are inferred from task wording. Specialist skills, qualifications and experience have not been assessed. These suggestions do not indicate job readiness or hiring probability.</p>
       <BotPet
-        placement="inline"
-        storageKey="aiwrevolusi.botPetPosition.possibilities.v1"
+        storageKey="aiwrevolusi.botPetPosition.possibilities.v4"
+        defaultCorner="top-right"
         speech={petSpeech}
         onSpeechDismiss={dismissPet}
         onPetTap={nudgePet}

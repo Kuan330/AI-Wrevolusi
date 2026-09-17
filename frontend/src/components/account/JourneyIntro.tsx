@@ -102,7 +102,7 @@ export default function JourneyIntro(props: {
     style: { background: PAGE_GRADIENT_CSS },
   } satisfies Partial<ComponentProps<typeof CardContent>>;
   return (
-    <div className="mx-auto w-full max-w-[1180px] pb-10">
+    <div className="mx-auto w-full max-w-[1400px] pb-10">
       <PageHeader {...pageHeaderProps1} />
       <Card className="overflow-hidden rounded-3xl border-white/80 bg-white/80 shadow-xl">
         <CardContent {...cardContentProps2}>

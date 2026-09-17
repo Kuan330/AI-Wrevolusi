@@ -27,6 +27,8 @@ from app.schemas.skill_matching import (
 
 MAX_SKILL_MATCHES = 3
 MINIMUM_SKILL_MATCH_CONFIDENCE = 0.50
+# Occupation profiles need the full evidence set; the UI/task suggest path stays capped.
+MAX_OCCUPATION_SKILL_MATCHES = len(SKILL_RULES) if False else 26  # filled after SKILL_RULES — see below
 
 
 @dataclass(frozen=True)
@@ -79,6 +81,20 @@ def _candidate_value(candidate: SkillMatchCandidate | Mapping[str, Any], key: st
     return getattr(candidate, key)
 
 
+def _phrase_pattern(phrase: str) -> re.Pattern[str]:
+    """Compile once: word-boundary match with optional simple plurals."""
+
+    return re.compile(rf"\b{re.escape(phrase)}(?:s|es)?\b", flags=re.IGNORECASE)
+
+
+# Possibilities ranks every ILO task through these rules; compiling up front
+# avoids rebuilding hundreds of thousands of regexes on a cold request.
+_COMPILED_RULES: tuple[tuple[SkillRule, tuple[re.Pattern[str], ...]], ...] = tuple(
+    (rule, tuple(_phrase_pattern(phrase) for phrase in rule.phrases))
+    for rule in SKILL_RULES
+)
+
+
 def _whole_phrase_match(task_text: str, phrase: str) -> str | None:
     """Return the exact source substring matching a case-insensitive phrase.
 
@@ -90,17 +106,19 @@ def _whole_phrase_match(task_text: str, phrase: str) -> str | None:
     spelled out in the rule table instead, so matching stays predictable.
     """
 
-    pattern = rf"\b{re.escape(phrase)}(?:s|es)?\b"
-    match = re.search(pattern, task_text, flags=re.IGNORECASE)
+    match = _phrase_pattern(phrase).search(task_text)
     return match.group(0) if match else None
 
 
-def _rule_evidence(task_text: str, rule: SkillRule) -> list[str]:
+def _rule_evidence(task_text: str, patterns: tuple[re.Pattern[str], ...]) -> list[str]:
     evidence: list[str] = []
     seen: set[str] = set()
-    for phrase in rule.phrases:
-        source_phrase = _whole_phrase_match(task_text, phrase)
-        if source_phrase and source_phrase.casefold() not in seen:
+    for pattern in patterns:
+        match = pattern.search(task_text)
+        if not match:
+            continue
+        source_phrase = match.group(0)
+        if source_phrase.casefold() not in seen:
             evidence.append(source_phrase)
             seen.add(source_phrase.casefold())
     return evidence
@@ -109,8 +127,15 @@ def _rule_evidence(task_text: str, rule: SkillRule) -> list[str]:
 def match_skills(
     task_text: str,
     candidates: Sequence[SkillMatchCandidate | Mapping[str, Any]],
+    *,
+    limit: int | None = MAX_SKILL_MATCHES,
 ) -> list[SkillMatchItem]:
-    """Return the strongest matches, at most three, from the candidate allowlist."""
+    """Return the strongest matches from the candidate allowlist.
+
+    Task-level suggestions stay capped (default ``MAX_SKILL_MATCHES``). Pass
+    ``limit=None`` when building an occupation skill set so every matched WEF
+    skill is kept for overlap percentages.
+    """
 
     if not task_text.strip():
         return []
@@ -123,10 +148,10 @@ def match_skills(
             continue
 
     matches: list[SkillMatchItem] = []
-    for rule in SKILL_RULES:
+    for rule, patterns in _COMPILED_RULES:
         if rule.skill_id not in candidate_by_id:
             continue
-        evidence = _rule_evidence(task_text, rule)
+        evidence = _rule_evidence(task_text, patterns)
         if not evidence:
             continue
         matches.append(
@@ -140,7 +165,9 @@ def match_skills(
     # Strongest signal first. Ordered by the rule table instead, the suggestions
     # a user sees would depend on where a rule happens to sit in the file.
     matches.sort(key=lambda item: item.confidence, reverse=True)
-    return matches[:MAX_SKILL_MATCHES]
+    if limit is None:
+        return matches
+    return matches[: max(0, limit)]
 
 
 def match_skills_response(

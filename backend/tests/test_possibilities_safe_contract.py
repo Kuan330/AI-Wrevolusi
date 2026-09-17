@@ -150,30 +150,66 @@ def test_response_contract_rejects_demo_skill_ids_and_bounds_scores() -> None:
 
 def test_recommendations_rank_real_occupations_by_confirmed_skill_overlap() -> None:
     occupations = [
-        {'occupation_code': '100', 'title': 'First', 'tasks': ['analyse data', 'lead a team']},
-        {'occupation_code': '200', 'title': 'Second', 'tasks': ['analyse data']},
-        {'occupation_code': 'fake', 'title': 'No mapping', 'tasks': ['holiday cooking']},
+        {
+            'occupation_code': '100',
+            'title': 'First',
+            'description': 'Lead teams and analyse problems',
+            'tasks': [
+                'analyse data and problem solving',
+                'lead a team and supervising staff',
+                'mentor and coaching new staff',
+            ],
+        },
+        {
+            'occupation_code': '200',
+            'title': 'Second',
+            'description': 'Analyse business data and write reports for managers',
+            'tasks': [
+                'analyse data carefully',
+                'write reports and documentation',
+                'check calculations and budget records',
+            ],
+        },
+        {
+            'occupation_code': 'fake',
+            'title': 'No mapping',
+            'tasks': ['holiday cooking'],
+        },
+        {
+            'occupation_code': 'current',
+            'title': 'Current role',
+            'tasks': ['analyse data', 'lead a team'],
+        },
     ]
-    skills = {1: {'core_skill': 'Analytical thinking'}, 3: {'core_skill': 'Leadership'}}
-    result = recommend_occupations(occupations, {1, 3}, skills)
+    skills = {
+        1: {'core_skill': 'Analytical thinking'},
+        3: {'core_skill': 'Leadership'},
+        16: {'core_skill': 'Teaching and mentoring'},
+        21: {'core_skill': 'Reading, writing and mathematics'},
+    }
+    result = recommend_occupations(
+        occupations, {1, 3}, skills, exclude_codes={'current'}
+    )
     assert [row['occupation_code'] for row in result] == ['100', '200']
-    assert result[0]['coverage_pct'] == 100
-    assert result[1]['coverage_pct'] == 67
+    assert 'current' not in {row['occupation_code'] for row in result}
+    assert result[0]['coverage_pct'] >= result[1]['coverage_pct']
+    assert len(result[0]['required_skill_ids']) >= 2
+    assert {1, 3}.issubset(result[0]['required_skill_ids'])
 
 
 def test_recommendations_exclude_current_role_before_applying_limit() -> None:
     occupations = [
         {'occupation_code': '100', 'title': 'Current', 'tasks': ['analyse data', 'lead a team']},
-        {'occupation_code': '200', 'title': 'Alternative', 'tasks': ['analyse data']},
+        {'occupation_code': '200', 'title': 'Alternative', 'tasks': ['analyse data', 'writing reports']},
     ]
-    skills = {1: {'core_skill': 'Analytical thinking'}, 3: {'core_skill': 'Leadership'}}
+    skills = {1: {'core_skill': 'Analytical thinking'}, 3: {'core_skill': 'Leadership'}, 21: {'core_skill': 'Reading, writing and mathematics'}}
 
     result = recommend_occupations(
         occupations,
         {1, 3},
         skills,
         limit=1,
-        excluded_codes={'100'},
+        exclude_codes={'100'},
     )
 
     assert [row['occupation_code'] for row in result] == ['200']

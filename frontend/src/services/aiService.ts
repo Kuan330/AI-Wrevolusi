@@ -79,7 +79,7 @@ export interface OccupationSuggestionsResponse {
 export type TaskAssistStatus = "available" | "pending" | "completed";
 
 export interface TaskAssistDetailInput {
-  profile_task_id: string;
+  task_key: string;
   task_text: string;
   notes?: string;
 }
@@ -89,12 +89,12 @@ export interface TaskAssistDetailBatchRequest {
 }
 
 export interface TaskAssistRequest {
-  task_id: string;
+  task_key: string;
   user_message: string;
 }
 
 export interface TaskAssistInteraction {
-  task_id: string;
+  task_key: string;
   status: TaskAssistStatus;
   question: string | null;
   reply: string | null;
