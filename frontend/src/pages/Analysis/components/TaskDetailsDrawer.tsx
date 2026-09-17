@@ -247,95 +247,99 @@ export default function TaskDetailsDrawer(props: {
               </DrawerDescription>
             </DrawerHeader>
             <DrawerBody className="task-details__body">
-              <ExposureScorePanel
-                {...({
-                  score: selectedScore,
-                  className: "mb-4",
-                } satisfies Partial<ComponentProps<typeof ExposureScorePanel>>)}
-              />
-              {selectedScore == null ? (
-                <p className="task-details__unavailable mb-4">
-                  No published task score is available for this item.
-                </p>
-              ) : null}
-
-              <TaskRelatedSkills taskText={selectedTask.wording} />
-
-              <div className="task-details__detail-block">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="task-details__detail-toggle"
-                  aria-expanded={detailOpen}
-                  onClick={() => setDetailOpen((open) => !open)}
-                >
-                  Evidence and Source
-                  <ChevronDown
-                    className={cn(
-                      "size-4 transition-transform",
-                      detailOpen && "rotate-180",
-                    )}
-                    aria-hidden
-                  />
-                </Button>
-                {detailOpen ? (
-                  <section className="task-details__explanation">
-                    {selectedAssessment ? (
-                      <div className="task-details__evidence is-open">
-                        <p>
-                          <strong>Evidence method:</strong>{" "}
-                          {formatTaskAssessmentMatchLayer(
-                            selectedAssessment.match_layer,
-                          )}
-                        </p>
-                        <p>
-                          <strong>Uncertainty:</strong>{" "}
-                          {selectedAssessment.uncertainty}
-                        </p>
-                        <p>
-                          <strong>Limitations:</strong>{" "}
-                          {selectedAssessment.limitations}
-                        </p>
-                        {selectedAssessment.matched_reference_tasks[0] ? (
-                          <p>
-                            <strong>Closest ILO task evidence:</strong>{" "}
-                            {
-                              selectedAssessment.matched_reference_tasks[0]
-                                .task_text
-                            }
-                          </p>
-                        ) : null}
-                        <p>
-                          <strong>Source:</strong>{" "}
-                          <a
-                            href={selectedAssessment.source_url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="task-details__source-link"
-                          >
-                            {selectedAssessment.source_name} (
-                            {selectedAssessment.source_year})
-                          </a>
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="task-details__reason">
-                        This task does not have a current ILO evidence match.
-                        Return to your tasks and run the assessment again.
-                      </p>
-                    )}
-                  </section>
+              <div className="task-details__content-area">
+                <ExposureScorePanel
+                  {...({
+                    score: selectedScore,
+                    className: "mb-4",
+                  } satisfies Partial<ComponentProps<typeof ExposureScorePanel>>)}
+                />
+                {selectedScore == null ? (
+                  <p className="task-details__unavailable mb-4">
+                    No published task score is available for this item.
+                  </p>
                 ) : null}
+
+                <TaskRelatedSkills taskText={selectedTask.wording} />
+
+                <div className="task-details__detail-block">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="task-details__detail-toggle"
+                    aria-expanded={detailOpen}
+                    onClick={() => setDetailOpen((open) => !open)}
+                  >
+                    Evidence and Source
+                    <ChevronDown
+                      className={cn(
+                        "size-4 transition-transform",
+                        detailOpen && "rotate-180",
+                      )}
+                      aria-hidden
+                    />
+                  </Button>
+                  {detailOpen ? (
+                    <section className="task-details__explanation">
+                      {selectedAssessment ? (
+                        <div className="task-details__evidence is-open">
+                          <p>
+                            <strong>Evidence method:</strong>{" "}
+                            {formatTaskAssessmentMatchLayer(
+                              selectedAssessment.match_layer,
+                            )}
+                          </p>
+                          <p>
+                            <strong>Uncertainty:</strong>{" "}
+                            {selectedAssessment.uncertainty}
+                          </p>
+                          <p>
+                            <strong>Limitations:</strong>{" "}
+                            {selectedAssessment.limitations}
+                          </p>
+                          {selectedAssessment.matched_reference_tasks[0] ? (
+                            <p>
+                              <strong>Closest ILO task evidence:</strong>{" "}
+                              {
+                                selectedAssessment.matched_reference_tasks[0]
+                                  .task_text
+                              }
+                            </p>
+                          ) : null}
+                          <p>
+                            <strong>Source:</strong>{" "}
+                            <a
+                              href={selectedAssessment.source_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="task-details__source-link"
+                            >
+                              {selectedAssessment.source_name} (
+                              {selectedAssessment.source_year})
+                            </a>
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="task-details__reason">
+                          This task does not have a current ILO evidence match.
+                          Return to your tasks and run the assessment again.
+                        </p>
+                      )}
+                    </section>
+                  ) : null}
+                </div>
               </div>
 
-              <TaskAssistAccess
-                key={taskAssistContextKey(
-                  selectedTask.id,
-                  selectedTask.wording,
-                  selectedTask.notes ?? "",
-                )}
-                task={selectedTask}
-              />
+              <div className="task-details__assist-container">
+                <TaskAssistAccess
+                  key={taskAssistContextKey(
+                    selectedTask.id,
+                    selectedTask.wording,
+                    selectedTask.notes ?? "",
+                  )}
+                  task={selectedTask}
+                />
+              </div>
             </DrawerBody>
           </>
         ) : null}
