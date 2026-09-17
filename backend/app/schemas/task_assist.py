@@ -4,16 +4,13 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
 TaskAssistStatus = Literal['available', 'pending', 'completed']
 
 
 class TaskAssistDetailInput(BaseModel):
-    """One account-scoped task detail registered before assistance is requested."""
-
     model_config = ConfigDict(str_strip_whitespace=True, extra='forbid')
 
-    profile_task_id: str = Field(min_length=1, max_length=128)
+    task_key: str = Field(min_length=1, max_length=128)
     task_text: str = Field(min_length=1, max_length=4000)
     notes: str = Field(default='', max_length=2000)
 
@@ -25,17 +22,13 @@ class TaskAssistDetailBatchRequest(BaseModel):
 
 
 class TaskAssistRequest(BaseModel):
-    """The one allowed question for a previously registered task detail."""
-
     model_config = ConfigDict(str_strip_whitespace=True, extra='forbid')
 
-    task_id: uuid.UUID
+    task_key: str = Field(min_length=1, max_length=128)
     user_message: str = Field(min_length=1, max_length=2000)
 
 
 class TaskAssistResponse(BaseModel):
-    """A bounded model/fallback reply before it is persisted."""
-
     model_config = ConfigDict(extra='forbid')
 
     reply: str = Field(min_length=1, max_length=1200)
@@ -44,11 +37,9 @@ class TaskAssistResponse(BaseModel):
 
 
 class TaskAssistInteractionRead(BaseModel):
-    """The permanent one-question/one-answer state for one task detail."""
-
     model_config = ConfigDict(extra='forbid')
 
-    task_id: uuid.UUID
+    task_key: str
     status: TaskAssistStatus
     question: str | None = None
     reply: str | None = None

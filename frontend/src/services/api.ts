@@ -85,8 +85,8 @@ const request = async <T>(
 };
 
 export const api = {
-  get: <T>(path: string, signal?: AbortSignal) =>
-    request<T>(path, { method: "GET", signal }),
+  get: <T>(path: string, signal?: AbortSignal, timeoutMs?: number) =>
+    request<T>(path, { method: "GET", signal }, timeoutMs),
   post: <T, TBody = unknown>(
     path: string,
     payload?: TBody,

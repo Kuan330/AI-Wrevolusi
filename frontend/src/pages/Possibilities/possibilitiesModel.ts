@@ -19,6 +19,30 @@ export function toPossibilitiesData(response: PossibilitiesResponse): Possibilit
     currentRole: response.current_role, currentRoleCoverage: response.current_role_coverage_pct,
     skills: response.skills, directions: response.directions, chosenDirectionCode: response.chosen_direction_code, chosenDirectionCoverage: response.chosen_direction_coverage_pct, shortlistedSkillIds: response.shortlisted_skill_ids };
 }
+export function possibilitiesProfilePath(workspace: { tasksOccupationCode?: string | null } | null | undefined): string {
+  return workspace?.tasksOccupationCode ? "/profile/tasks" : "/profile";
+}
+
+export async function loadSavedPossibilities(options: {
+  signal: AbortSignal;
+  flush: () => Promise<void>;
+  get: (signal: AbortSignal) => Promise<PossibilitiesResponse>;
+  onSuccess: (response: PossibilitiesResponse) => void;
+  onError: (error: unknown) => void;
+}): Promise<void> {
+  if (options.signal.aborted) return;
+  let response: PossibilitiesResponse;
+  try {
+    await options.flush();
+    if (options.signal.aborted) return;
+    response = await options.get(options.signal);
+  } catch (error) {
+    if (!options.signal.aborted) options.onError(error);
+    return;
+  }
+  if (!options.signal.aborted) options.onSuccess(response);
+}
+
 export type PossibilitiesViewState = "loading" | "error" | "needs-profile" | "unavailable" | "ready";
 export function possibilitiesViewState(input: { loading: boolean; error: string; data: PossibilitiesResponse | null }): PossibilitiesViewState {
   if (input.loading) return "loading";

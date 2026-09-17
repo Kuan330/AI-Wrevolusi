@@ -1,19 +1,16 @@
-"""Atomic persistence for the one-answer-per-server-task Task Assist boundary."""
+"""Atomic persistence for isolated one-answer-per-profile-task Assist."""
 
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Literal, Sequence
 
-from sqlalchemy import case, func, select, update
+from sqlalchemy import case, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.constants.task_status import TaskStatus
-from app.models.task import Task
 from app.models.task_assist import TaskAssistInteraction
 from app.schemas.task_assist import TaskAssistDetailInput, TaskAssistResponse
-from app.services.exposure import infer_exposure_state
 from app.services.task_assist import deterministic_task_assist
 
 PENDING_RECOVERY_AFTER = timedelta(minutes=2)
@@ -32,71 +29,37 @@ async def register_details(
     user_id: uuid.UUID,
     details: Sequence[TaskAssistDetailInput],
 ) -> list[TaskAssistInteraction]:
-    """Create/update server-owned Tasks, then register their immutable answer slots."""
-
+    """Create or reuse account-scoped immutable answer slots."""
     rows: list[TaskAssistInteraction] = []
     for detail in details:
-        exposure_type, _, _ = infer_exposure_state(detail.task_text)
-        task_statement = insert(Task).values(
+        statement = insert(TaskAssistInteraction).values(
             id=uuid.uuid4(),
             user_id=user_id,
-            profile_task_id=detail.profile_task_id,
-            title=detail.task_text,
-            description=detail.notes or None,
-            status=TaskStatus.needs_review,
-            exposure_type=exposure_type,
-            context={'source': 'profile_task'},
-        )
-        task_statement = task_statement.on_conflict_do_update(
-            constraint='uq_tasks_user_profile_task',
-            set_={
-                'title': task_statement.excluded.title,
-                'description': task_statement.excluded.description,
-                'exposure_type': task_statement.excluded.exposure_type,
-                'updated_at': func.now(),
-            },
-        ).returning(Task)
-        task = (await db.execute(task_statement)).scalar_one()
-
-        interaction_statement = insert(TaskAssistInteraction).values(
-            id=uuid.uuid4(),
-            user_id=user_id,
-            task_id=task.id,
-            task_text=task.title,
-            notes=task.description or '',
+            task_key=detail.task_key,
+            task_text=detail.task_text,
+            notes=detail.notes,
             status='available',
             needs_user_confirmation=True,
         )
-        excluded = interaction_statement.excluded
+        excluded = statement.excluded
         mutable = TaskAssistInteraction.status == 'available'
-        interaction_statement = interaction_statement.on_conflict_do_update(
+        statement = statement.on_conflict_do_update(
             constraint='uq_task_assist_user_task',
             set_={
-                'task_text': case(
-                    (mutable, excluded.task_text),
-                    else_=TaskAssistInteraction.task_text,
-                ),
-                'notes': case(
-                    (mutable, excluded.notes),
-                    else_=TaskAssistInteraction.notes,
-                ),
+                'task_text': case((mutable, excluded.task_text), else_=TaskAssistInteraction.task_text),
+                'notes': case((mutable, excluded.notes), else_=TaskAssistInteraction.notes),
             },
         ).returning(TaskAssistInteraction)
-        row = (await db.execute(interaction_statement)).scalar_one()
-        rows.append(row)
+        rows.append((await db.execute(statement)).scalar_one())
     await db.commit()
     return rows
 
 
-async def get_interaction(
-    db: AsyncSession,
-    user_id: uuid.UUID,
-    task_id: uuid.UUID,
-) -> TaskAssistInteraction | None:
+async def get_interaction(db: AsyncSession, user_id: uuid.UUID, task_key: str) -> TaskAssistInteraction | None:
     result = await db.execute(
         select(TaskAssistInteraction).where(
             TaskAssistInteraction.user_id == user_id,
-            TaskAssistInteraction.task_id == task_id,
+            TaskAssistInteraction.task_key == task_key,
         )
     )
     return result.scalar_one_or_none()
@@ -105,27 +68,20 @@ async def get_interaction(
 async def claim_interaction(
     db: AsyncSession,
     user_id: uuid.UUID,
-    task_id: uuid.UUID,
+    task_key: str,
     *,
     question: str,
 ) -> ClaimResult:
-    """Atomically grant the only provider-call claim for this server-owned Task."""
-
     now = datetime.now(timezone.utc)
     claim_token = uuid.uuid4()
     statement = (
         update(TaskAssistInteraction)
         .where(
             TaskAssistInteraction.user_id == user_id,
-            TaskAssistInteraction.task_id == task_id,
+            TaskAssistInteraction.task_key == task_key,
             TaskAssistInteraction.status == 'available',
         )
-        .values(
-            status='pending',
-            claim_token=claim_token,
-            claimed_at=now,
-            question=question,
-        )
+        .values(status='pending', claim_token=claim_token, claimed_at=now, question=question)
         .returning(TaskAssistInteraction)
         .execution_options(synchronize_session=False)
     )
@@ -133,9 +89,8 @@ async def claim_interaction(
     if row is not None:
         await db.commit()
         return ClaimResult('claimed', row, claim_token)
-
     await db.rollback()
-    existing = await get_interaction(db, user_id, task_id)
+    existing = await get_interaction(db, user_id, task_key)
     if existing is None:
         return ClaimResult('missing', None)
     if existing.status == 'completed':
@@ -146,31 +101,24 @@ async def claim_interaction(
 async def complete_interaction(
     db: AsyncSession,
     user_id: uuid.UUID,
-    task_id: uuid.UUID,
+    task_key: str,
     claim_token: uuid.UUID,
     *,
-    question: str,
     response: TaskAssistResponse,
 ) -> TaskAssistInteraction:
-    """Persist the only answer, but only for the request that owns the claim."""
-
     statement = (
         update(TaskAssistInteraction)
         .where(
             TaskAssistInteraction.user_id == user_id,
-            TaskAssistInteraction.task_id == task_id,
+            TaskAssistInteraction.task_key == task_key,
             TaskAssistInteraction.status == 'pending',
             TaskAssistInteraction.claim_token == claim_token,
         )
         .values(
-            status='completed',
-            question=question,
-            reply=response.reply,
+            status='completed', reply=response.reply,
             generated_by_model=response.generated_by_model,
             needs_user_confirmation=response.needs_user_confirmation,
-            completed_at=datetime.now(timezone.utc),
-            claim_token=None,
-            claimed_at=None,
+            completed_at=datetime.now(timezone.utc), claim_token=None, claimed_at=None,
         )
         .returning(TaskAssistInteraction)
         .execution_options(synchronize_session=False)
@@ -184,39 +132,28 @@ async def complete_interaction(
 
 
 async def resolve_stale_pending(
-    db: AsyncSession,
-    user_id: uuid.UUID,
-    task_id: uuid.UUID,
+    db: AsyncSession, user_id: uuid.UUID, task_key: str
 ) -> TaskAssistInteraction | None:
-    """Finish an abandoned claim with fallback without starting another provider call."""
-
-    existing = await get_interaction(db, user_id, task_id)
+    existing = await get_interaction(db, user_id, task_key)
     if existing is None or existing.status != 'pending':
         return existing
-    claimed_at = existing.claimed_at
-    if claimed_at is None or existing.question is None:
+    if existing.claimed_at is None or existing.question is None:
         return existing
-    if claimed_at >= datetime.now(timezone.utc) - PENDING_RECOVERY_AFTER:
+    if existing.claimed_at >= datetime.now(timezone.utc) - PENDING_RECOVERY_AFTER:
         return existing
-
     fallback = deterministic_task_assist(existing.task_text)
     statement = (
         update(TaskAssistInteraction)
         .where(
             TaskAssistInteraction.user_id == user_id,
-            TaskAssistInteraction.task_id == task_id,
+            TaskAssistInteraction.task_key == task_key,
             TaskAssistInteraction.status == 'pending',
-            TaskAssistInteraction.claimed_at == claimed_at,
+            TaskAssistInteraction.claimed_at == existing.claimed_at,
         )
         .values(
-            status='completed',
-            question=existing.question,
-            reply=fallback.reply,
-            generated_by_model=False,
-            needs_user_confirmation=True,
-            completed_at=datetime.now(timezone.utc),
-            claim_token=None,
-            claimed_at=None,
+            status='completed', reply=fallback.reply, generated_by_model=False,
+            needs_user_confirmation=True, completed_at=datetime.now(timezone.utc),
+            claim_token=None, claimed_at=None,
         )
         .returning(TaskAssistInteraction)
         .execution_options(synchronize_session=False)
@@ -226,4 +163,4 @@ async def resolve_stale_pending(
         await db.commit()
         return recovered
     await db.rollback()
-    return await get_interaction(db, user_id, task_id)
+    return await get_interaction(db, user_id, task_key)

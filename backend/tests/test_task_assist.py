@@ -35,13 +35,13 @@ class StubTaskAssistRecords:
         rows = []
         with self.lock:
             for detail in details:
-                profile_key = (user_id, detail.profile_task_id)
-                task_id = self.profile_tasks.setdefault(profile_key, uuid.uuid4())
-                key = (user_id, task_id)
+                profile_key = (user_id, detail.task_key)
+                task_key = self.profile_tasks.setdefault(profile_key, uuid.uuid4())
+                key = (user_id, task_key)
                 row = self.rows.get(key)
                 if row is None:
                     row = SimpleNamespace(
-                        task_id=task_id,
+                        task_key=task_key,
                         task_text=detail.task_text,
                         notes=detail.notes,
                         status='available',
@@ -58,12 +58,12 @@ class StubTaskAssistRecords:
                 rows.append(row)
         return rows
 
-    async def get_interaction(self, _db, user_id, task_id):
-        return self.rows.get((user_id, task_id))
+    async def get_interaction(self, _db, user_id, task_key):
+        return self.rows.get((user_id, task_key))
 
-    async def claim_interaction(self, _db, user_id, task_id, *, question):
+    async def claim_interaction(self, _db, user_id, task_key, *, question):
         with self.lock:
-            row = self.rows.get((user_id, task_id))
+            row = self.rows.get((user_id, task_key))
             if row is None:
                 return SimpleNamespace(outcome='missing', row=None, claim_token=None)
             if row.status == 'completed':
@@ -76,11 +76,11 @@ class StubTaskAssistRecords:
             return SimpleNamespace(outcome='claimed', row=row, claim_token=token)
 
     async def complete_interaction(
-        self, _db, user_id, task_id, claim_token, *, question, response
+        self, _db, user_id, task_key, claim_token, *, question, response
     ):
         del claim_token
         with self.lock:
-            row = self.rows[(user_id, task_id)]
+            row = self.rows[(user_id, task_key)]
             row.status = 'completed'
             row.question = question
             row.reply = response.reply
@@ -89,9 +89,9 @@ class StubTaskAssistRecords:
             row.completed_at = datetime.now(timezone.utc)
             return row
 
-    async def resolve_stale_pending(self, _db, user_id, task_id):
+    async def resolve_stale_pending(self, _db, user_id, task_key):
         with self.lock:
-            row = self.rows.get((user_id, task_id))
+            row = self.rows.get((user_id, task_key))
             if row is not None and row.status == 'pending':
                 row.status = 'completed'
                 row.reply = 'Fallback guidance recovered without another provider call.'
@@ -113,10 +113,10 @@ def _application(gateway: AIGateway, *, user_id: uuid.UUID | None = None):
     return application, signed_in_user
 
 
-def _register(client: TestClient, *, task_id='detail-1', text='Prepare the weekly report.', notes=''):
+def _register(client: TestClient, *, task_key='detail-1', text='Prepare the weekly report.', notes=''):
     return client.post(
         '/api/v1/ai/task-assist/details',
-        json={'details': [{'profile_task_id': task_id, 'task_text': text, 'notes': notes}]},
+        json={'details': [{'task_key': task_key, 'task_text': text, 'notes': notes}]},
     )
 
 
@@ -231,12 +231,12 @@ def test_task_assist_provider_failure_returns_a_transparent_fallback() -> None:
 @pytest.mark.parametrize(
     'payload',
     [
-        {'task_id': '   ', 'user_message': DEFAULT_QUESTION},
-        {'task_id': 'detail-1', 'user_message': '   '},
-        {'task_id': 'detail-1', 'user_message': DEFAULT_QUESTION, 'messages': []},
-        {'task_id': 'x' * 129, 'user_message': DEFAULT_QUESTION},
-        {'task_id': 'detail-1', 'user_message': 'x' * 2001},
-        {'task_id': 'detail-1', 'task_text': 'Forged context.', 'user_message': DEFAULT_QUESTION},
+        {'task_key': '   ', 'user_message': DEFAULT_QUESTION},
+        {'task_key': 'detail-1', 'user_message': '   '},
+        {'task_key': 'detail-1', 'user_message': DEFAULT_QUESTION, 'messages': []},
+        {'task_key': 'x' * 129, 'user_message': DEFAULT_QUESTION},
+        {'task_key': 'detail-1', 'user_message': 'x' * 2001},
+        {'task_key': 'detail-1', 'task_text': 'Forged context.', 'user_message': DEFAULT_QUESTION},
     ],
 )
 def test_task_assist_rejects_invalid_multi_turn_or_client_context(payload: dict[str, Any]) -> None:
@@ -247,7 +247,7 @@ def test_task_assist_rejects_invalid_multi_turn_or_client_context(payload: dict[
 def test_task_assist_answer_requires_a_server_owned_task_uuid() -> None:
     with pytest.raises(ValidationError):
         TaskAssistRequest.model_validate(
-            {'task_id': 'client-profile-task-id', 'user_message': DEFAULT_QUESTION}
+            {'task_key': 'client-profile-task-id', 'user_message': DEFAULT_QUESTION}
         )
 
 
@@ -269,19 +269,19 @@ def test_registered_detail_is_answered_from_the_server_snapshot_and_saved(monkey
             registered = _register(
                 client, text='Prepare the trusted weekly report.', notes='Use the approved template.'
             )
-            task_id = registered.json()['items'][0]['task_id']
+            task_key = registered.json()['items'][0]['task_key']
             answered = client.post(
                 '/api/v1/ai/task-assist',
-                json={'task_id': task_id, 'user_message': DEFAULT_QUESTION},
+                json={'task_key': task_key, 'user_message': DEFAULT_QUESTION},
             )
-            saved = client.get(f'/api/v1/ai/task-assist/{task_id}')
+            saved = client.get(f'/api/v1/ai/task-assist/{task_key}')
     finally:
         application.dependency_overrides.clear()
 
     assert registered.status_code == 200
     assert registered.json()['items'][0]['status'] == 'available'
-    assert uuid.UUID(registered.json()['items'][0]['task_id'])
-    assert registered.json()['items'][0]['task_id'] != 'detail-1'
+    assert uuid.UUID(registered.json()['items'][0]['task_key'])
+    assert registered.json()['items'][0]['task_key'] != 'detail-1'
     assert answered.status_code == 200
     assert answered.json()['status'] == 'completed'
     assert answered.json()['question'] == DEFAULT_QUESTION
@@ -309,18 +309,18 @@ def test_second_question_returns_the_permanent_first_exchange_without_calling_ai
     try:
         with TestClient(application) as client:
             registered = _register(client, text='Original trusted text.', notes='Original note.')
-            task_id = registered.json()['items'][0]['task_id']
+            task_key = registered.json()['items'][0]['task_key']
             first = client.post(
                 '/api/v1/ai/task-assist',
-                json={'task_id': task_id, 'user_message': DEFAULT_QUESTION},
+                json={'task_key': task_key, 'user_message': DEFAULT_QUESTION},
             )
             repeated_registration = _register(
                 client, text='Changed client text.', notes='Changed note.'
             )
-            assert repeated_registration.json()['items'][0]['task_id'] == task_id
+            assert repeated_registration.json()['items'][0]['task_key'] == task_key
             second = client.post(
                 '/api/v1/ai/task-assist',
-                json={'task_id': task_id, 'user_message': 'A second question.'},
+                json={'task_key': task_key, 'user_message': 'A second question.'},
             )
     finally:
         application.dependency_overrides.clear()
@@ -342,12 +342,12 @@ def test_same_detail_is_isolated_by_authenticated_user(monkeypatch) -> None:
     try:
         with TestClient(first_app) as first_client, TestClient(second_app) as second_client:
             registered = _register(first_client)
-            task_id = registered.json()['items'][0]['task_id']
-            assert first_client.get(f'/api/v1/ai/task-assist/{task_id}').status_code == 200
-            assert second_client.get(f'/api/v1/ai/task-assist/{task_id}').status_code == 404
+            task_key = registered.json()['items'][0]['task_key']
+            assert first_client.get(f'/api/v1/ai/task-assist/{task_key}').status_code == 200
+            assert second_client.get(f'/api/v1/ai/task-assist/{task_key}').status_code == 404
             assert second_client.post(
                 '/api/v1/ai/task-assist',
-                json={'task_id': task_id, 'user_message': DEFAULT_QUESTION},
+                json={'task_key': task_key, 'user_message': DEFAULT_QUESTION},
             ).status_code == 404
     finally:
         first_app.dependency_overrides.clear()
@@ -374,15 +374,15 @@ def test_concurrent_requests_grant_only_one_provider_call(monkeypatch) -> None:
         records.register_details(
             object(),
             user_id,
-            [TaskAssistDetailInput(profile_task_id='detail-1', task_text='Trusted task.')],
+            [TaskAssistDetailInput(task_key='detail-1', task_text='Trusted task.')],
         )
     )
-    task_id = registered_rows[0].task_id
+    task_key = registered_rows[0].task_key
 
     async def submit(question: str):
         try:
             return await ai_router.task_assist(
-                TaskAssistRequest(task_id=task_id, user_message=question),
+                TaskAssistRequest(task_key=task_key, user_message=question),
                 db=object(),
                 current_user=SimpleNamespace(id=user_id),
                 gateway=AIGateway(provider=provider),
@@ -411,7 +411,7 @@ def test_pending_state_recovers_to_saved_fallback_without_a_second_provider_call
             row = next(iter(records.rows.values()))
             row.status = 'pending'
             row.question = 'How should I safely verify this report?'
-            recovered = client.get(f'/api/v1/ai/task-assist/{row.task_id}')
+            recovered = client.get(f'/api/v1/ai/task-assist/{row.task_key}')
     finally:
         application.dependency_overrides.clear()
 
@@ -419,7 +419,7 @@ def test_pending_state_recovers_to_saved_fallback_without_a_second_provider_call
     assert recovered.json()['status'] == 'completed'
     assert recovered.json()['generated_by_model'] is False
     assert recovered.json()['question'] == 'How should I safely verify this report?'
-    assert records.rows[(user_id, row.task_id)].status == 'completed'
+    assert records.rows[(user_id, row.task_key)].status == 'completed'
 
 
 def test_task_assist_requires_authentication() -> None:
@@ -427,7 +427,7 @@ def test_task_assist_requires_authentication() -> None:
     with TestClient(application) as client:
         response = client.post(
             '/api/v1/ai/task-assist',
-            json={'task_id': str(uuid.uuid4()), 'user_message': DEFAULT_QUESTION},
+            json={'task_key': str(uuid.uuid4()), 'user_message': DEFAULT_QUESTION},
         )
 
     assert response.status_code == 401

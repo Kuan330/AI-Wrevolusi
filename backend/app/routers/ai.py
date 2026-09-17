@@ -235,7 +235,7 @@ def skill_match(
 
 def _task_assist_read(row) -> TaskAssistInteractionRead:
     return TaskAssistInteractionRead(
-        task_id=row.task_id,
+        task_key=row.task_key,
         status=row.status,
         question=row.question,
         reply=row.reply,
@@ -265,11 +265,11 @@ async def register_task_assist_details(
 
 
 @router.get(
-    '/task-assist/{task_id}',
+    '/task-assist/{task_key}',
     response_model=TaskAssistInteractionRead,
 )
 async def get_task_assist_interaction(
-    task_id: uuid.UUID,
+    task_key: str,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> TaskAssistInteractionRead:
@@ -278,7 +278,7 @@ async def get_task_assist_interaction(
     row = await task_assist_records.resolve_stale_pending(
         db,
         current_user.id,
-        task_id,
+        task_key,
     )
     if row is None:
         raise HTTPException(
@@ -300,7 +300,7 @@ async def task_assist(
     claim = await task_assist_records.claim_interaction(
         db,
         current_user.id,
-        request.task_id,
+        request.task_key,
         question=request.user_message,
     )
     if claim.outcome == 'missing':
@@ -332,9 +332,8 @@ async def task_assist(
         completed = await task_assist_records.complete_interaction(
             db,
             current_user.id,
-            request.task_id,
+            request.task_key,
             claim.claim_token,
-            question=request.user_message,
             response=response,
         )
     except Exception:
