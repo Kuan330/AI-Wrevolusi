@@ -88,7 +88,7 @@ def _task_text(task: object) -> str:
 # Reference occupation→skill maps are stable for a process; cache avoids re-matching
 # every occupation on each Possibilities request (the main timeout source).
 # Bump when the occupation skill aggregation rules change (e.g. uncapped matches).
-_OCCUPATION_SKILL_CACHE_VERSION = 2
+_OCCUPATION_SKILL_CACHE_VERSION = 3
 _required_skills_cache: dict[str, frozenset[int]] = {}
 _required_skills_cache_key: tuple[int, int, tuple[tuple[int, str], ...]] | None = None
 
