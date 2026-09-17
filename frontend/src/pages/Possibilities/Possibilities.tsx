@@ -33,12 +33,12 @@ const readJson = <T,>(key: string, fallback: T): T => {
 function directionReason(direction: PossibilityDirection): string {
   const owned = direction.skills.filter((skill) => skill.state === "have");
   if (owned.length >= 2) {
-    return `Strong match in ${owned[0].name.toLowerCase()} and ${owned[1].name.toLowerCase()}.`;
+    return `Shared skills include ${owned[0].name.toLowerCase()} and ${owned[1].name.toLowerCase()}.`;
   }
   if (owned.length === 1) {
-    return `Builds on your ${owned[0].name.toLowerCase()} skill.`;
+    return `One shared skill detected: ${owned[0].name.toLowerCase()}.`;
   }
-  return "A direction you can explore by building new skills.";
+  return "No shared skills detected from the available task evidence.";
 }
 
 export default function Possibilities() {
@@ -255,12 +255,8 @@ export default function Possibilities() {
                   >
                     <h3>{direction.title}</h3>
                     <div className="px-score">
-                      <strong>
-                        {direction.coverage_pct === null
-                          ? "—"
-                          : `${direction.coverage_pct}%`}
-                      </strong>
-                      <span>skill overlap</span>
+                      <strong>{ownedSkills.length}</strong>
+                      <span>shared {ownedSkills.length === 1 ? "skill" : "skills"} detected</span>
                     </div>
                     <p>{directionReason(direction)}</p>
                     <ChevronDown size={22} aria-hidden="true" />
@@ -304,7 +300,7 @@ export default function Possibilities() {
                             })}
                           </div>
                         ) : (
-                          <p>No additional skill gaps were detected.</p>
+                          <p>Other skill requirements have not been assessed.</p>
                         )}
 
                         <div className="px-detail-actions">
@@ -355,7 +351,9 @@ export default function Possibilities() {
       </section>
 
       <p className="px-disclaimer">
-        <Info size={17} /> {data.disclaimer}
+        <Info size={17} /> Shared skills are inferred from task wording. Specialist skills,
+        qualifications and experience have not been assessed. These suggestions do not
+        indicate job readiness or hiring probability.
       </p>
 
       <BotPet
