@@ -8,9 +8,10 @@ export const workspaceKeys = [
   "aiwrevolusi.learningResourceSelections.v1",
   "aiwrevolusi.courseLibrary.v1",
   "aiwrevolusi.learningSkills.v1",
+  "aiwrevolusi.plan.courses.v1",
   "aiwrevolusi.planner.v1",
-  "aiwrevolusi.possibilities.saved",
-  "aiwrevolusi.possibilities.intent",
+  "aiwrevolusi.possibilities.chosenDirection",
+  "aiwrevolusi.possibilities.shortlist",
 ];
 let userId: string | null = null;
 let workspace: Workspace = { data: {}, revision: 0 };

@@ -1,5 +1,11 @@
-from fastapi import APIRouter, Depends
+import uuid
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.concurrency import run_in_threadpool
+
+from app.db.session import get_db
+from app.models.user import User
 from app.schemas.ai_matching import TaskMatchRequest, TaskMatchResponse
 from app.schemas.occupation_ai import (
     OccupationRecommendationsRequest,
@@ -7,9 +13,19 @@ from app.schemas.occupation_ai import (
     OccupationSuggestionsRequest,
     OccupationSuggestionsResponse,
 )
-from app.schemas.skill_matching import SkillMatchRequest, SkillMatchResponse
-from app.schemas.task_assist import TaskAssistRequest, TaskAssistResponse
+from app.schemas.skill_matching import (
+    SkillMatchCandidate,
+    SkillMatchRequest,
+    SkillMatchResponse,
+)
+from app.schemas.task_assist import (
+    TaskAssistDetailBatchRequest,
+    TaskAssistDetailBatchResponse,
+    TaskAssistInteractionRead,
+    TaskAssistRequest,
+)
 from app.services.ai_gateway import AIGateway, default_ai_gateway
+from app.services.auth import get_current_user
 from app.services.ai_matching import (
     MINIMUM_TASK_MATCH_WORDS,
     DeterministicTaskMatchProvider,
@@ -21,21 +37,37 @@ from app.services.occupation_ai import (
     deterministic_recommend_occupations,
     deterministic_suggest_occupations,
 )
-from app.services.skill_matching import match_skills_response
+from app.services.skill_matching import MAX_SKILL_MATCHES, match_skills_response
 from app.services.task_assist import deterministic_task_assist, suggest_task_assist
+from app.services import task_assist_records
 
 
 
-def _retain_task_evidence(response: SkillMatchResponse, task_text: str) -> SkillMatchResponse:
-    """Drop provider skill items whose evidence is not in the input task."""
+def _finalize_skill_matches(
+    response: SkillMatchResponse,
+    task_text: str,
+    candidates: list[SkillMatchCandidate],
+) -> SkillMatchResponse:
+    """Verify provider evidence, then fall back to the deterministic rules.
 
-    valid_items = [
+    Two things can empty a provider response: evidence that cannot be traced
+    back to the input, and short inputs the model judges too vague to match — a
+    lone word like "thinking" can never reproduce the full name "Analytical
+    thinking", so a strict evidence check would drop all three of its matches.
+    An empty list is a dead end for the user either way, so the rule table
+    answers instead when the provider returns nothing.
+    """
+
+    verified = [
         item
         for item in response.skills
         if item.evidence_phrases
         and all(phrase in task_text for phrase in item.evidence_phrases)
-    ][:2]
-    return SkillMatchResponse(skills=valid_items)
+    ]
+    kept = verified or response.skills
+    if kept:
+        return SkillMatchResponse(skills=kept[:MAX_SKILL_MATCHES])
+    return match_skills_response(task_text, candidates)
 
 
 router = APIRouter(prefix='/ai', tags=['AI Matching'])
@@ -173,7 +205,18 @@ def skill_match(
     request: SkillMatchRequest,
     gateway: AIGateway = Depends(get_ai_gateway),
 ) -> SkillMatchResponse:
-    """Match a task only against the caller-supplied skill candidates."""
+    """Match a task only against the caller-supplied skill candidates.
+
+    The deterministic rules answer first. They already cover every skill name
+    plus the everyday words for the work behind it, and they return in under a
+    millisecond — so the common case never pays for a provider round-trip. The
+    model is only consulted when the rules find nothing at all, which is where
+    its judgement actually adds something.
+    """
+
+    quick = match_skills_response(request.task_text, request.candidates)
+    if quick.skills or request.fast_only:
+        return quick
 
     result = gateway.run_candidate_constrained(
         operation='skill-match',
@@ -183,16 +226,120 @@ def skill_match(
         candidate_key='id',
         local=lambda: match_skills_response(request.task_text, request.candidates),
         fallback=lambda: SkillMatchResponse(skills=[]),
-        post_validate=lambda response: _retain_task_evidence(response, request.task_text),
+        post_validate=lambda response: _finalize_skill_matches(
+            response, request.task_text, request.candidates
+        ),
     )
     return result.value
 
 
-@router.post('/task-assist', response_model=TaskAssistResponse)
-async def task_assist(request: TaskAssistRequest) -> TaskAssistResponse:
-    """One-shot workplace task assistance reply for the chat dialog."""
+def _task_assist_read(row) -> TaskAssistInteractionRead:
+    return TaskAssistInteractionRead(
+        task_id=row.task_id,
+        status=row.status,
+        question=row.question,
+        reply=row.reply,
+        generated_by_model=row.generated_by_model,
+        needs_user_confirmation=row.needs_user_confirmation,
+        completed_at=row.completed_at,
+    )
+
+
+@router.post(
+    '/task-assist/details',
+    response_model=TaskAssistDetailBatchResponse,
+)
+async def register_task_assist_details(
+    request: TaskAssistDetailBatchRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> TaskAssistDetailBatchResponse:
+    """Bind current profile-detail snapshots to the signed-in user."""
+
+    rows = await task_assist_records.register_details(
+        db,
+        current_user.id,
+        request.details,
+    )
+    return TaskAssistDetailBatchResponse(items=[_task_assist_read(row) for row in rows])
+
+
+@router.get(
+    '/task-assist/{task_id}',
+    response_model=TaskAssistInteractionRead,
+)
+async def get_task_assist_interaction(
+    task_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> TaskAssistInteractionRead:
+    """Return only this user's stored state and permanent first exchange."""
+
+    row = await task_assist_records.resolve_stale_pending(
+        db,
+        current_user.id,
+        task_id,
+    )
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Task detail not registered.',
+        )
+    return _task_assist_read(row)
+
+
+@router.post('/task-assist', response_model=TaskAssistInteractionRead)
+async def task_assist(
+    request: TaskAssistRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    gateway: AIGateway = Depends(get_ai_gateway),
+) -> TaskAssistInteractionRead:
+    """Generate and permanently store at most one answer for this user's detail."""
+
+    claim = await task_assist_records.claim_interaction(
+        db,
+        current_user.id,
+        request.task_id,
+        question=request.user_message,
+    )
+    if claim.outcome == 'missing':
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Task detail not registered.',
+        )
+    if claim.outcome == 'completed':
+        return _task_assist_read(claim.row)
+    if claim.outcome == 'pending':
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Task assistance is already being generated.',
+        )
+
+    assert claim.row is not None and claim.claim_token is not None
+    try:
+        response = await run_in_threadpool(
+            suggest_task_assist,
+            task_text=claim.row.task_text,
+            notes=claim.row.notes,
+            user_message=request.user_message,
+            gateway=gateway,
+        )
+    except Exception:
+        response = deterministic_task_assist(claim.row.task_text)
 
     try:
-        return await suggest_task_assist(request)
+        completed = await task_assist_records.complete_interaction(
+            db,
+            current_user.id,
+            request.task_id,
+            claim.claim_token,
+            question=request.user_message,
+            response=response,
+        )
     except Exception:
-        return deterministic_task_assist(request)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail='Task assistance is pending recovery. Please reopen this detail shortly.',
+        ) from None
+    return _task_assist_read(completed)

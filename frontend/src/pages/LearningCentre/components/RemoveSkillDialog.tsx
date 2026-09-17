@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { AppButton } from "@/components/ui/app-button";
 import {
   Dialog,
   DialogContent,
@@ -29,20 +29,24 @@ export default function RemoveSkillDialog(props: RemoveSkillDialogProps) {
             be removed from your learning list.
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="gap-2 sm:gap-2">
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button
+        <DialogFooter className="flex-row justify-end gap-2 sm:justify-end">
+          <AppButton
             type="button"
-            variant="destructive"
+            tone="outline"
+            onClick={() => onOpenChange(false)}
+          >
+            Cancel
+          </AppButton>
+          <AppButton
+            type="button"
+            tone="blue"
             onClick={() => {
               onConfirm();
               onOpenChange(false);
             }}
           >
             Remove
-          </Button>
+          </AppButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

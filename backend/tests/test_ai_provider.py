@@ -108,6 +108,30 @@ def test_provider_raises_after_exhausting_retries() -> None:
     assert calls['count'] == 3
 
 
+def test_provider_accepts_a_per_request_timeout_and_retry_budget() -> None:
+    captured: dict = {'count': 0}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured['count'] += 1
+        captured['timeout'] = request.extensions['timeout']
+        return httpx.Response(503, json={'error': 'unavailable'})
+
+    provider = _build_provider(handler, max_retries=2)
+
+    with pytest.raises(AIProviderError):
+        provider.complete_json(
+            operation='task-assist',
+            payload={'question': 'help'},
+            response_model=Answer,
+            request_timeout_s=20.0,
+            request_max_retries=0,
+        )
+
+    assert captured['count'] == 1
+    assert captured['timeout']['connect'] == 20.0
+    assert captured['timeout']['read'] == 20.0
+
+
 def test_provider_rejects_non_json_content() -> None:
     def handler(_request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, json=_completion_body('not valid JSON'))
@@ -140,6 +164,26 @@ def test_provider_cache_avoids_repeating_an_identical_request() -> None:
     assert _call(provider) == {'answer': 11}
     assert _call(provider) == {'answer': 11}
     assert calls['count'] == 1
+
+
+def test_provider_can_disable_cache_for_sensitive_requests() -> None:
+    calls = {'count': 0}
+
+    def handler(_request: httpx.Request) -> httpx.Response:
+        calls['count'] += 1
+        return httpx.Response(200, json=_completion_body('{"answer": 12}'))
+
+    provider = _build_provider(handler, cache_size=8)
+    arguments = {
+        'operation': 'task-assist',
+        'payload': {'question': 'sensitive context'},
+        'response_model': Answer,
+        'request_cache_enabled': False,
+    }
+
+    assert provider.complete_json(**arguments) == {'answer': 12}
+    assert provider.complete_json(**arguments) == {'answer': 12}
+    assert calls['count'] == 2
 
 
 def test_provider_rate_limit_refuses_a_burst() -> None:

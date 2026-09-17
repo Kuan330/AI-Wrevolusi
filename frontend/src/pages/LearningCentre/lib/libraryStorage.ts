@@ -1,11 +1,10 @@
 import { accountStorage } from "@/services/accountStorage";
-import { courses, focusSkills } from "../catalogue";
 import type { LibraryState } from "../types";
 const KEY = "aiwrevolusi.courseLibrary.v1";
 export const emptyLibrary = (): LibraryState => ({
   version: 1,
   workContext: accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "",
-  skillId: focusSkills[0].id,
+  skillId: "",
   saved: [],
   choices: {},
   basis: {},
@@ -26,14 +25,12 @@ export function readLibrary(): LibraryState {
       "Saved courses could not be read. Your saved data has not been overwritten.",
     );
   const context = accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "";
+  // Keep the learning list across analysis refreshes. Profile/occupation changes
+  // still clear it explicitly in writeUserProfile / saveLearningSkills.
+  if (typeof state.skillId !== "string") state.skillId = "";
   if (state.workContext !== context) {
-    return { ...state, workContext: context, saved: [], choices: {}, basis: {} };
+    state.workContext = context;
   }
-  const known = new Set(courses.map((course) => course.id));
-  state.saved = state.saved.filter((id) => known.has(id));
-  state.pending = state.pending.filter((entry) => known.has(entry.courseId));
-  if (!focusSkills.some((skill) => skill.id === state.skillId))
-    state.skillId = "";
   for (const choice of [
     ...Object.values(state.choices),
     ...state.pending.map((entry) => entry.choice),

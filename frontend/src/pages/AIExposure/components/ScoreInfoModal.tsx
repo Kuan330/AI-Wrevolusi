@@ -1,5 +1,4 @@
 import type { ComponentProps } from "react";
-import "./ScoreInfoModal.css";
 import {
   Dialog,
   DialogContent,

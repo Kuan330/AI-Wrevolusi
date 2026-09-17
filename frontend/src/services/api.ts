@@ -102,6 +102,11 @@ export const api = {
       },
       timeoutMs,
     ),
+  put: <T, TBody = unknown>(path: string, payload?: TBody) =>
+    request<T>(path, {
+      method: "PUT",
+      body: payload ? JSON.stringify(payload) : undefined,
+    }),
   patch: <T, TBody = unknown>(path: string, payload?: TBody) =>
     request<T>(path, {
       method: "PATCH",

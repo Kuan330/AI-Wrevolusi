@@ -188,7 +188,7 @@ const SkillOutlookSummary = (props: SkillOutlookSummaryProps) => {
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                addSkill(skill.core_skill, "work");
+                addSkill(skill.core_skill, "wef");
                 onAddComplete?.();
               }}
               onPointerDown={(event) => event.stopPropagation()}

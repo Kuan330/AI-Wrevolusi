@@ -28,6 +28,7 @@ class TaskRead(BaseModel):
 
     id: uuid.UUID
     user_id: uuid.UUID
+    profile_task_id: str | None
     occupation_id: uuid.UUID | None
     title: str
     description: str | None
