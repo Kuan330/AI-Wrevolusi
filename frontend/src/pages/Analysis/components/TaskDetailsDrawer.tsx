@@ -109,6 +109,12 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
     };
   }, [interaction?.status, interaction?.task_key]);
 
+  useEffect(() => {
+    if (interaction?.status === "completed" && chatOpen) {
+      setChatOpen(false);
+    }
+  }, [interaction?.status, chatOpen]);
+
   if (error) {
     return (
       <div className="task-details__footer flex-col items-start gap-2">
@@ -146,12 +152,12 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
   return (
     <>
       {saved && interaction.question && interaction.reply ? (
-        <section className="mb-4 space-y-3">
+        <section className="mx-5 mb-4 space-y-3 rounded-2xl border border-[#eadde4] bg-white/80 p-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#7f7280] mb-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#7f7280]">
               Saved AI guidance
             </p>
-            <p className="text-sm leading-6 text-[#2f2430] mb-3">
+            <p className="mt-1 text-sm leading-6 text-[#2f2430]">
               {interaction.question}
             </p>
           </div>
@@ -163,7 +169,7 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
             </p>
             <p>{interaction.reply}</p>
           </div>
-          <p className="text-xs text-[#7f7280] mt-2">
+          <p className="text-xs text-[#7f7280]">
             This is the permanent response for this Task Detail. Further questions
             are disabled.
           </p>

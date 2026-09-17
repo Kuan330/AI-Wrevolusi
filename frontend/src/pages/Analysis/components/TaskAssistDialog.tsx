@@ -95,6 +95,7 @@ const TaskAssistDialogSession = (props: TaskAssistDialogProps) => {
       }
       setResult(saved);
       onCompleted(saved);
+      onOpenChange(false);
     } catch (err) {
       if (
         controller.signal.aborted ||
