@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from app.models.refresh_token import RefreshToken
     from app.models.schedule import Schedule
     from app.models.task import Task
+    from app.models.task_assist import TaskAssistInteraction
 
 
 class User(TimestampMixin, Base):
@@ -42,3 +43,7 @@ class User(TimestampMixin, Base):
     learning_progress: Mapped[list['LearningProgress']] = relationship(back_populates='user', cascade='all, delete-orphan')
     learning_checkins: Mapped[list['LearningCheckin']] = relationship(back_populates='user', cascade='all, delete-orphan')
     daily_briefs: Mapped[list['DailyBrief']] = relationship(back_populates='user', cascade='all, delete-orphan')
+    task_assist_interactions: Mapped[list['TaskAssistInteraction']] = relationship(
+        back_populates='user',
+        cascade='all, delete-orphan',
+    )

@@ -7,18 +7,20 @@ import SkillSidebar from "./components/SkillSidebar";
 import CourseFilters, { emptyFilters } from "./components/CourseFilters";
 import CourseCard from "./components/CourseCard";
 import CourseDetailDrawer from "./components/CourseDetailDrawer";
-import FloatingLearningCourses from "./components/FloatingLearningCourses";
-import LearningCoursesDialog from "./components/LearningCoursesDialog";
 import AddSkillDialog from "./components/AddSkillDialog";
 import RemoveSkillDialog from "./components/RemoveSkillDialog";
-import { courses } from "./catalogue";
+import BotPet from "@/components/common/BotPet";
 import { useCourseLibrary } from "./hooks/useCourseLibrary";
+import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
+import { fetchPageCatalogue } from "@/services/catalogueService";
+import type { Course } from "./types";
 import {
-  coursesForSkill,
   ensureLearningSkills,
   toLearningSkill,
   type LearningSkill,
 } from "@/pages/Skills/learningSkills";
+import { loadCourseDirectory } from "./lib/courseDirectory";
+import { rateWefSkills } from "./lib/skillStars";
 import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
 import { useLearningSkills } from "@/pages/Skills/useLearningSkills";
 import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
@@ -36,7 +38,6 @@ export default function LearningCentre() {
     ...emptyFilters,
     query: params.get("q") ?? "",
   });
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [removeTarget, setRemoveTarget] = useState<{
@@ -47,8 +48,10 @@ export default function LearningCentre() {
   const [skillsError, setSkillsError] = useState("");
   const [analysis] = useState(readConfirmedAnalysis);
   const [seeded, setSeeded] = useState(false);
-  /** Empty = show all courses (default). */
+  /** Select the first skill after seeding when the list is empty. */
   const [activeId, setActiveId] = useState("");
+  const { speech: petSpeech, say: sayPet, dismiss: dismissPet, nudge: nudgePet } =
+    useBotPetGreeting("learning");
 
   const workSkills = useMemo(() => {
     const evidence = buildSkillEvidence(analysis?.tasks ?? [], wefSkills);
@@ -85,14 +88,22 @@ export default function LearningCentre() {
     if (!wefSkills.length || seeded) return;
     const next = ensureLearningSkills(workSkills);
     setSkills(next);
+    // Initialise once. Search links keep their whole-catalogue results, and
+    // later deselection must not immediately select the first skill again.
+    if (!params.get("q")) {
+      setActiveId(current => current || next[0]?.id || "");
+    }
     setSeeded(true);
-  }, [wefSkills.length, workSkills, seeded, setSkills]);
+  }, [wefSkills.length, workSkills, seeded, setSkills, params]);
 
   const focusSkills = skills.map((item: LearningSkill) => ({
     id: item.id,
     en: item.name,
-    hint: item.source === "work" ? "From your work" : undefined,
+    source: item.source,
   }));
+  // Star band comes from the whole WEF framework, so it is rated once here
+  // rather than per card.
+  const skillRatings = useMemo(() => rateWefSkills(wefSkills), [wefSkills]);
 
   useEffect(() => {
     if (!activeId) return;
@@ -102,12 +113,46 @@ export default function LearningCentre() {
   }, [focusSkills, activeId]);
 
   const skill = focusSkills.find((item) => item.id === activeId);
-  const matching =
-    !activeId || params.get("q")
-      ? courses
-      : courses.filter((course) =>
-          coursesForSkill(activeId).includes(course.id),
+  const [pageCourses, setPageCourses] = useState<Course[]>([]);
+  const [catalogueError, setCatalogueError] = useState("");
+  const [catalogueNotice, setCatalogueNotice] = useState("");
+  const [catalogueLoading, setCatalogueLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    const searchActive = Boolean(params.get("q"));
+    // Courses only appear once a sidebar skill is selected; the search query
+    // is the one exception and covers the whole catalogue.
+    if (!searchActive && !activeId) {
+      setPageCourses([]);
+      setCatalogueNotice("");
+      setCatalogueError("");
+      setCatalogueLoading(false);
+      return;
+    }
+    setCatalogueLoading(true);
+    const skillId = searchActive ? null : activeId;
+    void fetchPageCatalogue(skillId)
+      .then((result) => {
+        if (cancelled) return;
+        setPageCourses(result.courses);
+        setCatalogueNotice(result.notice ?? "");
+        setCatalogueError("");
+        setCatalogueLoading(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setCatalogueError(
+          "The course catalogue could not be loaded. Check your connection and try again.",
         );
+        setCatalogueLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeId, params.get("q")]);
+
+  const matching = pageCourses;
   const visible = matching.filter(
     (course) =>
       [course.title, course.provider, course.intro, ...course.outcomes]
@@ -120,35 +165,56 @@ export default function LearningCentre() {
       (!filters.language || course.language === filters.language) &&
       (!filters.registration || course.register === filters.registration),
   );
-  const detailCourse = courses.find((course) => course.id === detailId) ?? null;
+  const detailCourse =
+    pageCourses.find((course) => course.id === detailId) ?? null;
   const addedIds = new Set(skills.map((item) => item.id));
 
-  const confirmRemoveSkill = () => {
+  const onToggleSave = (courseId: string) => {
+    const wasSaved = state.saved.includes(courseId);
+    toggleSave(courseId);
+    if (!wasSaved) sayPet("add-course");
+    else sayPet("remove-item");
+  };
+
+  const confirmRemoveSkill = async () => {
     if (!removeTarget) return;
-    const linked = coursesForSkill(removeTarget.id);
-    const remaining = skills.filter((item) => item.id !== removeTarget.id);
-    // Keep a course if another remaining skill still links to it.
-    const stillLinked = new Set(
-      remaining.flatMap((item) => coursesForSkill(item.id)),
+    const removedId = removeTarget.id;
+    const remainingIds = new Set(
+      skills.filter((item) => item.id !== removedId).map((item) => item.id),
     );
-    const dropCourses = linked.filter((id) => !stillLinked.has(id));
-    removeSkill(removeTarget.id);
-    if (dropCourses.length) {
-      removeSavedCourses(dropCourses);
-    }
-    if (activeId === removeTarget.id) setActiveId("");
+    removeSkill(removedId);
+    sayPet("remove-item");
+    if (activeId === removedId) setActiveId("");
     setRemoveTarget(null);
+    // Drop courses that only the removed skill linked to. Links come from the
+    // backend catalogue, so this no longer depends on a bundled id map.
+    try {
+      const directory = await loadCourseDirectory();
+      const dropCourses = [...directory.values()]
+        .filter(
+          (course) =>
+            course.skills.includes(removedId) &&
+            !course.skills.some((id) => remainingIds.has(id)),
+        )
+        .map((course) => course.id);
+      if (dropCourses.length) {
+        removeSavedCourses(dropCourses);
+      }
+    } catch {
+      // Catalogue unreachable: leave the saved list untouched.
+    }
   };
 
   const sidebarProps = {
     activeId,
     skills: focusSkills,
+    ratings: skillRatings,
     onSelect: (skillId: string) => {
       setActiveId(skillId);
       setFilters({ ...emptyFilters });
     },
-    onClear: () => setActiveId(""),
     onRemove: (id: string, name: string) => setRemoveTarget({ id, name }),
+    onAdd: () => setAddOpen(true),
   };
 
   const filterProps = {
@@ -159,25 +225,13 @@ export default function LearningCentre() {
 
   const headerProps = {
     title: "Learning Resources",
-    actions: (
-      <div className="flex flex-wrap items-center gap-3">
-        <Button
-          type="button"
-          variant="ghost"
-          className="learning-courses-trigger h-10 rounded-full px-5 font-semibold"
-          onClick={() => setDrawerOpen(true)}
-        >
-          Learning courses · {state.saved.length}
-        </Button>
-      </div>
-    ),
     description:
       "Browse courses for skills reflected in your work, or add skills you want to grow.",
   };
 
   return (
     <div className="course-library">
-      <PageHeader {...headerProps} />
+      <PageHeader {...headerProps} className="library-page-header" />
       {(skillsError || notice) && (
         <p role="alert">{skillsError || notice}</p>
       )}
@@ -204,50 +258,41 @@ export default function LearningCentre() {
             tabIndex={0}
           >
             <CourseFilters {...filterProps} />
+            {catalogueLoading && (
+              <p className="library-muted" role="status">
+                Loading courses…
+              </p>
+            )}
+            {catalogueError && (
+              <p className="library-muted" role="alert">
+                {catalogueError}
+              </p>
+            )}
+            {!catalogueLoading && catalogueNotice && (
+              <p className="library-muted" role="status">
+                {catalogueNotice}
+              </p>
+            )}
             <p className="library-muted" role="status">
               {skill
                 ? `${visible.length} of ${matching.length} courses for ${skill.en}`
                 : `${visible.length} of ${matching.length} courses in the catalogue`}
             </p>
-            <div className="library-course-list">
-              <div className="library-course-list__col">
-                {visible
-                  .filter((_, index) => index % 2 === 0)
-                  .map((course) => (
-                    <CourseCard
-                      key={course.id}
-                      course={course}
-                      saved={state.saved.includes(course.id)}
-                      onSave={() => toggleSave(course.id)}
-                      onDetails={() => setDetailId(course.id)}
-                    />
-                  ))}
-              </div>
-              <div className="library-course-list__col">
-                {visible
-                  .filter((_, index) => index % 2 === 1)
-                  .map((course) => (
-                    <CourseCard
-                      key={course.id}
-                      course={course}
-                      saved={state.saved.includes(course.id)}
-                      onSave={() => toggleSave(course.id)}
-                      onDetails={() => setDetailId(course.id)}
-                    />
-                  ))}
-              </div>
-            </div>
-            {!visible.length && (
+            {!visible.length && !catalogueLoading ? (
               <div className="library-empty library-glass">
                 <h3>
                   {matching.length
                     ? "No courses match these filters"
-                    : "No matching courses yet"}
+                    : !skill && !params.get("q")
+                      ? "Select a skill to see its courses"
+                      : "No matching courses yet"}
                 </h3>
                 <p>
                   {matching.length
                     ? "Try another format, provider or search term."
-                    : "This skill stays in your learning list. The current catalogue has no linked courses yet."}
+                    : !skill && !params.get("q")
+                      ? "Choose a skill in the sidebar to browse its verified courses."
+                      : "This skill stays in your learning list. The current catalogue has no linked courses yet."}
                 </p>
                 <Button
                   variant="outline"
@@ -256,24 +301,22 @@ export default function LearningCentre() {
                   Clear filters
                 </Button>
               </div>
+            ) : (
+              <div className="library-course-list">
+                {visible.map((course) => (
+                  <CourseCard
+                    key={course.id}
+                    course={course}
+                    saved={state.saved.includes(course.id)}
+                    onSave={() => onToggleSave(course.id)}
+                    onDetails={() => setDetailId(course.id)}
+                  />
+                ))}
+              </div>
             )}
           </div>
         </div>
       )}
-
-      {focusSkills.length > 0 && (
-        <FloatingLearningCourses
-          count={state.saved.length}
-          onOpen={() => setDrawerOpen(true)}
-        />
-      )}
-
-      <LearningCoursesDialog
-        open={drawerOpen}
-        onOpenChange={setDrawerOpen}
-        saved={state.saved}
-        onRemove={toggleSave}
-      />
 
       {detailCourse && (
         <CourseDetailDrawer
@@ -282,8 +325,7 @@ export default function LearningCentre() {
           skillName={skill?.en ?? ""}
           saved={state.saved.includes(detailCourse.id)}
           onClose={() => setDetailId(null)}
-          onSave={() => toggleSave(detailCourse.id)}
-          onSkillsChanged={refresh}
+          onSave={() => onToggleSave(detailCourse.id)}
         />
       )}
 
@@ -304,6 +346,14 @@ export default function LearningCentre() {
           if (!open) setRemoveTarget(null);
         }}
         onConfirm={confirmRemoveSkill}
+      />
+
+      <BotPet
+        storageKey="aiwrevolusi.botPetPosition.learning.v4"
+        defaultCorner="top-right"
+        speech={petSpeech}
+        onSpeechDismiss={dismissPet}
+        onPetTap={nudgePet}
       />
     </div>
   );

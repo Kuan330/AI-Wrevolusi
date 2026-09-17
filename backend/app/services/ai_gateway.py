@@ -78,10 +78,13 @@ class AIGateway:
         cache_key: str | None = None,
         prefer_local_on_provider_failure: bool = False,
         system_prompt: str | None = None,
+        request_timeout_s: float | None = None,
+        request_max_retries: int | None = None,
+        request_cache_enabled: bool = True,
     ) -> GatewayResult[ModelT]:
         started = self._clock()
         key = cache_key or self._cache_key(operation, payload)
-        if key in self.cache:
+        if request_cache_enabled and key in self.cache:
             cached = self._validate(self.cache[key], response_model)
             if cached is not None:
                 return GatewayResult(cached, self._metadata(started, cached=True, attempts=0))
@@ -97,12 +100,16 @@ class AIGateway:
                             payload=payload,
                             response_model=response_model,
                             system_prompt=system_prompt,
+                            request_timeout_s=request_timeout_s,
+                            request_max_retries=request_max_retries,
+                            request_cache_enabled=request_cache_enabled,
                         ),
                         response_model,
                     )
                     if value is None:
                         raise ValueError('provider returned invalid structured JSON')
-                    self.cache[key] = value.model_dump(mode='json')
+                    if request_cache_enabled:
+                        self.cache[key] = value.model_dump(mode='json')
                     return GatewayResult(value, self._metadata(started, attempts=attempt))
                 except Exception as exc:
                     last_error = type(exc).__name__
@@ -499,31 +506,42 @@ class OpenAICompatibleProvider:
         payload: Any,
         response_model: type[ModelT],
         system_prompt: str | None = None,
+        request_timeout_s: float | None = None,
+        request_max_retries: int | None = None,
+        request_cache_enabled: bool = True,
     ) -> Any:
         """Return parsed JSON that satisfies ``response_model`` or raise."""
+        retry_limit = (
+            self.max_retries
+            if request_max_retries is None
+            else max(0, int(request_max_retries))
+        )
         cache_key = self._cache_key(operation, payload)
-        cached = self._cache.get(cache_key)
-        if cached is not None:
-            return cached
+        if request_cache_enabled:
+            cached = self._cache.get(cache_key)
+            if cached is not None:
+                return cached
 
         body = self._build_request_body(operation, payload, response_model, system_prompt)
         last_error: Exception | None = None
-        for attempt in range(self.max_retries + 1):
+        for attempt in range(retry_limit + 1):
             if attempt > 0:
                 self._sleep(self._backoff_base_s * (2 ** (attempt - 1)))
             try:
                 self._consume_rate_limit_slot()
-                response = self._client.post(
-                    self._endpoint,
-                    headers=self._headers,
-                    json=body,
-                )
+                request_options: dict[str, Any] = {
+                    'headers': self._headers,
+                    'json': body,
+                }
+                if request_timeout_s is not None:
+                    request_options['timeout'] = httpx.Timeout(float(request_timeout_s))
+                response = self._client.post(self._endpoint, **request_options)
             except httpx.HTTPError as error:  # timeouts and transport failures
                 last_error = error
                 _LOGGER.warning(
                     'AI provider attempt %s/%s failed: %s',
                     attempt + 1,
-                    self.max_retries + 1,
+                    retry_limit + 1,
                     type(error).__name__,
                 )
                 continue
@@ -535,7 +553,7 @@ class OpenAICompatibleProvider:
                 _LOGGER.warning(
                     'AI provider attempt %s/%s failed with status %s',
                     attempt + 1,
-                    self.max_retries + 1,
+                    retry_limit + 1,
                     response.status_code,
                 )
                 continue
@@ -552,7 +570,7 @@ class OpenAICompatibleProvider:
                 _LOGGER.warning(
                     'AI provider attempt %s/%s returned unusable content: %s',
                     attempt + 1,
-                    self.max_retries + 1,
+                    retry_limit + 1,
                     error,
                 )
                 continue
@@ -563,15 +581,16 @@ class OpenAICompatibleProvider:
                 _LOGGER.warning(
                     'AI provider attempt %s/%s returned schema-invalid output',
                     attempt + 1,
-                    self.max_retries + 1,
+                    retry_limit + 1,
                 )
                 continue
 
-            self._cache.put(cache_key, parsed)
+            if request_cache_enabled:
+                self._cache.put(cache_key, parsed)
             return parsed
 
         raise AIProviderError(
-            f'provider request failed after {self.max_retries + 1} attempt(s): {last_error}'
+            f'provider request failed after {retry_limit + 1} attempt(s): {last_error}'
         )
 
     def _build_request_body(

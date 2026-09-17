@@ -1,1033 +1,1111 @@
-import ConflictMessage, { WhatsAppIcon } from "./ConflictMessage";
-import { Drawer, DrawerContent, DrawerTitle, DrawerDescription, DrawerBody } from "@/components/ui/drawer";
-import PlanCourseDrawer from "./PlanCourseDrawer";
-import { courses } from "@/pages/LearningCentre/catalogue";
-import { AppButton } from "@/components/ui/app-button";
-import { readLibrary } from "@/pages/LearningCentre/lib/libraryStorage";
-import { TimePicker } from "@/components/ui/time-picker";
-import { learningSession } from "@/pages/LearningCentre/lib/learningSession";
-import type { ComponentProps } from "react";
-import WeekCalendar from "./WeekCalendar";
-import { scheduleCourses } from "./scheduleCourses";
-import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import type { MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
-  AlertTriangle,
-  ArrowRight,
-  BookOpen,
-  CalendarDays,
+  Check,
   ChevronLeft,
   ChevronRight,
-  Clock3,
-  Copy,
-  MessageCircle,
-  Plus,
-  Trash2,
 } from "lucide-react";
+import BotPet from "@/components/common/BotPet";
+import DataTable from "@/components/common/DataTable";
+import type { DataTableColumn } from "@/components/common/DataTable";
 import PageHeader from "@/components/common/PageHeader";
+import { useAccount } from "@/components/account/useAccount";
+import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
+import ExposureScorePie from "@/pages/AIExposure/components/ExposureScorePie";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { message } from "@/components/ui/message";
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import SoftPercentField from "@/components/ui/soft-percent-field";
+import { GradientBar } from "@/components/ui/gradient-bar";
+import { cn } from "@/lib/utils";
 import { ROUTES } from "@/constants/routes";
 import {
-  resources,
-  readSelections,
-  saveSelections,
-  type Selection,
-} from "@/pages/LearningCentre/resources";
-import { demoResources, demoSelections } from "@/pages/LearningCentre/demoData";
-import { localPlanRepository } from "@/services/planService";
+  readLibrary,
+  saveLibrary,
+} from "@/pages/LearningCentre/lib/libraryStorage";
+import { readLearningSkills } from "@/pages/Skills/learningSkills";
 import {
-  addDays,
-  conflicts,
-  dateKey,
-  duration,
-  monday,
-  overlaps,
-  requestMessage,
-  suggestions,
-  validateEvent,
-  whatsappLink,
-  type PlanEvent,
+  flushWorkspace,
+  hasAccountWorkspace,
+} from "@/services/accountStorage";
+import { ApiError } from "@/services/api";
+import {
+  getLearningCalendar,
+  postLearningCheckin,
+  postLearningDailyBrief,
+  postLearningProgress,
+  type CalendarDay,
+  type DailyBriefResponse,
+} from "@/services/learningService";
+import {
+  readPlanState,
+  savePlanState,
+  syncPlanWithLearningCourses,
+  type PlanCourse,
+  type PlanDayChapterEntry,
+  type PlanRecordDay,
   type PlanState,
-} from "./planModel";
-import "./plan.css";
-const labels = {
-  learning: "Learning",
-  work: "Work",
-  care: "Family & care",
-  personal: "Personal & rest",
-};
-const readable = (date: string) =>
-  new Date(`${date}T12:00:00`).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-  });
-export default function Plan() {
-  const [params] = useSearchParams();
-  // Example content is opt-in only.
-  const demo = import.meta.env.DEV && params.get("demo") === "1";
-  return <PlanContent key={String(demo)} demo={demo} />;
+} from "@/pages/Plan/lib/planCourses";
+import {
+  buildBriefTourSteps,
+  briefTourStorageKey,
+  hasSeenBriefTour,
+  markBriefTourSeen,
+} from "./PlanDailyBrief";
+import "@/pages/LearningCentre/course-library.css";
+import "./learning-preview.css";
+
+type Course = PlanCourse;
+type RecordDay = PlanRecordDay;
+type Preview = PlanState;
+
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+const dateKey = (d = new Date()) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+const localHour = (d = new Date()) => d.getHours();
+
+const emptyRecord = (): RecordDay => ({
+  minutes: 0,
+  note: "",
+  studied: false,
+  checked: false,
+  entries: [],
+});
+
+function dayHasProgress(r: RecordDay | undefined) {
+  return Boolean(r && (r.checked || r.studied || (r.entries?.length ?? 0) > 0));
 }
-function PlanContent(props: { demo: boolean }) {
-  const { demo } = props;
+
+function monthRange(month: Date) {
+  const from = dateKey(new Date(month.getFullYear(), month.getMonth(), 1));
+  const to = dateKey(new Date(month.getFullYear(), month.getMonth() + 1, 0));
+  return { from, to };
+}
+
+function briefSkillsFromPlan(courses: PlanCourse[]) {
+  const fromCourses = courses
+    .map((c) => c.skillId)
+    .filter((id): id is string => Boolean(id));
+  let fromLearning: string[] = [];
+  try {
+    fromLearning = (readLearningSkills() ?? []).map((s) => s.id);
+  } catch {
+    fromLearning = [];
+  }
+  return [...new Set([...fromCourses, ...fromLearning])].map((skill_id) => ({
+    skill_id,
+  }));
+}
+
+function mergeDayEntries(
+  existing: PlanDayChapterEntry[] | undefined,
+  next: PlanDayChapterEntry[],
+): PlanDayChapterEntry[] {
+  const map = new Map<string, PlanDayChapterEntry>();
+  for (const entry of existing ?? []) {
+    map.set(`${entry.courseId}::${entry.chapterTitle}`, entry);
+  }
+  for (const entry of next) {
+    map.set(`${entry.courseId}::${entry.chapterTitle}`, entry);
+  }
+  return [...map.values()];
+}
+
+function initial(): Preview {
+  return readPlanState();
+}
+
+function persist(next: Preview) {
+  savePlanState(next);
+  if (hasAccountWorkspace()) {
+    void flushWorkspace().catch(() => {
+      /* Local mirror already kept; workspace retry happens on next edit. */
+    });
+  }
+}
+
+const percent = (c: Course) =>
+  c.chapters.length
+    ? Math.round(
+        (c.chapters.reduce((n, ch) => n + ch.value, 0) /
+          (c.chapters.length * 10)) *
+          100,
+      )
+    : 0;
+
+const doneCount = (c: Course) => c.chapters.filter((ch) => ch.value === 10).length;
+
+/** Drives the Status column: not started, in progress, or complete. */
+function courseStatus(c: Course) {
+  const value = percent(c);
+  if (value === 0) return { key: "start", label: "Start" } as const;
+  if (value === 100) return { key: "finished", label: "Finished" } as const;
+  return { key: "continue", label: "Continue" } as const;
+}
+
+export default function Plan() {
   const location = useLocation();
-  const repository = useMemo(() => localPlanRepository(demo), [demo]);
-  const [state, setState] = useState<PlanState>({
-    version: 1,
-    revision: 0,
-    events: [],
-  });
-  const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const [week, setWeek] = useState(monday(dateKey(new Date())));
-  const [selectedId, setSelectedId] = useState("");
-  const [courseOpen, setCourseOpen] = useState(false);
-  const [editor, setEditor] = useState<PlanEvent | null>(null);
-  const [repeat, setRepeat] = useState(false);
-  const [savedCourseIds] = useState(() => { try { return readLibrary().saved.slice().reverse(); } catch { return []; } });
-  const [workOpen, setWorkOpen] = useState(false);
-  const [workDays, setWorkDays] = useState([0, 1, 2, 3, 4]);
-  const [workStart, setWorkStart] = useState('09:00');
-  const [workEnd, setWorkEnd] = useState('17:00');
-  const [workFrom, setWorkFrom] = useState(dateKey(new Date()));
-  const [workTo, setWorkTo] = useState(addDays(dateKey(new Date()), 83));
-  const [formError, setFormError] = useState("");
-  const [helper, setHelper] = useState("");
-  const [message, setMessage] = useState("");
-  const [requestOpen, setRequestOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const catalogue = demo ? demoResources : resources;
-  const [shortlist, setShortlist] = useState<Selection[]>(() =>
-    demo
-      ? Array.isArray(location.state?.shortlist)
-        ? location.state.shortlist.filter(
-            (s: Selection) =>
-              s && demoResources.some((r) => r.id === s.resourceId),
-          )
-        : demoSelections
-      : readSelections(),
+  const { user } = useAccount();
+  const [state, setState] = useState<Preview>(initial);
+  const [today, setToday] = useState(dateKey);
+  const [month, setMonth] = useState(
+    () => new Date(new Date().getFullYear(), new Date().getMonth(), 1),
   );
+  const [courseId, setCourseId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<number[]>([]);
+  const [recordDate, setRecordDate] = useState<string | null>(null);
+  const [notice, setNotice] = useState("");
+  const [removeId, setRemoveId] = useState<string | null>(null);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [calendarDays, setCalendarDays] = useState<Record<string, CalendarDay>>(
+    {},
+  );
+  const [streakDays, setStreakDays] = useState(0);
+  const [brief, setBrief] = useState<DailyBriefResponse | null>(null);
+  const [briefLoading, setBriefLoading] = useState(false);
+  const [briefStep, setBriefStep] = useState(0);
+  const [briefTourOpen, setBriefTourOpen] = useState(false);
+  /** After finishing today's brief once this visit, don't chain into entry greeting. */
+  const [briefFinishedSession, setBriefFinishedSession] = useState(false);
+  const [checkInBusy, setCheckInBusy] = useState(false);
+  // The drawer opens programmatically, so Radix has no trigger to restore focus
+  // to on close; remember the button that opened it instead.
+  const detailOpener = useRef<HTMLButtonElement | null>(null);
+  const calendarRef = useRef<HTMLDivElement | null>(null);
+  // Raw text of a chapter's percent field while it is being typed, so the value
+  // is clamped on commit instead of fighting the caret on every keystroke.
+  const [rawPercent, setRawPercent] = useState<Record<string, string>>({});
+
+  const planReady = !coursesLoading;
+  const briefKey = brief ? briefTourStorageKey(brief) : null;
+  const briefTourPending =
+    Boolean(briefKey) && briefKey !== null && !hasSeenBriefTour(briefKey);
+  // Brief tour first; once finished for this variant, normal Plan entry tips apply.
+  const { speech: petSpeech, say: sayPet, dismiss: dismissPet, nudge: nudgePet } =
+    useBotPetGreeting("plan", {
+    ready: planReady && !briefLoading,
+    skipEntry:
+      briefLoading ||
+      briefTourOpen ||
+      briefTourPending ||
+      briefFinishedSession,
+  });
+
+  const refreshCalendar = useCallback(async (targetMonth: Date) => {
+    if (!hasAccountWorkspace()) return;
+    const { from, to } = monthRange(targetMonth);
+    try {
+      const res = await getLearningCalendar(from, to);
+      const next: Record<string, CalendarDay> = {};
+      for (const day of res.days) next[day.day] = day;
+      setCalendarDays(next);
+      setStreakDays(res.streak_days);
+    } catch {
+      /* Keep local calendar lights when the API is unreachable. */
+    }
+  }, []);
+
+  const refreshBrief = useCallback(
+    async (courses: PlanCourse[], day = dateKey()) => {
+      if (!hasAccountWorkspace()) {
+        setBrief(null);
+        setBriefLoading(false);
+        return;
+      }
+      const skills = briefSkillsFromPlan(courses);
+      if (!skills.length) {
+        setBrief(null);
+        setBriefLoading(false);
+        return;
+      }
+      setBriefLoading(true);
+      try {
+        const next = await postLearningDailyBrief(
+          day,
+          localHour(),
+          user?.username?.trim() || null,
+          skills,
+        );
+        setBrief(next);
+        setStreakDays(next.streak_days);
+      } catch {
+        setBrief(null);
+      } finally {
+        setBriefLoading(false);
+      }
+    },
+    [user?.username],
+  );
+
   useEffect(() => {
-    let active = true;
-    repository
-      .load()
-      .then(async (data) => {
-        if (active) {
-          setState(data);
-          setSelectedId(data.events.find((e) => e.kind === "care")?.id || "");
-          const requestedId = new URLSearchParams(location.search).get(
-            "resource",
-          );
-          const selection = (demo ? demoSelections : readSelections()).find(
-            (item) => item.resourceId === requestedId,
-          );
-          const resource = catalogue.find((item) => item.id === requestedId);
-          if (selection && resource) {
-            const existing = data.events.filter(event => event.resourceId === resource.id).sort((a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start))[0];
-            if (existing) {
-              setWeek(monday(existing.date));
-              setSelectedId(existing.id);
-              setNotice(
-                `${resource.title} · ${data.events.filter(event => event.resourceId === resource.id).length} sessions in your calendar, starting ${existing.date} at ${existing.start}.`,
-              );
-            } else {
-              if (selection.startTime && selection.endTime && selection.scheduleMode === "routine") {
-                const batch = scheduleCourses([selection], catalogue, data.events);
-                if (batch.events.length && active) {
-                  const saved = await repository.save({ ...data, events: [...data.events, ...batch.events] }, data.revision);
-                  if (!active) return;
-                  setState(saved);
-                  setWeek(monday(batch.events[0].date));
-                  setSelectedId(batch.events[0].id);
-                }
-                if (active) setNotice([`${batch.events.length} learning sessions imported.`, ...batch.issues].join(' '));
-              } else {
-                setNotice('Choose study days and times to import your course, or add individual sessions.');
-              }
-            }
-          }
-        }
+    let cancelled = false;
+    setCoursesLoading(true);
+    void syncPlanWithLearningCourses()
+      .then((next) => {
+        if (!cancelled) setState(next);
       })
-      .catch((e) => {
-        if (active) setError(e.message);
+      .catch(() => {
+        if (!cancelled) setState(readPlanState());
       })
       .finally(() => {
-        if (active) setLoading(false);
+        if (!cancelled) setCoursesLoading(false);
       });
     return () => {
-      active = false;
+      cancelled = true;
     };
-  }, [repository, location.search, catalogue, demo]);
+  }, [location.key]);
+
   useEffect(() => {
-    if (loading || location.hash !== "#course-progress") return;
-    const node = document.getElementById("course-progress");
-    if (!node) return;
-    requestAnimationFrame(() => {
-      node.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  }, [loading, location.hash]);
-  async function commit(events: PlanEvent[]) {
-    setBusy(true);
-    setError("");
-    try {
-      const next = await repository.save({ ...state, events }, state.revision);
-      setState(next);
-      setNotice("Plan saved. Account sync runs automatically.");
-      return true;
-    } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Could not save. Please try again.",
-      );
-      return false;
-    } finally {
-      setBusy(false);
-    }
-  }
-  const days = Array.from({ length: 7 }, (_, i) => addDays(week, i));
-  const visible = state.events.filter((e) => days.includes(e.date));
-  const pairs = conflicts(visible);
-  const selected = state.events.find((e) => e.id === selectedId);
-  const selectedConflicts = selected
-    ? state.events.filter((e) => overlaps(selected, e))
-    : [];
-  function newEvent(resourceId?: string) {
-    const resource = catalogue.find((r) => r.id === resourceId);
-    setFormError("");
-    setRepeat(false);
-    setEditor(
-      learningSession(
-        resource,
-        shortlist.find((item) => item.resourceId === resourceId),
-        week < dateKey(new Date()) ? dateKey(new Date()) : week,
-      ),
-    );
-  }
-  async function saveEvent() {
-    if (!editor) return;
-    const validation = validateEvent(editor);
-    if (validation) {
-      setFormError(validation);
+    if (coursesLoading) return;
+    void refreshCalendar(month);
+  }, [coursesLoading, month, refreshCalendar]);
+
+  useEffect(() => {
+    if (coursesLoading) return;
+    void refreshBrief(state.courses, today);
+  }, [coursesLoading, state.courses, today, refreshBrief]);
+
+  useEffect(() => {
+    if (!brief || !briefKey) {
+      setBriefTourOpen(false);
       return;
     }
-    const previous = state.events.find((e) => e.id === editor.id);
-    const changed =
-      previous &&
-      (previous.date !== editor.date ||
-        previous.start !== editor.start ||
-        previous.end !== editor.end ||
-        previous.title !== editor.title ||
-        previous.shareable !== editor.shareable);
-    const event = {
-      ...editor,
-      title: editor.title.trim(),
-      assistance: changed ? undefined : editor.assistance,
+    if (hasSeenBriefTour(briefKey)) {
+      setBriefTourOpen(false);
+      return;
+    }
+    setBriefStep(0);
+    setBriefTourOpen(true);
+    setBriefFinishedSession(false);
+  }, [brief, briefKey]);
+
+  function finishBriefTour() {
+    if (briefKey) markBriefTourSeen(briefKey);
+    setBriefTourOpen(false);
+    setBriefFinishedSession(true);
+  }
+
+  useEffect(() => {
+    const refresh = () => setToday(dateKey());
+    window.addEventListener("focus", refresh);
+    const timer = window.setInterval(refresh, 60000);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      window.clearInterval(timer);
     };
-    let events = state.events.filter((e) => e.id !== event.id).concat(event);
-    if (repeat && !previous)
-      events = events.concat(
-        [1, 2, 3].map((i) => ({
-          ...event,
-          id: crypto.randomUUID(),
-          date: addDays(event.date, i * 7),
-        })),
-      );
-    if (await commit(events)) {
-      setEditor(null);
-      setSelectedId(event.id);
-      setWeek(monday(event.date));
-      if (changed && previous.assistance)
-        setNotice(
-          "Updated. The previous assistance confirmation has been cleared; contact your helper about the change.",
-        );
-    }
-  }
-  function openRequest() {
-    if (!selected) return;
-    setCourseOpen(false);
-    const name = selected.assistance?.name || "";
-    setHelper(name);
-    setMessage(
-      selected.assistance?.message || requestMessage(selected, name || "there"),
-    );
-    setFormError("");
-    setRequestOpen(true);
-  }
-  async function saveRequest() {
-    if (!selected) return;
-    if (!helper.trim() || !message.trim()) {
-      setFormError("Enter a helper name and message.");
-      return;
-    }
-    if (
-      await commit(
-        state.events.map((e) =>
-          e.id === selected.id
-            ? {
-                ...e,
-                assistance: {
-                  name: helper.trim(),
-                  message,
-                  status: "draft",
-                  updatedAt: new Date().toISOString(),
-                },
-              }
-            : e,
-        ),
-      )
-    )
-      setRequestOpen(false);
-  }
-  async function status(status: "pending" | "accepted" | "declined") {
-    if (!selected?.assistance) return;
-    await commit(
-      state.events.map((e) =>
-        e.id === selected.id
-          ? {
-              ...e,
-              assistance: {
-                ...selected.assistance!,
-                status,
-                updatedAt: new Date().toISOString(),
-              },
-            }
-          : e,
-      ),
-    );
-  }
-  async function copy(text: string) {
+  }, []);
+
+  function save(next: Preview) {
+    setState(next);
     try {
-      await navigator.clipboard.writeText(text);
-      setNotice("Message copied.");
+      persist(next);
     } catch {
-      setNotice("Copy unavailable. Select and copy the message text below.");
+      setNotice(
+        "Changes are available until you leave this page; browser storage is unavailable.",
+      );
     }
   }
-  const savedQueue = savedCourseIds.map(id => {
-    const resource = catalogue.find(item => item.id === `epic5-${id}`);
-    if (!resource || state.events.some(event => event.resourceId === resource.id)) return null;
-    return shortlist.find(item => item.resourceId === resource.id) ?? { resourceId: resource.id, themeTitle: resource.title, skillName: '', addedAt: '', weekdays: [], scheduleMode: 'routine' as const };
-  }).filter((item): item is Selection => !!item);
-  function updatePreference(resourceId: string, patch: Partial<Selection>) {
-    const previous = shortlist.find(item => item.resourceId === resourceId) ?? savedQueue.find(item => item.resourceId === resourceId);
-    if (!previous) return;
-    const next = shortlist.filter(item => item.resourceId !== resourceId).concat({ ...previous, ...patch });
-    try { if (!demo) saveSelections(next); setShortlist(next); }
-    catch { setError('Could not save study times. Please try again.'); }
+
+  const course = state.courses.find((c) => c.id === courseId);
+  // The drawer summary must follow the draft values, not only the saved ones.
+  const draftValues = course
+    ? course.chapters.map((ch, i) => draft[i] ?? ch.value)
+    : [];
+  const draftDone = draftValues.filter((v) => v === 10).length;
+  const draftPercent = course?.chapters.length
+    ? Math.round(
+        (draftValues.reduce((n, v) => n + v, 0) / (course.chapters.length * 10)) *
+          100,
+      )
+    : 0;
+  const chapters = state.courses.flatMap((c) => c.chapters);
+  const overall = chapters.length
+    ? Math.round(
+        (chapters.reduce((n, c) => n + c.value, 0) / (chapters.length * 10)) *
+          100,
+      )
+    : 0;
+  const monthPrefix = dateKey(month).slice(0, 7);
+  const checkedDays = useMemo(() => {
+    const fromApi = Object.values(calendarDays).filter(
+      (d) => d.day.startsWith(monthPrefix) && d.checked_in,
+    ).length;
+    if (fromApi > 0 || Object.keys(calendarDays).length > 0) return fromApi;
+    return Object.entries(state.records).filter(
+      ([day, r]) => day.startsWith(monthPrefix) && Boolean(r.checked),
+    ).length;
+  }, [calendarDays, monthPrefix, state.records]);
+  const viewRecord = recordDate ? state.records[recordDate] : undefined;
+  const viewApiDay = recordDate ? calendarDays[recordDate] : undefined;
+  const viewEntries = viewRecord?.entries ?? [];
+  const viewChecked = viewApiDay
+    ? viewApiDay.checked_in
+    : Boolean(viewRecord?.checked);
+  const viewStudied = viewApiDay
+    ? viewApiDay.studied || viewApiDay.checked_in
+    : dayHasProgress(viewRecord);
+  const inProgress = state.courses.filter(
+    (c) => percent(c) > 0 && percent(c) < 100,
+  ).length;
+
+  const briefSteps = useMemo(
+    () => (brief ? buildBriefTourSteps(brief) : []),
+    [brief],
+  );
+
+  function openCourse(c: Course) {
+    setCourseId(c.id);
+    setDraft(c.chapters.map((ch) => ch.value));
+    setRawPercent({});
   }
-  const courseTasks = state.events.filter(event => event.kind === 'learning' && courses.some(course => `epic5-${course.id}` === event.resourceId));
-  const completedCourseTasks = courseTasks.filter(event => event.completed).length;
-  const courseProgress = courses.flatMap(course => {
-    const tasks = courseTasks.filter(event => event.resourceId === `epic5-${course.id}`);
-    if (!tasks.length) return [];
-    const preference = shortlist.find(item => item.resourceId === `epic5-${course.id}`);
-    const total = preference?.totalMinutes === undefined ? course.durationMin : preference.totalMinutes;
-    const daily = preference?.startTime && preference.endTime
-      ? (Number(preference.endTime.slice(0,2)) * 60 + Number(preference.endTime.slice(3))) - (Number(preference.startTime.slice(0,2)) * 60 + Number(preference.startTime.slice(3)))
-      : Math.max(...tasks.map(duration));
-    return [{ title: course.title, total, daily, days: total && daily > 0 ? Math.ceil(total / daily) : null,
-      done: tasks.filter(event => event.completed).length, count: tasks.length,
-      finish: tasks.map(event => event.date).sort().at(-1) }];
-  });
-  const busyOrLoading = busy || loading;
 
-  const dialogProps1 = {
-    open: !!editor,
-    onOpenChange: (open) => {
-      if (!open && !busy) setEditor(null);
-    },
-  } satisfies Partial<ComponentProps<typeof Dialog>>;
-  const dialogProps2 = {
-    open: requestOpen,
-    onOpenChange: (open) => {
-      if (!busy) setRequestOpen(open);
-    },
-  } satisfies Partial<ComponentProps<typeof Dialog>>;
-  const dialogProps3 = {
-    open: deleteOpen,
-    onOpenChange: setDeleteOpen,
-  } satisfies Partial<ComponentProps<typeof Dialog>>;
-  return (
-    <div className="pl-page">
-      <PageHeader
-        title="My Plan"
-        description="Make room for learning, everyday life and the people who matter."
-        actions={
-          <div className="flex flex-wrap items-center gap-4">
-          <AppButton tone="outline" variant="outline" asChild><Link to={ROUTES.learningCentre}>Choose courses</Link></AppButton>
-          <AppButton tone="gradient" asChild><Link to={ROUTES.possibilities}>Explore possibilities</Link></AppButton>
-          </div>
+  /**
+   * Chapter progress can only increase, so the saved value is the floor. Typing
+   * is committed on blur or Enter: the value is snapped to the 10% grid and
+   * clamped into [saved, 100].
+   */
+  function commitChapter(index: number, title: string, typedOverride?: string) {
+    const typed = typedOverride ?? rawPercent[title];
+    setRawPercent((prev) => {
+      const next = { ...prev };
+      delete next[title];
+      return next;
+    });
+    const chapter = course?.chapters[index];
+    if (typed === undefined || !chapter) return;
+    const parsed = Number.parseInt(typed, 10);
+    if (!Number.isFinite(parsed)) return;
+    const floor = chapter.value * 10;
+    const next = Math.min(100, Math.max(floor, Math.round(parsed / 10) * 10));
+    setDraft((current) =>
+      current.map((value, i) => (i === index ? next / 10 : value)),
+    );
+  }
+
+  function openRecord(day: string) {
+    setRecordDate(day);
+  }
+
+  async function handleCheckIn() {
+    if (checkInBusy) return;
+    setCheckInBusy(true);
+    try {
+      const res = await postLearningCheckin(today);
+      setStreakDays(res.streak_days);
+      message.success(
+        res.created
+          ? `Checked in · ${res.streak_days} day streak`
+          : `Already checked in · ${res.streak_days} day streak`,
+      );
+      sayPet("plan-record");
+      const previous = state.records[today] ?? emptyRecord();
+      save({
+        ...state,
+        records: {
+          ...state.records,
+          [today]: { ...previous, checked: true, studied: true },
+        },
+      });
+      await refreshCalendar(month);
+      await refreshBrief(state.courses, today);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 409) {
+        message.warning(
+          error.detail ||
+            "Log some chapter progress first, then check in.",
+        );
+      } else {
+        message.error("Could not check in. Please try again.");
+      }
+    } finally {
+      setCheckInBusy(false);
+    }
+  }
+
+  const briefTourStep = briefSteps[briefStep];
+  const petTour =
+    briefTourOpen && briefSteps.length > 0 && briefTourStep
+      ? {
+          text: briefTourStep.text,
+          step: briefStep,
+          total: briefSteps.length,
+          widthRem: briefTourStep.widthRem,
+          onNext: () => {
+            if (briefStep >= briefSteps.length - 1) {
+              finishBriefTour();
+              return;
+            }
+            setBriefStep((current) => current + 1);
+          },
+          onDismiss: finishBriefTour,
+          primaryLabel:
+            briefTourStep.action === "checkin" ? "Check in" : undefined,
+          onPrimary:
+            briefTourStep.action === "checkin"
+              ? () => {
+                  void handleCheckIn();
+                }
+              : undefined,
+          primaryBusy: checkInBusy,
         }
-      />
-      {demo && (
-        <div className="pl-demo">
-          <span>
-            <strong>Demo plan</strong> · Example activities and conflicts.
-            Changes are saved separately from your own plan.
-          </span>
-          <Link to={`${ROUTES.plan}?demo=0`}>Exit demo</Link>
-        </div>
-      )}
-      <section
-        id="course-progress"
-        className="pl-task-progress"
-        aria-label="Course task progress"
-      >
-        <div><div><p className="pl-kicker">COURSE LEARNING ONLY</p><h2>Course plan progress</h2></div><strong>{completedCourseTasks} / {courseTasks.length}<small>learning sessions completed</small></strong></div>
-        <progress aria-label="Completed course tasks" value={completedCourseTasks} max={Math.max(1, courseTasks.length)} />
-        <p className="pl-muted">Work and personal activities are excluded.</p>
-        <div className="pl-course-progress-breakdown">{courseProgress.map(course => <div key={course.title}><strong>{course.title}</strong><span>{course.days ? `${course.days} study days · ${course.total} min ÷ ${course.daily} min/day` : 'Study duration not available'}</span><small>{course.done}/{course.count} sessions completed · Last scheduled: {course.finish}</small></div>)}</div>
-      </section>
-      {error && (
-        <div className="pl-error" role="alert">
-          {error}{" "}
-          <button onClick={() => window.location.reload()}>Reload plan</button>
-        </div>
-      )}
-      <p className="pl-notice" role="status">
-        {notice}
-      </p>
-      {loading ? (
-        <p>Loading your plan…</p>
-      ) : (
-        <div className="pl-layout">
-          <aside className="pl-sidebar pl-panel">
-            <p className="pl-kicker">YOUR NEXT STEPS</p>
-            <h2>Recently saved · {savedQueue.length}</h2>
-            <p className="pl-muted">
-              Choose a time for your saved courses.
-            </p>
-            {savedQueue.length ? (
-              savedQueue.map((s) => {
-                const r = catalogue.find((r) => r.id === s.resourceId);
-                if (!r) return null;
-                const scheduled = state.events
-                  .filter((e) => e.resourceId === r.id)
-                  .reduce((n, e) => n + duration(e), 0);
-                const total = s.totalMinutes === undefined ? r.minutes : s.totalMinutes;
-                if (total && scheduled >= total) return null;
-                return (
-                  <article className="pl-resource" key={r.id}>
-                    {s.skillName && <span>{s.skillName}</span>}
-                    <h3>{r.title}</h3>
-                    <p>
-                      {total
-                        ? `${total} min selected`
-                        : "Confirm duration with provider"}
-                    </p>
-                    {s.chapterNames?.length ? (
-                      <details>
-                        <summary>
-                          {s.chapterNames.length} selected chapters
-                        </summary>
-                        <ul>
-                          {s.chapterNames.map((name) => (
-                            <li key={name}>{name}</li>
-                          ))}
-                        </ul>
-                      </details>
-                    ) : null}
-                    {s.scheduleMode === "routine" && s.startDate ? (
-                      <p>Preferred start: {s.startDate}</p>
-                    ) : null}
-                    {s.weekdays?.length && s.minutesPerDay ? (
-                      <p>
-                        {s.weekdays
-                          .map(
-                            (day) =>
-                              ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][
-                                day
-                              ],
-                          )
-                          .join(", ")}{" "}
-                        · {s.startTime && s.endTime ? `${s.startTime}–${s.endTime}` : `${s.minutesPerDay} min/day preferred`}
-                      </p>
-                    ) : null}
-                    <div className="pl-work-days">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day,index) => <button key={day} aria-pressed={s.weekdays?.includes(index) ?? false} onClick={() => updatePreference(s.resourceId, { weekdays: s.weekdays?.includes(index) ? s.weekdays.filter(item => item !== index) : [...(s.weekdays ?? []), index] })}>{day}</button>)}</div>
-                    <div className="pl-form-row"><label>From<TimePicker compact label="Study start time" value={s.startTime ?? ''} onChange={value => updatePreference(s.resourceId, { startTime: value })} /></label><label>To<TimePicker compact label="Study end time" value={s.endTime ?? ''} onChange={value => updatePreference(s.resourceId, { endTime: value })} /></label></div>
-                    {!total && <label>Planned minutes<input type="number" min="1" value={s.totalMinutes ?? ''} onChange={event => updatePreference(s.resourceId, { totalMinutes: Number(event.target.value) })} /></label>}
-                    {scheduled > 0 && (
-                      <p>{scheduled} min scheduled across your plan</p>
-                    )}
-                    <button
-                      disabled={busyOrLoading}
-                      onClick={() => newEvent(r.id)}
-                    >
-                      Schedule a session <Plus size={14} />
-                    </button>
-                  </article>
-                );
-              })
-            ) : (
-              <div className="pl-empty">
-                <BookOpen />
-                <p>No saved courses waiting to be scheduled.</p>
-              </div>
-            )}
-            {!!savedQueue.length && <button className="pl-primary" disabled={busyOrLoading} onClick={async () => {
-              const batch = scheduleCourses(savedQueue, catalogue, state.events);
-              if (batch.events.length) {
-                if (!await commit([...state.events, ...batch.events])) return;
-                setWeek(monday(batch.events[0].date));
-              }
-              setNotice([`${batch.events.length} sessions imported.`, ...batch.issues].join(' '));
-            }}>Import course schedule</button>}
-            <Link
-              {...({
-                className: "pl-link",
-                to: `${ROUTES.learningCentre}${demo ? "" : "?demo=0"}`,
-              } satisfies Partial<ComponentProps<typeof Link>>)}
-            >
-              Explore learning resources <ArrowRight size={14} />
-            </Link>
-            <div className="pl-tip">
-              <Clock3 size={19} />
-              <h3>Leave a little breathing room</h3>
-              <p>
-                Keep time for rest and unexpected changes. An empty space does
-                not have to be filled.
-              </p>
-            </div>
-          </aside>
-          <main className="pl-calendar pl-panel">
-            <div className="pl-calendar-tools"><button className="pl-work-button" disabled={busyOrLoading} onClick={() => { setFormError(''); setWorkOpen(true); }}>Set work hours</button><button className="pl-primary" disabled={busyOrLoading} onClick={() => newEvent()}><Plus size={16} /> Add activity</button></div>
-            <div className="pl-weekbar">
-              <div>
-                <p className="pl-kicker">YOUR WEEK AT A GLANCE</p>
-                <h2>
-                  {readable(week)} – {readable(addDays(week, 6))}
-                </h2>
-              </div>
-              <div className="pl-week-buttons">
-                <button
-                  aria-label="Previous week"
-                  onClick={() => setWeek(addDays(week, -7))}
-                >
-                  <ChevronLeft size={17} />
-                </button>
-                <button onClick={() => setWeek(monday(dateKey(new Date())))}>
-                  Today
-                </button>
-                <button
-                  aria-label="Next week"
-                  onClick={() => setWeek(addDays(week, 7))}
-                >
-                  <ChevronRight size={17} />
-                </button>
-              </div>
-            </div>
-            <div className="pl-legend">
-              {Object.entries(labels).map(([kind, label]) => (
-                <span key={kind}>
-                  <i className={`pl-dot ${kind}`} />
-                  {label}
-                </span>
-              ))}
-            </div>
-            <p className="pl-timezone">
-              Times in {Intl.DateTimeFormat().resolvedOptions().timeZone} ·
-              Select an activity to manage it
-            </p>
-            {pairs.length > 0 && (
-              <div className="pl-conflict-strip">
-                <AlertTriangle size={17} />
-                <span>
-                  {pairs.length} overlapping{" "}
-                  {pairs.length === 1 ? "pair" : "pairs"} this week
-                </span>
-                <button
-                  onClick={() => { setSelectedId((pairs[0].find((e) => e.shareable) || pairs[0][0]).id); setCourseOpen(true); }}
-                >
-                  Review
-                </button>
-              </div>
-            )}
-            <WeekCalendar days={days} events={visible} selectedId={selectedId} onSelect={id => { setSelectedId(id); setCourseOpen(true); }} onAdd={(date, start) => {
-              setFormError(''); setRepeat(false);
-              const hour = Number(start.slice(0, 2));
-              setEditor({ id: crypto.randomUUID(), title: '', kind: 'personal', date, start, end: hour === 23 ? '23:59' : `${String(hour + 1).padStart(2, '0')}:00`, flexible: false, shareable: false, completed: false });
-            }} />
-          </main>
-          <Drawer open={courseOpen && !!selected && !courses.some(course => `epic5-${course.id}` === selected.resourceId)} onOpenChange={open => setCourseOpen(open)}>
-          <DrawerContent className="activity-drawer sm:max-w-xl"><DrawerBody className="pl-detail">
-            <p className="pl-kicker">ACTIVITY & SUPPORT</p>
-            {selected ? (
-              <>
-                <div className="pl-detail-heading">
-                  <DrawerTitle>{selected.title}</DrawerTitle>
+      : null;
 
-                </div>
-                <DrawerDescription className="pl-detail-date">
-                  {selected.date} · {selected.start}–{selected.end}
-                </DrawerDescription>
-                <div className="pl-tags">
-                  <span>{labels[selected.kind]}</span>
-                  <span>
-                    {selected.flexible ? "Flexible time" : "Fixed time"}
-                  </span>
-                </div>
-                <p className="pl-owner">
-                  Responsible:{" "}
-                  <strong>
-                    {selected.assistance?.status === "accepted"
-                      ? selected.assistance.name
-                      : "You"}
-                  </strong>
-                </p>
-                {selectedConflicts.length > 0 && (
-                  <div className="pl-conflict-box">
-                    <AlertTriangle size={18} />
-                    <h3>Two things need your time</h3>
-                    {selectedConflicts.map((e) => (
-                      <p key={e.id}>
-                        {e.title} · {e.start}–{e.end}
-                      </p>
-                    ))}
-                    <p>
-                      Move a flexible activity or ask someone to help with a
-                      shareable responsibility.
-                    </p>
-                    {selectedConflicts
-                      .filter((e) => e.flexible)
-                      .map((e) => (
-                        <button
-                          key={e.id}
-                          className="pl-link"
-                          onClick={() => setSelectedId(e.id)}
-                        >
-                          Adjust {e.title} →
-                        </button>
-                      ))}
-                  </div>
-                )}
-                {selectedConflicts.length > 0 && <ConflictMessage key={selected.id} event={selected} conflicts={selectedConflicts} />}
-                <div className="pl-detail-actions">
-                  <button
-                    disabled={busyOrLoading}
-                    onClick={() => {
-                      setCourseOpen(false);
-                      setEditor({ ...selected });
-                      setRepeat(false);
-                      setFormError("");
-                    }}
-                  >
-                    Edit activity
-                  </button>
-                  {selected && (
-                    <button
-                      disabled={busyOrLoading}
-                      onClick={() =>
-                        commit(
-                          state.events.map((e) =>
-                            e.id === selected.id
-                              ? { ...e, completed: !e.completed }
-                              : e,
-                          ),
-                        )
-                      }
-                    >
-                      {selected.completed
-                        ? "Mark incomplete"
-                        : "Mark completed"}
-                    </button>
-                  )}
-                </div>
-                {selected.flexible && (
-                  <section className="pl-suggestions">
-                    <h3>Other available times</h3>
-                    <p>
-                      Based on your saved activities, between 08:00 and 21:00.
-                      Choose a time that suits you.
-                    </p>
-                    {suggestions(selected, state.events).map((slot) => (
-                      <button
-                        disabled={busyOrLoading}
-                        key={slot.date + slot.start}
-                        onClick={async () => {
-                          if (
-                            await commit(
-                              state.events.map((e) =>
-                                e.id === selected.id
-                                  ? { ...e, ...slot, assistance: undefined }
-                                  : e,
-                              ),
-                            )
-                          ) {
-                            setWeek(monday(slot.date));
-                            setNotice(
-                              "Activity moved. Any previous assistance confirmation was cleared.",
-                            );
-                          }
-                        }}
-                      >
-                        {readable(slot.date)} · {slot.start}–{slot.end}
-                        <ArrowRight size={13} />
-                      </button>
-                    ))}
-                    {!suggestions(selected, state.events).length && (
-                      <p>
-                        No available suggestion in the next seven days. Edit the
-                        activity to choose another date.
-                      </p>
-                    )}
-                  </section>
-                )}
-                {selected.shareable && (
-                  <section className="pl-help">
-                    <MessageCircle size={21} />
-                    <h3>Ask family for a hand</h3>
-                    <p>
-                      Your family can reply in WhatsApp. They do not need an
-                      account here.
-                    </p>
-                    {!selected.assistance ? (
-                      <button
-                        className="pl-primary"
-                        disabled={busyOrLoading}
-                        onClick={openRequest}
-                      >
-                        Prepare a request
-                      </button>
-                    ) : (
-                      <>
-                        <div
-                          className={`pl-request-status ${selected.assistance.status}`}
-                        >
-                          <strong>{selected.assistance.name}</strong>
-                          <span>
-                            {
-                              {
-                                draft: "Draft · not sent",
-                                pending: "Waiting for a reply",
-                                accepted: "Accepted · recorded by you",
-                                declined: "Unable to help · recorded by you",
-                              }[selected.assistance.status]
-                            }
-                          </span>
-                        </div>
-                        <p className="pl-message">
-                          {selected.assistance.message}
-                        </p>
-                        {selected.assistance.status === "draft" && (
-                          <>
-                            <a
-                              className="pl-whatsapp-action"
-                              href={whatsappLink(selected.assistance.message)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <WhatsAppIcon /> Open WhatsApp
-                            </a>
-                            <p>
-                              Choose the intended person and send in WhatsApp.
-                              Opening it does not send or confirm this request.
-                            </p>
-                            <button
-                              disabled={busyOrLoading}
-                              onClick={() => status("pending")}
-                            >
-                              I sent the request
-                            </button>
-                            <button
-                              disabled={busyOrLoading}
-                              onClick={openRequest}
-                            >
-                              Edit draft
-                            </button>
-                          </>
-                        )}
-                        {selected.assistance.status === "pending" && (
-                          <>
-                            <p>
-                              After reading their reply, record the result
-                              below. You remain responsible until they accept.
-                            </p>
-                            <button
-                              disabled={busyOrLoading}
-                              className="pl-primary"
-                              onClick={() => status("accepted")}
-                            >
-                              They accepted
-                            </button>
-                            <button
-                              disabled={busyOrLoading}
-                              onClick={() => status("declined")}
-                            >
-                              They cannot help
-                            </button>
-                          </>
-                        )}
-                        {selected.assistance.status === "declined" && (
-                          <button
-                            disabled={busyOrLoading}
-                            onClick={openRequest}
-                          >
-                            Prepare another request
-                          </button>
-                        )}
-                        {selected.assistance.status === "accepted" && (
-                          <p>
-                            Check any handover details with{" "}
-                            {selected.assistance.name}. Their calendar is not
-                            connected.
-                          </p>
-                        )}
-                        <button
-                          onClick={() => copy(selected.assistance!.message)}
-                        >
-                          <Copy size={13} /> Copy message
-                        </button>
-                        <button
-                          disabled={busyOrLoading}
-                          onClick={() =>
-                            commit(
-                              state.events.map((e) =>
-                                e.id === selected.id
-                                  ? { ...e, assistance: undefined }
-                                  : e,
-                              ),
-                            )
-                          }
-                        >
-                          Clear request / take responsibility back
-                        </button>
-                      </>
-                    )}
-                  </section>
-                )}
-                <button
-                  className="pl-delete"
-                  disabled={busyOrLoading}
-                  onClick={() => { setCourseOpen(false); setDeleteOpen(true); }}
-                >
-                  <Trash2 size={14} /> Delete activity
-                </button>
-              </>
-            ) : (
-              <div className="pl-empty">
-                <CalendarDays />
-                <h3>A little space to organise</h3>
-                <p>
-                  Select an activity to edit its time, review a conflict or ask
-                  for help.
-                </p>
-              </div>
-            )}
-          </DrawerBody></DrawerContent></Drawer>
-        </div>
-      )}
-      <p className="pl-footer">
-        {demo
-          ? "Demo data stays in this browser."
-          : "Your plan is saved to your account."}{" "}
-        WhatsApp delivery and replies are not tracked automatically.
-      </p>
-      {courseOpen && selected && courses.some(course => `epic5-${course.id}` === selected.resourceId) && <PlanCourseDrawer conflicts={selectedConflicts} selectedEvent={selected} busy={busyOrLoading} onComplete={event => commit(state.events.map(item => item.id === event.id ? { ...item, completed: !item.completed } : item))} course={courses.find(course => `epic5-${course.id}` === selected.resourceId)!} events={state.events.filter(event => event.resourceId === selected.resourceId)} onClose={() => setCourseOpen(false)} onEdit={event => { setCourseOpen(false); setFormError(''); setRepeat(false); setEditor({ ...event }); }} />}
-      <Dialog open={workOpen} onOpenChange={setWorkOpen}><DialogContent className="pl-modal"><DialogTitle>Set work hours</DialogTitle><DialogDescription>Choose weekdays and the date range for your recurring work schedule.</DialogDescription>
-        <div className="pl-work-days">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day,index) => <button key={day} aria-pressed={workDays.includes(index)} onClick={() => setWorkDays(workDays.includes(index) ? workDays.filter(item => item !== index) : [...workDays,index])}>{day}</button>)}</div>
-        <div className="pl-form-row"><label>From<TimePicker value={workStart} onChange={value => setWorkStart(value)} /></label><label>To<TimePicker value={workEnd} onChange={value => setWorkEnd(value)} /></label></div>
-        <div className="pl-form-row"><label>Start date<input type="date" value={workFrom} onChange={e => setWorkFrom(e.target.value)} /></label><label>Through<input type="date" value={workTo} min={workFrom} onChange={e => setWorkTo(e.target.value)} /></label></div>
-        {formError && <p role="alert">{formError}</p>}<button className="pl-primary" disabled={busyOrLoading} onClick={async () => {
-          if (!workDays.length || !workFrom || !workTo || workTo < workFrom || !workStart || !workEnd || workEnd <= workStart) { setFormError('Choose work days, a valid date range and an end time after the start.'); return; }
-          if (workTo > addDays(workFrom, 365)) { setFormError('Choose a date range of up to one year.'); return; }
-          const additions: PlanEvent[] = [];
-          for (let date = workFrom; date <= workTo; date = addDays(date, 1)) {
-            if (!workDays.includes((new Date(`${date}T12:00:00`).getDay() + 6) % 7)) continue;
-            if (state.events.some(e => e.kind === 'work' && e.date === date && e.start === workStart && e.end === workEnd)) continue;
-            additions.push({id: crypto.randomUUID(), title: 'Work', kind: 'work', date, start: workStart, end: workEnd, flexible: false, shareable: false, completed: false});
+  function updateProgress() {
+    if (!course) return;
+    const bumps: PlanDayChapterEntry[] = course.chapters.flatMap((ch, i) => {
+      const next = draft[i] ?? ch.value;
+      if (next <= ch.value) return [];
+      return [
+        {
+          courseId: course.id,
+          courseTitle: course.title,
+          chapterTitle: ch.title,
+          percent: next * 10,
+        },
+      ];
+    });
+    const changed = bumps.length > 0;
+    const day = dateKey();
+    const previous = state.records[day] ?? emptyRecord();
+    const nextCourses = state.courses.map((c) =>
+      c.id === course.id
+        ? {
+            ...c,
+            chapters: c.chapters.map((ch, i) => ({
+              ...ch,
+              value: Math.max(ch.value, draft[i]),
+            })),
           }
-          if (await commit([...state.events, ...additions])) { setWorkOpen(false); setWeek(monday(workFrom)); }
-        }}>Save work hours</button>
-      </DialogContent></Dialog>
-      <Dialog {...dialogProps1}>
-        <DialogContent className="pl-modal">
-          <DialogTitle>
-            {state.events.some((e) => e.id === editor?.id)
-              ? "Edit activity"
-              : "Add an activity"}
-          </DialogTitle>
-          <DialogDescription>
-            Choose a time for learning or everyday life. Overlaps are allowed
-            and will be highlighted.
-          </DialogDescription>
-          {editor && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                void saveEvent();
-              }}
-            >
-              <label>
-                Activity title
-                <input
-                  required
-                  maxLength={160}
-                  value={editor.title}
-                  onChange={(e) =>
-                    setEditor({ ...editor, title: e.target.value })
-                  }
-                />
-              </label>
-              <label>
-                Category
-                <select
-                  value={editor.kind}
-                  onChange={(e) =>
-                    setEditor({
-                      ...editor,
-                      kind: e.target.value as PlanEvent["kind"],
-                      shareable: false,
-                      assistance: undefined,
-                      resourceId: undefined,
-                    })
-                  }
-                >
-                  {Object.entries(labels).map(([k, v]) => (
-                    <option key={k} value={k}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Date
-                <input
-                  required
-                  type="date"
-                  value={editor.date}
-                  onChange={(e) =>
-                    setEditor({ ...editor, date: e.target.value })
-                  }
-                />
-              </label>
-              <div className="pl-form-row">
-                <label>
-                  Start
-                  <TimePicker label="Start time" value={editor.start} onChange={value => setEditor({ ...editor, start: value })} />
-                </label>
-                <label>
-                  End
-                  <TimePicker label="End time" value={editor.end} onChange={value => setEditor({ ...editor, end: value })} />
-                </label>
-              </div>
-              <label className="pl-check">
-                <input
-                  type="checkbox"
-                  checked={editor.flexible}
-                  onChange={(e) =>
-                    setEditor({ ...editor, flexible: e.target.checked })
-                  }
-                />{" "}
-                Time can be adjusted
-              </label>
-              {editor.kind === "care" && (
-                <label className="pl-check">
-                  <input
-                    type="checkbox"
-                    checked={editor.shareable}
-                    onChange={(e) =>
-                      setEditor({ ...editor, shareable: e.target.checked })
-                    }
-                  />{" "}
-                  I can ask someone to share this responsibility
-                </label>
-              )}
-              {!state.events.some((e) => e.id === editor.id) && (
-                <label className="pl-check">
-                  <input
-                    type="checkbox"
-                    checked={repeat}
-                    onChange={(e) => setRepeat(e.target.checked)}
-                  />{" "}
-                  Repeat weekly for 4 weeks (independent activities)
-                </label>
-              )}
-              {editor.assistance && (
-                <p>
-                  Changing the title, time or sharing setting clears this
-                  request. Tell your helper about any changes.
-                </p>
-              )}
-              {formError && (
-                <p role="alert" className="pl-error">
-                  {formError}
-                </p>
-              )}
-              <button className="pl-primary" disabled={busy} type="submit">
-                {busy ? "Saving…" : "Save activity"}
-              </button>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
-      <Dialog {...dialogProps2}>
-        <DialogContent className="pl-modal">
-          <DialogTitle>Prepare a WhatsApp request</DialogTitle>
-          <DialogDescription>
-            Only the message below will be shared. Review it before opening
-            WhatsApp.
-          </DialogDescription>
-          <label>
-            Who would you like to ask?
-            <input
-              maxLength={80}
-              value={helper}
-              onChange={(e) => {
-                setHelper(e.target.value);
-                if (selected)
-                  setMessage(
-                    requestMessage(selected, e.target.value || "there"),
-                  );
-              }}
-              placeholder="Family member’s name"
-            />
-          </label>
-          <label>
-            Message
-            <textarea
-              rows={6}
-              maxLength={2000}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-          </label>
-          <p>
-            You will choose the recipient in WhatsApp. No message is sent from
-            this website.
-          </p>
-          {formError && <p role="alert">{formError}</p>}
-          <button className="pl-primary" disabled={busy} onClick={saveRequest}>
-            Save request draft
-          </button>
-        </DialogContent>
-      </Dialog>
-      <Dialog {...dialogProps3}>
-        <DialogContent className="pl-modal">
-          <DialogTitle>Delete this activity?</DialogTitle>
-          <DialogDescription>
-            Only this occurrence will be deleted. If you have asked someone for
-            help, let them know separately.
-          </DialogDescription>
+        : c,
+    );
+    const nextState: Preview = {
+      ...state,
+      courses: nextCourses,
+      records: changed
+        ? {
+            ...state.records,
+            [day]: {
+              ...previous,
+              studied: true,
+              // Check-in is an explicit action; save only marks studied.
+              checked: previous.checked,
+              entries: mergeDayEntries(previous.entries, bumps),
+            },
+          }
+        : state.records,
+    };
+    save(nextState);
+    setCourseId(null);
+    setToday(day);
+    if (changed) {
+      message.success("Chapter progress saved.");
+      sayPet("save-progress");
+      // Prompt check-in separately — save only marks studied.
+      const alreadyChecked =
+        Boolean(previous.checked) ||
+        Boolean(calendarDays[day]?.checked_in);
+      if (!alreadyChecked) {
+        window.setTimeout(() => setRecordDate(day), 0);
+      }
+    } else {
+      message.info("No changes to save.");
+    }
+    setNotice(
+      changed ? "Chapter progress saved." : "No changes to save.",
+    );
+
+    if (changed && hasAccountWorkspace() && course.skillId) {
+      const payload = bumps.flatMap((entry) => {
+        const index = course.chapters.findIndex(
+          (ch) => ch.title === entry.chapterTitle,
+        );
+        if (index < 0 || !course.skillId) return [];
+        return [
+          {
+            skill_id: course.skillId,
+            course_id: course.id,
+            chapter_index: index,
+            value: Math.round(entry.percent / 10),
+          },
+        ];
+      });
+      if (payload.length) {
+        void postLearningProgress(day, payload)
+          .then(async (res) => {
+            if (res.rejected.length) {
+              message.warning(
+                "Some chapter values could not be saved. Progress only moves forward.",
+              );
+            }
+            await refreshCalendar(month);
+            await refreshBrief(nextCourses, day);
+          })
+          .catch(() => {
+            /* Local mirror already kept; retry on next edit. */
+          });
+      }
+    } else if (changed) {
+      void refreshCalendar(month);
+    }
+  }
+
+  const offset = (month.getDay() + 6) % 7;
+  const dayCount = new Date(
+    month.getFullYear(),
+    month.getMonth() + 1,
+    0,
+  ).getDate();
+  const trailing = (7 - ((offset + dayCount) % 7)) % 7;
+
+  const courseColumns: DataTableColumn<Course>[] = [
+    {
+      id: "course",
+      header: "Course",
+      width: "30%",
+      sortValue: (c) => c.title.toLowerCase(),
+      cell: (c) => (
+        <span className="lp-cell-course">
+          <span className="lp-cell-course__copy">
+            <strong>{c.title}</strong>
+            <small>{c.provider}</small>
+          </span>
+        </span>
+      ),
+    },
+    {
+      id: "progress",
+      header: "Progress",
+      width: "24%",
+      sortValue: (c) => percent(c),
+      cell: (c) => (
+        <span className="lp-cell-progress">
+          <GradientBar
+            size="sm"
+            value={percent(c)}
+            className="lp-bar"
+            aria-label={`${c.title} progress ${percent(c)}%`}
+          />
+          <span className="lp-bar__value">{percent(c)}%</span>
+        </span>
+      ),
+    },
+    {
+      id: "chapters",
+      header: "Chapters",
+      width: "13%",
+      align: "center",
+      sortValue: (c) => doneCount(c),
+      cell: (c) => (
+        <span className="lp-cell-muted">
+          {doneCount(c)} / {c.chapters.length}
+        </span>
+      ),
+    },
+    {
+      id: "status",
+      header: "Status",
+      width: "13%",
+      align: "center",
+      sortValue: (c) => percent(c),
+      cell: (c) => {
+        const s = courseStatus(c);
+        return (
+          <span className={cn("lp-status", `lp-status--${s.key}`)}>
+            {s.label}
+          </span>
+        );
+      },
+    },
+    {
+      id: "action",
+      header: "Action",
+      width: "20%",
+      align: "center",
+      cell: (c) => (
+        <span className="lp-cell-actions">
           <button
-            className="pl-primary"
-            disabled={busy}
-            onClick={async () => {
-              if (
-                selected &&
-                (await commit(state.events.filter((e) => e.id !== selected.id)))
-              ) {
-                setDeleteOpen(false);
-                setSelectedId("");
-              }
+            type="button"
+            className="lp-text-action lp-text-action--blue"
+            onClick={(e: MouseEvent<HTMLButtonElement>) => {
+              detailOpener.current = e.currentTarget;
+              openCourse(c);
             }}
           >
-            Delete activity
+            Record
           </button>
+          <button
+            type="button"
+            className="lp-text-action lp-text-action--red"
+            onClick={() => setRemoveId(c.id)}
+          >
+            Remove
+          </button>
+        </span>
+      ),
+    },
+  ];
+
+  return (
+    <div className="lp-page">
+      <PageHeader
+        className="lp-page-header"
+        title="My Plan"
+        description="Small steps, steady progress. Make your learning journey your own."
+      />
+
+      <p className="lp-notice" role="status">
+        {notice}
+      </p>
+
+      <div className="lp-layout">
+        <aside className="lp-left">
+          <div className="lp-stats">
+            <ExposureScorePie
+              className="lp-stats-pie"
+              score={overall / 100}
+              label="Overall chapter progress"
+              meta={`${overall}% complete`}
+              variant="tasks"
+            />
+            <article className="lp-stats-card lp-stats-card--checkins">
+              <div className="lp-stats-card__icon" aria-hidden="true">
+                <Check size={18} />
+              </div>
+              <div className="lp-stats-card__body">
+                <p className="lp-kicker">Check-ins this month</p>
+                <strong>
+                  {checkedDays}
+                  <span> {checkedDays === 1 ? "day" : "days"}</span>
+                </strong>
+                <span>
+                  {streakDays > 0
+                    ? `${streakDays}-day streak · `
+                    : null}
+                  {month.toLocaleDateString("en", { month: "long" })}
+                </span>
+              </div>
+            </article>
+          </div>
+
+          <section className="lp-calendar">
+            <div className="lp-heading">
+              <div>
+                <p className="lp-kicker">EVERY SMALL STEP COUNTS</p>
+                <h2>Learning calendar</h2>
+              </div>
+            </div>
+            <div className="lp-mini-month" ref={calendarRef}>
+              <div className="lp-month">
+                <button
+                  type="button"
+                  aria-label="Previous month"
+                  onClick={() =>
+                    setMonth(
+                      new Date(month.getFullYear(), month.getMonth() - 1, 1),
+                    )
+                  }
+                >
+                  <ChevronLeft size={14} />
+                </button>
+                <strong>
+                  {month.toLocaleDateString("en", {
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </strong>
+                <button
+                  type="button"
+                  aria-label="Next month"
+                  onClick={() =>
+                    setMonth(
+                      new Date(month.getFullYear(), month.getMonth() + 1, 1),
+                    )
+                  }
+                >
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+              <div className="lp-mini-grid">
+                {WEEKDAYS.map((d) => (
+                  <span className="lp-mini-weekday" key={d}>
+                    {d.charAt(0)}
+                  </span>
+                ))}
+                {Array.from({ length: offset }, (_, i) => (
+                  <span key={`lead${i}`} />
+                ))}
+                  {Array.from({ length: dayCount }, (_, i) => {
+                    const day = dateKey(
+                      new Date(month.getFullYear(), month.getMonth(), i + 1),
+                    );
+                    const r = state.records[day];
+                    const apiDay = calendarDays[day];
+                    const checked = apiDay
+                      ? apiDay.checked_in
+                      : Boolean(r?.checked);
+                    const studied = apiDay
+                      ? apiDay.studied || apiDay.checked_in
+                      : dayHasProgress(r);
+                    const lit = checked || studied;
+                    return (
+                      <button
+                        type="button"
+                        key={day}
+                        disabled={day > today}
+                        className={cn(
+                          day === today && "is-today",
+                          studied && !checked && "studied",
+                          checked && "checked",
+                        )}
+                        onClick={() => openRecord(day)}
+                        aria-label={`${day}${
+                          checked
+                            ? ", checked in"
+                            : studied
+                              ? ", studied"
+                              : ""
+                        }`}
+                        aria-current={day === today ? "date" : undefined}
+                      >
+                        <span className="lp-day-num">{i + 1}</span>
+                        {lit ? (
+                          <img
+                            className="lp-day-star"
+                            src="/images/icons/icon-star.svg"
+                            alt=""
+                            aria-hidden="true"
+                          />
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                {Array.from({ length: trailing }, (_, i) => (
+                  <span key={`trail${i}`} />
+                ))}
+              </div>
+                <div className="lp-legend">
+                  <span>Checked in</span>
+                  <span>Studied · not checked in</span>
+                </div>
+            </div>
+          </section>
+        </aside>
+
+        <section className="lp-courses">
+          <div className="lp-heading">
+            <div>
+              <p className="lp-kicker">YOUR LEARNING JOURNEY</p>
+              <h2>My courses</h2>
+            </div>
+          </div>
+          <div className="lp-courses-panel">
+            <DataTable
+              className="lp-courses-table"
+              rows={state.courses}
+              columns={courseColumns}
+              rowKey={(c) => c.id}
+              caption="Your courses with progress, chapter counts and status."
+              initialSort={{ columnId: "progress", direction: "desc" }}
+              emptyState={
+                <div className="lp-empty">
+                  <h3>
+                    {coursesLoading
+                      ? "Loading your courses…"
+                      : "No courses on your plan yet"}
+                  </h3>
+                  {!coursesLoading ? (
+                    <p>
+                      Add courses from Learning Resources, then return here to
+                      track progress.
+                    </p>
+                  ) : null}
+                </div>
+              }
+            />
+            <div className="lp-courses-footer">
+              <div className="lp-table-actions">
+                <span className="lp-table-actions__meta">
+                  {inProgress} of {state.courses.length} in progress
+                </span>
+                <div className="lp-table-actions__buttons">
+                  <button
+                    type="button"
+                    className="lp-mini lp-mini--blue"
+                    onClick={() => openRecord(dateKey())}
+                  >
+                    View today
+                  </button>
+                  <Link
+                    to={ROUTES.learningCentre}
+                    className="lp-mini lp-mini--gradient"
+                  >
+                    Add course
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <BotPet
+        storageKey="aiwrevolusi.botPetPosition.plan.v3"
+        defaultAnchorRef={calendarRef}
+        speech={
+          petSpeech ?? (briefLoading ? "Preparing your briefing…" : null)
+        }
+        tour={petTour}
+        onSpeechDismiss={dismissPet}
+        onPetTap={petTour ? undefined : nudgePet}
+      />
+
+      <Drawer
+        open={!!course}
+        onOpenChange={(v) => {
+          if (!v) setCourseId(null);
+        }}
+      >
+        <DrawerContent
+          className="lp-drawer"
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+          }}
+          onCloseAutoFocus={(e) => {
+            e.preventDefault();
+            detailOpener.current?.focus();
+          }}
+        >
+          {course && (
+            <>
+              <DrawerHeader>
+                <p className="lp-kicker">{course.provider}</p>
+                <DrawerTitle className="lp-drawer-title">
+                  {course.title}
+                </DrawerTitle>
+                <DrawerDescription>
+                  Chapter progress is a percentage and can only increase, so
+                  each field starts at the value you already saved.
+                </DrawerDescription>
+              </DrawerHeader>
+              <DrawerBody>
+                <ol className="lp-drawer-list">
+                  {course.chapters.map((ch, i) => {
+                    const savedComplete = ch.value === 10;
+                    const floorPercent = ch.value * 10;
+                    const chapterPercent = (draft[i] ?? ch.value) * 10;
+                    const complete = chapterPercent === 100;
+                    return (
+                      <li className="lp-drawer-chapter" key={ch.title}>
+                        <div className="lp-drawer-chapter__head">
+                          <span className="lp-drawer-chapter__name">
+                            {i + 1}. {ch.title}
+                          </span>
+                          <SoftPercentField
+                            min={floorPercent}
+                            max={100}
+                            step={10}
+                            readOnly={savedComplete}
+                            value={
+                              rawPercent[ch.title] ?? String(chapterPercent)
+                            }
+                            aria-label={`${ch.title} progress percentage`}
+                            onValueChange={(next) =>
+                              setRawPercent((prev) => ({
+                                ...prev,
+                                [ch.title]: next,
+                              }))
+                            }
+                            onCommit={(next) =>
+                              commitChapter(i, ch.title, next)
+                            }
+                          />
+                        </div>
+                        <div className="lp-drawer-chapter__bar">
+                          <GradientBar
+                            size="sm"
+                            value={chapterPercent}
+                            aria-label={`${ch.title} progress ${chapterPercent}%`}
+                          />
+                        </div>
+                        <div className="lp-drawer-chapter__foot">
+                          <span className="lp-drawer-chapter__hint">
+                            {savedComplete
+                              ? "Chapter complete"
+                              : complete
+                                ? "Will be saved as complete"
+                                : floorPercent > 0
+                                  ? `Saved ${floorPercent}% · can only increase`
+                                  : "Not started · any value up to 100%"}
+                          </span>
+                          {savedComplete ? (
+                            <span className="lp-drawer-chapter__done">
+                              Complete
+                            </span>
+                          ) : complete ? (
+                            <span className="lp-drawer-chapter__pending">
+                              Ready to save
+                            </span>
+                          ) : null}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </DrawerBody>
+              <div className="lp-drawer-foot">
+                <div className="lp-overall">
+                  <p className="lp-kicker">Overall progress</p>
+                  <strong>{draftPercent}%</strong>
+                  <span>
+                    {draftDone} of {course.chapters.length} chapters complete
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="lp-drawer-save"
+                  onClick={updateProgress}
+                >
+                  Save progress
+                </button>
+              </div>
+            </>
+          )}
+        </DrawerContent>
+      </Drawer>
+
+      <Dialog
+        open={!!recordDate}
+        onOpenChange={(v) => {
+          if (!v) setRecordDate(null);
+        }}
+      >
+        <DialogContent className="lp-modal lp-modal--day">
+          <DialogTitle>Day progress · {recordDate}</DialogTitle>
+          <DialogDescription>
+            {viewChecked
+              ? "Checked in for this day."
+              : viewStudied
+                ? "Chapter progress logged — check in when you are ready."
+                : "View-only snapshot of chapter progress saved on this day."}
+          </DialogDescription>
+          {viewEntries.length ? (
+            <div className="lp-day-view">
+              <p className="lp-day-view__summary">
+                {viewEntries.length} chapter
+                {viewEntries.length === 1 ? "" : "s"} logged
+                {viewApiDay?.chapters_touched
+                  ? ` · ${viewApiDay.chapters_touched} on server`
+                  : ""}
+              </p>
+              <ul className="lp-day-view__list">
+                {viewEntries.map((entry) => (
+                  <li
+                    key={`${entry.courseId}-${entry.chapterTitle}`}
+                    className="lp-day-view__item"
+                  >
+                    <div>
+                      <strong>{entry.chapterTitle}</strong>
+                      <small>{entry.courseTitle}</small>
+                    </div>
+                    <span>{entry.percent}%</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="lp-day-view__empty">
+              {viewStudied
+                ? "Progress is on the server for this day, but no local chapter list is stored yet."
+                : "No chapter progress was saved on this day yet. Open a course and use Save progress to log today."}
+            </p>
+          )}
+          <div className="lp-day-view__foot">
+            <button
+              type="button"
+              className="soft-btn-gray"
+              onClick={() => setRecordDate(null)}
+            >
+              Close
+            </button>
+            {recordDate === today &&
+            !viewChecked &&
+            hasAccountWorkspace() ? (
+              <button
+                type="button"
+                className="soft-btn-blue"
+                disabled={checkInBusy}
+                onClick={() => {
+                  void handleCheckIn();
+                }}
+              >
+                {checkInBusy ? "Checking in…" : "Check in today"}
+              </button>
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!removeId}
+        onOpenChange={(v) => {
+          if (!v) setRemoveId(null);
+        }}
+      >
+        <DialogContent className="lp-modal">
+          <DialogTitle>Remove this course from your plan?</DialogTitle>
+          <DialogDescription>
+            It will leave your learning list too. Daily notes on My Plan stay.
+          </DialogDescription>
+          <div className="lp-modal__actions">
+            <button
+              type="button"
+              className="soft-btn-gray"
+              onClick={() => setRemoveId(null)}
+            >
+              Keep course
+            </button>
+            <button
+              type="button"
+              className="soft-btn-blue"
+              onClick={() => {
+                if (!removeId) return;
+                save({
+                  ...state,
+                  courses: state.courses.filter((c) => c.id !== removeId),
+                });
+                try {
+                  const library = readLibrary();
+                  saveLibrary({
+                    ...library,
+                    saved: library.saved.filter((id) => id !== removeId),
+                  });
+                } catch {
+                  /* Plan removal still succeeds if the learning list cannot update. */
+                }
+                setRemoveId(null);
+                setNotice("Course removed from your plan.");
+                message.success("Course removed from your plan.");
+                sayPet("remove-item");
+              }}
+            >
+              Remove course
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

@@ -1,4 +1,3 @@
-import { courses } from "./catalogue";
 import { accountStorage } from "@/services/accountStorage";
 import type { LearningCentreItem } from "@/pages/Skills/skillDirections";
 
@@ -96,23 +95,9 @@ export function matches(resource: Resource, theme: LearningCentreItem) {
       : text.includes(tag),
   );
 }
-// Keep the existing planner resource contract and previously saved resource IDs.
-resources.push(
-  ...courses.map((course) => ({
-    id: `epic5-${course.id}`,
-    title: course.title,
-    provider: course.provider,
-    url: course.url,
-    summary: course.intro,
-    minutes: course.durationMin ?? undefined,
-    format: "Course" as const,
-    tags: course.skills,
-    access:
-      course.register === "required"
-        ? "Free registration required"
-        : "No registration required",
-  })),
-);
+// Courses used to be appended here from a bundled sample catalogue under the
+// planner's `epic5-*` id contract. The live catalogue is served by the backend
+// now, so those ids no longer exist and the injection is gone.
 export type Selection = {
   resourceId: string;
   themeTitle: string;

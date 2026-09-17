@@ -85,8 +85,8 @@ const request = async <T>(
 };
 
 export const api = {
-  get: <T>(path: string, signal?: AbortSignal) =>
-    request<T>(path, { method: "GET", signal }),
+  get: <T>(path: string, signal?: AbortSignal, timeoutMs?: number) =>
+    request<T>(path, { method: "GET", signal }, timeoutMs),
   post: <T, TBody = unknown>(
     path: string,
     payload?: TBody,
@@ -102,6 +102,11 @@ export const api = {
       },
       timeoutMs,
     ),
+  put: <T, TBody = unknown>(path: string, payload?: TBody) =>
+    request<T>(path, {
+      method: "PUT",
+      body: payload ? JSON.stringify(payload) : undefined,
+    }),
   patch: <T, TBody = unknown>(path: string, payload?: TBody) =>
     request<T>(path, {
       method: "PATCH",

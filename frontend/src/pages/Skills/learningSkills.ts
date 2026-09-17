@@ -2,7 +2,7 @@ import { accountStorage } from "@/services/accountStorage";
 export type LearningSkill = {
   id: string;
   name: string;
-  source?: "work" | "wef" | "custom";
+  source?: "work" | "wef" | "custom" | "other-role";
 };
 export const skillKey = (name: string) =>
   name
@@ -70,41 +70,19 @@ export function saveLearningSkills(skills: LearningSkill[]) {
     accountStorage.removeItem("aiwrevolusi.learningResourceSelections.v1");
   }
 }
-// Editorial course associations based on catalogue topics; these are not WEF recommendations.
-const courseLinks: Record<string, string[]> = {
-  "ai-and-big-data": ["c2", "c4", "c12", "c13", "c14"],
-  "technological-literacy": ["c5", "c6", "c11"],
-  "creative-thinking": ["c8"],
-  "curiosity-and-lifelong-learning": ["c8"],
-  "analytical-thinking": ["c2", "c3", "c4", "c6", "c7", "c8", "c14"],
-  "empathy-and-active-listening": ["c9"],
-  "leadership-and-social-influence": ["c9", "c15"],
-  "reading-writing-and-mathematics": ["c7", "c10"],
-  "resource-management-and-operations": ["c15"],
-  "service-orientation-and-customer-service": ["c9"],
-  programming: ["c1", "c13"],
-};
-export const coursesForSkill = (id: string) => courseLinks[id] ?? [];
-
-/** WEF skill ids linked to a catalogue course (editorial map; not WEF recommendations). */
-export function skillIdsForCourse(courseId: string): string[] {
-  return Object.entries(courseLinks)
-    .filter(([, courseIds]) => courseIds.includes(courseId))
-    .map(([skillId]) => skillId);
-}
-
 export function reconcileLearningSkills(
   saved: LearningSkill[] | null,
   work: LearningSkill[],
 ): LearningSkill[] {
-  if (!saved) return work;
-  const current = new Set(work.map((skill) => skill.id));
-  return saved.filter(
-    (skill) =>
-      current.has(skill.id) ||
-      skill.source === "custom" ||
-      skill.source === "wef",
-  );
+  // Work evidence is the default list, including skills without course mappings.
+  // Keep manually added skills, but use the current work source for overlaps.
+  const merged = new Map(work.map(skill => [skill.id, skill]));
+  for (const skill of saved ?? []) {
+    if (!merged.has(skill.id) && (skill.source === "custom" || skill.source === "wef" || skill.source === "other-role")) {
+      merged.set(skill.id, skill);
+    }
+  }
+  return [...merged.values()];
 }
 
 /** Convert a skill name into a LearningSkill for storage. */
@@ -127,7 +105,9 @@ export function ensureLearningSkills(work: LearningSkill[]): LearningSkill[] {
     saved = null;
   }
   if (saved && saved.length > 0) {
-    return reconcileLearningSkills(saved, work);
+    const next = reconcileLearningSkills(saved, work);
+    if (JSON.stringify(next) !== JSON.stringify(saved)) saveLearningSkills(next);
+    return next;
   }
   if (work.length > 0) {
     saveLearningSkills(work);

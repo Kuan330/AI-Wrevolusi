@@ -7,6 +7,7 @@ from app.models.preparation import Preparation
 from app.models.refresh_token import RefreshToken
 from app.models.schedule import Schedule
 from app.models.task import Task
+from app.models.task_assist import TaskAssistInteraction
 from app.models.user import User
 
 __all__ = [
@@ -23,4 +24,5 @@ __all__ = [
     'LearningProgress',
     'LearningCheckin',
     'DailyBrief',
+    'TaskAssistInteraction',
 ]

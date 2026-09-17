@@ -5,7 +5,6 @@ import { FormSelect } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
 import type { Course, CourseFilters as Filters } from "../types";
 import {
-  COURSE_LEVELS,
   COURSE_LEVEL_TONE,
   courseLevelLabel,
   isCourseLevel,
@@ -34,18 +33,13 @@ export default function CourseFilters(props: CourseFiltersProps) {
     {
       key: "level",
       label: "Level",
-      options: [...COURSE_LEVELS],
+      options: ["beginner", "intermediate", "advanced"],
     },
-    ...(["provider", "format", "language"] as const).map((key) => ({
+    ...(["provider", "format"] as const).map((key) => ({
       key,
       label: key[0].toUpperCase() + key.slice(1),
       options: [...new Set(courses.map((course) => course[key]))],
     })),
-    {
-      key: "registration",
-      label: "Registration",
-      options: ["required", "not-required"],
-    },
   ] as const;
   const active = groups.filter((group) => value[group.key]);
   const extraCount = active.filter((group) => group.key !== "level").length;
@@ -74,7 +68,7 @@ export default function CourseFilters(props: CourseFiltersProps) {
           label: "All levels",
           className: "library-level-option library-level-option--all",
         },
-        ...COURSE_LEVELS.map((level) => ({
+        ...(["beginner", "intermediate", "advanced"] as const).map((level) => ({
           value: level,
           label: courseLevelLabel(level),
           className: `library-level-option ${COURSE_LEVEL_TONE[level].className}`,
@@ -95,6 +89,7 @@ export default function CourseFilters(props: CourseFiltersProps) {
         <div className="library-level">{levelSelect}</div>
         <Button
           variant="outline"
+          className="library-more-filters"
           aria-expanded={expanded}
           aria-controls={panelId}
           onClick={() => setExpanded(!expanded)}

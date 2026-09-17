@@ -388,6 +388,12 @@
   box-shadow: 0 0 0 2px rgba(232, 160, 176, 0.18);
 }
 
+.exposure-skill-cloud__legend-dot.is-learning {
+  background: linear-gradient(180deg, #eaf3fb 0%, #d6eaf7 100%);
+  border: 1px solid rgba(79, 145, 186, 0.45);
+  box-shadow: 0 0 0 2px rgba(79, 145, 186, 0.12);
+}
+
 .exposure-skill-cloud__legend-dot.is-other {
   border: 1px solid #d6e4f0;
   background: rgba(255, 255, 255, 0.8);
@@ -530,6 +536,30 @@
   box-shadow:
     0 5px 14px rgba(79, 145, 186, 0.14),
     0 0 18px rgba(199, 160, 200, 0.11);
+}
+
+/* In Learning Resources but not reflected in current tasks — to learn. */
+.exposure-skill-cloud__skill.is-learning {
+  z-index: 1;
+  min-height: 2.15rem;
+  border-color: rgba(79, 145, 186, 0.42);
+  background: linear-gradient(180deg, #f4f9fd 0%, #eaf3fb 100%);
+  color: #35617c;
+  cursor: default;
+  padding: 0.48rem 0.9rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  opacity: 1;
+  box-shadow:
+    0 4px 12px rgba(79, 145, 186, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.exposure-skill-cloud__skill.is-learning:hover {
+  z-index: 2;
+  border-color: rgba(79, 145, 186, 0.55);
+  background: linear-gradient(180deg, #eaf3fb 0%, #dceef9 100%);
+  box-shadow: 0 6px 14px rgba(79, 145, 186, 0.18);
 }
 
 .exposure-skill-cloud__skill.is-matched:hover,

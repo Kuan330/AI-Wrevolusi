@@ -99,6 +99,83 @@ async def catalogue_for_bot(db: AsyncSession = Depends(get_db)) -> list[dict]:
     return build_bot_catalogue(result.mappings().all())
 
 
+@router.get('/courses')
+async def list_catalogue_courses(
+    skill: str | None = Query(default=None, max_length=80),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Verified catalogue for the Learning Resources page.
+
+    ``skill`` accepts either a skill name ("AI and big data") or its stable
+    slug ("ai-and-big-data"). Courses for that skill are returned easiest
+    first (Beginner -> Intermediate -> Advanced, then course_no). An unknown
+    skill returns ``found: false`` with an empty course list so the page can
+    show its "no courses for this skill" state instead of guessing.
+    """
+
+    skill_rows = (
+        await db.execute(
+            text('SELECT wef_skill_id, core_skill FROM ref_wef_skills')
+        )
+    ).mappings().all()
+
+    requested_slug = catalogue_service.skill_slug(skill) if skill else None
+    resolved_id = None
+    resolved_name = None
+    if skill:
+        for row in skill_rows:
+            name = str(row.get('core_skill') or '')
+            if catalogue_service.skill_slug(name) == requested_slug:
+                resolved_id = int(row.get('wef_skill_id'))
+                resolved_name = name
+                break
+    found = not skill or resolved_id is not None
+
+    if skill is None:
+        where_clause = ''
+        params = {}
+    elif found:
+        where_clause = 'WHERE c.skill_id = :skill_id'
+        params = {'skill_id': resolved_id}
+    else:
+        where_clause = 'WHERE FALSE'
+        params = {}
+    course_sql = (
+        'SELECT s.wef_skill_id, s.core_skill, c.course_code, c.title, '
+        'c.provider, c.url, c.level, c.course_no, c.language, c.format, '
+        'c.self_paced, c.duration_min, c.register, c.course_description, '
+        'c.outcomes, c.prereq, c.advice, COUNT(ch.id) AS chapter_count '
+        'FROM catalogue_courses AS c '
+        'JOIN ref_wef_skills AS s ON s.wef_skill_id = c.skill_id '
+        'LEFT JOIN catalogue_chapters AS ch ON ch.course_id = c.id '
+        f'{where_clause} '
+        'GROUP BY s.wef_skill_id, s.core_skill, c.id'
+    )
+    course_rows = (
+        await db.execute(text(course_sql), params)
+    ).mappings().all()
+
+    chapter_sql = (
+        'SELECT c.course_code, ch.chapter_order, ch.title, ch.duration_min '
+        'FROM catalogue_courses AS c '
+        'JOIN catalogue_chapters AS ch ON ch.course_id = c.id '
+        f'{where_clause} '
+        'ORDER BY c.course_code, ch.chapter_order'
+    )
+    chapter_rows = (
+        await db.execute(text(chapter_sql), params)
+    ).mappings().all()
+
+    return {
+        'skill_id': requested_slug,
+        'skill_name': resolved_name,
+        'found': found,
+        'courses': catalogue_service.build_page_catalogue(
+            course_rows, chapter_rows
+        ),
+    }
+
+
 @router.post('/progress', response_model=ProgressUpdateResponse)
 async def update_progress(
     payload: ProgressUpdateRequest,

@@ -1,4 +1,4 @@
-import { Bookmark, ArrowRight } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { durationLabel } from "../lib/coursePlanning";
@@ -33,7 +33,7 @@ export default function CourseCard(props: CourseCardProps) {
           onClick={onSave}
         >
           <Bookmark size={16} fill={saved ? "currentColor" : "none"} />{" "}
-          {saved ? "Added" : "Add to learning"}
+          {saved ? "Added" : "Add to My Plan"}
         </Button>
       </div>
       <h3>{course.title}</h3>
@@ -45,7 +45,6 @@ export default function CourseCard(props: CourseCardProps) {
         <span>{course.language}</span>
         <span>{course.selfPaced ? "Self-paced" : "Scheduled course"}</span>
       </div>
-      <p className="learning-course-summary">{course.intro}</p>
       <div className="library-row">
         <small className="library-muted">
           {course.register === "required"
@@ -54,7 +53,6 @@ export default function CourseCard(props: CourseCardProps) {
         </small>
         <Button variant="link" onClick={onDetails}>
           View details
-          <ArrowRight size={16} />
         </Button>
       </div>
     </Card>
