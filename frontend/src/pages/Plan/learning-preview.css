@@ -360,15 +360,16 @@ main:has(> .lp-page){
 .lp-day-view{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:12px;
   flex:1 1 auto;
   min-height:0;
-  margin:8px 0 0;
+  margin:0;
 }
 .lp-day-view__summary{
   flex-shrink:0;
   margin:0;
   font-size:12.5px;
+  line-height:1.5;
   color:#8c7e90;
 }
 .lp-day-view__list{
@@ -376,7 +377,7 @@ main:has(> .lp-page){
   margin:0;
   padding:0 2px 4px 0;
   display:grid;
-  gap:8px;
+  gap:10px;
   flex:1 1 auto;
   min-height:0;
   max-height:min(18rem,42vh);
@@ -390,21 +391,29 @@ main:has(> .lp-page){
   align-items:center;
   justify-content:space-between;
   gap:12px;
-  padding:10px 12px;
+  padding:12px 14px;
   border-radius:12px;
   background:#fff;
   border:1px solid #efe6ec;
 }
-.lp-day-view__item strong{display:block;font-size:13px;color:#2f2430}
-.lp-day-view__item small{display:block;margin-top:2px;font-size:11px;color:#8c7e90}
+.lp-day-view__item strong{display:block;font-size:13px;line-height:1.4;color:#2f2430}
+.lp-day-view__item small{display:block;margin-top:5px;font-size:11px;line-height:1.4;color:#8c7e90}
 .lp-day-view__item>span{font-size:14px;font-weight:600;color:#4f7894;flex-shrink:0}
-.lp-day-view__empty{margin:8px 0 0;font-size:13px;line-height:1.55;color:#8c7e90;flex:1}
+.lp-day-view__empty{
+  margin:0;
+  font-size:13px;
+  line-height:1.65;
+  color:#8c7e90;
+  flex:1;
+}
 .lp-day-view__foot{
   flex-shrink:0;
   display:flex;
+  flex-wrap:wrap;
   justify-content:flex-end;
-  margin-top:12px;
-  padding-top:12px;
+  gap:0.55rem;
+  margin-top:4px;
+  padding-top:14px;
   border-top:1px solid #efe9f0;
 }
 
@@ -418,9 +427,19 @@ button.lp-status{cursor:pointer;border:0}
   flex-direction:column!important;
   max-height:min(28rem,78vh)!important;
   overflow:hidden!important;
-  gap:0!important;
+  gap:0.85rem!important;
 }
 .lp-modal--day > button[class*="absolute"]{z-index:2}
+/* Title uses leading-none by default — open it up for this dialog */
+.lp-modal--day > h2{
+  margin:0;
+  line-height:1.4!important;
+  padding-right:1.75rem;
+}
+.lp-modal--day > p{
+  margin:0;
+  line-height:1.55;
+}
 .lp-modal label{display:block;font-size:13px;margin:18px 0}
 .lp-modal input:not([type=range]),.lp-modal textarea{display:block;width:100%;border:1px solid #dfd6e5;border-radius:9px;background:white;padding:10px;margin-top:8px}
 .lp-modal__actions{
@@ -432,6 +451,7 @@ button.lp-status{cursor:pointer;border:0}
 }
 .lp-modal__actions .soft-btn-gray,
 .lp-modal__actions .soft-btn-blue,
+.lp-day-view__foot .soft-btn-gray,
 .lp-day-view__foot .soft-btn-blue{
   min-height:2.4rem;
   padding:0.55rem 1.15rem;

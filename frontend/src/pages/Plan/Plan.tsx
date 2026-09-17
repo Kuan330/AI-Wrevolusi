@@ -515,6 +515,13 @@ export default function Plan() {
     if (changed) {
       message.success("Chapter progress saved.");
       sayPet("save-progress");
+      // Prompt check-in separately — save only marks studied.
+      const alreadyChecked =
+        Boolean(previous.checked) ||
+        Boolean(calendarDays[day]?.checked_in);
+      if (!alreadyChecked) {
+        window.setTimeout(() => setRecordDate(day), 0);
+      }
     } else {
       message.info("No changes to save.");
     }
@@ -1028,6 +1035,13 @@ export default function Plan() {
             </p>
           )}
           <div className="lp-day-view__foot">
+            <button
+              type="button"
+              className="soft-btn-gray"
+              onClick={() => setRecordDate(null)}
+            >
+              Close
+            </button>
             {recordDate === today &&
             !viewChecked &&
             hasAccountWorkspace() ? (
@@ -1042,13 +1056,6 @@ export default function Plan() {
                 {checkInBusy ? "Checking in…" : "Check in today"}
               </button>
             ) : null}
-            <button
-              type="button"
-              className="soft-btn-blue"
-              onClick={() => setRecordDate(null)}
-            >
-              Close
-            </button>
           </div>
         </DialogContent>
       </Dialog>
