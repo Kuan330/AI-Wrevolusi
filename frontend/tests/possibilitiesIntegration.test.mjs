@@ -42,19 +42,35 @@ test('loading waits for workspace save before GET and publishes the real respons
   assert.deepEqual(events, ['save', 'get', 'publish']);
 });
 
-test('save and GET failures are delivered intact, and failed saves never GET', async () => {
-  for (const stage of ['save', 'get']) {
-    const failure = new Error(`${stage} failed`);
-    const events = [];
-    await model.loadSavedPossibilities({
-      signal: new AbortController().signal,
-      flush: async () => { events.push('save'); if (stage === 'save') throw failure; },
-      get: async () => { events.push('get'); throw failure; },
-      onSuccess: () => assert.fail('must not publish data'),
-      onError: error => { assert.equal(error, failure); events.push('error'); },
-    });
-    assert.deepEqual(events, stage === 'save' ? ['save', 'error'] : ['save', 'get', 'error']);
-  }
+test('a save conflict does not block loading the saved Possibilities response', async () => {
+  const saveFailure = new Error('Your account changed in another session.');
+  const result = { status: 'ready' };
+  const events = [];
+
+  await model.loadSavedPossibilities({
+    signal: new AbortController().signal,
+    flush: async () => { events.push('save'); throw saveFailure; },
+    get: async () => { events.push('get'); return result; },
+    onSuccess: value => { assert.equal(value, result); events.push('publish'); },
+    onError: () => assert.fail('the read should remain available'),
+  });
+
+  assert.deepEqual(events, ['save', 'get', 'publish']);
+});
+
+test('a failed Possibilities GET is still delivered intact', async () => {
+  const failure = new Error('get failed');
+  const events = [];
+
+  await model.loadSavedPossibilities({
+    signal: new AbortController().signal,
+    flush: async () => { events.push('save'); },
+    get: async () => { events.push('get'); throw failure; },
+    onSuccess: () => assert.fail('must not publish data'),
+    onError: error => { assert.equal(error, failure); events.push('error'); },
+  });
+
+  assert.deepEqual(events, ['save', 'get', 'error']);
 });
 
 test('cancellation prevents requests and ignores late save or GET outcomes', async () => {

@@ -31,16 +31,19 @@ export async function loadSavedPossibilities(options: {
   onError: (error: unknown) => void;
 }): Promise<void> {
   if (options.signal.aborted) return;
-  let response: PossibilitiesResponse;
   try {
     await options.flush();
-    if (options.signal.aborted) return;
-    response = await options.get(options.signal);
+  } catch {
+    // AccountProvider owns workspace-sync recovery. A stale local revision must
+    // not block this read-only page from showing the last saved server data.
+  }
+  if (options.signal.aborted) return;
+  try {
+    const response = await options.get(options.signal);
+    if (!options.signal.aborted) options.onSuccess(response);
   } catch (error) {
     if (!options.signal.aborted) options.onError(error);
-    return;
   }
-  if (!options.signal.aborted) options.onSuccess(response);
 }
 
 export type PossibilitiesViewState = "loading" | "error" | "needs-profile" | "unavailable" | "ready";

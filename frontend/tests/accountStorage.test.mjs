@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { accountStorage, activateWorkspace, flushWorkspace } from '../src/services/accountStorage.ts';
 const memory = new Map();
 globalThis.localStorage = { getItem: key => memory.get(key) ?? null, setItem: (key, value) => memory.set(key, value), removeItem: key => memory.delete(key) };
 globalThis.window = new EventTarget();
-const key = 'aiwrevolusi.possibilities.intent';
+const key = 'aiwrevolusi.possibilities.chosenDirection';
 
 test('account workspaces isolate guest data and save only under the expected owner', async () => {
   activateWorkspace(null);
@@ -31,4 +32,13 @@ test('a rejected sync retains local changes rather than silently replacing serve
   assert.equal(accountStorage.getItem(key), '"new"');
   assert.equal(JSON.parse(memory.get('aiwrevolusi.account.conflict')).dirty, true);
   activateWorkspace(null);
+});
+
+test('account conflict banner offers backup and reload instead of futile retry', () => {
+  const provider = readFileSync(
+    new URL('../src/components/account/AccountProvider.tsx', import.meta.url),
+    'utf8',
+  );
+  assert.doesNotMatch(provider, /Retry saving/);
+  assert.match(provider, /Download local backup and reload saved account/);
 });

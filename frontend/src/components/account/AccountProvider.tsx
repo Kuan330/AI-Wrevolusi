@@ -138,14 +138,6 @@ export function AccountProvider(props: { children: ReactNode }) {
           <Button
             {...({
               variant: "link",
-              onClick: () => void flushWorkspace().catch(() => {}),
-            } satisfies Partial<ComponentProps<typeof Button>>)}
-          >
-            Retry saving
-          </Button>
-          <Button
-            {...({
-              variant: "link",
               onClick: () => {
                 const key = `aiwrevolusi.account.${user.id}`;
                 const copy = localStorage.getItem(key);
@@ -166,7 +158,7 @@ export function AccountProvider(props: { children: ReactNode }) {
               },
             } satisfies Partial<ComponentProps<typeof Button>>)}
           >
-            Export local changes and reload saved account
+            Download local backup and reload saved account
           </Button>
         </div>
       )}
