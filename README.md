@@ -14,6 +14,7 @@ AI-Wrevolusi monorepo for FIT5120, including:
 - [Vercel deployment](docs/deployment.md)
 - [Reference-data management](docs/iteration1_data_management.md)
 - [Frontend architecture](frontend/ARCHITECTURE.md)
+- [Iteration 2 architecture report and diagrams](docs/reports/iteration-2-architecture/README.md)
 
 ## Python dependency management
 

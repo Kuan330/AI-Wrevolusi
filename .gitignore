@@ -20,3 +20,12 @@ frontend/dist/
 # Local AI-tool memory
 .workbuddy/
 .hermes/
+
+# Local architecture report generation sources and intermediate exports
+/.local/architecture-report/
+
+# Duplicate report exports and working source files stay local
+/docs/reports/iteration-2-architecture/source/
+/docs/reports/iteration-2-architecture/figures/*.html
+/docs/reports/iteration-2-architecture/figures/*.svg
+/docs/reports/iteration-2-architecture/figures/ERD-*.png

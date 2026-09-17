@@ -10,8 +10,10 @@ change is part of this work.
 - Alembic starts at `0001_learning_tables`, then `0002_catalogue_tables`, then
   `0003_task_assist_once`. The first revision references `app_users` but does not
   create it. These revision identities must remain stable for installed systems.
-- `AUTO_CREATE_TABLES` calls metadata `create_all`. It creates missing tables,
-  does not upgrade existing columns, and does not record migration history.
+- `AUTO_CREATE_TABLES` calls metadata `create_all`. It does not upgrade existing
+  columns or record migration history. Current metadata cannot resolve the
+  catalogue foreign key to the SQL-owned `ref_wef_skills` table, so this path
+  cannot serve as a complete bootstrap.
 - `db/schema.sql` creates reference tables and older business tables such as
   `users` and `work_profiles`; it is not the current application baseline.
 

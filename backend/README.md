@@ -38,9 +38,10 @@ database. Do not generate a personal `init` revision to work around this.
 
 Alembic reads `DATABASE_URL` from `.env`. For an existing database, check its
 schema and recorded revision before planning an upgrade. Startup
-`AUTO_CREATE_TABLES` is disabled by default; it creates missing ORM tables but
-does not migrate columns or record Alembic revisions. Do not combine it with
-migration-managed databases.
+`AUTO_CREATE_TABLES` runs ORM metadata creation. It does not migrate columns or
+record Alembic revisions. The current metadata also lacks the SQL-owned
+`ref_wef_skills` target required by the catalogue foreign key, so it is not a
+complete bootstrap path. Do not combine it with migration-managed databases.
 
 The [database baseline proposal](../docs/database-baseline-proposal.md) describes
 the checks needed before implementing a supported fresh-install and upgrade

@@ -36,8 +36,11 @@ Generate a local JWT secret with:
 openssl rand -hex 32
 ```
 
-Do not commit `.env`. The example enables `AUTO_CREATE_TABLES=true` for local
-development. Deployed environments must set it to `false`.
+Do not commit `.env`. The example enables `AUTO_CREATE_TABLES=true`, but the
+current schema bootstrap is incomplete. For an already prepared development
+database, set it to `false`. Starting the app is not a supported way to create a
+fresh database. Read the [database baseline proposal](database-baseline-proposal.md)
+first. Deployed environments must also set this flag to `false`.
 
 Install the frontend packages in another terminal:
 

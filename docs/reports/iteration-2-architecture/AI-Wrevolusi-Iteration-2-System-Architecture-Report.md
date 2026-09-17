@@ -82,7 +82,7 @@ The new SQL statements and response contracts have offline tests. Real PostgreSQ
 
 # 5. Current data model overview
 
-![Figure 2. Main current relationships. This overview is supported by the full ERD.PNG and the detail diagrams in the appendices. Solid lines show declared foreign keys. Dotted links show application-level associations. Workspace payloads are JSON values rather than separate relational tables. [S7]](figures/ERD-Overview.png)
+[View this diagram in the PDF report, page 6](AI-Wrevolusi-Iteration-2-System-Architecture-Report.pdf#page=6)
 
 Figure 2. Main current relationships. This overview is supported by the full ERD.PNG and the detail diagrams in the appendices. Solid lines show declared foreign keys. Dotted links show application-level associations. Workspace payloads are JSON values rather than separate relational tables. [S7]
 
@@ -195,17 +195,17 @@ The nine baseline backend failures cover AI output limits, fallback/evidence exp
 
 # References and evidence
 
-Repository references use the current code baseline aa4f8fb unless an earlier ref is shown. The source folder beside this report includes the detailed history evidence, schema inventory and a rebuild script.
+Repository references use the current code baseline aa4f8fb unless an earlier ref is shown. The report text and full data dictionary are included beside the Word and PDF copies. Earlier code can be checked using the Git references listed below.
 
 | ID | Source | Use in this report |
 | --- | --- | --- |
-| S1 | Git history<br>ff57c98, 3801a0a, 2499736, 0e70bac, 8c27a04, 818cfae, aa4f8fb | Dates, release snapshots and frontend ownership changes. See source/history-evidence.md for exact files and lines. |
+| S1 | Git history<br>ff57c98, 3801a0a, 2499736, 0e70bac, 8c27a04, 818cfae, aa4f8fb | Dates, release snapshots and frontend ownership changes. The named Git references preserve the earlier source versions. |
 | S2 | docs/iteration1_erd.md<br>db/schema.sql | Original E1-E4 design, reference data and older business schema. |
 | S3 | vercel.json<br>backend/main.py<br>docs/deployment.md | Service routing, entrypoint and environment boundary. |
 | S4 | frontend/ARCHITECTURE.md<br>frontend/src/features/<br>frontend/scripts/ | Shared domain ownership, profile preservation and boundary checks. |
 | S5 | frontend/src/services/accountStorage.ts<br>backend/app/routers/accounts.py | Account workspace, revisions, session checks and saves. |
 | S6 | backend/app/services/learning_records.py<br>backend/app/services/tasks.py<br>backend/app/services/workspace.py | Atomic writes, commit ownership and shortlist validation. |
-| S7 | backend/app/models/<br>backend/alembic/versions/<br>source/schema-evidence.json | Current tables, constraints, logical links and migration limits. |
+| S7 | backend/app/models/<br>backend/alembic/versions/<br>Data-Dictionary.md | Current tables, constraints, logical links and migration limits. |
 | S8 | backend/pyproject.toml and uv.lock<br>frontend/package.json<br>dev and scripts/dev.py | Dependency management and local startup. |
 | S9 | backend/app/core/config.py<br>backend/app/services/ai_gateway.py<br>backend/app/services/skill_directions.py | Configured providers, fallback and separate skill-direction path. |
 | S10 | docs/architecture-validation.md<br>docs/database-baseline-proposal.md | Checks run before commit aa4f8fb, known failures and pending database work. |
@@ -214,24 +214,24 @@ Reference examples: TM04-FutureStack, ParkiCare Iteration 2 System Architecture 
 
 # Appendix A. Identity and learning records
 
-![Identity, saved account workspace and learning activity. The diagram shows the declared keys and constraints. Workspace JSON contains frontend journey records, while learning activity also has separate relational tables. [S7]](figures/ERD-Identity-Learning.png)
+[View this diagram in the PDF report, page 13](AI-Wrevolusi-Iteration-2-System-Architecture-Report.pdf#page=13)
 
 Identity, saved account workspace and learning activity. The diagram shows the declared keys and constraints. Workspace JSON contains frontend journey records, while learning activity also has separate relational tables. [S7]
 
 # Appendix B. Work and planning models
 
-![Current backend work and planning model definitions. A model or registered API does not by itself prove that every current page uses it. The task-capability association is shown as a defined model whose explicit runtime write path was not found. [S7]](figures/ERD-Work-Planning.png)
+[View this diagram in the PDF report, page 14](AI-Wrevolusi-Iteration-2-System-Architecture-Report.pdf#page=14)
 
 Current backend work and planning model definitions. A model or registered API does not by itself prove that every current page uses it. The task-capability association is shown as a defined model whose explicit runtime write path was not found. [S7]
 
 # Appendix C. Reference data and catalogue
 
-![Current reference and catalogue model. Code and chapter-index associations are distinct from declared foreign keys. Source data preparation and import take place outside normal browser requests. [S7]](figures/ERD-Reference-Catalogue.png)
+[View this diagram in the PDF report, page 15](AI-Wrevolusi-Iteration-2-System-Architecture-Report.pdf#page=15)
 
 Current reference and catalogue model. Code and chapter-index associations are distinct from declared foreign keys. Source data preparation and import take place outside normal browser requests. [S7]
 
 # Appendix D. Separate legacy business schema
 
-![Older business tables retained in db/schema.sql. They are separate from the current account workspace model. Their presence in the SQL file does not prove current backend use or live database contents. They are included for historical comparison, not as a proposed migration. [S2, S7]](figures/ERD-Legacy.png)
+[View this diagram in the PDF report, page 16](AI-Wrevolusi-Iteration-2-System-Architecture-Report.pdf#page=16)
 
 Older business tables retained in db/schema.sql. They are separate from the current account workspace model. Their presence in the SQL file does not prove current backend use or live database contents. They are included for historical comparison, not as a proposed migration. [S2, S7]
