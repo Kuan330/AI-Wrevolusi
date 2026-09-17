@@ -48,6 +48,7 @@ function JourneyCompanion({
   progress,
   skills,
   shortlist,
+  onToggleSkill,
   onExplore,
 }: {
   currentTitle: string;
@@ -55,9 +56,9 @@ function JourneyCompanion({
   progress: number;
   skills: PossibilitySkill[];
   shortlist: number[];
+  onToggleSkill: (id: number) => void;
   onExplore: () => void;
 }) {
-  const previewSkills = skills.slice(0, 4);
   return (
     <aside className="px-companion">
       <p className="px-eyebrow">Journey Companion</p>
@@ -78,20 +79,29 @@ function JourneyCompanion({
             <span>{targetTitle}</span>
           </p>
           <ProgressBar value={progress} label="Path progress" />
-          {previewSkills.length > 0 && (
+          {skills.length > 0 && (
             <div className="px-companion-skills">
               <h3>Skills on this path</h3>
               <div className="px-chips">
-                {previewSkills.map(skill => {
+                {skills.map(skill => {
                   const planned = shortlist.includes(skill.skill_id);
                   const state = planned ? "planned" : skill.state;
                   return (
-                    <span className={`px-chip ${state}`} key={skill.skill_id}>
+                    <button
+                      className={`px-chip ${state}`}
+                      key={skill.skill_id}
+                      type="button"
+                      onClick={() => onToggleSkill(skill.skill_id)}
+                    >
                       {skill.name}
-                      {state === "have" || state === "learning" ? (
+                      {planned ? (
+                        <X size={13} aria-hidden />
+                      ) : skill.state === "missing" ? (
+                        <Plus size={13} aria-hidden />
+                      ) : (
                         <Check size={13} aria-hidden />
-                      ) : null}
-                    </span>
+                      )}
+                    </button>
                   );
                 })}
               </div>
@@ -221,7 +231,6 @@ export default function Possibilities() {
       : selected.occupation_code === data.chosenDirectionCode && data.chosenDirectionCoverage !== null
         ? Math.round(data.chosenDirectionCoverage)
         : selected.coverage_pct ?? 0;
-  const skillName = (id: number) => data.skills.find(skill => skill.skill_id === id)?.name ?? String(id);
   const goLearning = () => {
     if (!selected) return;
     navigate(`/learning-centre?q=${encodeURIComponent(selected.title)}`);
@@ -237,7 +246,7 @@ export default function Possibilities() {
         <div className="px-main-col">
           <section className="px-current">
             <div className="px-current-intro">
-              <p className="px-eyebrow">01 · YOUR STARTING POINT</p>
+              <p className="px-eyebrow">YOUR STARTING POINT</p>
               <h2>{currentTitle}</h2>
               <p>These connections come from your confirmed Work Profile.</p>
               <Link to={profilePath}>
@@ -260,7 +269,7 @@ export default function Possibilities() {
           </section>
 
           <section className="px-options">
-            <p className="px-eyebrow">02 · EXPLORE OTHER DIRECTIONS</p>
+            <p className="px-eyebrow">EXPLORE OTHER DIRECTIONS</p>
             <h2>Where could you go next?</h2>
             <div className="px-direction-grid">
               {data.directions.slice(0, 3).map((direction, index) => {
@@ -299,43 +308,6 @@ export default function Possibilities() {
               })}
             </div>
           </section>
-
-          {selected && (
-            <section className="px-journey">
-              <p className="px-eyebrow">03 · MY CHOSEN DIRECTION</p>
-              <h2>Your path to {selected.title}</h2>
-              <p>{selected.description}</p>
-              <h3>Skills to explore next</h3>
-              <div className="px-chips">
-                {selected.skills.map(skill => {
-                  const added = shortlist.includes(skill.skill_id);
-                  return (
-                    <button
-                      className={`px-chip ${added ? "planned" : skill.state}`}
-                      key={skill.skill_id}
-                      type="button"
-                      onClick={() => toggle(skill.skill_id)}
-                    >
-                      {skillName(skill.skill_id)}
-                      {added ? (
-                        <X size={13} aria-hidden />
-                      ) : skill.state === "missing" ? (
-                        <Plus size={13} aria-hidden />
-                      ) : (
-                        <Check size={13} aria-hidden />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="px-next-step">
-                <p>Browse verified courses for these skills in Learning Resources.</p>
-                <button className="px-primary" type="button" onClick={goLearning}>
-                  Explore learning resources <ArrowRight size={16} />
-                </button>
-              </div>
-            </section>
-          )}
         </div>
 
         <JourneyCompanion
@@ -344,6 +316,7 @@ export default function Possibilities() {
           progress={pathProgress}
           skills={selected?.skills ?? []}
           shortlist={shortlist}
+          onToggleSkill={toggle}
           onExplore={goLearning}
         />
       </div>
