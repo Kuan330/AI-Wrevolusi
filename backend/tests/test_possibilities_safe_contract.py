@@ -147,6 +147,23 @@ def test_chosen_direction_score_counts_owned_and_shortlisted_once() -> None:
     assert chosen_direction_score({1, 2}, {2, 3}, {1, 2, 3, 4}) == 62.5
 
 
+def test_direction_payload_maps_database_industry_to_schema_area() -> None:
+    from app.routers.possibilities import build_direction_payload
+
+    payload = build_direction_payload(
+        {'occupation_code': '2512', 'title': 'Software developers', 'industry': 'ICT', 'description': 'Build software', 'coverage_pct': 50, 'required_skill_ids': []},
+        {},
+    )
+    assert payload == {
+        'occupation_code': '2512',
+        'title': 'Software developers',
+        'area': 'ICT',
+        'description': 'Build software',
+        'coverage_pct': 50,
+        'skills': [],
+    }
+
+
 def test_needs_profile_response_can_be_explicitly_empty() -> None:
     response = PossibilitiesResponse(
         contract_version='1',

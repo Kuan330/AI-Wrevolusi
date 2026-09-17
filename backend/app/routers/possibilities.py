@@ -8,6 +8,7 @@ from app.models.user import User
 from app.services.auth import get_current_user
 from app.services.possibilities import (
     chosen_direction_score,
+    confirmed_workspace_evidence,
     recommend_occupations,
     validate_shortlist_ids,
 )
@@ -25,6 +26,27 @@ def _json_value(workspace: dict, key: str, default):
         return default
 
 
+def build_direction_payload(row: dict, skills: dict) -> dict:
+    from app.services.possibilities import slugify_skill_name
+
+    return {
+        'occupation_code': row['occupation_code'],
+        'title': row['title'],
+        'area': row.get('industry'),
+        'description': row.get('description') or '',
+        'coverage_pct': row.get('coverage_pct'),
+        'skills': [
+            {
+                'skill_id': skill_id,
+                'skill_slug': slugify_skill_name(str(skills[skill_id]['core_skill'])),
+                'name': skills[skill_id]['core_skill'],
+                'state': row.get('skill_states', {}).get(skill_id, 'missing'),
+            }
+            for skill_id in row.get('required_skill_ids', [])
+        ],
+    }
+
+
 @router.get('', response_model=PossibilitiesResponse)
 async def get_possibilities(
     current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
@@ -39,9 +61,6 @@ async def get_possibilities(
     from app.schemas.skill_matching import SkillMatchCandidate
     from app.services.skill_matching import match_skills
     candidates = [SkillMatchCandidate(id=i, skill=str(row['core_skill'])) for i, row in skills.items()]
-    owned = {item.wef_skill_id for task in confirmed_rows for item in match_skills(
-        f"{task['title']} {task['description'] or ''}", candidates
-    )}
 
     occupation_rows = (await db.execute(text(
         "SELECT o.occupation_code, o.title, o.description, NULL AS industry, "
@@ -50,6 +69,12 @@ async def get_possibilities(
         "GROUP BY o.occupation_code,o.title,o.description ORDER BY o.occupation_code"
     ))).mappings().all()
     workspace = (await db.execute(text('SELECT workspace FROM app_accounts WHERE user_id=:id'), {'id': current_user.id})).scalar_one_or_none() or {}
+    workspace = workspace if isinstance(workspace, dict) else {}
+    confirmed_texts, workspace_role = confirmed_workspace_evidence(workspace, occupation_rows)
+    task_texts = set(confirmed_texts)
+    task_texts.update(f"{task['title']} {task['description'] or ''}".strip() for task in confirmed_rows)
+    owned = {item.wef_skill_id for task_text in task_texts for item in match_skills(task_text, candidates)}
+    has_confirmed_tasks = bool(confirmed_rows or confirmed_texts)
     shortlist_raw = _json_value(workspace, 'aiwrevolusi.possibilities.shortlist', [])
     shortlist = validate_shortlist_ids(shortlist_raw, allowed_skill_ids=set(skills), limit=60) if isinstance(shortlist_raw, list) else []
     chosen_raw = _json_value(workspace, 'aiwrevolusi.possibilities.chosenDirection', {})
@@ -58,13 +83,18 @@ async def get_possibilities(
     allowed_codes = {row['occupation_code'] for row in recommendations}
     if chosen_code not in allowed_codes:
         chosen_code = None
-    role = None
-    if current_user.occupation_id:
+    role = workspace_role
+    if role is None and current_user.occupation_id:
         role_row = (await db.execute(text('SELECT masco_code, title FROM occupations WHERE id=:id'), {'id': current_user.occupation_id})).mappings().one_or_none()
         if role_row:
             role = {'occupation_code': role_row['masco_code'], 'title': role_row['title']}
     from app.services.possibilities import slugify_skill_name
     skill_items = [{'skill_id': i, 'skill_slug': slugify_skill_name(str(row['core_skill'])), 'name': row['core_skill'], 'state': 'have' if i in owned else ('shortlisted' if i in shortlist else 'missing')} for i, row in skills.items()]
-    directions = [{k: v for k, v in row.items() if k != 'required_skill_ids'} | {'skills': [{'skill_id': i, 'skill_slug': slugify_skill_name(str(skills[i]['core_skill'])), 'name': skills[i]['core_skill'], 'state': 'have' if i in owned else ('shortlisted' if i in shortlist else 'missing')} for i in row['required_skill_ids']]} for row in recommendations]
+    for row in recommendations:
+        row['skill_states'] = {
+            skill_id: 'have' if skill_id in owned else ('shortlisted' if skill_id in shortlist else 'missing')
+            for skill_id in row['required_skill_ids']
+        }
+    directions = [build_direction_payload(row, skills) for row in recommendations]
     chosen_score = next((chosen_direction_score(owned, set(shortlist), set(row['required_skill_ids'])) for row in recommendations if row['occupation_code'] == chosen_code), None)
-    return PossibilitiesResponse(disclaimer=DISCLAIMER, source='live', status='ready' if owned else 'needs_profile', current_role=role, skills=skill_items, directions=directions, chosen_direction_code=chosen_code, chosen_direction_coverage_pct=chosen_score if chosen_score is not None else None, shortlisted_skill_ids=shortlist)
+    return PossibilitiesResponse(disclaimer=DISCLAIMER, source='live', status='ready' if owned else ('unavailable' if has_confirmed_tasks else 'needs_profile'), current_role=role, skills=skill_items, directions=directions, chosen_direction_code=chosen_code, chosen_direction_coverage_pct=chosen_score if chosen_score is not None else None, shortlisted_skill_ids=shortlist)

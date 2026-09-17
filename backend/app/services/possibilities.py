@@ -1,11 +1,47 @@
 from __future__ import annotations
 
+import json
 import math
 import re
 from collections.abc import Iterable, Mapping
 from typing import Literal
 
 SkillState = Literal['have', 'learning', 'shortlisted', 'missing']
+
+
+def confirmed_workspace_evidence(workspace: object, occupations: Iterable[Mapping]) -> tuple[list[str], dict | None]:
+    """Read the confirmed snapshot, never the editable task draft.
+
+    A present modern profile is authoritative, including a cleared/invalid
+    analysis; stale legacy data must not resurrect that confirmation.
+    """
+    if not isinstance(workspace, Mapping):
+        return [], None
+    key = 'aiwrevolusi.userProfile'
+    try:
+        if key in workspace:
+            profile = json.loads(workspace[key])
+            analysis = profile.get('analysis') if isinstance(profile, dict) else None
+        else:
+            analysis = json.loads(workspace.get('aiwrevolusi.confirmedAnalysis', 'null'))
+    except (TypeError, ValueError):
+        return [], None
+    if not isinstance(analysis, dict):
+        return [], None
+    code = analysis.get('occupationCode')
+    if not isinstance(code, str):
+        return [], None
+    reference = next((row for row in occupations if row['occupation_code'] == code), None)
+    tasks = analysis.get('tasks')
+    if reference is None or not isinstance(tasks, list):
+        return [], None
+    texts = list(dict.fromkeys(
+        task['wording'].strip() for task in tasks
+        if isinstance(task, dict) and isinstance(task.get('wording'), str) and task['wording'].strip()
+    ))
+    if not texts:
+        return [], None
+    return texts, {'occupation_code': code, 'title': reference['title']}
 
 
 def slugify_skill_name(name: str) -> str:

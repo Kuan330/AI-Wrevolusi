@@ -1,7 +1,7 @@
 import uuid
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import Enum, ForeignKey, JSON, String, Table, Text, Column, UniqueConstraint
+from sqlalchemy import Enum, ForeignKey, JSON, String, Table, Text, Column
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -25,14 +25,8 @@ task_capability_link = Table(
 
 class Task(TimestampMixin, Base):
     __tablename__ = 'tasks'
-    __table_args__ = (
-        UniqueConstraint('user_id', 'profile_task_id', name='uq_tasks_user_profile_task'),
-        UniqueConstraint('user_id', 'id', name='uq_tasks_user_id_id'),
-    )
-
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('app_users.id', ondelete='CASCADE'), index=True)
-    profile_task_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
     occupation_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey('occupations.id', ondelete='SET NULL'),
