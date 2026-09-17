@@ -1,6 +1,7 @@
 import asyncio
 import json
-from fastapi import APIRouter, Depends
+import logging
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,6 +18,7 @@ from app.services.possibilities import (
 )
 from app.schemas.possibilities import PossibilitiesResponse
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix='/possibilities', tags=['Possibilities'])
 DISCLAIMER = 'Exploratory skill connections only; not job readiness or hiring probability.'
 
@@ -83,17 +85,26 @@ async def _load_reference_data(db: AsyncSession) -> tuple[dict[int, dict], list[
 async def get_possibilities(
     current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ) -> PossibilitiesResponse:
-    skills, occupation_rows = await _load_reference_data(db)
-    confirmed_rows = (await db.execute(text(
-        "SELECT title, description FROM tasks WHERE user_id=:user_id AND status='confirmed' ORDER BY created_at"
-    ), {'user_id': current_user.id})).mappings().all()
+    try:
+        skills, occupation_rows = await _load_reference_data(db)
+        confirmed_rows = (await db.execute(text(
+            "SELECT title, description FROM tasks WHERE user_id=:user_id AND status='confirmed' ORDER BY created_at"
+        ), {'user_id': current_user.id})).mappings().all()
+    except Exception as e:
+        logger.error(f"Error loading reference data or tasks for user {current_user.id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to load user data")
     from app.schemas.skill_matching import SkillMatchCandidate
     from app.services.skill_matching import match_skills
     candidates = [SkillMatchCandidate(id=i, skill=str(row['core_skill'])) for i, row in skills.items()]
 
-    workspace = (await db.execute(text('SELECT workspace FROM app_accounts WHERE user_id=:id'), {'id': current_user.id})).scalar_one_or_none() or {}
-    workspace = workspace if isinstance(workspace, dict) else {}
-    confirmed_texts, workspace_role = confirmed_workspace_evidence(workspace, occupation_rows)
+    try:
+        workspace = (await db.execute(text('SELECT workspace FROM app_accounts WHERE user_id=:id'), {'id': current_user.id})).scalar_one_or_none() or {}
+        workspace = workspace if isinstance(workspace, dict) else {}
+        confirmed_texts, workspace_role = confirmed_workspace_evidence(workspace, occupation_rows)
+    except Exception as e:
+        logger.error(f"Error loading workspace for user {current_user.id}: {str(e)}")
+        workspace = {}
+        confirmed_texts, workspace_role = [], None
     task_texts = set(confirmed_texts)
     task_texts.update(f"{task['title']} {task['description'] or ''}".strip() for task in confirmed_rows)
     owned = {
@@ -108,15 +119,25 @@ async def get_possibilities(
     chosen_code = chosen_raw.get('occupation_code') if isinstance(chosen_raw, dict) else None
     role = workspace_role
     if role is None and current_user.occupation_id:
-        role_row = (await db.execute(text('SELECT masco_code, title FROM occupations WHERE id=:id'), {'id': current_user.occupation_id})).mappings().one_or_none()
-        if role_row:
-            role = {'occupation_code': role_row['masco_code'], 'title': role_row['title']}
+        try:
+            role_row = (await db.execute(text('SELECT masco_code, title FROM occupations WHERE id=:id'), {'id': current_user.occupation_id})).mappings().one_or_none()
+            if role_row:
+                role = {'occupation_code': role_row['masco_code'], 'title': role_row['title']}
+            else:
+                logger.warning(f"No occupation found for user {current_user.id} with occupation_id {current_user.occupation_id}")
+        except Exception as e:
+            logger.error(f"Error loading occupation for user {current_user.id}: {str(e)}")
+            # Continue without role - don't fail the entire request
 
     exclude_codes = {role['occupation_code']} if role and role.get('occupation_code') else set()
     # CPU-heavy ranking — keep the async event loop free on cold cache fills.
-    recommendations = await asyncio.to_thread(
-        recommend_occupations, occupation_rows, owned, skills, 3, exclude_codes=exclude_codes
-    )
+    try:
+        recommendations = await asyncio.to_thread(
+            recommend_occupations, occupation_rows, owned, skills, 3, exclude_codes=exclude_codes
+        )
+    except Exception as e:
+        logger.error(f"Error generating recommendations for user {current_user.id}: {str(e)}")
+        recommendations = []
     allowed_codes = {row['occupation_code'] for row in recommendations}
     if chosen_code not in allowed_codes:
         chosen_code = None

@@ -79,7 +79,7 @@ export interface OccupationSuggestionsResponse {
 export type TaskAssistStatus = "available" | "pending" | "completed";
 
 export interface TaskAssistDetailInput {
-  profile_task_id: string;
+  task_key: string;
   task_text: string;
   notes?: string;
 }

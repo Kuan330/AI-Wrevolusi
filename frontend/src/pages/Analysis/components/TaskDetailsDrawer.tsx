@@ -53,7 +53,7 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
         {
           details: [
             {
-              profile_task_id: task.id,
+              task_key: task.id,
               task_text: task.wording,
               notes: task.notes ?? "",
             },
