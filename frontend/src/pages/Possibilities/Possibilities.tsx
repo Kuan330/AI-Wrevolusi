@@ -9,11 +9,9 @@ import { possibilitiesService } from "@/services/possibilitiesService";
 import { referenceService } from "@/services/referenceService";
 import { accountStorage, flushWorkspace } from "@/services/accountStorage";
 import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
-import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
 import SkillOutlookSummary from "@/pages/Skills/components/SkillOutlookSummary";
 import { useLearningSkills } from "@/pages/Skills/useLearningSkills";
 import {
-  readConfirmedAnalysis,
   readTaskWorkspace,
 } from "@/pages/WorkProfile/userProfile";
 import type { WefSkill } from "@/types/reference";
@@ -165,7 +163,6 @@ function JourneyCompanion({
 export default function Possibilities() {
   const navigate = useNavigate();
   const profilePath = possibilitiesProfilePath(readTaskWorkspace());
-  const analysis = readConfirmedAnalysis();
   const [data, setData] = useState<PossibilitiesData | null>(null);
   const [wefSkills, setWefSkills] = useState<WefSkill[]>([]);
   const [selectedCode, setSelectedCode] = useState<string | null>(
@@ -202,8 +199,10 @@ export default function Possibilities() {
   }, []);
 
   const reflectedSkills = useMemo(
-    () => buildSkillEvidence(analysis?.tasks ?? [], wefSkills),
-    [analysis?.tasks, wefSkills],
+    () => (data?.skills ?? [])
+      .filter(skill => skill.state === "have")
+      .map(skill => ({ skill: { wef_skill_id: skill.skill_id, core_skill: skill.name } })),
+    [data],
   );
   const reflectedSkillIds = useMemo(
     () => new Set(reflectedSkills.map(({ skill }) => skill.wef_skill_id)),
@@ -321,7 +320,7 @@ export default function Possibilities() {
             <div className="px-current-skills">
               <h3>Skills in your profile</h3>
               <p className="px-chosen-hint">
-                Same skills marked as Reflected in your tasks on AI Impact.
+                Skills detected from your confirmed task wording.
               </p>
               <div className="px-chips">
                 {reflectedSkills.length > 0 ? (
