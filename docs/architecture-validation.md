@@ -1,8 +1,9 @@
 # Architecture change validation
 
 Reviewed against clean starting commit `818cfae` on `kuan/design-prototype`.
-Changes are uncommitted. No packages were installed, no database was connected
-or changed, and nothing was pushed or deployed.
+The code changes were committed locally as `aa4f8fb` after these checks. No
+packages were installed, no database was connected or changed, and nothing was
+pushed or deployed.
 
 ## Delivered scope
 

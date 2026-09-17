@@ -1,0 +1,3431 @@
+{
+  "commit": "aa4f8fb1e89b651e23a5c4efb9710fe25bb41960",
+  "branch": "kuan/design-prototype",
+  "title": "AI-Wrevolusi current code schema evidence",
+  "database_verified": false,
+  "method": "Imported app.models metadata only. Did not import app.db.session, app.main or create an engine. Parsed reference and legacy SQL. Read runtime consumers and history.",
+  "tables": [
+    {
+      "name": "app_accounts",
+      "group": "identity",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/account.py:8",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [
+            {
+              "target": "app_users.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/account.py:11"
+        },
+        {
+          "name": "username",
+          "type": "VARCHAR(32)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/account.py:12"
+        },
+        {
+          "name": "workspace",
+          "type": "JSON",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/account.py:13"
+        },
+        {
+          "name": "revision",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/account.py:14"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "user_id"
+      ],
+      "unique_constraints": [
+        {
+          "name": "ix_app_accounts_username",
+          "columns": [
+            "username"
+          ],
+          "kind": "unique_index"
+        }
+      ],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/routers/accounts.py:62",
+        "backend/app/routers/accounts.py:96",
+        "backend/app/routers/possibilities.py:101"
+      ]
+    },
+    {
+      "name": "catalogue_courses",
+      "group": "catalogue",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/catalogue.py:16",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:23"
+        },
+        {
+          "name": "course_code",
+          "type": "VARCHAR(32)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:24"
+        },
+        {
+          "name": "skill_id",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "ref_wef_skills.wef_skill_id",
+              "on_delete": "RESTRICT"
+            }
+          ],
+          "source": "backend/app/models/catalogue.py:25"
+        },
+        {
+          "name": "level",
+          "type": "VARCHAR(16)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:31"
+        },
+        {
+          "name": "course_no",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:32"
+        },
+        {
+          "name": "collection_status",
+          "type": "VARCHAR(24)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:33"
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:34"
+        },
+        {
+          "name": "provider",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:35"
+        },
+        {
+          "name": "url",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:36"
+        },
+        {
+          "name": "course_description",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:37"
+        },
+        {
+          "name": "outcomes",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:38"
+        },
+        {
+          "name": "language",
+          "type": "VARCHAR(120)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:39"
+        },
+        {
+          "name": "format",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:40"
+        },
+        {
+          "name": "self_paced",
+          "type": "BOOLEAN",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:41"
+        },
+        {
+          "name": "duration_min",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:42"
+        },
+        {
+          "name": "register",
+          "type": "VARCHAR(24)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:43"
+        },
+        {
+          "name": "prereq",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:44"
+        },
+        {
+          "name": "match",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:45"
+        },
+        {
+          "name": "advice",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:46"
+        },
+        {
+          "name": "official_level",
+          "type": "VARCHAR(80)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:47"
+        },
+        {
+          "name": "level_source",
+          "type": "VARCHAR(32)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:48"
+        },
+        {
+          "name": "difficulty_note",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:49"
+        },
+        {
+          "name": "chapter_status",
+          "type": "VARCHAR(80)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:50"
+        },
+        {
+          "name": "chapter_note",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:51"
+        },
+        {
+          "name": "chapter_source_url",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:52"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [
+        {
+          "name": "uq_catalogue_course_slot",
+          "columns": [
+            "skill_id",
+            "level",
+            "course_no"
+          ],
+          "kind": "constraint"
+        },
+        {
+          "name": "uq_catalogue_course_code",
+          "columns": [
+            "course_code"
+          ],
+          "kind": "constraint"
+        }
+      ],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/routers/learning.py:148",
+        "backend/app/services/catalogue.py:161"
+      ]
+    },
+    {
+      "name": "catalogue_chapters",
+      "group": "catalogue",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/catalogue.py:59",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:65"
+        },
+        {
+          "name": "course_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "catalogue_courses.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/catalogue.py:66"
+        },
+        {
+          "name": "chapter_order",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:72"
+        },
+        {
+          "name": "parent_order",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:73"
+        },
+        {
+          "name": "level",
+          "type": "VARCHAR(24)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:74"
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:75"
+        },
+        {
+          "name": "duration_min",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/catalogue.py:76"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [
+        {
+          "name": "uq_catalogue_chapter_order",
+          "columns": [
+            "course_id",
+            "chapter_order"
+          ],
+          "kind": "constraint"
+        }
+      ],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/routers/learning.py:158",
+        "backend/app/services/catalogue.py:162"
+      ]
+    },
+    {
+      "name": "task_capability_link",
+      "group": "task",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "model_association_no_explicit_runtime_write_found",
+      "source": "backend/app/models/task.py:18",
+      "columns": [
+        {
+          "name": "task_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "tasks.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/task.py:21"
+        },
+        {
+          "name": "capability_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "capabilities.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/task.py:22"
+        }
+      ],
+      "primary_key": [
+        "task_id",
+        "capability_id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/models/task.py:47",
+        "backend/app/models/capability.py:34"
+      ]
+    },
+    {
+      "name": "tasks",
+      "group": "task",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/task.py:26",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/task.py:28"
+        },
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "app_users.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/task.py:29"
+        },
+        {
+          "name": "occupation_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "occupations.id",
+              "on_delete": "SET NULL"
+            }
+          ],
+          "source": "backend/app/models/task.py:30"
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(200)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task.py:36"
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task.py:37"
+        },
+        {
+          "name": "status",
+          "type": "taskstatus",
+          "enum_values": [
+            "confirmed",
+            "needs_review",
+            "optional_context_missing"
+          ],
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task.py:38"
+        },
+        {
+          "name": "exposure_type",
+          "type": "exposuretype",
+          "enum_values": [
+            "human_led",
+            "ai_assisted",
+            "partly_automated",
+            "reshaped",
+            "insufficient_data"
+          ],
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task.py:39"
+        },
+        {
+          "name": "context",
+          "type": "JSON",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task.py:43"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/repositories/tasks.py:13",
+        "backend/app/routers/possibilities.py:91"
+      ]
+    },
+    {
+      "name": "capabilities",
+      "group": "task",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/capability.py:23",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/capability.py:26"
+        },
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "app_users.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/capability.py:27"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(120)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/capability.py:28"
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/capability.py:29"
+        },
+        {
+          "name": "evolution",
+          "type": "capabilityevolution",
+          "enum_values": [
+            "continue_to_be_useful",
+            "needs_strengthening",
+            "needs_updating"
+          ],
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/capability.py:30"
+        },
+        {
+          "name": "evidence",
+          "type": "JSON",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/capability.py:31"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/repositories/capabilities.py:13",
+        "backend/app/services/capabilities.py:24"
+      ]
+    },
+    {
+      "name": "learning_progress",
+      "group": "learning",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/learning.py:36",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:50"
+        },
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "app_users.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/learning.py:51"
+        },
+        {
+          "name": "skill_id",
+          "type": "VARCHAR(120)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:56"
+        },
+        {
+          "name": "course_id",
+          "type": "VARCHAR(32)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:57"
+        },
+        {
+          "name": "chapter_index",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:58"
+        },
+        {
+          "name": "value",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:59"
+        },
+        {
+          "name": "last_studied_on",
+          "type": "DATE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:62"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [
+        {
+          "name": "uq_learning_progress_chapter",
+          "columns": [
+            "user_id",
+            "skill_id",
+            "course_id",
+            "chapter_index"
+          ],
+          "kind": "constraint"
+        }
+      ],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/services/learning_records.py:38",
+        "backend/app/services/learning_records.py:84"
+      ]
+    },
+    {
+      "name": "learning_checkins",
+      "group": "learning",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/learning.py:67",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:75"
+        },
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "app_users.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/learning.py:76"
+        },
+        {
+          "name": "checked_on",
+          "type": "DATE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:81"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [
+        {
+          "name": "uq_learning_checkin_day",
+          "columns": [
+            "user_id",
+            "checked_on"
+          ],
+          "kind": "constraint"
+        }
+      ],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/services/learning_records.py:169"
+      ]
+    },
+    {
+      "name": "daily_briefs",
+      "group": "learning",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/learning.py:86",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:103"
+        },
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "app_users.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/learning.py:104"
+        },
+        {
+          "name": "brief_date",
+          "type": "DATE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:109"
+        },
+        {
+          "name": "variant",
+          "type": "VARCHAR(24)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:110"
+        },
+        {
+          "name": "generated_by_model",
+          "type": "BOOLEAN",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:111"
+        },
+        {
+          "name": "content",
+          "type": "JSON",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/learning.py:113"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [
+        {
+          "name": "uq_daily_brief_day",
+          "columns": [
+            "user_id",
+            "brief_date",
+            "variant"
+          ],
+          "kind": "constraint"
+        }
+      ],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/services/learning_records.py:238"
+      ]
+    },
+    {
+      "name": "occupations",
+      "group": "work",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/occupation.py:15",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/occupation.py:18"
+        },
+        {
+          "name": "masco_code",
+          "type": "VARCHAR(20)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/occupation.py:19"
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(120)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/occupation.py:20"
+        },
+        {
+          "name": "industry",
+          "type": "VARCHAR(120)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/occupation.py:21"
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/occupation.py:22"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [
+        {
+          "name": "ix_occupations_masco_code",
+          "columns": [
+            "masco_code"
+          ],
+          "kind": "unique_index"
+        }
+      ],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/repositories/occupations.py:13",
+        "backend/app/routers/possibilities.py:123"
+      ]
+    },
+    {
+      "name": "preparations",
+      "group": "work",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/preparation.py:22",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/preparation.py:25"
+        },
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "app_users.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/preparation.py:26"
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(150)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/preparation.py:27"
+        },
+        {
+          "name": "rationale",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/preparation.py:28"
+        },
+        {
+          "name": "effort_level",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/preparation.py:29"
+        },
+        {
+          "name": "priority",
+          "type": "prioritylevel",
+          "enum_values": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/preparation.py:30"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/repositories/preparation.py:14"
+      ]
+    },
+    {
+      "name": "refresh_tokens",
+      "group": "identity",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/refresh_token.py:15",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/refresh_token.py:18"
+        },
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "app_users.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/refresh_token.py:19"
+        },
+        {
+          "name": "token_jti",
+          "type": "VARCHAR(64)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/refresh_token.py:20"
+        },
+        {
+          "name": "expires_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/refresh_token.py:21"
+        },
+        {
+          "name": "revoked_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/refresh_token.py:22"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [
+        {
+          "name": "ix_refresh_tokens_token_jti",
+          "columns": [
+            "token_jti"
+          ],
+          "kind": "unique_index"
+        }
+      ],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/services/auth.py:48",
+        "backend/app/services/auth.py:69"
+      ]
+    },
+    {
+      "name": "schedules",
+      "group": "work",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/schedule.py:16",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/schedule.py:19"
+        },
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "app_users.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/schedule.py:20"
+        },
+        {
+          "name": "preparation_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "preparations.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/schedule.py:21"
+        },
+        {
+          "name": "planned_for",
+          "type": "DATE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/schedule.py:26"
+        },
+        {
+          "name": "is_done",
+          "type": "BOOLEAN",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/schedule.py:27"
+        },
+        {
+          "name": "note",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/schedule.py:28"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/services/schedule.py:16"
+      ]
+    },
+    {
+      "name": "task_assist_interactions",
+      "group": "task",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/task_assist.py:17",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/task_assist.py:39"
+        },
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "app_users.id",
+              "on_delete": "CASCADE"
+            }
+          ],
+          "source": "backend/app/models/task_assist.py:40"
+        },
+        {
+          "name": "task_key",
+          "type": "VARCHAR(128)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task_assist.py:43"
+        },
+        {
+          "name": "task_text",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task_assist.py:44"
+        },
+        {
+          "name": "notes",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task_assist.py:45"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(16)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task_assist.py:46"
+        },
+        {
+          "name": "claim_token",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task_assist.py:47"
+        },
+        {
+          "name": "claimed_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task_assist.py:48"
+        },
+        {
+          "name": "question",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task_assist.py:49"
+        },
+        {
+          "name": "reply",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task_assist.py:50"
+        },
+        {
+          "name": "generated_by_model",
+          "type": "BOOLEAN",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task_assist.py:51"
+        },
+        {
+          "name": "needs_user_confirmation",
+          "type": "BOOLEAN",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task_assist.py:52"
+        },
+        {
+          "name": "completed_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/task_assist.py:53"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [
+        {
+          "name": "uq_task_assist_user_task",
+          "columns": [
+            "user_id",
+            "task_key"
+          ],
+          "kind": "constraint"
+        }
+      ],
+      "checks": [
+        {
+          "name": "ck_task_assist_status",
+          "sql": "status IN ('available', 'pending', 'completed')"
+        },
+        {
+          "name": "ck_task_assist_completed_payload",
+          "sql": "status <> 'completed' OR (question IS NOT NULL AND reply IS NOT NULL AND generated_by_model IS NOT NULL AND completed_at IS NOT NULL)"
+        },
+        {
+          "name": "ck_task_assist_pending_claim",
+          "sql": "status <> 'pending' OR (claim_token IS NOT NULL AND claimed_at IS NOT NULL AND question IS NOT NULL)"
+        }
+      ],
+      "runtime_evidence": [
+        "backend/app/services/task_assist_records.py:35"
+      ]
+    },
+    {
+      "name": "app_users",
+      "group": "identity",
+      "origin": "SQLAlchemy ORM metadata",
+      "status": "runtime_backend",
+      "source": "backend/app/models/user.py:21",
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/user.py:26"
+        },
+        {
+          "name": "email",
+          "type": "VARCHAR(255)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "backend/app/models/user.py:27"
+        },
+        {
+          "name": "full_name",
+          "type": "VARCHAR(120)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/user.py:28"
+        },
+        {
+          "name": "hashed_password",
+          "type": "VARCHAR(255)",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/user.py:29"
+        },
+        {
+          "name": "is_active",
+          "type": "BOOLEAN",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/models/user.py:30"
+        },
+        {
+          "name": "occupation_id",
+          "type": "UUID",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "occupations.id",
+              "on_delete": "SET NULL"
+            }
+          ],
+          "source": "backend/app/models/user.py:31"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:12"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "backend/app/db/base.py:17"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [
+        {
+          "name": "ix_app_users_email",
+          "columns": [
+            "email"
+          ],
+          "kind": "unique_index"
+        }
+      ],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/services/auth.py:29",
+        "backend/app/routers/accounts.py:59"
+      ]
+    },
+    {
+      "name": "ref_occupations",
+      "group": "reference",
+      "origin": "db/schema.sql",
+      "status": "runtime_reference",
+      "source": "db/schema.sql:10",
+      "columns": [
+        {
+          "name": "occupation_code",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "db/schema.sql:11"
+        },
+        {
+          "name": "level",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:12"
+        },
+        {
+          "name": "parent_code",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:13"
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:14"
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:15"
+        },
+        {
+          "name": "skill_level",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:16"
+        },
+        {
+          "name": "source",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:17"
+        },
+        {
+          "name": "source_year",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:18"
+        }
+      ],
+      "primary_key": [
+        "occupation_code"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/routers/reference.py:34",
+        "backend/app/routers/possibilities.py:73"
+      ]
+    },
+    {
+      "name": "ref_ilo_tasks",
+      "group": "reference",
+      "origin": "db/schema.sql",
+      "status": "runtime_reference",
+      "source": "db/schema.sql:27",
+      "columns": [
+        {
+          "name": "isco_08",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:28"
+        },
+        {
+          "name": "task_id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:29"
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:30"
+        },
+        {
+          "name": "task_text",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:31"
+        },
+        {
+          "name": "score_2025",
+          "type": "DOUBLE PRECISION",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:32"
+        },
+        {
+          "name": "potential25",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:33"
+        },
+        {
+          "name": "potential23",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:34"
+        },
+        {
+          "name": "mean_score_2025",
+          "type": "DOUBLE PRECISION",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:35"
+        },
+        {
+          "name": "source",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:36"
+        },
+        {
+          "name": "source_year",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:37"
+        }
+      ],
+      "primary_key": [
+        "isco_08",
+        "task_id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/routers/reference.py:96",
+        "backend/app/services/exposure.py:489"
+      ]
+    },
+    {
+      "name": "ref_wef_skills",
+      "group": "reference",
+      "origin": "db/schema.sql",
+      "status": "runtime_reference",
+      "source": "db/schema.sql:44",
+      "columns": [
+        {
+          "name": "wef_skill_id",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "db/schema.sql:45"
+        },
+        {
+          "name": "core_skill",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "db/schema.sql:46"
+        },
+        {
+          "name": "wef_skill_group",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:47"
+        },
+        {
+          "name": "core_skill_importance_2025_pct",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:48"
+        },
+        {
+          "name": "future_net_increase_2025_2030",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:49"
+        },
+        {
+          "name": "future_trend_category",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:50"
+        },
+        {
+          "name": "genai_substitution_capacity_category",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:51"
+        },
+        {
+          "name": "genai_chart_label",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:52"
+        },
+        {
+          "name": "source",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:53"
+        },
+        {
+          "name": "source_year",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:54"
+        },
+        {
+          "name": "source_figures",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:55"
+        }
+      ],
+      "primary_key": [
+        "wef_skill_id"
+      ],
+      "unique_constraints": [
+        {
+          "name": null,
+          "columns": [
+            "core_skill"
+          ],
+          "kind": "constraint"
+        }
+      ],
+      "checks": [],
+      "runtime_evidence": [
+        "backend/app/routers/reference.py:110",
+        "backend/app/routers/learning.py:149"
+      ]
+    },
+    {
+      "name": "users",
+      "group": "legacy",
+      "origin": "db/schema.sql",
+      "status": "legacy_sql_no_current_backend_consumer_found",
+      "source": "db/schema.sql:62",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "db/schema.sql:63"
+        },
+        {
+          "name": "display_name",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:64"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMPTZ",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:65"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": []
+    },
+    {
+      "name": "work_profiles",
+      "group": "legacy",
+      "origin": "db/schema.sql",
+      "status": "legacy_sql_no_current_backend_consumer_found",
+      "source": "db/schema.sql:68",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "db/schema.sql:69"
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "users.id",
+              "on_delete": "NO ACTION"
+            }
+          ],
+          "source": "db/schema.sql:70"
+        },
+        {
+          "name": "occupation_code",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:71"
+        },
+        {
+          "name": "confirmation_status",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:72"
+        },
+        {
+          "name": "confirmed_at",
+          "type": "TIMESTAMPTZ",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:73"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": []
+    },
+    {
+      "name": "profile_tasks",
+      "group": "legacy",
+      "origin": "db/schema.sql",
+      "status": "legacy_sql_no_current_backend_consumer_found",
+      "source": "db/schema.sql:76",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "db/schema.sql:77"
+        },
+        {
+          "name": "work_profile_id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "work_profiles.id",
+              "on_delete": "NO ACTION"
+            }
+          ],
+          "source": "db/schema.sql:78"
+        },
+        {
+          "name": "ilo_isco_08",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:79"
+        },
+        {
+          "name": "ilo_task_id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:80"
+        },
+        {
+          "name": "task_text",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:81"
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:82"
+        },
+        {
+          "name": "input_method",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:83"
+        },
+        {
+          "name": "time_spent",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:84"
+        },
+        {
+          "name": "responsibility_level",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:85"
+        },
+        {
+          "name": "is_user_added",
+          "type": "BOOLEAN",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:86"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": []
+    },
+    {
+      "name": "task_assessments",
+      "group": "legacy",
+      "origin": "db/schema.sql",
+      "status": "legacy_sql_no_current_backend_consumer_found",
+      "source": "db/schema.sql:89",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "db/schema.sql:90"
+        },
+        {
+          "name": "profile_task_id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "profile_tasks.id",
+              "on_delete": "NO ACTION"
+            }
+          ],
+          "source": "db/schema.sql:91"
+        },
+        {
+          "name": "suggested_state",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:92"
+        },
+        {
+          "name": "match_layer",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:93"
+        },
+        {
+          "name": "source",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:94"
+        },
+        {
+          "name": "reasoning",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:95"
+        },
+        {
+          "name": "uncertainty",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:96"
+        },
+        {
+          "name": "limitations",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:97"
+        },
+        {
+          "name": "missing_data_status",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:98"
+        },
+        {
+          "name": "confirmation_status",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:99"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": []
+    },
+    {
+      "name": "profile_wef_skills",
+      "group": "legacy",
+      "origin": "db/schema.sql",
+      "status": "legacy_sql_no_current_backend_consumer_found",
+      "source": "db/schema.sql:102",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "db/schema.sql:103"
+        },
+        {
+          "name": "work_profile_id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "work_profiles.id",
+              "on_delete": "NO ACTION"
+            }
+          ],
+          "source": "db/schema.sql:104"
+        },
+        {
+          "name": "wef_skill_id",
+          "type": "INTEGER",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:105"
+        },
+        {
+          "name": "wef_core_skill",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:106"
+        },
+        {
+          "name": "interpretation",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:107"
+        },
+        {
+          "name": "match_layer",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:108"
+        },
+        {
+          "name": "source",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:109"
+        },
+        {
+          "name": "reasoning",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:110"
+        },
+        {
+          "name": "uncertainty",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:111"
+        },
+        {
+          "name": "limitations",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:112"
+        },
+        {
+          "name": "missing_data_status",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:113"
+        },
+        {
+          "name": "confirmation_status",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:114"
+        },
+        {
+          "name": "is_user_added",
+          "type": "BOOLEAN",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:115"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": []
+    },
+    {
+      "name": "wef_skill_task_links",
+      "group": "legacy",
+      "origin": "db/schema.sql",
+      "status": "legacy_sql_no_current_backend_consumer_found",
+      "source": "db/schema.sql:118",
+      "columns": [
+        {
+          "name": "profile_wef_skill_id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "profile_wef_skills.id",
+              "on_delete": "NO ACTION"
+            }
+          ],
+          "source": "db/schema.sql:119"
+        },
+        {
+          "name": "profile_task_id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "profile_tasks.id",
+              "on_delete": "NO ACTION"
+            }
+          ],
+          "source": "db/schema.sql:120"
+        }
+      ],
+      "primary_key": [
+        "profile_wef_skill_id",
+        "profile_task_id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": []
+    },
+    {
+      "name": "skill_examples",
+      "group": "legacy",
+      "origin": "db/schema.sql",
+      "status": "legacy_sql_no_current_backend_consumer_found",
+      "source": "db/schema.sql:124",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "db/schema.sql:125"
+        },
+        {
+          "name": "profile_wef_skill_id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "profile_wef_skills.id",
+              "on_delete": "NO ACTION"
+            }
+          ],
+          "source": "db/schema.sql:126"
+        },
+        {
+          "name": "example_text",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:127"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": []
+    },
+    {
+      "name": "review_events",
+      "group": "legacy",
+      "origin": "db/schema.sql",
+      "status": "legacy_sql_no_current_backend_consumer_found",
+      "source": "db/schema.sql:130",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": true,
+          "nullable": false,
+          "unique": true,
+          "foreign_keys": [],
+          "source": "db/schema.sql:131"
+        },
+        {
+          "name": "work_profile_id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": false,
+          "unique": false,
+          "foreign_keys": [
+            {
+              "target": "work_profiles.id",
+              "on_delete": "NO ACTION"
+            }
+          ],
+          "source": "db/schema.sql:132"
+        },
+        {
+          "name": "entity_type",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:133"
+        },
+        {
+          "name": "entity_id",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:134"
+        },
+        {
+          "name": "action",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:135"
+        },
+        {
+          "name": "previous_value",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:136"
+        },
+        {
+          "name": "new_value",
+          "type": "TEXT",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:137"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMPTZ",
+          "enum_values": null,
+          "pk": false,
+          "nullable": true,
+          "unique": false,
+          "foreign_keys": [],
+          "source": "db/schema.sql:138"
+        }
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [],
+      "checks": [],
+      "runtime_evidence": []
+    }
+  ],
+  "foreign_key_relationships": [
+    {
+      "parent_table": "app_users",
+      "parent_column": "id",
+      "child_table": "app_accounts",
+      "child_columns": [
+        "user_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..1",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/account.py:11"
+    },
+    {
+      "parent_table": "ref_wef_skills",
+      "parent_column": "wef_skill_id",
+      "child_table": "catalogue_courses",
+      "child_columns": [
+        "skill_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "RESTRICT",
+      "source": "backend/app/models/catalogue.py:25"
+    },
+    {
+      "parent_table": "catalogue_courses",
+      "parent_column": "id",
+      "child_table": "catalogue_chapters",
+      "child_columns": [
+        "course_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/catalogue.py:66"
+    },
+    {
+      "parent_table": "tasks",
+      "parent_column": "id",
+      "child_table": "task_capability_link",
+      "child_columns": [
+        "task_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/task.py:21"
+    },
+    {
+      "parent_table": "capabilities",
+      "parent_column": "id",
+      "child_table": "task_capability_link",
+      "child_columns": [
+        "capability_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/task.py:22"
+    },
+    {
+      "parent_table": "app_users",
+      "parent_column": "id",
+      "child_table": "tasks",
+      "child_columns": [
+        "user_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/task.py:29"
+    },
+    {
+      "parent_table": "occupations",
+      "parent_column": "id",
+      "child_table": "tasks",
+      "child_columns": [
+        "occupation_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "0..1",
+      "parent_to_child": "0..many",
+      "on_delete": "SET NULL",
+      "source": "backend/app/models/task.py:30"
+    },
+    {
+      "parent_table": "app_users",
+      "parent_column": "id",
+      "child_table": "capabilities",
+      "child_columns": [
+        "user_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/capability.py:27"
+    },
+    {
+      "parent_table": "app_users",
+      "parent_column": "id",
+      "child_table": "learning_progress",
+      "child_columns": [
+        "user_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/learning.py:51"
+    },
+    {
+      "parent_table": "app_users",
+      "parent_column": "id",
+      "child_table": "learning_checkins",
+      "child_columns": [
+        "user_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/learning.py:76"
+    },
+    {
+      "parent_table": "app_users",
+      "parent_column": "id",
+      "child_table": "daily_briefs",
+      "child_columns": [
+        "user_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/learning.py:104"
+    },
+    {
+      "parent_table": "app_users",
+      "parent_column": "id",
+      "child_table": "preparations",
+      "child_columns": [
+        "user_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/preparation.py:26"
+    },
+    {
+      "parent_table": "app_users",
+      "parent_column": "id",
+      "child_table": "refresh_tokens",
+      "child_columns": [
+        "user_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/refresh_token.py:19"
+    },
+    {
+      "parent_table": "app_users",
+      "parent_column": "id",
+      "child_table": "schedules",
+      "child_columns": [
+        "user_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/schedule.py:20"
+    },
+    {
+      "parent_table": "preparations",
+      "parent_column": "id",
+      "child_table": "schedules",
+      "child_columns": [
+        "preparation_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/schedule.py:21"
+    },
+    {
+      "parent_table": "app_users",
+      "parent_column": "id",
+      "child_table": "task_assist_interactions",
+      "child_columns": [
+        "user_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "CASCADE",
+      "source": "backend/app/models/task_assist.py:40"
+    },
+    {
+      "parent_table": "occupations",
+      "parent_column": "id",
+      "child_table": "app_users",
+      "child_columns": [
+        "occupation_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "0..1",
+      "parent_to_child": "0..many",
+      "on_delete": "SET NULL",
+      "source": "backend/app/models/user.py:31"
+    },
+    {
+      "parent_table": "users",
+      "parent_column": "id",
+      "child_table": "work_profiles",
+      "child_columns": [
+        "user_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "NO ACTION",
+      "source": "db/schema.sql:70"
+    },
+    {
+      "parent_table": "work_profiles",
+      "parent_column": "id",
+      "child_table": "profile_tasks",
+      "child_columns": [
+        "work_profile_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "NO ACTION",
+      "source": "db/schema.sql:78"
+    },
+    {
+      "parent_table": "profile_tasks",
+      "parent_column": "id",
+      "child_table": "task_assessments",
+      "child_columns": [
+        "profile_task_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "NO ACTION",
+      "source": "db/schema.sql:91"
+    },
+    {
+      "parent_table": "work_profiles",
+      "parent_column": "id",
+      "child_table": "profile_wef_skills",
+      "child_columns": [
+        "work_profile_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "NO ACTION",
+      "source": "db/schema.sql:104"
+    },
+    {
+      "parent_table": "profile_wef_skills",
+      "parent_column": "id",
+      "child_table": "wef_skill_task_links",
+      "child_columns": [
+        "profile_wef_skill_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "NO ACTION",
+      "source": "db/schema.sql:119"
+    },
+    {
+      "parent_table": "profile_tasks",
+      "parent_column": "id",
+      "child_table": "wef_skill_task_links",
+      "child_columns": [
+        "profile_task_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "NO ACTION",
+      "source": "db/schema.sql:120"
+    },
+    {
+      "parent_table": "profile_wef_skills",
+      "parent_column": "id",
+      "child_table": "skill_examples",
+      "child_columns": [
+        "profile_wef_skill_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "NO ACTION",
+      "source": "db/schema.sql:126"
+    },
+    {
+      "parent_table": "work_profiles",
+      "parent_column": "id",
+      "child_table": "review_events",
+      "child_columns": [
+        "work_profile_id"
+      ],
+      "enforced": "declared FK in source, deployment unverified",
+      "child_to_parent": "1",
+      "parent_to_child": "0..many",
+      "on_delete": "NO ACTION",
+      "source": "db/schema.sql:132"
+    }
+  ],
+  "logical_relationships": [
+    {
+      "from": "ref_occupations.parent_code",
+      "to": "ref_occupations.occupation_code",
+      "reason": "Hierarchy lookup without a declared FK",
+      "source": "backend/app/routers/reference.py:47"
+    },
+    {
+      "from": "ref_ilo_tasks.isco_08",
+      "to": "ref_occupations.occupation_code",
+      "reason": "Occupation code join without a declared FK",
+      "source": "backend/app/routers/possibilities.py:73"
+    },
+    {
+      "from": "occupations.masco_code",
+      "to": "ref_occupations.occupation_code",
+      "reason": "Same occupation-code domain but no declared FK",
+      "source": "backend/app/routers/possibilities.py:123"
+    },
+    {
+      "from": "learning_progress.course_id",
+      "to": "catalogue_courses.course_code",
+      "reason": "Stored code not catalogue UUID. Validated against catalogue in service, not database FK",
+      "source": "backend/app/routers/learning.py:193"
+    },
+    {
+      "from": "learning_progress.skill_id",
+      "to": "ref_wef_skills.core_skill",
+      "reason": "Normalized skill slug not integer WEF key. Service resolves scope",
+      "source": "backend/app/services/catalogue.py:150"
+    },
+    {
+      "from": "learning_progress.chapter_index",
+      "to": "catalogue_chapters.chapter_order",
+      "reason": "Zero-based chapter_index equals catalogue chapter_order minus one within the course. Application scope validation only, not a database FK",
+      "source": "backend/app/services/catalogue.py:150"
+    },
+    {
+      "from": "task_assist_interactions.task_key",
+      "to": "app_accounts.workspace profile task identity",
+      "reason": "Browser profile task key scoped by user. NOT an FK to tasks.id",
+      "source": "backend/app/models/task_assist.py:18"
+    },
+    {
+      "from": "catalogue_chapters.parent_order",
+      "to": "catalogue_chapters.chapter_order within course",
+      "reason": "Optional hierarchy number only, no declared self FK",
+      "source": "backend/app/models/catalogue.py:73"
+    }
+  ],
+  "json_payloads": [
+    {
+      "table": "app_accounts",
+      "column": "workspace",
+      "shape": "Map of storage keys to JSON-encoded strings. Not separate relational tables.",
+      "keys": [
+        "aiwrevolusi.userProfile",
+        "aiwrevolusi.confirmedAnalysis",
+        "aiwrevolusi.learningCentre",
+        "aiwrevolusi.learningResourceSelections.v1",
+        "aiwrevolusi.courseLibrary.v1",
+        "aiwrevolusi.learningSkills.v1",
+        "aiwrevolusi.plan.courses.v1",
+        "aiwrevolusi.planner.v1",
+        "aiwrevolusi.possibilities.chosenDirection",
+        "aiwrevolusi.possibilities.shortlist"
+      ],
+      "source": "backend/app/models/account.py:13",
+      "writer": "backend/app/routers/accounts.py:96",
+      "examples": [
+        "work profile and confirmed analysis",
+        "course library and saved IDs",
+        "local course plan and calendar events",
+        "learning skills and Possibilities choices"
+      ]
+    }
+  ],
+  "rendering_notes": [
+    "Primary ERD should show 15 ORM tables plus 3 active SQL reference tables. Put 8 legacy SQL business tables in a clearly separate inset or appendix.",
+    "Use solid connectors only for the declared FK list. Use dashed connectors for logical links and label them clearly.",
+    "Raw CSV files are source data assets, not current database tables.",
+    "app_accounts.user_id is PK and FK. Each account has one user. A user may have zero or one account because email auth can create app_users without app_accounts.",
+    "task_capability_link has a composite PK. ORM relationships exist but current inference writes JSON evidence rather than inserting association rows.",
+    "Do not draw tasks.profile_task_id. It is absent from ORM at both the historic tag and current commit. The response schema still expects it, which is an outstanding mismatch.",
+    "No FK joins learning_progress to catalogue records. Scope is checked by application code.",
+    "Catalogue FK targets a SQL-owned ref_wef_skills table absent from Base.metadata. Do not imply the ORM alone owns all tables.",
+    "Current routes register occupations, tasks, capabilities, preparations and schedules. Those APIs are real backend code even though current frontend stores much of its journey in workspace JSON."
+  ],
+  "history": {
+    "tag": "iteration-1-release",
+    "tag_commit": "2499736fb8da7f42f579b734dbc34220566b8d81",
+    "existing_orm_tables_at_tag": [
+      "app_users",
+      "refresh_tokens",
+      "occupations",
+      "tasks",
+      "capabilities",
+      "task_capability_link",
+      "preparations",
+      "schedules"
+    ],
+    "added_orm_tables": [
+      "app_accounts",
+      "catalogue_courses",
+      "catalogue_chapters",
+      "learning_progress",
+      "learning_checkins",
+      "daily_briefs",
+      "task_assist_interactions"
+    ],
+    "existing_table_column_changes": "No persisted column changes in existing ORM model files. user.py adds relationships only. task.py changes whitespace only.",
+    "legacy_sql_schema_changes": "No table or column changes since tag. Only the command in the header changed.",
+    "historic_doc_status": "docs/iteration1_erd.md was a conceptual E1-E4 model, not a full representation of the backend ORM even at iteration-1-release. Do not describe every mismatch as a later migration.",
+    "tag_object": "cd9b913494cf64894b4e4eb8bcd2b5f6940648f7",
+    "release_is_ancestor_of_current": false,
+    "comparison_method": "Direct tree comparison of the peeled release commit and current HEAD, not a claim of linear ancestry"
+  },
+  "migration_notes": {
+    "chain": [
+      "0001_learning_tables",
+      "0002_catalogue_tables",
+      "0003_task_assist_once"
+    ],
+    "missing_baseline": "0001 expects app_users already exists. 0002 expects SQL-owned ref_wef_skills already exists. Actual deployed schema and revision have not been inspected.",
+    "proposal": "docs/database-baseline-proposal.md",
+    "metadata_bootstrap_gap": "An offline Base.metadata.sorted_tables check raises NoReferencedTableError because catalogue_courses.skill_id refers to SQL-owned ref_wef_skills, which is absent from ORM metadata. No database was contacted."
+  },
+  "historic_doc_differences": [
+    {
+      "issue": "The old ERD shows profile_tasks to task_assessments as zero or one, but SQL has no unique constraint on task_assessments.profile_task_id. Source allows zero or many assessments",
+      "doc": "docs/iteration1_erd.md:167",
+      "source": "db/schema.sql:91"
+    },
+    {
+      "issue": "Raw CSV entities in the old ERD are ingestion data shapes, not tables declared by current SQL or ORM",
+      "doc": "docs/iteration1_erd.md:29",
+      "source": "db/schema.sql:10"
+    },
+    {
+      "issue": "The old document excludes E5-E8, while current models add verified learning catalogue, progress, daily check-ins and briefs",
+      "doc": "docs/iteration1_erd.md:25",
+      "source": "backend/app/models/learning.py:36"
+    },
+    {
+      "issue": "The old document describes legacy users/work_profiles. Current account users deliberately use app_users to avoid colliding with that pipeline schema",
+      "doc": "docs/iteration1_erd.md:86",
+      "source": "backend/app/models/user.py:22"
+    },
+    {
+      "issue": "New Task Assist records own one permanent exchange per user and profile task_key with explicit pending/completed checks, without repurposing tasks",
+      "source": "backend/app/models/task_assist.py:17"
+    },
+    {
+      "issue": "Workspace JSON preserves frontend journey state and uses row lock plus revision to prevent silent account overwrites. Those payloads are not normalized tables",
+      "source": "backend/app/routers/accounts.py:95"
+    }
+  ],
+  "migration_metadata_comparison": [
+    {
+      "table": "learning_progress",
+      "migration": "backend/alembic/versions/0001_add_learning_tables.py",
+      "columns_types_nullability_unique_constraints_match_orm": true
+    },
+    {
+      "table": "learning_checkins",
+      "migration": "backend/alembic/versions/0001_add_learning_tables.py",
+      "columns_types_nullability_unique_constraints_match_orm": true
+    },
+    {
+      "table": "daily_briefs",
+      "migration": "backend/alembic/versions/0001_add_learning_tables.py",
+      "columns_types_nullability_unique_constraints_match_orm": true
+    },
+    {
+      "table": "catalogue_courses",
+      "migration": "backend/alembic/versions/0002_add_catalogue_tables.py",
+      "columns_types_nullability_unique_constraints_match_orm": true
+    },
+    {
+      "table": "catalogue_chapters",
+      "migration": "backend/alembic/versions/0002_add_catalogue_tables.py",
+      "columns_types_nullability_unique_constraints_match_orm": true
+    },
+    {
+      "table": "task_assist_interactions",
+      "migration": "backend/alembic/versions/0003_add_task_assist_interactions.py",
+      "columns_types_nullability_unique_constraints_match_orm": true
+    }
+  ],
+  "runtime_diagram_table_count": 18,
+  "legacy_inset_table_count": 8
+}
