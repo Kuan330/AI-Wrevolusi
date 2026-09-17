@@ -26,6 +26,25 @@ def test_skill_state_precedence_is_have_learning_shortlisted_missing() -> None:
     assert classify_skill_state(has_skill=False, learning=False, shortlisted=False) == 'missing'
 
 
+def test_midwifery_confirmed_tasks_have_traceable_skill_matches() -> None:
+    from app.services.skill_matching import match_skills
+    from app.services.possibilities import occupation_required_skills
+
+    tasks = [
+        'Providing advice to women and families and conducting community education on health, nutrition and hygiene.',
+        'Planning, providing and evaluating care and support services for women and babies before, during and after pregnancy and childbirth.',
+        'Planning and conducting midwifery education activities in clinical and community settings.',
+    ]
+    skills = {10: {'core_skill': 'Service orientation and customer service'}, 16: {'core_skill': 'Teaching and mentoring'}}
+    candidates = [{'id': key, 'skill': value['core_skill']} for key, value in skills.items()]
+    assert occupation_required_skills(tasks, skills) == {10, 16}
+    for task in tasks:
+        matches = match_skills(task, candidates)
+        assert matches
+        assert all(phrase in task for item in matches for phrase in item.evidence_phrases)
+    assert match_skills('No relevant evidence here.', candidates) == []
+
+
 def test_shortlist_accepts_only_unique_allowlisted_wef_ids() -> None:
     assert validate_shortlist_ids([1, 3, 1], allowed_skill_ids={1, 2, 3}, limit=5) == [1, 3]
 
