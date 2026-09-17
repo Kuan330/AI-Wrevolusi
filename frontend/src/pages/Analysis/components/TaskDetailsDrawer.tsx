@@ -146,12 +146,12 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
   return (
     <>
       {saved && interaction.question && interaction.reply ? (
-        <section className="mx-5 mb-4 space-y-3 rounded-2xl border border-[#eadde4] bg-white/80 p-4">
+        <section className="mb-4 space-y-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#7f7280]">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#7f7280] mb-2">
               Saved AI guidance
             </p>
-            <p className="mt-1 text-sm leading-6 text-[#2f2430]">
+            <p className="text-sm leading-6 text-[#2f2430] mb-3">
               {interaction.question}
             </p>
           </div>
@@ -163,7 +163,7 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
             </p>
             <p>{interaction.reply}</p>
           </div>
-          <p className="text-xs text-[#7f7280]">
+          <p className="text-xs text-[#7f7280] mt-2">
             This is the permanent response for this Task Detail. Further questions
             are disabled.
           </p>
