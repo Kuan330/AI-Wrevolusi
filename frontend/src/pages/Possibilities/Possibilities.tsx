@@ -317,7 +317,6 @@ export default function Possibilities() {
               <Link className="px-light" to={profilePath}>
                 Review work profile
               </Link>
-              
             </div>
             <div className="px-current-skills">
               <h3>Skills in your profile</h3>
