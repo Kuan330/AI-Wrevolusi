@@ -82,7 +82,7 @@ test('completed details render saved guidance without any second-turn controls',
   assert.match(drawer, /setTimeout/);
   assert.match(drawer, /saved\.status === "available" && attempts < 6/);
   assert.match(dialog, /onStarted/);
-  assert.match(dialog, /task_id: interaction\.task_id/);
+  assert.match(dialog, /task_key: interaction\.task_key/);
   assert.ok(
     dialog.indexOf('onStarted(') < dialog.indexOf('aiService.taskAssist'),
     'parent pending state must be published before the request starts',

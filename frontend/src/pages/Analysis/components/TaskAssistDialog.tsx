@@ -77,7 +77,7 @@ const TaskAssistDialogSession = (props: TaskAssistDialogProps) => {
     try {
       const saved = await aiService.taskAssist(
         {
-          task_id: interaction.task_id,
+          task_key: interaction.task_key,
           user_message: userMessage,
         },
         controller.signal,

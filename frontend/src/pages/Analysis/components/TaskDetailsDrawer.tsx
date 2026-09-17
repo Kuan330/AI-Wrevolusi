@@ -85,7 +85,7 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const poll = () => {
       void aiService
-        .getTaskAssist(interaction.task_id)
+        .getTaskAssist(interaction.task_key)
         .then((saved) => {
           if (!active) return;
           if (saved.status === "available" && attempts < 6) {
@@ -107,7 +107,7 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
       active = false;
       if (timer) clearTimeout(timer);
     };
-  }, [interaction?.status, interaction?.task_id]);
+  }, [interaction?.status, interaction?.task_key]);
 
   if (error) {
     return (
