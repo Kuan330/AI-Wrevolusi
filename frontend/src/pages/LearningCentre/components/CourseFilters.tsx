@@ -3,7 +3,7 @@ import { ChevronDown, X } from "lucide-react";
 import { SearchField } from "@/components/ui/search-field";
 import { FormSelect } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
-import type { Course, CourseFilters as Filters } from "../types";
+import type { Course, CourseFilters as Filters } from "../../../features/learning-planning/types";
 import {
   COURSE_LEVEL_TONE,
   courseLevelLabel,

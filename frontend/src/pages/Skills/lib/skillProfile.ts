@@ -1,5 +1,5 @@
 import { skillsForTask } from "@/pages/Analysis/lib/matchSkills";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+import type { ProfileTask } from "@/features/work-profile/types";
 import type { WefSkill } from "@/types/reference";
 
 export type SkillEvidence = {

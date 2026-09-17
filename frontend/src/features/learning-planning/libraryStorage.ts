@@ -1,5 +1,5 @@
-import { accountStorage } from "@/services/accountStorage";
-import type { LibraryState } from "../types";
+import { accountStorage } from "../../services/accountStorage.ts";
+import type { LibraryState } from "./types";
 const KEY = "aiwrevolusi.courseLibrary.v1";
 export const emptyLibrary = (): LibraryState => ({
   version: 1,
@@ -25,8 +25,7 @@ export function readLibrary(): LibraryState {
       "Saved courses could not be read. Your saved data has not been overwritten.",
     );
   const context = accountStorage.getItem("aiwrevolusi.confirmedAnalysis") ?? "";
-  // Keep the learning list across analysis refreshes. Profile/occupation changes
-  // still clear it explicitly in writeUserProfile / saveLearningSkills.
+  // Saved learning survives profile changes; the profile carries a review flag.
   if (typeof state.skillId !== "string") state.skillId = "";
   if (state.workContext !== context) {
     state.workContext = context;

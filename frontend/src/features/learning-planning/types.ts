@@ -1,11 +1,10 @@
-import type { CourseLevel } from "./lib/courseLevels";
 
 export type FocusSkill = { id: string; en: string; ico: string; hint: string };
 export type Course = {
   id: string;
   title: string;
   provider: string;
-  level: CourseLevel | string;
+  level: string;
   language: string;
   format: string;
   selfPaced: boolean;

@@ -9,7 +9,7 @@ import {
   saveConfirmedAnalysis,
   saveTaskPractice,
   readUserProfile,
-} from "../src/pages/WorkProfile/userProfile.ts";
+} from "../src/features/work-profile/userProfile.ts";
 
 const trial = {
   id: "one",

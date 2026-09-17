@@ -14,8 +14,10 @@ export const workspaceKeys = [
   "aiwrevolusi.possibilities.shortlist",
 ];
 let userId: string | null = null;
+let workspaceSession = 0;
 let workspace: Workspace = { data: {}, revision: 0 };
 let saving: Promise<void> | null = null;
+let savingSession: number | null = null;
 let dirty = false;
 let timer: ReturnType<typeof setTimeout> | undefined;
 export let syncError = "";
@@ -32,6 +34,7 @@ const cache = () => {
 };
 export function activateWorkspace(id: string | null, next?: Workspace) {
   clearTimeout(timer);
+  workspaceSession += 1;
   userId = id;
   workspace = next ?? { data: {}, revision: 0 };
   dirty = false;
@@ -68,7 +71,13 @@ export function clearWorkspaceOnLogout() {
 export async function flushWorkspace(): Promise<void> {
   clearTimeout(timer);
   if (saving) {
-    await saving;
+    const pendingOwner = savingSession;
+    try {
+      await saving;
+    } catch (error) {
+      // A previous account's failed request must not block this account's save.
+      if (pendingOwner === workspaceSession) throw error;
+    }
     if (dirty) return flushWorkspace();
     return;
   }
@@ -78,21 +87,25 @@ export async function flushWorkspace(): Promise<void> {
     data: { ...workspace.data },
     revision: workspace.revision,
   };
+  const ownerSession = workspaceSession;
+  savingSession = ownerSession;
   saving = (async () => {
     try {
       const saved = await api.patch<Workspace>("/account/workspace", snapshot);
+      if (ownerSession !== workspaceSession) return;
       workspace.revision = saved.revision;
       dirty = JSON.stringify(workspace.data) !== JSON.stringify(snapshot.data);
       syncError = "";
       cache();
     } catch (error) {
-      syncError =
-        error instanceof Error
-          ? error.message
-          : "Your changes could not sync. Please retry.";
+      if (ownerSession === workspaceSession) {
+        syncError = error instanceof Error
+          ? error.message : "Your changes could not sync. Please retry.";
+      }
       throw error;
     } finally {
       saving = null;
+      savingSession = null;
       notify();
     }
   })();
@@ -136,3 +149,52 @@ export const accountStorage = {
   },
 };
 export const hasAccountWorkspace = () => Boolean(userId);
+/** Detect an account change while an operation waits for catalogue data. */
+export const currentWorkspaceSession = () => workspaceSession;
+
+/** Legacy browser imports are permitted only in the guest workspace. */
+export function readGuestLegacyItem(key: string): string | null {
+  if (userId) return null;
+  return (typeof sessionStorage !== "undefined" ? sessionStorage.getItem(key) : null)
+    ?? (typeof localStorage !== "undefined" ? localStorage.getItem(key) : null);
+}
+
+/** Commit related course records together before notifying or scheduling sync. */
+export function saveWorkspaceItems(items: Record<string, string>) {
+  if (userId) {
+    if (Object.keys(items).some((key) => !workspaceKeys.includes(key)))
+      throw new Error("This data cannot be saved in your account workspace.");
+    const previous = workspace;
+    const wasDirty = dirty;
+    workspace = { ...workspace, data: { ...workspace.data, ...items } };
+    dirty = true;
+    try {
+      cache();
+    } catch (error) {
+      workspace = previous;
+      dirty = wasDirty;
+      throw error;
+    }
+    notify();
+    clearTimeout(timer);
+    timer = setTimeout(() => { void flushWorkspace().catch(() => {}); }, 400);
+    return;
+  }
+  const previous = Object.fromEntries(
+    Object.keys(items).map((key) => [key, localStorage.getItem(key)]),
+  );
+  try {
+    for (const [key, value] of Object.entries(items)) localStorage.setItem(key, value);
+  } catch (error) {
+    try {
+      for (const [key, value] of Object.entries(previous)) {
+        if (value === null) localStorage.removeItem(key);
+        else localStorage.setItem(key, value);
+      }
+    } catch {
+      throw new Error("Course changes could not be restored. Reload and review your saved courses before continuing.");
+    }
+    throw error;
+  }
+  notify();
+}

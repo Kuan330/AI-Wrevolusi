@@ -32,10 +32,8 @@ import SoftPercentField from "@/components/ui/soft-percent-field";
 import { GradientBar } from "@/components/ui/gradient-bar";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/constants/routes";
-import {
-  readLibrary,
-  saveLibrary,
-} from "@/pages/LearningCentre/lib/libraryStorage";
+import { changeSavedCourses } from "@/features/learning-planning/courseOperations";
+import LearningReviewNotice from "@/components/common/LearningReviewNotice";
 import { readLearningSkills } from "@/pages/Skills/learningSkills";
 import {
   flushWorkspace,
@@ -58,7 +56,7 @@ import {
   type PlanDayChapterEntry,
   type PlanRecordDay,
   type PlanState,
-} from "@/pages/Plan/lib/planCourses";
+} from "@/features/learning-planning/planCourses";
 import {
   buildBriefTourSteps,
   briefTourStorageKey,
@@ -126,15 +124,22 @@ function mergeDayEntries(
   return [...map.values()];
 }
 
-function initial(): Preview {
-  return readPlanState();
+function initial(): { state: Preview; error: string } {
+  try {
+    return { state: readPlanState(), error: "" };
+  } catch (error) {
+    return {
+      state: { version: 1, courses: [], records: {} },
+      error: error instanceof Error ? error.message : "Saved plan could not be read. Your stored data has not been overwritten.",
+    };
+  }
 }
 
 function persist(next: Preview) {
   savePlanState(next);
   if (hasAccountWorkspace()) {
     void flushWorkspace().catch(() => {
-      /* Local mirror already kept; workspace retry happens on next edit. */
+      /* The account-scoped pending cache is retained for recovery. */
     });
   }
 }
@@ -161,7 +166,8 @@ function courseStatus(c: Course) {
 export default function Plan() {
   const location = useLocation();
   const { user } = useAccount();
-  const [state, setState] = useState<Preview>(initial);
+  const [loaded] = useState(initial);
+  const [state, setState] = useState<Preview>(loaded.state);
   const [today, setToday] = useState(dateKey);
   const [month, setMonth] = useState(
     () => new Date(new Date().getFullYear(), new Date().getMonth(), 1),
@@ -253,14 +259,15 @@ export default function Plan() {
   );
 
   useEffect(() => {
+    if (loaded.error) { setCoursesLoading(false); return; }
     let cancelled = false;
     setCoursesLoading(true);
     void syncPlanWithLearningCourses()
       .then((next) => {
         if (!cancelled) setState(next);
       })
-      .catch(() => {
-        if (!cancelled) setState(readPlanState());
+      .catch((error: unknown) => {
+        if (!cancelled) setNotice(error instanceof Error ? error.message : "Could not refresh your saved courses.");
       })
       .finally(() => {
         if (!cancelled) setCoursesLoading(false);
@@ -268,7 +275,7 @@ export default function Plan() {
     return () => {
       cancelled = true;
     };
-  }, [location.key]);
+  }, [location.key, loaded.error]);
 
   useEffect(() => {
     if (coursesLoading) return;
@@ -660,6 +667,8 @@ export default function Plan() {
     },
   ];
 
+  if (loaded.error) return <div className="lp-page"><PageHeader title="My Plan" description="Your saved data has been kept." /><p role="alert">{loaded.error}</p></div>;
+
   return (
     <div className="lp-page">
       <PageHeader
@@ -671,6 +680,8 @@ export default function Plan() {
       <p className="lp-notice" role="status">
         {notice}
       </p>
+
+      <LearningReviewNotice />
 
       <div className="lp-layout">
         <aside className="lp-left">
@@ -1082,20 +1093,16 @@ export default function Plan() {
             <button
               type="button"
               className="soft-btn-blue"
-              onClick={() => {
+              onClick={async () => {
                 if (!removeId) return;
-                save({
-                  ...state,
-                  courses: state.courses.filter((c) => c.id !== removeId),
-                });
                 try {
-                  const library = readLibrary();
-                  saveLibrary({
-                    ...library,
-                    saved: library.saved.filter((id) => id !== removeId),
-                  });
-                } catch {
-                  /* Plan removal still succeeds if the learning list cannot update. */
+                  const result = await changeSavedCourses({ remove: [removeId] });
+                  setState(result.plan);
+                } catch (error) {
+                  const detail = error instanceof Error ? error.message : "Could not remove the course. Please try again.";
+                  setNotice(detail);
+                  message.error(detail);
+                  return;
                 }
                 setRemoveId(null);
                 setNotice("Course removed from your plan.");

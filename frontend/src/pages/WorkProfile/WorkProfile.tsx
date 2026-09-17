@@ -20,7 +20,7 @@ import {
   readTaskWorkspace,
   hasConfirmedAnalysis,
   saveSelectedOccupation,
-} from "@/pages/WorkProfile/userProfile";
+} from "@/features/work-profile/userProfile";
 import type { ReferenceOccupation } from "@/types/reference";
 
 type WorkProfileMode = "search" | "filters";

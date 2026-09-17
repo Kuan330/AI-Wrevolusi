@@ -9,7 +9,7 @@ and not implausibly old.
 from datetime import date, datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.models.learning import CHAPTER_VALUE_MAX, CHAPTER_VALUE_MIN
 
@@ -41,6 +41,14 @@ class ProgressUpdateRequest(BaseModel):
 
     local_date: date
     chapters: list[ChapterProgressIn] = Field(min_length=1, max_length=200)
+
+    @field_validator('chapters')
+    @classmethod
+    def unique_chapters(cls, chapters: list[ChapterProgressIn]) -> list[ChapterProgressIn]:
+        keys = [(item.skill_id, item.course_id, item.chapter_index) for item in chapters]
+        if len(set(keys)) != len(keys):
+            raise ValueError('Each chapter may appear only once in a progress batch.')
+        return chapters
 
 
 class ProgressUpdateResponse(BaseModel):

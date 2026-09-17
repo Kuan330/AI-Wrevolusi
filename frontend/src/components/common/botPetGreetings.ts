@@ -1,3 +1,4 @@
+import { localPreferences } from "@/infrastructure/storage/localPreferences";
 /** How long a short BotPet tip stays visible. */
 export const BOT_PET_SPEECH_MS = 4000;
 
@@ -94,7 +95,7 @@ function shuffle(items: string[]): string[] {
 
 function readBags(): BagStore {
   try {
-    const raw = localStorage.getItem(BAG_STORAGE_KEY);
+    const raw = localPreferences.getItem(BAG_STORAGE_KEY);
     if (!raw) return {};
     const parsed = JSON.parse(raw) as BagStore;
     return parsed && typeof parsed === "object" ? parsed : {};
@@ -105,7 +106,7 @@ function readBags(): BagStore {
 
 function writeBags(bags: BagStore) {
   try {
-    localStorage.setItem(BAG_STORAGE_KEY, JSON.stringify(bags));
+    localPreferences.setItem(BAG_STORAGE_KEY, JSON.stringify(bags));
   } catch {
     /* Greeting bags are optional when storage is blocked. */
   }

@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 import { AccountContext as Context, type Account } from "./useAccount";
-import { clearSelectedOccupation } from "@/pages/WorkProfile/userProfile";
+import { clearSelectedOccupation } from "@/features/work-profile/userProfile";
 import { useEffect, useState, type ReactNode } from "react";
 import { api, ApiError } from "@/services/api";
 import { authService } from "@/services/authService";

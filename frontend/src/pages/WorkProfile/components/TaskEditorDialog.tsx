@@ -12,7 +12,7 @@ import {
 import { useStandardTaskMatch } from "@/pages/WorkProfile/hooks/useStandardTaskMatch";
 import { MIN_TASK_MATCH_WORDS } from "@/pages/WorkProfile/taskMatchWords";
 import { TIME_SPENT_OPTIONS } from "@/pages/WorkProfile/taskOptions";
-import type { TaskEditorValues } from "@/pages/WorkProfile/types";
+import type { TaskEditorValues } from "@/features/work-profile/types";
 import { validateTaskTitle } from "@/utils/validation";
 
 type Props = {

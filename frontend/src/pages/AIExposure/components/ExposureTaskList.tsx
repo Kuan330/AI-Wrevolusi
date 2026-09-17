@@ -10,9 +10,9 @@ import {
   taskIsWithinScoreRange,
   type TaskScoreRange,
 } from "@/pages/Analysis/lib/taskScore";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+import type { ProfileTask } from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
-import { formatScorePercent } from "@/pages/Analysis/lib/scorePercent";
+import { formatScorePercent } from "@/lib/scorePercent";
 import { cn } from "@/lib/utils";
 
 type Props = {

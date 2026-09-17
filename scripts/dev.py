@@ -127,40 +127,40 @@ def main() -> int:
     print(f"  Health:   {backend_origin}/api/healthz", flush=True)
     print("Press Ctrl+C to stop both services.\n", flush=True)
 
-    backend = subprocess.Popen(
-        [
-            "uv",
-            "run",
-            "uvicorn",
-            "app.main:app",
-            "--reload",
-            "--host",
-            HOST,
-            "--port",
-            str(backend_port),
-        ],
-        cwd=BACKEND_ROOT,
-        env=backend_environment,
-        **common_options,
-    )
-    frontend = subprocess.Popen(
-        [
-            "npm",
-            "run",
-            "dev",
-            "--",
-            "--host",
-            HOST,
-            "--port",
-            str(frontend_port),
-        ],
-        cwd=FRONTEND_ROOT,
-        env=frontend_environment,
-        **common_options,
-    )
-    processes = [backend, frontend]
-
+    processes: list[subprocess.Popen[bytes]] = []
     try:
+        processes.append(subprocess.Popen(
+            [
+                "uv",
+                "run",
+                "--locked",
+                "uvicorn",
+                "app.main:app",
+                "--reload",
+                "--host",
+                HOST,
+                "--port",
+                str(backend_port),
+            ],
+            cwd=BACKEND_ROOT,
+            env=backend_environment,
+            **common_options,
+        ))
+        processes.append(subprocess.Popen(
+            [
+                "npm",
+                "run",
+                "dev",
+                "--",
+                "--host",
+                HOST,
+                "--port",
+                str(frontend_port),
+            ],
+            cwd=FRONTEND_ROOT,
+            env=frontend_environment,
+            **common_options,
+        ))
         while True:
             for process in processes:
                 return_code = process.poll()

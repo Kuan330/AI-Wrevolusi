@@ -8,7 +8,7 @@ import {
   skillKey,
 } from "@/pages/Skills/learningSkills";
 import type { WefSkill } from "@/types/reference";
-import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
+import { PAGE_GRADIENT_CSS } from "@/constants/palette";
 
 type ExposureSkillCloudProps = {
   skills: WefSkill[];

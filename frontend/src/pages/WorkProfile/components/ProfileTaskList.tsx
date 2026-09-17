@@ -12,7 +12,7 @@ import {
   optionLabel,
   TIME_SPENT_OPTIONS,
 } from "@/pages/WorkProfile/taskOptions";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+import type { ProfileTask } from "@/features/work-profile/types";
 
 type ProfileTaskListProps = {
   tasks: ProfileTask[];

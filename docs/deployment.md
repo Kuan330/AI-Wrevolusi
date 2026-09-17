@@ -120,7 +120,10 @@ approved.
    and direct-route checks against the Production URL.
 5. Record the deployed commit and Vercel deployment identifier.
 
-A code deployment does not migrate or seed Neon. Run database changes as a
+A code deployment does not migrate or seed Neon. The committed migrations are
+not yet a complete empty-database bootstrap. See the
+[baseline proposal](database-baseline-proposal.md) before planning a new database
+or adopting Alembic on an existing one. Run database changes as a
 separate reviewed operation. Follow
 [`iteration1_data_management.md`](iteration1_data_management.md), test against
 the development or Preview branch first, and never use a development reset

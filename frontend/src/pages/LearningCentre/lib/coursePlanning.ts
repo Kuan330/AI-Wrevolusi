@@ -1,4 +1,4 @@
-import type { Course, CourseChoice } from "../types";
+import type { Course, CourseChoice } from "../../../features/learning-planning/types";
 export const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 export function defaultChoice(course: Course): CourseChoice {
   return {

@@ -1,7 +1,7 @@
 import { PILOT_WEF_SKILLS } from "@/data/pilotWefSkills";
 import { skillKey } from "@/pages/Skills/learningSkills";
 import type { WefSkill } from "@/types/reference";
-import type { Course } from "../types";
+import type { Course } from "../../../features/learning-planning/types";
 
 /**
  * WEF skills linked to one course, read from the backend course record. This

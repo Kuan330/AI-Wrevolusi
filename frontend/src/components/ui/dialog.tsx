@@ -3,7 +3,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
+import { PAGE_GRADIENT_CSS } from "@/constants/palette";
 
 const Dialog = DialogPrimitive.Root;
 

@@ -21,7 +21,7 @@ import {
   taskAssistContextKey,
   taskAssistResponseLabel,
 } from "@/pages/AIExposure/lib/taskAssistState";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+import type { ProfileTask } from "@/features/work-profile/types";
 import { ApiError } from "@/services/api";
 import { aiService } from "@/services/aiService";
 import type { TaskAssistInteraction } from "@/services/aiService";

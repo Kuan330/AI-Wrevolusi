@@ -1,5 +1,5 @@
-import { api } from "@/services/api";
-import type { Course } from "@/pages/LearningCentre/types";
+import { api } from "./api.ts";
+import type { Course } from "@/features/learning-planning/types";
 
 /** Verified catalogue endpoints return DB level names; the page uses slugs. */
 const LEVEL_BY_API_VALUE: Record<string, string> = {

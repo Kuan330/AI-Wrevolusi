@@ -1,3 +1,4 @@
+import LearningReviewNotice from "@/components/common/LearningReviewNotice";
 import { useEffect, useMemo, useState } from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -13,24 +14,23 @@ import BotPet from "@/components/common/BotPet";
 import { useCourseLibrary } from "./hooks/useCourseLibrary";
 import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
 import { fetchPageCatalogue } from "@/services/catalogueService";
-import type { Course } from "./types";
+import type { Course } from "../../features/learning-planning/types";
 import {
   ensureLearningSkills,
   toLearningSkill,
   type LearningSkill,
 } from "@/pages/Skills/learningSkills";
-import { loadCourseDirectory } from "./lib/courseDirectory";
 import { rateWefSkills } from "./lib/skillStars";
 import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
 import { useLearningSkills } from "@/pages/Skills/useLearningSkills";
-import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
+import { readConfirmedAnalysis } from "@/features/work-profile/userProfile";
 import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
 import "./course-library.css";
 
 export default function LearningCentre() {
   const library = useCourseLibrary();
-  const { state, notice, toggleSave, removeSavedCourses } = library;
+  const { state, notice, toggleSave, removeSavedCoursesForSkill } = library;
   const { skills, setSkills, addSkill, removeSkill, refresh } =
     useLearningSkills();
   const [params] = useSearchParams();
@@ -169,9 +169,9 @@ export default function LearningCentre() {
     pageCourses.find((course) => course.id === detailId) ?? null;
   const addedIds = new Set(skills.map((item) => item.id));
 
-  const onToggleSave = (courseId: string) => {
+  const onToggleSave = async (courseId: string) => {
     const wasSaved = state.saved.includes(courseId);
-    toggleSave(courseId);
+    if (!(await toggleSave(courseId))) return;
     if (!wasSaved) sayPet("add-course");
     else sayPet("remove-item");
   };
@@ -186,23 +186,10 @@ export default function LearningCentre() {
     sayPet("remove-item");
     if (activeId === removedId) setActiveId("");
     setRemoveTarget(null);
-    // Drop courses that only the removed skill linked to. Links come from the
-    // backend catalogue, so this no longer depends on a bundled id map.
-    try {
-      const directory = await loadCourseDirectory();
-      const dropCourses = [...directory.values()]
-        .filter(
-          (course) =>
-            course.skills.includes(removedId) &&
-            !course.skills.some((id) => remainingIds.has(id)),
-        )
-        .map((course) => course.id);
-      if (dropCourses.length) {
-        removeSavedCourses(dropCourses);
-      }
-    } catch {
-      // Catalogue unreachable: leave the saved list untouched.
-    }
+    // The shared operation owns catalogue loading and checks the same account
+    // before changing saved courses, including when login changes while waiting.
+    await removeSavedCoursesForSkill(removedId, [...remainingIds]);
+
   };
 
   const sidebarProps = {
@@ -232,6 +219,7 @@ export default function LearningCentre() {
   return (
     <div className="course-library">
       <PageHeader {...headerProps} className="library-page-header" />
+      <LearningReviewNotice />
       {(skillsError || notice) && (
         <p role="alert">{skillsError || notice}</p>
       )}

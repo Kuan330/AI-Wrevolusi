@@ -11,27 +11,22 @@ const tasks = [
 const assessments = [{ task_id: 'd', baseline_score: 0.85, adjusted_score: 0.9 }];
 
 test('personal overview excludes missing scores and includes genuine zero scores', () => {
-  const overview = taskOverview(tasks, assessments, [0, 1]);
+  const overview = taskOverview(tasks, assessments);
   assert.equal(overview.scored.length, 4);
   assert.equal(overview.missingCount, 1);
   assert.equal(overview.mean, 0.45);
-  assert.equal(overview.percentage, 100);
 });
 
-test('range counts are inclusive and priorities remain independent of filtering', () => {
-  const overview = taskOverview(tasks, assessments, [0.3, 0.65]);
-  assert.equal(overview.inRange, 2);
-  assert.equal(overview.percentage, 50);
+test('priorities use the three highest evidence scores',()=>{
+  const overview = taskOverview(tasks, assessments);
   assert.deepEqual(overview.priorities.map(({ task }) => task.id), ['d', 'b', 'a']);
   assert.equal(overview.priorities[0].score, 0.85);
-  assert.equal(taskOverview(tasks, assessments, [0.95, 1]).inRange, 0);
 });
 
-test('empty or unscored data has no fabricated mean or percentage', () => {
+test('empty or unscored data has no fabricated mean', () => {
   for (const input of [[], [{ id: 'missing', score2025: null }]]) {
-    const overview = taskOverview(input, [], [0, 1]);
+    const overview = taskOverview(input, []);
     assert.equal(overview.mean, null);
-    assert.equal(overview.percentage, null);
     assert.deepEqual(overview.priorities, []);
   }
 });

@@ -17,7 +17,7 @@ const planning = await import(
 );
 const model = moduleUrl(
   readFileSync(
-    new URL("../src/pages/Plan/planModel.ts", import.meta.url),
+    new URL("../src/features/learning-planning/planModel.ts", import.meta.url),
     "utf8",
   ),
 );
@@ -29,7 +29,7 @@ const { learningSession } = await import(
         import.meta.url,
       ),
       "utf8",
-    ).replaceAll("@/pages/Plan/planModel", model),
+    ).replaceAll("@/features/learning-planning/planModel", model),
   )
 );
 const course = {

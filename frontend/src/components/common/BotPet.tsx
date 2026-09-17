@@ -1,3 +1,4 @@
+import { localPreferences } from "@/infrastructure/storage/localPreferences";
 import {
   useEffect,
   useRef,
@@ -204,7 +205,7 @@ export default function BotPet({
   useEffect(() => {
     if (isInline) return;
     try {
-      const saved = JSON.parse(localStorage.getItem(storageKey) ?? "null");
+      const saved = JSON.parse(localPreferences.getItem(storageKey) ?? "null");
       if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
         customised.current = true;
         setPosition(clamp(saved, rootRef.current));
@@ -312,7 +313,7 @@ export default function BotPet({
 
   const persist = (next: Position) => {
     try {
-      localStorage.setItem(storageKey, JSON.stringify(next));
+      localPreferences.setItem(storageKey, JSON.stringify(next));
     } catch {
       /* Keep dragging available when storage is disabled. */
     }

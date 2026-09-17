@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Tooltip } from "@/components/ui/tooltip";
-import { dateKey, mins, overlaps, type PlanEvent } from "./planModel";
+import { dateKey, mins, overlaps, type PlanEvent } from "../../features/learning-planning/planModel";
 
 export default function WeekCalendar({
   days,

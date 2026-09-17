@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerBody } from '@/components/ui/drawer';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { AppButton } from '@/components/ui/app-button';
-import type { Course } from '@/pages/LearningCentre/types';
-import type { PlanEvent } from './planModel';
+import type { Course } from '@/features/learning-planning/types';
+import type { PlanEvent } from '../../features/learning-planning/planModel';
 export default function PlanCourseDrawer({ course, events, conflicts, selectedEvent, busy, onComplete, onClose, onEdit }: { course: Course; events: PlanEvent[]; conflicts: PlanEvent[]; selectedEvent: PlanEvent; busy: boolean; onComplete: (event: PlanEvent) => Promise<boolean>; onClose: () => void; onEdit: (event: PlanEvent) => void }) {
   const [saveError, setSaveError] = useState('');
   async function toggle(event: PlanEvent) {

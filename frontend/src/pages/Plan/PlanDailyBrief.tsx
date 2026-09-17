@@ -1,3 +1,4 @@
+import { localPreferences } from "@/infrastructure/storage/localPreferences";
 import type { DailyBriefResponse } from "@/services/learningService";
 
 export type BriefTourStep = {
@@ -19,7 +20,7 @@ export function briefTourStorageKey(brief: DailyBriefResponse) {
 
 export function hasSeenBriefTour(key: string): boolean {
   try {
-    const raw = JSON.parse(localStorage.getItem(BRIEF_TOUR_SEEN_KEY) ?? "{}") as
+    const raw = JSON.parse(localPreferences.getItem(BRIEF_TOUR_SEEN_KEY) ?? "{}") as
       | Record<string, boolean>
       | null;
     return Boolean(raw && raw[key]);
@@ -30,14 +31,14 @@ export function hasSeenBriefTour(key: string): boolean {
 
 export function markBriefTourSeen(key: string) {
   try {
-    const raw = (JSON.parse(localStorage.getItem(BRIEF_TOUR_SEEN_KEY) ?? "{}") ??
+    const raw = (JSON.parse(localPreferences.getItem(BRIEF_TOUR_SEEN_KEY) ?? "{}") ??
       {}) as Record<string, boolean>;
     raw[key] = true;
     const keys = Object.keys(raw);
     if (keys.length > 20) {
       for (const old of keys.slice(0, keys.length - 20)) delete raw[old];
     }
-    localStorage.setItem(BRIEF_TOUR_SEEN_KEY, JSON.stringify(raw));
+    localPreferences.setItem(BRIEF_TOUR_SEEN_KEY, JSON.stringify(raw));
   } catch {
     /* Tour memory is optional. */
   }

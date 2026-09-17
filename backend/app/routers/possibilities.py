@@ -14,9 +14,9 @@ from app.services.possibilities import (
     occupation_required_skills,
     recommend_occupations,
     skill_overlap_score,
-    validate_shortlist_ids,
 )
 from app.schemas.possibilities import PossibilitiesResponse
+from app.services.workspace import SHORTLIST_KEY, read_workspace_shortlist
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix='/possibilities', tags=['Possibilities'])
@@ -113,8 +113,8 @@ async def get_possibilities(
         for item in match_skills(task_text, candidates, limit=None)
     }
     has_confirmed_tasks = bool(confirmed_rows or confirmed_texts)
-    shortlist_raw = _json_value(workspace, 'aiwrevolusi.possibilities.shortlist', [])
-    shortlist = validate_shortlist_ids(shortlist_raw, allowed_skill_ids=set(skills), limit=60) if isinstance(shortlist_raw, list) else []
+    shortlist_raw = _json_value(workspace, SHORTLIST_KEY, [])
+    shortlist = read_workspace_shortlist(shortlist_raw, allowed_skill_ids=set(skills))
     chosen_raw = _json_value(workspace, 'aiwrevolusi.possibilities.chosenDirection', {})
     chosen_code = chosen_raw.get('occupation_code') if isinstance(chosen_raw, dict) else None
     role = workspace_role

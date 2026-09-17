@@ -1,47 +1,27 @@
 import { readFileSync, readdirSync } from "node:fs";
-import { extname, join, relative, sep } from "node:path";
+import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import ts from "typescript";
+import { checkSourceBoundaries } from "./architecture-rules.mjs";
 
-const root = new URL("../src/", import.meta.url);
-const sourceRoot = fileURLToPath(root);
-const sourceExtensions = new Set([".ts", ".tsx"]);
+const frontendRoot = fileURLToPath(new URL("../", import.meta.url));
+const sourceRoot = join(frontendRoot, "src");
+const configPath = join(frontendRoot, "tsconfig.app.json");
+const config = ts.readConfigFile(configPath, ts.sys.readFile);
+if (config.error) throw new Error(ts.flattenDiagnosticMessageText(config.error.messageText, "\n"));
+const { options, errors } = ts.parseJsonConfigFileContent(config.config, ts.sys, frontendRoot);
+if (errors.length) throw new Error(errors.map((error) => ts.flattenDiagnosticMessageText(error.messageText, "\n")).join("\n"));
 
 function sourceFiles(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) return sourceFiles(path);
-    return sourceExtensions.has(extname(entry.name)) ? [path] : [];
+    return [".ts", ".tsx"].includes(extname(entry.name)) ? [path] : [];
   });
 }
-
-const failures = [];
-for (const file of sourceFiles(sourceRoot)) {
-  const name = relative(sourceRoot, file).split(sep).join("/");
-  const source = readFileSync(file, "utf8");
-
-  if (
-    !name.startsWith("infrastructure/storage/") &&
-    /\b(?:localStorage|sessionStorage)\b/.test(source)
-  ) {
-    failures.push(`${name}: browser storage must go through infrastructure/storage`);
-  }
-
-  if (name.startsWith("features/") && /from\s+["']@\/pages\//.test(source)) {
-    failures.push(`${name}: features must not import route pages`);
-  }
-
-  const pageMatch = name.match(/^pages\/([^/]+)\//);
-  if (!pageMatch) continue;
-  const owner = pageMatch[1];
-  for (const match of source.matchAll(/from\s+["']@\/pages\/([^/]+)\//g)) {
-    if (match[1] !== owner) {
-      failures.push(
-        `${name}: page ${owner} must not import page ${match[1]}; move the shared contract to features or shared UI`,
-      );
-    }
-  }
-}
-
+const failures = sourceFiles(sourceRoot).flatMap((file) =>
+  checkSourceBoundaries(file, readFileSync(file, "utf8"), options, sourceRoot),
+);
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exitCode = 1;

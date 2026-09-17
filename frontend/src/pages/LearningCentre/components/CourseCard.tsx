@@ -6,7 +6,7 @@ import {
   courseLevelClassName,
   courseLevelLabel,
 } from "../lib/courseLevels";
-import type { Course } from "../types";
+import type { Course } from "../../../features/learning-planning/types";
 
 export type CourseCardProps = {
   course: Course;

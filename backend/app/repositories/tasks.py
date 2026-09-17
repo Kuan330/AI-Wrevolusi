@@ -8,6 +8,8 @@ from app.schemas.task import TaskCreate, TaskUpdate
 
 
 class TaskRepository:
+    """Stage task changes; TaskService owns the transaction commit."""
+
     @staticmethod
     async def list_by_user(db: AsyncSession, user_id: uuid.UUID) -> list[Task]:
         result = await db.execute(select(Task).where(Task.user_id == user_id).order_by(Task.created_at.desc()))
@@ -22,8 +24,6 @@ class TaskRepository:
     async def create(db: AsyncSession, user_id: uuid.UUID, payload: TaskCreate) -> Task:
         task = Task(user_id=user_id, **payload.model_dump())
         db.add(task)
-        await db.commit()
-        await db.refresh(task)
         return task
 
     @staticmethod
@@ -31,11 +31,8 @@ class TaskRepository:
         update_data = payload.model_dump(exclude_none=True)
         for key, value in update_data.items():
             setattr(task, key, value)
-        await db.commit()
-        await db.refresh(task)
         return task
 
     @staticmethod
     async def delete(db: AsyncSession, task: Task) -> None:
         await db.delete(task)
-        await db.commit()

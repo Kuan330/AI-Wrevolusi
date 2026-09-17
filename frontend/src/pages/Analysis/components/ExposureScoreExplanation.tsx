@@ -1,6 +1,6 @@
 import { InfoPopover } from "@/components/ui/info-popover";
 import { cn } from "@/lib/utils";
-import { ILO_EXPOSURE_METHOD_URL } from "@/pages/Analysis/lib/iloExposure";
+import { ILO_EXPOSURE_METHOD_URL } from "@/constants/iloExposure";
 import { OCCUPATION_BANDS } from "@/pages/Analysis/lib/occupationBands";
 
 /** Plain-language score guidance; classification details stay in one popover. */

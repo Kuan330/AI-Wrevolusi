@@ -1,5 +1,5 @@
-import { fetchPageCatalogue } from "@/services/catalogueService";
-import type { Course } from "../types";
+import { fetchPageCatalogue } from "../../services/catalogueService.ts";
+import type { Course } from "./types";
 
 /**
  * The backend owns the course catalogue, so anything that keeps a bare course id

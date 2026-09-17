@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { ExternalLink, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InfoPopover } from "@/components/ui/info-popover";
-import { EXPOSURE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
+import { EXPOSURE_GRADIENT_CSS } from "@/constants/palette";
 import {
   ILO_OCCUPATION_EXPOSURE_OPEN_DATA,
   ILO_OCCUPATION_EXPOSURE_SOURCE,
@@ -10,7 +10,7 @@ import {
 import { occupationBandFromPotential, plainOccupationBandLabel } from "@/pages/Analysis/lib/occupationBands";
 import type { ExposureCompareInsight } from "@/pages/AIExposure/lib/exposureCompare";
 import ExposureScorePie from "@/pages/AIExposure/components/ExposureScorePie";
-import { formatScorePercent, scoreToPercent } from "@/pages/Analysis/lib/scorePercent";
+import { formatScorePercent, scoreToPercent } from "@/lib/scorePercent";
 import "./ExposureCompareCard.css";
 
 type ExposureCompareCardProps = {

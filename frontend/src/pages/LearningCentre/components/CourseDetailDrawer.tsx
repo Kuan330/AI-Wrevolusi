@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/drawer";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import type { Course } from "../types";
+import type { Course } from "../../../features/learning-planning/types";
 import { durationLabel } from "../lib/coursePlanning";
 import { courseLevelLabel } from "../lib/courseLevels";
 

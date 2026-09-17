@@ -19,7 +19,7 @@ From the repository root, install the locked backend environment:
 
 ```bash
 cd backend
-uv sync
+uv sync --locked
 test -f .env || cp .env.example .env
 ```
 
@@ -56,7 +56,9 @@ From the repository root, start both services with:
 
 The command prefers frontend port 5173 and backend port 8000. If either port
 is occupied, it selects the next available port and prints the actual URLs.
-Press Ctrl+C once to stop both services.
+Press Ctrl+C once to stop both services. Partial startup failure also stops any
+child that already started. Both launcher UV commands use `--locked`; update the
+lock deliberately before starting if the dependency definition has changed.
 
 You can choose different starting ports while keeping automatic fallback:
 
@@ -71,7 +73,7 @@ the backend first:
 
 ```bash
 cd backend
-uv run uvicorn app.main:app --reload
+uv run --locked uvicorn app.main:app --reload
 ```
 
 Start the frontend in another terminal:
@@ -98,7 +100,7 @@ port. Explicit alternative ports are supported. For example:
 # Terminal 1
 cd backend
 CORS_ORIGINS=http://127.0.0.1:5174 \
-  uv run uvicorn app.main:app --reload --port 8001
+  uv run --locked uvicorn app.main:app --reload --port 8001
 
 # Terminal 2
 cd frontend
@@ -155,6 +157,18 @@ npm run check
 
 Report warnings separately. Do not describe a check as passing if its command
 returned a non-zero exit code.
+
+The launcher can be tested without starting either service or using a database:
+
+```bash
+uv run --project backend --locked python -m unittest discover -s scripts -p test_dev.py -v
+```
+
+The offline backend suite checks SQL construction and transaction contracts with
+fakes. It does not prove PostgreSQL concurrency or replay migrations. See the
+[database baseline proposal](database-baseline-proposal.md) for the separate,
+reviewed database verification work. Do not use automatic table creation as proof
+that Alembic can initialize or upgrade an existing database.
 
 ## Data-tool checks
 

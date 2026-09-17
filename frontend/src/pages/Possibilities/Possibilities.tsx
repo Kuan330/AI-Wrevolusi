@@ -8,12 +8,12 @@ import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
 import { possibilitiesService } from "@/services/possibilitiesService";
 import { referenceService } from "@/services/referenceService";
 import { accountStorage, flushWorkspace } from "@/services/accountStorage";
-import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
+import { PAGE_GRADIENT_CSS } from "@/constants/palette";
 import SkillOutlookSummary from "@/pages/Skills/components/SkillOutlookSummary";
 import { useLearningSkills } from "@/pages/Skills/useLearningSkills";
 import {
   readTaskWorkspace,
-} from "@/pages/WorkProfile/userProfile";
+} from "@/features/work-profile/userProfile";
 import type { WefSkill } from "@/types/reference";
 import {
   loadSavedPossibilities,

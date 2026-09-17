@@ -8,12 +8,13 @@ lives here.
 from collections.abc import Sequence
 from datetime import date, timedelta
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, tuple_
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.learning import DailyBrief, LearningCheckin, LearningProgress
 from app.schemas.learning import ChapterProgressIn, RejectedChapter
-from app.services.learning import ChapterValue, clamp_chapter_value, merge_chapter_value
+from app.services.learning import ChapterValue
 
 # Streak arithmetic walks back day by day through the learner's check-in history.
 # This bounds that walk without any realistic streak ever reaching it.
@@ -75,81 +76,60 @@ async def upsert_progress(
     a network retry never looks like a failure.
     """
 
-    keys = {(item.skill_id, item.course_id, item.chapter_index) for item in chapters}
-    existing_rows = (
-        await db.execute(
-            select(LearningProgress).where(
+    if not chapters:
+        return [], []
+    keys = [(item.skill_id, item.course_id, item.chapter_index) for item in chapters]
+    if len(set(keys)) != len(keys):
+        raise ValueError('Each chapter may appear only once in a progress batch.')
+
+    # Stable lock order avoids opposite-order batches deadlocking each other.
+    statement = insert(LearningProgress).values([
+        {
+            'user_id': user_id,
+            'skill_id': item.skill_id,
+            'course_id': item.course_id,
+            'chapter_index': item.chapter_index,
+            'value': item.value,
+            'last_studied_on': local_date,
+        }
+        for item in sorted(chapters, key=lambda item: (item.skill_id, item.course_id, item.chapter_index))
+    ])
+    statement = statement.on_conflict_do_update(
+        constraint='uq_learning_progress_chapter',
+        set_={
+            'value': statement.excluded.value,
+            'last_studied_on': statement.excluded.last_studied_on,
+            'updated_at': func.now(),
+        },
+        where=statement.excluded.value > LearningProgress.value,
+    ).returning(LearningProgress.skill_id, LearningProgress.course_id, LearningProgress.chapter_index)
+    changed = set((await db.execute(statement)).all())
+    unchanged_keys = [key for key in keys if key not in changed]
+    stored = {}
+    if unchanged_keys:
+        # ON CONFLICT locks rejected updates until commit, so this read sees the
+        # value used by the atomic comparison. Equal retries keep their old date.
+        rows = (await db.execute(
+            select(
+                LearningProgress.skill_id, LearningProgress.course_id,
+                LearningProgress.chapter_index, LearningProgress.value,
+            ).where(
                 LearningProgress.user_id == user_id,
-                LearningProgress.skill_id.in_([key[0] for key in keys]),
+                tuple_(LearningProgress.skill_id, LearningProgress.course_id,
+                       LearningProgress.chapter_index).in_(unchanged_keys),
             )
-        )
-    ).scalars().all()
+        )).all()
+        stored = {(row[0], row[1], row[2]): row[3] for row in rows}
 
-    stored: dict[tuple[str, str, int], LearningProgress] = {
-        (row.skill_id, row.course_id, row.chapter_index): row for row in existing_rows
-    }
-
-    accepted: list[ChapterProgressIn] = []
-    rejected: list[RejectedChapter] = []
-
-    for item in chapters:
-        key = (item.skill_id, item.course_id, item.chapter_index)
-        row = stored.get(key)
-        current = (
-            ChapterValue(
-                skill_id=row.skill_id,
-                course_id=row.course_id,
-                chapter_index=row.chapter_index,
-                value=row.value,
-                last_studied_on=row.last_studied_on,
-            )
-            if row is not None
-            else None
-        )
-
-        record, reason = merge_chapter_value(
-            current,
-            skill_id=item.skill_id,
-            course_id=item.course_id,
-            chapter_index=item.chapter_index,
-            value=item.value,
-            local_date=local_date,
-        )
-
-        if reason is not None:
-            rejected.append(
-                RejectedChapter(
-                    course_id=item.course_id,
-                    chapter_index=item.chapter_index,
-                    reason=reason,
-                    stored_value=row.value if row is not None else None,
-                )
-            )
-            continue
-
-        accepted.append(item)
-
-        if record is None:
-            # Identical value already stored: nothing to write, and crucially the
-            # stored study date is left alone so the chapter does not appear as
-            # "studied today" because of a re-send.
-            continue
-
-        if row is None:
-            db.add(
-                LearningProgress(
-                    user_id=user_id,
-                    skill_id=record.skill_id,
-                    course_id=record.course_id,
-                    chapter_index=record.chapter_index,
-                    value=record.value,
-                    last_studied_on=record.last_studied_on,
-                )
-            )
+    accepted, rejected = [], []
+    for item, key in zip(chapters, keys):
+        if key in changed or stored[key] == item.value:
+            accepted.append(item)
         else:
-            row.value = clamp_chapter_value(record.value)
-            row.last_studied_on = record.last_studied_on
-
+            rejected.append(RejectedChapter(
+                course_id=item.course_id, chapter_index=item.chapter_index,
+                reason='not_increase', stored_value=stored[key],
+            ))
     await db.commit()
     return accepted, rejected
 
@@ -186,20 +166,13 @@ async def create_checkin(db: AsyncSession, user_id, *, local_date: date) -> bool
     calendar cannot be tapped twice into a different state.
     """
 
-    existing = (
-        await db.execute(
-            select(LearningCheckin.id).where(
-                LearningCheckin.user_id == user_id,
-                LearningCheckin.checked_on == local_date,
-            )
-        )
-    ).scalar_one_or_none()
-    if existing is not None:
-        return False
-
-    db.add(LearningCheckin(user_id=user_id, checked_on=local_date))
+    statement = insert(LearningCheckin).values(user_id=user_id, checked_on=local_date)
+    statement = statement.on_conflict_do_nothing(
+        constraint='uq_learning_checkin_day',
+    ).returning(LearningCheckin.id)
+    created = (await db.execute(statement)).scalar_one_or_none() is not None
     await db.commit()
-    return True
+    return created
 
 
 async def has_progress_on(db: AsyncSession, user_id, *, local_date: date) -> bool:
@@ -262,21 +235,19 @@ async def store_brief(
     outage does not lock in plain wording for the rest of the day.
     """
 
-    existing = await get_stored_brief(db, user_id, brief_date=brief_date, variant=variant)
-    if existing is not None:
-        existing.content = content
-        existing.generated_by_model = generated_by_model
-        await db.commit()
-        return existing
-
-    row = DailyBrief(
-        user_id=user_id,
-        brief_date=brief_date,
-        variant=variant,
-        generated_by_model=generated_by_model,
-        content=content,
+    statement = insert(DailyBrief).values(
+        user_id=user_id, brief_date=brief_date, variant=variant,
+        content=content, generated_by_model=generated_by_model,
     )
-    db.add(row)
+    statement = statement.on_conflict_do_update(
+        constraint='uq_daily_brief_day',
+        set_={
+            'content': statement.excluded.content,
+            'generated_by_model': statement.excluded.generated_by_model,
+            'updated_at': func.now(),
+        },
+    ).returning(DailyBrief)
+    row = (await db.execute(statement.execution_options(populate_existing=True))).scalar_one()
     await db.commit()
     return row
 

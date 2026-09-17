@@ -508,3 +508,12 @@ def test_brief_uses_catalogue_importance_for_tie_breaking(client):
     recommended = [item['skill_id'] for item in response.json()['recommendations']]
     # The catalogue stub ranks ai-and-big-data highest; the client's flat 1s are ignored.
     assert recommended[0] == 'ai-and-big-data'
+
+
+def test_duplicate_chapter_batch_is_rejected_before_persistence(client):
+    body = body_chapters()
+    body['chapters'].append({**body['chapters'][0], 'value': 8})
+    response = client.post('/api/v1/learning/progress', json=body)
+    assert response.status_code == 422
+    assert 'only once' in response.text
+    assert client.store.upsert_calls == 0

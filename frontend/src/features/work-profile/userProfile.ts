@@ -1,5 +1,5 @@
 import { accountStorage } from "../../services/accountStorage.ts";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+import type { ProfileTask } from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 import type { ReferenceOccupation } from "@/types/reference";
 
@@ -28,6 +28,8 @@ export type UserProfile = {
   tasks: ProfileTask[];
   tasksOccupationCode: string | null;
   analysis: ConfirmedAnalysis | null;
+  /** Saved learning remains available until the user reviews the changed work. */
+  learningReviewNeeded?: boolean;
 };
 
 const parseJson = <T>(raw: string | null): T | null => {
@@ -53,6 +55,7 @@ export const readUserProfile = (): UserProfile => {
       tasks: Array.isArray(stored.tasks) ? stored.tasks : [],
       tasksOccupationCode: stored.tasksOccupationCode ?? null,
       analysis: stored.analysis ?? null,
+      learningReviewNeeded: stored.learningReviewNeeded === true,
     };
     accountStorage.removeItem(OCCUPATION_KEY);
 
@@ -72,31 +75,23 @@ export const readUserProfile = (): UserProfile => {
 export const writeUserProfile = (patch: Partial<UserProfile>): UserProfile => {
   const previous = readUserProfile();
   const next = { ...previous, ...patch };
-  if (
-    JSON.stringify(previous.analysis) !== JSON.stringify(next.analysis) ||
-    previous.tasksOccupationCode !== next.tasksOccupationCode ||
-    JSON.stringify(previous.tasks) !== JSON.stringify(next.tasks)
-  ) {
-    const rawLibrary = accountStorage.getItem("aiwrevolusi.courseLibrary.v1");
-    if (rawLibrary) {
-      try {
-        const library = JSON.parse(rawLibrary);
-        accountStorage.setItem(
-          "aiwrevolusi.courseLibrary.v1",
-          JSON.stringify({
-            ...library,
-            saved: [],
-            choices: {},
-            basis: {},
-            workContext: next.analysis ? JSON.stringify(next.analysis) : "",
-          }),
-        );
-        accountStorage.removeItem("aiwrevolusi.planner.v1");
-        accountStorage.removeItem("aiwrevolusi.learningResourceSelections.v1");
-      } catch {
-        accountStorage.removeItem("aiwrevolusi.courseLibrary.v1");
-      }
-    }
+  // Practice notes/trials do not change the work used for recommendations.
+  const structural = (profile: UserProfile) => JSON.stringify({
+    occupation: profile.tasksOccupationCode,
+    tasks: profile.tasks.map(({ practice: _practice, ...task }) => task),
+    analysis: profile.analysis && {
+      ...profile.analysis,
+      tasks: profile.analysis.tasks.map(({ practice: _practice, ...task }) => task),
+    },
+  });
+  const hasSavedLearning = [
+    "aiwrevolusi.courseLibrary.v1", "aiwrevolusi.plan.courses.v1",
+    "aiwrevolusi.planner.v1", "aiwrevolusi.learningResourceSelections.v1",
+  ].some((key) => accountStorage.getItem(key) !== null);
+  if (hasSavedLearning && structural(previous) !== structural(next)) {
+    // Preserve saved courses, progress and calendar entries. A review is a user
+    // decision; changing a profile must never erase another domain's records.
+    next.learningReviewNeeded = true;
   }
   accountStorage.setItem(PROFILE_KEY, JSON.stringify(next));
   accountStorage.removeItem(OCCUPATION_KEY);

@@ -1,17 +1,9 @@
+import type { Resource, Selection } from "@/features/learning-planning/resourceTypes";
+export type { Resource, Selection } from "@/features/learning-planning/resourceTypes";
 import { accountStorage } from "@/services/accountStorage";
 import type { LearningCentreItem } from "@/pages/Skills/skillDirections";
 
-export type Resource = {
-  id: string;
-  title: string;
-  provider: string;
-  url: string;
-  summary: string;
-  minutes?: number;
-  format: "Module" | "Course";
-  tags: string[];
-  access: string;
-};
+
 // Curated source links checked on 2026-09-07. This is not a live API catalogue.
 export const resources: Resource[] = [
   {
@@ -98,20 +90,7 @@ export function matches(resource: Resource, theme: LearningCentreItem) {
 // Courses used to be appended here from a bundled sample catalogue under the
 // planner's `epic5-*` id contract. The live catalogue is served by the backend
 // now, so those ids no longer exist and the injection is gone.
-export type Selection = {
-  resourceId: string;
-  themeTitle: string;
-  skillName: string;
-  addedAt: string;
-  chapterNames?: string[];
-  weekdays?: number[];
-  minutesPerDay?: number;
-  startTime?: string;
-  endTime?: string;
-  totalMinutes?: number | null;
-  startDate?: string;
-  scheduleMode?: "later" | "routine";
-};
+
 const KEY = "aiwrevolusi.learningResourceSelections.v1";
 export function readSelections(): Selection[] {
   try {

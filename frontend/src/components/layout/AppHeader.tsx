@@ -5,7 +5,7 @@ import { useAccount } from "@/components/account/useAccount";
 import {
   hasConfirmedAnalysis,
   readTaskWorkspace,
-} from "@/pages/WorkProfile/userProfile";
+} from "@/features/work-profile/userProfile";
 
 import Logo from "@/components/common/Logo";
 import { PRIMARY_NAV_MENU } from "@/constants/menu";

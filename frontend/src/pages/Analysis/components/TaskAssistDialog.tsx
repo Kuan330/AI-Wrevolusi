@@ -12,7 +12,7 @@ import {
 import { ApiError } from "@/services/api";
 import { aiService } from "@/services/aiService";
 import type { TaskAssistInteraction } from "@/services/aiService";
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+import type { ProfileTask } from "@/features/work-profile/types";
 import {
   DEFAULT_TASK_ASSIST_QUESTION,
   shouldApplyTaskAssistResult,

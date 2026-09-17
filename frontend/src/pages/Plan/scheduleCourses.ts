@@ -1,5 +1,5 @@
-import { addDays, dateKey, duration, mins, overlaps, timeString, type PlanEvent } from './planModel';
-import type { Resource, Selection } from '@/pages/LearningCentre/resources';
+import { addDays, dateKey, duration, mins, overlaps, timeString, type PlanEvent } from '../../features/learning-planning/planModel';
+import type { Resource, Selection } from '@/features/learning-planning/resourceTypes';
 /** Place remaining course minutes into future, conflict-free preferred windows. */
 export function scheduleCourses(selections: Selection[], resources: Resource[], existing: PlanEvent[], now = new Date()) {
   const events: PlanEvent[] = [];

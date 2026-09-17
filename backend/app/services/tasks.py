@@ -40,8 +40,8 @@ class TaskService:
         if payload.title:
             exposure, _, _ = infer_exposure_state(payload.title)
             updated.exposure_type = exposure
-            await db.commit()
-            await db.refresh(updated)
+        await db.commit()
+        await db.refresh(updated)
         return updated
 
     @staticmethod
@@ -52,3 +52,4 @@ class TaskService:
         if task.user_id != user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Task access denied.')
         await TaskRepository.delete(db, task)
+        await db.commit()

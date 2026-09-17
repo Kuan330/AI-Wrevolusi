@@ -3,7 +3,7 @@ import { useId } from "react";
 import {
   formatScorePercent,
   scoreToPercent,
-} from "@/pages/Analysis/lib/scorePercent";
+} from "@/lib/scorePercent";
 import { cn } from "@/lib/utils";
 import "./ExposureScorePie.css";
 

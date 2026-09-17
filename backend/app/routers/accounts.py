@@ -10,6 +10,7 @@ from app.models.account import Account
 from app.models.user import User
 from app.core.security import get_password_hash, verify_password, set_auth_cookies
 from app.services.auth import AuthService, get_current_user
+from app.services.workspace import SHORTLIST_KEY, validate_workspace_shortlist
 
 router = APIRouter(prefix='/account', tags=['Account'])
 
@@ -35,8 +36,10 @@ class WorkspaceUpdate(BaseModel):
         allowed = {'aiwrevolusi.userProfile', 'aiwrevolusi.confirmedAnalysis', 'aiwrevolusi.learningCentre', 'aiwrevolusi.learningResourceSelections.v1', 'aiwrevolusi.courseLibrary.v1', 'aiwrevolusi.learningSkills.v1', 'aiwrevolusi.plan.courses.v1', 'aiwrevolusi.planner.v1', 'aiwrevolusi.possibilities.chosenDirection', 'aiwrevolusi.possibilities.shortlist', 'aiwrevolusi.possibilities.saved', 'aiwrevolusi.possibilities.intent'}
         if not data.keys() <= allowed or len(json.dumps(data)) > 2_000_000:
             raise ValueError('Workspace is invalid or too large.')
-        for value in data.values():
-            json.loads(value)
+        for key, value in data.items():
+            parsed = json.loads(value)
+            if key == SHORTLIST_KEY:
+                validate_workspace_shortlist(parsed)
         return data
 
 

@@ -1,4 +1,4 @@
 #!/bin/sh
 set -eu
 
-exec uv run --project backend python scripts/dev.py "$@"
+exec uv run --locked --project backend python scripts/dev.py "$@"

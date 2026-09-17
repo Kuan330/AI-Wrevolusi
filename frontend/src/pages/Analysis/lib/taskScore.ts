@@ -1,4 +1,4 @@
-import type { ProfileTask } from "@/pages/WorkProfile/types";
+import type { ProfileTask } from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 
 export type TaskScoreRange = readonly [number, number];

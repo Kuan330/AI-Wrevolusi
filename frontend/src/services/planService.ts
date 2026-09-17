@@ -1,10 +1,10 @@
-import { accountStorage } from "@/services/accountStorage";
-import { api } from "./api";
+import { accountStorage } from "./accountStorage.ts";
+import { api } from "./api.ts";
 import {
   demoPlan,
   validateEvent,
   type PlanState,
-} from "@/pages/Plan/planModel";
+} from "../features/learning-planning/planModel.ts";
 export interface PlanRepository {
   load(): Promise<PlanState>;
   save(state: PlanState, expectedRevision: number): Promise<PlanState>;
@@ -64,9 +64,8 @@ export function localPlanRepository(demo = false): PlanRepository {
         ? demoPlan()
         : { version: 1 as const, revision: 0, context, events: [] };
     const state = checked(JSON.parse(raw));
-    return !demo && state.context !== context
-      ? { version: 1 as const, revision: 0, context, events: [] }
-      : state;
+    // A changed profile asks for review; it does not discard saved events.
+    return state;
   };
   return {
     load: async () => read(),

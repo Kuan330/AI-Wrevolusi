@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { message } from "@/components/ui/message";
-import { syncPlanWithLearningCourses } from "@/pages/Plan/lib/planCourses";
-import { readLibrary, saveLibrary, emptyLibrary } from "../lib/libraryStorage";
-import type { LibraryState } from "../types";
+import { changeSavedCourses, type SavedCourseChange } from "@/features/learning-planning/courseOperations";
+import { readLibrary, saveLibrary, emptyLibrary } from "../../../features/learning-planning/libraryStorage";
+import type { LibraryState } from "../../../features/learning-planning/types";
 
 export function useCourseLibrary() {
   const [initial] = useState(() => {
@@ -35,45 +35,34 @@ export function useCourseLibrary() {
     }
   }
 
-  async function syncPlan(savedIds: string[]) {
+  const saving = useRef(false);
+  async function changeCourses(change: SavedCourseChange) {
+    if (saving.current || initial.error) return false;
+    saving.current = true;
     try {
-      await syncPlanWithLearningCourses(savedIds);
-    } catch {
-      setNotice(
-        "Course saved, but My Plan could not be updated. Open My Plan to retry.",
-      );
-      message.error(
-        "Course saved, but My Plan could not be updated. Open My Plan to retry.",
-      );
+      const result = await changeSavedCourses(change);
+      setState(result.library);
+      setNotice("");
+      return true;
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : "Could not save your courses. Please try again.";
+      setNotice(detail);
+      message.error(detail);
+      return false;
+    } finally {
+      saving.current = false;
     }
   }
 
-  function toggleSave(courseId: string) {
+  async function toggleSave(courseId: string) {
     const wasSaved = state.saved.includes(courseId);
-    const nextSaved = wasSaved
-      ? state.saved.filter((id) => id !== courseId)
-      : [...state.saved, courseId];
-    const changed = update({
-      ...state,
-      saved: nextSaved,
-    });
-    if (!changed) {
-      message.error("Could not save your changes. Please try again.");
-      return;
-    }
-    void syncPlan(nextSaved);
-    message.success(wasSaved ? "Removed from My Plan" : "Added to My Plan");
+    const changed = await changeCourses(wasSaved ? { remove: [courseId] } : { add: [courseId] });
+    if (changed) message.success(wasSaved ? "Removed from My Plan" : "Added to My Plan");
+    return changed;
   }
 
-  /** Drop courses from the learning list (e.g. when their skill is removed). */
-  function removeSavedCourses(courseIds: string[]) {
-    if (!courseIds.length) return false;
-    const drop = new Set(courseIds);
-    const nextSaved = state.saved.filter((id) => !drop.has(id));
-    if (nextSaved.length === state.saved.length) return false;
-    const changed = update({ ...state, saved: nextSaved });
-    if (changed) void syncPlan(nextSaved);
-    return changed;
+  async function removeSavedCoursesForSkill(id: string, remainingIds: string[]) {
+    return changeCourses({ removeSkill: { id, remainingIds } });
   }
 
   return {
@@ -81,6 +70,6 @@ export function useCourseLibrary() {
     update,
     notice,
     toggleSave,
-    removeSavedCourses,
+    removeSavedCoursesForSkill,
   };
 }

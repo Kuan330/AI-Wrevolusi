@@ -1,7 +1,7 @@
-import { accountStorage } from "@/services/accountStorage";
-import { loadCourseDirectory } from "@/pages/LearningCentre/lib/courseDirectory";
-import { readLibrary } from "@/pages/LearningCentre/lib/libraryStorage";
-import type { Course as CatalogueCourse } from "@/pages/LearningCentre/types";
+import { accountStorage, hasAccountWorkspace, currentWorkspaceSession, readGuestLegacyItem } from "../../services/accountStorage.ts";
+import { loadCourseDirectory } from "./courseDirectory.ts";
+import { readLibrary } from "./libraryStorage.ts";
+import type { Course as CatalogueCourse } from "@/features/learning-planning/types";
 
 export type PlanChapter = { title: string; value: number };
 export type PlanCourse = {
@@ -120,29 +120,16 @@ function parseState(raw: string | null): PlanState | null {
 }
 
 export function readPlanState(): PlanState {
-  const current = parseState(accountStorage.getItem(KEY));
+  const raw = accountStorage.getItem(KEY);
+  const current = parseState(raw);
   if (current) return current;
+  if (raw !== null) throw new Error("Saved plan could not be read. Your stored data has not been overwritten.");
 
-  // Migrate orphan browser copies (e.g. written before the key was synced).
-  const orphan =
-    typeof localStorage !== "undefined"
-      ? parseState(localStorage.getItem(KEY))
-      : null;
-  if (orphan) {
-    savePlanState(orphan);
-    return orphan;
-  }
+  // Browser legacy data belongs to the guest. Signing in must never import it
+  // implicitly into an empty account workspace.
+  if (hasAccountWorkspace()) return emptyState();
 
-  const legacy =
-    parseState(accountStorage.getItem(LEGACY_KEY)) ??
-    parseState(
-      typeof sessionStorage !== "undefined"
-        ? sessionStorage.getItem(LEGACY_KEY)
-        : null,
-    ) ??
-    (typeof localStorage !== "undefined"
-      ? parseState(localStorage.getItem(LEGACY_KEY))
-      : null);
+  const legacy = parseState(readGuestLegacyItem(LEGACY_KEY));
   if (legacy) {
     savePlanState(legacy);
     return legacy;
@@ -152,12 +139,7 @@ export function readPlanState(): PlanState {
 
 export function savePlanState(state: PlanState) {
   accountStorage.setItem(KEY, JSON.stringify(state));
-  // Always keep a local mirror so refresh works even if workspace sync lags.
-  try {
-    localStorage.setItem(KEY, JSON.stringify(state));
-  } catch {
-    /* Storage may be unavailable in private mode. */
-  }
+
 }
 
 export function catalogueToPlanCourse(
@@ -188,31 +170,36 @@ export function catalogueToPlanCourse(
  * Progress is preserved for courses that remain in the list.
  */
 export async function syncPlanWithLearningCourses(
-  savedIds: string[] = readLibrary().saved,
+  savedIds?: string[],
 ): Promise<PlanState> {
+  const owner = currentWorkspaceSession();
   const directory = await loadCourseDirectory();
+  if (owner !== currentWorkspaceSession())
+    throw new Error("Your account changed. Reload before changing saved courses.");
   const previous = readPlanState();
-  const previousById = new Map(
-    previous.courses.map((course) => [course.id, course]),
-  );
-
-  const nextCourses: PlanCourse[] = [];
-  for (const id of savedIds) {
-    const catalogue = directory.get(id);
-    if (!catalogue) continue;
-    nextCourses.push(
-      catalogueToPlanCourse(catalogue, previousById.get(id)),
-    );
-  }
-
-  const next = { ...previous, courses: nextCourses };
+  const next = planForSavedCourses(savedIds ?? readLibrary().saved, directory, previous);
   savePlanState(next);
   return next;
 }
 
+export function planForSavedCourses(
+  savedIds: string[],
+  directory: Map<string, CatalogueCourse>,
+  previous: PlanState,
+): PlanState {
+  const previousById = new Map(previous.courses.map((course) => [course.id, course]));
+  const courses = savedIds.flatMap((id) => {
+    const catalogue = directory.get(id);
+    const existing = previousById.get(id);
+    // Keep recorded progress when a saved course temporarily leaves the catalogue.
+    return catalogue ? [catalogueToPlanCourse(catalogue, existing)] : existing ? [existing] : [];
+  });
+  return { ...previous, courses };
+}
+
 /** @deprecated Prefer syncPlanWithLearningCourses. */
 export async function commitLearningCoursesToPlan(
-  savedIds: string[] = readLibrary().saved,
+  savedIds?: string[],
 ): Promise<PlanState> {
   return syncPlanWithLearningCourses(savedIds);
 }

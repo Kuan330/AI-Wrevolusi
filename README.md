@@ -41,14 +41,14 @@ To start only the backend:
 
 ```bash
 cd backend
-uv sync
+uv sync --locked
 ```
 
 Copy `backend/.env.example` to `backend/.env`, set a valid Neon development
 `DATABASE_URL`, and replace `JWT_SECRET_KEY`. Never commit either secret. Then run:
 
 ```bash
-uv run uvicorn app.main:app --reload
+uv run --locked uvicorn app.main:app --reload
 ```
 
 Backend will run at:

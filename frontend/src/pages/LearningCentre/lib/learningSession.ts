@@ -1,6 +1,6 @@
-import type { PlanEvent } from "@/pages/Plan/planModel";
+import type { PlanEvent } from "@/features/learning-planning/planModel";
 import type { Resource, Selection } from "../resources";
-import { addDays, mins, timeString } from "@/pages/Plan/planModel";
+import { addDays, mins, timeString } from "@/features/learning-planning/planModel";
 /** Produces an editable session, never a saved calendar event. */
 export function learningSession(
   resource: Resource | undefined,

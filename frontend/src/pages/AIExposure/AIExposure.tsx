@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import type { TaskScoreRange } from "@/pages/Analysis/lib/taskScore";
 import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
-import { readConfirmedAnalysis } from "@/pages/WorkProfile/userProfile";
+import { readConfirmedAnalysis } from "@/features/work-profile/userProfile";
 import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
 import ExposureCompareCard from "./components/ExposureCompareCard";

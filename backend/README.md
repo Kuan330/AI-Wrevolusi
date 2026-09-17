@@ -15,14 +15,14 @@ FastAPI backend scaffold for AI-Wrevolusi with PostgreSQL/Neon, SQLAlchemy 2.0, 
 
 ```bash
 cd backend
-uv sync
+uv sync --locked
 cp .env.example .env  # if .env does not exist yet
 ```
 
 Set a real `DATABASE_URL` in `.env`, then start:
 
 ```bash
-uv run uvicorn app.main:app --reload
+uv run --locked uvicorn app.main:app --reload
 ```
 
 Backend URL:
@@ -32,13 +32,19 @@ Backend URL:
 
 ## Database & migrations
 
-```bash
-cd backend
-uv run alembic revision --autogenerate -m "init"
-uv run alembic upgrade head
-```
+The committed migration chain starts with learning tables and expects existing
+application tables such as `app_users`. It does **not** yet initialize an empty
+database. Do not generate a personal `init` revision to work around this.
 
-Alembic reads `DATABASE_URL` from `.env`.
+Alembic reads `DATABASE_URL` from `.env`. For an existing database, check its
+schema and recorded revision before planning an upgrade. Startup
+`AUTO_CREATE_TABLES` is disabled by default; it creates missing ORM tables but
+does not migrate columns or record Alembic revisions. Do not combine it with
+migration-managed databases.
+
+The [database baseline proposal](../docs/database-baseline-proposal.md) describes
+the checks needed before implementing a supported fresh-install and upgrade
+path. No baseline migration or database adoption has been implemented yet.
 
 ## Dependency groups
 

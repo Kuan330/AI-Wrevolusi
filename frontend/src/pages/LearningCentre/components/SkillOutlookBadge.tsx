@@ -2,7 +2,7 @@ import { useRef, type RefObject } from "react";
 import { Popover } from "@base-ui/react/popover";
 import type { WefSkill } from "@/types/reference";
 import SkillOutlookSummary from "@/pages/Skills/components/SkillOutlookSummary";
-import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
+import { PAGE_GRADIENT_CSS } from "@/constants/palette";
 
 export type SkillOutlookBadgeProps = {
   skill: WefSkill;
