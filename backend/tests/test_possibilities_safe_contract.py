@@ -12,6 +12,8 @@ from app.schemas.possibilities import (
 from app.services.possibilities import (
     classify_skill_state,
     filter_allowed_directions,
+    recommend_occupations,
+    skill_overlap_score,
     slugify_skill_name,
     validate_shortlist_ids,
 )
@@ -128,10 +130,8 @@ def test_response_contract_rejects_demo_skill_ids_and_bounds_scores() -> None:
 
 
 def test_recommendations_rank_real_occupations_by_confirmed_skill_overlap() -> None:
-    from app.services.possibilities import recommend_occupations
-
     occupations = [
-        {'occupation_code': '100', 'title': 'First', 'tasks': ['analyse data', 'lead team']},
+        {'occupation_code': '100', 'title': 'First', 'tasks': ['analyse data', 'lead a team']},
         {'occupation_code': '200', 'title': 'Second', 'tasks': ['analyse data']},
         {'occupation_code': 'fake', 'title': 'No mapping', 'tasks': ['holiday cooking']},
     ]
@@ -139,12 +139,38 @@ def test_recommendations_rank_real_occupations_by_confirmed_skill_overlap() -> N
     result = recommend_occupations(occupations, {1, 3}, skills)
     assert [row['occupation_code'] for row in result] == ['100', '200']
     assert result[0]['coverage_pct'] == 100
+    assert result[1]['coverage_pct'] == 67
 
 
-def test_chosen_direction_score_counts_owned_and_shortlisted_once() -> None:
+def test_recommendations_exclude_current_role_before_applying_limit() -> None:
+    occupations = [
+        {'occupation_code': '100', 'title': 'Current', 'tasks': ['analyse data', 'lead a team']},
+        {'occupation_code': '200', 'title': 'Alternative', 'tasks': ['analyse data']},
+    ]
+    skills = {1: {'core_skill': 'Analytical thinking'}, 3: {'core_skill': 'Leadership'}}
+
+    result = recommend_occupations(
+        occupations,
+        {1, 3},
+        skills,
+        limit=1,
+        excluded_codes={'100'},
+    )
+
+    assert [row['occupation_code'] for row in result] == ['200']
+
+
+def test_skill_overlap_score_penalizes_narrow_one_skill_matches() -> None:
+    assert skill_overlap_score({1, 2, 3}, {3}) == 50
+    assert skill_overlap_score({1, 2}, {1, 2}) == 100
+    assert skill_overlap_score({1, 2}, {3, 4}) == 0
+    assert skill_overlap_score(set(), {1}) == 0
+
+
+def test_chosen_direction_score_does_not_count_shortlisted_skills_as_owned() -> None:
     from app.services.possibilities import chosen_direction_score
 
-    assert chosen_direction_score({1, 2}, {2, 3}, {1, 2, 3, 4}) == 62.5
+    assert chosen_direction_score({1, 2}, {1, 2, 3, 4}) == 67
 
 
 def test_direction_payload_maps_database_industry_to_schema_area() -> None:

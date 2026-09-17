@@ -87,7 +87,7 @@ def _task_text(task: object) -> str:
 
 # Reference occupation→skill maps are stable for a process; cache avoids re-matching
 # every occupation on each Possibilities request (the main timeout source).
-_required_skills_cache: dict[str, frozenset[int]] = {}
+_required_skills_cache: dict[str, tuple[tuple[str, ...], frozenset[int]]] = {}
 _required_skills_cache_key: tuple[int, tuple[tuple[int, str], ...]] | None = None
 
 
@@ -130,44 +130,64 @@ def _cached_occupation_required_skills(
     if _required_skills_cache_key != cache_key:
         _required_skills_cache = {}
         _required_skills_cache_key = cache_key
+    task_texts = tuple(_task_text(task) for task in tasks)
     cached = _required_skills_cache.get(occupation_code)
-    if cached is not None:
-        return set(cached)
-    required = frozenset(occupation_required_skills(tasks, skills))
-    _required_skills_cache[occupation_code] = required
+    if cached is not None and cached[0] == task_texts:
+        return set(cached[1])
+    required = frozenset(occupation_required_skills(task_texts, skills))
+    _required_skills_cache[occupation_code] = (task_texts, required)
     return set(required)
 
 
+def skill_overlap_score(
+    confirmed_skill_ids: set[int], required_skill_ids: set[int]
+) -> int:
+    """Return a symmetric overlap score without rewarding narrow subsets as 100%."""
+
+    if not confirmed_skill_ids or not required_skill_ids:
+        return 0
+    shared = confirmed_skill_ids & required_skill_ids
+    return round(
+        2 * len(shared) * 100 / (len(confirmed_skill_ids) + len(required_skill_ids))
+    )
+
+
 def recommend_occupations(
-    occupations: Iterable[Mapping], confirmed_skill_ids: set[int], skills: Mapping[int, Mapping], limit: int = 3
+    occupations: Iterable[Mapping],
+    confirmed_skill_ids: set[int],
+    skills: Mapping[int, Mapping],
+    limit: int = 3,
+    excluded_codes: set[str] | None = None,
 ) -> list[dict]:
-    """Return valid real occupations, ranked by overlap; input order breaks ties."""
+    """Return real alternative occupations ranked by symmetric skill overlap."""
+
+    excluded = excluded_codes or set()
     ranked: list[dict] = []
     for occupation in occupations:
         code = str(occupation.get('occupation_code') or occupation.get('masco_code') or '')
+        if not code or code in excluded:
+            continue
         required = _cached_occupation_required_skills(code, occupation.get('tasks') or [], skills)
         if not required:
             continue
-        owned = required & confirmed_skill_ids
         ranked.append({
             'occupation_code': code,
             'title': str(occupation.get('title') or ''),
             'area': occupation.get('industry'),
             'description': str(occupation.get('description') or ''),
-            'coverage_pct': round(len(owned) * 100 / len(required)),
+            'coverage_pct': skill_overlap_score(confirmed_skill_ids, required),
             'required_skill_ids': sorted(required),
         })
     ranked.sort(key=lambda row: -row['coverage_pct'])
     return ranked[:limit]
 
 
-def chosen_direction_score(owned_skill_ids: set[int], shortlisted_skill_ids: set[int], required_skill_ids: set[int]) -> int:
-    """Score owned skills fully and shortlisted-only skills half, once each."""
-    if not required_skill_ids:
-        return 0
-    owned = owned_skill_ids & required_skill_ids
-    shortlist_only = (shortlisted_skill_ids & required_skill_ids) - owned
-    return (len(owned) + 0.5 * len(shortlist_only)) * 100 / len(required_skill_ids)
+def chosen_direction_score(
+    owned_skill_ids: set[int], required_skill_ids: set[int]
+) -> int:
+    """Use the same overlap score; planned skills are not owned capabilities."""
+
+    return skill_overlap_score(owned_skill_ids, required_skill_ids)
 
 
 def filter_allowed_directions(
@@ -206,6 +226,7 @@ __all__ = [
     'filter_allowed_directions',
     'occupation_required_skills',
     'recommend_occupations',
+    'skill_overlap_score',
     'slugify_skill_name',
     'validate_shortlist_ids',
 ]
