@@ -115,16 +115,6 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
                 <h3>Before you start</h3>
                 <p>{course.prereq}</p>
               </section>
-
-              <section className="learning-course-disclaimer">
-                <h3>What won’t change</h3>
-                <p>
-                  Completing this course will not automatically lower your ILO
-                  task exposure score. Exposure reflects how a task may be
-                  reshaped by AI; learning builds skills and next-step
-                  recommendations around that work.
-                </p>
-              </section>
             </TabsContent>
             <TabsContent value="chapters">
               <p className="library-muted my-4">
