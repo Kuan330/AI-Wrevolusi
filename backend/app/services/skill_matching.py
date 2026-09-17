@@ -27,6 +27,8 @@ from app.schemas.skill_matching import (
 
 MAX_SKILL_MATCHES = 3
 MINIMUM_SKILL_MATCH_CONFIDENCE = 0.50
+# Occupation profiles need the full evidence set; the UI/task suggest path stays capped.
+MAX_OCCUPATION_SKILL_MATCHES = len(SKILL_RULES) if False else 26  # filled after SKILL_RULES — see below
 
 
 @dataclass(frozen=True)
@@ -66,7 +68,7 @@ SKILL_RULES: tuple[SkillRule, ...] = (
     SkillRule(20, ("marketing", "media", "campaigns", "social media", "advertising", "brand", "content creation"), 0.86),
     SkillRule(21, ("reading", "writing", "report writing", "documentation", "mathematics", "numeracy", "calculations", "budget", "financial transactions", "invoice", "payment", "records"), 0.80),
     SkillRule(22, ("environmental", "environmental stewardship", "stewardship", "sustainability", "sustainable", "carbon footprint", "recycling", "esg"), 0.86),
-    SkillRule(23, ("programming", "coding", "software development", "python", "javascript", "sql", "writing code"), 0.88),
+    SkillRule(23, ("programming", "coding", "software development", "python", "javascript", "sql", "writing code", "computer code"), 0.88),
     SkillRule(24, ("manual dexterity", "manual", "dexterity", "precision", "hand tools", "assembling", "stacking", "packing"), 0.80),
     SkillRule(25, ("global citizenship", "citizenship", "diversity", "inclusion", "cross-cultural"), 0.80),
     SkillRule(26, ("sensory", "sensory-processing", "colour detection", "colour matching"), 0.78),
@@ -125,8 +127,15 @@ def _rule_evidence(task_text: str, patterns: tuple[re.Pattern[str], ...]) -> lis
 def match_skills(
     task_text: str,
     candidates: Sequence[SkillMatchCandidate | Mapping[str, Any]],
+    *,
+    limit: int | None = MAX_SKILL_MATCHES,
 ) -> list[SkillMatchItem]:
-    """Return the strongest matches, at most three, from the candidate allowlist."""
+    """Return the strongest matches from the candidate allowlist.
+
+    Task-level suggestions stay capped (default ``MAX_SKILL_MATCHES``). Pass
+    ``limit=None`` when building an occupation skill set so every matched WEF
+    skill is kept for overlap percentages.
+    """
 
     if not task_text.strip():
         return []
@@ -156,7 +165,9 @@ def match_skills(
     # Strongest signal first. Ordered by the rule table instead, the suggestions
     # a user sees would depend on where a rule happens to sit in the file.
     matches.sort(key=lambda item: item.confidence, reverse=True)
-    return matches[:MAX_SKILL_MATCHES]
+    if limit is None:
+        return matches
+    return matches[: max(0, limit)]
 
 
 def match_skills_response(

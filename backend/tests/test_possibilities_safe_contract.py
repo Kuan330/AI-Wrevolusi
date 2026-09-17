@@ -131,14 +131,51 @@ def test_recommendations_rank_real_occupations_by_confirmed_skill_overlap() -> N
     from app.services.possibilities import recommend_occupations
 
     occupations = [
-        {'occupation_code': '100', 'title': 'First', 'tasks': ['analyse data', 'lead team']},
-        {'occupation_code': '200', 'title': 'Second', 'tasks': ['analyse data']},
-        {'occupation_code': 'fake', 'title': 'No mapping', 'tasks': ['holiday cooking']},
+        {
+            'occupation_code': '100',
+            'title': 'First',
+            'description': 'Lead teams and analyse problems',
+            'tasks': [
+                'analyse data and problem solving',
+                'lead a team and supervising staff',
+                'mentor and coaching new staff',
+            ],
+        },
+        {
+            'occupation_code': '200',
+            'title': 'Second',
+            'description': 'Analyse business data and write reports for managers',
+            'tasks': [
+                'analyse data carefully',
+                'write reports and documentation',
+                'check calculations and budget records',
+            ],
+        },
+        {
+            'occupation_code': 'fake',
+            'title': 'No mapping',
+            'tasks': ['holiday cooking'],
+        },
+        {
+            'occupation_code': 'current',
+            'title': 'Current role',
+            'tasks': ['analyse data', 'lead a team'],
+        },
     ]
-    skills = {1: {'core_skill': 'Analytical thinking'}, 3: {'core_skill': 'Leadership'}}
-    result = recommend_occupations(occupations, {1, 3}, skills)
+    skills = {
+        1: {'core_skill': 'Analytical thinking'},
+        3: {'core_skill': 'Leadership'},
+        16: {'core_skill': 'Teaching and mentoring'},
+        21: {'core_skill': 'Reading, writing and mathematics'},
+    }
+    result = recommend_occupations(
+        occupations, {1, 3}, skills, exclude_codes={'current'}
+    )
     assert [row['occupation_code'] for row in result] == ['100', '200']
-    assert result[0]['coverage_pct'] == 100
+    assert 'current' not in {row['occupation_code'] for row in result}
+    assert result[0]['coverage_pct'] >= result[1]['coverage_pct']
+    assert len(result[0]['required_skill_ids']) >= 2
+    assert {1, 3}.issubset(result[0]['required_skill_ids'])
 
 
 def test_chosen_direction_score_counts_owned_and_shortlisted_once() -> None:

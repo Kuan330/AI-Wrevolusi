@@ -10,6 +10,7 @@ from app.services.auth import get_current_user
 from app.services.possibilities import (
     chosen_direction_score,
     confirmed_workspace_evidence,
+    occupation_required_skills,
     recommend_occupations,
     validate_shortlist_ids,
 )
@@ -94,23 +95,31 @@ async def get_possibilities(
     confirmed_texts, workspace_role = confirmed_workspace_evidence(workspace, occupation_rows)
     task_texts = set(confirmed_texts)
     task_texts.update(f"{task['title']} {task['description'] or ''}".strip() for task in confirmed_rows)
-    owned = {item.wef_skill_id for task_text in task_texts for item in match_skills(task_text, candidates)}
+    owned = {
+        item.wef_skill_id
+        for task_text in task_texts
+        for item in match_skills(task_text, candidates, limit=None)
+    }
     has_confirmed_tasks = bool(confirmed_rows or confirmed_texts)
     shortlist_raw = _json_value(workspace, 'aiwrevolusi.possibilities.shortlist', [])
     shortlist = validate_shortlist_ids(shortlist_raw, allowed_skill_ids=set(skills), limit=60) if isinstance(shortlist_raw, list) else []
     chosen_raw = _json_value(workspace, 'aiwrevolusi.possibilities.chosenDirection', {})
     chosen_code = chosen_raw.get('occupation_code') if isinstance(chosen_raw, dict) else None
 
-    # CPU-heavy ranking — keep the async event loop free on cold cache fills.
-    recommendations = await asyncio.to_thread(recommend_occupations, occupation_rows, owned, skills)
-    allowed_codes = {row['occupation_code'] for row in recommendations}
-    if chosen_code not in allowed_codes:
-        chosen_code = None
     role = workspace_role
     if role is None and current_user.occupation_id:
         role_row = (await db.execute(text('SELECT masco_code, title FROM occupations WHERE id=:id'), {'id': current_user.occupation_id})).mappings().one_or_none()
         if role_row:
             role = {'occupation_code': role_row['masco_code'], 'title': role_row['title']}
+
+    exclude_codes = {role['occupation_code']} if role and role.get('occupation_code') else set()
+    # CPU-heavy ranking — keep the async event loop free on cold cache fills.
+    recommendations = await asyncio.to_thread(
+        recommend_occupations, occupation_rows, owned, skills, 3, exclude_codes=exclude_codes
+    )
+    allowed_codes = {row['occupation_code'] for row in recommendations}
+    if chosen_code not in allowed_codes:
+        chosen_code = None
     from app.services.possibilities import slugify_skill_name
     skill_items = [{'skill_id': i, 'skill_slug': slugify_skill_name(str(row['core_skill'])), 'name': row['core_skill'], 'state': 'have' if i in owned else ('shortlisted' if i in shortlist else 'missing')} for i, row in skills.items()]
     for row in recommendations:
@@ -120,4 +129,27 @@ async def get_possibilities(
         }
     directions = [build_direction_payload(row, skills) for row in recommendations]
     chosen_score = next((chosen_direction_score(owned, set(shortlist), set(row['required_skill_ids'])) for row in recommendations if row['occupation_code'] == chosen_code), None)
-    return PossibilitiesResponse(disclaimer=DISCLAIMER, source='live', status='ready' if owned else ('unavailable' if has_confirmed_tasks else 'needs_profile'), current_role=role, skills=skill_items, directions=directions, chosen_direction_code=chosen_code, chosen_direction_coverage_pct=chosen_score if chosen_score is not None else None, shortlisted_skill_ids=shortlist)
+    current_role_coverage_pct = None
+    if role:
+        current_ref = next(
+            (row for row in occupation_rows if row['occupation_code'] == role['occupation_code']),
+            None,
+        )
+        if current_ref is not None:
+            required = occupation_required_skills(
+                current_ref.get('tasks') or [], skills, occupation=current_ref
+            )
+            if required:
+                current_role_coverage_pct = round(len(owned & required) * 100 / len(required))
+    return PossibilitiesResponse(
+        disclaimer=DISCLAIMER,
+        source='live',
+        status='ready' if owned else ('unavailable' if has_confirmed_tasks else 'needs_profile'),
+        current_role=role,
+        current_role_coverage_pct=current_role_coverage_pct,
+        skills=skill_items,
+        directions=directions,
+        chosen_direction_code=chosen_code,
+        chosen_direction_coverage_pct=chosen_score if chosen_score is not None else None,
+        shortlisted_skill_ids=shortlist,
+    )
