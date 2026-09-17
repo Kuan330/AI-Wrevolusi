@@ -9,7 +9,9 @@ from app.services.auth import get_current_user
 from app.services.possibilities import (
     chosen_direction_score,
     confirmed_workspace_evidence,
+    occupation_required_skills,
     recommend_occupations,
+    skill_overlap_score,
     validate_shortlist_ids,
 )
 from app.schemas.possibilities import PossibilitiesResponse
@@ -79,15 +81,31 @@ async def get_possibilities(
     shortlist = validate_shortlist_ids(shortlist_raw, allowed_skill_ids=set(skills), limit=60) if isinstance(shortlist_raw, list) else []
     chosen_raw = _json_value(workspace, 'aiwrevolusi.possibilities.chosenDirection', {})
     chosen_code = chosen_raw.get('occupation_code') if isinstance(chosen_raw, dict) else None
-    recommendations = recommend_occupations(occupation_rows, owned, skills)
-    allowed_codes = {row['occupation_code'] for row in recommendations}
-    if chosen_code not in allowed_codes:
-        chosen_code = None
     role = workspace_role
     if role is None and current_user.occupation_id:
         role_row = (await db.execute(text('SELECT masco_code, title FROM occupations WHERE id=:id'), {'id': current_user.occupation_id})).mappings().one_or_none()
         if role_row:
             role = {'occupation_code': role_row['masco_code'], 'title': role_row['title']}
+    current_role_score = None
+    if role is not None:
+        current_role_row = next(
+            (row for row in occupation_rows if row['occupation_code'] == role['occupation_code']),
+            None,
+        )
+        if current_role_row is not None:
+            current_role_required = occupation_required_skills(
+                current_role_row.get('tasks') or [], skills
+            )
+            current_role_score = skill_overlap_score(owned, current_role_required)
+    recommendations = recommend_occupations(
+        occupation_rows,
+        owned,
+        skills,
+        excluded_codes={role['occupation_code']} if role is not None else None,
+    )
+    allowed_codes = {row['occupation_code'] for row in recommendations}
+    if chosen_code not in allowed_codes:
+        chosen_code = None
     from app.services.possibilities import slugify_skill_name
     skill_items = [{'skill_id': i, 'skill_slug': slugify_skill_name(str(row['core_skill'])), 'name': row['core_skill'], 'state': 'have' if i in owned else ('shortlisted' if i in shortlist else 'missing')} for i, row in skills.items()]
     for row in recommendations:
@@ -96,5 +114,5 @@ async def get_possibilities(
             for skill_id in row['required_skill_ids']
         }
     directions = [build_direction_payload(row, skills) for row in recommendations]
-    chosen_score = next((chosen_direction_score(owned, set(shortlist), set(row['required_skill_ids'])) for row in recommendations if row['occupation_code'] == chosen_code), None)
-    return PossibilitiesResponse(disclaimer=DISCLAIMER, source='live', status='ready' if owned else ('unavailable' if has_confirmed_tasks else 'needs_profile'), current_role=role, skills=skill_items, directions=directions, chosen_direction_code=chosen_code, chosen_direction_coverage_pct=chosen_score if chosen_score is not None else None, shortlisted_skill_ids=shortlist)
+    chosen_score = next((chosen_direction_score(owned, set(row['required_skill_ids'])) for row in recommendations if row['occupation_code'] == chosen_code), None)
+    return PossibilitiesResponse(disclaimer=DISCLAIMER, source='live', status='ready' if owned else ('unavailable' if has_confirmed_tasks else 'needs_profile'), current_role=role, current_role_coverage_pct=current_role_score, skills=skill_items, directions=directions, chosen_direction_code=chosen_code, chosen_direction_coverage_pct=chosen_score if chosen_score is not None else None, shortlisted_skill_ids=shortlist)
