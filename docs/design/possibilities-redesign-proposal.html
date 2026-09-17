@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Possibilities 页面设计提案 — 美化 · 功能整合 · IP 人物</title>
+<style>
+:root{
+  --ink:#342d3c; --muted:#7b7282; --line:#e9e5eb;
+  --blue:#486f88; --blue-deep:#355974; --blue-soft:#e6eff7; --blue-mist:#f1f6fa;
+  --green:#48735b; --green-soft:#e8f3eb;
+  --amber:#806243; --amber-soft:#fff0db;
+  --plum:#6d5d7a; --plum-soft:#f6f3f8;
+  --pink:#e9b7c8; --pink-soft:#fdf1f5;
+  --card:rgba(255,255,255,.78);
+  --r:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;color:var(--ink);background:linear-gradient(160deg,#eaf3fb 0%,#f6f0fa 55%,#fbeef3 100%);line-height:1.7}
+.wrap{max-width:1180px;margin:0 auto;padding:48px 28px 80px}
+.doc-eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:40px;font-weight:650;letter-spacing:-.03em;margin:10px 0 8px}
+.doc-sub{color:var(--muted);font-size:14px;max-width:640px}
+.doc-meta{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 0}
+.tag{font-size:11px;padding:5px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--blue)}
+.toc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:34px 0 56px}
+.toc a{display:block;background:var(--card);border:1px solid #fff;border-radius:var(--r);padding:18px 20px;text-decoration:none;color:var(--ink);box-shadow:0 4px 18px rgba(52,45,60,.05);transition:transform .15s}
+.toc a:hover{transform:translateY(-2px)}
+.toc b{display:block;font-size:15px;margin-bottom:4px}
+.toc span{font-size:12px;color:var(--muted)}
+.toc i{font-style:normal;font-size:11px;color:var(--blue);letter-spacing:.12em}
+section{margin-bottom:72px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.sec-num{font-size:13px;color:var(--blue);letter-spacing:.14em;font-weight:600}
+h2{font-size:27px;font-weight:650;letter-spacing:-.02em}
+.sec-sub{color:var(--muted);font-size:13.5px;margin:6px 0 26px;max-width:720px}
+h3{font-size:16px;font-weight:650;margin:30px 0 12px}
+h4{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+p.note{font-size:12.5px;color:var(--muted)}
+.callout{background:var(--blue-soft);border:1px solid #cfe0ee;border-radius:14px;padding:14px 18px;font-size:12.5px;color:var(--blue-deep);margin:16px 0}
+.callout b{font-weight:650}
+
+/* ============ MOCKUP FRAME ============ */
+.frame{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(52,45,60,.10)}
+.mock-nav{display:flex;align-items:center;gap:26px;padding:16px 34px;background:rgba(255,255,255,.85);border-bottom:1px solid var(--line);font-size:13px}
+.mock-logo{display:flex;align-items:center;gap:9px;font-weight:650}
+.mock-logo .dot{width:26px;height:26px;border-radius:9px;background:linear-gradient(135deg,#7b5ea7,#4f7ea8);display:grid;place-items:center;color:#fff;font-size:12px}
+.mock-nav .links{display:flex;gap:22px;color:#5a5262}
+.mock-nav .links .on{color:var(--blue);background:var(--blue-soft);padding:5px 14px;border-radius:999px;font-weight:600}
+.mock-body{padding:34px 40px 40px;background:linear-gradient(165deg,#f2f7fc 0%,#faf5fa 60%,#fdeff4 100%)}
+.mock-title h1{font-size:30px;letter-spacing:-.02em;margin:0 0 4px}
+.mock-title p{color:var(--muted);font-size:13px}
+
+/* step 1 card */
+.px-card{background:var(--card);border:1px solid #fff;border-radius:var(--r);padding:26px 28px;box-shadow:0 6px 24px rgba(52,45,60,.06);margin-top:26px}
+.px-step1{display:grid;grid-template-columns:minmax(0,1fr) 150px minmax(0,1.35fr);gap:30px;align-items:center}
+.eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.px-step1 h2{font-size:24px;margin-bottom:6px}
+.px-step1 .desc{font-size:12.5px;color:var(--muted)}
+.link-arrow{display:inline-flex;align-items:center;gap:6px;color:var(--blue);font-size:12.5px;margin-top:14px;font-weight:550}
+.ring{width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--blue) calc(var(--p)*1%),#e2e8ed 0);display:grid;place-items:center;margin:0 auto}
+.ring .inner{width:78px;height:78px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .inner b{font-size:22px;font-weight:650}
+.ring .inner small{font-size:10px;color:var(--muted)}
+.ring-cap{text-align:center;font-size:10px;letter-spacing:.1em;color:var(--muted);margin-top:10px;text-transform:uppercase}
+.skills-col h3{font-size:13px;margin:0 0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:6px 11px;font-size:12px;line-height:1.4;border:1px solid transparent}
+.chip.have{background:var(--green-soft);color:var(--green)}
+.chip.learning{background:var(--blue-soft);color:var(--blue)}
+.chip.short{background:var(--amber-soft);color:var(--amber)}
+.chip.missing{background:var(--plum-soft);color:var(--plum);border-style:dashed;border-color:#ddd4e5}
+
+/* step 2 */
+.px-options{margin-top:40px}
+.px-options h2{font-size:23px}
+.dir-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+.dir-card{background:var(--card);border:1px solid #fff;border-radius:var(--r);padding:24px;display:flex;flex-direction:column;box-shadow:0 6px 24px rgba(52,45,60,.05);position:relative;transition:transform .18s,box-shadow .18s}
+.dir-card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(52,45,60,.10)}
+.dir-card.chosen{border-color:#628ba4;background:var(--blue-mist);box-shadow:0 0 0 1px #628ba4}
+.badge-chosen{position:absolute;top:16px;right:16px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--blue);color:#fff;border-radius:999px;padding:4px 11px}
+.dir-card h3{font-size:17px;margin:4px 0 14px;line-height:1.4}
+.score-row{display:flex;align-items:baseline;gap:9px}
+.score-row b{font-size:30px;font-weight:650;color:var(--blue)}
+.score-row small{font-size:14px;color:var(--blue)}
+.score-row span{font-size:9px;letter-spacing:.08em;color:#60819a;text-transform:uppercase}
+.meter{height:5px;background:#e2e8ed;border-radius:4px;margin:12px 0 14px;overflow:hidden}
+.meter i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#628ba4,#7ba3bd)}
+.dir-card .desc{font-size:12px;color:var(--muted);line-height:1.75;flex:1;margin-bottom:18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:10px;font-size:12.5px;font-weight:550;cursor:pointer;border:1px solid transparent;text-decoration:none}
+.btn-solid{background:var(--blue);color:#fff}
+.btn-solid:hover{background:var(--blue-deep)}
+.btn-ghost{background:#fff;border-color:#d2dfe8;color:var(--blue)}
+.btn-ghost:hover{background:var(--blue-soft)}
+
+/* step 3 */
+.journey{margin-top:40px}
+.journey-head{display:flex;justify-content:space-between;align-items:center}
+.journey-head h2{font-size:23px}
+.transition{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:22px;padding:22px 26px;background:var(--blue-mist);border-radius:14px;margin:22px 0 26px}
+.transition .side span{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#60819a;margin-bottom:6px}
+.transition .side b{font-size:17px;font-weight:650}
+.transition .arrow{color:var(--blue);font-size:22px}
+.journey-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:26px}
+.panel{background:#faf8fb;border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+.panel h3{font-size:13px;margin:0 0 12px}
+.chip.add{cursor:pointer;border:1px dashed #b9a94f;background:#fff8e6;color:#8a7420}
+.chip.add:hover{background:#fdf3d3}
+.legend{display:flex;gap:14px;font-size:10.5px;color:var(--muted);margin-top:14px;flex-wrap:wrap}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;font-style:normal;vertical-align:baseline}
+.next-step{display:flex;justify-content:space-between;align-items:center;gap:20px;border-top:1px solid var(--line);margin-top:26px;padding-top:22px}
+.next-step h3{margin:0 0 4px;font-size:14px}
+.next-step p{font-size:12.5px;color:var(--muted);margin:0}
+.disclaimer{font-size:10.5px;color:var(--muted);margin-top:22px}
+
+/* planbar */
+.planbar{position:sticky;bottom:14px;margin-top:26px;padding:16px 22px;border:1px solid #d2dfe8;border-radius:16px;background:#f1f6faee;backdrop-filter:blur(6px);box-shadow:0 10px 34px rgba(52,45,60,.12);display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.planbar small{display:block;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:#60819a;margin-bottom:7px}
+.planbar .grow{flex:1}
+.planbar .chips .chip{background:#e6eff7;color:var(--blue);font-size:11px;padding:5px 10px}
+.planbar a{display:flex;align-items:center;gap:8px;color:var(--blue);font-size:12.5px;font-weight:550;text-decoration:none}
+
+/* bot pet in mock */
+.mock-stage{position:relative}
+.botpet{position:absolute;right:-6px;bottom:-18px;width:120px;text-align:center;z-index:5}
+.botpet .bubble{background:#fff;border:1px solid var(--line);border-radius:14px 14px 4px 14px;padding:10px 13px;font-size:11.5px;line-height:1.55;box-shadow:0 8px 22px rgba(52,45,60,.12);margin-bottom:9px;color:var(--ink);text-align:left}
+.botpet .doll{width:86px;height:86px;margin:0 auto;border-radius:50%;background:radial-gradient(circle at 35% 30%,#aab8e8,#5d6fbe 70%);display:grid;place-items:center;font-size:40px;box-shadow:0 10px 26px rgba(93,111,190,.35);animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* before/after */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.ba .col{background:var(--card);border:1px solid #fff;border-radius:var(--r);padding:22px 24px}
+.ba h3{margin-top:0}
+.ba li{font-size:12.5px;color:var(--muted);margin:7px 0 7px 16px}
+.ba .good li{color:var(--ink)}
+
+/* tokens */
+.tok-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.tok{background:var(--card);border:1px solid #fff;border-radius:14px;padding:14px}
+.tok .sw{height:52px;border-radius:10px;margin-bottom:10px;border:1px solid rgba(52,45,60,.08)}
+.tok b{font-size:12px;display:block}
+.tok span{font-size:10.5px;color:var(--muted);font-family:ui-monospace,monospace}
+.type-spec{background:var(--card);border:1px solid #fff;border-radius:var(--r);padding:22px 26px;margin-top:18px}
+.type-row{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px dashed var(--line);padding:10px 0}
+.type-row:last-child{border:0}
+.type-row small{color:var(--muted);font-size:11px;font-family:ui-monospace,monospace}
+
+/* integration flow */
+.flow{display:flex;align-items:stretch;gap:0;margin:22px 0;flex-wrap:wrap}
+.fnode{flex:1;min-width:170px;background:var(--card);border:1px solid #fff;border-radius:14px;padding:16px 18px;box-shadow:0 4px 16px rgba(52,45,60,.05);position:relative}
+.fnode b{font-size:13px;display:block;margin-bottom:5px}
+.fnode p{font-size:11.5px;color:var(--muted);line-height:1.6}
+.fnode.src{background:var(--blue-mist);border-color:#cfe0ee}
+.farrow{display:flex;align-items:center;padding:0 10px;color:var(--blue);font-size:18px}
+.state-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 4px 16px rgba(52,45,60,.05)}
+.state-table th,.state-table td{padding:12px 16px;font-size:12.5px;text-align:left;border-bottom:1px solid var(--line)}
+.state-table th{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:#faf8fb}
+.state-table tr:last-child td{border:0}
+.state-table code{font-size:11.5px;background:var(--plum-soft);color:var(--plum);border-radius:5px;padding:2px 7px}
+.pill{font-size:10.5px;border-radius:999px;padding:3px 10px;font-weight:600}
+.pill.b{background:var(--blue-soft);color:var(--blue)}
+.pill.g{background:var(--green-soft);color:var(--green)}
+.pill.a{background:var(--amber-soft);color:var(--amber)}
+.pill.p{background:var(--plum-soft);color:var(--plum)}
+
+/* character */
+.char-hero{display:grid;grid-template-columns:300px minmax(0,1fr);gap:30px;background:var(--card);border:1px solid #fff;border-radius:22px;padding:30px;box-shadow:0 8px 30px rgba(52,45,60,.07)}
+.char-visual{background:linear-gradient(165deg,#eef3fb,#f7eef5);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px;gap:14px}
+.char-visual .doll-big{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#aab8e8,#5d6fbe 70%);display:grid;place-items:center;font-size:70px;box-shadow:0 16px 40px rgba(93,111,190,.35)}
+.char-visual .nm{font-weight:650;font-size:16px}
+.char-visual .rl{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.pose-row{display:flex;gap:10px}
+.pose{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px}
+.pose i{font-style:normal;font-size:18px}
+.char-facts{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start}
+.fact{background:#faf8fb;border:1px solid var(--line);border-radius:14px;padding:15px 17px}
+.fact h4{margin-bottom:6px}
+.fact p{font-size:12px;color:var(--muted);line-height:1.65}
+.fact p b{color:var(--ink);font-weight:600}
+.line-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 4px 16px rgba(52,45,60,.05);margin-top:14px}
+.line-table th,.line-table td{padding:11px 16px;font-size:12.5px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.line-table th{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:#faf8fb}
+.line-table tr:last-child td{border:0}
+.line-table td:first-child{white-space:nowrap;font-weight:600;font-size:12px}
+.line-table em{color:var(--muted);font-style:normal;font-size:11px;display:block;margin-top:2px}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px}
+.rule-col{background:var(--card);border:1px solid #fff;border-radius:var(--r);padding:20px 24px}
+.rule-col h3{margin:0 0 10px;font-size:14px}
+.rule-col li{font-size:12.5px;color:var(--muted);margin:6px 0 6px 16px}
+.rule-col.yes li{color:var(--ink)}
+.rule-col h3.ok{color:var(--green)}
+.rule-col h3.no{color:#b05656}
+
+.footer-note{font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:22px;margin-top:20px}
+@media(max-width:920px){
+  .px-step1,.journey-grid,.char-hero,.rules,.ba{grid-template-columns:1fr}
+  .dir-grid{grid-template-columns:1fr}
+  .toc{grid-template-columns:1fr}
+  .botpet{position:static;margin-top:18px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="doc-eyebrow">AI-Wrevolusi · FIT5120 · Design Proposal (Design Only — No Code Changes)</p>
+  <h1>Possibilities 页面设计提案</h1>
+  <p class="doc-sub">基于现有 <code>Possibilities.tsx</code> 的三段式逻辑（起点 → 方向探索 → 我的路径）与 handover 文档的数据契约，进行视觉美化、功能整合与 BotPet 人物形象设计。<b>本提案仅为设计稿，不改动任何源代码。</b></p>
+  <div class="doc-meta">
+    <span class="tag">视觉美化</span><span class="tag">功能整合</span><span class="tag">IP 人物设计</span>
+    <span class="tag">数据契约: contract_version 1</span><span class="tag">安全边界: disclaimer 保留</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#s1"><i>PART 1</i><b>页面美化</b><span>三段式布局重排 · 视觉令牌 · 组件细节</span></a>
+  <a href="#s2"><i>PART 2</i><b>功能整合</b><span>数据流 · 页面状态 · 短名单闭环 · 安全边界</span></a>
+  <a href="#s3"><i>PART 3</i><b>IP 人物设计</b><span>Nova 角色设定 · 话术系统 · 行为规则</span></a>
+</nav>
+
+<!-- ================================================================ -->
+<section id="s1">
+  <div class="sec-head"><span class="sec-num">PART 1</span><h2>页面美化</h2></div>
+  <p class="sec-sub">保留现有信息架构与全部交互逻辑（覆盖率数字、方向选择、短名单、Learning Resources 跳转），重排视觉层级：每一段都有明确的「标题 → 证据 → 行动」节奏，用进度环替代裸百分比，用色彩系统区分技能四态。</p>
+
+  <div class="frame mock-stage">
+    <div class="mock-nav">
+      <div class="mock-logo"><span class="dot">A</span>AI-Wrevolusi</div>
+      <div class="links"><span>AI Impact</span><span>Learning Resources</span><span>My Plan</span><span class="on">Possibilities</span></div>
+    </div>
+    <div class="mock-body">
+      <div class="mock-title">
+        <h1>Possibilities</h1>
+        <p>Grow in your current role, or explore where your experience could take you next.</p>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="px-card px-step1">
+        <div>
+          <p class="eyebrow">01 · Your Starting Point</p>
+          <h2>Web Technicians</h2>
+          <p class="desc">These connections come from your confirmed Work Profile.</p>
+          <span class="link-arrow">Review work profile →</span>
+        </div>
+        <div>
+          <div class="ring" style="--p:0"><div class="inner"><b>0<small style="font-size:12px">%</small></b><small>coverage</small></div></div>
+          <p class="ring-cap">Current role coverage</p>
+        </div>
+        <div class="skills-col">
+          <h3>Skills in your profile</h3>
+          <div class="chips">
+            <span class="chip have">Technological literacy</span>
+            <span class="chip have">Service orientation and customer service</span>
+            <span class="chip have">Systems thinking</span>
+            <span class="chip have">Resource management and operations</span>
+            <span class="chip have">Dependability and attention to detail</span>
+            <span class="chip have">Design and user experience</span>
+            <span class="chip have">Reading, writing and mathematics</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="px-options">
+        <p class="eyebrow" style="margin-bottom:6px">02 · Explore Other Directions</p>
+        <h2>Where could you go next?</h2>
+        <div class="dir-grid">
+          <article class="dir-card chosen">
+            <span class="badge-chosen">✓ Chosen</span>
+            <p class="eyebrow">Public Administration</p>
+            <h3>Senior Government Officials</h3>
+            <div class="score-row"><b>100</b><small>%</small><span>Skill coverage</span></div>
+            <div class="meter"><i style="width:100%"></i></div>
+            <p class="desc">Occupational group from the ILO 2025 task dataset (ISCO-08).</p>
+            <a class="btn btn-solid">Chosen direction →</a>
+          </article>
+          <article class="dir-card">
+            <p class="eyebrow">Civil Society</p>
+            <h3>Senior Officials of Special-interest Organizations</h3>
+            <div class="score-row"><b>100</b><small>%</small><span>Skill coverage</span></div>
+            <div class="meter"><i style="width:100%"></i></div>
+            <p class="desc">Occupational group from the ILO 2025 task dataset (ISCO-08).</p>
+            <a class="btn btn-ghost">Explore this direction →</a>
+          </article>
+          <article class="dir-card">
+            <p class="eyebrow">Science &amp; Engineering</p>
+            <h3>Geologists and Geophysicists</h3>
+            <div class="score-row"><b>100</b><small>%</small><span>Skill coverage</span></div>
+            <div class="meter"><i style="width:100%"></i></div>
+            <p class="desc">Occupational group from the ILO 2025 task dataset (ISCO-08).</p>
+            <a class="btn btn-ghost">Explore this direction →</a>
+          </article>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="journey">
+        <div class="journey-head">
+          <div>
+            <p class="eyebrow" style="margin-bottom:6px">03 · My Chosen Direction</p>
+            <h2>Your path to Senior Government Officials</h2>
+          </div>
+        </div>
+        <div class="transition">
+          <div class="side"><span>From · current role</span><b>Web Technicians</b></div>
+          <span class="arrow">⟶</span>
+          <div class="side"><span>To · chosen direction</span><b>Senior Government Officials</b></div>
+        </div>
+        <div class="journey-grid">
+          <div class="panel">
+            <h3>Skills to explore next</h3>
+            <div class="chips">
+              <span class="chip short">✓ Service orientation and customer service</span>
+              <span class="chip short">✓ Systems thinking</span>
+              <span class="chip short">✓ Reading, writing and mathematics</span>
+              <span class="chip add">＋ Negotiation · add to shortlist</span>
+              <span class="chip add">＋ Coordination · add to shortlist</span>
+            </div>
+            <div class="legend">
+              <span><i style="background:#e8f3eb;border:1px solid #bcd9c6"></i>Have</span>
+              <span><i style="background:#e6eff7;border:1px solid #bcd3e4"></i>Learning</span>
+              <span><i style="background:#fff0db;border:1px solid #e8d3ab"></i>Shortlisted</span>
+              <span><i style="background:#f6f3f8;border:1px dashed #ddd4e5"></i>Missing</span>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>About this direction</h3>
+            <p style="font-size:12.5px;color:var(--muted)">Senior Government Officials plan and direct government policy and departmental operations. The coverage score reflects overlap between your confirmed profile skills and this direction's skill set.</p>
+            <p style="font-size:11px;color:var(--blue);margin-top:12px">🔒 Score = direction skill coverage — not job readiness or hiring probability.</p>
+          </div>
+        </div>
+        <div class="next-step">
+          <div>
+            <h3>Your next step</h3>
+            <p>Browse verified courses for shortlisted skills in Learning Resources.</p>
+          </div>
+          <a class="btn btn-solid">Explore learning resources →</a>
+        </div>
+        <p class="disclaimer">Exploratory skill connections only; not job readiness or hiring probability.</p>
+
+        <!-- planbar -->
+        <div class="planbar">
+          <div class="grow">
+            <small>Your shortlist · saved automatically</small>
+            <div class="chips">
+              <span class="chip">Service orientation and customer service ✕</span>
+              <span class="chip">Systems thinking ✕</span>
+              <span class="chip">Reading, writing and mathematics ✕</span>
+            </div>
+          </div>
+          <a>Continue in My Plan →</a>
+        </div>
+
+        <!-- BotPet -->
+        <div class="botpet">
+          <div class="bubble">Let's see where your strengths lead. ✦</div>
+          <div class="doll">🧚‍♀️</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>1.1 改造前后对比</h3>
+  <div class="ba">
+    <div class="col">
+      <h3>现状问题</h3>
+      <ul>
+        <li>覆盖率只是孤立的大数字，缺乏视觉锚点与「进度感」</li>
+        <li>三张方向卡片信息密度相同，已选方向与备选方向区分弱</li>
+        <li>第 03 段「Skills to explore next」里 Have / 短名单技能混排，用户分不清哪些还需行动</li>
+        <li>短名单 planbar 与第 03 段割裂，用户不知道选完之后去哪</li>
+        <li>卡片阴影生硬，背景渐变与内容区对比不足</li>
+      </ul>
+    </div>
+    <div class="col good">
+      <h3>本提案的改法</h3>
+      <ul>
+        <li><b>进度环 + 细分条</b>：起点覆盖率用 conic-gradient 环（复用现有 .px-ring 语言），方向卡片加渐变 meter 条</li>
+        <li><b>已选卡片</b>：右上角「✓ Chosen」徽标 + 描边高亮，主按钮区分「已选 / 可探索」</li>
+        <li><b>技能四态色彩系统</b>：Have（绿）/ Learning（蓝）/ Shortlisted（琥珀）/ Missing（紫虚线），图例内嵌</li>
+        <li><b>旅程化过渡</b>：「From → To」转换条明确表达职业迁移叙事</li>
+        <li><b>短名单闭环</b>：planbar 吸底常驻，芯片可直接移除，出口指向 My Plan</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>1.2 设计令牌（Design Tokens）</h3>
+  <div class="tok-grid">
+    <div class="tok"><div class="sw" style="background:#486f88"></div><b>Ink Blue · 主色/链接</b><span>#486F88</span></div>
+    <div class="tok"><div class="sw" style="background:#355974"></div><b>Deep Blue · hover</b><span>#355974</span></div>
+    <div class="tok"><div class="sw" style="background:#e6eff7"></div><b>Blue Mist · 学习态/底</b><span>#E6EFF7</span></div>
+    <div class="tok"><div class="sw" style="background:#e8f3eb"></div><b>Sage · Have 态</b><span>#E8F3EB / #48735B</span></div>
+    <div class="tok"><div class="sw" style="background:#fff0db"></div><b>Amber · Shortlisted</b><span>#FFF0DB / #806243</span></div>
+    <div class="tok"><div class="sw" style="background:#f6f3f8"></div><b>Plum · Missing 态</b><span>#F6F3F8 / #6D5D7A</span></div>
+    <div class="tok"><div class="sw" style="background:linear-gradient(135deg,#eaf3fb,#fbeef3)"></div><b>Page Wash · 页面底</b><span>蓝→紫→粉 160°</span></div>
+    <div class="tok"><div class="sw" style="background:#ffffffc7"></div><b>Card Glass · 卡片</b><span>rgba(255,255,255,.78)</span></div>
+  </div>
+
+  <div class="type-spec">
+    <div class="type-row"><span style="font-size:28px;font-weight:650;letter-spacing:-.03em">Page Title 28–30 / 650</span><small>H1 · -0.03em tracking</small></div>
+    <div class="type-row"><span style="font-size:22px;font-weight:600">Section Heading 22 / 600</span><small>H2 · 段落标题</small></div>
+    <div class="type-row"><span style="font-size:16px;font-weight:650">Card Title 16–17 / 650</span><small>H3 · 卡片标题</small></div>
+    <div class="type-row"><span style="font-size:12.5px;color:var(--muted)">Body 12.5 / 400 · line-height 1.75</span><small>正文与描述</small></div>
+    <div class="type-row"><span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Eyebrow 10 / +0.14em / uppercase</span><small>段落编号标签</small></div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="s2">
+  <div class="sec-head"><span class="sec-num">PART 2</span><h2>功能整合</h2></div>
+  <p class="sec-sub">现有功能散落在页面各处：Work Profile 跳转、方向选择、短名单、Learning Resources。整合原则：<b>一条主线讲完，一个出口收尾</b>——起点给出「我是谁」，探索给出「我能去哪」，路径给出「我怎么去」，planbar 作为全程可见的购物车式暂存区。</p>
+
+  <h3>2.1 数据流与功能挂点</h3>
+  <div class="flow">
+    <div class="fnode src"><b>Work Profile</b><p>已确认职业 + 任务证据<br><code style="font-size:11px">/profile → /profile/tasks</code></p></div>
+    <div class="farrow">→</div>
+    <div class="fnode src"><b>GET /api/v1/possibilities</b><p>服务端计算 coverage，<br>AI 不产生 ID / 分数（安全边界）</p></div>
+    <div class="farrow">→</div>
+    <div class="fnode"><b>① 起点</b><p>当前职业 + 覆盖率环<br>已掌握技能 chips（have）</p></div>
+    <div class="farrow">→</div>
+    <div class="fnode"><b>② 方向探索</b><p>3 张方向卡（allowlist）<br>选择写入 chosen direction</p></div>
+    <div class="farrow">→</div>
+    <div class="fnode"><b>③ 我的路径</b><p>缺 skills → 加入短名单<br>planbar 暂存 → My Plan / 课程</p></div>
+  </div>
+
+  <h3>2.2 页面状态整合（已在代码中，设计稿补齐视觉）</h3>
+  <table class="state-table">
+    <tr><th>状态</th><th>触发</th><th>设计表现</th></tr>
+    <tr><td><code>loading</code></td><td>请求进行中</td><td>骨架屏：三张方向卡用 shimmer 占位，避免布局跳动 <span class="pill b">需补设计</span></td></tr>
+    <tr><td><code>error</code></td><td>网络/服务失败</td><td>居中提示 + 「Review your work profile」链接，BotPet 说安抚话术 <span class="pill b">需补设计</span></td></tr>
+    <tr><td><code>needs_profile</code></td><td>未确认 Work Profile</td><td>引导卡「Complete your Work Profile」，主按钮跳转，隐藏 02/03 段</td></tr>
+    <tr><td><code>unavailable</code></td><td>服务端无法安全生成方向</td><td>非预测性空状态 + 重试按钮，不显示任何分数</td></tr>
+    <tr><td><code>ready</code></td><td>正常数据</td><td>三段式主布局（本提案 Part 1 mockup）</td></tr>
+  </table>
+
+  <h3>2.3 交互闭环：短名单 → 学习资源 → My Plan</h3>
+  <div class="callout">
+    <b>核心整合点</b>：用户在第 03 段点击「＋」把 missing 技能加入短名单（触发 BotPet 反馈「Nice pick — that direction suits you.」）→ 芯片实时出现在吸底 planbar（<code>aiwrevolusi.possibilities.shortlist</code>）→ planbar 右侧「Continue in My Plan」与「Explore learning resources」把短名单技能带去课程选择 → Plan 页打卡记录学习进度 → 技能状态从 shortlisted → learning → have，回到起点页覆盖率环上涨。<b>整条闭环无需新功能，只需把现有出口在视觉上串联。</b>
+  </div>
+
+  <h3>2.4 安全与文案边界（保留自 handover 文档）</h3>
+  <table class="state-table">
+    <tr><th>规则</th><th>设计呈现方式</th></tr>
+    <tr><td>分数语义</td><td>所有覆盖率旁标注「Skill coverage」，永不使用「match / readiness」字样</td></tr>
+    <tr><td>Disclaimer</td><td>页面底部固定一行：「Exploratory skill connections only; not job readiness or hiring probability.」</td></tr>
+    <tr><td>Demo 数据隔离</td><td>demo 模式角落显示轻量「Demo data」pill（仅视觉标识，不写用户数据）</td></tr>
+    <tr><td>方向来源</td><td>方向卡 eyebrow 显示 ISCO 领域（如 Public Administration），描述固定引用 ILO 2025 / ISCO-08 数据集</td></tr>
+  </table>
+</section>
+
+<!-- ================================================================ -->
+<section id="s3">
+  <div class="sec-head"><span class="sec-num">PART 3</span><h2>IP 人物设计</h2></div>
+  <p class="sec-sub">现有 BotPet（右下角蓝发 Q 版角色 + speech 气泡 + 拖拽 + 分页位置记忆）已具备完整骨架。本部分为其补全「人设」：命名、性格、视觉规范、话术系统与行为边界，使其从「装饰挂件」升级为贯穿三个页面的引导者。</p>
+
+  <div class="char-hero">
+    <div class="char-visual">
+      <div class="doll-big">🧚‍♀️</div>
+      <div class="nm">Nova</div>
+      <div class="rl">Your Possibility Guide</div>
+      <div class="pose-row">
+        <span class="pose"><i>🧚</i>idle · 悬浮呼吸</span>
+        <span class="pose"><i>👋</i>waving · 进场问候</span>
+        <span class="pose"><i>✨</i>cheer · 操作成功</span>
+      </div>
+    </div>
+    <div class="char-facts">
+      <div class="fact"><h4>身份</h4><p><b>「可能性精灵」</b>——住在 AI-Wrevolusi 里的职业探索向导。她不预测未来，只帮你把已有的能力连成看得见的路。</p></div>
+      <div class="fact"><h4>性格关键词</h4><p><b>温暖 · 轻快 · 鼓励但不卖萌 · 克制</b>。短句、主动但从不打断；用户专注时安静陪伴，行动时及时肯定。</p></div>
+      <div class="fact"><h4>视觉规范</h4><p>Q 版 3 头身，主色 <b>#5D6FBE 靛蓝</b> + 发梢渐变粉（呼应页面 wash 背景）；悬浮态带柔光投影，呼吸浮动 2.6s 循环；reduced-motion 下仅保留淡入淡出。</p></div>
+      <div class="fact"><h4>出现位置</h4><p>默认右下角，可拖拽、记忆分页位置（已有 storageKey）；<b>避开</b> planbar 与卡片按钮区（已有 avoidRef/avoidActive 机制）。</p></div>
+    </div>
+  </div>
+
+  <h3>3.1 话术系统（三池分工）</h3>
+  <table class="line-table">
+    <tr><th>池</th><th>触发时机</th><th>示例台词（Possibilities 页）</th></tr>
+    <tr><td>进入话术</td><td>进入页面弹一次，~4s 淡出；shuffle bag 抽取避免重复</td><td>“Let's see where your strengths lead.” / “What's got you curious today?” / “Your next step is hiding in here.” / “Open a card and see what fits.”<em>已实现于 botPetGreetings.ts</em></td></tr>
+    <tr><td>操作反馈</td><td>用户点击「＋加入短名单」那一刻，临时覆盖气泡 ~3s 后回落</td><td>“Nice pick — that direction suits you.” / “Added! Your learning list is growing.” / “Good eye. One more?” / “Locked in. What's next?”<em>代码挂点：say("add-skill-chip")，已存在</em></td></tr>
+    <tr><td>语境提示</td><td>needs_profile / error / unavailable 状态下的安抚与引导（建议新增）</td><td>needs_profile：“Your profile is the map — let's fill it in first.”；error：“Hmm, the road got foggy. Try again?”；选方向：“Bold choice. I like it.”<em>需与现有 priority > checkinHint > greeting 优先级链对齐</em></td></tr>
+  </table>
+
+  <div class="rules">
+    <div class="rule-col yes">
+      <h3 class="ok">✓ 行为守则（Do）</h3>
+      <ul>
+        <li>台词英文、≤45 字符，跟随应用语言；气泡窄、不换行超过两行</li>
+        <li>气泡与挥手动画同框；点击气泡可关闭，点击本体换一条提示（已有）</li>
+        <li>动作反馈永远顶掉正在播的旧气泡（动作 &gt; checkinHint &gt; 进入话术）</li>
+        <li>role="status" 保证读屏播报；同一秒不叠加两条</li>
+      </ul>
+    </div>
+    <div class="rule-col">
+      <h3 class="no">✗ 禁止事项（Don't）</h3>
+      <ul>
+        <li>不解读分数：“You're 100% ready!” 之类话术违反 AI 边界，永远不说</li>
+        <li>不推荐具体职业方向（方向只来自服务端 allowlist）</li>
+        <li>不高频弹气泡；页内导航不重弹进入话术</li>
+        <li>不遮挡按钮与卡片（avoid 区已定义），移动端自动缩小</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>3.2 落地映射（全部复用现有能力，无需改架构）</h3>
+  <div class="callout">
+    视觉：`public/images/bot/` 已有 idle/waving 序列帧，按本提案补一套 <b>cheer（庆祝）帧</b>即可覆盖全部场景。<br>
+    话术：进入话术与 add-skill-chip 反馈<b>已在代码中实现</b>；「选方向」与异常态话术只需在 botPetGreetings.ts 增加对应 key，经 speech 属性传入。<br>
+    行为：优先级链（action &gt; checkinHint &gt; greeting）、4s 自动隐藏、拖拽记忆、reduced-motion 均已由 BotPet + useBotPetGreeting 提供。
+  </div>
+</section>
+
+<p class="footer-note">设计提案 · 2026-09-17 · 基于 Possibilities.tsx (b595eee 后版本)、possibilitiesModel.ts、handover/possibilities.md 与 BotPet 现有能力整理。本文件为纯设计稿，未修改任何前端/后端源码。</p>
+
+</div>
+</body>
+</html>

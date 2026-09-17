@@ -87,11 +87,13 @@ def _task_text(task: object) -> str:
 
 # Reference occupation→skill maps are stable for a process; cache avoids re-matching
 # every occupation on each Possibilities request (the main timeout source).
-_required_skills_cache: dict[str, tuple[tuple[str, ...], frozenset[int]]] = {}
-_required_skills_cache_key: tuple[int, tuple[tuple[int, str], ...]] | None = None
+# Bump when the occupation skill aggregation rules change (e.g. uncapped matches).
+_OCCUPATION_SKILL_CACHE_VERSION = 3
+_required_skills_cache: dict[str, frozenset[int]] = {}
+_required_skills_cache_key: tuple[int, int, tuple[tuple[int, str], ...]] | None = None
 
 
-def _skills_cache_key(skills: Mapping[int, Mapping]) -> tuple[int, tuple[tuple[int, str], ...]]:
+def _skills_cache_key(skills: Mapping[int, Mapping]) -> tuple[int, int, tuple[tuple[int, str], ...]]:
     names = tuple(
         sorted(
             (int(skill_id), str(row.get('core_skill') or ''))
@@ -99,7 +101,7 @@ def _skills_cache_key(skills: Mapping[int, Mapping]) -> tuple[int, tuple[tuple[i
             if str(row.get('core_skill') or '').strip()
         )
     )
-    return (len(names), names)
+    return (_OCCUPATION_SKILL_CACHE_VERSION, len(names), names)
 
 
 def _match_candidates(skills: Mapping[int, Mapping]):
@@ -107,36 +109,82 @@ def _match_candidates(skills: Mapping[int, Mapping]):
 
     return [
         SkillMatchCandidate(id=int(skill_id), skill=name)
-        for skill_id, name in _skills_cache_key(skills)[1]
+        for skill_id, name in _skills_cache_key(skills)[2]
     ]
 
 
-def occupation_required_skills(tasks: Iterable[object], skills: Mapping[int, Mapping]) -> set[int]:
-    """Map occupation task evidence through the existing allowlisted matcher."""
+def occupation_required_skills(
+    tasks: Iterable[object],
+    skills: Mapping[int, Mapping],
+    *,
+    occupation: Mapping | None = None,
+) -> set[int]:
+    """Map occupation evidence through the allowlisted matcher without a 3-skill cap.
+
+    Pass ``occupation`` so title and description also contribute to the skill set.
+    """
+    if occupation is not None:
+        code = str(occupation.get('occupation_code') or occupation.get('masco_code') or '')
+        if code:
+            return _cached_occupation_required_skills(
+                code, occupation, tasks, skills
+            )
     from app.services.skill_matching import match_skills
 
     candidates = _match_candidates(skills)
     required: set[int] = set()
     for task in tasks:
-        required.update(item.wef_skill_id for item in match_skills(_task_text(task), candidates))
+        required.update(
+            item.wef_skill_id
+            for item in match_skills(_task_text(task), candidates, limit=None)
+        )
     return required
 
 
-def _cached_occupation_required_skills(
-    occupation_code: str, tasks: Iterable[object], skills: Mapping[int, Mapping]
-) -> set[int]:
+def _ensure_skills_cache(skills: Mapping[int, Mapping]) -> None:
     global _required_skills_cache, _required_skills_cache_key
     cache_key = _skills_cache_key(skills)
     if _required_skills_cache_key != cache_key:
         _required_skills_cache = {}
         _required_skills_cache_key = cache_key
-    task_texts = tuple(_task_text(task) for task in tasks)
+
+
+def _occupation_evidence_texts(occupation: Mapping, tasks: Iterable[object]) -> list[str]:
+    """Title, description, and task wording all contribute to the skill set."""
+    texts: list[str] = []
+    for value in (occupation.get('title'), occupation.get('description')):
+        if isinstance(value, str) and value.strip():
+            texts.append(value.strip())
+    for task in tasks:
+        text = _task_text(task).strip()
+        if text:
+            texts.append(text)
+    return texts
+
+
+def _cached_occupation_required_skills(
+    occupation_code: str,
+    occupation: Mapping,
+    tasks: Iterable[object],
+    skills: Mapping[int, Mapping],
+    *,
+    candidates: list | None = None,
+) -> set[int]:
+    _ensure_skills_cache(skills)
     cached = _required_skills_cache.get(occupation_code)
-    if cached is not None and cached[0] == task_texts:
-        return set(cached[1])
-    required = frozenset(occupation_required_skills(task_texts, skills))
-    _required_skills_cache[occupation_code] = (task_texts, required)
-    return set(required)
+    if cached is not None:
+        return set(cached)
+    from app.services.skill_matching import match_skills
+
+    match_list = candidates if candidates is not None else _match_candidates(skills)
+    required: set[int] = set()
+    for text in _occupation_evidence_texts(occupation, tasks):
+        required.update(
+            item.wef_skill_id for item in match_skills(text, match_list, limit=None)
+        )
+    frozen = frozenset(required)
+    _required_skills_cache[occupation_code] = frozen
+    return set(frozen)
 
 
 def skill_overlap_score(
@@ -157,19 +205,29 @@ def recommend_occupations(
     confirmed_skill_ids: set[int],
     skills: Mapping[int, Mapping],
     limit: int = 3,
-    excluded_codes: set[str] | None = None,
+    *,
+    exclude_codes: set[str] | None = None,
 ) -> list[dict]:
-    """Return real alternative occupations ranked by symmetric skill overlap."""
+    """Return real occupations ranked by overlap with the full skill set.
 
-    excluded = excluded_codes or set()
+    Coverage is owned ∩ required / |required|, using every WEF skill matched
+    from the occupation's title, description, and ILO tasks (not a 3-skill cap).
+    """
+    _ensure_skills_cache(skills)
+    candidates = _match_candidates(skills)
+    excluded = exclude_codes or set()
     ranked: list[dict] = []
     for occupation in occupations:
         code = str(occupation.get('occupation_code') or occupation.get('masco_code') or '')
         if not code or code in excluded:
             continue
-        required = _cached_occupation_required_skills(code, occupation.get('tasks') or [], skills)
-        if not required:
+        required = _cached_occupation_required_skills(
+            code, occupation, occupation.get('tasks') or [], skills, candidates=candidates
+        )
+        # Tiny sets inflate percentages; keep occupations with a usable skill map.
+        if len(required) < 2:
             continue
+        owned = confirmed_skill_ids & required
         ranked.append({
             'occupation_code': code,
             'title': str(occupation.get('title') or ''),
@@ -177,8 +235,12 @@ def recommend_occupations(
             'description': str(occupation.get('description') or ''),
             'coverage_pct': skill_overlap_score(confirmed_skill_ids, required),
             'required_skill_ids': sorted(required),
+            'overlap_count': len(owned),
         })
-    ranked.sort(key=lambda row: -row['coverage_pct'])
+    # Prefer higher overlap %, then richer shared skill counts, then broader maps.
+    ranked.sort(
+        key=lambda row: (-row['coverage_pct'], -row['overlap_count'], -len(row['required_skill_ids']))
+    )
     return ranked[:limit]
 
 
