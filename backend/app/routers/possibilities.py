@@ -1,3 +1,4 @@
+import asyncio
 import json
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
@@ -16,6 +17,10 @@ from app.schemas.possibilities import PossibilitiesResponse
 
 router = APIRouter(prefix='/possibilities', tags=['Possibilities'])
 DISCLAIMER = 'Exploratory skill connections only; not job readiness or hiring probability.'
+
+# Reference data is stable per process — avoid re-joining ~2.5k ILO tasks every request.
+_skills_cache: dict[int, dict] | None = None
+_occupation_rows_cache: list[dict] | None = None
 
 
 def _json_value(workspace: dict, key: str, default):
@@ -47,14 +52,36 @@ def build_direction_payload(row: dict, skills: dict) -> dict:
     }
 
 
-@router.get('', response_model=PossibilitiesResponse)
-async def get_possibilities(
-    current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
-) -> PossibilitiesResponse:
+async def _load_reference_data(db: AsyncSession) -> tuple[dict[int, dict], list[dict]]:
+    global _skills_cache, _occupation_rows_cache
+    if _skills_cache is not None and _occupation_rows_cache is not None:
+        return _skills_cache, _occupation_rows_cache
+
     skill_rows = (await db.execute(text(
         'SELECT wef_skill_id, core_skill, wef_skill_group FROM ref_wef_skills ORDER BY wef_skill_id'
     ))).mappings().all()
     skills = {int(row['wef_skill_id']): dict(row) for row in skill_rows}
+
+    # Unit occupations only — major/minor tree nodes have no ILO tasks and inflate matching.
+    occupation_rows = (await db.execute(text(
+        "SELECT o.occupation_code, o.title, o.description, NULL AS industry, "
+        "COALESCE(array_agg(i.task_text ORDER BY i.task_id) FILTER (WHERE i.task_text IS NOT NULL), '{}') AS tasks "
+        "FROM ref_occupations o LEFT JOIN ref_ilo_tasks i ON i.isco_08=o.occupation_code "
+        "WHERE o.level = 'unit' "
+        "GROUP BY o.occupation_code,o.title,o.description ORDER BY o.occupation_code"
+    ))).mappings().all()
+    occupations = [dict(row) for row in occupation_rows]
+
+    _skills_cache = skills
+    _occupation_rows_cache = occupations
+    return skills, occupations
+
+
+@router.get('', response_model=PossibilitiesResponse)
+async def get_possibilities(
+    current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
+) -> PossibilitiesResponse:
+    skills, occupation_rows = await _load_reference_data(db)
     confirmed_rows = (await db.execute(text(
         "SELECT title, description FROM tasks WHERE user_id=:user_id AND status='confirmed' ORDER BY created_at"
     ), {'user_id': current_user.id})).mappings().all()
@@ -62,12 +89,6 @@ async def get_possibilities(
     from app.services.skill_matching import match_skills
     candidates = [SkillMatchCandidate(id=i, skill=str(row['core_skill'])) for i, row in skills.items()]
 
-    occupation_rows = (await db.execute(text(
-        "SELECT o.occupation_code, o.title, o.description, NULL AS industry, "
-        "COALESCE(array_agg(i.task_text ORDER BY i.task_id) FILTER (WHERE i.task_text IS NOT NULL), '{}') AS tasks "
-        "FROM ref_occupations o LEFT JOIN ref_ilo_tasks i ON i.isco_08=o.occupation_code "
-        "GROUP BY o.occupation_code,o.title,o.description ORDER BY o.occupation_code"
-    ))).mappings().all()
     workspace = (await db.execute(text('SELECT workspace FROM app_accounts WHERE user_id=:id'), {'id': current_user.id})).scalar_one_or_none() or {}
     workspace = workspace if isinstance(workspace, dict) else {}
     confirmed_texts, workspace_role = confirmed_workspace_evidence(workspace, occupation_rows)
@@ -79,7 +100,9 @@ async def get_possibilities(
     shortlist = validate_shortlist_ids(shortlist_raw, allowed_skill_ids=set(skills), limit=60) if isinstance(shortlist_raw, list) else []
     chosen_raw = _json_value(workspace, 'aiwrevolusi.possibilities.chosenDirection', {})
     chosen_code = chosen_raw.get('occupation_code') if isinstance(chosen_raw, dict) else None
-    recommendations = recommend_occupations(occupation_rows, owned, skills)
+
+    # CPU-heavy ranking — keep the async event loop free on cold cache fills.
+    recommendations = await asyncio.to_thread(recommend_occupations, occupation_rows, owned, skills)
     allowed_codes = {row['occupation_code'] for row in recommendations}
     if chosen_code not in allowed_codes:
         chosen_code = None

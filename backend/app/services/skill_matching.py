@@ -79,6 +79,20 @@ def _candidate_value(candidate: SkillMatchCandidate | Mapping[str, Any], key: st
     return getattr(candidate, key)
 
 
+def _phrase_pattern(phrase: str) -> re.Pattern[str]:
+    """Compile once: word-boundary match with optional simple plurals."""
+
+    return re.compile(rf"\b{re.escape(phrase)}(?:s|es)?\b", flags=re.IGNORECASE)
+
+
+# Possibilities ranks every ILO task through these rules; compiling up front
+# avoids rebuilding hundreds of thousands of regexes on a cold request.
+_COMPILED_RULES: tuple[tuple[SkillRule, tuple[re.Pattern[str], ...]], ...] = tuple(
+    (rule, tuple(_phrase_pattern(phrase) for phrase in rule.phrases))
+    for rule in SKILL_RULES
+)
+
+
 def _whole_phrase_match(task_text: str, phrase: str) -> str | None:
     """Return the exact source substring matching a case-insensitive phrase.
 
@@ -90,17 +104,19 @@ def _whole_phrase_match(task_text: str, phrase: str) -> str | None:
     spelled out in the rule table instead, so matching stays predictable.
     """
 
-    pattern = rf"\b{re.escape(phrase)}(?:s|es)?\b"
-    match = re.search(pattern, task_text, flags=re.IGNORECASE)
+    match = _phrase_pattern(phrase).search(task_text)
     return match.group(0) if match else None
 
 
-def _rule_evidence(task_text: str, rule: SkillRule) -> list[str]:
+def _rule_evidence(task_text: str, patterns: tuple[re.Pattern[str], ...]) -> list[str]:
     evidence: list[str] = []
     seen: set[str] = set()
-    for phrase in rule.phrases:
-        source_phrase = _whole_phrase_match(task_text, phrase)
-        if source_phrase and source_phrase.casefold() not in seen:
+    for pattern in patterns:
+        match = pattern.search(task_text)
+        if not match:
+            continue
+        source_phrase = match.group(0)
+        if source_phrase.casefold() not in seen:
             evidence.append(source_phrase)
             seen.add(source_phrase.casefold())
     return evidence
@@ -123,10 +139,10 @@ def match_skills(
             continue
 
     matches: list[SkillMatchItem] = []
-    for rule in SKILL_RULES:
+    for rule, patterns in _COMPILED_RULES:
         if rule.skill_id not in candidate_by_id:
             continue
-        evidence = _rule_evidence(task_text, rule)
+        evidence = _rule_evidence(task_text, patterns)
         if not evidence:
             continue
         matches.append(

@@ -122,30 +122,48 @@ def occupation_required_skills(tasks: Iterable[object], skills: Mapping[int, Map
     return required
 
 
-def _cached_occupation_required_skills(
-    occupation_code: str, tasks: Iterable[object], skills: Mapping[int, Mapping]
-) -> set[int]:
+def _ensure_skills_cache(skills: Mapping[int, Mapping]) -> None:
     global _required_skills_cache, _required_skills_cache_key
     cache_key = _skills_cache_key(skills)
     if _required_skills_cache_key != cache_key:
         _required_skills_cache = {}
         _required_skills_cache_key = cache_key
+
+
+def _cached_occupation_required_skills(
+    occupation_code: str,
+    tasks: Iterable[object],
+    skills: Mapping[int, Mapping],
+    *,
+    candidates: list | None = None,
+) -> set[int]:
+    _ensure_skills_cache(skills)
     cached = _required_skills_cache.get(occupation_code)
     if cached is not None:
         return set(cached)
-    required = frozenset(occupation_required_skills(tasks, skills))
-    _required_skills_cache[occupation_code] = required
-    return set(required)
+    from app.services.skill_matching import match_skills
+
+    match_list = candidates if candidates is not None else _match_candidates(skills)
+    required: set[int] = set()
+    for task in tasks:
+        required.update(item.wef_skill_id for item in match_skills(_task_text(task), match_list))
+    frozen = frozenset(required)
+    _required_skills_cache[occupation_code] = frozen
+    return set(frozen)
 
 
 def recommend_occupations(
     occupations: Iterable[Mapping], confirmed_skill_ids: set[int], skills: Mapping[int, Mapping], limit: int = 3
 ) -> list[dict]:
     """Return valid real occupations, ranked by overlap; input order breaks ties."""
+    _ensure_skills_cache(skills)
+    candidates = _match_candidates(skills)
     ranked: list[dict] = []
     for occupation in occupations:
         code = str(occupation.get('occupation_code') or occupation.get('masco_code') or '')
-        required = _cached_occupation_required_skills(code, occupation.get('tasks') or [], skills)
+        required = _cached_occupation_required_skills(
+            code, occupation.get('tasks') or [], skills, candidates=candidates
+        )
         if not required:
             continue
         owned = required & confirmed_skill_ids

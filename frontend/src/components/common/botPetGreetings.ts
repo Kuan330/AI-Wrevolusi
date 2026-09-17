@@ -17,7 +17,7 @@ type TimeSlot = "morning" | "afternoon" | "evening" | "night";
 /** Time-of-day openers (local browser hour). */
 const TIME_OPENERS: Record<TimeSlot, string> = {
   morning: "Morning!",
-  afternoon: "Afternoon —",
+  afternoon: "Afternoon!",
   evening: "Evening wind-down.",
   night: "Late one!",
 };

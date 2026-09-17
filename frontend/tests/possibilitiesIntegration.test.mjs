@@ -143,8 +143,9 @@ test('page loads live data, restores and persists approved workspace keys', () =
   assert.match(page, /get: possibilitiesService\.getPossibilities/);
   assert.match(page, /return \(\) => controller\.abort\(\)/);
   assert.match(page, /possibilitiesProfilePath\(readTaskWorkspace\(\)\)/);
-  assert.equal((page.match(/to=\{profilePath\}/g) ?? []).length, 3);
+  assert.equal((page.match(/to=\{profilePath\}/g) ?? []).length, 4);
   assert.doesNotMatch(page, /to="\/profile"/);
   assert.match(page, /setError\(""\)/);
+  assert.match(page, /PossibilitiesShell/);
   assert.doesNotMatch(page, /sessionStorage/);
 });
