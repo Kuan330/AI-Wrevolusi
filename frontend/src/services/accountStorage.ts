@@ -45,7 +45,7 @@ export function activateWorkspace(id: string | null, next?: Workspace) {
           workspace = pending;
           dirty = true;
           syncError =
-            "You have unsynced changes on this browser. Retry saving before continuing.";
+            "You have unsynced changes on this browser. Download a local backup and reload the saved account before continuing.";
         }
       } catch {
         /* The server copy remains authoritative for unreadable caches. */

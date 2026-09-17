@@ -39,6 +39,12 @@ test('account conflict banner offers backup and reload instead of futile retry',
     new URL('../src/components/account/AccountProvider.tsx', import.meta.url),
     'utf8',
   );
+  const storage = readFileSync(
+    new URL('../src/services/accountStorage.ts', import.meta.url),
+    'utf8',
+  );
   assert.doesNotMatch(provider, /Retry saving/);
+  assert.doesNotMatch(storage, /Retry saving/);
   assert.match(provider, /Download local backup and reload saved account/);
+  assert.match(storage, /Download a local backup and reload the saved account/);
 });
