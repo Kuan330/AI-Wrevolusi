@@ -13,7 +13,7 @@ import RemoveSkillDialog from "./components/RemoveSkillDialog";
 import BotPet from "@/components/common/BotPet";
 import { useCourseLibrary } from "./hooks/useCourseLibrary";
 import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
-import { fetchPageCatalogue } from "@/services/catalogueService";
+import { loadLearningCatalogue, resetCourseDirectory } from "@/features/learning-planning/courseDirectory";
 import type { Course } from "../../features/learning-planning/types";
 import {
   ensureLearningSkills,
@@ -117,6 +117,7 @@ export default function LearningCentre() {
   const [catalogueError, setCatalogueError] = useState("");
   const [catalogueNotice, setCatalogueNotice] = useState("");
   const [catalogueLoading, setCatalogueLoading] = useState(true);
+  const [catalogueRefresh, setCatalogueRefresh] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -132,7 +133,7 @@ export default function LearningCentre() {
     }
     setCatalogueLoading(true);
     const skillId = searchActive ? null : activeId;
-    void fetchPageCatalogue(skillId)
+    void loadLearningCatalogue(skillId)
       .then((result) => {
         if (cancelled) return;
         setPageCourses(result.courses);
@@ -150,7 +151,7 @@ export default function LearningCentre() {
     return () => {
       cancelled = true;
     };
-  }, [activeId, params.get("q")]);
+  }, [activeId, params.get("q"), catalogueRefresh]);
 
   const matching = pageCourses;
   const visible = matching.filter(
@@ -220,6 +221,7 @@ export default function LearningCentre() {
     <div className="course-library">
       <PageHeader {...headerProps} className="library-page-header" />
       <LearningReviewNotice />
+      <button type="button" className="mb-3 text-sm underline" disabled={catalogueLoading} onClick={() => { resetCourseDirectory(); setCatalogueRefresh(value => value + 1); }}>Refresh course catalogue</button>
       {(skillsError || notice) && (
         <p role="alert">{skillsError || notice}</p>
       )}

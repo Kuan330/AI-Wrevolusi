@@ -517,3 +517,38 @@ def test_duplicate_chapter_batch_is_rejected_before_persistence(client):
     assert response.status_code == 422
     assert 'only once' in response.text
     assert client.store.upsert_calls == 0
+
+
+def test_progress_read_returns_only_authenticated_user_records(monkeypatch):
+    from types import SimpleNamespace
+    from unittest.mock import AsyncMock
+    from uuid import uuid4
+    from app.services.auth import get_current_user
+    from app.services.learning import ChapterValue
+    from app.services import learning_records
+    from app.db.session import get_db
+
+    user_id = uuid4()
+    reader = AsyncMock(return_value=[ChapterValue('skill', 'course', 0, 7, TODAY)])
+    monkeypatch.setattr(learning_records, 'list_progress', reader)
+    application = create_app('/api')
+    application.dependency_overrides[get_current_user] = lambda: SimpleNamespace(id=user_id)
+    async def db():
+        yield object()
+    application.dependency_overrides[get_db] = db
+    with TestClient(application) as client:
+        response = client.get('/api/v1/learning/progress', params={'user_id': str(uuid4())})
+    assert response.status_code == 200
+    assert response.json() == {'chapters': [{'skill_id': 'skill', 'course_id': 'course', 'chapter_index': 0, 'value': 7}]}
+    assert reader.await_args.args[1] == user_id
+
+
+def test_progress_read_requires_authentication(monkeypatch):
+    from unittest.mock import AsyncMock
+    from app.services import learning_records
+    reader = AsyncMock()
+    monkeypatch.setattr(learning_records, 'list_progress', reader)
+    with TestClient(create_app('/api')) as client:
+        response = client.get('/api/v1/learning/progress')
+    assert response.status_code == 401
+    reader.assert_not_awaited()

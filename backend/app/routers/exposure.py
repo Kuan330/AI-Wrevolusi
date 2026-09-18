@@ -5,6 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.repositories.tasks import TaskRepository
+from app.models.user import User
+from app.services.auth import get_current_user
 from app.schemas.exposure import (
     ConfirmedTaskExposureAssessmentBatchRequest,
     ConfirmedTaskExposureAssessmentBatchResponse,
@@ -44,10 +46,16 @@ async def assess_confirmed_tasks_for_possible_ai_transformation(
 
 
 @router.get('/tasks/{task_id}', response_model=ExposureResult)
-async def task_exposure(task_id: uuid.UUID, db: AsyncSession = Depends(get_db)) -> ExposureResult:
+async def task_exposure(
+    task_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> ExposureResult:
     task = await TaskRepository.get_by_id(db, task_id)
     if not task:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Task not found.')
+    if task.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Task access denied.')
 
     exposure_type, confidence, reason = infer_exposure_state(task.title)
     return ExposureResult(task_id=task.id, exposure_type=exposure_type, confidence=confidence, reason=reason)

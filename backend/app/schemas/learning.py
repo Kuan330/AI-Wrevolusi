@@ -51,6 +51,12 @@ class ProgressUpdateRequest(BaseModel):
         return chapters
 
 
+class ProgressReadResponse(BaseModel):
+    """Authoritative chapter values for the signed-in learner."""
+
+    chapters: list[ChapterProgressIn]
+
+
 class ProgressUpdateResponse(BaseModel):
     """Outcome per submitted chapter so the client can show what was accepted.
 

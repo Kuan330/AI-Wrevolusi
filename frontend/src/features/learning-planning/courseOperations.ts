@@ -35,6 +35,10 @@ export async function changeSavedCourses(change: SavedCourseChange) {
     .filter((id) => !removed.has(id));
   const library = { ...current, saved };
   const plan = planForSavedCourses(saved, directory, readPlanState());
+  if (plan.pendingProgress) {
+    plan.pendingProgress = plan.pendingProgress.filter(item => !removed.has(item.course_id));
+    if (!plan.pendingProgress.length) plan.progressSyncError = "";
+  }
   saveWorkspaceItems({
     "aiwrevolusi.courseLibrary.v1": JSON.stringify(library),
     "aiwrevolusi.plan.courses.v1": JSON.stringify(plan),

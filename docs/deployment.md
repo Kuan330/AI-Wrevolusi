@@ -11,6 +11,10 @@ The root `vercel.json` defines two services:
 - `backend/` exposes the FastAPI `main:app` entrypoint behind `/api`.
 - Neon remains external and is selected through `DATABASE_URL`.
 
+The frontend service selects npm 12.0.2 explicitly for installation and builds.
+Its Node engine stays on major 24 so Vercel can apply compatible patch updates.
+The development baseline is Node 24.19.0 and the manifest enforces that minimum.
+
 The frontend calls `/api/v1` on the same deployment origin. Vercel routes that
 path to the backend service.
 

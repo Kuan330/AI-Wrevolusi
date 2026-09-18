@@ -82,10 +82,19 @@ uv export --project backend --locked --only-group data --no-hashes --output-file
 - `/api/v1/preparation`
 - `/api/v1/schedule`
 
-## Suggested additions
+## Access and profile ownership
 
-1. `.env.example` without sensitive values for team onboarding.
-2. `Dockerfile` + `docker-compose.yml` for consistent local DB/runtime.
-3. Role-based authorization and audit logging for correction actions.
-4. CI pipeline (lint, tests, migration check) on pull requests.
-5. Redis-based token blacklist / rate limit for production hardening.
+Occupation lookup and search remain public read-only endpoints. Occupation
+creation through HTTP is disabled until an administrative workflow exists.
+Stored-task exposure requires the authenticated task owner. Learning progress
+reads return only the signed-in user's records.
+
+Possibilities uses an existing modern workspace profile as its source of truth.
+Cleared or unconfirmed profiles do not fall back to older tasks or occupations.
+Invalid saved profile data returns a recovery error. Older records are considered
+only when no modern workspace profile exists. Failure to load account data is
+not treated as an absent profile.
+
+Database bootstrap and adoption remain a separate task described in the
+[baseline proposal](../docs/database-baseline-proposal.md). CI runs the offline
+application and data checks but does not apply database migrations or deploy.

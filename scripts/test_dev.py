@@ -1,6 +1,7 @@
 """Launcher checks using fake child processes and sockets only."""
 
 import argparse
+import json
 from contextlib import ExitStack
 import unittest
 from unittest.mock import Mock, call, patch
@@ -15,6 +16,7 @@ class LauncherTests(unittest.TestCase):
             backend_port=8000, frontend_port=5173,
         )))
         stack.enter_context(patch.object(dev, "require_command"))
+        self.toolchain = stack.enter_context(patch.object(dev, "require_frontend_toolchain"))
         stack.enter_context(patch.object(dev.Path, "exists", return_value=True))
         self.ports = stack.enter_context(patch.object(dev, "available_port", side_effect=[8001, 5174]))
         self.spawn = stack.enter_context(patch.object(dev.subprocess, "Popen"))
@@ -22,6 +24,13 @@ class LauncherTests(unittest.TestCase):
         self.wait = stack.enter_context(patch.object(dev, "wait_for_exit"))
         self.sleep = stack.enter_context(patch.object(dev.time, "sleep"))
         stack.enter_context(patch("builtins.print"))
+
+    def test_toolchain_failure_starts_no_services(self):
+        self.toolchain.side_effect = RuntimeError("wrong node version")
+        with self.assertRaisesRegex(RuntimeError, "wrong node version"):
+            dev.main()
+        self.spawn.assert_not_called()
+        self.ports.assert_not_called()
 
     def test_frontend_start_failure_cleans_up_backend(self):
         backend = Mock()
@@ -62,6 +71,57 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(dev.main(), 0)
         self.assertEqual(self.stop.call_args_list, [call(backend), call(frontend)])
         self.assertEqual(self.wait.call_args_list, [call(backend), call(frontend)])
+
+
+class ToolchainTests(unittest.TestCase):
+    def setUp(self):
+        self.enterContext(patch.object(dev, "require_command"))
+        self.run = self.enterContext(patch.object(dev.subprocess, "run"))
+
+    def test_matching_versions_are_accepted(self):
+        self.run.side_effect = [Mock(stdout="v24.19.0\n"), Mock(stdout="12.0.2\n")]
+        dev.require_frontend_toolchain()
+        self.assertEqual([c.args[0] for c in self.run.call_args_list], [["node", "--version"], ["npm", "--version"]])
+
+    def test_node_mismatch_fails_before_checking_npm(self):
+        self.run.return_value = Mock(stdout="v26.6.0\n")
+        with self.assertRaisesRegex(RuntimeError, "requires node >=24.19.0 <25, but found 26.6.0"):
+            dev.require_frontend_toolchain()
+        self.assertEqual(self.run.call_count, 1)
+
+    def test_newer_node_24_patch_is_accepted(self):
+        self.run.side_effect = [Mock(stdout="v24.20.0\n"), Mock(stdout="12.0.2\n")]
+        dev.require_frontend_toolchain()
+
+    def test_older_node_24_is_rejected(self):
+        self.run.return_value = Mock(stdout="v24.18.0\n")
+        with self.assertRaisesRegex(RuntimeError, "requires node >=24.19.0 <25"):
+            dev.require_frontend_toolchain()
+
+    def test_prerelease_node_is_rejected(self):
+        self.run.return_value = Mock(stdout="v24.20.0-rc.1\n")
+        with self.assertRaisesRegex(RuntimeError, "requires node >=24.19.0 <25"):
+            dev.require_frontend_toolchain()
+
+    def test_npm_mismatch_reports_required_version(self):
+        self.run.side_effect = [Mock(stdout="v24.19.0\n"), Mock(stdout="11.6.2\n")]
+        with self.assertRaisesRegex(RuntimeError, "requires npm 12.0.2, but found 11.6.2"):
+            dev.require_frontend_toolchain()
+
+    def test_broken_version_command_reports_actionable_error(self):
+        self.run.side_effect = dev.subprocess.TimeoutExpired("node", 10)
+        with self.assertRaisesRegex(RuntimeError, "Could not check node version"):
+            dev.require_frontend_toolchain()
+
+
+class HostingToolchainTests(unittest.TestCase):
+    def test_frontend_service_uses_project_npm_for_install_and_build(self):
+        package = json.loads((dev.FRONTEND_ROOT / "package.json").read_text())
+        config = json.loads((dev.REPOSITORY_ROOT / "vercel.json").read_text())
+        manager = package["packageManager"]
+        self.assertEqual(manager, "npm@" + package["devEngines"]["packageManager"]["version"])
+        self.assertEqual(config["services"]["frontend"]["installCommand"], f"npx --yes {manager} ci")
+        self.assertEqual(config["services"]["frontend"]["buildCommand"], f"npx --yes {manager} run build")
 
 
 class PortTests(unittest.TestCase):

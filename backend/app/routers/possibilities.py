@@ -9,6 +9,8 @@ from app.db.session import get_db
 from app.models.user import User
 from app.services.auth import get_current_user
 from app.services.possibilities import (
+    MODERN_PROFILE_KEY,
+    PROFILE_RECOVERY_MESSAGE,
     chosen_direction_score,
     confirmed_workspace_evidence,
     occupation_required_skills,
@@ -87,24 +89,36 @@ async def get_possibilities(
 ) -> PossibilitiesResponse:
     try:
         skills, occupation_rows = await _load_reference_data(db)
-        confirmed_rows = (await db.execute(text(
-            "SELECT title, description FROM tasks WHERE user_id=:user_id AND status='confirmed' ORDER BY created_at"
-        ), {'user_id': current_user.id})).mappings().all()
-    except Exception as e:
-        logger.error(f"Error loading reference data or tasks for user {current_user.id}: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to load user data")
+    except Exception:
+        logger.exception('Failed to load Possibilities reference data')
+        raise HTTPException(status_code=503, detail='Reference data is unavailable. Please retry.') from None
     from app.schemas.skill_matching import SkillMatchCandidate
     from app.services.skill_matching import match_skills
     candidates = [SkillMatchCandidate(id=i, skill=str(row['core_skill'])) for i, row in skills.items()]
 
     try:
-        workspace = (await db.execute(text('SELECT workspace FROM app_accounts WHERE user_id=:id'), {'id': current_user.id})).scalar_one_or_none() or {}
-        workspace = workspace if isinstance(workspace, dict) else {}
-        confirmed_texts, workspace_role = confirmed_workspace_evidence(workspace, occupation_rows)
-    except Exception as e:
-        logger.error(f"Error loading workspace for user {current_user.id}: {str(e)}")
+        workspace = (await db.execute(
+            text('SELECT workspace FROM app_accounts WHERE user_id=:id'), {'id': current_user.id}
+        )).scalar_one_or_none()
+    except Exception:
+        logger.exception('Failed to load the account workspace for Possibilities')
+        raise HTTPException(status_code=503, detail='Your saved account could not be loaded. Please retry before viewing Possibilities.') from None
+    if workspace is None:
         workspace = {}
-        confirmed_texts, workspace_role = [], None
+    try:
+        confirmed_texts, workspace_role = confirmed_workspace_evidence(workspace, occupation_rows)
+    except ValueError:
+        raise HTTPException(status_code=409, detail=PROFILE_RECOVERY_MESSAGE) from None
+    modern_profile = MODERN_PROFILE_KEY in workspace
+    confirmed_rows = []
+    if not modern_profile:
+        try:
+            confirmed_rows = (await db.execute(text(
+                "SELECT title, description FROM tasks WHERE user_id=:user_id AND status='confirmed' ORDER BY created_at"
+            ), {'user_id': current_user.id})).mappings().all()
+        except Exception:
+            logger.exception('Failed to load legacy confirmed tasks for Possibilities')
+            raise HTTPException(status_code=503, detail='Your saved task evidence could not be loaded. Please retry.') from None
     task_texts = set(confirmed_texts)
     task_texts.update(f"{task['title']} {task['description'] or ''}".strip() for task in confirmed_rows)
     owned = {
@@ -118,7 +132,7 @@ async def get_possibilities(
     chosen_raw = _json_value(workspace, 'aiwrevolusi.possibilities.chosenDirection', {})
     chosen_code = chosen_raw.get('occupation_code') if isinstance(chosen_raw, dict) else None
     role = workspace_role
-    if role is None and current_user.occupation_id:
+    if not modern_profile and role is None and current_user.occupation_id:
         try:
             role_row = (await db.execute(text('SELECT masco_code, title FROM occupations WHERE id=:id'), {'id': current_user.occupation_id})).mappings().one_or_none()
             if role_row:

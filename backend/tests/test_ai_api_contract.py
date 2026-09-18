@@ -232,7 +232,7 @@ def test_published_and_runtime_output_limits_are_bounded() -> None:
         '/api/v1/ai/task-match': {'matched_concepts': 50, 'unmatched_concepts': 50},
         '/api/v1/ai/occupation-suggestions': {'candidates': 5},
         '/api/v1/ai/occupation-recommendations': {'candidates': 5},
-        '/api/v1/ai/skill-match': {'skills': 2},
+        '/api/v1/ai/skill-match': {'skills': 3},
     }
 
     with TestClient(application) as client:

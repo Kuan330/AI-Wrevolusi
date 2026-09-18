@@ -2,7 +2,7 @@ import asyncio
 import threading
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from typing import Any
 
@@ -27,16 +27,14 @@ class StubTaskAssistRecords:
     """Account-scoped in-memory contract double for the persistence layer."""
 
     def __init__(self) -> None:
-        self.rows: dict[tuple[uuid.UUID, uuid.UUID], SimpleNamespace] = {}
-        self.profile_tasks: dict[tuple[uuid.UUID, str], uuid.UUID] = {}
+        self.rows: dict[tuple[uuid.UUID, str], SimpleNamespace] = {}
         self.lock = threading.Lock()
 
     async def register_details(self, _db, user_id, details):
         rows = []
         with self.lock:
             for detail in details:
-                profile_key = (user_id, detail.task_key)
-                task_key = self.profile_tasks.setdefault(profile_key, uuid.uuid4())
+                task_key = detail.task_key
                 key = (user_id, task_key)
                 row = self.rows.get(key)
                 if row is None:
@@ -50,6 +48,8 @@ class StubTaskAssistRecords:
                         generated_by_model=None,
                         needs_user_confirmation=True,
                         completed_at=None,
+                        claim_token=None,
+                        claimed_at=None,
                     )
                     self.rows[key] = row
                 elif row.status == 'available':
@@ -73,16 +73,20 @@ class StubTaskAssistRecords:
             row.status = 'pending'
             row.question = question
             token = uuid.uuid4()
+            row.claim_token = token
+            row.claimed_at = datetime.now(timezone.utc)
             return SimpleNamespace(outcome='claimed', row=row, claim_token=token)
 
     async def complete_interaction(
-        self, _db, user_id, task_key, claim_token, *, question, response
+        self, _db, user_id, task_key, claim_token, *, response
     ):
-        del claim_token
         with self.lock:
             row = self.rows[(user_id, task_key)]
+            if row.status != 'pending' or row.claim_token != claim_token:
+                raise RuntimeError('Task Assist claim no longer belongs to this request.')
             row.status = 'completed'
-            row.question = question
+            row.claim_token = None
+            row.claimed_at = None
             row.reply = response.reply
             row.generated_by_model = response.generated_by_model
             row.needs_user_confirmation = response.needs_user_confirmation
@@ -92,7 +96,8 @@ class StubTaskAssistRecords:
     async def resolve_stale_pending(self, _db, user_id, task_key):
         with self.lock:
             row = self.rows.get((user_id, task_key))
-            if row is not None and row.status == 'pending':
+            if (row is not None and row.status == 'pending' and row.claimed_at is not None
+                    and row.claimed_at < datetime.now(timezone.utc) - timedelta(minutes=2)):
                 row.status = 'completed'
                 row.reply = 'Fallback guidance recovered without another provider call.'
                 row.generated_by_model = False
@@ -244,11 +249,11 @@ def test_task_assist_rejects_invalid_multi_turn_or_client_context(payload: dict[
         TaskAssistRequest.model_validate(payload)
 
 
-def test_task_assist_answer_requires_a_server_owned_task_uuid() -> None:
-    with pytest.raises(ValidationError):
-        TaskAssistRequest.model_validate(
-            {'task_key': 'client-profile-task-id', 'user_message': DEFAULT_QUESTION}
-        )
+def test_task_assist_accepts_bounded_profile_task_keys():
+    request = TaskAssistRequest.model_validate(
+        {'task_key': 'client-profile-task-id', 'user_message': DEFAULT_QUESTION}
+    )
+    assert request.task_key == 'client-profile-task-id'
 
 
 def test_registered_detail_is_answered_from_the_server_snapshot_and_saved(monkeypatch) -> None:
@@ -280,8 +285,7 @@ def test_registered_detail_is_answered_from_the_server_snapshot_and_saved(monkey
 
     assert registered.status_code == 200
     assert registered.json()['items'][0]['status'] == 'available'
-    assert uuid.UUID(registered.json()['items'][0]['task_key'])
-    assert registered.json()['items'][0]['task_key'] != 'detail-1'
+    assert registered.json()['items'][0]['task_key'] == 'detail-1'
     assert answered.status_code == 200
     assert answered.json()['status'] == 'completed'
     assert answered.json()['question'] == DEFAULT_QUESTION
@@ -410,6 +414,7 @@ def test_pending_state_recovers_to_saved_fallback_without_a_second_provider_call
             _register(client)
             row = next(iter(records.rows.values()))
             row.status = 'pending'
+            row.claimed_at = datetime.now(timezone.utc) - timedelta(minutes=5)
             row.question = 'How should I safely verify this report?'
             recovered = client.get(f'/api/v1/ai/task-assist/{row.task_key}')
     finally:
@@ -432,3 +437,34 @@ def test_task_assist_requires_authentication() -> None:
 
     assert response.status_code == 401
     assert response.json()['detail'] == 'Missing auth cookie.'
+
+
+def test_unregistered_profile_key_cannot_invoke_provider(monkeypatch):
+    class Provider:
+        name = 'must-not-run'
+        def complete_json(self, **kwargs):
+            raise AssertionError('An unregistered task must not reach the provider')
+    records = StubTaskAssistRecords()
+    monkeypatch.setattr(ai_router, 'task_assist_records', records)
+    application, _ = _application(AIGateway(provider=Provider()))
+    with TestClient(application) as client:
+        response = client.post('/api/v1/ai/task-assist', json={
+            'task_key': 'unregistered-client-key', 'user_message': DEFAULT_QUESTION,
+        })
+    assert response.status_code == 404
+    assert records.rows == {}
+
+
+def test_same_profile_key_can_be_registered_by_two_users_without_shared_state(monkeypatch):
+    records = StubTaskAssistRecords()
+    monkeypatch.setattr(ai_router, 'task_assist_records', records)
+    first_app, first_user = _application(AIGateway())
+    second_app, second_user = _application(AIGateway())
+    with TestClient(first_app) as first, TestClient(second_app) as second:
+        assert _register(first, text='First users work').status_code == 200
+        assert _register(second, text='Second users work').status_code == 200
+        answered = first.post('/api/v1/ai/task-assist', json={'task_key': 'detail-1', 'user_message': DEFAULT_QUESTION})
+        assert answered.status_code == 200
+        assert second.get('/api/v1/ai/task-assist/detail-1').json()['status'] == 'available'
+    assert records.rows[(first_user, 'detail-1')].task_text == 'First users work'
+    assert records.rows[(second_user, 'detail-1')].task_text == 'Second users work'

@@ -1,5 +1,53 @@
 # Architecture change validation
 
+## 18 September 2026 follow-up
+
+Starting code: `639951a`. The results below cover the follow-up changes recorded
+in this revision.
+
+- Stored-task exposure requires an authenticated owner. The progress read API
+  returns only the signed-in user's chapter values.
+- Task responses retain the optional profile-task compatibility field without
+  requiring a new database column.
+- Rejected AI evidence no longer returns through the fallback path. Stale tests
+  were aligned with the current Task Assist and matching contracts.
+- Plan progress is saved as pending work before network calls and has explicit
+  retry and server reconciliation. Check-in uses current state and account
+  guards. Explicit course removal cancels its pending progress writes.
+- The frontend uses Node 24.19.0 and npm 12.0.2 for development and CI. Compatible
+  later Node 24 patches remain supported. Strict TypeScript is enabled.
+- The CI definition runs locked frontend, backend, data and launcher checks.
+  Vercel's frontend commands explicitly select the same npm version.
+
+| Check | Result |
+|---|---|
+| Frontend combined check on Node 24.19.0 | Passed, including 86 tests and production build |
+| Backend and data-parser tests | 281 passed, including in-memory SQLite tests |
+| Launcher and toolchain contract tests | 15 passed |
+| Mocked browser progress flow | Passed restore, failure, reload, retry and check-in |
+| Mocked Possibilities policy states | Passed invalid-profile recovery, cleared profile and current profile |
+| Whitespace check | Passed |
+
+The old nine backend failures were reproduced on the unchanged starting code.
+The full current suite passes without excluding or quarantining those tests.
+Test fixtures clear real provider/signing credentials and block network sockets.
+
+No package installation, live database connection or deployment was performed.
+The CI workflow and hosted npm commands have not run remotely. Browser API calls
+were mocked. PostgreSQL bootstrap, concurrency and existing-schema adoption
+remain separate verification work. Older local progress without a pending entry
+is retained rather than assigned an invented historical study date.
+
+The approved policy changes are complete. Occupation creation through HTTP is
+disabled while public reads remain available. A modern workspace profile is
+authoritative for Possibilities, including cleared and unconfirmed states.
+Malformed modern data returns a recovery error. An account read failure does not
+fall back to old records. Legacy behavior is retained only when no modern
+profile exists. The 21 added policy cases passed, with 17 failing against the
+previous source as expected. Database bootstrap remains separate by agreement.
+
+## 17 September 2026 baseline
+
 Reviewed against clean starting commit `818cfae` on `kuan/design-prototype`.
 The code changes were committed locally as `aa4f8fb` after these checks. No
 packages were installed, no database was connected or changed, and nothing was

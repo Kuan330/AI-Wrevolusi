@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { api } from "./api.ts";
 
 /** Skill input for brief/summary — only `skill_id` is used by the server. */
 export type SkillShape = {
@@ -166,4 +166,9 @@ export function postLearningDailyBrief(
     60_000,
     signal,
   );
+}
+
+/** Authoritative saved chapter values for the signed-in learner. */
+export function getLearningProgress() {
+  return api.get<{ chapters: LearningChapterProgress[] }>("/learning/progress");
 }

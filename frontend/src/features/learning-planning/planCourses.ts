@@ -1,4 +1,4 @@
-import { accountStorage, hasAccountWorkspace, currentWorkspaceSession, readGuestLegacyItem } from "../../services/accountStorage.ts";
+import { accountStorage, hasAccountWorkspace, currentWorkspaceSession, readGuestLegacyItem, saveWorkspaceItems } from "../../services/accountStorage.ts";
 import { loadCourseDirectory } from "./courseDirectory.ts";
 import { readLibrary } from "./libraryStorage.ts";
 import type { Course as CatalogueCourse } from "@/features/learning-planning/types";
@@ -28,10 +28,19 @@ export type PlanRecordDay = {
   /** Chapter progress recorded on this day (view-only on the calendar). */
   entries?: PlanDayChapterEntry[];
 };
+export type PendingProgress = {
+  skill_id: string;
+  course_id: string;
+  chapter_index: number;
+  value: number;
+  local_date: string;
+};
 export type PlanState = {
   version: 1;
   courses: PlanCourse[];
   records: Record<string, PlanRecordDay>;
+  pendingProgress?: PendingProgress[];
+  progressSyncError?: string;
 };
 
 const KEY = "aiwrevolusi.plan.courses.v1";
@@ -105,7 +114,13 @@ function parseState(raw: string | null): PlanState | null {
       !value.courses.every(isCourse) ||
       !value.records ||
       typeof value.records !== "object" ||
-      !Object.values(value.records).every(isRecord)
+      !Object.values(value.records).every(isRecord) ||
+      (value.progressSyncError !== undefined && typeof value.progressSyncError !== "string") ||
+      (value.pendingProgress !== undefined && (!Array.isArray(value.pendingProgress) || !value.pendingProgress.every(item =>
+        item && typeof item.skill_id === "string" && typeof item.course_id === "string" &&
+        Number.isInteger(item.chapter_index) && item.chapter_index >= 0 &&
+        Number.isInteger(item.value) && item.value >= 0 && item.value <= 10 &&
+        /^\d{4}-\d{2}-\d{2}$/.test(item.local_date))))
     ) {
       return null;
     }
@@ -138,7 +153,7 @@ export function readPlanState(): PlanState {
 }
 
 export function savePlanState(state: PlanState) {
-  accountStorage.setItem(KEY, JSON.stringify(state));
+  saveWorkspaceItems({ [KEY]: JSON.stringify(state) });
 
 }
 

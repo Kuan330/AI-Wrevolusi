@@ -6,12 +6,17 @@ AI-Wrevolusi frontend, backend, and data tools.
 ## Prerequisites
 
 - UV
-- Python 3.12; UV selects it from `backend/.python-version`
-- Node.js 24 and npm; `frontend/.nvmrc` records the required Node major
+- Python 3.12, selected by UV from `backend/.python-version`
+- Node.js 24.19.0 and npm 12.0.2 for the tested development setup
+- Compatible stable Node 24 patches are allowed by `frontend/package.json`
 - A Neon development connection string for database-backed checks
 
 Use a development database locally. Do not point local table creation, seed,
 or destructive reference-data commands at production.
+
+The launcher and npm commands reject an unsupported frontend toolchain. Select
+Node from `frontend/.nvmrc` using your existing version manager before starting.
+Verify `node --version` and `npm --version` in the same shell used to run the app.
 
 ## First-time setup
 
@@ -151,6 +156,9 @@ uv run --project backend --locked --all-groups \
 The suite disables provider calls and automatic database table creation, so it
 does not depend on the developer's `.env` or network access.
 
+The tests use mocked network clients and in-memory SQLite where required. The
+backend fixture blocks real socket connections and clears provider keys.
+
 Run the frontend checks:
 
 ```bash
@@ -172,6 +180,13 @@ fakes. It does not prove PostgreSQL concurrency or replay migrations. See the
 [database baseline proposal](database-baseline-proposal.md) for the separate,
 reviewed database verification work. Do not use automatic table creation as proof
 that Alembic can initialize or upgrade an existing database.
+
+## Continuous integration
+
+`.github/workflows/check.yml` runs on pull requests and pushes to main. It uses
+the pinned development Node/npm versions and UV 0.12.13. It installs from the
+lockfiles and runs frontend, backend, data-parser and launcher checks. This
+workflow does not deploy or use a hosted database.
 
 ## Data-tool checks
 

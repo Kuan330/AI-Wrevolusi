@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 from pathlib import Path
 import shutil
@@ -42,6 +43,37 @@ def available_port(
 def require_command(name: str) -> None:
     if shutil.which(name) is None:
         raise RuntimeError(f"Required command is not installed: {name}")
+
+
+def require_frontend_toolchain() -> None:
+    """Fail before starting either service when the local toolchain differs."""
+    engines = json.loads((FRONTEND_ROOT / "package.json").read_text())["devEngines"]
+    for kind in ("runtime", "packageManager"):
+        command = engines[kind]["name"]
+        expected = engines[kind]["version"]
+        require_command(command)
+        try:
+            result = subprocess.run(
+                [command, "--version"], check=True, capture_output=True,
+                text=True, timeout=10,
+            )
+        except (OSError, subprocess.SubprocessError) as error:
+            raise RuntimeError(f"Could not check {command} version. Check your PATH and retry.") from error
+        actual = result.stdout.strip().removeprefix("v")
+        if kind == "runtime":
+            minimum = tuple(int(part) for part in (FRONTEND_ROOT / ".nvmrc").read_text().strip().split("."))
+            try:
+                installed = tuple(int(part) for part in actual.split("."))
+                matches = len(installed) == 3 and installed[0] == minimum[0] and installed >= minimum
+            except ValueError:
+                matches = False
+        else:
+            matches = actual == expected
+        if not matches:
+            raise RuntimeError(
+                f"This project requires {command} {expected}, but found {actual}. "
+                "Select the versions in frontend/.nvmrc and frontend/package.json, then retry."
+            )
 
 
 def port_number(value: str) -> int:
@@ -93,7 +125,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     require_command("uv")
-    require_command("npm")
+    require_frontend_toolchain()
     if not (FRONTEND_ROOT / "node_modules" / ".bin" / "vite").exists():
         raise RuntimeError("Frontend packages are missing. Run: cd frontend && npm ci")
     if not (BACKEND_ROOT / ".env").exists():

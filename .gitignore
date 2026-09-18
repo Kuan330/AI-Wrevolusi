@@ -29,3 +29,6 @@ frontend/dist/
 /docs/reports/iteration-2-architecture/figures/*.html
 /docs/reports/iteration-2-architecture/figures/*.svg
 /docs/reports/iteration-2-architecture/figures/ERD-*.png
+
+# Local browser verification snapshots
+/.playwright-mcp/

@@ -1,0 +1,64 @@
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Select the project npm version
+        run: npm install --global "$(node -p 'require("./frontend/package.json").packageManager')"
+      - name: Install locked frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Check frontend boundaries, lint, tests and build
+        working-directory: frontend
+        run: npm run check
+
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SKILL_LLM_API_KEY: ''
+      AI_API_KEY: ''
+      AI_KEYLESS: 'false'
+      AI_FALLBACK_ENABLED: 'false'
+      AUTO_CREATE_TABLES: 'false'
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/aiwrevolusi
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          version: '0.12.13'
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - name: Install locked backend dependencies
+        working-directory: backend
+        run: uv sync --locked --all-groups
+      - name: Run offline backend tests
+        working-directory: backend
+        run: uv run --locked --all-groups python -B -m pytest tests ../data/raw/test_masco_pdf.py -q -p no:cacheprovider
+      - name: Run mocked localhost launcher tests
+        run: backend/.venv/bin/python -B -m unittest discover -s scripts -p test_dev.py -v

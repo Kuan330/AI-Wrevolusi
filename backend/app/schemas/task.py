@@ -28,7 +28,8 @@ class TaskRead(BaseModel):
 
     id: uuid.UUID
     user_id: uuid.UUID
-    profile_task_id: str | None
+    # Reserved compatibility field. Tasks have no profile-task relation in the ORM.
+    profile_task_id: str | None = None
     occupation_id: uuid.UUID | None
     title: str
     description: str | None

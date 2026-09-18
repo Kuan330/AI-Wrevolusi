@@ -1,3 +1,4 @@
+import { checkInToPlan, refreshChapterProgress, saveChapterProgress, syncChapterProgress } from "@/features/learning-planning/progressOperations";
 import type { MouseEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -36,24 +37,19 @@ import { changeSavedCourses } from "@/features/learning-planning/courseOperation
 import LearningReviewNotice from "@/components/common/LearningReviewNotice";
 import { readLearningSkills } from "@/pages/Skills/learningSkills";
 import {
-  flushWorkspace,
   hasAccountWorkspace,
 } from "@/services/accountStorage";
 import { ApiError } from "@/services/api";
 import {
   getLearningCalendar,
-  postLearningCheckin,
   postLearningDailyBrief,
-  postLearningProgress,
   type CalendarDay,
   type DailyBriefResponse,
 } from "@/services/learningService";
 import {
   readPlanState,
-  savePlanState,
   syncPlanWithLearningCourses,
   type PlanCourse,
-  type PlanDayChapterEntry,
   type PlanRecordDay,
   type PlanState,
 } from "@/features/learning-planning/planCourses";
@@ -76,14 +72,6 @@ const dateKey = (d = new Date()) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 const localHour = (d = new Date()) => d.getHours();
-
-const emptyRecord = (): RecordDay => ({
-  minutes: 0,
-  note: "",
-  studied: false,
-  checked: false,
-  entries: [],
-});
 
 function dayHasProgress(r: RecordDay | undefined) {
   return Boolean(r && (r.checked || r.studied || (r.entries?.length ?? 0) > 0));
@@ -110,20 +98,6 @@ function briefSkillsFromPlan(courses: PlanCourse[]) {
   }));
 }
 
-function mergeDayEntries(
-  existing: PlanDayChapterEntry[] | undefined,
-  next: PlanDayChapterEntry[],
-): PlanDayChapterEntry[] {
-  const map = new Map<string, PlanDayChapterEntry>();
-  for (const entry of existing ?? []) {
-    map.set(`${entry.courseId}::${entry.chapterTitle}`, entry);
-  }
-  for (const entry of next) {
-    map.set(`${entry.courseId}::${entry.chapterTitle}`, entry);
-  }
-  return [...map.values()];
-}
-
 function initial(): { state: Preview; error: string } {
   try {
     return { state: readPlanState(), error: "" };
@@ -132,15 +106,6 @@ function initial(): { state: Preview; error: string } {
       state: { version: 1, courses: [], records: {} },
       error: error instanceof Error ? error.message : "Saved plan could not be read. Your stored data has not been overwritten.",
     };
-  }
-}
-
-function persist(next: Preview) {
-  savePlanState(next);
-  if (hasAccountWorkspace()) {
-    void flushWorkspace().catch(() => {
-      /* The account-scoped pending cache is retained for recovery. */
-    });
   }
 }
 
@@ -189,6 +154,7 @@ export default function Plan() {
   /** After finishing today's brief once this visit, don't chain into entry greeting. */
   const [briefFinishedSession, setBriefFinishedSession] = useState(false);
   const [checkInBusy, setCheckInBusy] = useState(false);
+  const [progressBusy, setProgressBusy] = useState(false);
   // The drawer opens programmatically, so Radix has no trigger to restore focus
   // to on close; remember the button that opened it instead.
   const detailOpener = useRef<HTMLButtonElement | null>(null);
@@ -265,6 +231,10 @@ export default function Plan() {
     void syncPlanWithLearningCourses()
       .then((next) => {
         if (!cancelled) setState(next);
+        return refreshChapterProgress();
+      })
+      .then((next) => {
+        if (!cancelled) setState(next);
       })
       .catch((error: unknown) => {
         if (!cancelled) setNotice(error instanceof Error ? error.message : "Could not refresh your saved courses.");
@@ -316,17 +286,6 @@ export default function Plan() {
       window.clearInterval(timer);
     };
   }, []);
-
-  function save(next: Preview) {
-    setState(next);
-    try {
-      persist(next);
-    } catch {
-      setNotice(
-        "Changes are available until you leave this page; browser storage is unavailable.",
-      );
-    }
-  }
 
   const course = state.courses.find((c) => c.id === courseId);
   // The drawer summary must follow the draft values, not only the saved ones.
@@ -412,25 +371,15 @@ export default function Plan() {
     if (checkInBusy) return;
     setCheckInBusy(true);
     try {
-      const res = await postLearningCheckin(today);
+      const { result: res, state: next } = await checkInToPlan(today);
+      setState(next);
       setStreakDays(res.streak_days);
-      message.success(
-        res.created
-          ? `Checked in · ${res.streak_days} day streak`
-          : `Already checked in · ${res.streak_days} day streak`,
-      );
+      message.success(res.created ? `Checked in · ${res.streak_days} day streak` : `Already checked in · ${res.streak_days} day streak`);
       sayPet("plan-record");
-      const previous = state.records[today] ?? emptyRecord();
-      save({
-        ...state,
-        records: {
-          ...state.records,
-          [today]: { ...previous, checked: true, studied: true },
-        },
-      });
       await refreshCalendar(month);
       await refreshBrief(state.courses, today);
     } catch (error) {
+      try { setState(readPlanState()); } catch { /* Keep the visible plan. */ }
       if (error instanceof ApiError && error.status === 409) {
         message.warning(
           error.detail ||
@@ -472,102 +421,50 @@ export default function Plan() {
         }
       : null;
 
-  function updateProgress() {
-    if (!course) return;
-    const bumps: PlanDayChapterEntry[] = course.chapters.flatMap((ch, i) => {
-      const next = draft[i] ?? ch.value;
-      if (next <= ch.value) return [];
-      return [
-        {
-          courseId: course.id,
-          courseTitle: course.title,
-          chapterTitle: ch.title,
-          percent: next * 10,
-        },
-      ];
-    });
-    const changed = bumps.length > 0;
-    const day = dateKey();
-    const previous = state.records[day] ?? emptyRecord();
-    const nextCourses = state.courses.map((c) =>
-      c.id === course.id
-        ? {
-            ...c,
-            chapters: c.chapters.map((ch, i) => ({
-              ...ch,
-              value: Math.max(ch.value, draft[i]),
-            })),
-          }
-        : c,
-    );
-    const nextState: Preview = {
-      ...state,
-      courses: nextCourses,
-      records: changed
-        ? {
-            ...state.records,
-            [day]: {
-              ...previous,
-              studied: true,
-              // Check-in is an explicit action; save only marks studied.
-              checked: previous.checked,
-              entries: mergeDayEntries(previous.entries, bumps),
-            },
-          }
-        : state.records,
-    };
-    save(nextState);
-    setCourseId(null);
-    setToday(day);
-    if (changed) {
-      message.success("Chapter progress saved.");
-      sayPet("save-progress");
-      // Prompt check-in separately — save only marks studied.
-      const alreadyChecked =
-        Boolean(previous.checked) ||
-        Boolean(calendarDays[day]?.checked_in);
-      if (!alreadyChecked) {
-        window.setTimeout(() => setRecordDate(day), 0);
-      }
-    } else {
-      message.info("No changes to save.");
+  async function retryProgress() {
+    if (progressBusy) return;
+    setProgressBusy(true);
+    setNotice("Syncing chapter progress…");
+    try {
+      const next = await syncChapterProgress();
+      setState(next);
+      setNotice("Chapter progress synced.");
+      message.success("Chapter progress synced.");
+      await refreshCalendar(month);
+      await refreshBrief(next.courses, today);
+      return true;
+    } catch (error) {
+      try { setState(readPlanState()); } catch { /* Keep the visible draft. */ }
+      const detail = error instanceof Error ? error.message : "Progress could not sync. Your changes are kept for retry.";
+      setNotice(detail);
+      message.error(detail);
+      return false;
+    } finally {
+      setProgressBusy(false);
     }
-    setNotice(
-      changed ? "Chapter progress saved." : "No changes to save.",
-    );
+  }
 
-    if (changed && hasAccountWorkspace() && course.skillId) {
-      const payload = bumps.flatMap((entry) => {
-        const index = course.chapters.findIndex(
-          (ch) => ch.title === entry.chapterTitle,
-        );
-        if (index < 0 || !course.skillId) return [];
-        return [
-          {
-            skill_id: course.skillId,
-            course_id: course.id,
-            chapter_index: index,
-            value: Math.round(entry.percent / 10),
-          },
-        ];
-      });
-      if (payload.length) {
-        void postLearningProgress(day, payload)
-          .then(async (res) => {
-            if (res.rejected.length) {
-              message.warning(
-                "Some chapter values could not be saved. Progress only moves forward.",
-              );
-            }
-            await refreshCalendar(month);
-            await refreshBrief(nextCourses, day);
-          })
-          .catch(() => {
-            /* Local mirror already kept; retry on next edit. */
-          });
+  async function updateProgress() {
+    if (!course || progressBusy) return;
+    const day = dateKey();
+    try {
+      const next = saveChapterProgress(course.id, draft, day);
+      setState(next);
+      setCourseId(null);
+      setToday(day);
+      if (next.pendingProgress?.length) {
+        setNotice("Saved on this browser. Waiting to sync chapter progress.");
+        const synced = await retryProgress();
+        if (synced && !readPlanState().records[day]?.checked) setRecordDate(day);
+      } else {
+        setNotice(hasAccountWorkspace() ? "No new chapter progress to sync." : "Chapter progress saved on this browser.");
       }
-    } else if (changed) {
-      void refreshCalendar(month);
+      sayPet("save-progress");
+    } catch (error) {
+      // No success message or closed drawer when the local save fails.
+      const detail = error instanceof Error ? error.message : "Could not save progress. Your draft is still open.";
+      setNotice(detail);
+      message.error(detail);
     }
   }
 
@@ -682,6 +579,11 @@ export default function Plan() {
       </p>
 
       <LearningReviewNotice />
+      {(state.pendingProgress?.length || state.progressSyncError) && <div role="status" className="mb-4 rounded-xl border p-3 text-sm">
+        <p>{progressBusy ? "Syncing chapter progress…" : state.progressSyncError ? "Progress sync failed. Your changes are kept on this browser." : "Chapter progress is waiting to sync."}</p>
+        {state.progressSyncError && <p>{state.progressSyncError}</p>}
+        <button type="button" className="mt-2 underline" disabled={progressBusy} onClick={() => void retryProgress()}>Retry progress sync</button>
+      </div>}
 
       <div className="lp-layout">
         <aside className="lp-left">
@@ -1081,6 +983,7 @@ export default function Plan() {
           <DialogTitle>Remove this course from your plan?</DialogTitle>
           <DialogDescription>
             It will leave your learning list too. Daily notes on My Plan stay.
+            {state.pendingProgress?.some(item => item.course_id === removeId) && " Unsynced chapter progress for this course will be discarded."}
           </DialogDescription>
           <div className="lp-modal__actions">
             <button

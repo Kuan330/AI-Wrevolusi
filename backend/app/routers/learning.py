@@ -15,6 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.learning import (
+    ChapterProgressIn,
+    ProgressReadResponse,
     MAX_BACKFILL_DAYS,
     CalendarDay,
     CalendarResponse,
@@ -174,6 +176,21 @@ async def list_catalogue_courses(
             course_rows, chapter_rows
         ),
     }
+
+
+@router.get('/progress', response_model=ProgressReadResponse)
+async def read_progress(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> ProgressReadResponse:
+    values = await records.list_progress(db, current_user.id)
+    return ProgressReadResponse(chapters=[
+        ChapterProgressIn(
+            skill_id=item.skill_id, course_id=item.course_id,
+            chapter_index=item.chapter_index, value=item.value,
+        )
+        for item in values
+    ])
 
 
 @router.post('/progress', response_model=ProgressUpdateResponse)

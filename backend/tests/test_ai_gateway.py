@@ -216,10 +216,13 @@ def test_task_route_uses_the_shared_gateway_provider_before_contract_enforcement
 
 
 def test_skill_route_uses_a_safe_gateway_fallback_for_malformed_provider_json() -> None:
+    calls = []
+
     class Provider:
         name = 'fixture-provider'
 
         def complete_json(self, **_kwargs: Any) -> Any:
+            calls.append(_kwargs)
             return '{malformed'
 
     application = create_app('/api')
@@ -231,7 +234,7 @@ def test_skill_route_uses_a_safe_gateway_fallback_for_malformed_provider_json() 
             response = client.post(
                 '/api/v1/ai/skill-match',
                 json={
-                    'task_text': 'Provide customer service.',
+                    'task_text': 'Move the blue marker.',
                     'candidates': [
                         {'id': 10, 'skill': 'Customer service'},
                     ],
@@ -240,6 +243,7 @@ def test_skill_route_uses_a_safe_gateway_fallback_for_malformed_provider_json() 
     finally:
         application.dependency_overrides.clear()
 
+    assert len(calls) == 1
     assert response.status_code == 200
     assert response.json()['skills'] == []
 
@@ -261,10 +265,13 @@ def test_gateway_uses_the_local_deterministic_path_when_provider_fails() -> None
 
 
 def test_skill_provider_evidence_must_be_an_exact_task_substring() -> None:
+    calls = []
+
     class Provider:
         name = 'fixture-provider'
 
         def complete_json(self, **_kwargs: Any) -> Any:
+            calls.append(_kwargs)
             return {
                 'skills': [
                     {
@@ -282,13 +289,14 @@ def test_skill_provider_evidence_must_be_an_exact_task_substring() -> None:
             response = client.post(
                 '/api/v1/ai/skill-match',
                 json={
-                    'task_text': 'Provide customer service.',
+                    'task_text': 'Move the blue marker.',
                     'candidates': [{'id': 10, 'skill': 'Service orientation'}],
                 },
             )
     finally:
         application.dependency_overrides.clear()
 
+    assert len(calls) == 1
     assert response.status_code == 200
     payload = response.json()
     assert payload['skills'] == []

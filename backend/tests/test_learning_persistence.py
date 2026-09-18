@@ -95,3 +95,14 @@ def test_brief_replacement_is_one_atomic_statement():
     assert 'updated_at = now()' in query
     assert statement.get_execution_options()['populate_existing'] is True
     db.commit.assert_awaited_once()
+
+
+def test_progress_read_query_filters_by_owner():
+    owner = uuid4()
+    response = Mock()
+    response.scalars.return_value.all.return_value = []
+    db = session(response)
+    assert asyncio.run(records.list_progress(db, owner)) == []
+    statement = db.execute.call_args.args[0]
+    assert 'WHERE learning_progress.user_id =' in sql(statement)
+    assert owner in statement.compile(dialect=postgresql.dialect()).params.values()

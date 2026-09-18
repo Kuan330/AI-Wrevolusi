@@ -53,7 +53,7 @@ def test_possibilities_route_survives_invalid_legacy_shortlist(monkeypatch):
     account_row.scalar_one_or_none.return_value = {
         'aiwrevolusi.possibilities.shortlist': '["bad", true, 999, 2]',
     }
-    db = SimpleNamespace(execute=AsyncMock(side_effect=[task_rows, account_row]))
+    db = SimpleNamespace(execute=AsyncMock(side_effect=[account_row, task_rows]))
     user = SimpleNamespace(id=uuid.uuid4(), occupation_id=None)
     response = asyncio.run(route.get_possibilities(current_user=user, db=db))
     assert response.shortlisted_skill_ids == [2]

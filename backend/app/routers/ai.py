@@ -48,14 +48,10 @@ def _finalize_skill_matches(
     task_text: str,
     candidates: list[SkillMatchCandidate],
 ) -> SkillMatchResponse:
-    """Verify provider evidence, then fall back to the deterministic rules.
+    """Keep traceable provider evidence or use the deterministic rules.
 
-    Two things can empty a provider response: evidence that cannot be traced
-    back to the input, and short inputs the model judges too vague to match — a
-    lone word like "thinking" can never reproduce the full name "Analytical
-    thinking", so a strict evidence check would drop all three of its matches.
-    An empty list is a dead end for the user either way, so the rule table
-    answers instead when the provider returns nothing.
+    An empty verified result must not restore rejected provider items. The
+    fallback can still suggest a skill when its evidence occurs in the input.
     """
 
     verified = [
@@ -64,9 +60,8 @@ def _finalize_skill_matches(
         if item.evidence_phrases
         and all(phrase in task_text for phrase in item.evidence_phrases)
     ]
-    kept = verified or response.skills
-    if kept:
-        return SkillMatchResponse(skills=kept[:MAX_SKILL_MATCHES])
+    if verified:
+        return SkillMatchResponse(skills=verified[:MAX_SKILL_MATCHES])
     return match_skills_response(task_text, candidates)
 
 

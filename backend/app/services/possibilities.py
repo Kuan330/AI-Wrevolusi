@@ -9,31 +9,57 @@ from typing import Literal
 SkillState = Literal['have', 'learning', 'shortlisted', 'missing']
 
 
-def confirmed_workspace_evidence(workspace: object, occupations: Iterable[Mapping]) -> tuple[list[str], dict | None]:
-    """Read the confirmed snapshot, never the editable task draft.
+MODERN_PROFILE_KEY = 'aiwrevolusi.userProfile'
+PROFILE_RECOVERY_MESSAGE = 'Your saved work profile could not be read. Reload your saved account or restore a valid profile before viewing Possibilities.'
 
-    A present modern profile is authoritative, including a cleared/invalid
-    analysis; stale legacy data must not resurrect that confirmation.
+
+def confirmed_workspace_evidence(workspace: object, occupations: Iterable[Mapping]) -> tuple[list[str], dict | None]:
+    """Read confirmed evidence. A modern profile never falls back to old data.
+
+    A cleared or not-yet-confirmed analysis has no evidence. Invalid modern data
+    needs recovery instead of silently substituting another source.
     """
     if not isinstance(workspace, Mapping):
-        return [], None
-    key = 'aiwrevolusi.userProfile'
+        raise ValueError(PROFILE_RECOVERY_MESSAGE)
+    modern = MODERN_PROFILE_KEY in workspace
     try:
-        if key in workspace:
-            profile = json.loads(workspace[key])
-            analysis = profile.get('analysis') if isinstance(profile, dict) else None
+        if modern:
+            profile = json.loads(workspace[MODERN_PROFILE_KEY])
+            if not isinstance(profile, dict):
+                raise ValueError(PROFILE_RECOVERY_MESSAGE)
+            if 'tasks' in profile and (
+                not isinstance(profile['tasks'], list)
+                or any(not isinstance(task, dict) for task in profile['tasks'])
+            ):
+                raise ValueError(PROFILE_RECOVERY_MESSAGE)
+            analysis = profile.get('analysis')
         else:
             analysis = json.loads(workspace.get('aiwrevolusi.confirmedAnalysis', 'null'))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError) as error:
+        if modern:
+            raise ValueError(PROFILE_RECOVERY_MESSAGE) from error
+        return [], None
+    if analysis is None:
         return [], None
     if not isinstance(analysis, dict):
+        if modern:
+            raise ValueError(PROFILE_RECOVERY_MESSAGE)
         return [], None
     code = analysis.get('occupationCode')
-    if not isinstance(code, str):
+    tasks = analysis.get('tasks')
+    valid = (
+        isinstance(code, str) and bool(code.strip()) and isinstance(tasks, list)
+        and all(isinstance(task, dict) and isinstance(task.get('wording'), str)
+                and bool(task['wording'].strip()) for task in tasks)
+    )
+    if modern and not valid:
+        raise ValueError(PROFILE_RECOVERY_MESSAGE)
+    if not isinstance(code, str) or not isinstance(tasks, list):
         return [], None
     reference = next((row for row in occupations if row['occupation_code'] == code), None)
-    tasks = analysis.get('tasks')
-    if reference is None or not isinstance(tasks, list):
+    if reference is None:
+        if modern:
+            raise ValueError(PROFILE_RECOVERY_MESSAGE)
         return [], None
     texts = list(dict.fromkeys(
         task['wording'].strip() for task in tasks
