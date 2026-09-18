@@ -45,6 +45,54 @@ def require_command(name: str) -> None:
         raise RuntimeError(f"Required command is not installed: {name}")
 
 
+def compatible_node(version: str, minimum: tuple[int, ...]) -> bool:
+    try:
+        installed = tuple(int(part) for part in version.removeprefix("v").split("."))
+    except ValueError:
+        return False
+    return len(installed) == 3 and installed[0] == minimum[0] and installed >= minimum
+
+
+def installed_node_candidates(version: str) -> list[Path]:
+    """Known existing installations only. Never download a runtime."""
+    major = version.split(".")[0]
+    return [
+        Path.home() / ".nvm" / "versions" / "node" / f"v{version}" / "bin" / "node",
+        Path(f"/opt/homebrew/opt/node@{major}/bin/node"),
+        Path(f"/usr/local/opt/node@{major}/bin/node"),
+        Path.home() / ".cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    ]
+
+
+def select_frontend_runtime() -> None:
+    """Select an installed compatible Node for this launcher and its children."""
+    version = (FRONTEND_ROOT / ".nvmrc").read_text().strip()
+    minimum = tuple(int(part) for part in version.split("."))
+    override = os.environ.get("AIW_NODE_BIN")
+    current = shutil.which("node")
+    candidates = ([Path(override).expanduser().absolute()] if override else
+                  ([Path(current)] if current else []) + installed_node_candidates(version))
+    for binary in candidates:
+        if binary.name not in {"node", "node.exe"} or not binary.is_file():
+            continue
+        try:
+            result = subprocess.run(
+                [str(binary), "--version"], check=True, capture_output=True,
+                text=True, timeout=10,
+            )
+        except (OSError, subprocess.SubprocessError):
+            continue
+        actual = result.stdout.strip()
+        if compatible_node(actual, minimum):
+            if override or str(binary) != current:
+                os.environ["PATH"] = str(binary.parent) + os.pathsep + os.environ.get("PATH", "")
+                print(f"Using Node {actual.removeprefix('v')} from {binary}", flush=True)
+            return
+    if override:
+        raise RuntimeError(f"AIW_NODE_BIN must point to a working Node {minimum[0]} executable, version {version} or newer.")
+    # The normal preflight supplies the missing/mismatched-version explanation.
+
+
 def require_frontend_toolchain() -> None:
     """Fail before starting either service when the local toolchain differs."""
     engines = json.loads((FRONTEND_ROOT / "package.json").read_text())["devEngines"]
@@ -62,17 +110,14 @@ def require_frontend_toolchain() -> None:
         actual = result.stdout.strip().removeprefix("v")
         if kind == "runtime":
             minimum = tuple(int(part) for part in (FRONTEND_ROOT / ".nvmrc").read_text().strip().split("."))
-            try:
-                installed = tuple(int(part) for part in actual.split("."))
-                matches = len(installed) == 3 and installed[0] == minimum[0] and installed >= minimum
-            except ValueError:
-                matches = False
+            matches = compatible_node(actual, minimum)
         else:
             matches = actual == expected
         if not matches:
             raise RuntimeError(
                 f"This project requires {command} {expected}, but found {actual}. "
-                "Select the versions in frontend/.nvmrc and frontend/package.json, then retry."
+                "Select the versions in frontend/.nvmrc and frontend/package.json, then retry. "
+                "You can set AIW_NODE_BIN to an installed compatible node executable."
             )
 
 
@@ -125,6 +170,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     require_command("uv")
+    select_frontend_runtime()
     require_frontend_toolchain()
     if not (FRONTEND_ROOT / "node_modules" / ".bin" / "vite").exists():
         raise RuntimeError("Frontend packages are missing. Run: cd frontend && npm ci")

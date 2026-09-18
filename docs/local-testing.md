@@ -14,9 +14,15 @@ AI-Wrevolusi frontend, backend, and data tools.
 Use a development database locally. Do not point local table creation, seed,
 or destructive reference-data commands at production.
 
-The launcher and npm commands reject an unsupported frontend toolchain. Select
-Node from `frontend/.nvmrc` using your existing version manager before starting.
-Verify `node --version` and `npm --version` in the same shell used to run the app.
+`./dev` first tries the Node on your PATH. If it is incompatible, the launcher
+looks for the pinned NVM installation, Homebrew Node 24, then the existing Codex
+bundled runtime. It changes PATH only for itself and its child processes. It does
+not install Node or change your shell profile or global default.
+
+For a different existing installation, set `AIW_NODE_BIN` to its full `node`
+executable path. The normal Node and npm version checks still run before either
+service starts. Direct npm commands use your shell's PATH, so select the versions
+in `frontend/.nvmrc` and `frontend/package.json` when running those separately.
 
 ## First-time setup
 

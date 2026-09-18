@@ -16,6 +16,7 @@ class LauncherTests(unittest.TestCase):
             backend_port=8000, frontend_port=5173,
         )))
         stack.enter_context(patch.object(dev, "require_command"))
+        self.select_runtime = stack.enter_context(patch.object(dev, "select_frontend_runtime"))
         self.toolchain = stack.enter_context(patch.object(dev, "require_frontend_toolchain"))
         stack.enter_context(patch.object(dev.Path, "exists", return_value=True))
         self.ports = stack.enter_context(patch.object(dev, "available_port", side_effect=[8001, 5174]))
@@ -71,6 +72,53 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(dev.main(), 0)
         self.assertEqual(self.stop.call_args_list, [call(backend), call(frontend)])
         self.assertEqual(self.wait.call_args_list, [call(backend), call(frontend)])
+
+
+class RuntimeSelectionTests(unittest.TestCase):
+    def setUp(self):
+        self.enterContext(patch.dict(dev.os.environ, {"PATH": "/global/bin"}))
+        dev.os.environ.pop("AIW_NODE_BIN", None)
+        self.enterContext(patch.object(dev.shutil, "which", return_value="/global/bin/node"))
+        self.enterContext(patch.object(dev, "installed_node_candidates", return_value=[dev.Path("/local/node24/bin/node")]))
+        self.enterContext(patch.object(dev.Path, "is_file", return_value=True))
+        self.run = self.enterContext(patch.object(dev.subprocess, "run"))
+        self.enterContext(patch("builtins.print"))
+
+    def test_compatible_path_runtime_is_kept(self):
+        self.run.return_value = Mock(stdout="v24.19.0\n")
+        dev.select_frontend_runtime()
+        self.assertEqual(dev.os.environ["PATH"], "/global/bin")
+        self.run.assert_called_once()
+
+    def test_node_26_falls_back_to_installed_node_24(self):
+        self.run.side_effect = [Mock(stdout="v26.6.0\n"), Mock(stdout="v24.19.0\n")]
+        dev.select_frontend_runtime()
+        self.assertEqual(dev.os.environ["PATH"], "/local/node24/bin:/global/bin")
+        self.assertEqual(self.run.call_args.args[0], ["/local/node24/bin/node", "--version"])
+
+    def test_incompatible_fallback_does_not_change_path(self):
+        self.run.side_effect = [Mock(stdout="v26.6.0\n"), Mock(stdout="v24.18.0\n")]
+        dev.select_frontend_runtime()
+        self.assertEqual(dev.os.environ["PATH"], "/global/bin")
+
+    def test_broken_fallback_does_not_change_path(self):
+        self.run.side_effect = [Mock(stdout="v26.6.0\n"), OSError("not executable")]
+        dev.select_frontend_runtime()
+        self.assertEqual(dev.os.environ["PATH"], "/global/bin")
+
+    def test_explicit_runtime_is_selected(self):
+        dev.os.environ["AIW_NODE_BIN"] = "/chosen/bin/node"
+        self.run.return_value = Mock(stdout="v24.20.0\n")
+        dev.select_frontend_runtime()
+        self.assertEqual(dev.os.environ["PATH"], "/chosen/bin:/global/bin")
+        self.assertEqual(self.run.call_args.args[0], ["/chosen/bin/node", "--version"])
+
+    def test_invalid_override_fails_instead_of_silently_ignoring_it(self):
+        dev.os.environ["AIW_NODE_BIN"] = "/chosen/bin/node"
+        self.run.return_value = Mock(stdout="v26.6.0\n")
+        with self.assertRaisesRegex(RuntimeError, "AIW_NODE_BIN must point"):
+            dev.select_frontend_runtime()
+        self.assertEqual(dev.os.environ["PATH"], "/global/bin")
 
 
 class ToolchainTests(unittest.TestCase):
