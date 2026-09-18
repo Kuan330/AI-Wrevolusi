@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Check, Plus } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Plus } from "lucide-react";
 import { Popover } from "@base-ui/react/popover";
 import BotPet from "@/components/common/BotPet";
 import PageHeader from "@/components/common/PageHeader";
@@ -9,6 +9,7 @@ import { possibilitiesService } from "@/services/possibilitiesService";
 import { referenceService } from "@/services/referenceService";
 import { accountStorage, flushWorkspace } from "@/services/accountStorage";
 import { PAGE_GRADIENT_CSS } from "@/pages/Analysis/lib/palette";
+import { GradientBar } from "@/components/ui/gradient-bar";
 import SkillOutlookSummary from "@/pages/Skills/components/SkillOutlookSummary";
 import { useLearningSkills } from "@/pages/Skills/useLearningSkills";
 import {
@@ -98,14 +99,22 @@ function BuildSkillChip({
 function JourneyCompanion({
   currentTitle,
   targetTitle,
-  sharedCount,
+  coveragePct,
   onExplore,
 }: {
   currentTitle: string;
   targetTitle: string | null;
-  sharedCount: number;
+  coveragePct: number | null;
   onExplore: () => void;
 }) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const coverage = coveragePct ?? 0;
+  const hasCoverage = coveragePct != null;
+
+  useEffect(() => {
+    setDetailsOpen(false);
+  }, [targetTitle, coveragePct]);
+
   return (
     <aside className="px-companion">
       <p className="px-eyebrow">Journey Companion</p>
@@ -125,23 +134,62 @@ function JourneyCompanion({
             <ArrowRight size={14} aria-hidden />
             <span>{targetTitle}</span>
           </p>
-          <p>{sharedCount} shared {sharedCount === 1 ? "skill" : "skills"} detected</p>
-          <div className="px-companion-story">
-            <h3>What this path suggests</h3>
-            <p>
-              Your confirmed tasks already overlap with skills used in{" "}
-              <strong>{targetTitle}</strong>. These are detected skill signals. Other requirements have not been assessed.
-            </p>
-            <ul>
-              <li>
-                <strong>{sharedCount} shared skills</strong> were detected from task wording.
-              </li>
-              <li>
-                When you are ready, open Learning Resources to turn a gap into a
-                small next step.
-              </li>
-            </ul>
+
+          <div className="px-companion-coverage">
+            <div className="px-companion-coverage-meta">
+              <strong>{hasCoverage ? `${coverage}%` : "—"}</strong>
+              <span>Skill coverage</span>
+            </div>
+            <GradientBar
+              value={hasCoverage ? coverage : 0}
+              size="md"
+              aria-label={
+                hasCoverage
+                  ? `Skill coverage ${coverage} percent`
+                  : "Skill coverage unavailable"
+              }
+            />
+            <button
+              type="button"
+              className={`px-companion-details-btn${detailsOpen ? " is-open" : ""}`}
+              aria-expanded={detailsOpen}
+              onClick={() => setDetailsOpen((open) => !open)}
+            >
+              {detailsOpen ? "Hide explanation" : "Details"}
+              <ChevronDown size={14} aria-hidden />
+            </button>
+            {detailsOpen ? (
+              <div className="px-companion-story" id="px-companion-details">
+                <h3>What this path suggests</h3>
+                <p>
+                  Your confirmed tasks already overlap with skills used in{" "}
+                  <strong>{targetTitle}</strong>. These are detected skill
+                  signals. Other requirements have not been assessed.
+                </p>
+                <ul>
+                  <li>
+                    {hasCoverage ? (
+                      <>
+                        <strong>{coverage}% skill coverage</strong> comes from
+                        overlapping task wording with this role&apos;s skill
+                        map.
+                      </>
+                    ) : (
+                      <>
+                        Skill overlap is inferred from your confirmed task
+                        wording.
+                      </>
+                    )}
+                  </li>
+                  <li>
+                    When you are ready, open Learning Resources to turn a gap
+                    into a small next step.
+                  </li>
+                </ul>
+              </div>
+            ) : null}
           </div>
+
           <button className="px-primary px-companion-cta" type="button" onClick={onExplore}>
             Explore learning resources
           </button>
@@ -294,7 +342,7 @@ export default function Possibilities() {
 
   const selected = data.directions.find(item => item.occupation_code === selectedCode);
   const currentTitle = data.currentRole?.title ?? "Your current role";
-  const sharedCount = selected?.skills.filter(skill => reflectedSkillIds.has(skill.skill_id)).length ?? 0;
+  const selectedCoverage = selected?.coverage_pct ?? data.chosenDirectionCoverage;
   const goLearning = () => {
     if (!selected) return;
     navigate(`/learning-centre?q=${encodeURIComponent(selected.title)}`);
@@ -345,7 +393,7 @@ export default function Possibilities() {
             <div className="px-direction-grid">
               {data.directions.slice(0, 3).map((direction, index) => {
                 const chosen = selected?.occupation_code === direction.occupation_code;
-                const sharedCount = direction.skills.filter(skill => reflectedSkillIds.has(skill.skill_id)).length;
+                const coverage = direction.coverage_pct;
                 return (
                   <article
                     className={`px-direction-card px-accent-${index} ${chosen ? "is-chosen" : ""}`}
@@ -355,9 +403,10 @@ export default function Possibilities() {
                     <h3>{direction.title}</h3>
                     <div className="px-card-score">
                       <strong>
-                        {sharedCount}
+                        {coverage != null ? coverage : "—"}
                       </strong>
-                      <span>SHARED {sharedCount === 1 ? "SKILL" : "SKILLS"} DETECTED</span>
+                      {coverage != null ? <small>%</small> : null}
+                      <span>SKILL COVERAGE</span>
                     </div>
                     <p className="px-direction-description">{direction.description}</p>
                     <button
@@ -454,12 +503,12 @@ export default function Possibilities() {
         <JourneyCompanion
           currentTitle={currentTitle}
           targetTitle={selected?.title ?? null}
-          sharedCount={sharedCount}
+          coveragePct={selectedCoverage}
           onExplore={goLearning}
         />
       </div>
 
-      <p className="px-chosen-hint">Shared skills are inferred from task wording. Specialist skills, qualifications and experience have not been assessed. These suggestions do not indicate job readiness or hiring probability.</p>
+      <p className="px-chosen-hint">Skill coverage is inferred from task wording against each role&apos;s skill map. Specialist skills, qualifications and experience have not been assessed. These suggestions do not indicate job readiness or hiring probability.</p>
       <BotPet
         storageKey="aiwrevolusi.botPetPosition.possibilities.v4"
         defaultCorner="top-right"

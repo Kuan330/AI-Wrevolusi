@@ -233,7 +233,8 @@ def recommend_occupations(
             'title': str(occupation.get('title') or ''),
             'area': occupation.get('industry'),
             'description': str(occupation.get('description') or ''),
-            'coverage_pct': skill_overlap_score(confirmed_skill_ids, required),
+            # Coverage = shared / required — matches the direction skill map.
+            'coverage_pct': round(len(owned) * 100 / len(required)),
             'required_skill_ids': sorted(required),
             'overlap_count': len(owned),
         })
@@ -247,9 +248,11 @@ def recommend_occupations(
 def chosen_direction_score(
     owned_skill_ids: set[int], required_skill_ids: set[int]
 ) -> int:
-    """Use the same overlap score; planned skills are not owned capabilities."""
+    """Coverage against the chosen direction's required skill map."""
 
-    return skill_overlap_score(owned_skill_ids, required_skill_ids)
+    if not required_skill_ids:
+        return 0
+    return round(len(owned_skill_ids & required_skill_ids) * 100 / len(required_skill_ids))
 
 
 def filter_allowed_directions(

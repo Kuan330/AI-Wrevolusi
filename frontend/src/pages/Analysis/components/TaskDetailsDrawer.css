@@ -4,6 +4,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 .task-details__eyebrow {
@@ -20,6 +22,7 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .task-details__explanation {
@@ -110,11 +113,195 @@
 .task-details__content-area {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 1rem;
+  padding-bottom: 7.5rem;
 }
 
 .task-details__assist-container {
-  margin-top: auto;
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.85rem;
+  z-index: 30;
+  width: auto;
+  max-width: min(28rem, calc(100% - 1rem));
+  margin: 0;
+  pointer-events: none;
+}
+
+/* Floating companion — hover shows guidance; click pins / starts generation. */
+.task-assist-pet {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 0.35rem;
+  width: max-content;
+  max-width: 100%;
+  padding: 0;
+  pointer-events: none;
+}
+
+.task-assist-pet__avatar {
+  pointer-events: auto;
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  width: 96px;
+  height: 104px;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.task-assist-pet__avatar .bot-pet__sprite {
+  transform: scale(0.5);
+  transform-origin: top left;
+}
+
+.task-assist-pet__bubble {
+  pointer-events: auto;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  max-width: min(22rem, calc(100% - 7rem));
+  margin: 0 0.35rem 1.1rem 0;
+  padding: 0.85rem 0.95rem 0.9rem;
+  border: 1px solid rgba(214, 228, 240, 0.95);
+  border-radius: 1.25rem;
+  background: linear-gradient(165deg, #ffffff 0%, #f7fbfe 100%);
+  box-shadow:
+    0 10px 24px rgba(61, 43, 54, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  animation: task-assist-pet-in 0.35s ease;
+}
+
+.task-assist-pet__bubble::before,
+.task-assist-pet__bubble::after {
+  content: "";
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid rgba(214, 228, 240, 0.95);
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(61, 43, 54, 0.06);
+}
+
+.task-assist-pet__bubble::before {
+  right: -0.4rem;
+  bottom: 0.85rem;
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.task-assist-pet__bubble::after {
+  right: -0.9rem;
+  bottom: 0.6rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  background: linear-gradient(165deg, #ffffff 0%, #f7fbfe 100%);
+}
+
+.task-assist-pet__eyebrow {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7f7280;
+}
+
+.task-assist-pet__question {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.4;
+  color: #2f2430;
+}
+
+.task-assist-pet__reply {
+  margin-top: 0.55rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.85rem;
+  background: #f7f1f4;
+  color: #574a55;
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+
+.task-assist-pet__reply > p {
+  margin: 0;
+}
+
+.task-assist-pet__label {
+  margin-bottom: 0.35rem !important;
+  font-size: 0.62rem !important;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7f7280;
+}
+
+.task-assist-pet__thinking {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: #3d5f7a;
+  letter-spacing: 0.02em;
+}
+
+.task-assist-pet__error {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.task-assist-pet__error > p[role="alert"] {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #a15b5b;
+}
+
+.task-assist-pet.is-thinking .task-assist-pet__avatar {
+  cursor: wait;
+}
+
+.task-assist-pet__avatar:disabled {
+  opacity: 1;
+}
+
+@keyframes task-assist-pet-in {
+  from {
+    opacity: 0;
+    transform: translateX(0.35rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task-assist-pet__bubble {
+    animation: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .task-assist-pet {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+  }
+
+  .task-assist-pet__bubble {
+    max-width: 100%;
+    margin: 0 0 0.35rem;
+  }
+
+  .task-assist-pet__bubble::before,
+  .task-assist-pet__bubble::after {
+    display: none;
+  }
 }
 
 .task-details__detail-toggle {

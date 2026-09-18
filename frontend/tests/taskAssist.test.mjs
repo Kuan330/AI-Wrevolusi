@@ -53,7 +53,7 @@ test('task context key changes for same-id wording or note edits', () => {
   );
 });
 
-test('completed details render saved guidance without any second-turn controls', () => {
+test('drawer companion generates guidance without a Chat with AI dialog', () => {
   const drawer = readFileSync(
     new URL(
       '../src/pages/Analysis/components/TaskDetailsDrawer.tsx',
@@ -61,9 +61,9 @@ test('completed details render saved guidance without any second-turn controls',
     ),
     'utf8',
   );
-  const dialog = readFileSync(
+  const guidePet = readFileSync(
     new URL(
-      '../src/pages/Analysis/components/TaskAssistDialog.tsx',
+      '../src/pages/Analysis/components/TaskAssistGuidePet.tsx',
       import.meta.url,
     ),
     'utf8',
@@ -74,42 +74,36 @@ test('completed details render saved guidance without any second-turn controls',
   );
 
   assert.match(drawer, /registerTaskAssistDetails/);
-  assert.match(drawer, /hasSavedTaskAssist\(interaction\.status\)/);
-  assert.match(drawer, /canStartTaskAssist\(interaction\.status\)/);
-  assert.match(drawer, /Saved AI guidance/);
+  assert.match(drawer, /TaskAssistGuidePet/);
+  assert.match(drawer, /aiService\.taskAssist/);
+  assert.match(drawer, /DEFAULT_TASK_ASSIST_QUESTION/);
+  assert.doesNotMatch(drawer, /TaskAssistDialog|Chat with AI|setChatOpen|MessageSquare/);
+  assert.match(guidePet, /Saved AI guidance/);
+  assert.match(guidePet, /Thinking…/);
+  assert.match(guidePet, /onRequestGuidance/);
+  assert.match(guidePet, /setOpen/);
+  assert.doesNotMatch(guidePet, /onMouseEnter|setHovered|setPinned/);
+  assert.doesNotMatch(guidePet, /pickContextLine|composeGreeting|useBotPetGreeting/);
   assert.match(drawer, /task_key: task\.id/);
   assert.match(drawer, /getTaskAssist/);
   assert.match(drawer, /setTimeout/);
   assert.match(drawer, /saved\.status === "available" && attempts < 6/);
-  assert.match(
-    drawer,
-    /interaction\?\.status === "completed" && chatOpen/,
-  );
-  assert.match(drawer, /setChatOpen\(false\)/);
-  assert.match(dialog, /onStarted/);
-  assert.match(dialog, /task_key: interaction\.task_key/);
-  assert.match(dialog, /onCompleted\(saved\);\s*onOpenChange\(false\)/);
-  assert.ok(
-    dialog.indexOf('onStarted(') < dialog.indexOf('aiService.taskAssist'),
-    'parent pending state must be published before the request starts',
-  );
-  assert.match(drawer, /onStarted={setInteraction}/);
-  assert.doesNotMatch(dialog, /task_text: task\.wording/);
-  assert.doesNotMatch(dialog, /Close and reopen to ask again/);
-  assert.match(dialog, /!completed \? \([\s\S]{0,120}<form/);
   assert.match(service, /registerTaskAssistDetails/);
   assert.match(service, /task_key: string/);
   assert.match(service, /getTaskAssist/);
   assert.match(service, /"\/ai\/task-assist\/details"/);
   assert.match(drawer, /useAccount/);
   assert.match(drawer, /if \(!user\) return null/);
-  const bodyStart = drawer.indexOf('<DrawerBody');
+  assert.match(drawer, /task-details__assist-container/);
+  const contentStart = drawer.indexOf('<DrawerContent');
   const savedAccess = drawer.lastIndexOf('<TaskAssistAccess');
-  const bodyEnd = drawer.indexOf('</DrawerBody>');
-  assert.ok(bodyStart >= 0 && bodyStart < savedAccess && savedAccess < bodyEnd);
+  const contentEnd = drawer.indexOf('</DrawerContent>');
+  assert.ok(
+    contentStart >= 0 && contentStart < savedAccess && savedAccess < contentEnd,
+  );
 });
 
-test('dialog preserves the single-turn, cancellation and accessibility guards', () => {
+test('dialog module keeps single-turn guards for optional reuse', () => {
   const dialog = readFileSync(
     new URL(
       '../src/pages/Analysis/components/TaskAssistDialog.tsx',
@@ -122,6 +116,16 @@ test('dialog preserves the single-turn, cancellation and accessibility guards', 
     'utf8',
   );
 
+  assert.match(dialog, /onStarted/);
+  assert.match(dialog, /task_key: interaction\.task_key/);
+  assert.match(dialog, /onCompleted\(saved\);\s*onOpenChange\(false\)/);
+  assert.ok(
+    dialog.indexOf('onStarted(') < dialog.indexOf('aiService.taskAssist'),
+    'parent pending state must be published before the request starts',
+  );
+  assert.doesNotMatch(dialog, /task_text: task\.wording/);
+  assert.doesNotMatch(dialog, /Close and reopen to ask again/);
+  assert.match(dialog, /!completed \? \([\s\S]{0,120}<form/);
   assert.match(dialog, /sending \|\| completed/);
   assert.match(dialog, /new AbortController\(\)/);
   assert.match(dialog, /maxLength=\{2000\}/);

@@ -162,7 +162,7 @@ test('page loads live data, restores and persists approved workspace keys', () =
   assert.ok((page.match(/to=\{profilePath\}/g) ?? []).length >= 1);
   assert.doesNotMatch(page, /to="\/profile"/);
   assert.match(page, /setError\(""\)/);
-  assert.match(page, /SHARED/);
-  assert.doesNotMatch(page, /<small>%<\/small>/);
+  assert.match(page, /SKILL COVERAGE/);
+  assert.match(page, /<small>%<\/small>/);
   assert.doesNotMatch(page, /sessionStorage/);
 });
