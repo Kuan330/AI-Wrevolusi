@@ -36,7 +36,6 @@ import {
   readLibrary,
   saveLibrary,
 } from "@/pages/LearningCentre/lib/libraryStorage";
-import { readLearningSkills } from "@/pages/Skills/learningSkills";
 import {
   flushWorkspace,
   hasAccountWorkspace,
@@ -97,19 +96,15 @@ function monthRange(month: Date) {
   return { from, to };
 }
 
+/** Daily brief only recommends skills bound to courses currently in My Plan. */
 function briefSkillsFromPlan(courses: PlanCourse[]) {
-  const fromCourses = courses
-    .map((c) => c.skillId)
-    .filter((id): id is string => Boolean(id));
-  let fromLearning: string[] = [];
-  try {
-    fromLearning = (readLearningSkills() ?? []).map((s) => s.id);
-  } catch {
-    fromLearning = [];
-  }
-  return [...new Set([...fromCourses, ...fromLearning])].map((skill_id) => ({
-    skill_id,
-  }));
+  return [
+    ...new Set(
+      courses
+        .map((c) => c.skillId)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  ].map((skill_id) => ({ skill_id }));
 }
 
 function mergeDayEntries(
