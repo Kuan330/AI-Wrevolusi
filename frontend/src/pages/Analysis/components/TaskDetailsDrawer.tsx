@@ -37,10 +37,14 @@ const formatTaskAssessmentMatchLayer = (
   return "No reliable evidence match";
 };
 
+const isAuthFailure = (caught: unknown) =>
+  caught instanceof ApiError && caught.status === 401;
+
 const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
   const [interaction, setInteraction] =
     useState<TaskAssistInteraction | null>(null);
   const [error, setError] = useState("");
+  const [authRequired, setAuthRequired] = useState(false);
   const [generateError, setGenerateError] = useState("");
   const [generating, setGenerating] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
@@ -65,12 +69,19 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
         if (!controller.signal.aborted) {
           setInteraction(response.items[0] ?? null);
           setError("");
+          setAuthRequired(false);
           setGenerateError("");
           setGenerating(false);
         }
       })
       .catch((caught) => {
         if (controller.signal.aborted) return;
+        if (isAuthFailure(caught)) {
+          setAuthRequired(true);
+          setError("");
+          return;
+        }
+        setAuthRequired(false);
         setError(
           caught instanceof ApiError
             ? caught.detail
@@ -145,6 +156,10 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
     } catch (caught) {
       if (controller.signal.aborted) return;
       setGenerating(false);
+      if (isAuthFailure(caught)) {
+        setAuthRequired(true);
+        return;
+      }
       setInteraction((current) =>
         current
           ? { ...current, status: "available", question: null, reply: null }
@@ -163,6 +178,9 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
       }
     }
   };
+
+  // Guest / expired session: hide the companion instead of an auth error.
+  if (authRequired) return null;
 
   if (error) {
     return (
@@ -211,8 +229,8 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
 };
 
 const TaskAssistAccess = ({ task }: { task: ProfileTask }) => {
-  const { user } = useAccount();
-  if (!user) return null;
+  const { user, loading } = useAccount();
+  if (loading || !user) return null;
   return <SignedInTaskAssistAccess task={task} />;
 };
 
