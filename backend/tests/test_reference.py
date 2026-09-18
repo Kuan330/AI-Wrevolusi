@@ -3,12 +3,13 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
 
 from app.db.session import get_db
-from app.routers.reference import router
+from app.routers.reference import clear_occupation_search_caches, router
 
 
 def test_database_occupation_search_browsing_and_tasks():
     # SQLite exercises the query against occupations outside the original pilot.
     # PostgreSQL ILIKE is translated to SQLite's case-insensitive LIKE for this fixture.
+    clear_occupation_search_caches()
     engine = create_engine('sqlite://', connect_args={'check_same_thread': False})
     connection = engine.connect()
     connection.execute(text('CREATE TABLE ref_occupations (occupation_code TEXT, level TEXT, parent_code TEXT, title TEXT, description TEXT)'))

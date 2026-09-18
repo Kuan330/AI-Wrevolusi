@@ -1,3 +1,4 @@
+import asyncio
 import json
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, Response
@@ -53,7 +54,13 @@ def public(account: Account) -> dict:
 
 @router.post('/register', status_code=201)
 async def register(payload: Credentials, response: Response, db: AsyncSession = Depends(get_db)):
-    user = User(email=f'{uuid.uuid4().hex}@accounts.example.com', full_name=payload.username, hashed_password=get_password_hash(payload.password))
+    # Password hashing is CPU-bound — keep the event loop free under load.
+    hashed_password = await asyncio.to_thread(get_password_hash, payload.password)
+    user = User(
+        email=f'{uuid.uuid4().hex}@accounts.example.com',
+        full_name=payload.username,
+        hashed_password=hashed_password,
+    )
     db.add(user)
     await db.flush()
     account = Account(user_id=user.id, username=payload.username, workspace={}, revision=0)
@@ -72,7 +79,10 @@ async def register(payload: Credentials, response: Response, db: AsyncSession = 
 async def login(payload: Credentials, response: Response, db: AsyncSession = Depends(get_db)):
     account = await db.scalar(select(Account).where(Account.username == payload.username))
     user = await db.get(User, account.user_id) if account else None
-    if not user or not user.is_active or not verify_password(payload.password, user.hashed_password):
+    if not user or not user.is_active:
+        raise HTTPException(401, 'Incorrect username or password.')
+    password_ok = await asyncio.to_thread(verify_password, payload.password, user.hashed_password)
+    if not password_ok:
         raise HTTPException(401, 'Incorrect username or password.')
     access, refresh = await AuthService.issue_token_pair(db, user)
     set_auth_cookies(response, access, refresh)

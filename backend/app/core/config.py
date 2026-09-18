@@ -28,6 +28,16 @@ class Settings(BaseSettings):
     database_url: str = Field(
         default='postgresql+asyncpg://postgres:postgres@localhost:5432/aiwrevolusi'
     )
+    # Asyncpg connection pool — sized for Neon / shared Postgres under concurrent
+    # search, register, and Possibilities traffic without exhausting free tiers.
+    db_pool_size: int = Field(default=10, ge=1, le=40)
+    db_max_overflow: int = Field(default=20, ge=0, le=80)
+    db_pool_timeout: float = Field(default=30, gt=0, le=120)
+    db_pool_recycle: int = Field(default=1800, ge=60, le=7200)
+
+    # Soft ceiling for the optional occupation-search keyword normaliser so a
+    # slow LLM never blocks the whole search past the client timeout.
+    occupation_search_normaliser_timeout_s: float = Field(default=1.5, gt=0, le=10)
 
     jwt_secret_key: str = Field(default='change-me-in-production')
     jwt_algorithm: str = 'HS256'

@@ -25,6 +25,7 @@ export const referenceService = {
     onlyUnits(await api.get<ReferenceOccupation[]>(
       `/reference/occupations?q=${encodeURIComponent(query.trim())}`,
       signal,
+      12_000,
     )),
   tasks: (occupationCode: string) =>
     api.get<ReferenceTask[]>(

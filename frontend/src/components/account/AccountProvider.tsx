@@ -80,10 +80,14 @@ export function AccountProvider(props: { children: ReactNode }) {
         return value ? [[key, value]] : [];
       }),
     );
-    const account = await api.post<Account>(`/account/${mode}`, {
-      username,
-      password,
-    });
+    const account = await api.post<Account>(
+      `/account/${mode}`,
+      {
+        username,
+        password,
+      },
+      15_000,
+    );
     await load(account);
     setError("");
     if (importGuest) {

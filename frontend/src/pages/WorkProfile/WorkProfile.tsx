@@ -16,10 +16,10 @@ import {
   type OccupationSearchResult,
 } from "@/pages/WorkProfile/hooks/useOccupationFilters";
 import {
+  beginOccupationChange,
   clearSelectedOccupation,
   readTaskWorkspace,
   hasConfirmedAnalysis,
-  saveSelectedOccupation,
 } from "@/pages/WorkProfile/userProfile";
 import type { ReferenceOccupation } from "@/types/reference";
 
@@ -58,18 +58,12 @@ const WorkProfile = () => {
     clearSelectedOccupation();
   }, []);
 
-  const persistOccupation = (
-    unit: ReferenceOccupation,
-    path: ReferenceOccupation[],
-  ) => {
-    saveSelectedOccupation({ unit, path });
-  };
-
   const goToTasks = (
     unit: ReferenceOccupation,
     path: ReferenceOccupation[],
   ) => {
-    persistOccupation(unit, path);
+    // Switching unit clears prior analysis/plans so the journey restarts.
+    beginOccupationChange({ unit, path });
     navigate(ROUTES.task);
   };
 

@@ -7,6 +7,21 @@ const PROFILE_KEY = "aiwrevolusi.userProfile";
 const OCCUPATION_KEY = "aiwrevolusi.selectedOccupation";
 const ANALYSIS_KEY = "aiwrevolusi.confirmedAnalysis";
 
+/** Workspace keys that are derived from a confirmed occupation + analysis. */
+const WORK_DERIVED_KEYS = [
+  ANALYSIS_KEY,
+  "aiwrevolusi.learningCentre",
+  "aiwrevolusi.learningResourceSelections.v1",
+  "aiwrevolusi.courseLibrary.v1",
+  "aiwrevolusi.learningSkills.v1",
+  "aiwrevolusi.plan.courses.v1",
+  "aiwrevolusi.planner.v1",
+  "aiwrevolusi.possibilities.chosenDirection",
+  "aiwrevolusi.possibilities.shortlist",
+  "aiwrevolusi.possibilities.saved",
+  "aiwrevolusi.possibilities.intent",
+] as const;
+
 let transientSelectedOccupation: SelectedOccupation | null = null;
 
 export type SelectedOccupation = {
@@ -46,6 +61,13 @@ const readLegacyAnalysis = (): ConfirmedAnalysis | null => {
   return parsed;
 };
 
+/** Drop plans, learning choices, and Possibilities state tied to the old role. */
+export const clearWorkDerivedData = () => {
+  for (const key of WORK_DERIVED_KEYS) {
+    accountStorage.removeItem(key);
+  }
+};
+
 export const readUserProfile = (): UserProfile => {
   const stored = parseJson<UserProfile>(accountStorage.getItem(PROFILE_KEY));
   if (stored) {
@@ -72,32 +94,25 @@ export const readUserProfile = (): UserProfile => {
 export const writeUserProfile = (patch: Partial<UserProfile>): UserProfile => {
   const previous = readUserProfile();
   const next = { ...previous, ...patch };
-  if (
-    JSON.stringify(previous.analysis) !== JSON.stringify(next.analysis) ||
-    previous.tasksOccupationCode !== next.tasksOccupationCode ||
-    JSON.stringify(previous.tasks) !== JSON.stringify(next.tasks)
-  ) {
-    const rawLibrary = accountStorage.getItem("aiwrevolusi.courseLibrary.v1");
-    if (rawLibrary) {
-      try {
-        const library = JSON.parse(rawLibrary);
-        accountStorage.setItem(
-          "aiwrevolusi.courseLibrary.v1",
-          JSON.stringify({
-            ...library,
-            saved: [],
-            choices: {},
-            basis: {},
-            workContext: next.analysis ? JSON.stringify(next.analysis) : "",
-          }),
-        );
-        accountStorage.removeItem("aiwrevolusi.planner.v1");
-        accountStorage.removeItem("aiwrevolusi.learningResourceSelections.v1");
-      } catch {
-        accountStorage.removeItem("aiwrevolusi.courseLibrary.v1");
-      }
-    }
+  const occupationChanged =
+    previous.tasksOccupationCode !== next.tasksOccupationCode;
+  const analysisCleared = Boolean(previous.analysis) && !next.analysis;
+  const analysisChanged =
+    JSON.stringify(previous.analysis) !== JSON.stringify(next.analysis);
+  const tasksChanged =
+    JSON.stringify(previous.tasks) !== JSON.stringify(next.tasks);
+
+  if (occupationChanged || analysisCleared) {
+    clearWorkDerivedData();
+  } else if (analysisChanged || tasksChanged) {
+    // Soft refresh of the same occupation: drop plan picks that assumed the
+    // previous confirmed snapshot, but keep learning skills the user curated.
+    accountStorage.removeItem("aiwrevolusi.courseLibrary.v1");
+    accountStorage.removeItem("aiwrevolusi.planner.v1");
+    accountStorage.removeItem("aiwrevolusi.learningResourceSelections.v1");
+    accountStorage.removeItem("aiwrevolusi.plan.courses.v1");
   }
+
   accountStorage.setItem(PROFILE_KEY, JSON.stringify(next));
   accountStorage.removeItem(OCCUPATION_KEY);
   if (next.analysis) {
@@ -118,6 +133,30 @@ export const readSelectedOccupation = (): SelectedOccupation | null =>
 export const clearSelectedOccupation = () => {
   transientSelectedOccupation = null;
   accountStorage.removeItem(OCCUPATION_KEY);
+};
+
+/**
+ * Start a new occupation flow. When the unit code changes, wipe the previous
+ * tasks, confirmed analysis, and all derived journey data so the user re-analyses.
+ */
+export const beginOccupationChange = (occupation: SelectedOccupation) => {
+  const previousCode = readUserProfile().tasksOccupationCode;
+  const nextCode = occupation.unit.occupation_code;
+  saveSelectedOccupation(occupation);
+
+  if (previousCode === nextCode) {
+    return { occupationChanged: false };
+  }
+
+  clearWorkDerivedData();
+  // Leave tasksOccupationCode null so ProfileTasks loads fresh ILO starters
+  // instead of treating an empty array as a saved empty list.
+  writeUserProfile({
+    tasks: [],
+    tasksOccupationCode: null,
+    analysis: null,
+  });
+  return { occupationChanged: true };
 };
 
 export const saveProfileTasks = (

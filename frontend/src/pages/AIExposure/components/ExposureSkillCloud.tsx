@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Popover } from "@base-ui/react/popover";
 import { cn } from "@/lib/utils";
 import type { SkillEvidence } from "@/pages/Skills/lib/skillProfile";
@@ -37,11 +37,12 @@ type SkillCloudChipProps = {
   tone: ChipTone;
   active: boolean;
   onSelect: (skillId: number | null) => void;
+  onLearningChanged: () => void;
 };
 
 /** Uncontrolled hover popover; dismiss on click/add until the pointer leaves. */
 const SkillCloudChip = (props: SkillCloudChipProps) => {
-  const { skill, tone, active, onSelect } = props;
+  const { skill, tone, active, onSelect, onLearningChanged } = props;
   const actionsRef = useRef<Popover.Root.Actions | null>(null);
   const blockHoverUntilLeave = useRef(false);
   const matched = tone === "matched";
@@ -49,6 +50,11 @@ const SkillCloudChip = (props: SkillCloudChipProps) => {
   const dismissOutlook = () => {
     blockHoverUntilLeave.current = true;
     actionsRef.current?.close();
+  };
+
+  const handleLearningChanged = () => {
+    onLearningChanged();
+    dismissOutlook();
   };
 
   return (
@@ -103,7 +109,7 @@ const SkillCloudChip = (props: SkillCloudChipProps) => {
               skill={skill}
               compact
               showAddToLearning
-              onAddComplete={dismissOutlook}
+              onAddComplete={handleLearningChanged}
             />
           </Popover.Popup>
         </Popover.Positioner>
@@ -122,12 +128,16 @@ function loadLearningSkillKeys(): Set<string> {
 
 const ExposureSkillCloud = (props: ExposureSkillCloudProps) => {
   const { skills, evidence, selectedSkillId, onSelectSkill } = props;
+  const [learningRevision, setLearningRevision] = useState(0);
   const matchedSkillIds = useMemo(
     () => new Set(evidence.map(({ skill }) => skill.wef_skill_id)),
     [evidence],
   );
   // Skills on the Learning Resources list that are not in current task evidence.
-  const learningKeys = useMemo(() => loadLearningSkillKeys(), []);
+  const learningKeys = useMemo(
+    () => loadLearningSkillKeys(),
+    [learningRevision],
+  );
   const learningSkillIds = useMemo(() => {
     const ids = new Set<number>();
     for (const skill of skills) {
@@ -251,6 +261,9 @@ const ExposureSkillCloud = (props: ExposureSkillCloudProps) => {
                   tone={chipTone(skill.wef_skill_id)}
                   active={selectedSkillId === skill.wef_skill_id}
                   onSelect={onSelectSkill}
+                  onLearningChanged={() =>
+                    setLearningRevision((value) => value + 1)
+                  }
                 />
               ))}
             </div>

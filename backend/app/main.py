@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.db.session import init_models
+from app.middleware.timing import RequestTimingMiddleware, snapshot_metrics
 from app.routers import (
     accounts,
     ai,
@@ -29,6 +30,7 @@ def create_app(api_root: str = '/api') -> FastAPI:
         redoc_url='/redoc',
     )
 
+    # Last added middleware is outermost: timing wraps CORS + route work.
     application.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -36,6 +38,7 @@ def create_app(api_root: str = '/api') -> FastAPI:
         allow_methods=['*'],
         allow_headers=['*'],
     )
+    application.add_middleware(RequestTimingMiddleware)
 
     api_root = api_root.rstrip('/')
     api_prefix = f'{api_root}/{settings.api_version}'
@@ -62,6 +65,12 @@ def create_app(api_root: str = '/api') -> FastAPI:
     @application.get(f'{api_root}/healthz', tags=['System'])
     async def health_check() -> dict[str, str]:
         return {'status': 'ok'}
+
+    @application.get(f'{api_root}/metrics', tags=['System'])
+    async def request_metrics() -> dict:
+        """In-process latency snapshot for the hot endpoints under load."""
+
+        return snapshot_metrics()
 
     return application
 
