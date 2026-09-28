@@ -24,6 +24,18 @@ CREATE INDEX IF NOT EXISTS ref_occupations_parent_idx
 CREATE INDEX IF NOT EXISTS ref_occupations_level_idx
     ON ref_occupations (level);
 
+CREATE INDEX IF NOT EXISTS ref_occupations_level_code_idx
+    ON ref_occupations (level, occupation_code);
+
+-- Trigram indexes speed up ILIKE '%needle%' occupation search.
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX IF NOT EXISTS ref_occupations_title_trgm_idx
+    ON ref_occupations USING gin (title gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS ref_occupations_description_trgm_idx
+    ON ref_occupations USING gin (description gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS ref_occupations_code_trgm_idx
+    ON ref_occupations USING gin (occupation_code gin_trgm_ops);
+
 CREATE TABLE IF NOT EXISTS ref_ilo_tasks (
     isco_08 TEXT NOT NULL,
     task_id TEXT NOT NULL,

@@ -28,7 +28,11 @@ const parseResponseBody = async (response: Response): Promise<unknown> => {
 const request = async <T>(
   path: string,
   init?: RequestInit,
-  timeoutMs = 4000,
+  // Deployed serverless + shared database hosts answer in 1-2s when idle, but
+  // concurrent testers can push a real response past 8s. A 4s budget aborted
+  // requests the server had already answered, which surfaced as page-level
+  // "try again" errors. Endpoints that need a different budget pass their own.
+  timeoutMs = 20000,
   retrySession = true,
 ): Promise<T> => {
   const controller = new AbortController();

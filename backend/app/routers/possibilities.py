@@ -15,7 +15,6 @@ from app.services.possibilities import (
     confirmed_workspace_evidence,
     occupation_required_skills,
     recommend_occupations,
-    skill_overlap_score,
 )
 from app.schemas.possibilities import PossibilitiesResponse
 from app.services.workspace import SHORTLIST_KEY, read_workspace_shortlist
@@ -163,7 +162,14 @@ async def get_possibilities(
             for skill_id in row['required_skill_ids']
         }
     directions = [build_direction_payload(row, skills) for row in recommendations]
-    chosen_score = next((chosen_direction_score(owned, set(shortlist), set(row['required_skill_ids'])) for row in recommendations if row['occupation_code'] == chosen_code), None)
+    chosen_score = next(
+        (
+            chosen_direction_score(owned, set(row['required_skill_ids']))
+            for row in recommendations
+            if row['occupation_code'] == chosen_code
+        ),
+        None,
+    )
     current_role_coverage_pct = None
     if role:
         current_ref = next(

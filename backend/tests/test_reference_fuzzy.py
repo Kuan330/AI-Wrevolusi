@@ -15,7 +15,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
 
 from app.db.session import get_db
-from app.routers.reference import get_reference_ai_gateway, router
+from app.routers.reference import clear_occupation_search_caches, get_reference_ai_gateway, router
 from app.services.occupation_search import (
     MAXIMUM_FUZZY_OCCUPATION_RESULTS,
     normalise_search_query,
@@ -63,6 +63,7 @@ MAJOR_ROW = dict(
 
 
 def _make_client(gateway=None) -> TestClient:
+    clear_occupation_search_caches()
     engine = create_engine('sqlite://', connect_args={'check_same_thread': False})
     connection = engine.connect()
     connection.execute(

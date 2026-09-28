@@ -225,7 +225,10 @@ def test_skill_overlap_score_penalizes_narrow_one_skill_matches() -> None:
 def test_chosen_direction_score_does_not_count_shortlisted_skills_as_owned() -> None:
     from app.services.possibilities import chosen_direction_score
 
-    assert chosen_direction_score({1, 2}, {1, 2, 3, 4}) == 67
+    # Coverage is owned ∩ required / |required| — shortlisted skills are not owned.
+    assert chosen_direction_score({1, 2}, {1, 2, 3, 4}) == 50
+    assert chosen_direction_score({1, 2, 3, 4}, {1, 2, 3, 4}) == 100
+    assert chosen_direction_score(set(), {1, 2}) == 0
 
 
 def test_direction_payload_maps_database_industry_to_schema_area() -> None:

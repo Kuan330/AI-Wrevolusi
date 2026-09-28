@@ -1,8 +1,8 @@
 import type { ComponentProps } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useAccount } from "@/components/account/useAccount";
-import TaskAssistDialog from "@/pages/Analysis/components/TaskAssistDialog";
+import TaskAssistGuidePet from "@/pages/Analysis/components/TaskAssistGuidePet";
 import TaskRelatedSkills from "@/pages/Analysis/components/TaskRelatedSkills";
 import {
   Drawer,
@@ -16,17 +16,15 @@ import { Button } from "@/components/ui/button";
 import ExposureScorePanel from "@/components/ui/exposure-score-panel";
 import { taskScore } from "@/pages/Analysis/lib/taskScore";
 import {
-  canStartTaskAssist,
-  hasSavedTaskAssist,
+  DEFAULT_TASK_ASSIST_QUESTION,
   taskAssistContextKey,
-  taskAssistResponseLabel,
 } from "@/pages/AIExposure/lib/taskAssistState";
 import type { ProfileTask } from "@/features/work-profile/types";
 import { ApiError } from "@/services/api";
 import { aiService } from "@/services/aiService";
 import type { TaskAssistInteraction } from "@/services/aiService";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
-import { ChevronDown, MessageSquare } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import "./TaskDetailsDrawer.css";
 
@@ -39,12 +37,18 @@ const formatTaskAssessmentMatchLayer = (
   return "No reliable evidence match";
 };
 
+const isAuthFailure = (caught: unknown) =>
+  caught instanceof ApiError && caught.status === 401;
+
 const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
-  const [chatOpen, setChatOpen] = useState(false);
   const [interaction, setInteraction] =
     useState<TaskAssistInteraction | null>(null);
   const [error, setError] = useState("");
+  const [authRequired, setAuthRequired] = useState(false);
+  const [generateError, setGenerateError] = useState("");
+  const [generating, setGenerating] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
+  const requestRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -65,17 +69,29 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
         if (!controller.signal.aborted) {
           setInteraction(response.items[0] ?? null);
           setError("");
+          setAuthRequired(false);
+          setGenerateError("");
+          setGenerating(false);
         }
       })
       .catch((caught) => {
         if (controller.signal.aborted) return;
+        if (isAuthFailure(caught)) {
+          setAuthRequired(true);
+          setError("");
+          return;
+        }
+        setAuthRequired(false);
         setError(
           caught instanceof ApiError
             ? caught.detail
             : "Could not load saved AI guidance.",
         );
       });
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      requestRef.current?.abort();
+    };
   }, [retryKey, task.id, task.notes, task.wording]);
 
   useEffect(() => {
@@ -94,6 +110,7 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
             return;
           }
           setInteraction(saved);
+          setGenerating(false);
           if (saved.status === "pending") {
             timer = setTimeout(poll, 1500);
           }
@@ -109,11 +126,61 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
     };
   }, [interaction?.status, interaction?.task_key]);
 
-  useEffect(() => {
-    if (interaction?.status === "completed" && chatOpen) {
-      setChatOpen(false);
+  const requestGuidance = async () => {
+    if (!interaction || generating) return;
+    if (interaction.status === "completed" || interaction.status === "pending") {
+      return;
     }
-  }, [interaction?.status, chatOpen]);
+    requestRef.current?.abort();
+    const controller = new AbortController();
+    requestRef.current = controller;
+    setGenerating(true);
+    setGenerateError("");
+    const pending: TaskAssistInteraction = {
+      ...interaction,
+      status: "pending",
+      question: DEFAULT_TASK_ASSIST_QUESTION,
+    };
+    setInteraction(pending);
+    try {
+      const saved = await aiService.taskAssist(
+        {
+          task_key: interaction.task_key,
+          user_message: DEFAULT_TASK_ASSIST_QUESTION,
+        },
+        controller.signal,
+      );
+      if (controller.signal.aborted) return;
+      setInteraction(saved);
+      setGenerating(false);
+    } catch (caught) {
+      if (controller.signal.aborted) return;
+      setGenerating(false);
+      if (isAuthFailure(caught)) {
+        setAuthRequired(true);
+        return;
+      }
+      setInteraction((current) =>
+        current
+          ? { ...current, status: "available", question: null, reply: null }
+          : current,
+      );
+      setGenerateError(
+        caught instanceof ApiError
+          ? caught.detail
+          : caught instanceof Error
+            ? caught.message
+            : "Could not generate assistance.",
+      );
+    } finally {
+      if (requestRef.current === controller) {
+        requestRef.current = null;
+      }
+    }
+  };
+
+  // Guest / expired session: hide the companion instead of an auth error.
+  if (authRequired) return null;
 
   if (error) {
     return (
@@ -146,73 +213,24 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
     );
   }
 
-  const saved = hasSavedTaskAssist(interaction.status);
-  const canStart = canStartTaskAssist(interaction.status);
-
   return (
-    <>
-      {saved && interaction.question && interaction.reply ? (
-        <section className="mx-5 mb-4 space-y-3 rounded-2xl border border-[#eadde4] bg-white/80 p-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#7f7280]">
-              Saved AI guidance
-            </p>
-            <p className="mt-1 text-sm leading-6 text-[#2f2430]">
-              {interaction.question}
-            </p>
-          </div>
-          <div className="rounded-xl bg-[#f7f1f4] p-3 text-sm leading-6 text-[#574a55]">
-            <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#7f7280]">
-              {taskAssistResponseLabel(
-                interaction.generated_by_model === true,
-              )}
-            </p>
-            <p>{interaction.reply}</p>
-          </div>
-          <p className="text-xs text-[#7f7280]">
-            This is the permanent response for this Task Detail. Further questions
-            are disabled.
-          </p>
-        </section>
-      ) : null}
-
-      {canStart ? (
-        <div className="task-details__footer">
-          <Button
-            type="button"
-            variant="ghost"
-            className="task-details__chat-btn"
-            onClick={() => setChatOpen(true)}
-          >
-            <MessageSquare className="size-4" aria-hidden />
-            Chat with AI
-          </Button>
-        </div>
-      ) : interaction.status === "pending" ? (
-        <div className="task-details__footer">
-          <p role="status" className="text-xs text-[#7f7280]">
-            AI guidance is already being generated for this Task Detail.
-          </p>
-        </div>
-      ) : null}
-
-      {canStart || chatOpen ? (
-        <TaskAssistDialog
-          open={chatOpen}
-          task={task}
-          interaction={interaction}
-          onStarted={setInteraction}
-          onCompleted={setInteraction}
-          onOpenChange={setChatOpen}
-        />
-      ) : null}
-    </>
+    <TaskAssistGuidePet
+      status={interaction.status}
+      question={interaction.question}
+      reply={interaction.reply}
+      generatedByModel={interaction.generated_by_model === true}
+      generating={generating}
+      error={generateError}
+      onRequestGuidance={() => {
+        void requestGuidance();
+      }}
+    />
   );
 };
 
 const TaskAssistAccess = ({ task }: { task: ProfileTask }) => {
-  const { user } = useAccount();
-  if (!user) return null;
+  const { user, loading } = useAccount();
+  if (loading || !user) return null;
   return <SignedInTaskAssistAccess task={task} />;
 };
 
@@ -335,18 +353,18 @@ export default function TaskDetailsDrawer(props: {
                   ) : null}
                 </div>
               </div>
-
-              <div className="task-details__assist-container">
-                <TaskAssistAccess
-                  key={taskAssistContextKey(
-                    selectedTask.id,
-                    selectedTask.wording,
-                    selectedTask.notes ?? "",
-                  )}
-                  task={selectedTask}
-                />
-              </div>
             </DrawerBody>
+
+            <div className="task-details__assist-container">
+              <TaskAssistAccess
+                key={taskAssistContextKey(
+                  selectedTask.id,
+                  selectedTask.wording,
+                  selectedTask.notes ?? "",
+                )}
+                task={selectedTask}
+              />
+            </div>
           </>
         ) : null}
       </DrawerContent>

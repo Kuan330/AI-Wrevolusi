@@ -1,7 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+import asyncio
+import logging
+import time
+from threading import Lock
 
+from app.core.config import settings
 from app.db.session import get_db
 from app.services.ai_gateway import AIGateway, default_ai_gateway
 from app.services.occupation_search import (
@@ -10,14 +15,104 @@ from app.services.occupation_search import (
 )
 
 router = APIRouter(prefix='/reference', tags=['Reference Data'])
+logger = logging.getLogger(__name__)
 
 OCCUPATION_COLUMNS = 'occupation_code, level, parent_code, title, description'
+
+# Unit occupations are stable reference data — cache once per process so every
+# search keystroke does not re-scan the full table.
+_unit_rows_cache: list[dict] | None = None
+_unit_rows_lock = Lock()
+
+# Short-lived result cache for identical search queries (typing + retries).
+_SEARCH_RESULT_TTL_S = 60.0
+_SEARCH_RESULT_MAX = 128
+_search_result_cache: dict[str, tuple[float, list[dict]]] = {}
+_search_result_lock = Lock()
 
 
 def get_reference_ai_gateway() -> AIGateway:
     """Dependency seam for the optional search-keyword normaliser."""
 
     return default_ai_gateway()
+
+
+def clear_occupation_search_caches() -> None:
+    """Test helper — drop process caches between fixtures."""
+
+    global _unit_rows_cache
+    with _unit_rows_lock:
+        _unit_rows_cache = None
+    with _search_result_lock:
+        _search_result_cache.clear()
+
+
+async def _load_unit_occupations(db: AsyncSession) -> list[dict]:
+    global _unit_rows_cache
+    with _unit_rows_lock:
+        if _unit_rows_cache is not None:
+            return _unit_rows_cache
+
+    unit_result = await db.execute(
+        text(
+            f'SELECT {OCCUPATION_COLUMNS} FROM ref_occupations '
+            "WHERE level = 'unit' ORDER BY occupation_code"
+        )
+    )
+    rows = [dict(row) for row in unit_result.mappings().all()]
+    with _unit_rows_lock:
+        _unit_rows_cache = rows
+    return rows
+
+
+def _cached_search_result(query: str) -> list[dict] | None:
+    now = time.monotonic()
+    with _search_result_lock:
+        entry = _search_result_cache.get(query)
+        if entry is None:
+            return None
+        expires_at, rows = entry
+        if expires_at < now:
+            del _search_result_cache[query]
+            return None
+        return [dict(row) for row in rows]
+
+
+def _store_search_result(query: str, rows: list[dict]) -> None:
+    now = time.monotonic()
+    with _search_result_lock:
+        if len(_search_result_cache) >= _SEARCH_RESULT_MAX:
+            # Drop expired entries first, then the oldest insert.
+            stale = [key for key, (expires_at, _) in _search_result_cache.items() if expires_at < now]
+            for key in stale:
+                del _search_result_cache[key]
+            while len(_search_result_cache) >= _SEARCH_RESULT_MAX:
+                _search_result_cache.pop(next(iter(_search_result_cache)))
+        _search_result_cache[query] = (
+            now + _SEARCH_RESULT_TTL_S,
+            [dict(row) for row in rows],
+        )
+
+
+def _timed_keyword_normaliser(query: str, gateway: AIGateway) -> list[str]:
+    """Sync normaliser with a hard timeout — only invoked for unmatched scripts."""
+
+    from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
+
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(normalise_search_query, query, gateway)
+        try:
+            return list(future.result(timeout=settings.occupation_search_normaliser_timeout_s))
+        except FuturesTimeout:
+            logger.warning(
+                'occupation_search_normaliser_timeout query=%r budget_s=%.1f',
+                query,
+                settings.occupation_search_normaliser_timeout_s,
+            )
+            return []
+        except Exception:  # noqa: BLE001 - optional layer by design
+            logger.exception('occupation_search_normaliser_failed query=%r', query)
+            return []
 
 
 @router.get('/occupations')
@@ -29,6 +124,11 @@ async def list_reference_occupations(
 ) -> list[dict]:
     if q and q.strip():
         needle = q.strip()
+        cached = _cached_search_result(needle.casefold())
+        if cached is not None:
+            return cached
+
+        # Indexed ILIKE for direct hits; unit list comes from the process cache.
         result = await db.execute(
             text(
                 f'SELECT {OCCUPATION_COLUMNS} FROM ref_occupations '
@@ -39,22 +139,18 @@ async def list_reference_occupations(
             {'query': f'%{needle}%'},
         )
         direct_rows = [dict(row) for row in result.mappings().all()]
-        # Token-level fuzzy recall over the full unit list complements the
-        # substring hits above.  The occupation table is small enough to score
-        # in-process (see tests/test_reference_fuzzy.py for the budget check).
-        unit_result = await db.execute(
-            text(
-                f'SELECT {OCCUPATION_COLUMNS} FROM ref_occupations '
-                "WHERE level = 'unit' ORDER BY occupation_code"
-            )
-        )
-        unit_rows = [dict(row) for row in unit_result.mappings().all()]
-        return search_occupation_rows(
+        unit_rows = await _load_unit_occupations(db)
+
+        # Fuzzy scoring is CPU-bound; keep the async event loop free.
+        rows = await asyncio.to_thread(
+            search_occupation_rows,
             unit_rows,
             direct_rows,
             needle,
-            keyword_normaliser=lambda query: normalise_search_query(query, gateway),
+            keyword_normaliser=lambda query: _timed_keyword_normaliser(query, gateway),
         )
+        _store_search_result(needle.casefold(), rows)
+        return rows
     elif parent:
         result = await db.execute(
             text(

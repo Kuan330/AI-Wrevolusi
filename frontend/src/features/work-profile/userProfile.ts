@@ -7,6 +7,15 @@ const PROFILE_KEY = "aiwrevolusi.userProfile";
 const OCCUPATION_KEY = "aiwrevolusi.selectedOccupation";
 const ANALYSIS_KEY = "aiwrevolusi.confirmedAnalysis";
 
+/** Role-specific evidence and suggestions, separate from saved learning. */
+const WORK_DERIVED_KEYS = [
+  ANALYSIS_KEY,
+  "aiwrevolusi.possibilities.chosenDirection",
+  "aiwrevolusi.possibilities.shortlist",
+  "aiwrevolusi.possibilities.saved",
+  "aiwrevolusi.possibilities.intent",
+] as const;
+
 let transientSelectedOccupation: SelectedOccupation | null = null;
 
 export type SelectedOccupation = {
@@ -46,6 +55,13 @@ const readLegacyAnalysis = (): ConfirmedAnalysis | null => {
     parseJson<ConfirmedAnalysis>(accountStorage.getItem(ANALYSIS_KEY)) ?? null;
   if (!parsed?.occupationTitle || !Array.isArray(parsed.tasks)) return null;
   return parsed;
+};
+
+/** Clear old role evidence without deleting saved learning or progress. */
+export const clearWorkDerivedData = () => {
+  for (const key of WORK_DERIVED_KEYS) {
+    accountStorage.removeItem(key);
+  }
 };
 
 export const readUserProfile = (): UserProfile => {
@@ -93,6 +109,14 @@ export const writeUserProfile = (patch: Partial<UserProfile>): UserProfile => {
     // decision; changing a profile must never erase another domain's records.
     next.learningReviewNeeded = true;
   }
+
+  const occupationChanged =
+    previous.tasksOccupationCode !== next.tasksOccupationCode;
+  const analysisCleared = Boolean(previous.analysis) && !next.analysis;
+  if (occupationChanged || analysisCleared) {
+    clearWorkDerivedData();
+  }
+
   accountStorage.setItem(PROFILE_KEY, JSON.stringify(next));
   accountStorage.removeItem(OCCUPATION_KEY);
   if (next.analysis) {
@@ -113,6 +137,31 @@ export const readSelectedOccupation = (): SelectedOccupation | null =>
 export const clearSelectedOccupation = () => {
   transientSelectedOccupation = null;
   accountStorage.removeItem(OCCUPATION_KEY);
+};
+
+/**
+ * Start a new occupation flow. When the unit code changes, wipe the previous
+ * tasks, confirmed analysis, and role suggestions so the user re-analyses.
+ * Saved learning stays available and is marked for review.
+ */
+export const beginOccupationChange = (occupation: SelectedOccupation) => {
+  const previousCode = readUserProfile().tasksOccupationCode;
+  const nextCode = occupation.unit.occupation_code;
+  saveSelectedOccupation(occupation);
+
+  if (previousCode === nextCode) {
+    return { occupationChanged: false };
+  }
+
+  // Leave tasksOccupationCode null so ProfileTasks loads fresh ILO starters
+  // instead of treating an empty array as a saved empty list.
+  writeUserProfile({
+    tasks: [],
+    tasksOccupationCode: null,
+    analysis: null,
+  });
+  clearWorkDerivedData();
+  return { occupationChanged: true };
 };
 
 export const saveProfileTasks = (

@@ -187,6 +187,37 @@ fakes. It does not prove PostgreSQL concurrency or replay migrations. See the
 reviewed database verification work. Do not use automatic table creation as proof
 that Alembic can initialize or upgrade an existing database.
 
+### Offline E2 matching evaluation
+
+Run the focused regression checks from the repository root:
+
+```bash
+uv run --project backend --locked --all-groups \
+  pytest -q backend/tests/test_e2_task_matching_regression.py
+```
+
+To reproduce the provisional results, write both the results and the generated
+label worksheet to a new temporary directory:
+
+```bash
+aiw_evaluation_dir=$(mktemp -d /tmp/aiw-e2-evaluation.XXXXXX)
+uv run --project backend --locked --all-groups \
+  python backend/scripts/evaluate_e2_task_matching.py \
+  --output-dir "$aiw_evaluation_dir" \
+  --review-worksheet "$aiw_evaluation_dir/label_review.csv"
+```
+
+Both output options are needed to preserve the committed baseline and any human
+review answers. The default command overwrites the versioned results and the
+label worksheet, leaving its human-review columns blank.
+
+This evaluator uses the reference CSV and the deterministic matcher. It needs no
+database or AI key and blocks network connections. It does not evaluate the live
+AI pipeline or change production thresholds. Results remain provisional until a
+separate reviewed-label workflow is implemented and run. See the
+[E2 evaluation guide](evaluation/e2_task_matching_reliability.md) and
+[human review instructions](evaluation/e2_human_review_instructions.md).
+
 ## Continuous integration
 
 `.github/workflows/check.yml` runs on pull requests and pushes to main. It uses
