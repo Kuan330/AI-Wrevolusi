@@ -1,6 +1,7 @@
 import { localPreferences } from "@/infrastructure/storage/localPreferences";
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -10,6 +11,7 @@ import {
 import { createPortal } from "react-dom";
 
 import { BOT_PET_SPEECH_MS } from "@/components/common/botPetGreetings";
+import { clampPetPosition } from "./botPetPosition";
 
 import "./bot-pet.css";
 
@@ -81,12 +83,27 @@ function petSize(root: HTMLElement | null): { w: number; h: number } {
   };
 }
 
+const NAVIGATION_SELECTOR = ".journey-header, .app-header, .journey-navigation";
+
+function navigationBottom(): number {
+  return Math.max(0, ...Array.from(document.querySelectorAll(NAVIGATION_SELECTOR),
+    element => element.getBoundingClientRect().bottom));
+}
+
 function clamp(position: Position, root: HTMLElement | null): Position {
   const { w, h } = petSize(root);
-  return {
-    x: Math.max(GAP, Math.min(position.x, window.innerWidth - w - GAP)),
-    y: Math.max(0, Math.min(position.y, window.innerHeight - h - GAP)),
-  };
+  // Speech sits below the character's top edge. Include a taller open bubble
+  // when keeping the complete companion within the lower viewport boundary.
+  const speech = root?.querySelector<HTMLElement>(".bot-pet__speech");
+  const height = Math.max(h, speech ? speech.offsetTop + speech.offsetHeight : 0);
+  return clampPetPosition(position, {
+    viewportWidth: window.innerWidth,
+    viewportHeight: window.innerHeight,
+    petWidth: w,
+    petHeight: height,
+    navigationBottom: navigationBottom(),
+    gap: GAP,
+  });
 }
 
 function cornerPosition(
@@ -100,7 +117,7 @@ function cornerPosition(
   const base =
     Number.parseFloat(styles?.getPropertyValue("--bot-pet-base") ?? "") || 18;
   if (corner === "top-right") {
-    // Flush with the top of the viewport (Learning Resources default).
+    // Start below the current header and local journey navigation.
     return clamp(
       {
         x: window.innerWidth - w - right,
@@ -156,7 +173,7 @@ export default function BotPet({
   const [speechHidden, setSpeechHidden] = useState(false);
   const timer = useRef<number | undefined>(undefined);
   const isInline = placement === "inline";
-  /** User-chosen left/top; null means stay on the default CSS corner. */
+  /** Measured left/top; null is only the initial CSS fallback. */
   const [position, setPosition] = useState<Position | null>(null);
   const [dragging, setDragging] = useState(false);
   const customised = useRef(false);
@@ -183,18 +200,27 @@ export default function BotPet({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speech]);
 
+  const setSafePosition = (next: Position) => {
+    setPosition(current => current?.x === next.x && current.y === next.y ? current : next);
+  };
+
   const applyDefault = () => {
     const root = rootRef.current;
     const anchor = defaultAnchorRef?.current;
     if (anchor) {
-      setPosition(anchorBottomRight(anchor, root));
+      setSafePosition(anchorBottomRight(anchor, root));
       return;
     }
-    if (defaultCorner === "top-right") {
-      setPosition(cornerPosition("top-right", root));
-      return;
+    let next = cornerPosition(defaultCorner, root);
+    const avoid = avoidRef?.current;
+    if (defaultCorner === "bottom-right" && avoid && avoidActive) {
+      const bar = avoid.getBoundingClientRect();
+      const { h } = petSize(root);
+      if (bar.top < window.innerHeight && bar.bottom > 0 && next.y < bar.bottom && next.y + h > bar.top) {
+        next = clamp({ ...next, y: bar.top - h - CLEARANCE }, root);
+      }
     }
-    setPosition(null);
+    setSafePosition(next);
   };
 
   useEffect(() => {
@@ -202,114 +228,59 @@ export default function BotPet({
     return () => window.clearTimeout(timer.current);
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isInline) return;
     try {
       const saved = JSON.parse(localPreferences.getItem(storageKey) ?? "null");
       if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
         customised.current = true;
-        setPosition(clamp(saved, rootRef.current));
+        setSafePosition(clamp(saved, rootRef.current));
         return;
       }
     } catch {
       /* Position storage is optional. */
     }
     customised.current = false;
-    // Wait a frame so anchor layout (calendar) has settled.
-    const id = window.requestAnimationFrame(() => applyDefault());
-    return () => window.cancelAnimationFrame(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- apply from latest props on key/corner/anchor change
+    applyDefault();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- restore only when the placement changes
   }, [isInline, storageKey, defaultCorner, defaultAnchorRef]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isInline) return;
-    const onResize = () => {
-      if (customised.current) {
-        setPosition((current) =>
-          current ? clamp(current, rootRef.current) : current,
-        );
-        return;
-      }
-      applyDefault();
-    };
-    window.addEventListener("resize", onResize);
-    const anchor = defaultAnchorRef?.current;
-    const observer =
-      !customised.current &&
-      anchor &&
-      typeof ResizeObserver !== "undefined"
-        ? new ResizeObserver(onResize)
-        : null;
-    if (anchor) observer?.observe(anchor);
-    return () => {
-      window.removeEventListener("resize", onResize);
-      observer?.disconnect();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInline, defaultAnchorRef, position]);
-
-  // Lift the pet clear of a sticky bar — only while still on the CSS corner.
-  useEffect(() => {
-    if (
-      isInline ||
-      position ||
-      defaultCorner !== "bottom-right" ||
-      defaultAnchorRef
-    )
-      return;
-    const root = rootRef.current;
-    const avoid = avoidRef?.current;
-    if (!root || !avoid || !avoidActive) {
-      root?.style.setProperty("--bot-pet-lift", "0px");
-      return;
-    }
-
-    let frame = 0;
     const measure = () => {
-      frame = 0;
-      const styles = window.getComputedStyle(root);
-      const height =
-        Number.parseFloat(styles.getPropertyValue("--bot-pet-height")) ||
-        root.offsetHeight;
-      const base =
-        Number.parseFloat(styles.getPropertyValue("--bot-pet-base")) || 0;
-      const bar = avoid.getBoundingClientRect();
-      const barTop = window.innerHeight - bar.top;
-      const barBottom = window.innerHeight - bar.bottom;
-      const petTop = base + height;
-      const visible = bar.top < window.innerHeight && bar.bottom > 0;
-      const overlaps = visible && base < barTop && petTop > barBottom;
-      const lift = overlaps
-        ? Math.max(0, Math.round(barTop + CLEARANCE - base))
-        : 0;
-      root.style.setProperty("--bot-pet-lift", `${lift}px`);
+      if (customised.current) {
+        setPosition(current => {
+          if (!current) return current;
+          const next = clamp(current, rootRef.current);
+          return next.x === current.x && next.y === current.y ? current : next;
+        });
+      } else {
+        applyDefault();
+      }
     };
+    let frame = 0;
     const schedule = () => {
-      if (!frame) frame = window.requestAnimationFrame(measure);
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => { frame = 0; measure(); });
     };
-
     measure();
-    window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
-    const observer =
-      typeof ResizeObserver === "undefined"
-        ? null
-        : new ResizeObserver(schedule);
-    observer?.observe(avoid);
+    window.addEventListener("scroll", schedule, { passive: true, capture: true });
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(schedule);
+    for (const element of document.querySelectorAll(NAVIGATION_SELECTOR)) observer?.observe(element);
+    if (defaultAnchorRef?.current) observer?.observe(defaultAnchorRef.current);
+    if (avoidRef?.current) observer?.observe(avoidRef.current);
+    const bubble = rootRef.current?.querySelector(".bot-pet__speech");
+    if (bubble) observer?.observe(bubble);
     return () => {
-      window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
+      window.removeEventListener("scroll", schedule, true);
       observer?.disconnect();
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [
-    avoidRef,
-    avoidActive,
-    isInline,
-    position,
-    defaultCorner,
-    defaultAnchorRef,
-  ]);
+    // Measurement never persists a position. Only an intentional drag does.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInline, storageKey, defaultCorner, defaultAnchorRef, avoidRef, avoidActive, speech, speechHidden, tour?.text, tour?.widthRem]);
 
   const persist = (next: Position) => {
     try {

@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,7 @@ import { AppButton } from "@/components/ui/app-button";
 import { Button } from "@/components/ui/button";
 import { useAccount } from "./useAccount";
 import { ROUTES } from "@/constants/routes";
+import { safeJourneyDestination } from "@/features/journey/journey";
 
 export function AuthDialog(props: {
   open: boolean;
@@ -22,6 +23,7 @@ export function AuthDialog(props: {
   const { open, onClose, destination } = props;
   const { authenticate } = useAccount();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -117,11 +119,9 @@ export function AuthDialog(props: {
             try {
               await authenticate(mode, username.trim(), password, importGuest);
               onClose();
-              navigate(
-                mode === "register"
-                  ? ROUTES.workProfile
-                  : (destination ?? ROUTES.aiExposure),
-              );
+              const intended = safeJourneyDestination(destination) ??
+                safeJourneyDestination(location.pathname + location.search + location.hash);
+              navigate(intended ?? ROUTES.continue, { replace: true });
             } catch (issue) {
               setError(
                 issue instanceof Error

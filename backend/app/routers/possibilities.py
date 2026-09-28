@@ -18,6 +18,7 @@ from app.services.possibilities import (
 )
 from app.schemas.possibilities import PossibilitiesResponse
 from app.services.workspace import SHORTLIST_KEY, read_workspace_shortlist
+from app.services.journey import apply_skill_review
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix='/possibilities', tags=['Possibilities'])
@@ -125,6 +126,10 @@ async def get_possibilities(
         for task_text in task_texts
         for item in match_skills(task_text, candidates, limit=None)
     }
+    try:
+        owned = apply_skill_review(owned, workspace)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from None
     has_confirmed_tasks = bool(confirmed_rows or confirmed_texts)
     shortlist_raw = _json_value(workspace, SHORTLIST_KEY, [])
     shortlist = read_workspace_shortlist(shortlist_raw, allowed_skill_ids=set(skills))

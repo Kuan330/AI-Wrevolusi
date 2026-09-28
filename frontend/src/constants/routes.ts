@@ -1,4 +1,6 @@
 export const ROUTES = {
+  skills: "/skills",
+  continue: "/continue",
   possibilities: "/possibilities",
   plan: "/plan",
   home: "/",

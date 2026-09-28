@@ -13,10 +13,13 @@ export type CourseCardProps = {
   saved: boolean;
   onSave: () => void;
   onDetails: () => void;
+  busy?: boolean;
+  saveDisabled?: boolean;
+  pendingSync?: boolean;
 };
 
 export default function CourseCard(props: CourseCardProps) {
-  const { course, saved, onSave, onDetails } = props;
+  const { course, saved, onSave, onDetails, busy, saveDisabled, pendingSync } = props;
   return (
     <Card className="library-course library-glass">
       <div className="library-row">
@@ -30,10 +33,11 @@ export default function CourseCard(props: CourseCardProps) {
           variant="ghost"
           size="sm"
           aria-pressed={saved}
+          disabled={busy || pendingSync || (!saved && saveDisabled)}
           onClick={onSave}
         >
           <Bookmark size={16} fill={saved ? "currentColor" : "none"} />{" "}
-          {saved ? "Added" : "Add to My Plan"}
+          {busy ? "Saving…" : saved ? pendingSync ? "Added on this browser" : "Added" : "Add to My Learning"}
         </Button>
       </div>
       <h3>{course.title}</h3>

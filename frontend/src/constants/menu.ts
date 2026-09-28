@@ -1,11 +1,69 @@
-import type { NavigationItem } from "@/types/navigation";
 import { ROUTES } from "@/constants/routes";
 
-export const PRIMARY_NAV_MENU: NavigationItem[] = [
-  { key: "work-profile", label: "Work Profile", path: ROUTES.workProfile, epic: "E1", description: "Choose your occupation" },
-  { key: "tasks", label: "Tasks", path: ROUTES.task, epic: "E1", description: "Confirm and edit your tasks" },
-  { key: "ai-exposure", label: "AI Impact", path: ROUTES.aiExposure, epic: "E2", description: "Understand AI impact on your role, tasks and skills" },
-  { key: "learning-centre", label: "Learning Resources", path: ROUTES.learningCentre, epic: "E3", description: "Plan what to learn next" },
-  { key: "plan", label: "My Plan", path: ROUTES.plan, epic: "E4", description: "Make room for learning and life" },
-  { key: "possibilities", label: "Possibilities", path: ROUTES.possibilities, epic: "E5", description: "Explore where your skills can take you" },
+export type JourneyArea = "work" | "learning" | "careers";
+
+type JourneyMenuItem = {
+  key: JourneyArea;
+  label: string;
+  path: string;
+  paths: readonly string[];
+};
+
+/** Areas stay in the same order before and after work confirmation. */
+export const PRIMARY_NAV_MENU: readonly JourneyMenuItem[] = [
+  {
+    key: "work",
+    label: "My Work",
+    path: ROUTES.workProfile,
+    paths: [ROUTES.workProfile, ROUTES.aiExposure, ROUTES.skills, "/work-profile"],
+  },
+  {
+    key: "learning",
+    label: "My Learning",
+    path: ROUTES.plan,
+    paths: [ROUTES.plan, ROUTES.learningCentre],
+  },
+  {
+    key: "careers",
+    label: "Career Options",
+    path: ROUTES.possibilities,
+    paths: [ROUTES.possibilities],
+  },
 ];
+
+export const WORK_NAV_MENU = [
+  { key: "details", label: "Work details", path: ROUTES.workProfile },
+  { key: "tasks", label: "My tasks", path: ROUTES.task },
+  { key: "findings", label: "AI findings", path: ROUTES.aiExposure },
+  { key: "skills", label: "My skills", path: ROUTES.skills },
+] as const;
+
+export const LEARNING_NAV_MENU = [
+  { key: "plan", label: "My learning", path: ROUTES.plan },
+  { key: "resources", label: "Find learning", path: ROUTES.learningCentre },
+] as const;
+
+export function getJourneyArea(pathname: string): JourneyArea | undefined {
+  return PRIMARY_NAV_MENU.find((item) =>
+    item.paths.some((path) => pathname === path || pathname.startsWith(`${path}/`)),
+  )?.key;
+}
+
+export type WorkNavigationState = {
+  workConfirmed: boolean;
+  assessmentChecked: boolean;
+  skillsReviewed: boolean;
+};
+
+/** Status describes saved decisions, never a page visit or a reliable score. */
+export function getWorkStepStatus(
+  key: (typeof WORK_NAV_MENU)[number]["key"],
+  state: WorkNavigationState,
+): string | undefined {
+  if ((key === "details" || key === "tasks") && state.workConfirmed) {
+    return "Confirmed";
+  }
+  if (key === "findings" && state.assessmentChecked) return "Checked";
+  if (key === "skills" && state.skillsReviewed) return "Reviewed";
+  return undefined;
+}

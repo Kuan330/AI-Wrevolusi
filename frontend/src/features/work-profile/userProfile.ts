@@ -37,6 +37,8 @@ export type UserProfile = {
   tasks: ProfileTask[];
   tasksOccupationCode: string | null;
   analysis: ConfirmedAnalysis | null;
+  /** Explicit task confirmation is independent of a successful evidence request. */
+  tasksConfirmed?: boolean;
   /** Saved learning remains available until the user reviews the changed work. */
   learningReviewNeeded?: boolean;
 };
@@ -71,10 +73,9 @@ export const readUserProfile = (): UserProfile => {
       tasks: Array.isArray(stored.tasks) ? stored.tasks : [],
       tasksOccupationCode: stored.tasksOccupationCode ?? null,
       analysis: stored.analysis ?? null,
+      tasksConfirmed: stored.tasksConfirmed === true || Boolean(stored.analysis?.tasks?.length),
       learningReviewNeeded: stored.learningReviewNeeded === true,
     };
-    accountStorage.removeItem(OCCUPATION_KEY);
-
     return cleaned;
   }
 
@@ -83,8 +84,8 @@ export const readUserProfile = (): UserProfile => {
     tasks: analysis?.tasks ?? [],
     tasksOccupationCode: analysis?.occupationCode ?? null,
     analysis,
+    tasksConfirmed: Boolean(analysis?.tasks.length),
   };
-  accountStorage.removeItem(OCCUPATION_KEY);
   return migrated;
 };
 
@@ -113,6 +114,10 @@ export const writeUserProfile = (patch: Partial<UserProfile>): UserProfile => {
   const occupationChanged =
     previous.tasksOccupationCode !== next.tasksOccupationCode;
   const analysisCleared = Boolean(previous.analysis) && !next.analysis;
+  const taskEvidence = (profile: UserProfile) => JSON.stringify(profile.tasks.map(({ practice: _practice, ...task }) => task));
+  if ((occupationChanged || analysisCleared || taskEvidence(previous) !== taskEvidence(next)) && patch.tasksConfirmed !== true) {
+    next.tasksConfirmed = false;
+  }
   if (occupationChanged || analysisCleared) {
     clearWorkDerivedData();
   }
@@ -159,6 +164,7 @@ export const beginOccupationChange = (occupation: SelectedOccupation) => {
     tasks: [],
     tasksOccupationCode: null,
     analysis: null,
+    tasksConfirmed: false,
   });
   clearWorkDerivedData();
   return { occupationChanged: true };
@@ -172,6 +178,7 @@ export const saveProfileTasks = (
     tasks,
     tasksOccupationCode: occupationCode,
     analysis: null,
+    tasksConfirmed: false,
   });
 };
 
@@ -196,9 +203,17 @@ export const readTaskWorkspace = (): Pick<
   };
 };
 
+export const confirmProfileTasks = () => {
+  const profile = readUserProfile();
+  if (!profile.tasks.length || profile.tasks.some(task => !task.wording.trim()))
+    throw new Error("Review at least one clear work task before continuing.");
+  writeUserProfile({ tasksConfirmed: true });
+};
+
 export const saveConfirmedAnalysis = (analysis: ConfirmedAnalysis) => {
   writeUserProfile({
     analysis,
+    tasksConfirmed: true,
     tasks: analysis.tasks,
     tasksOccupationCode: analysis.occupationCode,
   });

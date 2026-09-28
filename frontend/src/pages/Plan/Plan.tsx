@@ -1,3 +1,5 @@
+import PlanContinuation from "./PlanContinuation";
+import { rememberCourse } from "@/features/journey/journey";
 import { checkInToPlan, refreshChapterProgress, saveChapterProgress, syncChapterProgress } from "@/features/learning-planning/progressOperations";
 import type { MouseEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -330,6 +332,7 @@ export default function Plan() {
   );
 
   function openCourse(c: Course) {
+    void rememberCourse(c.id).catch(error => setNotice(error instanceof Error ? error.message : "Could not save the course you want to continue."));
     setCourseId(c.id);
     setDraft(c.chapters.map((ch) => ch.value));
     setRawPercent({});
@@ -559,13 +562,13 @@ export default function Plan() {
     },
   ];
 
-  if (loaded.error) return <div className="lp-page"><PageHeader title="My Plan" description="Your saved data has been kept." /><p role="alert">{loaded.error}</p></div>;
+  if (loaded.error) return <div className="lp-page"><PageHeader title="My Learning" description="Your saved data has been kept." /><p role="alert">{loaded.error}</p></div>;
 
   return (
     <div className="lp-page">
       <PageHeader
         className="lp-page-header"
-        title="My Plan"
+        title="My Learning"
         description="Small steps, steady progress. Make your learning journey your own."
       />
 
@@ -574,6 +577,7 @@ export default function Plan() {
       </p>
 
       <LearningReviewNotice />
+      <PlanContinuation courses={state.courses} loading={coursesLoading} onRecord={openCourse} />
       {(state.pendingProgress?.length || state.progressSyncError) && <div role="status" className="mb-4 rounded-xl border p-3 text-sm">
         <p>{progressBusy ? "Syncing chapter progress…" : state.progressSyncError ? "Progress sync failed. Your changes are kept on this browser." : "Chapter progress is waiting to sync."}</p>
         {state.progressSyncError && <p>{state.progressSyncError}</p>}

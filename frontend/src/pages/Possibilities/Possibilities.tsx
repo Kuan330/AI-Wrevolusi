@@ -7,7 +7,7 @@ import PageHeader from "@/components/common/PageHeader";
 import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
 import { possibilitiesService } from "@/services/possibilitiesService";
 import { referenceService } from "@/services/referenceService";
-import { accountStorage, flushWorkspace } from "@/services/accountStorage";
+import { accountStorage, currentWorkspaceSession, flushWorkspace } from "@/services/accountStorage";
 import { PAGE_GRADIENT_CSS } from "@/constants/palette";
 import { GradientBar } from "@/components/ui/gradient-bar";
 import SkillOutlookSummary from "@/pages/Skills/components/SkillOutlookSummary";
@@ -22,6 +22,8 @@ import {
   toPossibilitiesData,
   type PossibilitiesData,
 } from "./possibilitiesModel";
+import { getSkillDecision, isSkillReviewCurrent, readLearningContext, startLearning } from "@/features/journey/journey";
+import { skillKey } from "@/pages/Skills/learningSkills";
 import "./exploration.css";
 
 const DIRECTION_KEY = "aiwrevolusi.possibilities.chosenDirection";
@@ -59,8 +61,8 @@ function BuildSkillChip({
         aria-haspopup="dialog"
         title={
           added
-            ? "View outlook · already in Learning Resources"
-            : "View outlook · add to Learning Resources"
+            ? "View outlook · already in your learning skills"
+            : "View outlook · add to your learning skills"
         }
       >
         {skill.core_skill}
@@ -101,11 +103,15 @@ function JourneyCompanion({
   targetTitle,
   coveragePct,
   onExplore,
+  canExplore,
+  continuing,
 }: {
   currentTitle: string;
   targetTitle: string | null;
   coveragePct: number | null;
   onExplore: () => void;
+  canExplore: boolean;
+  continuing: boolean;
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const coverage = coveragePct ?? 0;
@@ -182,16 +188,16 @@ function JourneyCompanion({
                     )}
                   </li>
                   <li>
-                    When you are ready, open Learning Resources to turn a gap
-                    into a small next step.
+                    When you are ready, open Find learning to explore a small
+                    next step.
                   </li>
                 </ul>
               </div>
             ) : null}
           </div>
 
-          <button className="px-primary px-companion-cta" type="button" onClick={onExplore}>
-            Explore learning resources
+          <button className="px-primary px-companion-cta" type="button" disabled={!canExplore || continuing} onClick={onExplore}>
+            {continuing ? "Saving your choice…" : canExplore ? "Continue with selected skill" : "Choose a skill to continue"}
           </button>
         </>
       ) : (
@@ -216,6 +222,17 @@ export default function Possibilities() {
   const [selectedCode, setSelectedCode] = useState<string | null>(
     () => readJson<{ occupation_code?: string } | null>(DIRECTION_KEY, null)?.occupation_code ?? null,
   );
+  const [skillChoice, setSkillChoice] = useState<{ careerCode: string; id: number } | null>(() => {
+    try {
+      const saved = readLearningContext();
+      return saved?.origin === "career" && saved.career ? { careerCode: saved.career.code, id: saved.skill.id } : null;
+    } catch { return null; }
+  });
+  const [navigationError, setNavigationError] = useState("");
+  const [continuing, setContinuing] = useState(false);
+  const [wefError, setWefError] = useState("");
+  const mounted = useRef(true);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const {
@@ -227,10 +244,11 @@ export default function Possibilities() {
 
   useEffect(() => {
     let cancelled = false;
+    const owner = currentWorkspaceSession();
     void referenceService
       .wefSkills()
       .then((rows) => {
-        if (!cancelled) {
+        if (!cancelled && owner === currentWorkspaceSession()) {
           setWefSkills(
             [...rows].sort(
               (left, right) => left.wef_skill_id - right.wef_skill_id,
@@ -239,19 +257,24 @@ export default function Possibilities() {
         }
       })
       .catch(() => {
-        if (!cancelled) setWefSkills([]);
+        if (!cancelled && owner === currentWorkspaceSession()) setWefError("The WEF skill framework could not be loaded. Reload to choose a supported learning skill.");
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const reflectedSkills = useMemo(
-    () => (data?.skills ?? [])
-      .filter(skill => skill.state === "have")
-      .map(skill => ({ skill: { wef_skill_id: skill.skill_id, core_skill: skill.name } })),
-    [data],
-  );
+  const reviewedEvidence = useMemo(() => {
+    try {
+      const current = isSkillReviewCurrent();
+      return { skills: (data?.skills ?? [])
+        .filter(skill => skill.state === "have" && current && getSkillDecision(skill.skill_id) === "accepted")
+        .map(skill => ({ skill: { wef_skill_id: skill.skill_id, core_skill: skill.name } })), error: "" };
+    } catch (error) {
+      return { skills: [], error: error instanceof Error ? error.message : "Could not read your skill review." };
+    }
+  }, [data]);
+  const reflectedSkills = reviewedEvidence.skills;
   const reflectedSkillIds = useMemo(
     () => new Set(reflectedSkills.map(({ skill }) => skill.wef_skill_id)),
     [reflectedSkills],
@@ -264,11 +287,13 @@ export default function Possibilities() {
 
   useEffect(() => {
     const controller = new AbortController();
+    const owner = currentWorkspaceSession();
     void loadSavedPossibilities({
       signal: controller.signal,
       flush: flushWorkspace,
       get: possibilitiesService.getPossibilities,
       onSuccess: (response) => {
+        if (owner !== currentWorkspaceSession()) return;
         const mapped = toPossibilitiesData(response);
         setData(mapped);
         setError("");
@@ -281,6 +306,7 @@ export default function Possibilities() {
         });
       },
       onError: err => {
+        if (owner !== currentWorkspaceSession()) return;
         setError(
           err instanceof Error
             ? err.message
@@ -293,27 +319,30 @@ export default function Possibilities() {
   }, []);
 
   const choose = (code: string) => {
-    setSelectedCode(code);
+    if (continuing) return;
     const direction = data?.directions.find(item => item.occupation_code === code);
-    if (direction) {
-      accountStorage.setItem(
-        DIRECTION_KEY,
-        JSON.stringify({ occupation_code: code, title: direction.title }),
-      );
+    if (!direction) return;
+    try {
+      accountStorage.setItem(DIRECTION_KEY, JSON.stringify({ occupation_code: code, title: direction.title }));
+      setSelectedCode(code);
+      setSkillChoice(current => current?.careerCode === code ? current : null);
+      setNavigationError("");
+    } catch (error) {
+      setNavigationError(error instanceof Error ? error.message : "Could not save this direction.");
     }
   };
 
   if (loading) {
     return (
       <div className="px-page">
-        <p role="status">Loading possibilities…</p>
+        <p role="status">Loading career options…</p>
       </div>
     );
   }
   if (error || !data) {
     return (
       <div className="px-page">
-        <p role="alert">{error || "Possibilities are unavailable."}</p>
+        <p role="alert">{error || "Career options are unavailable."}</p>
         <Link to={profilePath}>Review your work profile</Link>
       </div>
     );
@@ -321,7 +350,7 @@ export default function Possibilities() {
   if (data.status === "needs_profile") {
     return (
       <div className="px-page">
-        <PageHeader title="Possibilities" description="Explore directions based on your work profile." />
+        <PageHeader title="Career options" description="Explore directions based on your work profile." />
         <section className="px-no-direction">
           <h2>Complete your Work Profile</h2>
           <p>Confirm your current role and tasks first so we can show relevant directions.</p>
@@ -335,7 +364,7 @@ export default function Possibilities() {
   if (data.status === "unavailable") {
     return (
       <div className="px-page">
-        <p role="alert">Possibilities are temporarily unavailable. Please try again later.</p>
+        <p role="alert">Career options are temporarily unavailable. Please try again later.</p>
       </div>
     );
   }
@@ -343,17 +372,38 @@ export default function Possibilities() {
   const selected = data.directions.find(item => item.occupation_code === selectedCode);
   const currentTitle = data.currentRole?.title ?? "Your current role";
   const selectedCoverage = selected?.coverage_pct ?? data.chosenDirectionCoverage;
-  const goLearning = () => {
-    if (!selected) return;
-    navigate(`/learning-centre?q=${encodeURIComponent(selected.title)}`);
+  const availableSkills = (selected?.skills ?? []).filter(item => {
+    const wef = wefById.get(item.skill_id);
+    return wef && item.skill_slug === skillKey(wef.core_skill);
+  });
+  const selectedSkill = skillChoice?.careerCode === selected?.occupation_code
+    ? availableSkills.find(item => item.skill_id === skillChoice?.id) : undefined;
+  const goLearning = async () => {
+    if (!selected || !selectedSkill || continuing) return;
+    const wef = wefById.get(selectedSkill.skill_id);
+    if (!wef) return;
+    const owner = currentWorkspaceSession();
+    setContinuing(true);
+    setNavigationError("");
+    try {
+      const url = await startLearning({ origin: "career",
+        skill: { id: wef.wef_skill_id, slug: skillKey(wef.core_skill), name: wef.core_skill },
+        career: { code: selected.occupation_code, title: selected.title } });
+      if (mounted.current && owner === currentWorkspaceSession()) navigate(url);
+    } catch (error) {
+      if (mounted.current && owner === currentWorkspaceSession()) setNavigationError(error instanceof Error ? error.message : "Could not save your skill choice. Please try again.");
+    } finally {
+      if (mounted.current && owner === currentWorkspaceSession()) setContinuing(false);
+    }
   };
 
   return (
     <div className="px-page">
       <PageHeader
-        title="Possibilities"
+        title="Career options"
         description="Grow in your current role, or explore where your experience could take you next."
       />
+      {reviewedEvidence.error && <p role="alert">{reviewedEvidence.error}</p>}
       <div className="px-body">
         <div className="px-main-col">
           <section className="px-current">
@@ -368,7 +418,7 @@ export default function Possibilities() {
             <div className="px-current-skills">
               <h3>Skills in your profile</h3>
               <p className="px-chosen-hint">
-                Skills detected from your confirmed task wording.
+                Skills accepted in your current skill review.
               </p>
               <div className="px-chips">
                 {reflectedSkills.length > 0 ? (
@@ -379,8 +429,7 @@ export default function Possibilities() {
                   ))
                 ) : (
                   <p className="px-chosen-hint">
-                    No reflected skills yet. Confirm tasks in your Work Profile
-                    to see them here.
+                    No accepted skills from a current review yet. Review your skills before treating detected connections as current strengths.
                   </p>
                 )}
               </div>
@@ -458,7 +507,7 @@ export default function Possibilities() {
                     <div>
                       <h3>Skills to build</h3>
                       <p className="px-chosen-hint">
-                        Open a skill to see its outlook and add it to Learning Resources.
+                        Open a skill to see its outlook and add it to your learning skills.
                       </p>
                       <div className="px-chips px-chips--path">
                         {selected.skills
@@ -493,8 +542,22 @@ export default function Possibilities() {
                   </div>
                 </div>
               ) : null}
-              <button className="px-primary" type="button" onClick={goLearning}>
-                Explore learning resources
+              <fieldset className="mt-5 space-y-3" disabled={continuing}>
+                <legend className="font-semibold">Choose one skill for your next learning step</legend>
+                <p className="px-chosen-hint">These are broad WEF skills linked by the current career model. They do not establish specialist requirements or prove a skill gap.</p>
+                {availableSkills.map(item => (
+                  <label key={item.skill_id} className="flex items-center gap-2">
+                    <input type="radio" name="career-learning-skill" value={item.skill_id}
+                      checked={selectedSkill?.skill_id === item.skill_id}
+                      onChange={() => { setSkillChoice({ careerCode: selected.occupation_code, id: item.skill_id }); setNavigationError(""); }} />
+                    {wefById.get(item.skill_id)?.core_skill}
+                  </label>
+                ))}
+                {!availableSkills.length && <p role="status">{wefError || "No supported learning skill is available for this direction yet. Your direction stays saved."}</p>}
+              </fieldset>
+              {navigationError && <p role="alert" className="mt-3">{navigationError}</p>}
+              <button className="px-primary mt-4" type="button" disabled={!selectedSkill || continuing} onClick={() => { void goLearning(); }}>
+                {continuing ? "Saving your choice…" : selectedSkill ? `Continue with ${selectedSkill.name}` : "Choose a skill to continue"}
               </button>
             </section>
           ) : null}
@@ -504,7 +567,9 @@ export default function Possibilities() {
           currentTitle={currentTitle}
           targetTitle={selected?.title ?? null}
           coveragePct={selectedCoverage}
-          onExplore={goLearning}
+          onExplore={() => { void goLearning(); }}
+          canExplore={Boolean(selectedSkill)}
+          continuing={continuing}
         />
       </div>
 

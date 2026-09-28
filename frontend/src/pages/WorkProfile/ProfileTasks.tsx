@@ -1,3 +1,5 @@
+import { currentWorkspaceSession, flushWorkspace } from "@/services/accountStorage";
+import { currentWorkKey } from "@/features/journey/journey";
 import type { ComponentProps } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
@@ -8,6 +10,8 @@ import {
   readSelectedOccupation,
   readTaskWorkspace,
   saveConfirmedAnalysis,
+  confirmProfileTasks,
+  readUserProfile,
   type SelectedOccupation,
 } from "@/features/work-profile/userProfile";
 import ProfileTaskList from "@/pages/WorkProfile/components/ProfileTaskList";
@@ -100,6 +104,10 @@ const ProfileTasks = () => {
     setTaskAssessmentRequestInProgress(true);
     setTaskAssessmentRequestError(null);
     try {
+      confirmProfileTasks();
+      const owner = currentWorkspaceSession();
+      const workKey = currentWorkKey();
+      await flushWorkspace();
       const assessmentResponse =
         await exposureService.assessConfirmedTasksAgainstIloReferences({
           occupation_code: selected.unit.occupation_code,
@@ -118,6 +126,8 @@ const ProfileTasks = () => {
             },
           })),
         });
+      if (owner !== currentWorkspaceSession() || workKey !== currentWorkKey())
+        throw new Error("Your account or tasks changed during the assessment. Review your current work before retrying.");
       const scored =
         profileTasks.tasks.find(
           (task) => task.potential25 && typeof task.meanScore2025 === "number",
@@ -140,10 +150,13 @@ const ProfileTasks = () => {
         tasks: profileTasks.tasks,
         taskExposureAssessments: assessmentResponse.assessments,
       });
+      await flushWorkspace();
+      if (owner !== currentWorkspaceSession()) return;
       navigate(ROUTES.aiExposure);
-    } catch {
+    } catch (error) {
       setTaskAssessmentRequestError(
-        "The task assessment could not be completed. Your confirmed tasks are still saved; please try again.",
+        error instanceof Error ? `${error.message} Your tasks have not been cleared.` :
+          "The task assessment could not be completed. Your tasks have not been cleared; please retry.",
       );
     } finally {
       setTaskAssessmentRequestInProgress(false);
@@ -153,6 +166,7 @@ const ProfileTasks = () => {
   useEffect(() => {
     if (
       !shouldAutoAnalyze ||
+      !readUserProfile().tasksConfirmed ||
       autoAnalyzeStartedRef.current ||
       occupationLoading ||
       profileTasks.loading ||

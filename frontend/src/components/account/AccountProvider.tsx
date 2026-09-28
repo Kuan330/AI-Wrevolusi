@@ -133,6 +133,12 @@ export function AccountProvider(props: { children: ReactNode }) {
         },
       }}
     >
+      {error && !loading && (
+        <div role="alert" className="bg-amber-50 px-5 py-3 text-sm text-amber-950">
+          We could not restore your account. Your saved work has not been reset.
+          <Button variant="link" onClick={() => { setLoading(true); setError(""); setAttempt(value => value + 1); }}>Retry account restore</Button>
+        </div>
+      )}
       {user && syncError && (
         <div
           role="alert"

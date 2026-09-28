@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from "react";
-import { Bookmark, ExternalLink, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, Bookmark, ExternalLink, Trash2 } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -13,6 +13,9 @@ import { Button } from "@/components/ui/button";
 import type { Course } from "../../../features/learning-planning/types";
 import { durationLabel } from "../lib/coursePlanning";
 import { courseLevelLabel } from "../lib/courseLevels";
+import { useNavigate } from "react-router-dom";
+import { currentWorkspaceSession } from "@/services/accountStorage";
+import { planCourseUrl, rememberCourse } from "@/features/journey/journey";
 
 export type CourseDetailDrawerProps = {
   course: Course;
@@ -20,10 +23,15 @@ export type CourseDetailDrawerProps = {
   saved: boolean;
   onClose: () => void;
   onSave: () => void;
+  busy?: boolean;
+  saveDisabled?: boolean;
+  pendingSync?: boolean;
+  saveNotice?: string;
+  onRetrySync?: () => void;
 };
 
 export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
-  const { course, skillName, saved, onClose, onSave } = props;
+  const { course, skillName, saved, onClose, onSave, busy, saveDisabled, pendingSync, saveNotice, onRetrySync } = props;
   // Providers publish outcomes as one semicolon-separated sentence, so only the
   // first clause is capitalised and only the last one keeps its full stop.
   // Normalise them into standalone list items.
@@ -38,6 +46,25 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const aboutIsLong = course.intro.length > 180;
+  const navigate = useNavigate();
+  const [continuing, setContinuing] = useState(false);
+  const [continueError, setContinueError] = useState("");
+  const mounted = useRef(true);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  const continueCourse = async () => {
+    if (continuing || busy || pendingSync) return;
+    const owner = currentWorkspaceSession();
+    setContinuing(true);
+    setContinueError("");
+    try {
+      await rememberCourse(course.id);
+      if (mounted.current && owner === currentWorkspaceSession()) navigate(planCourseUrl(course.id));
+    } catch (error) {
+      if (mounted.current && owner === currentWorkspaceSession()) setContinueError(error instanceof Error ? error.message : "Could not save your place. Please try again.");
+    } finally {
+      if (mounted.current && owner === currentWorkspaceSession()) setContinuing(false);
+    }
+  };
 
   return (
     <Drawer
@@ -143,15 +170,25 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
             </TabsContent>
           </Tabs>
         </DrawerBody>
+        {saveNotice && <p role="alert">{saveNotice}</p>}
+        {pendingSync && !saveNotice && <p role="status">Your course changes are on this browser. Waiting for your account to confirm the save.</p>}
+        {continueError && <p role="alert">{continueError}</p>}
         <div className="learning-drawer-actions">
+          {pendingSync && <Button disabled={busy} onClick={onRetrySync}>{busy ? "Syncing…" : "Retry sync"}</Button>}
+          {saved && (
+            <Button disabled={busy || continuing || pendingSync} onClick={() => { void continueCourse(); }}>
+              {continuing ? "Saving your place…" : "Continue with this course"} <ArrowRight size={16} />
+            </Button>
+          )}
           <Button
             className={`library-save-button learning-drawer-save${saved ? " is-saved" : ""}`}
             variant="ghost"
             aria-pressed={saved}
+            disabled={busy || continuing || pendingSync || (!saved && saveDisabled)}
             onClick={onSave}
           >
             {saved ? <Trash2 size={16} /> : <Bookmark size={16} />}
-            {saved ? "Remove" : "Add to My Plan"}
+            {busy ? "Saving…" : saved ? "Remove from My Learning" : "Add to My Learning"}
           </Button>
         </div>
       </DrawerContent>

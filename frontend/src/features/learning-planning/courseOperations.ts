@@ -1,3 +1,4 @@
+import { JOURNEY_KEY, journeyForAddedCourse, readLearningContext } from "../journey/journey.ts";
 import { currentWorkspaceSession, saveWorkspaceItems } from "../../services/accountStorage.ts";
 import { loadCourseDirectory } from "./courseDirectory.ts";
 import { readLibrary } from "./libraryStorage.ts";
@@ -5,6 +6,7 @@ import { planForSavedCourses, readPlanState } from "./planCourses.ts";
 import type { Course } from "./types";
 
 export type SavedCourseChange = {
+  learningContextId?: string;
   add?: string[];
   remove?: string[];
   removeSkill?: { id: string; remainingIds: string[] };
@@ -39,7 +41,18 @@ export async function changeSavedCourses(change: SavedCourseChange) {
     plan.pendingProgress = plan.pendingProgress.filter(item => !removed.has(item.course_id));
     if (!plan.pendingProgress.length) plan.progressSyncError = "";
   }
+  const journeyItems: Record<string, string> = {};
+  if (change.learningContextId && change.add?.length) {
+    const context = readLearningContext(change.learningContextId);
+    if (!context) throw new Error("The selected learning goal is no longer available.");
+    if (change.add.length !== 1) throw new Error("Choose one course for this learning goal.");
+    const courseId = change.add[0];
+    if (!directory.get(courseId)?.skills.includes(context.skill.slug))
+      throw new Error("This course has no supported link to the selected skill.");
+    journeyItems[JOURNEY_KEY] = journeyForAddedCourse(courseId, context.id);
+  }
   saveWorkspaceItems({
+    ...journeyItems,
     "aiwrevolusi.courseLibrary.v1": JSON.stringify(library),
     "aiwrevolusi.plan.courses.v1": JSON.stringify(plan),
   });

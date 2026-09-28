@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 
 import AppHeader from "@/components/layout/AppHeader";
+import JourneyNavigation from "@/components/layout/JourneyNavigation";
 import { ROUTES } from "@/constants/routes";
 import "@/pages/WorkProfile/workProfile.css";
 
@@ -20,6 +21,7 @@ const ProfileLayout = () => {
       }}
     >
       <AppHeader />
+      <JourneyNavigation />
       <main
         className={`mx-auto flex w-full min-h-0 flex-1 flex-col px-4 lg:px-6 ${
           isTasksPage

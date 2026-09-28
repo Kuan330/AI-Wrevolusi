@@ -15,10 +15,18 @@ import { AuthDialog } from "./AuthDialog";
 import { ROUTES } from "@/constants/routes";
 import { PAGE_GRADIENT_CSS } from "@/constants/palette";
 
-export type JourneyKind = "resources" | "plan" | "possibilities";
+export type JourneyKind = "work" | "resources" | "plan" | "possibilities";
 const content = {
+  work: {
+    name: "My Work",
+    title: "Keep your work review with you",
+    description: "Sign in or create an account, then describe and confirm your actual work. Your choices will stay connected to skills and learning when you return.",
+    steps: [["Describe your work", "Start with your role and the tasks you actually do."], ["Review the evidence", "See what is supported and correct suggestions that do not fit."], ["Choose your next step", "Keep one skill and learning goal connected to that work."]],
+    action: "Describe my work",
+    path: ROUTES.workProfile,
+  },
   resources: {
-    name: "Learning Resources",
+    name: "Find learning",
     title: "Turn a skill into your next learning step",
     description:
       "Choose skills you want to grow, then explore relevant resources and build your own plan.",
@@ -31,29 +39,29 @@ const content = {
         "Explore resources",
         "Compare relevant content and choose what fits your goal.",
       ],
-      ["Save your next step", "Keep a shortlist and bring it into My Plan."],
+      ["Save your next step", "Keep a shortlist and bring it into My Learning."],
     ],
     action: "Choose a skill",
     path: ROUTES.learningCentre,
   },
   plan: {
-    name: "My Plan",
-    title: "Make room for your next step",
+    name: "My Learning",
+    title: "Continue learning at your own pace",
     description:
-      "Bring a resource into your week and arrange learning alongside work and everyday life.",
+      "Keep your chosen course and goal together, record study, and return to the next step.",
     steps: [
       ["Choose a resource", "Start with something you want to learn."],
-      ["Make a little time", "Arrange a session that fits your schedule."],
+      ["Continue learning", "Return to the course or skill you chose."],
       [
         "Track your progress",
-        "Mark activities complete and adjust your next step.",
+        "Record what you studied and review your next step.",
       ],
     ],
     action: "Explore learning resources",
     path: ROUTES.learningCentre,
   },
   possibilities: {
-    name: "Possibilities",
+    name: "Career Options",
     title: "Explore where your skills could take you",
     description:
       "Use your work experience and learning interests to consider your next direction.",
@@ -178,7 +186,7 @@ export default function JourneyIntro(props: {
           {...({
             open: true,
             onClose: () => setAuthOpen(false),
-            destination: window.location.pathname,
+            destination: window.location.pathname + window.location.search + window.location.hash,
           } satisfies Partial<ComponentProps<typeof AuthDialog>>)}
         />
       )}

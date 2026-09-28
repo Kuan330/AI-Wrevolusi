@@ -16,8 +16,9 @@ PROFILE_RECOVERY_MESSAGE = 'Your saved work profile could not be read. Reload yo
 def confirmed_workspace_evidence(workspace: object, occupations: Iterable[Mapping]) -> tuple[list[str], dict | None]:
     """Read confirmed evidence. A modern profile never falls back to old data.
 
-    A cleared or not-yet-confirmed analysis has no evidence. Invalid modern data
-    needs recovery instead of silently substituting another source.
+    A completed analysis or an explicit task confirmation supplies evidence.
+    Starter drafts do not. Invalid modern data needs recovery instead of
+    silently substituting another source.
     """
     if not isinstance(workspace, Mapping):
         raise ValueError(PROFILE_RECOVERY_MESSAGE)
@@ -33,6 +34,8 @@ def confirmed_workspace_evidence(workspace: object, occupations: Iterable[Mappin
             ):
                 raise ValueError(PROFILE_RECOVERY_MESSAGE)
             analysis = profile.get('analysis')
+            if analysis is None and profile.get('tasksConfirmed') is True:
+                analysis = {'occupationCode': profile.get('tasksOccupationCode'), 'tasks': profile.get('tasks')}
         else:
             analysis = json.loads(workspace.get('aiwrevolusi.confirmedAnalysis', 'null'))
     except (TypeError, ValueError) as error:

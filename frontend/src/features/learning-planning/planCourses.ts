@@ -134,7 +134,7 @@ function parseState(raw: string | null): PlanState | null {
   }
 }
 
-export function readPlanState(): PlanState {
+export function readPlanState(options: { migrateLegacy?: boolean } = {}): PlanState {
   const raw = accountStorage.getItem(KEY);
   const current = parseState(raw);
   if (current) return current;
@@ -146,7 +146,7 @@ export function readPlanState(): PlanState {
 
   const legacy = parseState(readGuestLegacyItem(LEGACY_KEY));
   if (legacy) {
-    savePlanState(legacy);
+    if (options.migrateLegacy !== false) savePlanState(legacy);
     return legacy;
   }
   return emptyState();

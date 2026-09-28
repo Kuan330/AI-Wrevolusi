@@ -1,0 +1,36 @@
+.skills-review-page { display: grid; gap: 1.25rem; color: #2f2430; }
+.skills-review-page > :first-child { flex-wrap: wrap; }
+.skills-review-page__intro { max-width: 76ch; color: #645868; font-size: .95rem; line-height: 1.65; }
+.skills-review-page__notice { display: grid; justify-items: start; gap: .75rem; padding: 1rem 1.25rem; border: 1px solid #d5c7dd; border-radius: 14px; background: #f7f0fa; line-height: 1.6; }
+.skills-review-page__notice.is-error { border-color: #d99494; background: #fff3f2; color: #8f2e2e; }
+.skills-review-page__save-status { min-height: 1.5rem; font-size: .875rem; color: #645868; }
+.skills-review-page__section-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1rem; margin-bottom: 1rem; }
+.skills-review-page h2 { font-size: 1.15rem; font-weight: 650; line-height: 1.4; }
+.skills-review-page__section-heading p { font-size: .875rem; color: #645868; }
+.skills-review-page__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.skills-review-page__card { min-width: 0; display: grid; align-content: start; gap: .85rem; border: 1px solid rgba(255,255,255,.9); border-radius: 20px; padding: 1.4rem; background: rgba(255,255,255,.76); box-shadow: 0 8px 24px rgba(61,43,54,.06); }
+.skills-review-page__card h3 { font-size: 1.05rem; font-weight: 650; line-height: 1.45; }
+.skills-review-page__card p { line-height: 1.6; }
+.skills-review-page__skill-heading { display: flex; align-items: start; justify-content: space-between; gap: .75rem; }
+.skills-review-page__state { flex-shrink: 0; border: 1px solid #d5c7dd; border-radius: 99px; padding: .2rem .55rem; font-size: .75rem; color: #645868; background: #f7f2f8; }
+.skills-review-page__state.is-accepted { color: #245640; background: #e8f4ee; border-color: #a5cbb6; }
+.skills-review-page__state.is-rejected { color: #744346; background: #f9eced; border-color: #d6aeb1; }
+.skills-review-page__source, .skills-review-page__hint { font-size: .8rem; color: #645868; }
+.skills-review-page__evidence-label { font-size: .85rem; font-weight: 600; margin-top: .25rem; }
+.skills-review-page__tasks { margin: 0; padding-left: 1.2rem; display: grid; gap: .45rem; font-size: .9rem; line-height: 1.6; overflow-wrap: anywhere; }
+.skills-review-page__decisions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .4rem; }
+.skills-review-page__decisions button { white-space: normal; height: auto; min-height: 2.5rem; }
+.skills-review-page__decisions button[aria-pressed="true"] { outline: 2px solid #70607e; outline-offset: 2px; }
+.skills-review-page__next { margin-top: .25rem; }
+.skills-review-page__next form { display: grid; justify-items: start; gap: .7rem; max-width: 42rem; }
+.skills-review-page__next label { font-size: .9rem; font-weight: 600; }
+.skills-review-page__next select, .skills-review-page__next textarea { width: 100%; min-height: 2.75rem; padding: .7rem; border: 1px solid #c3b7ca; border-radius: .6rem; background: #fff; color: #2f2430; font: inherit; }
+.skills-review-page__next textarea { resize: vertical; }
+.skills-review-page__next select:focus-visible, .skills-review-page__next textarea:focus-visible, .skills-review-page a:focus-visible { outline: 2px solid #76548a; outline-offset: 3px; }
+.skills-review-page__finish { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding-top: .5rem; }
+.skills-review-page__finish a { color: #634476; text-decoration: underline; text-underline-offset: .2rem; }
+@media (max-width: 720px) {
+  .skills-review-page__grid { grid-template-columns: minmax(0, 1fr); }
+  .skills-review-page__card { padding: 1.1rem; }
+  .skills-review-page__skill-heading { flex-wrap: wrap; }
+}

@@ -4,6 +4,7 @@ import { Link, Navigate } from "react-router-dom";
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
+import { getSkillDecision, readJourneyState } from "@/features/journey/journey";
 import type { TaskScoreRange } from "@/pages/Analysis/lib/taskScore";
 import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
 import { readConfirmedAnalysis } from "@/features/work-profile/userProfile";
@@ -26,6 +27,13 @@ export default function AIExposure() {
   const [skills, setSkills] = useState<WefSkill[]>([]);
   const [skillsLoading, setSkillsLoading] = useState(true);
   const [skillsError, setSkillsError] = useState<string | null>(null);
+  const [, setJourneyRevision] = useState(0);
+
+  useEffect(() => {
+    const refresh = () => setJourneyRevision((value) => value + 1);
+    window.addEventListener("workspace-change", refresh);
+    return () => window.removeEventListener("workspace-change", refresh);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,8 +66,19 @@ export default function AIExposure() {
     () => buildSkillEvidence(analysis?.tasks ?? [], skills),
     [analysis?.tasks, skills],
   );
+  const review = (() => {
+    try {
+      readJourneyState();
+      return {
+        evidence: evidence.filter(({ skill }) => getSkillDecision(skill.wef_skill_id) !== "rejected"),
+        error: "",
+      };
+    } catch {
+      return { evidence: [], error: "Your saved skill decisions could not be read. Reload your saved work before reviewing suggestions." };
+    }
+  })();
   const selectedEvidence =
-    evidence.find(({ skill }) => skill.wef_skill_id === selectedSkillId) ??
+    review.evidence.find(({ skill }) => skill.wef_skill_id === selectedSkillId) ??
     null;
   const activeSkillId = selectedEvidence?.skill.wef_skill_id ?? null;
   const filteredTasks = selectedEvidence
@@ -82,7 +101,7 @@ export default function AIExposure() {
     occupationScore: analysis.meanScore2025,
     overview,
   });
-  const buttonPropsChange = {
+  const buttonPropsReview = {
     asChild: true,
     className: "profile-gradient-btn rounded-full font-normal",
   } satisfies Partial<ComponentProps<typeof Button>>;
@@ -109,7 +128,7 @@ export default function AIExposure() {
   } satisfies Partial<ComponentProps<typeof ExposureCompareCard>>;
   const exposureSkillCloudProps = {
     skills,
-    evidence,
+    evidence: review.evidence,
     selectedSkillId: activeSkillId,
     onSelectSkill: setSelectedSkillId,
   } satisfies Partial<ComponentProps<typeof ExposureSkillCloud>>;
@@ -129,15 +148,18 @@ export default function AIExposure() {
     <div className="analysis-page exposure-page mx-auto w-full max-w-[1400px]">
       <PageHeader
         className="exposure-page__header flex-col items-start sm:flex-row sm:items-center"
-        title="AI Impact on Your Role, Tasks and Skills"
-        description="Compare occupation and task exposure, see skills in your work, then prioritise where to try AI."
+        title="AI impact on my work"
+        description="Review the available evidence for your occupation and tasks, then check the skills suggested from your work."
         actions={
           <div className="exposure-page__actions">
             <Button {...buttonPropsEdit}>
               <Link to={ROUTES.task}>Edit tasks</Link>
             </Button>
-            <Button {...buttonPropsChange}>
+            <Button {...buttonPropsEdit}>
               <Link to={ROUTES.workProfile}>Change occupation</Link>
+            </Button>
+            <Button {...buttonPropsReview}>
+              <Link to={ROUTES.skills}>Review my skills</Link>
             </Button>
           </div>
         }
@@ -146,9 +168,9 @@ export default function AIExposure() {
       <div className="exposure-dashboard">
         <div className="exposure-dashboard__main">
           <ExposureCompareCard {...exposureCompareCardProps} />
-          {skillsError ? (
-            <div className="rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
-              {skillsError}
+          {skillsError || review.error ? (
+            <div className="rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive" role="alert">
+              {skillsError || review.error}
             </div>
           ) : skillsLoading ? (
             <section

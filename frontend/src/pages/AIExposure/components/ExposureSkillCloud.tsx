@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
+import { Link } from "react-router-dom";
 import { Popover } from "@base-ui/react/popover";
 import { cn } from "@/lib/utils";
 import type { SkillEvidence } from "@/pages/Skills/lib/skillProfile";
@@ -9,6 +10,7 @@ import {
 } from "@/pages/Skills/learningSkills";
 import type { WefSkill } from "@/types/reference";
 import { PAGE_GRADIENT_CSS } from "@/constants/palette";
+import { ROUTES } from "@/constants/routes";
 
 type ExposureSkillCloudProps = {
   skills: WefSkill[];
@@ -37,12 +39,11 @@ type SkillCloudChipProps = {
   tone: ChipTone;
   active: boolean;
   onSelect: (skillId: number | null) => void;
-  onLearningChanged: () => void;
 };
 
-/** Uncontrolled hover popover; dismiss on click/add until the pointer leaves. */
+/** Uncontrolled hover popover; dismiss on selection until the pointer leaves. */
 const SkillCloudChip = (props: SkillCloudChipProps) => {
-  const { skill, tone, active, onSelect, onLearningChanged } = props;
+  const { skill, tone, active, onSelect } = props;
   const actionsRef = useRef<Popover.Root.Actions | null>(null);
   const blockHoverUntilLeave = useRef(false);
   const matched = tone === "matched";
@@ -50,11 +51,6 @@ const SkillCloudChip = (props: SkillCloudChipProps) => {
   const dismissOutlook = () => {
     blockHoverUntilLeave.current = true;
     actionsRef.current?.close();
-  };
-
-  const handleLearningChanged = () => {
-    onLearningChanged();
-    dismissOutlook();
   };
 
   return (
@@ -108,9 +104,11 @@ const SkillCloudChip = (props: SkillCloudChipProps) => {
             <SkillOutlookSummary
               skill={skill}
               compact
-              showAddToLearning
-              onAddComplete={handleLearningChanged}
+              showAddToLearning={false}
             />
+            <Link to={ROUTES.skills} onClick={dismissOutlook} className="mx-2 mt-3 inline-block text-sm font-semibold text-[#634476] underline underline-offset-4">
+              Review my skills before choosing learning
+            </Link>
           </Popover.Popup>
         </Popover.Positioner>
       </Popover.Portal>
@@ -128,16 +126,12 @@ function loadLearningSkillKeys(): Set<string> {
 
 const ExposureSkillCloud = (props: ExposureSkillCloudProps) => {
   const { skills, evidence, selectedSkillId, onSelectSkill } = props;
-  const [learningRevision, setLearningRevision] = useState(0);
   const matchedSkillIds = useMemo(
     () => new Set(evidence.map(({ skill }) => skill.wef_skill_id)),
     [evidence],
   );
   // Skills on the Learning Resources list that are not in current task evidence.
-  const learningKeys = useMemo(
-    () => loadLearningSkillKeys(),
-    [learningRevision],
-  );
+  const learningKeys = loadLearningSkillKeys();
   const learningSkillIds = useMemo(() => {
     const ids = new Set<number>();
     for (const skill of skills) {
@@ -183,21 +177,22 @@ const ExposureSkillCloud = (props: ExposureSkillCloudProps) => {
     <section className="exposure-glass-card exposure-skill-cloud">
       <div className="exposure-skill-cloud__header">
         <div className="min-w-0">
-          <p className="exposure-kicker">Skills in your work</p>
+          <p className="exposure-kicker">Skill suggestions</p>
           <h2 className="exposure-skill-cloud__title">
-            See the skills reflected in your work.
+            Explore suggestions from your task wording.
           </h2>
           <p className="exposure-skill-cloud__copy">
-            Highlighted skills appear in your confirmed tasks. Blue marks skills
-            you added to learn. Hover for external outlook. Select a reflected
-            skill to filter the task list.
+            Highlighted skills are suggested by your task wording. Review their
+            task connections before choosing learning. Blue marks skills you
+            added to learn. Open a skill for external outlook, or select a
+            suggested skill to filter the tasks.
           </p>
         </div>
         <div className="exposure-skill-cloud__header-aside">
           <div className="exposure-skill-cloud__legend" aria-hidden>
             <span className="inline-flex items-center gap-2">
               <span className="exposure-skill-cloud__legend-dot is-matched" />
-              Reflected in your tasks
+              Suggested by your tasks
             </span>
             <span className="inline-flex items-center gap-2">
               <span className="exposure-skill-cloud__legend-dot is-learning" />
@@ -261,9 +256,6 @@ const ExposureSkillCloud = (props: ExposureSkillCloudProps) => {
                   tone={chipTone(skill.wef_skill_id)}
                   active={selectedSkillId === skill.wef_skill_id}
                   onSelect={onSelectSkill}
-                  onLearningChanged={() =>
-                    setLearningRevision((value) => value + 1)
-                  }
                 />
               ))}
             </div>
