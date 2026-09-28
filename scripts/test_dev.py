@@ -1,8 +1,12 @@
-"""Launcher checks using fake child processes and sockets only."""
+"""Launcher and hosting checks with fake services and isolated command probes."""
 
 import argparse
 import json
+import os
 from contextlib import ExitStack
+from pathlib import Path
+import subprocess
+import tempfile
 import unittest
 from unittest.mock import Mock, call, patch
 
@@ -168,8 +172,36 @@ class HostingToolchainTests(unittest.TestCase):
         config = json.loads((dev.REPOSITORY_ROOT / "vercel.json").read_text())
         manager = package["packageManager"]
         self.assertEqual(manager, "npm@" + package["devEngines"]["packageManager"]["version"])
-        self.assertEqual(config["services"]["frontend"]["installCommand"], f"npx --yes {manager} ci")
-        self.assertEqual(config["services"]["frontend"]["buildCommand"], f"npx --yes {manager} run build")
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            frontend = root / "frontend"
+            frontend.mkdir()
+            (frontend / "package.json").write_text(json.dumps(package))
+            binaries = root / "bin"
+            binaries.mkdir()
+            # Vercel's older host npm rejects the guarded package before npx
+            # can select the project version. Model that first bootstrap step.
+            npx = binaries / "npx"
+            npx.write_text(
+                "#!/usr/bin/env python3\n"
+                "import json, os, sys\n"
+                "from pathlib import Path\n"
+                "if Path('package.json').exists():\n"
+                "    sys.exit('Host npm encountered project devEngines before bootstrap')\n"
+                "print(json.dumps({'cwd': os.getcwd(), 'args': sys.argv[1:]}))\n"
+            )
+            npx.chmod(0o755)
+            env = {**os.environ, "PATH": str(binaries) + os.pathsep + os.environ["PATH"]}
+            for key, action in (("installCommand", ["ci"]), ("buildCommand", ["run", "build"])):
+                with self.subTest(command=key):
+                    result = subprocess.run(
+                        ["sh", "-c", config["services"]["frontend"][key]],
+                        cwd=frontend, env=env, capture_output=True, text=True,
+                    )
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    invocation = json.loads(result.stdout)
+                    self.assertEqual(Path(invocation["cwd"]).resolve(), root.resolve())
+                    self.assertEqual(invocation["args"], ["--yes", manager, "--prefix", "frontend", *action])
 
 
 class PortTests(unittest.TestCase):

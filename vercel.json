@@ -8,8 +8,8 @@
           "destination": "/index.html"
         }
       ],
-      "installCommand": "npx --yes npm@12.0.2 ci",
-      "buildCommand": "npx --yes npm@12.0.2 run build"
+      "installCommand": "cd .. && npx --yes npm@12.0.2 --prefix frontend ci",
+      "buildCommand": "cd .. && npx --yes npm@12.0.2 --prefix frontend run build"
     },
     "backend": {
       "root": "backend/",

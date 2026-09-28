@@ -12,6 +12,10 @@ The root `vercel.json` defines two services:
 - Neon remains external and is selected through `DATABASE_URL`.
 
 The frontend service selects npm 12.0.2 explicitly for installation and builds.
+It starts `npx` from the repository root, then uses `--prefix frontend` for the
+selected npm. This prevents Vercel's older host npm from rejecting the frontend's
+strict `devEngines` requirement before npm 12 can start. Keep the bootstrap outside
+the frontend directory; do not disable the version checks to work around it.
 Its Node engine stays on major 24 so Vercel can apply compatible patch updates.
 The development baseline is Node 24.19.0 and the manifest enforces that minimum.
 
