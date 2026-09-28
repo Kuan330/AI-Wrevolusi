@@ -21,9 +21,9 @@ export const referenceService = {
     ),
   getOccupation: (code: string) =>
     api.get<ReferenceOccupation>(`/reference/occupations/${encodeURIComponent(code)}`),
-  searchOccupations: async (query: string, signal?: AbortSignal) =>
+  searchOccupations: async (query: string, signal?: AbortSignal, area?: string) =>
     onlyUnits(await api.get<ReferenceOccupation[]>(
-      `/reference/occupations?q=${encodeURIComponent(query.trim())}`,
+      `/reference/occupations?${new URLSearchParams({ ...(query.trim() ? { q: query.trim() } : {}), ...(area ? { area } : {}) })}`,
       signal,
       12_000,
     )),

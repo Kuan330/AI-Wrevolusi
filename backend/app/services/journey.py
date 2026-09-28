@@ -59,6 +59,24 @@ def validate_journey(value: object) -> dict:
         raise ValueError(error)
     if 'activeContextId' in value and (not _text(value['activeContextId'], 100) or value['activeContextId'] not in contexts):
         raise ValueError(error)
+    if 'personalSkills' in value:
+        personal = value['personalSkills']
+        if not isinstance(personal, list) or len(personal) > 50:
+            raise ValueError(error)
+        ids = set()
+        for entry in personal:
+            if not isinstance(entry, dict) or not _text(entry.get('id'), 100, nonempty=True) or not entry['id'].strip() or entry['id'] in ids:
+                raise ValueError(error)
+            ids.add(entry['id'])
+            if not _text(entry.get('name'), 120, nonempty=True) or not entry['name'].strip():
+                raise ValueError(error)
+            task_ids, labels = entry.get('taskIds'), entry.get('taskLabels')
+            if not _strings(task_ids) or not task_ids or any(not item.strip() for item in task_ids) or len(set(task_ids)) != len(task_ids):
+                raise ValueError(error)
+            if not _strings(labels) or len(labels) != len(task_ids) or any(not item.strip() for item in labels):
+                raise ValueError(error)
+            if not _text(entry.get('workKey'), 100_000, nonempty=True) or not _date(entry.get('updatedAt')):
+                raise ValueError(error)
     review = value.get('review')
     if 'review' in value:
         if not isinstance(review, dict) or not _text(review.get('workKey'), 100_000) or type(review.get('completed')) is not bool or not _date(review.get('updatedAt')):

@@ -41,6 +41,9 @@ MAXIMUM_NORMALISED_QUERY_KEYWORDS = 12
 DIRECT_MATCH_FALLBACK_CONFIDENCE = 0.5
 
 _ALNUM_PATTERN = re.compile(r'[A-Za-z0-9]')
+# Common job-search terms mapped to words present in the reference titles.
+# These expand search text only; they never create or choose occupation rows.
+_COMMON_TITLE_TERMS = {'nurse': 'nursing', 'admin': 'administrative', 'hr': 'human resources'}
 
 
 @dataclass(frozen=True)
@@ -273,8 +276,14 @@ def search_occupation_rows(
     are the SQL substring hits that must always be preserved.
     """
 
-    query_tokens = tokenize_task_text_for_matching(query)
-    normalized_query = normalize_task_text_for_matching(query)
+    expanded_query = re.sub(
+        r'\b(nurse|admin|hr)\b',
+        lambda match: _COMMON_TITLE_TERMS[match.group().casefold()],
+        query,
+        flags=re.IGNORECASE,
+    )
+    query_tokens = tokenize_task_text_for_matching(expanded_query)
+    normalized_query = normalize_task_text_for_matching(expanded_query)
 
     combined_rows: list[Mapping[str, Any]] = list(rows)
     known_codes = {str(row.get('occupation_code') or '') for row in combined_rows}
@@ -344,6 +353,10 @@ def search_occupation_rows(
                 item = _enrich_row(row, hit, 'fuzzy')
                 item['evidence'] = [note, *item['evidence']]
                 results.append(item)
+
+    if expanded_query.casefold() != query.casefold():
+        for item in results:
+            item['evidence'] = [f'Search wording: "{query}" → "{expanded_query}"', *item['evidence']]
 
     results.sort(
         key=lambda item: (

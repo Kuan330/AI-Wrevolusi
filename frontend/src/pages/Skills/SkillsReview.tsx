@@ -5,6 +5,9 @@ import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import {
+  addPersonalSkill,
+  removePersonalSkill,
+  type PersonalSkill,
   completeSkillReview,
   currentWorkKey,
   isSkillReviewCurrent,
@@ -14,6 +17,7 @@ import {
 } from "@/features/journey/journey";
 import type { ProfileTask } from "@/features/work-profile/types";
 import { readUserProfile } from "@/features/work-profile/userProfile";
+import { currentWorkspaceSession } from "@/services/accountStorage";
 import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
 import { skillKey } from "./learningSkills";
@@ -23,6 +27,7 @@ import "./SkillsReview.css";
 type Decision = "accepted" | "rejected" | undefined;
 type WorkSnapshot = {
   tasks: ProfileTask[];
+  personalSkills: PersonalSkill[];
   workKey: string;
   needsReview: boolean;
   reviewComplete: boolean;
@@ -36,6 +41,7 @@ function readWorkSnapshot(): { work: WorkSnapshot | null; error: string } {
     return {
       work: {
         tasks: readUserProfile().tasks,
+        personalSkills: journey.personalSkills ?? [],
         workKey,
         needsReview: Boolean(journey.review && journey.review.workKey !== workKey),
         reviewComplete: isSkillReviewCurrent(),
@@ -58,6 +64,8 @@ export default function SkillsReview() {
   const { work, error: readError } = snapshot;
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [goal, setGoal] = useState("");
+  const [personalName, setPersonalName] = useState("");
+  const [personalTask, setPersonalTask] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [saveMessage, setSaveMessage] = useState("");
@@ -99,12 +107,18 @@ export default function SkillsReview() {
 
   async function runSave(action: () => Promise<void>) {
     if (saving || readError) return;
-    retrySave.current = action;
+    const owner = currentWorkspaceSession();
+    const guardedAction = async () => {
+      if (owner !== currentWorkspaceSession()) throw new Error("Your account changed. Reload before trying again.");
+      await action();
+      if (owner !== currentWorkspaceSession()) throw new Error("Your account changed. Reload before continuing.");
+    };
+    retrySave.current = guardedAction;
     setSaving(true);
     setSaveError("");
     setSaveMessage("");
     try {
-      await action();
+      await guardedAction();
       if (mounted.current) {
         retrySave.current = null;
         setSaveMessage("Your changes are saved.");
@@ -166,8 +180,8 @@ export default function SkillsReview() {
         actions={<Button asChild variant="outline" className="rounded-full"><Link to={ROUTES.task}>Edit my tasks</Link></Button>}
       />
       <p className="skills-review-page__intro">
-        These suggestions use the broad WEF skill framework and words in your tasks. A connection needs your review;
-        it does not measure your ability or mean you need improvement. AI-impact scores do not decide which skills appear here.
+        Check which suggestions fit your work. Add specific skills we missed, using a task as an example.
+        This is a record of your work, not an ability score.
       </p>
 
       {readError && <div className="skills-review-page__notice is-error" role="alert">
@@ -189,6 +203,47 @@ export default function SkillsReview() {
         {saving ? "Saving your changes…" : saveMessage}
       </p>
 
+      {!readError && work && work.tasks.length > 0 && <section className="skills-review-page__card skills-review-page__personal" aria-labelledby="personal-skills-title">
+        <div className="skills-review-page__section-heading">
+          <h2 id="personal-skills-title">Skills you added</h2>
+          <p>{work.personalSkills.filter(item => item.workKey === work.workKey).length} for your current work</p>
+        </div>
+        <p className="skills-review-page__hint">Add a specific skill or technique you use. These are your own statements; course suggestions use the broad skills below.</p>
+        {work.personalSkills.length > 0 && <ul className="skills-review-page__personal-list">
+          {work.personalSkills.map(item => <li key={item.id}>
+            <div><strong>{item.name}</strong> <span className="skills-review-page__state">You added</span>
+              {item.workKey !== work.workKey && <p className="skills-review-page__hint">From earlier work — check whether this still fits. Remove and add it again to link a current task.</p>}
+              <details><summary>Supporting task</summary><p>{item.taskLabels.join("; ")}</p></details>
+            </div>
+            <Button variant="ghost" disabled={saving} onClick={() => void runSave(() => removePersonalSkill(item.id))} aria-label={`Remove ${item.name}`}>Remove</Button>
+          </li>)}
+        </ul>}
+        <details>
+          <summary>Add a skill we missed</summary>
+          <form className="skills-review-page__personal-form" onSubmit={event => {
+            event.preventDefault();
+            const id = crypto.randomUUID();
+            const name = personalName;
+            const taskId = personalTask;
+            void runSave(async () => {
+              checkWork();
+              await addPersonalSkill(id, name, taskId);
+              if (mounted.current) { setPersonalName(""); setPersonalTask(""); }
+            });
+          }}>
+            <label htmlFor="personal-skill-name">Skill name</label>
+            <input id="personal-skill-name" value={personalName} maxLength={120} required disabled={saving}
+              placeholder="For example, reading technical drawings" onChange={event => setPersonalName(event.target.value)} />
+            <label htmlFor="personal-skill-task">Which task uses this skill?</label>
+            <select id="personal-skill-task" value={personalTask} required disabled={saving} onChange={event => setPersonalTask(event.target.value)}>
+              <option value="">Choose one of your tasks</option>
+              {work.tasks.map(task => <option key={task.id} value={task.id}>{task.wording}</option>)}
+            </select>
+            <Button type="submit" disabled={saving || !personalName.trim() || !personalTask}>Save my skill</Button>
+          </form>
+        </details>
+      </section>}
+
       {readError ? null : loading ? <p role="status">Loading skill suggestions…</p> : loadError ? <div className="skills-review-page__notice is-error" role="alert">
         <p>{loadError}</p><Button variant="outline" onClick={() => {
           setLoading(true); setLoadError(""); setLoadAttempt((value) => value + 1);
@@ -201,7 +256,7 @@ export default function SkillsReview() {
         <section aria-labelledby="skill-suggestions-title">
           <div className="skills-review-page__section-heading">
             <h2 id="skill-suggestions-title">Skills suggested from your tasks</h2>
-            <p>{accepted.length} accepted · {evidence.length} suggestions</p>
+            <p>{accepted.length} broad {accepted.length === 1 ? "skill" : "skills"} accepted · {evidence.length} suggestions</p>
           </div>
           {evidence.length === 0 ? <div className="skills-review-page__card">
             <h3>No supported suggestion yet</h3>
@@ -218,8 +273,9 @@ export default function SkillsReview() {
                   <span className={`skills-review-page__state${decision && !staleAccepted ? ` is-${decision}` : ""}`}>{status}</span>
                 </div>
                 <p className="skills-review-page__source">WEF skill framework · Suggested from task wording</p>
-                <p className="skills-review-page__evidence-label">Your supporting task{tasks.length === 1 ? "" : "s"}</p>
-                <ul className="skills-review-page__tasks">{tasks.map((task) => <li key={task.id}>{task.wording}</li>)}</ul>
+                <details><summary>Why this skill? · {tasks.length} task{tasks.length === 1 ? "" : "s"}</summary>
+                  <ul className="skills-review-page__tasks">{tasks.map((task) => <li key={task.id}>{task.wording}</li>)}</ul>
+                </details>
                 <div className="skills-review-page__decisions" aria-label={`Review ${skill.core_skill}`}>
                   <Button variant={decision === "accepted" && !staleAccepted ? "default" : "outline"}
                     disabled={disabled} aria-pressed={decision === "accepted" && !staleAccepted}

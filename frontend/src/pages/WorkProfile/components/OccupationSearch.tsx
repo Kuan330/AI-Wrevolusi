@@ -1,120 +1,50 @@
-import { Search } from "lucide-react";
-
-import { useState } from "react";
-
-import type { OccupationSearchResult } from "@/pages/WorkProfile/hooks/useOccupationFilters";
+import { Check, Search } from "lucide-react";
+import type { ReferenceOccupation } from "@/types/reference";
 
 type OccupationSearchProps = {
   query: string;
+  hasArea: boolean;
   searching: boolean;
   hasSearched: boolean;
-  results: OccupationSearchResult[];
+  results: ReferenceOccupation[];
   onQueryChange: (value: string) => void;
-  onChoose: (occupation: OccupationSearchResult) => void;
+  onChoose: (occupation: ReferenceOccupation) => void;
   selectedCode: string | null;
 };
 
-const OccupationSearch = (props: OccupationSearchProps) => {
-  const {
-    query,
-    searching,
-    hasSearched,
-    results,
-    onQueryChange,
-    onChoose,
-    selectedCode,
-  } = props;
-  const [isOpen, setIsOpen] = useState(false);
-  const canSearch = query.trim().length >= 2;
-  const showDropdown = isOpen && canSearch;
-
+export default function OccupationSearch({ query, hasArea, searching, hasSearched, results, onQueryChange, onChoose, selectedCode }: OccupationSearchProps) {
+  const canSearch = query.trim().length >= 2 || (hasArea && !query.trim());
   return (
     <div className="space-y-3">
+      <label htmlFor="job-search" className="block text-sm font-semibold">Job title</label>
       <div className="relative">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            value={query}
-            onFocus={() => setIsOpen(true)}
-            onBlur={() => {
-              window.setTimeout(() => setIsOpen(false), 120);
-            }}
-            onChange={(event) => {
-              onQueryChange(event.target.value);
-              setIsOpen(true);
-            }}
-            aria-label="Search occupations by job title"
-            placeholder="Search by job title"
-            className="h-12 w-full rounded-xl border border-white/80 bg-white/95 pl-10 pr-4 text-sm outline-none shadow-sm transition focus:border-primary focus:ring-4 focus:ring-primary/10"
-          />
-        </div>
-        {showDropdown ? (
-          <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-72 overflow-y-auto rounded-xl border border-white/85 bg-white p-2 shadow-lg">
-            {searching ? (
-              <p className="px-3 py-2 text-sm text-muted-foreground">
-                Searching occupations...
-              </p>
-            ) : null}
-            {!searching && hasSearched && results.length === 0 ? (
-              <p className="px-3 py-2 text-sm text-muted-foreground">
-                No matching occupations found. Try another title or browse by
-                category.
-              </p>
-            ) : null}
-            {!searching && results.length > 0 ? (
-              <div className="space-y-1">
-                {results.map((item) => (
-                  <button
-                    key={item.unit.occupation_code}
-                    type="button"
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => {
-                      onChoose(item);
-                      setIsOpen(false);
-                    }}
-                    className={`w-full rounded-lg px-3 py-2.5 text-left transition ${
-                      selectedCode === item.unit.occupation_code
-                        ? "bg-primary/10 ring-1 ring-primary/35"
-                        : "hover:bg-muted/60"
-                    }`}
-                  >
-                    <p className="text-sm font-medium text-foreground">
-                      {item.unit.title}
-                    </p>
-                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                      {item.pathLabel
-                        ? `${item.unit.title} - ${item.pathLabel}`
-                        : item.unit.title}
-                    </p>
-                    {item.unit.confidence !== undefined ? (
-                      <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
-                        {`Match confidence ${item.unit.confidence.toFixed(2)}`}
-                      </p>
-                    ) : null}
-                    {item.unit.evidence?.length ? (
-                      <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground/80">
-                        {item.unit.evidence.slice(0, 2).join(" · ")}
-                      </p>
-                    ) : null}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
+        <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <input id="job-search" type="search" autoComplete="off" value={query}
+          onChange={event => onQueryChange(event.target.value)}
+          placeholder="e.g. teacher, sales assistant"
+          aria-describedby="job-search-help"
+          className="h-12 w-full rounded-xl border border-white/80 bg-white/95 pl-10 pr-4 text-sm outline-none shadow-sm transition focus:border-primary focus:ring-4 focus:ring-primary/10" />
       </div>
-      {!canSearch ? (
-        <p className="text-xs text-muted-foreground">
-          Type at least 2 characters to search.
-        </p>
-      ) : null}
-      {selectedCode ? (
-        <p className="text-xs text-primary">
-          Occupation selected. You can continue now.
-        </p>
-      ) : null}
+      <p id="job-search-help" className="text-xs text-muted-foreground">Type a job title, or choose a type of work to see its jobs.</p>
+      <div role="status" className="text-sm text-muted-foreground">
+        {canSearch && searching ? "Finding jobs…" : canSearch && hasSearched && !results.length
+          ? "No matches yet. Try a different title or choose All types of work."
+          : canSearch && hasSearched ? "Choose the closest match." : query.trim().length === 1 ? "Type one more letter to search." : ""}
+      </div>
+      {canSearch && !searching && results.length > 0 && (
+        <ul aria-label="Matching jobs" className="max-h-72 space-y-1 overflow-y-auto rounded-xl bg-white/70 p-1">
+          {results.map(item => (
+            <li key={item.occupation_code}>
+              <button type="button" aria-pressed={selectedCode === item.occupation_code}
+                onClick={() => onChoose(item)}
+                className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${selectedCode === item.occupation_code ? "bg-primary/10 text-primary" : "hover:bg-muted/60"}`}>
+                <span>{item.title}</span>
+                {selectedCode === item.occupation_code && <Check aria-hidden="true" className="size-4 shrink-0" />}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
-};
-
-export default OccupationSearch;
+}

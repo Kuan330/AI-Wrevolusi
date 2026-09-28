@@ -41,34 +41,34 @@ class SkillRule:
 # IDs are only rule hints.  They become eligible output only when the same ID
 # is present in the caller-provided candidates.
 #
-# Every rule lists the distinctive words of its own skill name first, then the
-# everyday words for the work that uses it. The name words matter because people
-# search with fragments — "thinking" has to reach Analytical, Creative and
-# Systems thinking, since a partial name is a normal way to search.
+# These are task-evidence rules, not partial-name search rules. Generic words
+# such as "systems" and "thinking" do not establish a particular skill.
+# Keep phrases and ordering aligned with frontend matchSkills.ts; a parity test
+# prevents the review page and career matching from using different evidence.
 SKILL_RULES: tuple[SkillRule, ...] = (
-    SkillRule(1, ("analytical", "analytical thinking", "thinking", "analyse", "analyze", "analysis", "problem solving", "reasoning"), 0.88),
+    SkillRule(1, ("analytical", "analytical thinking", "analyse", "analyze", "analysis", "problem solving", "reasoning", "analysing", "analyzing"), 0.88),
     SkillRule(2, ("resilience", "resilient", "flexibility", "agility", "adapt to change", "working under pressure", "cope with change"), 0.84),
     SkillRule(3, ("leadership", "leading a team", "lead a team", "managing a team", "supervising staff", "assigning staff", "work schedules", "delegating"), 0.88),
-    SkillRule(4, ("creative", "creative thinking", "creativity", "thinking", "innovation", "brainstorming", "new ideas"), 0.86),
+    SkillRule(4, ("creative", "creative thinking", "creativity", "innovation", "brainstorming", "new ideas"), 0.86),
     SkillRule(5, ("motivation", "self-motivated", "self-awareness", "take initiative", "working independently", "reflect on"), 0.80),
     SkillRule(6, ("technological literacy", "technological", "literacy", "digital tools", "software", "spreadsheets", "excel", "computer skills"), 0.86),
     SkillRule(7, ("empathy", "empathetic", "active listening", "listening", "understand customer", "compassion"), 0.86),
     SkillRule(8, ("curiosity", "curious", "lifelong learning", "continuous learning", "upskilling", "self-development"), 0.82),
     SkillRule(9, ("talent management", "talent", "hiring", "recruiting", "interviewing staff", "evaluating staff", "promoting staff", "onboarding"), 0.88),
-    SkillRule(10, ("customer service", "prompt service", "advising", "providing advice", "support services", "customer", "client", "complaint", "after-sales"), 0.90),
+    SkillRule(10, ("customer service", "prompt service", "advising", "customer", "client", "complaint", "after-sales", "consulting with", "liaising with", "serving clients", "client relations", "providing advice", "support services"), 0.90),
     SkillRule(11, ("artificial intelligence", "generative ai", "machine learning", "big data", "data analytics", "data science", "ai"), 0.88),
-    SkillRule(12, ("systems thinking", "systems", "thinking", "root cause", "recurring causes", "interconnected"), 0.82),
+    SkillRule(12, ("systems thinking", "root cause", "recurring causes", "interconnected"), 0.82),
     SkillRule(13, ("resource management", "operations", "inventory", "stock levels", "ordering new stock", "supplier", "procurement", "logistics"), 0.86),
     SkillRule(14, ("dependability", "attention to detail", "dependable", "reliability", "accuracy", "checking work", "thoroughness"), 0.84),
-    SkillRule(15, ("quality control", "quality", "quality assurance", "quality checks", "inspection", "audit", "compliance", "safety"), 0.86),
+    SkillRule(15, ("quality control", "quality", "quality assurance", "quality checks", "inspection", "audit", "compliance", "safety", "ensuring consistency", "monitoring standards", "maintaining quality", "reviewing compliance"), 0.86),
     SkillRule(16, ("teaching", "teach", "mentor", "mentoring", "coach", "coaching", "training", "instructing staff", "education activities", "community education"), 0.88),
     SkillRule(17, ("cybersecurity", "network security", "it security", "firewall", "data protection", "networks"), 0.86),
-    SkillRule(18, ("design", "user experience", "usability", "prototyping", "wireframe", "user research", "displaying goods"), 0.82),
+    SkillRule(18, ("design", "user experience", "usability", "prototyping", "wireframe", "user research", "displaying goods", "designing"), 0.82),
     SkillRule(19, ("multi-lingualism", "multilingual", "language", "bilingual", "translating"), 0.84),
     SkillRule(20, ("marketing", "media", "campaigns", "social media", "advertising", "brand", "content creation"), 0.86),
-    SkillRule(21, ("reading", "writing", "report writing", "documentation", "mathematics", "numeracy", "calculations", "budget", "financial transactions", "invoice", "payment", "records"), 0.80),
+    SkillRule(21, ("reading", "writing", "report writing", "documentation", "mathematics", "numeracy", "calculations", "budget", "financial transactions", "invoice", "payment", "records", "preparing reports", "briefing papers", "written communication", "documenting", "estimates of quantities and costs", "cost estimates", "estimating costs"), 0.80),
     SkillRule(22, ("environmental", "environmental stewardship", "stewardship", "sustainability", "sustainable", "carbon footprint", "recycling", "esg"), 0.86),
-    SkillRule(23, ("programming", "coding", "software development", "python", "javascript", "sql", "writing code"), 0.88),
+    SkillRule(23, ("programming", "coding", "software development", "python", "javascript", "sql", "writing code", "computer code"), 0.88),
     SkillRule(24, ("manual dexterity", "manual", "dexterity", "precision", "hand tools", "assembling", "stacking", "packing"), 0.80),
     SkillRule(25, ("global citizenship", "citizenship", "diversity", "inclusion", "cross-cultural"), 0.80),
     SkillRule(26, ("sensory", "sensory-processing", "colour detection", "colour matching"), 0.78),

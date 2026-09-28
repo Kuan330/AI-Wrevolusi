@@ -1,233 +1,91 @@
-import type { ComponentProps } from "react";
 import { ArrowLeft } from "lucide-react";
-import { useAccount } from "@/components/account/useAccount";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAccount } from "@/components/account/useAccount";
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
-import { GradientPill } from "@/components/ui/gradient-pill";
 import { ROUTES } from "@/constants/routes";
-import OccupationFilters from "@/pages/WorkProfile/components/OccupationFilters";
-import OccupationSearch from "@/pages/WorkProfile/components/OccupationSearch";
-import SelectedOccupationSummary from "@/pages/WorkProfile/components/SelectedOccupationSummary";
-import {
-  useOccupationFilters,
-  type OccupationSearchResult,
-} from "@/pages/WorkProfile/hooks/useOccupationFilters";
-import {
-  beginOccupationChange,
-  clearSelectedOccupation,
-  readTaskWorkspace,
-  hasConfirmedAnalysis,
-} from "@/features/work-profile/userProfile";
+import OccupationSearch from "./components/OccupationSearch";
+import SelectedOccupationSummary from "./components/SelectedOccupationSummary";
+import { useOccupationFilters } from "./hooks/useOccupationFilters";
+import { beginOccupationChange, clearSelectedOccupation, readTaskWorkspace, hasConfirmedAnalysis } from "@/features/work-profile/userProfile";
+import { currentWorkspaceSession, flushWorkspace } from "@/services/accountStorage";
 import type { ReferenceOccupation } from "@/types/reference";
 
-type WorkProfileMode = "search" | "filters";
+// Plain labels for the existing top-level reference groups; codes stay unchanged.
+const workAreaLabels: Record<string, string> = {
+  "0": "Armed forces", "1": "Management", "2": "Professional roles",
+  "3": "Technical and associate professional roles", "4": "Office and clerical support",
+  "5": "Sales and service", "6": "Agriculture, forestry and fishing",
+  "7": "Skilled trades", "8": "Machine operation and assembly", "9": "General and manual work",
+};
 
-const WorkProfile = () => {
+export default function WorkProfile() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAccount();
   const hasWorkspace = Boolean(readTaskWorkspace()?.tasksOccupationCode);
   const requestedReturn = location.state?.returnTo;
-  const validReturn =
-    typeof requestedReturn === "string" &&
-    [
-      ROUTES.task,
-      ROUTES.aiExposure,
-      ROUTES.learningCentre,
-      ROUTES.plan,
-      ROUTES.possibilities,
-    ].some((path) => requestedReturn.split("?")[0] === path);
-  const returnTo = validReturn
-    ? requestedReturn
-    : hasConfirmedAnalysis()
-      ? ROUTES.aiExposure
-      : ROUTES.task;
-
+  const validReturn = typeof requestedReturn === "string" &&
+    [ROUTES.task, ROUTES.aiExposure, ROUTES.skills, ROUTES.learningCentre, ROUTES.plan, ROUTES.possibilities]
+      .some(path => requestedReturn.split("?")[0] === path);
+  const returnTo = validReturn ? requestedReturn : hasConfirmedAnalysis() ? ROUTES.aiExposure : ROUTES.task;
   const occupation = useOccupationFilters();
-  const [mode, setModeState] = useState<WorkProfileMode>("filters");
-  const [selectedFromSearch, setSelectedFromSearch] =
-    useState<OccupationSearchResult | null>(null);
+  const [selected, setSelected] = useState<ReferenceOccupation | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
-  useEffect(() => {
-    // Occupations are selected for the current flow only. The task workspace
-    // remains available separately so returning to the task list is possible
-    // without persisting the full occupation hierarchy in user data.
-    clearSelectedOccupation();
-  }, []);
+  useEffect(() => { clearSelectedOccupation(); }, []);
 
-  const goToTasks = (
-    unit: ReferenceOccupation,
-    path: ReferenceOccupation[],
-  ) => {
-    // Switching unit restarts task analysis while keeping saved learning.
-    beginOccupationChange({ unit, path });
-    navigate(ROUTES.task);
-  };
+  async function continueToTasks() {
+    if (!selected || saving) return;
+    const owner = currentWorkspaceSession();
+    setSaving(true);
+    setSaveError("");
+    try {
+      const path = await occupation.pathForUnit(selected);
+      if (owner !== currentWorkspaceSession()) return;
+      beginOccupationChange({ unit: selected, path });
+      await flushWorkspace();
+      if (owner === currentWorkspaceSession()) navigate(ROUTES.task);
+    } catch (error) {
+      if (owner === currentWorkspaceSession()) setSaveError(error instanceof Error ? error.message : "Your job could not be saved. Please try again.");
+    } finally { if (owner === currentWorkspaceSession()) setSaving(false); }
+  }
 
-  const activeUnit =
-    mode === "search"
-      ? (selectedFromSearch?.unit ?? null)
-      : occupation.selectedUnit;
-  const activePath =
-    mode === "search"
-      ? (selectedFromSearch?.path ?? [])
-      : occupation.selectedPath;
-  const confirmedUnit = activeUnit;
-  const confirmedPath = activePath;
-
-  const setMode = (nextMode: WorkProfileMode) => {
-    if (nextMode === mode) return;
-
-    if (nextMode === "filters") {
-      occupation.resetSearch();
-      setSelectedFromSearch(null);
-    } else {
-      occupation.resetFilters();
-    }
-
-    setModeState(nextMode);
-  };
-
-  const handleContinue = () => {
-    if (!confirmedUnit) return;
-    goToTasks(confirmedUnit, confirmedPath);
-  };
-
-  const handleSearchChoice = (result: OccupationSearchResult) => {
-    setSelectedFromSearch(result);
-    occupation.setQuery(result.unit.title);
-  };
-
-  const handleQueryChange = (value: string) => {
-    occupation.setQuery(value);
-    if (selectedFromSearch && value.trim() !== selectedFromSearch.unit.title) {
-      setSelectedFromSearch(null);
-    }
-  };
-
-  const buttonProps1 = {
-    className: "profile-blue-btn h-10 whitespace-nowrap rounded-full px-5",
-    disabled: !confirmedUnit,
-    onClick: handleContinue,
-  } satisfies Partial<ComponentProps<typeof Button>>;
-  return (
-    <div className="space-y-5">
-      <PageHeader
-        title="Find the occupation that matches your work"
-        description="Search by job title, or browse by field of work."
-        actions={
-          user && hasWorkspace ? (
-            <Button
-              {...({
-                variant: "outline",
-                className: "shrink-0 rounded-full",
-                onClick: () => {
-                  clearSelectedOccupation();
-                  navigate(returnTo);
-                },
-              } satisfies Partial<ComponentProps<typeof Button>>)}
-            >
-              <ArrowLeft className="size-4" /> Back to previous page
-            </Button>
-          ) : undefined
-        }
-      />
-
-      {occupation.error ? (
-        <div className="rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
-          {occupation.error}
-          <button
-            type="button"
-            className="ml-3 underline"
-            onClick={() => window.location.reload()}
-          >
-            Retry
-          </button>
+  return <div className="space-y-5">
+    <PageHeader className="flex-col items-start sm:flex-row sm:items-center" title="What is your job?"
+      description="Choose the closest match. Next, describe the tasks you actually do."
+      actions={user && hasWorkspace ? <Button variant="link" className="min-h-11 shrink-0 px-0" onClick={() => navigate(returnTo)}>
+        <ArrowLeft className="size-4" /> Back to my work
+      </Button> : undefined} />
+    <section className="profile-glass-card p-5 sm:p-6" aria-label="Choose your job">
+      <fieldset disabled={saving} className="space-y-5">
+        <legend className="sr-only">Find your job</legend>
+        <div className="space-y-2">
+          <label htmlFor="work-area" className="block text-sm font-semibold">Type of work <span className="font-normal text-muted-foreground">(optional)</span></label>
+          <select id="work-area" value={occupation.area} disabled={occupation.loadingAreas}
+            onChange={event => { occupation.setArea(event.target.value); setSelected(null); setSaveError(""); }}
+            className="min-h-12 w-full min-w-0 rounded-xl border border-white/80 bg-white px-3 py-3 text-sm shadow-sm focus:outline-primary disabled:opacity-60">
+            <option value="">{occupation.loadingAreas ? "Loading types of work…" : "All types of work"}</option>
+            {occupation.areas.map(area => <option key={area.occupation_code} value={area.occupation_code}>{workAreaLabels[area.occupation_code] ?? area.title}</option>)}
+          </select>
+          {occupation.areaError && <p role="alert" className="text-sm text-muted-foreground">{occupation.areaError} <button type="button" className="underline" onClick={occupation.retry}>Retry</button></p>}
         </div>
-      ) : null}
-
-      <section className="profile-glass-card p-5">
-        {mode === "filters" ? (
-          <>
-            <div className="mb-4 flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-foreground">
-                  Filter by category
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Choose from the form fields to narrow down your exact
-                  occupation.
-                </p>
-              </div>
-              <GradientPill
-                {...({
-                  asChild: true,
-                  className: "shrink-0 transition",
-                } satisfies Partial<ComponentProps<typeof GradientPill>>)}
-              >
-                <button type="button" onClick={() => setMode("search")}>
-                  Search by job title instead
-                </button>
-              </GradientPill>
-            </div>
-            <OccupationFilters
-              {...({
-                options: occupation.options,
-                selections: occupation.selections,
-                onSelect: (key, code) => {
-                  void occupation.selectFilter(key, code);
-                },
-              } satisfies Partial<ComponentProps<typeof OccupationFilters>>)}
-            />
-          </>
-        ) : (
-          <>
-            <div className="mb-4 flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-foreground">
-                  Search by job title
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Type and see matching occupations instantly.
-                </p>
-              </div>
-              <GradientPill
-                {...({
-                  asChild: true,
-                  className: "shrink-0 transition",
-                } satisfies Partial<ComponentProps<typeof GradientPill>>)}
-              >
-                <button type="button" onClick={() => setMode("filters")}>
-                  Back to category filters
-                </button>
-              </GradientPill>
-            </div>
-            <OccupationSearch
-              {...({
-                query: occupation.query,
-                searching: occupation.searching,
-                hasSearched: occupation.hasSearched,
-                results: occupation.searchResults,
-                selectedCode: selectedFromSearch?.unit.occupation_code ?? null,
-                onQueryChange: handleQueryChange,
-                onChoose: handleSearchChoice,
-              } satisfies Partial<ComponentProps<typeof OccupationSearch>>)}
-            />
-          </>
-        )}
-
-        <div className="mt-4 border-t border-white/70 pt-4">
-          <SelectedOccupationSummary occupation={confirmedUnit} />
-          <div className="mt-3 flex justify-end">
-            <Button {...buttonProps1}>Confirm and continue</Button>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-};
-
-export default WorkProfile;
+        <OccupationSearch query={occupation.query} hasArea={Boolean(occupation.area)}
+          searching={occupation.searching} hasSearched={occupation.hasSearched} results={occupation.results}
+          selectedCode={selected?.occupation_code ?? null}
+          onQueryChange={value => { occupation.setQuery(value); setSelected(null); setSaveError(""); }}
+          onChoose={job => { setSelected(job); setSaveError(""); }} />
+        {occupation.searchError && <p role="alert" className="text-sm text-destructive">{occupation.searchError} <button type="button" className="underline" onClick={occupation.retry}>Retry</button></p>}
+      </fieldset>
+      {selected && <div className="mt-5 border-t border-white/70 pt-5" aria-live="polite">
+        <SelectedOccupationSummary occupation={selected} />
+        {saveError && <p role="alert" className="mt-3 text-sm text-destructive">{saveError}</p>}
+        <Button disabled={saving} className="profile-blue-btn mt-4 min-h-11 rounded-full px-5" onClick={() => { void continueToTasks(); }}>
+          {saving ? "Saving your job…" : saveError ? "Try again" : "Continue to my tasks"}
+        </Button>
+      </div>}
+    </section>
+  </div>;
+}

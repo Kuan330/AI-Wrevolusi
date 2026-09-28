@@ -25,7 +25,11 @@ export type LearningInput = {
   career?: LearningContext["career"];
   goal?: string;
 };
+export type PersonalSkill = {
+  id: string; name: string; taskIds: string[]; taskLabels: string[]; workKey: string; updatedAt: string;
+};
 export type JourneyState = {
+  personalSkills?: PersonalSkill[];
   version: 1;
   contexts: Record<string, LearningContext>;
   courseContexts: Record<string, string>;
@@ -62,6 +66,15 @@ export function isLearningContext(value: unknown): value is LearningContext {
     (value.origin !== "career" || value.career !== undefined);
 }
 
+export function isPersonalSkill(value: unknown): value is PersonalSkill {
+  return record(value) && text(value.id, 100) && value.id.trim().length > 0 &&
+    text(value.name, 120) && value.name.trim().length > 0 &&
+    strings(value.taskIds) && value.taskIds.length > 0 && value.taskIds.every(id => id.trim().length > 0) &&
+    new Set(value.taskIds).size === value.taskIds.length && strings(value.taskLabels) &&
+    value.taskLabels.length === value.taskIds.length && value.taskLabels.every(label => label.trim().length > 0) &&
+    text(value.workKey, 100_000) && value.workKey.length > 0 && dated(value.updatedAt);
+}
+
 export function parseJourneyState(raw: string | null): JourneyState {
   if (raw === null) return empty();
   try {
@@ -71,6 +84,8 @@ export function parseJourneyState(raw: string | null): JourneyState {
     if (!Object.entries(state.contexts).every(([id, value]) => isLearningContext(value) && value.id === id)) throw new Error();
     if (!Object.entries(state.courseContexts).every(([id, context]) => text(id, 100) && id.length && text(context, 100) && Object.hasOwn(state.contexts as object, context))) throw new Error();
     if (state.activeContextId !== undefined && (!text(state.activeContextId, 100) || !Object.hasOwn(state.contexts, state.activeContextId))) throw new Error();
+    if (state.personalSkills !== undefined && (!Array.isArray(state.personalSkills) || state.personalSkills.length > 50 ||
+      !state.personalSkills.every(isPersonalSkill) || new Set(state.personalSkills.map(s => s.id)).size !== state.personalSkills.length)) throw new Error();
     if (state.review !== undefined) {
       const r = state.review;
       if (!record(r) || !text(r.workKey, 100_000) || !record(r.decisions) || typeof r.completed !== "boolean" || !dated(r.updatedAt)) throw new Error();
@@ -152,6 +167,34 @@ export async function saveSkillDecision(id: number, decision: SkillDecision | un
   else review.decisions[String(id)] = decision;
   await persist({ ...state, review, resume: { kind: "skills", updatedAt: review.updatedAt } });
 }
+/** User statements stay separate from reference skills and career/course matching. */
+export async function addPersonalSkill(id: string, name: string, taskId: string): Promise<void> {
+  const state = readJourneyState();
+  const profile = readJourneyProfile();
+  const task = profile.tasks.find(item => item.id === taskId);
+  if (!task || !(profile.tasksConfirmed || profile.analysis)) throw new Error("Choose one confirmed work task for this skill.");
+  const entry: PersonalSkill = { id, name: name.trim(), taskIds: [task.id], taskLabels: [task.wording], workKey: workKeyFor(profile), updatedAt: new Date().toISOString() };
+  if (!isPersonalSkill(entry)) throw new Error("Enter a skill name of up to 120 characters and choose a task.");
+  const saved = state.personalSkills ?? [];
+  const existing = saved.find(item => item.id === id);
+  if (existing) {
+    if (existing.name !== entry.name || existing.workKey !== entry.workKey || existing.taskIds[0] !== taskId) throw new Error("This saved skill changed. Reload before trying again.");
+    const owner = currentWorkspaceSession();
+    await flushWorkspace(); // Retrying a failed sync must not create a second entry.
+    if (owner !== currentWorkspaceSession()) throw new Error("Your account changed. Reload before continuing.");
+    return;
+  }
+  if (saved.some(item => item.workKey === entry.workKey && item.name.toLocaleLowerCase() === entry.name.toLocaleLowerCase() && item.taskIds.includes(taskId)))
+    throw new Error("You already added this skill for this task.");
+  if (saved.length >= 50) throw new Error("You can save up to 50 personal skills. Remove an old entry before adding another.");
+  await persist({ ...state, personalSkills: [...saved, entry] });
+}
+
+export async function removePersonalSkill(id: string): Promise<void> {
+  const state = readJourneyState();
+  await persist({ ...state, personalSkills: (state.personalSkills ?? []).filter(item => item.id !== id) });
+}
+
 export async function completeSkillReview(): Promise<void> {
   const state = readJourneyState();
   await persist({ ...state, review: { ...reviewFor(state), completed: true } });

@@ -27,7 +27,7 @@ _unit_rows_lock = Lock()
 # Short-lived result cache for identical search queries (typing + retries).
 _SEARCH_RESULT_TTL_S = 60.0
 _SEARCH_RESULT_MAX = 128
-_search_result_cache: dict[str, tuple[float, list[dict]]] = {}
+_search_result_cache: dict[tuple[str | None, str], tuple[float, list[dict]]] = {}
 _search_result_lock = Lock()
 
 
@@ -65,7 +65,7 @@ async def _load_unit_occupations(db: AsyncSession) -> list[dict]:
     return rows
 
 
-def _cached_search_result(query: str) -> list[dict] | None:
+def _cached_search_result(query: tuple[str | None, str]) -> list[dict] | None:
     now = time.monotonic()
     with _search_result_lock:
         entry = _search_result_cache.get(query)
@@ -78,7 +78,7 @@ def _cached_search_result(query: str) -> list[dict] | None:
         return [dict(row) for row in rows]
 
 
-def _store_search_result(query: str, rows: list[dict]) -> None:
+def _store_search_result(query: tuple[str | None, str], rows: list[dict]) -> None:
     now = time.monotonic()
     with _search_result_lock:
         if len(_search_result_cache) >= _SEARCH_RESULT_MAX:
@@ -119,27 +119,61 @@ def _timed_keyword_normaliser(query: str, gateway: AIGateway) -> list[str]:
 async def list_reference_occupations(
     parent: str | None = Query(default=None),
     q: str | None = Query(default=None),
+    area: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
     gateway: AIGateway = Depends(get_reference_ai_gateway),
 ) -> list[dict]:
+    area_rows = None
+    if area is not None:
+        area = area.strip()
+        major = await db.execute(
+            text("SELECT occupation_code FROM ref_occupations WHERE occupation_code = :area AND level = 'major'"),
+            {'area': area},
+        )
+        if major.scalar_one_or_none() is None:
+            raise HTTPException(status_code=422, detail='Choose a valid work area.')
+        # Codes need not share prefixes. Follow the stored parent relationships.
+        result = await db.execute(
+            text(
+                'WITH RECURSIVE descendants AS ('
+                f'SELECT {OCCUPATION_COLUMNS} FROM ref_occupations WHERE occupation_code = :area '
+                'UNION '
+                'SELECT child.occupation_code, child.level, child.parent_code, child.title, child.description '
+                'FROM ref_occupations child JOIN descendants parent ON child.parent_code = parent.occupation_code'
+                ') '
+                f"SELECT {OCCUPATION_COLUMNS} FROM descendants WHERE level = 'unit' ORDER BY title, occupation_code"
+            ),
+            {'area': area},
+        )
+        area_rows = [dict(row) for row in result.mappings().all()]
+        if not q or not q.strip():
+            return area_rows
+
     if q and q.strip():
         needle = q.strip()
-        cached = _cached_search_result(needle.casefold())
+        cache_key = (area, needle.casefold())
+        cached = _cached_search_result(cache_key)
         if cached is not None:
             return cached
 
-        # Indexed ILIKE for direct hits; unit list comes from the process cache.
-        result = await db.execute(
-            text(
-                f'SELECT {OCCUPATION_COLUMNS} FROM ref_occupations '
-                'WHERE (title ILIKE :query OR description ILIKE :query OR occupation_code ILIKE :query) '
-                "AND level = 'unit' "
-                'ORDER BY occupation_code'
-            ),
-            {'query': f'%{needle}%'},
-        )
-        direct_rows = [dict(row) for row in result.mappings().all()]
-        unit_rows = await _load_unit_occupations(db)
+        if area_rows is not None:
+            unit_rows = area_rows
+            direct_rows = [
+                row for row in area_rows
+                if any(needle.casefold() in str(row.get(field) or '').casefold()
+                       for field in ('title', 'description', 'occupation_code'))
+            ]
+        else:
+            result = await db.execute(
+                text(
+                    f'SELECT {OCCUPATION_COLUMNS} FROM ref_occupations '
+                    'WHERE (title ILIKE :query OR description ILIKE :query OR occupation_code ILIKE :query) '
+                    "AND level = 'unit' ORDER BY occupation_code"
+                ),
+                {'query': f'%{needle}%'},
+            )
+            direct_rows = [dict(row) for row in result.mappings().all()]
+            unit_rows = await _load_unit_occupations(db)
 
         # Fuzzy scoring is CPU-bound; keep the async event loop free.
         rows = await asyncio.to_thread(
@@ -149,7 +183,7 @@ async def list_reference_occupations(
             needle,
             keyword_normaliser=lambda query: _timed_keyword_normaliser(query, gateway),
         )
-        _store_search_result(needle.casefold(), rows)
+        _store_search_result(cache_key, rows)
         return rows
     elif parent:
         result = await db.execute(

@@ -156,3 +156,13 @@ def test_workspace_update_rejects_arrays_instead_of_coercing_them_to_journey_lab
         journey['resume'] = {'kind': ['course'], 'id': 'course-1', 'updatedAt': STAMP}
     with pytest.raises(ValidationError):
         WorkspaceUpdate(owner_id=uuid4(), revision=0, data={JOURNEY_KEY: json.dumps(journey)})
+
+
+def test_personal_skills_preserve_user_evidence_without_changing_reference_ownership():
+    entry = {'id': 'personal-1', 'name': 'CAD drafting', 'taskIds': ['task'], 'taskLabels': ['Draw a part'], 'workKey': 'snapshot', 'updatedAt': STAMP}
+    value = {**state(), 'personalSkills': [entry]}
+    assert validate_journey(value)['personalSkills'] == [entry]
+    assert apply_skill_review({1, 2}, {JOURNEY_KEY: json.dumps(value)}) == {1, 2}
+    for personal in (None, {}, [entry, entry], [{**entry, 'name': ' '}], [{**entry, 'taskIds': []}], [{**entry, 'taskLabels': []}], [{**entry, 'taskIds': ['task', 'task'], 'taskLabels': ['a', 'b']}], [{**entry, 'id': str(i)} for i in range(51)]):
+        with pytest.raises(ValueError):
+            validate_journey({**state(), 'personalSkills': personal})

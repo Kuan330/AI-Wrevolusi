@@ -34,3 +34,14 @@
   .skills-review-page__card { padding: 1.1rem; }
   .skills-review-page__skill-heading { flex-wrap: wrap; }
 }
+
+.skills-review-page summary { cursor: pointer; color: #355b73; font-weight: 600; line-height: 1.5; }
+.skills-review-page details[open] > summary { margin-bottom: .7rem; }
+.skills-review-page__personal-list { display: grid; gap: .8rem; list-style: none; padding: 0; }
+.skills-review-page__personal-list > li { display: flex; align-items: start; justify-content: space-between; gap: .8rem; border-bottom: 1px solid #ded7e1; padding-bottom: .8rem; }
+.skills-review-page__personal-list > li > div { min-width: 0; overflow-wrap: anywhere; }
+.skills-review-page__personal-list details { margin-top: .5rem; font-size: .85rem; }
+.skills-review-page__personal-form { display: grid; gap: .7rem; max-width: 42rem; }
+.skills-review-page__personal-form label { font-size: .9rem; font-weight: 600; }
+.skills-review-page__personal-form input, .skills-review-page__personal-form select { width: 100%; min-width: 0; min-height: 2.75rem; padding: .7rem; border: 1px solid #c3b7ca; border-radius: .6rem; background: white; color: #2f2430; font: inherit; }
+.skills-review-page__personal-form :is(input, select):focus-visible, .skills-review-page summary:focus-visible { outline: 2px solid #76548a; outline-offset: 3px; }

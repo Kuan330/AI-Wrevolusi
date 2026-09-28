@@ -270,7 +270,7 @@ const ProfileTasks = () => {
           <h1 className="text-2xl font-semibold text-[#2f2430]">Your tasks</h1>
           <div className="flex shrink-0 items-center gap-2">
             <Button {...buttonProps2}>
-              <Link {...linkProps3}>Change occupation</Link>
+              <Link {...linkProps3}>Change job</Link>
             </Button>
             <Button {...buttonProps4}>
               {taskAssessmentRequestInProgress
@@ -279,11 +279,7 @@ const ProfileTasks = () => {
             </Button>
           </div>
         </div>
-        {selected.path.length > 0 ? (
-          <p className="text-sm text-[#7f7280]">
-            {selected.path.map((item) => item.title).join(" → ")}
-          </p>
-        ) : null}
+        <p className="text-sm text-[#7f7280]">{selected.unit.title}</p>
       </header>
 
       <section className="profile-glass-card flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-5">

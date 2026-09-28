@@ -86,3 +86,37 @@ def test_fast_matching_does_not_call_model_for_unrelated_input() -> None:
         gateway=NoModel(),
     )
     assert response.skills == []
+
+
+def test_mechanical_task_variants_have_grounded_skill_evidence() -> None:
+    candidates = [{"id": n, "skill": f"Skill {n}"} for n in range(1, 27)]
+    cases = [
+        ("Designing and preparing layouts of machines and mechanical installations.", 18),
+        ("Collecting and analysing data from mechanical tests.", 1),
+        ("Collecting and analyzing data from mechanical tests.", 1),
+        ("Preparing detailed estimates of quantities and costs of materials and labour.", 21),
+    ]
+    for text, expected_id in cases:
+        result = match_skills(text, candidates, limit=None)
+        assert expected_id in {item.wef_skill_id for item in result}
+        assert all(phrase in text for item in result for phrase in item.evidence_phrases)
+
+
+def test_generic_systems_and_thinking_do_not_claim_cognitive_skills() -> None:
+    candidates = [{"id": n, "skill": f"Skill {n}"} for n in range(1, 27)]
+    assert match_skills("Installing hydraulic power systems.", candidates, limit=None) == []
+    assert match_skills("Thinking about a task and reviewing items.", candidates, limit=None) == []
+    assert {item.wef_skill_id for item in match_skills("Use systems thinking to investigate a root cause.", candidates, limit=None)} == {12}
+
+
+def test_frontend_and_backend_use_identical_task_skill_rules() -> None:
+    # Both runtimes ship their own rules. Guard the contract so accepting a skill
+    # in the review page cannot silently lose it in career matching.
+    import re
+    from pathlib import Path
+    from app.services.skill_matching import SKILL_RULES
+
+    source = (Path(__file__).resolve().parents[2] / "frontend/src/pages/Analysis/lib/matchSkills.ts").read_text()
+    parsed = re.findall(r"skillId: (\d+),\s*phrases: \[(.*?)\],\s*confidence: ([0-9.]+)", source, re.S)
+    frontend_rules = [(int(skill_id), tuple(re.findall(r'"([^"]+)"', phrases)), float(confidence)) for skill_id, phrases, confidence in parsed]
+    assert frontend_rules == [(rule.skill_id, rule.phrases, rule.confidence) for rule in SKILL_RULES]

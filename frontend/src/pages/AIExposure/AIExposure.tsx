@@ -5,7 +5,6 @@ import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { getSkillDecision, readJourneyState } from "@/features/journey/journey";
-import type { TaskScoreRange } from "@/pages/Analysis/lib/taskScore";
 import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
 import { readConfirmedAnalysis } from "@/features/work-profile/userProfile";
 import { referenceService } from "@/services/referenceService";
@@ -21,8 +20,6 @@ import "./exposure.css";
 
 export default function AIExposure() {
   const analysis = readConfirmedAnalysis();
-  const [scoreRange, setScoreRange] = useState<TaskScoreRange>([0, 1]);
-  const [selectedSkillId, setSelectedSkillId] = useState<number | null>(null);
   const [scoreInfoOpen, setScoreInfoOpen] = useState(false);
   const [skills, setSkills] = useState<WefSkill[]>([]);
   const [skillsLoading, setSkillsLoading] = useState(true);
@@ -77,14 +74,6 @@ export default function AIExposure() {
       return { evidence: [], error: "Your saved skill decisions could not be read. Reload your saved work before reviewing suggestions." };
     }
   })();
-  const selectedEvidence =
-    review.evidence.find(({ skill }) => skill.wef_skill_id === selectedSkillId) ??
-    null;
-  const activeSkillId = selectedEvidence?.skill.wef_skill_id ?? null;
-  const filteredTasks = selectedEvidence
-    ? selectedEvidence.tasks
-    : (analysis?.tasks ?? []);
-
   if (!analysis) {
     return (
       <Navigate
@@ -101,10 +90,6 @@ export default function AIExposure() {
     occupationScore: analysis.meanScore2025,
     overview,
   });
-  const buttonPropsReview = {
-    asChild: true,
-    className: "profile-gradient-btn rounded-full font-normal",
-  } satisfies Partial<ComponentProps<typeof Button>>;
   const buttonPropsEdit = {
     asChild: true,
     variant: "outline",
@@ -112,12 +97,9 @@ export default function AIExposure() {
   } satisfies Partial<ComponentProps<typeof Button>>;
   const exposureCompareCardProps = {
     occupationTitle: analysis.occupationTitle,
-    potential25: analysis.potential25,
     insight,
     onOpenDetails: () => setScoreInfoOpen(true),
     onViewTasks: () => {
-      setSelectedSkillId(null);
-      setScoreRange([0, 1]);
       requestAnimationFrame(() => {
         document.getElementById("task-list")?.scrollIntoView({
           behavior: "smooth",
@@ -126,19 +108,8 @@ export default function AIExposure() {
       });
     },
   } satisfies Partial<ComponentProps<typeof ExposureCompareCard>>;
-  const exposureSkillCloudProps = {
-    skills,
-    evidence: review.evidence,
-    selectedSkillId: activeSkillId,
-    onSelectSkill: setSelectedSkillId,
-  } satisfies Partial<ComponentProps<typeof ExposureSkillCloud>>;
-  const exposureTaskListProps = {
-    tasks: filteredTasks,
-    assessments,
-    range: scoreRange,
-    onRangeChange: setScoreRange,
-    skillFilterLabel: selectedEvidence?.skill.core_skill ?? null,
-  } satisfies Partial<ComponentProps<typeof ExposureTaskList>>;
+  const exposureSkillCloudProps = { evidence: review.evidence, frameworkCount: skills.length };
+  const exposureTaskListProps = { tasks: analysis.tasks, assessments };
   const scoreInfoModalProps = {
     open: scoreInfoOpen,
     onOpenChange: setScoreInfoOpen,
@@ -148,26 +119,22 @@ export default function AIExposure() {
     <div className="analysis-page exposure-page mx-auto w-full max-w-[1400px]">
       <PageHeader
         className="exposure-page__header flex-col items-start sm:flex-row sm:items-center"
-        title="AI impact on my work"
-        description="Review the available evidence for your occupation and tasks, then check the skills suggested from your work."
+        title="Where could AI affect my work?"
+        description="Understand one task, then decide what you want to learn."
         actions={
           <div className="exposure-page__actions">
             <Button {...buttonPropsEdit}>
               <Link to={ROUTES.task}>Edit tasks</Link>
             </Button>
-            <Button {...buttonPropsEdit}>
-              <Link to={ROUTES.workProfile}>Change occupation</Link>
-            </Button>
-            <Button {...buttonPropsReview}>
-              <Link to={ROUTES.skills}>Review my skills</Link>
-            </Button>
           </div>
         }
       />
 
-      <div className="exposure-dashboard">
-        <div className="exposure-dashboard__main">
+      <div className="mx-auto grid w-full max-w-4xl gap-5">
           <ExposureCompareCard {...exposureCompareCardProps} />
+          <div id="task-list" className="scroll-mt-32">
+            <ExposureTaskList {...exposureTaskListProps} />
+          </div>
           {skillsError || review.error ? (
             <div className="rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive" role="alert">
               {skillsError || review.error}
@@ -180,10 +147,6 @@ export default function AIExposure() {
           ) : (
             <ExposureSkillCloud {...exposureSkillCloudProps} />
           )}
-        </div>
-        <aside id="task-list" className="exposure-dashboard__tasks scroll-mt-24">
-          <ExposureTaskList {...exposureTaskListProps} />
-        </aside>
       </div>
 
       <ScoreInfoModal {...scoreInfoModalProps} />

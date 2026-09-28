@@ -13,7 +13,6 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import ExposureScorePanel from "@/components/ui/exposure-score-panel";
 import { taskScore } from "@/pages/Analysis/lib/taskScore";
 import {
   DEFAULT_TASK_ASSIST_QUESTION,
@@ -272,17 +271,13 @@ export default function TaskDetailsDrawer(props: {
             </DrawerHeader>
             <DrawerBody className="task-details__body">
               <div className="task-details__content-area">
-                <ExposureScorePanel
-                  {...({
-                    score: selectedScore,
-                    className: "mb-4",
-                  } satisfies Partial<ComponentProps<typeof ExposureScorePanel>>)}
-                />
-                {selectedScore == null ? (
-                  <p className="task-details__unavailable mb-4">
-                    No published task score is available for this item.
-                  </p>
-                ) : null}
+                <section className="mb-4 space-y-2" aria-label="Research score">
+                  <h3 className="task-details__score-title">Research score</h3>
+                  <p className="text-lg font-semibold">{selectedScore == null ? "Not available" : `${Math.round(selectedScore * 100)} out of 100`}</p>
+                  <p className="text-sm leading-6 text-muted-foreground">{selectedScore == null
+                    ? "There is not enough evidence to score this task. It does not mean the task has no value or no possible AI use."
+                    : "A higher score suggests more potential for this task to change with generative AI. It does not predict job loss or time saved."}</p>
+                </section>
 
                 <TaskRelatedSkills taskText={selectedTask.wording} />
 
@@ -294,7 +289,7 @@ export default function TaskDetailsDrawer(props: {
                     aria-expanded={detailOpen}
                     onClick={() => setDetailOpen((open) => !open)}
                   >
-                    Evidence and Source
+                    Evidence and source
                     <ChevronDown
                       className={cn(
                         "size-4 transition-transform",

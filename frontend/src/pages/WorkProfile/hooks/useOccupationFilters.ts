@@ -1,270 +1,73 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-
-import {
-  FILTER_ORDER,
-  NEXT_FILTER,
-  type OccupationFilterKey,
-} from "@/pages/WorkProfile/occupationFilters";
+import { useEffect, useRef, useState } from "react";
 import { referenceService } from "@/services/referenceService";
 import type { ReferenceOccupation } from "@/types/reference";
 
-export type OccupationSearchResult = {
-  unit: ReferenceOccupation;
-  path: ReferenceOccupation[];
-  pathLabel: string;
-};
-
-const emptySelections = (): Record<OccupationFilterKey, ReferenceOccupation | null> => ({
-  major: null,
-  sub_major: null,
-  minor: null,
-  unit: null,
-});
-
-const emptyOptions = (): Record<OccupationFilterKey, ReferenceOccupation[]> => ({
-  major: [],
-  sub_major: [],
-  minor: [],
-  unit: [],
-});
-
+/** The database hierarchy stays behind the two user-facing choices. */
 export const useOccupationFilters = () => {
-  const [selections, setSelections] = useState(emptySelections);
-  const [options, setOptions] = useState(emptyOptions);
+  const [areas, setAreas] = useState<ReferenceOccupation[]>([]);
+  const [area, setArea] = useState("");
   const [query, setQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<OccupationSearchResult[]>([]);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [results, setResults] = useState<ReferenceOccupation[]>([]);
+  const [loadingAreas, setLoadingAreas] = useState(true);
   const [searching, setSearching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const occupationCacheRef = useRef(new Map<string, ReferenceOccupation>());
-  const activeSearchRequestRef = useRef(0);
-  const searchAbortRef = useRef<AbortController | null>(null);
-
-  const selectedUnit = selections.unit;
-  const selectedPath = FILTER_ORDER.map((key) => selections[key]).filter(
-    (item): item is ReferenceOccupation => Boolean(item),
-  );
-
-  const cacheOccupations = useCallback((rows: ReferenceOccupation[]) => {
-    rows.forEach((row) => {
-      occupationCacheRef.current.set(row.occupation_code, row);
-    });
-  }, []);
-
-  const getOccupationByCode = useCallback(async (code: string) => {
-    const cached = occupationCacheRef.current.get(code);
-    if (cached) return cached;
-    const row = await referenceService.getOccupation(code);
-    occupationCacheRef.current.set(row.occupation_code, row);
-    return row;
-  }, []);
-
-  const loadLevel = async (key: OccupationFilterKey, parent?: string) => {
-    const rows = await referenceService.occupations(parent);
-    cacheOccupations(rows);
-    setOptions((current) => ({ ...current, [key]: rows }));
-    return rows;
-  };
-
-  const hydrateFromPath = useCallback(async (path: ReferenceOccupation[]) => {
-    if (path.length === 0) return;
-    cacheOccupations(path);
-    const nextSelections = emptySelections();
-    FILTER_ORDER.forEach((key, index) => {
-      if (path[index]) nextSelections[key] = path[index];
-    });
-    setSelections(nextSelections);
-
-    for (let index = 0; index < FILTER_ORDER.length - 1; index += 1) {
-      const current = path[index];
-      const nextKey = FILTER_ORDER[index + 1];
-      if (!current || !nextKey) break;
-      try {
-        await loadLevel(nextKey, current.occupation_code);
-      } catch {
-        break;
-      }
-    }
-  }, [cacheOccupations]);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [areaError, setAreaError] = useState("");
+  const [searchError, setSearchError] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  const cache = useRef(new Map<string, ReferenceOccupation>());
 
   useEffect(() => {
     let active = true;
-    void referenceService
-      .occupations()
-      .then((rows) => {
-        cacheOccupations(rows);
-        if (active) setOptions((current) => ({ ...current, major: rows }));
-      })
-      .catch(() => {
-        if (active) setError("Unable to load occupations right now. Please try again.");
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const clearAfter = (key: OccupationFilterKey) => {
-    const start = FILTER_ORDER.indexOf(key);
-    setSelections((current) => {
-      const next = { ...current };
-      FILTER_ORDER.slice(start + 1).forEach((level) => {
-        next[level] = null;
-      });
-      return next;
-    });
-    setOptions((current) => {
-      const next = { ...current };
-      FILTER_ORDER.slice(start + 1).forEach((level) => {
-        next[level] = [];
-      });
-      return next;
-    });
-  };
-
-  const resetFilters = () => {
-    setSelections(emptySelections());
-    setOptions((current) => ({
-      major: current.major,
-      sub_major: [],
-      minor: [],
-      unit: [],
-    }));
-    setError(null);
-  };
-
-  const resetSearch = () => {
-    activeSearchRequestRef.current += 1;
-    setQuery("");
-    setSearchResults([]);
-    setHasSearched(false);
-    setSearching(false);
-    setError(null);
-  };
-
-  const selectFilter = async (key: OccupationFilterKey, code: string) => {
-    setError(null);
-    if (!code) {
-      setSelections((current) => ({ ...current, [key]: null }));
-      clearAfter(key);
-      return;
-    }
-
-    const chosen = options[key].find((item) => item.occupation_code === code) ?? null;
-    setSelections((current) => ({ ...current, [key]: chosen }));
-    clearAfter(key);
-
-    const nextKey = NEXT_FILTER[key];
-    if (chosen && nextKey) {
-      setLoading(true);
-      try {
-        await loadLevel(nextKey, chosen.occupation_code);
-      } catch {
-        setError("Unable to load the next occupation list.");
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  const pathForUnit = useCallback(async (unit: ReferenceOccupation) => {
-    cacheOccupations([unit]);
-    const path: ReferenceOccupation[] = [unit];
-    let parent = unit.parent_code;
-    while (parent) {
-      const node = await getOccupationByCode(parent);
-      path.unshift(node);
-      parent = node.parent_code;
-    }
-    return path;
-  }, [cacheOccupations, getOccupationByCode]);
+    setLoadingAreas(true);
+    setAreaError("");
+    void referenceService.occupations().then(rows => {
+      if (!active) return;
+      setAreas(rows);
+      rows.forEach(row => cache.current.set(row.occupation_code, row));
+    }).catch(() => {
+      if (active) setAreaError("Work areas could not load. You can still search by job title.");
+    }).finally(() => { if (active) setLoadingAreas(false); });
+    return () => { active = false; };
+  }, [attempt]);
 
   useEffect(() => {
-    const requestId = ++activeSearchRequestRef.current;
+    const controller = new AbortController();
     const trimmed = query.trim();
-    if (trimmed.length < 2) {
-      searchAbortRef.current?.abort();
-      setHasSearched(false);
-      setSearching(false);
-      setSearchResults([]);
-      return;
-    }
-
-    setSearching(true);
-    setSearchResults([]);
+    setResults([]);
     setHasSearched(false);
-    setError(null);
-
+    setSearchError("");
+    if ((!area && trimmed.length < 2) || trimmed.length === 1) {
+      setSearching(false);
+      return () => controller.abort();
+    }
+    setSearching(true);
     const timer = setTimeout(() => {
-      void (async () => {
-        // Supersede any previous request: its late response must never
-        // overwrite the results of the newer query.
-        searchAbortRef.current?.abort();
-        const controller = new AbortController();
-        searchAbortRef.current = controller;
-        try {
-          const matches = await referenceService.searchOccupations(
-            trimmed,
-            controller.signal,
-          );
-          cacheOccupations(matches);
-          const expanded = await Promise.all(
-            matches.map(async (unit) => {
-              const path = await pathForUnit(unit);
-              const parentPath = path
-                .slice(0, -1)
-                .map((item) => item.title)
-                .join(" › ");
+      void referenceService.searchOccupations(trimmed, controller.signal, area || undefined).then(rows => {
+        if (controller.signal.aborted) return;
+        setResults(rows);
+        setHasSearched(true);
+      }).catch(() => {
+        if (!controller.signal.aborted) setSearchError("Jobs could not load. Please try again.");
+      }).finally(() => { if (!controller.signal.aborted) setSearching(false); });
+    }, trimmed ? 400 : 0);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [query, area, attempt]);
 
-              return {
-                unit,
-                path,
-                pathLabel: parentPath,
-              };
-            }),
-          );
-          if (activeSearchRequestRef.current !== requestId) return;
-          setSearchResults(expanded);
-          setHasSearched(true);
-        } catch {
-          if (activeSearchRequestRef.current !== requestId) return;
-          setError("Search is temporarily unavailable.");
-          setSearchResults([]);
-          setHasSearched(false);
-        } finally {
-          if (activeSearchRequestRef.current === requestId) {
-            setSearching(false);
-          }
-        }
-      })();
-    }, 400);
+  async function pathForUnit(unit: ReferenceOccupation): Promise<ReferenceOccupation[]> {
+    const path = [unit];
+    const seen = new Set([unit.occupation_code]);
+    let parent = unit.parent_code;
+    while (parent) {
+      if (seen.has(parent)) throw new Error("This job's work area could not be checked. Please choose another job.");
+      seen.add(parent);
+      const row = cache.current.get(parent) ?? await referenceService.getOccupation(parent);
+      cache.current.set(row.occupation_code, row);
+      path.unshift(row);
+      parent = row.parent_code;
+    }
+    return path;
+  }
 
-    return () => {
-      clearTimeout(timer);
-      activeSearchRequestRef.current += 1;
-      searchAbortRef.current?.abort();
-    };
-  }, [cacheOccupations, pathForUnit, query]);
-
-  return {
-    selections,
-    options,
-    query,
-    setQuery,
-    searchResults,
-    hasSearched,
-    loading,
-    searching,
-    error,
-    selectedUnit,
-    selectedPath,
-    selectFilter,
-    pathForUnit,
-    hydrateFromPath,
-    resetFilters,
-    resetSearch,
-  };
+  return { areas, area, setArea, query, setQuery, results, loadingAreas, searching,
+    hasSearched, areaError, searchError, pathForUnit, retry: () => setAttempt(value => value + 1) };
 };

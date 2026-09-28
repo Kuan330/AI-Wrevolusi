@@ -1,31 +1,17 @@
 import type { ReferenceOccupation } from "@/types/reference";
 
-type SelectedOccupationSummaryProps = {
-  occupation: ReferenceOccupation | null;
-};
+type SelectedOccupationSummaryProps = { occupation: ReferenceOccupation | null };
 
-const SelectedOccupationSummary = (props: SelectedOccupationSummaryProps) => {
-  const { occupation } = props;
-  const description = occupation?.description?.trim();
-
-  if (!occupation) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        No occupation selected yet.
-      </p>
-    );
-  }
-
+export default function SelectedOccupationSummary({ occupation }: SelectedOccupationSummaryProps) {
+  if (!occupation) return null;
   return (
     <div className="space-y-2">
-      <p className="text-sm text-muted-foreground">
-        Selected: {occupation.title}
-      </p>
-      {description ? (
-        <p className="text-xs leading-5 text-muted-foreground">{description}</p>
-      ) : null}
+      <p className="text-xs text-muted-foreground">Your selected job</p>
+      <p className="text-base font-semibold">{occupation.title}</p>
+      {occupation.description?.trim() && <details className="text-sm text-muted-foreground">
+        <summary className="min-h-11 cursor-pointer py-3">What does this job include?</summary>
+        <p className="pb-2 leading-relaxed">{occupation.description.trim()}</p>
+      </details>}
     </div>
   );
-};
-
-export default SelectedOccupationSummary;
+}

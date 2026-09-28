@@ -186,3 +186,51 @@ test('array enum impostors and null optional records are rejected', async()=>{
     value=>{value.review={workKey:currentWorkKey(),decisions:{1:['accepted']},completed:true,updatedAt:new Date().toISOString()}},
   ]){const bad=structuredClone(valid);mutate(bad);assert.throws(()=>parseJourneyState(JSON.stringify(bad)),/could not be read/)}
 });
+
+test('personal skills keep exact task evidence, survive edits and never become WEF learning skills', async () => {
+  const { addPersonalSkill, removePersonalSkill } = await import('../src/features/journey/journey.ts');
+  saveConfirmedAnalysis(analysis());
+  await addPersonalSkill('personal-1', '  Spreadsheet modelling  ', 'task-1');
+  await addPersonalSkill('personal-1', 'Spreadsheet modelling', 'task-1');
+  let saved = readJourneyState();
+  assert.equal(saved.personalSkills.length, 1);
+  assert.equal(saved.personalSkills[0].name, 'Spreadsheet modelling');
+  assert.deepEqual(saved.personalSkills[0].taskLabels, [analysis().tasks[0].wording]);
+  assert.equal(saved.review, undefined);
+  await assert.rejects(addPersonalSkill('personal-2', 'spreadsheet modelling', 'task-1'), /already added/);
+  await assert.rejects(addPersonalSkill('personal-2', 'CAD', 'missing-task'), /confirmed work task/);
+  saveProfileTasks('4110', [{id:'task-1',wording:'Use a different method'}]);
+  saved = readJourneyState();
+  assert.notEqual(saved.personalSkills[0].workKey, currentWorkKey());
+  await assert.rejects(addPersonalSkill('personal-2', 'CAD', 'task-1'), /confirmed work task/);
+  await removePersonalSkill('personal-1');
+  assert.deepEqual(readJourneyState().personalSkills, []);
+});
+
+test('malformed personal skills cannot overwrite a saved journey', () => {
+  const entry = {id:'a',name:'CAD',taskIds:['task'],taskLabels:['Draw a part'],workKey:'snapshot',updatedAt:new Date().toISOString()};
+  const base = {version:1,contexts:{},courseContexts:{}};
+  assert.equal(parseJourneyState(JSON.stringify({...base,personalSkills:[entry]})).personalSkills[0].name,'CAD');
+  for (const personalSkills of [null,{},[entry,entry],[{...entry,name:' '}],[{...entry,taskIds:[]}],[{...entry,taskLabels:[]}],[{...entry,taskIds:['task','task'],taskLabels:['a','b']}],Array.from({length:51},(_,i)=>({...entry,id:String(i)}))]) {
+    assert.throws(()=>parseJourneyState(JSON.stringify({...base,personalSkills})),/could not be read/);
+  }
+});
+
+test('personal skill retry syncs one entry and a late save cannot cross accounts', async () => {
+  const { addPersonalSkill } = await import('../src/features/journey/journey.ts');
+  activateWorkspace('personal-owner', {data:{},revision:0});
+  saveConfirmedAnalysis(analysis());
+  globalThis.fetch = async () => { throw new Error('Offline'); };
+  await assert.rejects(addPersonalSkill('p', 'CAD', 'task-1'), /Offline/);
+  assert.equal(readJourneyState().personalSkills.length, 1);
+  globalThis.fetch = async () => response({revision:1});
+  await addPersonalSkill('p', 'CAD', 'task-1');
+  assert.equal(readJourneyState().personalSkills.length, 1);
+  let finish;
+  globalThis.fetch = () => new Promise(resolve => {finish=resolve;});
+  const pending = addPersonalSkill('p2', 'Technical drawing', 'task-1');
+  activateWorkspace('other-person', {data:{},revision:0});
+  finish(response({revision:2}));
+  await assert.rejects(pending, /account changed/);
+  assert.equal(readJourneyState().personalSkills, undefined);
+});
