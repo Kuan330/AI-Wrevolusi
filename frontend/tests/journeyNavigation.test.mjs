@@ -22,6 +22,8 @@ test("every work page stays in the same global area, including task and skill li
 
 test("learning and career areas are separate and do not match unrelated prefixes", () => {
   assert.equal(getJourneyArea("/plan"), "learning");
+  assert.equal(getJourneyArea("/learning-goals"), "learning");
+  assert.equal(PRIMARY_NAV_MENU.find(item => item.key === "learning").path, "/learning-goals");
   assert.equal(getJourneyArea("/learning-centre"), "learning");
   assert.equal(getJourneyArea("/possibilities"), "careers");
   assert.equal(getJourneyArea("/profile-other"), undefined);
@@ -32,7 +34,7 @@ test("global and local links remain available before confirmation", () => {
   assert.deepEqual(PRIMARY_NAV_MENU.map(({ label }) => label), ["My Work", "My Learning", "Career Options"]);
   assert.deepEqual(WORK_NAV_MENU.map(({ path }) => path), ["/profile", "/ai-exposure", "/skills"]);
   assert.deepEqual(WORK_NAV_MENU.map(({ label }) => label), ["Profile", "AI findings", "My skills"]);
-  assert.deepEqual(LEARNING_NAV_MENU.map(({ path }) => path), ["/plan", "/learning-centre"]);
+  assert.deepEqual(LEARNING_NAV_MENU.map(({ path }) => path), ["/learning-goals", "/plan", "/learning-centre"]);
   const pending = { workConfirmed: false, assessmentChecked: false, skillsReviewed: false };
   for (const { key } of WORK_NAV_MENU) assert.equal(getWorkStepStatus(key, pending), undefined);
 });

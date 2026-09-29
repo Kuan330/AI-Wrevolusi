@@ -26,6 +26,8 @@ export default function SpecialistSkills({ tasks, occupationCode, focusTaskId, o
   const [roleLoading, setRoleLoading] = useState(false);
   const [roleError, setRoleError] = useState("");
   const [sourceVersion, setSourceVersion] = useState<{ context: string; version: string } | null>(null);
+  const [versionFailure, setVersionFailure] = useState<{ context: string; attempt: number; message: string } | null>(null);
+  const [versionAttempt, setVersionAttempt] = useState(0);
   const [visibleCount, setVisibleCount] = useState(20);
   const [attempt, setAttempt] = useState(0);
   const [saved, setSaved] = useState(readSaved);
@@ -33,24 +35,32 @@ export default function SpecialistSkills({ tasks, occupationCode, focusTaskId, o
   const [message, setMessage] = useState("");
   const [saveError, setSaveError] = useState("");
   const [query, setQuery] = useState("");
-  const [handoff, setHandoff] = useState<string | null>(null);
   const mounted = useRef(false);
   const busy = useRef(false);
   const roleContext = JSON.stringify([currentWorkspaceSession(), occupationCode]);
   const selectedRole = chosenRole?.context === roleContext ? chosenRole.role : null;
-  const rememberSourceVersion = useCallback((version: string) => setSourceVersion({ context: roleContext, version }), [roleContext]);
+  const rememberSourceVersion = useCallback((version: string) => { setSourceVersion({ context: roleContext, version }); setVersionFailure(null); }, [roleContext]);
   const roleKey = JSON.stringify([roleContext, selectedRole?.uri]);
   const context = JSON.stringify([currentWorkspaceSession(), occupationCode, tasks.map(task => [task.id, task.wording])]);
   const currentContext = useRef(context);
   useLayoutEffect(() => { currentContext.current = context; }, [context]);
   useEffect(() => {
     mounted.current = true;
-    const refresh = () => { setSaved(readSaved()); setHandoff(null); setMessage(""); setSaveError(""); };
+    const refresh = () => { setSaved(readSaved()); setMessage(""); setSaveError(""); };
     window.addEventListener("workspace-change", refresh);
     return () => { mounted.current = false; window.removeEventListener("workspace-change", refresh); };
   }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    void specialistSkillService.skills("", 0, controller.signal).then(data => {
+      if (!controller.signal.aborted) rememberSourceVersion(data.version);
+    }).catch(() => {
+      if (!controller.signal.aborted) setVersionFailure({ context: roleContext, attempt: versionAttempt, message: "The catalogue is unavailable. Your saved choices are still here, but we cannot check the source version yet." });
+    });
+    return () => controller.abort();
+  }, [roleContext, rememberSourceVersion, versionAttempt]);
   const firstTaskId = tasks[0]?.id || "";
-  useEffect(() => { setTaskId(focusTaskId || firstTaskId); setQuery(""); setHandoff(null); }, [focusTaskId, firstTaskId, context]);
+  useEffect(() => { setTaskId(focusTaskId || firstTaskId); setQuery(""); }, [focusTaskId, firstTaskId, context]);
   useEffect(() => {
     const controller = new AbortController();
     setRoleError(""); setVisibleCount(20); setQuery("");
@@ -63,19 +73,20 @@ export default function SpecialistSkills({ tasks, occupationCode, focusTaskId, o
     return () => controller.abort();
   }, [selectedRole, roleKey, attempt]);
   const catalogue = selectedRole && loadedRole?.key === roleKey ? loadedRole.data : null;
+  const versionError = versionFailure?.context === roleContext && versionFailure.attempt === versionAttempt ? versionFailure.message : "";
   const currentVersion = catalogue?.version || (sourceVersion?.context === roleContext ? sourceVersion.version : "");
-  function chooseRole(role: SpecialistOccupation) { setChosenRole({ context: roleContext, role }); setQuery(""); setVisibleCount(20); setHandoff(null); }
+  function chooseRole(role: SpecialistOccupation) { setChosenRole({ context: roleContext, role }); setQuery(""); setVisibleCount(20); }
 
   const task = tasks.find(item => item.id === taskId) || tasks[0];
   const entries = saved.data?.entries ?? [];
-  const currentEntries = entries.filter(entry => specialistEntryIsCurrent(entry, tasks, occupationCode) && currentVersion && entry.sourceVersion === currentVersion);
+  const currentEntries = entries.filter(entry => specialistEntryIsCurrent(entry, tasks, occupationCode) && (!currentVersion || entry.sourceVersion === currentVersion));
   const interests = currentEntries.filter(entry => entry.wantsLearning);
   const suggestions = task ? suggestSpecialistSkills(task.wording, catalogue?.skills ?? []) : [];
   const top = suggestions.slice(0, 3);
   const remaining = (catalogue?.skills ?? []).filter(skill => !top.some(item => item.skill.uri === skill.uri));
   const filteredRemaining = remaining.filter(skill => [skill.label, ...skill.aliases].join(" ").toLowerCase().includes(query.toLowerCase()));
   const focus = interests.find(entry => specialistEntryKey(entry) === saved.data?.focusKey);
-  const disabled = saving || Boolean(saved.error);
+  const disabled = saving || Boolean(saved.error) || !currentVersion;
 
   async function runSave(action: () => Promise<void>, success: string) {
     if (busy.current || saved.error) return;
@@ -106,6 +117,8 @@ export default function SpecialistSkills({ tasks, occupationCode, focusTaskId, o
     return <article key={skill.uri} className="specialist-skills__card">
       <h3>{skill.label}</h3>
       <p className="specialist-skills__reason">{skill.skill_type === "knowledge" ? "Knowledge area" : skill.skill_type === "unspecified" ? "Concept · source type not recorded" : "Skill / competence"}</p>
+      <p className="specialist-skills__description">{skill.description ? skill.description.length > 220 ? `${skill.description.slice(0, 217).replace(/\s+\S*$/, "")}…` : skill.description : "No description is available in this source record."}</p>
+      {skill.match_type === "related" && <p className="specialist-skills__reason">Related wording only. This may not fit your task.</p>}
       <p className="specialist-skills__reason">{sharedWords.length ? `Shared words with your task: ${sharedWords.join(", ")}. Check whether this connection fits.` : sourceOccupationUri ? "Listed for the source occupation. Check whether it fits this task." : "You found this in the ESCO catalogue. No occupation or task relationship has been assumed."}</p>
       <details><summary>Meaning and source</summary>
         <p>{skill.description || "No description is available in this source record."}</p>
@@ -125,15 +138,31 @@ export default function SpecialistSkills({ tasks, occupationCode, focusTaskId, o
   return <section className="specialist-skills" aria-labelledby="specialist-title">
     <header><p className="specialist-skills__eyebrow">Specific skills from your work</p><h2 id="specialist-title">Start with one task</h2><p>Review skills you recognise. You can choose to learn a skill even if you do not use it yet.</p></header>
     <label htmlFor="specialist-task">Which task would you like to review?</label>
-    <select id="specialist-task" value={task?.id ?? ""} disabled={saving} onChange={event => { setTaskId(event.target.value); onTaskChange?.(event.target.value); setQuery(""); setHandoff(null); }}>
+    <select id="specialist-task" value={task?.id ?? ""} disabled={saving} onChange={event => { setTaskId(event.target.value); onTaskChange?.(event.target.value); setQuery(""); }}>
       {tasks.map(item => <option key={item.id} value={item.id}>{item.wording}</option>)}
     </select>
     <p className="specialist-skills__reason">Your task comes from My work. An AI exposure score is not needed to review your skills.</p>
     {saved.error && <p role="alert">{saved.error}</p>}
     {saveError && <p role="alert">{saveError} Your change is not confirmed saved. Try your choice again.</p>}
     <p role="status" aria-live="polite">{saving ? "Saving your choice…" : message}</p>
+    {entries.length > 0 && <div className="specialist-skills__next"><h3>Your next learning focus</h3>
+      {!currentVersion && (versionError ? <div role="alert"><p>{versionError}</p><Button variant="outline" onClick={() => setVersionAttempt(value => value + 1)}>Retry catalogue check</Button></div> : <p role="status">Checking the catalogue version for your saved choices…</p>)}
+      {interests.length ? <><label htmlFor="specialist-focus">Choose one skill you want to develop</label><select id="specialist-focus" value={focus ? specialistEntryKey(focus) : ""} disabled={disabled} onChange={event => { const key = event.target.value || null; void runSave(() => saveSpecialistFocus(key), "Your learning focus is saved."); }}>
+        <option value="">Choose a skill</option>{interests.map(entry => <option key={specialistEntryKey(entry)} value={specialistEntryKey(entry)}>{entry.skillLabel} — {entry.taskWording}</option>)}
+      </select><Button asChild disabled={disabled || !focus}><Link aria-disabled={disabled || !focus} to={focus ? `${ROUTES.learningGoals}?${new URLSearchParams({ specialist: specialistEntryKey(focus) })}` : ROUTES.learningGoals} onClick={event => { if (disabled || !focus) event.preventDefault(); }}>Open my learning goal</Link></Button></> : <p>Choose “I want to develop this” on a skill to save a specific learning focus.</p>}
+      {entries.length > currentEntries.length && <p className="specialist-skills__reason">{entries.length - currentEntries.length} earlier choice(s) need review after your work or the source version changed. Review the current task to save a fresh choice.</p>}
+      {currentEntries.length > 0 && <details><summary>My saved skill choices ({currentEntries.length})</summary><ul className="specialist-skills__saved-list">{currentEntries.map(entry => <li key={specialistEntryKey(entry)}><strong>{entry.skillLabel}</strong><p>{entry.decision === "use" ? "I use this" : entry.decision === "no" ? "Does not fit" : entry.decision === "unsure" ? "Not sure" : "Not reviewed"}{entry.wantsLearning ? " · I want to develop this" : ""}</p><p className="specialist-skills__reason">{entry.taskWording} · ESCO {entry.sourceVersion}</p></li>)}</ul></details>}
+      <p className="specialist-skills__reason">Learning builds your capability. It does not lower the research exposure score.</p>
+    </div>}
+    <div className="specialist-skills__primary-search">
+      <h3>Find skills that fit this task</h3>
+      <p className="specialist-skills__reason">Search the full ESCO catalogue. Read each meaning and decide whether you use it or want to learn it.</p>
+      <SpecialistSourceSearch key={`skills-${roleContext}-${task?.id}`} kind="skill" taskWording={task?.wording} disabled={saving} onVersion={rememberSourceVersion} renderSkill={(skill, version) => card(skill, [], version, null)} />
+      <a href="#add-personal-skill" onClick={() => { const details = document.getElementById("add-personal-skill"); if (details instanceof HTMLDetailsElement) details.open = true; requestAnimationFrame(() => document.getElementById("personal-skill-name")?.focus()); }}>Cannot find your skill? Add it in your own words</a>
+    </div>
+    <details className="specialist-skills__browse"><summary>Browse by occupation instead <span className="specialist-skills__reason">Optional</span></summary>
     <div className="specialist-skills__references">
-      <h3>Choose a source occupation to explore</h3>
+      <h3>Search a source occupation</h3>
       <p className="specialist-skills__reason">Search for a source occupation by name. Malaysian occupation codes are not used to choose an ESCO role. Your choice helps you find skills; it does not change your work profile or confirm a Malaysian job match.</p>
       <SpecialistSourceSearch key={`roles-${roleContext}`} kind="occupation" disabled={saving} onChoose={chooseRole} onVersion={rememberSourceVersion} />
       {selectedRole && <p>Exploring: <strong>{selectedRole.label}</strong> · ESCO source ISCO code {selectedRole.isco_code}</p>}
@@ -150,21 +179,11 @@ export default function SpecialistSkills({ tasks, occupationCode, focusTaskId, o
       </details>}
       <details><summary>How these suggestions were found</summary><p>{catalogue.mapping_note}</p>{catalogue.attribution && <p>{catalogue.attribution}</p>}{catalogue.license_url && <a href={catalogue.license_url} target="_blank" rel="noreferrer">{catalogue.license || "Source reuse terms"}</a>}<p>Shared words in your task and the source names help order the first suggestions. We have not validated these task-to-skill links for your workplace. Your review records your own statement, not a qualification.</p></details>
     </> : null}
-    <details className="specialist-skills__browse"><summary>Search all skills and knowledge</summary>
-      <p>Use this when you cannot find a suitable source occupation or a skill is missing from its list. A catalogue result does not imply that you use it.</p>
-      <SpecialistSourceSearch key={`skills-${roleContext}`} kind="skill" disabled={saving} onVersion={rememberSourceVersion} renderSkill={(skill, version) => card(skill, [], version, null)} />
     </details>
     {entries.length > currentEntries.length && <details><summary>Earlier saved choices ({entries.length - currentEntries.length})</summary>
-      <p>These choices are kept, but their task, occupation or source version needs checking. When the catalogue is unavailable, its version cannot be checked. Review a current suggestion to update the choice.</p>
+      <p>These choices are kept, but their work context or a checked source version has changed. Review a current suggestion to update the choice.</p>
       <ul>{entries.filter(entry => !currentEntries.includes(entry)).map(entry => <li key={specialistEntryKey(entry)}><strong>{entry.skillLabel}</strong> — {entry.taskWording} · ESCO {entry.sourceVersion} · {entry.decision === "use" ? "You said you use this" : entry.decision === "no" ? "Did not fit" : entry.decision === "unsure" ? "Not sure" : "Not reviewed"}{entry.wantsLearning ? " · Learning interest" : ""}</li>)}</ul>
     </details>}
-    <div className="specialist-skills__next"><h3>Your next learning focus</h3>
-      {interests.length ? <><label htmlFor="specialist-focus">Choose one skill you want to develop</label><select id="specialist-focus" value={focus ? specialistEntryKey(focus) : ""} disabled={disabled} onChange={event => { const key = event.target.value || null; void runSave(() => saveSpecialistFocus(key), "Your learning focus is saved."); }}>
-        <option value="">Choose a skill</option>{interests.map(entry => <option key={specialistEntryKey(entry)} value={specialistEntryKey(entry)}>{entry.skillLabel} — {entry.taskWording}</option>)}
-      </select><Button disabled={disabled || !focus} onClick={() => setHandoff(focus ? specialistEntryKey(focus) : null)}>Review my next step</Button></> : <p>Choose “I want to develop this” on a skill to save a specific learning focus.</p>}
-      {handoff && focus && handoff === specialistEntryKey(focus) && <div className="specialist-skills__handoff" role="status"><h4>{focus.skillLabel}</h4><p>For: {focus.taskWording}</p><p>{focus.decision === "use" ? "You said you use this skill and want to develop it." : "This is your learning interest. You have not confirmed that you use this skill."}</p><p>Your focus is saved. We do not yet have a checked course match for this specific skill. Browsing the learning catalogue does not create one.</p><Button asChild variant="outline"><Link to={`${ROUTES.learningCentre}?mode=browse`}>Browse learning independently</Link></Button></div>}
-      {entries.length > currentEntries.length && <p className="specialist-skills__reason">{entries.length - currentEntries.length} earlier choice(s) need review after your work or the source version changed. Review the current task to save a fresh choice.</p>}
-      <p className="specialist-skills__reason">Learning builds your capability. It does not lower the research exposure score.</p>
-    </div>
+
   </section>;
 }

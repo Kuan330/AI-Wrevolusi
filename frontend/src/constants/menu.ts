@@ -20,8 +20,8 @@ export const PRIMARY_NAV_MENU: readonly JourneyMenuItem[] = [
   {
     key: "learning",
     label: "My Learning",
-    path: ROUTES.plan,
-    paths: [ROUTES.plan, ROUTES.learningCentre],
+    path: ROUTES.learningGoals,
+    paths: [ROUTES.learningGoals, ROUTES.plan, ROUTES.learningCentre],
   },
   {
     key: "careers",
@@ -38,7 +38,8 @@ export const WORK_NAV_MENU = [
 ] as const;
 
 export const LEARNING_NAV_MENU = [
-  { key: "plan", label: "My learning", path: ROUTES.plan },
+  { key: "goals", label: "My goals", path: ROUTES.learningGoals },
+  { key: "plan", label: "My courses", path: ROUTES.plan },
   { key: "resources", label: "Find learning", path: ROUTES.learningCentre },
 ] as const;
 

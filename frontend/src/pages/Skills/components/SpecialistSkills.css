@@ -30,3 +30,11 @@
 .specialist-skills__role-results li { display:flex; align-items:center; gap:.75rem; }
 .specialist-skills__role-results button { min-height:44px; height:auto; white-space:normal; text-align:left; }
 .specialist-skills__role-results span { flex-shrink:0; font-size:.8rem; color:#655d69; }
+.specialist-skills__primary-search { display:grid; gap:.85rem; padding:1.25rem; border:1px solid #bdd1da; background:#f7fbfd; border-radius:12px; }
+.specialist-skills__primary-search>h3 { font-weight:650; font-size:1.15rem; }
+.specialist-skills__description { color:#403946; font-size:.95rem; }
+.specialist-skills__task-search { justify-self:start; white-space:normal; min-height:44px; height:auto; }
+.specialist-skills__source-search input:focus-visible,.specialist-skills select:focus-visible { outline:3px solid #6499b2; outline-offset:2px; }
+@media(max-width:600px) { .specialist-skills__primary-search { padding:1rem; } .specialist-skills__role-results li { align-items:flex-start; flex-direction:column; gap:.2rem; } }
+.specialist-skills__saved-list { display:grid; gap:.8rem; padding:0; list-style:none; }
+.specialist-skills__saved-list li { border-bottom:1px solid #e0d9e5; padding-bottom:.8rem; }

@@ -8,4 +8,5 @@ export const ROUTES = {
   task: "/profile/tasks",
   aiExposure: "/ai-exposure",
   learningCentre: "/learning-centre",
+  learningGoals: "/learning-goals",
 } as const;

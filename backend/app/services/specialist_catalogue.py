@@ -1,9 +1,10 @@
 """Pinned catalogue import validation. Never infers personal task-to-skill links."""
 import json
+import re
 from pathlib import Path
 
 from fastapi import HTTPException
-from sqlalchemy import func, select
+from sqlalchemy import Text, and_, case, cast, func, literal, or_, select
 from app.models.specialist import SpecialistRelease, SpecialistOccupation, SpecialistConcept, SpecialistRelation
 
 VERSION = '1.2.0'
@@ -86,17 +87,100 @@ async def catalogue_for_occupation(db, code=None, uri=None):
         catalogue_counts=dict(occupations=release['occupation_count'], skills=release['skill_count'], relations=release['relation_count']))
 
 
+def _concept_search(table, query):
+    """Source text retrieval, not a task-to-skill mapping or proficiency assessment.
+
+    PostgreSQL English stemming handles reports/report and complaints/complaint.
+    Excel expands only to spreadsheet and AI to artificial intelligence. These
+    narrow discovery aids avoid verb excel and T'ai chi, and are not new ESCO links.
+    Short technical names retain whole-word matches instead of substring matches.
+    """
+    words = list(dict.fromkeys(re.findall(r"[^\W_]+(?:[+#]+)?", query.lower())))
+    source_text = table.c.search_text + ' ' + table.c.description
+    english = func.to_tsvector('english', source_text)
+    simple = func.to_tsvector('simple', source_text)
+    label_vector = func.to_tsvector('english', table.c.label)
+    alias_vector = func.to_tsvector('english', cast(table.c.aliases, Text))
+    matches, meaningful, label_matches, alias_matches = [], [], [], []
+    for word in words:
+        dictionary = 'simple' if word in {'excel', 'r', 'c', 'c++', 'c#', 'ai'} else 'english'
+        term = func.plainto_tsquery(dictionary, word)
+        active = func.numnode(term) > 0
+        match = (simple if dictionary == 'simple' else english).op('@@')(term)
+        label_match = func.to_tsvector(dictionary, table.c.label).op('@@')(term)
+        alias_match = func.to_tsvector(dictionary, cast(table.c.aliases, Text)).op('@@')(term)
+        if word in {'c', 'c++', 'c#'}:
+            # PostgreSQL tokenization discards + and #, so preserve these names.
+            pattern = r'(?<![[:alnum:]_])' + re.escape(word) + r'(?![[:alnum:]_+#])'
+            match = source_text.op('~*')(pattern)
+            label_match = table.c.label.op('~*')(pattern)
+            alias_match = cast(table.c.aliases, Text).op('~*')(pattern)
+        if word in {'excel', 'ai'}:
+            # These ambiguous short words have explicit software/technology intent.
+            # Do not retrieve performers who 'excel' or the token in T'ai chi.
+            expansion = func.plainto_tsquery('english', 'spreadsheet' if word == 'excel' else 'artificial intelligence')
+            match = english.op('@@')(expansion)
+            label_match = label_vector.op('@@')(expansion)
+            alias_match = alias_vector.op('@@')(expansion)
+        matches.append(and_(active, match))
+        meaningful.append(active)
+        label_matches.append(and_(active, label_match))
+        alias_matches.append(and_(active, alias_match))
+    score = sum((case((match, 1), else_=0) for match in matches), literal(0))
+    required = sum((case((active, 1), else_=0) for active in meaningful), literal(0))
+    all_terms = and_(required > 0, score == required)
+    # Partial results require two meaningful words for a longer task description.
+    partial = and_(required > 0, score >= func.least(2, required))
+    normalized = ' '.join(query.lower().split())
+    exact_label = func.lower(table.c.label) == normalized
+    exact_alias = func.lower(cast(table.c.aliases, Text)).contains(json.dumps(normalized), autoescape=True)
+    exact = or_(exact_label, exact_alias)
+    rank = case((exact_label, 2), (exact_alias, 1), else_=0)
+    # Generic task verbs should not outrank the subject of a user's task. This
+    # affects ordering only, never creates a skill link or removes exact matches.
+    generic_verbs = {'prepare', 'preparing', 'use', 'using', 'create', 'creating', 'make', 'making', 'do', 'doing', 'perform', 'performing'}
+    # A task's leading clause is usually its main activity. Later context still
+    # contributes, but must not drown out the task with incidental description words.
+    leading_clause = re.split(r'\b(?:for|and|then|while|so that)\b', query.lower(), maxsplit=1)[0]
+    leading_words = set(re.findall(r"[^\W_]+(?:[+#]+)?", leading_clause))
+    weights = [(1 if word in generic_verbs else 3) * (2 if word in leading_words else 1) for word in words]
+    relevance = sum((case((match, weight), else_=0) for match, weight in zip(matches, weights)), literal(0))
+    label_score = sum((case((match, weight), else_=0) for match, weight in zip(label_matches, weights)), literal(0))
+    alias_score = sum((case((match, 1), else_=0) for match in alias_matches), literal(0))
+    # Prefer a focused concept name over a long name with incidental matching words.
+    focused_label_score = label_score / (1 + func.length(label_vector) * 0.3)
+    columns = [case((exact, 'exact'), (all_terms, 'terms'), else_='related').label('match_type')]
+    columns += [match.label(f'matched_{index}') for index, match in enumerate(matches)]
+    return or_(exact, partial), [rank.desc(), focused_label_score.desc(), alias_score.desc(), all_terms.desc(), relevance.desc()], columns, words
+
+
 async def search_catalogue(db, *, concepts=False, query='', code=None, limit=20, offset=0):
     release = await require_release(db)
     table = SpecialistConcept.__table__ if concepts else SpecialistOccupation.__table__
     conditions = [table.c.version == VERSION]
-    # Treat user text literally. Wildcards cannot turn a small query into a browse-all query.
-    for word in query.lower().split():
-        conditions.append(table.c.search_text.contains(word, autoescape=True))
+    order, columns, words = [], [], []
+    # SQLite is used for catalogue import contract tests. Deployed catalogue search
+    # runs on PostgreSQL, whose dictionaries provide the source-text stemming.
+    postgres = db.bind.dialect.name == 'postgresql'
+    if query.strip() and concepts and postgres:
+        match, order, columns, words = _concept_search(table, query)
+        conditions.append(match)
+    else:
+        for word in query.lower().split():
+            conditions.append(table.c.search_text.contains(word, autoescape=True))
     if code and not concepts:
         conditions.append(table.c.isco_code == code)
     total = (await db.execute(select(func.count()).select_from(table).where(*conditions))).scalar_one()
-    rows = (await db.execute(select(table).where(*conditions).order_by(table.c.label, table.c.uri).limit(limit).offset(offset))).mappings().all()
-    items = [skill_record(row) if concepts else {key: row[key] for key in ('uri', 'label', 'isco_code')} for row in rows]
-    return dict(source='ESCO', version=VERSION, items=items, total=total, limit=limit, offset=offset,
+    rows = (await db.execute(select(table, *columns).where(*conditions)
+        .order_by(*order, table.c.label, table.c.uri).limit(limit).offset(offset))).mappings().all()
+    items = []
+    for row in rows:
+        item = skill_record(row) if concepts else {key: row[key] for key in ('uri', 'label', 'isco_code')}
+        if columns:
+            item.update(match_type=row['match_type'], matched_terms=[word for index, word in enumerate(words) if row[f'matched_{index}']])
+        items.append(item)
+    mode = 'browse' if not query.strip() else ('none' if not total else 'matches')
+    if items and items[0].get('match_type') == 'related':
+        mode = 'related'
+    return dict(source='ESCO', version=VERSION, items=items, total=total, limit=limit, offset=offset, search_mode=mode,
         **{key: release['source_metadata'].get(key, '') for key in ('attribution', 'license', 'license_url')})

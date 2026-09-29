@@ -61,7 +61,7 @@ export default function PlanContinuation({ courses, loading, onRecord }: {
       }}>Continue course <span className="sr-only">on the provider website, opens a new tab</span></a></Button>}
       {selected && <Button variant={provider?.url ? "outline" : "default"} onClick={() => onRecord(selected)}>Record progress for this course</Button>}
       {selected && context && <Button asChild variant="outline"><Link to={learningContextUrl(context)}>Back to this learning goal</Link></Button>}
-      {!selected && <Button asChild variant="outline"><Link to={context ? learningContextUrl(context) : ROUTES.skills}>{context ? "Find learning for this skill" : "Review my skills"}</Link></Button>}
+      {!selected && <Button asChild variant="outline"><Link to={context ? learningContextUrl(context) : ROUTES.skills}>{context ? "Open this learning goal" : "Review my skills"}</Link></Button>}
       <Button asChild variant="ghost"><Link to={`${ROUTES.learningCentre}?mode=browse`}>Find other learning</Link></Button>
     </div>
     {catalogueError && <p role="status" className="mt-3 text-sm">{catalogueError}</p>}

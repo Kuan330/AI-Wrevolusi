@@ -1,4 +1,4 @@
-import { accountStorage, currentWorkspaceSession, flushWorkspace, saveWorkspaceItems } from "../../services/accountStorage.ts";
+import { accountStorage, commitWorkspaceItems, currentWorkspaceSession, flushWorkspace, saveWorkspaceItems } from "../../services/accountStorage.ts";
 import { readUserProfile, type UserProfile } from "../work-profile/userProfile.ts";
 import { readPlanState } from "../learning-planning/planCourses.ts";
 import { readLibrary } from "../learning-planning/libraryStorage.ts";
@@ -26,8 +26,10 @@ export type LearningInput = {
   career?: LearningContext["career"];
   goal?: string;
 };
+export type PersonalSkillChoice = "use" | "no" | "unsure" | null;
 export type PersonalSkill = {
   id: string; name: string; taskIds: string[]; taskLabels: string[]; workKey: string; updatedAt: string;
+  decision?: PersonalSkillChoice; wantsLearning?: boolean;
 };
 export type JourneyState = {
   personalSkills?: PersonalSkill[];
@@ -73,7 +75,9 @@ export function isPersonalSkill(value: unknown): value is PersonalSkill {
     strings(value.taskIds) && value.taskIds.length > 0 && value.taskIds.every(id => id.trim().length > 0) &&
     new Set(value.taskIds).size === value.taskIds.length && strings(value.taskLabels) &&
     value.taskLabels.length === value.taskIds.length && value.taskLabels.every(label => label.trim().length > 0) &&
-    text(value.workKey, 100_000) && value.workKey.length > 0 && dated(value.updatedAt);
+    text(value.workKey, 100_000) && value.workKey.length > 0 && dated(value.updatedAt) &&
+    (value.decision === undefined || value.decision === null || (typeof value.decision === "string" && ["use", "no", "unsure"].includes(value.decision))) &&
+    (value.wantsLearning === undefined || typeof value.wantsLearning === "boolean");
 }
 
 export function parseJourneyState(raw: string | null): JourneyState {
@@ -198,6 +202,23 @@ export async function addPersonalSkill(id: string, name: string, taskId: string)
   await persist({ ...state, personalSkills: [...saved, entry] });
 }
 
+/** A personal label is the user's statement, never a verified catalogue concept. */
+export function personalSkillIsCurrent(entry: PersonalSkill): boolean {
+  const profile = readJourneyProfile();
+  return Boolean(profile.tasksConfirmed) &&
+    entry.taskIds.every((id, index) => profile.tasks.some(task => task.id === id && task.wording === entry.taskLabels[index]));
+}
+export async function savePersonalSkillChoice(id: string, patch: { decision?: PersonalSkillChoice; wantsLearning?: boolean }): Promise<void> {
+  const state = readJourneyState();
+  const saved = state.personalSkills?.find(entry => entry.id === id);
+  if (!saved) throw new Error("This personal skill is no longer available.");
+  if (!personalSkillIsCurrent(saved)) throw new Error("Your work changed. Add this skill again against a confirmed current task.");
+  const updated: PersonalSkill = { ...saved, ...patch, updatedAt: new Date().toISOString() };
+  if (!isPersonalSkill(updated)) throw new Error("Choose a supported skill decision or learning interest.");
+  const next = { ...state, personalSkills: state.personalSkills!.map(entry => entry.id === id ? updated : entry) };
+  await commitWorkspaceItems({ [JOURNEY_KEY]: JSON.stringify(next) });
+}
+
 export async function removePersonalSkill(id: string): Promise<void> {
   const state = readJourneyState();
   await persist({ ...state, personalSkills: (state.personalSkills ?? []).filter(item => item.id !== id) });
@@ -208,7 +229,7 @@ export async function completeSkillReview(): Promise<void> {
   await persist({ ...state, review: { ...reviewFor(state), completed: true } });
 }
 
-export const learningContextUrl = (context: LearningContext) => `${ROUTES.learningCentre}?${new URLSearchParams({ context: context.id, skill: context.skill.slug })}`;
+export const learningContextUrl = (context: LearningContext) => `${ROUTES.learningGoals}?${new URLSearchParams({ context: context.id })}`;
 export const planCourseUrl = (courseId: string) => `${ROUTES.plan}?${new URLSearchParams({ course: courseId })}`;
 export function readLearningContext(id?: string | null): LearningContext | null {
   const state = readJourneyState();

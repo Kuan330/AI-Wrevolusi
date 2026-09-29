@@ -20,6 +20,7 @@ import { ROUTES } from "@/constants/routes";
 import AIExposure from "@/pages/AIExposure/AIExposure";
 import Home from "@/pages/Home/Home";
 import LearningCentre from "@/pages/LearningCentre/LearningCentre";
+import LearningGoals from "@/pages/LearningGoals/LearningGoals";
 import Possibilities from "@/pages/Possibilities/Possibilities";
 import Plan from "@/pages/Plan/Plan";
 import WorkProfile from "@/pages/WorkProfile/WorkProfile";
@@ -58,6 +59,7 @@ const AppRoutes = () => {
             element={<Navigate {...navigateProps1} />}
           />
           <Route element={<MainLayout />}>
+            <Route path={ROUTES.learningGoals} element={<AccountGate kind="plan"><LearningGoals /></AccountGate>} />
             <Route path={ROUTES.continue} element={<AccountGate kind="plan"><ContinueJourney /></AccountGate>} />
             <Route element={<AccountGate kind="work"><Outlet /></AccountGate>}>
               <Route element={<RequireWorkTasks />}>

@@ -166,3 +166,16 @@ def test_personal_skills_preserve_user_evidence_without_changing_reference_owner
     for personal in (None, {}, [entry, entry], [{**entry, 'name': ' '}], [{**entry, 'taskIds': []}], [{**entry, 'taskLabels': []}], [{**entry, 'taskIds': ['task', 'task'], 'taskLabels': ['a', 'b']}], [{**entry, 'id': str(i)} for i in range(51)]):
         with pytest.raises(ValueError):
             validate_journey({**state(), 'personalSkills': personal})
+
+
+@pytest.mark.parametrize('patch',[{'decision':['use']},{'decision':'expert'},{'wantsLearning':1},{'wantsLearning':'yes'}])
+def test_personal_skill_choice_rejects_invalid_flags(patch):
+    entry={'id':'p1','name':'My skill','taskIds':['t1'],'taskLabels':['My task'],'workKey':'snapshot','updatedAt':STAMP,**patch}
+    with pytest.raises(ValueError):validate_journey({**state(),'personalSkills':[entry]})
+
+
+def test_personal_skill_choices_preserve_legacy_and_explicit_uncertainty():
+    entry={'id':'p1','name':'My skill','taskIds':['t1'],'taskLabels':['My task'],'workKey':'snapshot','updatedAt':STAMP}
+    assert 'decision' not in validate_journey({**state(),'personalSkills':[entry]})['personalSkills'][0]
+    entry.update(decision='unsure',wantsLearning=True)
+    assert validate_journey({**state(),'personalSkills':[entry]})['personalSkills'][0]['decision']=='unsure'

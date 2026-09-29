@@ -70,6 +70,8 @@ def validate_journey(value: object) -> dict:
             ids.add(entry['id'])
             if not _text(entry.get('name'), 120, nonempty=True) or not entry['name'].strip():
                 raise ValueError(error)
+            if ('decision' in entry and (entry['decision'] is not None and (not isinstance(entry['decision'], str) or entry['decision'] not in ('use', 'no', 'unsure')))) or ('wantsLearning' in entry and type(entry['wantsLearning']) is not bool):
+                raise ValueError(error)
             task_ids, labels = entry.get('taskIds'), entry.get('taskLabels')
             if not _strings(task_ids) or not task_ids or any(not item.strip() for item in task_ids) or len(set(task_ids)) != len(task_ids):
                 raise ValueError(error)

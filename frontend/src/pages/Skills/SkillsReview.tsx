@@ -7,6 +7,7 @@ import { ROUTES } from "@/constants/routes";
 import {
   addPersonalSkill,
   removePersonalSkill,
+  savePersonalSkillChoice,
   type PersonalSkill,
   completeSkillReview,
   currentWorkKey,
@@ -228,22 +229,31 @@ export default function SkillsReview() {
         if (task) { setSearchParams(params => { params.set("task", id); return params; }, { state: { taskWording: task.wording } }); setSelectedId(null); }
       }} />}
 
-      {!readError && work && work.tasks.length > 0 && <section className="skills-review-page__card skills-review-page__personal" aria-labelledby="personal-skills-title">
+      {!readError && work && work.tasks.length > 0 && <section id="personal-skills" className="skills-review-page__card skills-review-page__personal" aria-labelledby="personal-skills-title">
         <div className="skills-review-page__section-heading">
           <h2 id="personal-skills-title">Skills you added</h2>
           <p>{work.personalSkills.filter(item => item.taskIds.every((id, index) => work.tasks.some(task => task.id === id && task.wording === item.taskLabels[index]))).length} for your current work</p>
         </div>
-        <p className="skills-review-page__hint">Add a specific skill or technique you use. These are your own statements; course suggestions use the broad skills below.</p>
+        <p className="skills-review-page__hint">Add a skill you use or want to develop. Your own wording stays separate from the source catalogue, and you can carry it into a learning goal.</p>
         {work.personalSkills.length > 0 && <ul className="skills-review-page__personal-list">
-          {work.personalSkills.map(item => <li key={item.id}>
-            <div><strong>{item.name}</strong> <span className="skills-review-page__state">You added</span>
-              {!item.taskIds.every((id, index) => work.tasks.some(task => task.id === id && task.wording === item.taskLabels[index])) && <p className="skills-review-page__hint">From earlier work — check whether this still fits. Remove and add it again to link a current task.</p>}
-              <details><summary>Supporting task</summary><p>{item.taskLabels.join("; ")}</p></details>
-            </div>
-            <Button variant="ghost" disabled={saving} onClick={() => void runSave(() => removePersonalSkill(item.id))} aria-label={`Remove ${item.name}`}>Remove</Button>
-          </li>)}
+          {work.personalSkills.map(item => {
+            const current = item.taskIds.every((id, index) => work.tasks.some(task => task.id === id && task.wording === item.taskLabels[index]));
+            return <li key={item.id}>
+              <div>
+                <strong>{item.name}</strong> <span className="skills-review-page__state">Your own words</span>
+                {!current && <p className="skills-review-page__hint">From earlier work. Add a new entry with a current task to make a new learning choice. Earlier goals keep their original context.</p>}
+                <details><summary>Supporting task</summary><p>{item.taskLabels.join("; ")}</p></details>
+                <div className="skills-review-page__decisions" role="group" aria-label={`Review personal skill ${item.name}`}>
+                  {([['use', 'I use this'], ['no', 'Does not fit'], ['unsure', 'Not sure']] as const).map(([value, label]) => <Button key={value} variant={item.decision === value ? "default" : "outline"} aria-pressed={item.decision === value} disabled={saving || !current} onClick={() => void runSave(() => savePersonalSkillChoice(item.id, { decision: item.decision === value ? null : value }))}>{label}</Button>)}
+                </div>
+                <label className="specialist-skills__learn"><input type="checkbox" checked={item.wantsLearning ?? false} disabled={saving || !current} onChange={event => { const wantsLearning = event.target.checked; void runSave(() => savePersonalSkillChoice(item.id, { wantsLearning })); }} /> I want to develop this skill</label>
+                {current && item.wantsLearning && <Button asChild variant="outline"><Link to={`${ROUTES.learningGoals}?${new URLSearchParams({ personal: item.id })}`}>Open my learning goal</Link></Button>}
+              </div>
+              <Button variant="ghost" disabled={saving} onClick={() => void runSave(() => removePersonalSkill(item.id))} aria-label={`Remove ${item.name}`}>Remove</Button>
+            </li>;
+          })}
         </ul>}
-        <details>
+        <details id="add-personal-skill">
           <summary>Add a skill we missed</summary>
           <form className="skills-review-page__personal-form" onSubmit={event => {
             event.preventDefault();
@@ -259,7 +269,7 @@ export default function SkillsReview() {
             <label htmlFor="personal-skill-name">Skill name</label>
             <input id="personal-skill-name" value={personalName} maxLength={120} required disabled={saving}
               placeholder="For example, reading technical drawings" onChange={event => setPersonalName(event.target.value)} />
-            <label htmlFor="personal-skill-task">Which task uses this skill?</label>
+            <label htmlFor="personal-skill-task">Which task relates to this skill?</label>
             <select id="personal-skill-task" value={personalTask || activeFocus?.id || ""} required disabled={saving} onChange={event => setPersonalTask(event.target.value)}>
               <option value="">Choose one of your tasks</option>
               {work.tasks.map(task => <option key={task.id} value={task.id}>{task.wording}</option>)}

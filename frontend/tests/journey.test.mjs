@@ -82,6 +82,7 @@ test('accepted work skill and goal survive refresh and preserve exact task conte
   saveConfirmedAnalysis(analysis());
   await saveSkillDecision(1,'accepted');await completeSkillReview();
   const url=await startWork();
+  assert.equal(new URL(url,'https://local').pathname, '/learning-goals');
   const id=new URL(url,'https://local').searchParams.get('context');
   const context=readLearningContext(id);
   assert.equal(context.goal,'Check report conclusions');assert.deepEqual(context.taskIds,['task-1']);
@@ -255,4 +256,41 @@ test('generic entry resumes the saved work-draft stage without changing confirme
   memory.set('aiwrevolusi.workProfileDraft.v1',JSON.stringify({...draft,stage:'job'}));
   assert.equal(getContinueDestination(),'/profile?edit=job');
   assert.equal(memory.get(profileKey),original);
+});
+
+test('personal recognition and learning choices require acknowledgement and never infer ability',async()=>{
+ const {addPersonalSkill,savePersonalSkillChoice,personalSkillIsCurrent}=await import('../src/features/journey/journey.ts');
+ activateWorkspace('personal-choice-owner',{data:{},revision:0});saveConfirmedAnalysis(analysis());
+ await addPersonalSkill('p1','Local report checks','task-1');
+ let entry=readJourneyState().personalSkills[0];assert.equal(entry.decision,undefined);assert.equal(entry.wantsLearning,undefined);
+ assert.equal(personalSkillIsCurrent(entry),true);
+ globalThis.fetch=async()=>{throw Error('Offline');};
+ await assert.rejects(savePersonalSkillChoice('p1',{decision:'unsure',wantsLearning:true}),/Offline/);
+ assert.equal(readJourneyState().personalSkills[0].wantsLearning,undefined);
+ globalThis.fetch=async()=>response({revision:2});
+ await savePersonalSkillChoice('p1',{decision:'unsure',wantsLearning:true});
+ entry=readJourneyState().personalSkills[0];assert.equal(entry.decision,'unsure');assert.equal(entry.wantsLearning,true);
+ assert.equal(readJourneyState().review,undefined);
+ writeUserProfile({tasks:[{...analysis().tasks[0],wording:'Changed work'}],tasksConfirmed:true});
+ assert.equal(personalSkillIsCurrent(entry),false);
+ await assert.rejects(savePersonalSkillChoice('p1',{decision:'use'}),/work changed/);
+});
+
+test('personal choice flags retain legacy parsing and reject enum impostors',()=>{
+ const entry={id:'p1',name:'CAD',taskIds:['t1'],taskLabels:['Draw a part'],workKey:'snapshot',updatedAt:'2026-01-01T00:00:00Z'};
+ const base={version:1,contexts:{},courseContexts:{}};
+ for(const patch of [{decision:['use']},{decision:'expert'},{wantsLearning:1},{wantsLearning:'yes'}]) {
+  assert.throws(()=>parseJourneyState(JSON.stringify({...base,personalSkills:[{...entry,...patch}]})),/could not be read/);
+ }
+});
+
+
+test('unrelated task changes do not invalidate a personal learning interest',async()=>{
+ const {addPersonalSkill,savePersonalSkillChoice,personalSkillIsCurrent}=await import('../src/features/journey/journey.ts');
+ activateWorkspace('personal-choice-owner',{data:{},revision:0});saveConfirmedAnalysis(analysis());
+ await addPersonalSkill('p1','Local report checks','task-1');
+ writeUserProfile({tasks:[analysis().tasks[0],{id:'t2',wording:'Arrange deliveries'}],tasksConfirmed:true});
+ assert.equal(personalSkillIsCurrent(readJourneyState().personalSkills[0]),true);
+ await savePersonalSkillChoice('p1',{wantsLearning:true});
+ assert.equal(readJourneyState().personalSkills[0].wantsLearning,true);
 });

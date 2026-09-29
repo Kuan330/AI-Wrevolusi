@@ -280,7 +280,7 @@ async def search_specialist_occupations(
 
 @router.get('/specialist-skill-search')
 async def search_specialist_skills(
-    q: str = Query(default='', max_length=120),
+    q: str = Query(default='', max_length=300),
     limit: int = Query(default=20, ge=1, le=50),
     offset: int = Query(default=0, ge=0, le=20000),
     db: AsyncSession = Depends(get_db),

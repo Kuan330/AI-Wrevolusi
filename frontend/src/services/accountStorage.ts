@@ -4,6 +4,7 @@ type Workspace = { data: Record<string, string>; revision: number };
 export const workspaceKeys = [
   "aiwrevolusi.journey.v1",
   "aiwrevolusi.specialistSkills.v1",
+  "aiwrevolusi.learningGoals.v1",
   "aiwrevolusi.workProfileDraft.v1",
   "aiwrevolusi.userProfile",
   "aiwrevolusi.confirmedAnalysis",

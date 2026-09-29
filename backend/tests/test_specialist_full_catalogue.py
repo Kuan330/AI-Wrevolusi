@@ -118,3 +118,13 @@ def test_import_is_immutable_idempotent_and_atomic(catalogue_db):
             asyncio.run(import_catalogue(db, bad))
     assert connection.execute(select(func.count()).select_from(SpecialistRelease).where(SpecialistRelease.version == 'test-bad')).scalar_one() == 0
     assert connection.execute(select(func.count()).select_from(SpecialistConcept).where(SpecialistConcept.version == 'test-bad')).scalar_one() == 0
+
+
+def test_skill_task_query_limit_matches_the_discovery_form(catalogue_db):
+    connection, db, client = catalogue_db
+    asyncio.run(import_catalogue(db, sample()))
+    connection.commit()
+    # Natural task descriptions can exceed the older occupation-name limit.
+    assert client.get('/reference/specialist-skill-search', params={'q': 'report ' * 30}).status_code == 200
+    assert client.get('/reference/specialist-skill-search', params={'q': 'x' * 301}).status_code == 422
+    assert client.get('/reference/specialist-occupations', params={'q': 'x' * 121}).status_code == 422

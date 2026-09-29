@@ -8,11 +8,14 @@ export interface SpecialistSkill {
   source_relations?: string[];
   skill_type: string;
   aliases: string[];
+  match_type?: "exact" | "terms" | "related";
+  matched_terms?: string[];
 }
 export interface SpecialistOccupation { uri: string; label: string; isco_code: string }
 export interface SpecialistSearchResult<T> {
   source: "ESCO"; version: string; items: T[]; total: number; limit: number; offset: number;
   attribution?: string; license?: string; license_url?: string;
+  search_mode?: "browse" | "matches" | "related" | "none";
 }
 export interface SpecialistCatalogue {
   source: "ESCO";

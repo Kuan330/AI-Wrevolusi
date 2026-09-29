@@ -14,6 +14,7 @@ from app.services.auth import AuthService, get_current_user
 from app.services.workspace import SHORTLIST_KEY, validate_workspace_shortlist
 from app.services.journey import JOURNEY_KEY, validate_journey
 from app.services.specialist_review import SPECIALIST_KEY, validate_specialist_review
+from app.services.learning_goals import LEARNING_GOALS_KEY, validate_learning_goals, validate_learning_goal_transition
 
 router = APIRouter(prefix='/account', tags=['Account'])
 
@@ -36,13 +37,15 @@ class WorkspaceUpdate(BaseModel):
     @field_validator('data')
     @classmethod
     def validate_data(cls, data: dict[str, str]) -> dict[str, str]:
-        allowed = {SPECIALIST_KEY, 'aiwrevolusi.workProfileDraft.v1', JOURNEY_KEY, 'aiwrevolusi.userProfile', 'aiwrevolusi.confirmedAnalysis', 'aiwrevolusi.learningCentre', 'aiwrevolusi.learningResourceSelections.v1', 'aiwrevolusi.courseLibrary.v1', 'aiwrevolusi.learningSkills.v1', 'aiwrevolusi.plan.courses.v1', 'aiwrevolusi.planner.v1', 'aiwrevolusi.possibilities.chosenDirection', 'aiwrevolusi.possibilities.shortlist', 'aiwrevolusi.possibilities.saved', 'aiwrevolusi.possibilities.intent'}
+        allowed = {LEARNING_GOALS_KEY, SPECIALIST_KEY, 'aiwrevolusi.workProfileDraft.v1', JOURNEY_KEY, 'aiwrevolusi.userProfile', 'aiwrevolusi.confirmedAnalysis', 'aiwrevolusi.learningCentre', 'aiwrevolusi.learningResourceSelections.v1', 'aiwrevolusi.courseLibrary.v1', 'aiwrevolusi.learningSkills.v1', 'aiwrevolusi.plan.courses.v1', 'aiwrevolusi.planner.v1', 'aiwrevolusi.possibilities.chosenDirection', 'aiwrevolusi.possibilities.shortlist', 'aiwrevolusi.possibilities.saved', 'aiwrevolusi.possibilities.intent'}
         if not data.keys() <= allowed or len(json.dumps(data)) > 2_000_000:
             raise ValueError('Workspace is invalid or too large.')
         for key, value in data.items():
             parsed = json.loads(value)
             if key == SHORTLIST_KEY:
                 validate_workspace_shortlist(parsed)
+            elif key == LEARNING_GOALS_KEY:
+                validate_learning_goals(parsed)
             elif key == SPECIALIST_KEY:
                 validate_specialist_review(parsed)
             elif key == JOURNEY_KEY:
@@ -116,6 +119,10 @@ async def save_workspace(payload: WorkspaceUpdate, account: Account = Depends(cu
     account = await db.scalar(select(Account).where(Account.user_id == account.user_id).with_for_update().execution_options(populate_existing=True))
     if payload.revision != account.revision:
         raise HTTPException(409, 'Your account changed in another session. Reload before saving again.')
+    try:
+        validate_learning_goal_transition(account.workspace, payload.data)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from None
     account.workspace = payload.data
     account.revision += 1
     await db.commit()
