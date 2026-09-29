@@ -7,7 +7,7 @@ export type DraftAttempt = {
 export type GoalDraft = {
   version: 1; owner: string; goalId: string; baseRevision: number; baseContext?: string;
   wording?: string;
-  action?: { kind: "understand" | "practise" | "find_learning"; text: string } | null;
+  action?: { kind: "understand" | "practise" | "find_learning"; text: string; origin?: "ai_suggestion" | "template" } | null;
   attempt?: DraftAttempt;
 };
 export type DraftStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
@@ -21,7 +21,7 @@ export function parseGoalDraft(raw: string | null, owner: string, goalId: string
     if (!object(d) || d.version !== 1 || d.owner !== owner || d.goalId !== goalId || !Number.isSafeInteger(d.baseRevision) || Number(d.baseRevision) < 1 || Object.keys(d).some(k => !["version", "owner", "goalId", "baseRevision", "baseContext", "wording", "action", "attempt"].includes(k))) throw Error();
     if (d.baseContext !== undefined && !text(d.baseContext,1000000)) throw Error();
     if (d.wording !== undefined && !text(d.wording, 1000)) throw Error();
-    if (d.action !== undefined && d.action !== null && (!object(d.action) || (typeof d.action.kind !== "string" || !["understand", "practise", "find_learning"].includes(d.action.kind)) || !text(d.action.text,1000))) throw Error();
+    if (d.action !== undefined && d.action !== null && (!object(d.action) || (typeof d.action.kind !== "string" || !["understand", "practise", "find_learning"].includes(d.action.kind)) || !text(d.action.text,1000) || (d.action.origin !== undefined && d.action.origin !== "ai_suggestion" && d.action.origin !== "template"))) throw Error();
     if (d.attempt !== undefined) {
       const a = d.attempt;
       if (!object(a) || !text(a.id,100) || !a.id || typeof a.editing !== "boolean" || !text(a.date,10) || (typeof a.type !== "string" || !["study", "course_practice", "workplace_practice"].includes(a.type)) || !text(a.description,2000) || !text(a.notes,4000) || (a.task !== null && (!object(a.task) || !text(a.task.id,200) || !text(a.task.wording,5000)))) throw Error();

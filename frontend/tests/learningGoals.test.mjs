@@ -105,3 +105,12 @@ test('personal goal rejects unsaved interest stale task and failed save without 
  profile.tasks[0].wording='Prepare reports';fail=true;await assert.rejects(api.createPersonalGoal(personal),/save failed/);
  assert.equal(api.readLearningGoals().length,0);
 });
+
+
+test('generated action labels persist and remain in earlier versions', async () => {
+ const g=await api.createSpecialistGoal(entry);
+ await api.updateLearningGoal(g.id,{action:{kind:'practise',text:'Use a fictional sample',origin:'ai_suggestion'}});
+ assert.equal(api.readLearningGoals()[0].action.origin,'ai_suggestion');
+ await api.updateLearningGoal(g.id,{action:null});
+ assert.equal(api.readLearningGoals()[0].history.at(-1).action.origin,'ai_suggestion');
+});

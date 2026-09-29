@@ -41,3 +41,7 @@
 .specialist-skills__task-context { padding: .75rem 1rem; border-left: 3px solid #bfd1dc; background: #fff; }
 .specialist-skills__full-task { white-space: pre-wrap; overflow-wrap: anywhere; }
 .specialist-skills__experience-label { font-weight: 600; }
+.specialist-skills__guided { display:grid; gap:1rem; padding:1.25rem; border:1px solid #bdd1da; background:#f7fbfd; border-radius:12px; }
+.specialist-skills__guided h3 { font-size:1.2rem; font-weight:650; }
+.specialist-skills__guided h4 { font-size:1.05rem; font-weight:650; }
+.specialist-skills__guided>button,.specialist-skills__guided .specialist-skills__card>button { justify-self:start; min-height:44px; white-space:normal; }

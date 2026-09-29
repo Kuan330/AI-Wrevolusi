@@ -6,7 +6,7 @@ import type { SpecialistEntry } from "../journey/specialistSkills.ts";
 
 export const LEARNING_GOALS_KEY = "aiwrevolusi.learningGoals.v1";
 export type GoalTask = { id: string; wording: string };
-export type GoalAction = { kind: "understand" | "practise" | "find_learning"; text: string };
+export type GoalAction = { kind: "understand" | "practise" | "find_learning"; text: string; origin?: "ai_suggestion" | "template" };
 export type AttemptType = "study" | "course_practice" | "workplace_practice";
 export type LearningAttempt = { id: string; date: string; type: AttemptType; description: string; notes: string; task: GoalTask | null; createdAt: string; updatedAt: string };
 export type GoalSnapshot = {
@@ -23,7 +23,7 @@ const str = (v: unknown, max: number, empty = false): v is string => typeof v ==
 const keys = (v: Record<string, unknown>, names: string[]) => Object.keys(v).length === names.length && names.every(k => Object.hasOwn(v, k));
 const dated = (v: unknown) => str(v, 40) && Number.isFinite(Date.parse(v));
 const taskValid = (v: unknown): v is GoalTask => obj(v) && keys(v,["id","wording"]) && str(v.id,200) && str(v.wording,5000);
-const actionValid = (v: unknown) => v === null || (obj(v) && keys(v,["kind","text"]) && typeof v.kind === "string" && ["understand","practise","find_learning"].includes(v.kind) && str(v.text,1000));
+const actionValid = (v: unknown) => v === null || (obj(v) && Object.keys(v).every(key => ["kind", "text", "origin"].includes(key)) && (v.origin === undefined || v.origin === "ai_suggestion" || v.origin === "template") && typeof v.kind === "string" && ["understand","practise","find_learning"].includes(v.kind) && str(v.text,1000));
 function attemptValid(v: unknown): v is LearningAttempt {
   return obj(v) && keys(v,["id","date","type","description","notes","task","createdAt","updatedAt"]) && str(v.id,100) &&
     str(v.date,10) && /^\d{4}-\d{2}-\d{2}$/.test(v.date) && Number.isFinite(Date.parse(v.date)) && new Date(v.date).toISOString().slice(0,10) === v.date &&

@@ -145,3 +145,21 @@ def test_personal_goal_ignores_unrelated_work_changes():
     profile['tasks'].append({'id':'t2','wording':'Arrange deliveries'})
     data['aiwrevolusi.userProfile']=json.dumps(profile)
     validate_learning_goal_transition({},data)
+
+
+@pytest.mark.parametrize('origin', ['ai_suggestion', 'template'])
+def test_action_origin_survives_corrections_without_claiming_verified_advice(origin):
+    data = workspace()
+    second = changed(data, lambda g: g.update(action={'kind': 'practise', 'text': 'Try a fictional example', 'origin': origin}))
+    validate_learning_goal_transition(data, second)
+    third = changed(second, lambda g: g.update(action=None))
+    validate_learning_goal_transition(second, third)
+    assert json.loads(third[KEY])['goals'][0]['history'][-1]['action']['origin'] == origin
+
+
+@pytest.mark.parametrize('origin', ['verified', ['ai_suggestion'], None])
+def test_action_cannot_claim_an_unsupported_origin(origin):
+    state = json.loads(workspace()[KEY])
+    state['goals'][0]['action'] = {'kind': 'practise', 'text': 'Try an example', 'origin': origin}
+    with pytest.raises(ValueError):
+        validate_learning_goals(state)

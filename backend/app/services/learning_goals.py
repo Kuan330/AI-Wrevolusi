@@ -27,7 +27,9 @@ def task(v):
 
 
 def action(v):
-    return v is None or (fields(v, 'kind text') and v['kind'] in ('understand', 'practise', 'find_learning') and text(v['text'], 1000))
+    return v is None or (isinstance(v, dict) and {'kind', 'text'} <= set(v) <= {'kind', 'text', 'origin'}
+                         and v.get('origin', 'template') in ('ai_suggestion', 'template')
+                         and v['kind'] in ('understand', 'practise', 'find_learning') and text(v['text'], 1000))
 
 
 def attempt(v):

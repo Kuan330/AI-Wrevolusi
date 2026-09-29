@@ -10,6 +10,7 @@ from app.routers import (
     auth,
     capabilities,
     exposure,
+    guided_learning,
     learning,
     occupations,
     possibilities,
@@ -56,6 +57,7 @@ def create_app(api_root: str = '/api') -> FastAPI:
     application.include_router(reference.router, prefix=api_prefix)
     application.include_router(skill_directions.router, prefix=api_prefix)
     application.include_router(learning.router, prefix=api_prefix)
+    application.include_router(guided_learning.router, prefix=api_prefix)
 
     @application.on_event('startup')
     async def startup_event() -> None:

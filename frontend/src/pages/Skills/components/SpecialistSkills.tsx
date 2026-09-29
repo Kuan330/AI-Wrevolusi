@@ -11,6 +11,7 @@ import { currentWorkspaceSession } from "@/services/accountStorage";
 import { specialistSkillService, type SpecialistCatalogue, type SpecialistSkill, type SpecialistOccupation } from "@/services/specialistSkillService";
 import { suggestSpecialistSkills } from "../lib/specialistSuggestions";
 import SpecialistSourceSearch from "./SpecialistSourceSearch";
+import GuidedSkillSuggestions from "./GuidedSkillSuggestions";
 import "./SpecialistSkills.css";
 
 function readSaved() {
@@ -156,12 +157,15 @@ export default function SpecialistSkills({ tasks, occupationCode, focusTaskId, o
       {currentEntries.length > 0 && <details><summary>My saved skill choices ({currentEntries.length})</summary><ul className="specialist-skills__saved-list">{currentEntries.map(entry => <li key={specialistEntryKey(entry)}><strong>{entry.skillLabel}</strong><p>{entry.decision === "use" ? "I use this" : entry.decision === "no" ? "Does not fit" : entry.decision === "unsure" ? "Not sure" : "Not reviewed"}{entry.wantsLearning ? " · I want to develop this" : ""}</p><p className="specialist-skills__reason">{entry.taskWording} · ESCO {entry.sourceVersion}</p></li>)}</ul></details>}
       <p className="specialist-skills__reason">Learning builds your capability. It does not lower the research exposure score.</p>
     </div>}
+    {task && <GuidedSkillSuggestions key={JSON.stringify([currentWorkspaceSession(), task.id, task.wording, occupationCode])} task={task} occupationCode={occupationCode} disabled={saving || Boolean(saved.error)} onBusyChange={setSaving} onVersion={rememberSourceVersion} />}
+    <details className="specialist-skills__browse"><summary>Search the catalogue myself <span className="specialist-skills__reason">Optional</span></summary>
     <div className="specialist-skills__primary-search">
       <h3>Find skills that fit this task</h3>
       <p className="specialist-skills__reason">Search the full ESCO catalogue. Read each meaning and decide whether you use it or want to learn it.</p>
-      <SpecialistSourceSearch key={`skills-${roleContext}-${task?.id}`} kind="skill" taskWording={task?.wording} disabled={saving} onVersion={rememberSourceVersion} renderSkill={(skill, version) => card(skill, [], version, null)} />
+      <SpecialistSourceSearch key={`skills-${roleContext}-${task?.id}`} kind="skill" disabled={saving} onVersion={rememberSourceVersion} renderSkill={(skill, version) => card(skill, [], version, null)} />
       <a href="#add-personal-skill" onClick={() => { const details = document.getElementById("add-personal-skill"); if (details instanceof HTMLDetailsElement) details.open = true; requestAnimationFrame(() => document.getElementById("personal-skill-name")?.focus()); }}>Cannot find your skill? Add it in your own words</a>
     </div>
+    </details>
     <details className="specialist-skills__browse"><summary>Browse by occupation instead <span className="specialist-skills__reason">Optional</span></summary>
     <div className="specialist-skills__references">
       <h3>Search a source occupation</h3>
