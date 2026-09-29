@@ -1,0 +1,619 @@
+{
+  "schema_version": 1,
+  "esco_version": "1.2.0",
+  "source_bundle_sha256": "b66f9dfc565f9764e35beda66867912a225bcd822afd66856ab230f2a54097a9",
+  "baseline_head": "8dcc1564091afe1eabd5ac89ad450a136a03f6a6",
+  "annotation_policy": "Frozen engineering relevance cases, not expert gold labels, a representative user study, or exhaustive relevance annotations. Source definitions were reviewed before measuring these queries. Dev cases may guide implementation. Heldout cases must not guide tuning. Previously used exact search names occur only in dev.",
+  "baseline_input_policy": "The current UI sends at most the first 300 characters of a task. Keep both full task and actual baseline query.",
+  "metrics": {
+    "single": "Fraction of positive single cases with an expected concept in top 5.",
+    "compound": "Mean fraction of expected concepts found in top 10, across positive compound cases.",
+    "negative": "Fraction of negative cases violating expect_empty or returning a forbidden concept in top 10. This is negative retrieval leakage, not evidence of inferred skill ownership.",
+    "limits": "No precision metric because annotations do not enumerate every relevant result."
+  },
+  "cases": [
+    {
+      "id": "adm01",
+      "split": "dev",
+      "domain": "administration",
+      "kind": "single",
+      "task": "Excel",
+      "baseline_query": "Excel",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/1973c966-f236-40c9-b2d4-5d71a89019be",
+          "label": "use spreadsheets software",
+          "source_definition": "Use software tools to create and edit tabular data to carry out mathematical calculations, organise data and information, create diagrams based on data and to retrieve them."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "adm02",
+      "split": "dev",
+      "domain": "administration",
+      "kind": "single",
+      "task": "I turn notes from our team meeting into a written record of decisions and send it to everyone.",
+      "baseline_query": "I turn notes from our team meeting into a written record of decisions and send it to everyone.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/5fa6cd2f-9bab-4afa-a184-2d2f1401b770",
+          "label": "write meeting reports",
+          "source_definition": "Write complete reports based on minutes taken during a meeting in order to communicate the important points which were discussed, and the decisions which were made, to the appropriate people."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "adm03",
+      "split": "heldout",
+      "domain": "administration",
+      "kind": "single",
+      "task": "I calculate what customers owe and send them a bill listing each item and the payment terms.",
+      "baseline_query": "I calculate what customers owe and send them a bill listing each item and the payment terms.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/e3e42d54-78bd-4337-aa87-bb31a7670c9a",
+          "label": "issue sales invoices",
+          "source_definition": "Prepare the invoice of goods sold or services provided, containing individual prices, the total charge, and the terms. Complete order processing for orders received via telephone, fax and internet and calculate the customer’s final bill."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "adm04",
+      "split": "heldout",
+      "domain": "administration",
+      "kind": "compound",
+      "task": "After each department meeting I write a clear record of the decisions, the people responsible and the matters discussed. The document is shared with colleagues so that everyone has the same information and can check what was agreed. I keep this work separate from my other duties and repeat it whenever our team meets. I also use spreadsheet software to organise rows of figures, calculate totals and draw charts.",
+      "baseline_query": "After each department meeting I write a clear record of the decisions, the people responsible and the matters discussed. The document is shared with colleagues so that everyone has the same information and can check what was agreed. I keep this work separate from my other duties and repeat it whenev",
+      "baseline_query_truncated": true,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/5fa6cd2f-9bab-4afa-a184-2d2f1401b770",
+          "label": "write meeting reports",
+          "source_definition": "Write complete reports based on minutes taken during a meeting in order to communicate the important points which were discussed, and the decisions which were made, to the appropriate people."
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/1973c966-f236-40c9-b2d4-5d71a89019be",
+          "label": "use spreadsheets software",
+          "source_definition": "Use software tools to create and edit tabular data to carry out mathematical calculations, organise data and information, create diagrams based on data and to retrieve them."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "sal01",
+      "split": "dev",
+      "domain": "sales",
+      "kind": "single",
+      "task": "A customer is unhappy with their purchase. I listen to the complaint and arrange a suitable response.",
+      "baseline_query": "A customer is unhappy with their purchase. I listen to the complaint and arrange a suitable response.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/28d715e3-3e5b-4fb6-8dd2-4be4919c8587",
+          "label": "handle customer complaints",
+          "source_definition": "Administer complaints and negative feedback from customers in order to address concerns and where applicable provide a quick service recovery."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "sal02",
+      "split": "dev",
+      "domain": "sales",
+      "kind": "compound",
+      "task": "I summarise the products sold and sales volumes for the month, and I deal with complaints from unhappy customers.",
+      "baseline_query": "I summarise the products sold and sales volumes for the month, and I deal with complaints from unhappy customers.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/b0565bd9-29c8-42f6-b174-702970fc2f4f",
+          "label": "produce sales reports",
+          "source_definition": "Maintain records of calls made and products sold over a given time frame, including data regarding sales volumes, number of new accounts contacted and the costs involved."
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/28d715e3-3e5b-4fb6-8dd2-4be4919c8587",
+          "label": "handle customer complaints",
+          "source_definition": "Administer complaints and negative feedback from customers in order to address concerns and where applicable provide a quick service recovery."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "sal03",
+      "split": "heldout",
+      "domain": "sales",
+      "kind": "single",
+      "task": "At month end I put together the numbers of products sold, the calls we made, new accounts contacted and costs.",
+      "baseline_query": "At month end I put together the numbers of products sold, the calls we made, new accounts contacted and costs.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/b0565bd9-29c8-42f6-b174-702970fc2f4f",
+          "label": "produce sales reports",
+          "source_definition": "Maintain records of calls made and products sold over a given time frame, including data regarding sales volumes, number of new accounts contacted and the costs involved."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "sal04",
+      "split": "heldout",
+      "domain": "sales",
+      "kind": "compound",
+      "task": "I prepare the bill for goods we sold, including prices and payment terms, then handle customer complaints about the order.",
+      "baseline_query": "I prepare the bill for goods we sold, including prices and payment terms, then handle customer complaints about the order.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/e3e42d54-78bd-4337-aa87-bb31a7670c9a",
+          "label": "issue sales invoices",
+          "source_definition": "Prepare the invoice of goods sold or services provided, containing individual prices, the total charge, and the terms. Complete order processing for orders received via telephone, fax and internet and calculate the customer’s final bill."
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/28d715e3-3e5b-4fb6-8dd2-4be4919c8587",
+          "label": "handle customer complaints",
+          "source_definition": "Administer complaints and negative feedback from customers in order to address concerns and where applicable provide a quick service recovery."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "nur01",
+      "split": "dev",
+      "domain": "nursing",
+      "kind": "single",
+      "task": "blood pressure",
+      "baseline_query": "blood pressure",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/502ca51c-e818-4ec8-a1ae-026a2162beda",
+          "label": "take and analyse blood pressure",
+          "source_definition": "Take blood pressure of a patient and interpret the test result by using medical equipment such as a blood pressure monitor."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "nur02",
+      "split": "dev",
+      "domain": "nursing",
+      "kind": "single",
+      "task": "I give patients the medicines that their doctor has prescribed.",
+      "baseline_query": "I give patients the medicines that their doctor has prescribed.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/1fd57242-267e-46df-bd8c-849fdd593a50",
+          "label": "administer prescribed medication",
+          "source_definition": "Administer prescribed medications and treatments to patients on a doctor`s orders."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "nur03",
+      "split": "heldout",
+      "domain": "nursing",
+      "kind": "single",
+      "task": "I check the patient breathing, pulse and blood pressure and report the readings to the nurse.",
+      "baseline_query": "I check the patient breathing, pulse and blood pressure and report the readings to the nurse.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/d3b74d50-7fc9-4051-9335-58d129a4a064",
+          "label": "monitor basic patients signs",
+          "source_definition": "Monitor and analyse basic patient vital signs as vital signs of heart, respiration, and blood pressure. Take action by reporting them to the nurse."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "nur04",
+      "split": "heldout",
+      "domain": "nursing",
+      "kind": "compound",
+      "task": "I monitor patients heart rate, respiration and blood pressure, and administer medication prescribed by the doctor.",
+      "baseline_query": "I monitor patients heart rate, respiration and blood pressure, and administer medication prescribed by the doctor.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/d3b74d50-7fc9-4051-9335-58d129a4a064",
+          "label": "monitor basic patients signs",
+          "source_definition": "Monitor and analyse basic patient vital signs as vital signs of heart, respiration, and blood pressure. Take action by reporting them to the nurse."
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/1fd57242-267e-46df-bd8c-849fdd593a50",
+          "label": "administer prescribed medication",
+          "source_definition": "Administer prescribed medications and treatments to patients on a doctor`s orders."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "tec01",
+      "split": "dev",
+      "domain": "technical",
+      "kind": "single",
+      "task": "repair electrical wiring",
+      "baseline_query": "repair electrical wiring",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/af1c7b89-679b-4fae-b67c-ed05c669719c",
+          "label": "repair wiring",
+          "source_definition": "Find faults in wires or cables by using specialised equipment and repair these faults depending on type of wiring."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "tec02",
+      "split": "dev",
+      "domain": "technical",
+      "kind": "single",
+      "task": "I interpret measurements collected during equipment tests and use them to reach a conclusion.",
+      "baseline_query": "I interpret measurements collected during equipment tests and use them to reach a conclusion.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/81a2db2c-7e55-44d0-9cd9-74c25147d7cd",
+          "label": "analyse test data",
+          "source_definition": "Interpret and analyse data collected during testing in order to formulate conclusions, new insights or solutions."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "tec03",
+      "split": "heldout",
+      "domain": "technical",
+      "kind": "single",
+      "task": "I use specialised software to draw detailed technical designs for parts.",
+      "baseline_query": "I use specialised software to draw detailed technical designs for parts.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462",
+          "label": "use technical drawing software",
+          "source_definition": "Create technical designs and technical drawings using specialised software."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "tec04",
+      "split": "heldout",
+      "domain": "technical",
+      "kind": "compound",
+      "task": "I record the data produced during tests and then analyse those results to work out what they mean.",
+      "baseline_query": "I record the data produced during tests and then analyse those results to work out what they mean.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/328733a7-6d84-420d-a65c-2a8014fadc60",
+          "label": "record test data",
+          "source_definition": "Record data which has been identified specifically during preceding tests in order to verify that outputs of the test produce specific results or to review the reaction of the subject under exceptional or unusual input."
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/81a2db2c-7e55-44d0-9cd9-74c25147d7cd",
+          "label": "analyse test data",
+          "source_definition": "Interpret and analyse data collected during testing in order to formulate conclusions, new insights or solutions."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "sof01",
+      "split": "dev",
+      "domain": "software",
+      "kind": "single",
+      "task": "SQL",
+      "baseline_query": "SQL",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/598de5b0-5b58-4ea7-8058-a4bc4d18c742",
+          "label": "SQL",
+          "source_definition": "The computer language SQL is a query language for retrieval of information from a database and of documents containing the needed information. It is developed by the American National Standards Institute and the International Organization for Standardization."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "sof02",
+      "split": "dev",
+      "domain": "software",
+      "kind": "single",
+      "task": "When a program gives the wrong result, I find the fault in its code and fix it.",
+      "baseline_query": "When a program gives the wrong result, I find the fault in its code and fix it.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/2522a6ce-3202-4ac8-9f5b-b9cb5a3a83a1",
+          "label": "debug software",
+          "source_definition": "Repair computer code by analysing testing results, locating the defects causing the software to output an incorrect or unexpected result and remove these faults."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "sof03",
+      "split": "heldout",
+      "domain": "software",
+      "kind": "single",
+      "task": "I run checks on our application to find bugs and see whether it meets the customer requirements.",
+      "baseline_query": "I run checks on our application to find bugs and see whether it meets the customer requirements.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/913e7e83-b8f8-4574-b1ca-1b38f3fd974a",
+          "label": "execute software tests",
+          "source_definition": "Perform tests to ensure that a software product will perform flawlessly under the specified customer requirements and identify software defects (bugs) and malfunctions, using specialised software tools and testing techniques."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "sof04",
+      "split": "heldout",
+      "domain": "software",
+      "kind": "compound",
+      "task": "I create automated tests for our software and fix defects in the code when those tests fail.",
+      "baseline_query": "I create automated tests for our software and fix defects in the code when those tests fail.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/6a322874-e32f-4cd8-9683-badce67a7f73",
+          "label": "develop automated software tests",
+          "source_definition": "Create software test sets in an automated manner, ​using specialised languages or tools, that can be performed by testing tools in order to save resources, gain efficiency and effectiveness in test execution."
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/2522a6ce-3202-4ac8-9f5b-b9cb5a3a83a1",
+          "label": "debug software",
+          "source_definition": "Repair computer code by analysing testing results, locating the defects causing the software to output an incorrect or unexpected result and remove these faults."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "tea01",
+      "split": "dev",
+      "domain": "teaching",
+      "kind": "single",
+      "task": "I prepare examples and exercises for class that follow the curriculum objectives.",
+      "baseline_query": "I prepare examples and exercises for class that follow the curriculum objectives.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/20f57a7f-b90e-4403-8c77-5ddd89b5835b",
+          "label": "prepare lesson content",
+          "source_definition": "Prepare content to be taught in class in accordance with curriculum objectives by drafting exercises, researching up-to-date examples etc."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "tea02",
+      "split": "dev",
+      "domain": "teaching",
+      "kind": "single",
+      "task": "I mark student assignments and tests to understand their progress, strengths and weaknesses.",
+      "baseline_query": "I mark student assignments and tests to understand their progress, strengths and weaknesses.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/6fe019dd-027f-45f3-b19c-d27f7ae00980",
+          "label": "assess students",
+          "source_definition": "Evaluate the students' (academic) progress, achievements, course knowledge and skills through assignments, tests, and examinations. Diagnose their needs and track their progress, strengths, and weaknesses. Formulate a summative statement of the goals the student achieved."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "tea03",
+      "split": "heldout",
+      "domain": "teaching",
+      "kind": "single",
+      "task": "I arrange meetings with parents to talk about how their children are progressing at school.",
+      "baseline_query": "I arrange meetings with parents to talk about how their children are progressing at school.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/4b34864d-78a4-457e-8d91-0ab9296db890",
+          "label": "arrange parent teacher meeting",
+          "source_definition": "Set up joined and individual meetings with students' parents to discuss their child's academic progress and general well-being."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "tea04",
+      "split": "heldout",
+      "domain": "teaching",
+      "kind": "compound",
+      "task": "I plan lesson materials and exercises for the curriculum, then assess students through assignments and examinations.",
+      "baseline_query": "I plan lesson materials and exercises for the curriculum, then assess students through assignments and examinations.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/20f57a7f-b90e-4403-8c77-5ddd89b5835b",
+          "label": "prepare lesson content",
+          "source_definition": "Prepare content to be taught in class in accordance with curriculum objectives by drafting exercises, researching up-to-date examples etc."
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/6fe019dd-027f-45f3-b19c-d27f7ae00980",
+          "label": "assess students",
+          "source_definition": "Evaluate the students' (academic) progress, achievements, course knowledge and skills through assignments, tests, and examinations. Diagnose their needs and track their progress, strengths, and weaknesses. Formulate a summative statement of the goals the student achieved."
+        }
+      ],
+      "forbidden": [],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "neg01",
+      "split": "dev",
+      "domain": "none",
+      "kind": "negative",
+      "task": "zzqvplmokn",
+      "baseline_query": "zzqvplmokn",
+      "baseline_query_truncated": false,
+      "expected": [],
+      "forbidden": [],
+      "expect_empty": true,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "neg02",
+      "split": "dev",
+      "domain": "none",
+      "kind": "negative",
+      "task": "How do I change my password in this app?",
+      "baseline_query": "How do I change my password in this app?",
+      "baseline_query_truncated": false,
+      "expected": [],
+      "forbidden": [],
+      "expect_empty": true,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "neg03",
+      "split": "dev",
+      "domain": "nursing",
+      "kind": "negative",
+      "task": "I do not administer medication and I do not monitor patients vital signs.",
+      "baseline_query": "I do not administer medication and I do not monitor patients vital signs.",
+      "baseline_query_truncated": false,
+      "expected": [],
+      "forbidden": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/1fd57242-267e-46df-bd8c-849fdd593a50",
+          "label": "administer prescribed medication",
+          "source_definition": "Administer prescribed medications and treatments to patients on a doctor`s orders."
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/d3b74d50-7fc9-4051-9335-58d129a4a064",
+          "label": "monitor basic patients signs",
+          "source_definition": "Monitor and analyse basic patient vital signs as vital signs of heart, respiration, and blood pressure. Take action by reporting them to the nurse."
+        }
+      ],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "neg04",
+      "split": "heldout",
+      "domain": "none",
+      "kind": "negative",
+      "task": "Where is the sign out button on this website?",
+      "baseline_query": "Where is the sign out button on this website?",
+      "baseline_query_truncated": false,
+      "expected": [],
+      "forbidden": [],
+      "expect_empty": true,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "neg05",
+      "split": "heldout",
+      "domain": "sales",
+      "kind": "negative",
+      "task": "I prepare invoices, but I do not handle customer complaints.",
+      "baseline_query": "I prepare invoices, but I do not handle customer complaints.",
+      "baseline_query_truncated": false,
+      "expected": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/e3e42d54-78bd-4337-aa87-bb31a7670c9a",
+          "label": "issue sales invoices",
+          "source_definition": "Prepare the invoice of goods sold or services provided, containing individual prices, the total charge, and the terms. Complete order processing for orders received via telephone, fax and internet and calculate the customer’s final bill."
+        }
+      ],
+      "forbidden": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/28d715e3-3e5b-4fb6-8dd2-4be4919c8587",
+          "label": "handle customer complaints",
+          "source_definition": "Administer complaints and negative feedback from customers in order to address concerns and where applicable provide a quick service recovery."
+        }
+      ],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    },
+    {
+      "id": "neg06",
+      "split": "heldout",
+      "domain": "software",
+      "kind": "negative",
+      "task": "I neither write automated software tests nor debug software.",
+      "baseline_query": "I neither write automated software tests nor debug software.",
+      "baseline_query_truncated": false,
+      "expected": [],
+      "forbidden": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/6a322874-e32f-4cd8-9683-badce67a7f73",
+          "label": "develop automated software tests",
+          "source_definition": "Create software test sets in an automated manner, ​using specialised languages or tools, that can be performed by testing tools in order to save resources, gain efficiency and effectiveness in test execution."
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/2522a6ce-3202-4ac8-9f5b-b9cb5a3a83a1",
+          "label": "debug software",
+          "source_definition": "Repair computer code by analysing testing results, locating the defects causing the software to output an incorrect or unexpected result and remove these faults."
+        }
+      ],
+      "expect_empty": false,
+      "annotation_basis": "Engineering judgement against the quoted ESCO definition before retrieval measurement. Other relevant concepts may exist."
+    }
+  ]
+}

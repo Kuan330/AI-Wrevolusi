@@ -127,6 +127,8 @@ export default function SpecialistSkills({ tasks, occupationCode, focusTaskId, o
         {entry && entry.sourceOccupationUri !== undefined && entry.sourceOccupationUri !== sourceOccupationUri && <p>Your earlier decision used a different source reference. The skill concept is the same; making a new choice will update its reference.</p>}
         <a href={skill.uri} target="_blank" rel="noreferrer">Open ESCO concept</a>
       </details>
+      <p className="specialist-skills__experience-label">Review this suggestion against your experience</p>
+      <p className="specialist-skills__reason">Your choices are your own report. They do not verify the task to skill link.</p>
       <div className="specialist-skills__choices" aria-label={`Review ${skill.label}`}>
         {([['use', 'I use this'], ['no', 'Does not fit'], ['unsure', 'Not sure']] as const).map(([value, label]) =>
           <Button key={value} variant={entry?.decision === value ? "default" : "outline"} aria-pressed={entry?.decision === value} disabled={disabled} onClick={() => update(skill, version, sourceOccupationUri, { decision: entry?.decision === value ? null : value })}>{label}</Button>)}
