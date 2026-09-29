@@ -19,17 +19,17 @@ export default function OccupationSearch({ query, hasArea, searching, hasSearche
       <label htmlFor="job-search" className="block text-sm font-semibold">Job title</label>
       <div className="relative">
         <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <input id="job-search" type="search" autoComplete="off" value={query}
+        <input id="job-search" type="search" maxLength={200} autoComplete="off" value={query}
           onChange={event => onQueryChange(event.target.value)}
           placeholder="e.g. teacher, sales assistant"
           aria-describedby="job-search-help"
           className="h-12 w-full rounded-xl border border-white/80 bg-white/95 pl-10 pr-4 text-sm outline-none shadow-sm transition focus:border-primary focus:ring-4 focus:ring-primary/10" />
       </div>
-      <p id="job-search-help" className="text-xs text-muted-foreground">Type a job title, or choose a type of work to see its jobs.</p>
+      <p id="job-search-help" className="text-xs text-muted-foreground">Your own title is enough. You may choose a reference match below.</p>
       <div role="status" className="text-sm text-muted-foreground">
         {canSearch && searching ? "Finding jobs…" : canSearch && hasSearched && !results.length
-          ? "No matches yet. Try a different title or choose All types of work."
-          : canSearch && hasSearched ? "Choose the closest match." : query.trim().length === 1 ? "Type one more letter to search." : ""}
+          ? "No reference match found. You can keep your own title and continue."
+          : canSearch && hasSearched ? "Optional reference matches — choose one only if it fits." : query.trim().length === 1 ? "Type one more letter to search." : ""}
       </div>
       {canSearch && !searching && results.length > 0 && (
         <ul aria-label="Matching jobs" className="max-h-72 space-y-1 overflow-y-auto rounded-xl bg-white/70 p-1">

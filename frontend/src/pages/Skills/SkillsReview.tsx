@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
@@ -56,6 +56,8 @@ function readWorkSnapshot(): { work: WorkSnapshot | null; error: string } {
 
 export default function SkillsReview() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const [skills, setSkills] = useState<WefSkill[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -99,7 +101,13 @@ export default function SkillsReview() {
   }, [loadAttempt]);
 
   const evidence = useMemo(() => buildSkillEvidence(work?.tasks ?? [], skills), [work?.tasks, skills]);
-  const accepted = evidence.filter(({ skill }) =>
+  const focusId = searchParams.get("task");
+  const focusedTask = work?.tasks.find(task => task.id === focusId);
+  const incomingWording = typeof location.state?.taskWording === "string" ? location.state.taskWording : null;
+  const focusChanged = Boolean(focusedTask && incomingWording && incomingWording !== focusedTask.wording);
+  const activeFocus = focusChanged ? undefined : focusedTask;
+  const visibleEvidence = activeFocus ? evidence.map(item => ({ ...item, tasks: item.tasks.filter(task => task.id === activeFocus.id) })).filter(item => item.tasks.length > 0) : evidence;
+  const accepted = visibleEvidence.filter(({ skill }) =>
     !work?.needsReview && work?.decisions[skill.wef_skill_id] === "accepted",
   );
   const selected = accepted.find(({ skill }) => skill.wef_skill_id === selectedId);
@@ -157,7 +165,8 @@ export default function SkillsReview() {
   function continueToLearning(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!selected || !goal.trim()) return;
-    const { skill, tasks } = selected;
+    const { skill } = selected;
+    const tasks = activeFocus ? selected.tasks.filter(task => task.id === activeFocus.id) : selected.tasks;
     void runSave(async () => {
       checkWork();
       await completeSkillReview();
@@ -184,6 +193,13 @@ export default function SkillsReview() {
         This is a record of your work, not an ability score.
       </p>
 
+      {focusId && <section className="skills-review-page__notice" aria-label="Task carried from AI findings">
+        <h2>{activeFocus ? "Skills for your selected task" : "Your selected task needs review"}</h2>
+        <p>{activeFocus ? activeFocus.wording : "This task changed or is no longer in your work profile. Showing your current tasks instead."}</p>
+        <p className="skills-review-page__hint">Research exposure does not prove that you have or lack a skill. Check the task evidence below.</p>
+        <Button variant="outline" onClick={() => { setSearchParams(params => { params.delete("task"); return params; }); setSelectedId(null); }}>Show skills from all my tasks</Button>
+      </section>}
+
       {readError && <div className="skills-review-page__notice is-error" role="alert">
         <p>{readError} Your saved review has not been replaced. Reload your saved work before making changes.</p>
         <Button variant="outline" onClick={() => window.location.reload()}>Reload saved work</Button>
@@ -206,13 +222,13 @@ export default function SkillsReview() {
       {!readError && work && work.tasks.length > 0 && <section className="skills-review-page__card skills-review-page__personal" aria-labelledby="personal-skills-title">
         <div className="skills-review-page__section-heading">
           <h2 id="personal-skills-title">Skills you added</h2>
-          <p>{work.personalSkills.filter(item => item.workKey === work.workKey).length} for your current work</p>
+          <p>{work.personalSkills.filter(item => item.taskIds.every((id, index) => work.tasks.some(task => task.id === id && task.wording === item.taskLabels[index]))).length} for your current work</p>
         </div>
         <p className="skills-review-page__hint">Add a specific skill or technique you use. These are your own statements; course suggestions use the broad skills below.</p>
         {work.personalSkills.length > 0 && <ul className="skills-review-page__personal-list">
           {work.personalSkills.map(item => <li key={item.id}>
             <div><strong>{item.name}</strong> <span className="skills-review-page__state">You added</span>
-              {item.workKey !== work.workKey && <p className="skills-review-page__hint">From earlier work — check whether this still fits. Remove and add it again to link a current task.</p>}
+              {!item.taskIds.every((id, index) => work.tasks.some(task => task.id === id && task.wording === item.taskLabels[index])) && <p className="skills-review-page__hint">From earlier work — check whether this still fits. Remove and add it again to link a current task.</p>}
               <details><summary>Supporting task</summary><p>{item.taskLabels.join("; ")}</p></details>
             </div>
             <Button variant="ghost" disabled={saving} onClick={() => void runSave(() => removePersonalSkill(item.id))} aria-label={`Remove ${item.name}`}>Remove</Button>
@@ -224,7 +240,7 @@ export default function SkillsReview() {
             event.preventDefault();
             const id = crypto.randomUUID();
             const name = personalName;
-            const taskId = personalTask;
+            const taskId = personalTask || activeFocus?.id || "";
             void runSave(async () => {
               checkWork();
               await addPersonalSkill(id, name, taskId);
@@ -235,11 +251,11 @@ export default function SkillsReview() {
             <input id="personal-skill-name" value={personalName} maxLength={120} required disabled={saving}
               placeholder="For example, reading technical drawings" onChange={event => setPersonalName(event.target.value)} />
             <label htmlFor="personal-skill-task">Which task uses this skill?</label>
-            <select id="personal-skill-task" value={personalTask} required disabled={saving} onChange={event => setPersonalTask(event.target.value)}>
+            <select id="personal-skill-task" value={personalTask || activeFocus?.id || ""} required disabled={saving} onChange={event => setPersonalTask(event.target.value)}>
               <option value="">Choose one of your tasks</option>
               {work.tasks.map(task => <option key={task.id} value={task.id}>{task.wording}</option>)}
             </select>
-            <Button type="submit" disabled={saving || !personalName.trim() || !personalTask}>Save my skill</Button>
+            <Button type="submit" disabled={saving || !personalName.trim() || !(personalTask || activeFocus?.id)}>Save my skill</Button>
           </form>
         </details>
       </section>}
@@ -256,14 +272,14 @@ export default function SkillsReview() {
         <section aria-labelledby="skill-suggestions-title">
           <div className="skills-review-page__section-heading">
             <h2 id="skill-suggestions-title">Skills suggested from your tasks</h2>
-            <p>{accepted.length} broad {accepted.length === 1 ? "skill" : "skills"} accepted · {evidence.length} suggestions</p>
+            <p>{accepted.length} broad {accepted.length === 1 ? "skill" : "skills"} accepted · {visibleEvidence.length} suggestions</p>
           </div>
-          {evidence.length === 0 ? <div className="skills-review-page__card">
+          {visibleEvidence.length === 0 ? <div className="skills-review-page__card">
             <h3>No supported suggestion yet</h3>
             <p>The current matching rules found no skill connection in these tasks. This does not mean you have no skills.
               You can make the task wording clearer or browse learning on your own.</p>
           </div> : <div className="skills-review-page__grid">
-            {evidence.map(({ skill, tasks }) => {
+            {visibleEvidence.map(({ skill, tasks }) => {
               const decision = work.decisions[skill.wef_skill_id];
               const staleAccepted = work.needsReview && decision === "accepted";
               const status = staleAccepted ? "Needs review" : decision === "accepted" ? "Accepted" : decision === "rejected" ? "Rejected" : "Not reviewed";

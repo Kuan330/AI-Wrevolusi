@@ -16,7 +16,6 @@ import SkillsReview from "@/pages/Skills/SkillsReview";
 import RequireWorkTasks from "@/components/layout/RequireWorkTasks";
 import MainLayout from "@/components/layout/MainLayout";
 import ProfileLayout from "@/components/layout/ProfileLayout";
-import RequireConfirmedAnalysis from "@/components/layout/RequireConfirmedAnalysis";
 import { ROUTES } from "@/constants/routes";
 import AIExposure from "@/pages/AIExposure/AIExposure";
 import Home from "@/pages/Home/Home";
@@ -63,8 +62,6 @@ const AppRoutes = () => {
             <Route element={<AccountGate kind="work"><Outlet /></AccountGate>}>
               <Route element={<RequireWorkTasks />}>
                 <Route path={ROUTES.skills} element={<SkillsReview />} />
-              </Route>
-              <Route element={<RequireConfirmedAnalysis />}>
                 <Route path={ROUTES.aiExposure} element={<AIExposure />} />
               </Route>
             </Route>

@@ -887,3 +887,43 @@
 @media (max-width: 1023px) {
   .exposure-score-overview__copy { border-top: 1px solid rgba(255, 255, 255, 0.84); }
 }
+
+/* Task-first research review: one selected task, with evidence on demand. */
+.exposure-task-browser { display:grid;grid-template-columns:minmax(220px, .8fr) minmax(0, 2fr);gap:24px;align-items:start; }
+.exposure-task-picker { min-width:0; }
+.exposure-task-picker h2,.exposure-progress h2,.exposure-notice h2 { font-size:1rem;font-weight:650; }
+.exposure-task-picker>p { font-size:.8rem;color:#62616b;margin:8px 0 16px; }
+.exposure-task-picker__list { display:grid;gap:8px; }
+.exposure-task-picker__list button { width:100%;text-align:left;min-height:44px;padding:16px;border:1px solid #dce1e6;border-radius:12px;background:#ffffffa8;line-height:1.5;overflow-wrap:anywhere; }
+.exposure-task-picker__list button[aria-pressed=true] { border-color:#497693;background:#eff6fa;box-shadow:inset 3px 0 #497693; }
+.exposure-task-picker__list button span { display:block;font-weight:550;font-size:.9rem; }
+.exposure-task-picker__list small { display:block;margin-top:8px;color:#59636e;font-size:.75rem; }
+.exposure-task-picker__mobile { display:none; }
+.exposure-task-impact { min-width:0;background:#ffffffed;border:1px solid #dce1e6;border-radius:18px;padding:28px;overflow-wrap:anywhere; }
+.exposure-task-impact>h2 { font-size:1.3rem;font-weight:650;line-height:1.4;margin:10px 0; }
+.exposure-evidence-label { display:inline-block;color:#3d6178;font-size:.75rem;background:#edf3f7;border-radius:6px;padding:4px 8px; }
+.exposure-task-source { font-size:.75rem;color:#66616b;margin-bottom:22px; }
+.exposure-question { padding:20px 0;border-top:1px solid #e2e5ea; }
+.exposure-question h3 { font-size:1.05rem;font-weight:650;margin-bottom:10px; }
+.exposure-question p { margin:10px 0;line-height:1.65; }
+.exposure-question a { margin-top:6px;height:auto;min-height:44px;white-space:normal;text-align:center; }
+.exposure-evidence-note { font-size:.85rem;border-left:3px solid #a6bbc7;padding-left:12px;color:#515963; }
+.exposure-page .exposure-caption { color:#66616b;font-size:.8rem; }
+.exposure-evidence { border-top:1px solid #dce1e6;padding-top:18px;font-size:.9rem; }
+.exposure-page summary { cursor:pointer;min-height:44px;display:list-item;font-weight:600;color:#315f79; }
+.exposure-evidence p,.exposure-progress p,.exposure-notice p { margin:12px 0;line-height:1.65; }
+.exposure-evidence a,.exposure-progress a { color:#315f79;text-decoration:underline;text-underline-offset:3px; }
+.exposure-reference { background:#f4f7fa;border:1px solid #e2e7ec;border-radius:10px;padding:16px;margin:16px 0; }
+.exposure-reference h4 { font-size:.85rem;font-weight:650; }
+.exposure-progress { padding:18px 24px;background:#eef4f8;border-radius:12px;font-size:.9rem; }
+.exposure-notice { padding:20px;border:1px solid #c5d6e1;background:#f5f9fc;border-radius:12px; }
+.exposure-page button:focus-visible,.exposure-page summary:focus-visible,.exposure-page select:focus-visible { outline:3px solid #507c97;outline-offset:3px; }
+.exposure-ai-help { min-height:140px;position:relative; }
+@media(max-width:767px) {
+  .exposure-task-browser { grid-template-columns:1fr;gap:16px; }
+  .exposure-task-picker__list { display:none; }
+  .exposure-task-picker__mobile { display:grid;gap:8px;font-size:.85rem; }
+  .exposure-task-picker select { width:100%;min-height:48px;border:1px solid #abbfce;border-radius:10px;background:white;padding:12px;color:#292b38; }
+  .exposure-task-impact { padding:20px; }
+  .exposure-progress { padding:18px; }
+}

@@ -23,6 +23,7 @@ def confirmed_workspace_evidence(workspace: object, occupations: Iterable[Mappin
     if not isinstance(workspace, Mapping):
         raise ValueError(PROFILE_RECOVERY_MESSAGE)
     modern = MODERN_PROFILE_KEY in workspace
+    task_confirmation = False
     try:
         if modern:
             profile = json.loads(workspace[MODERN_PROFILE_KEY])
@@ -35,6 +36,7 @@ def confirmed_workspace_evidence(workspace: object, occupations: Iterable[Mappin
                 raise ValueError(PROFILE_RECOVERY_MESSAGE)
             analysis = profile.get('analysis')
             if analysis is None and profile.get('tasksConfirmed') is True:
+                task_confirmation = True
                 analysis = {'occupationCode': profile.get('tasksOccupationCode'), 'tasks': profile.get('tasks')}
         else:
             analysis = json.loads(workspace.get('aiwrevolusi.confirmedAnalysis', 'null'))
@@ -51,13 +53,18 @@ def confirmed_workspace_evidence(workspace: object, occupations: Iterable[Mappin
     code = analysis.get('occupationCode')
     tasks = analysis.get('tasks')
     valid = (
-        isinstance(code, str) and bool(code.strip()) and isinstance(tasks, list)
+        ((task_confirmation and code is None) or (isinstance(code, str) and bool(code.strip())))
+        and isinstance(tasks, list)
         and all(isinstance(task, dict) and isinstance(task.get('wording'), str)
                 and bool(task['wording'].strip()) for task in tasks)
     )
     if modern and not valid:
         raise ValueError(PROFILE_RECOVERY_MESSAGE)
-    if not isinstance(code, str) or not isinstance(tasks, list):
+    if not isinstance(tasks, list):
+        return [], None
+    if task_confirmation and code is None:
+        return list(dict.fromkeys(task['wording'].strip() for task in tasks)), None
+    if not isinstance(code, str):
         return [], None
     reference = next((row for row in occupations if row['occupation_code'] == code), None)
     if reference is None:

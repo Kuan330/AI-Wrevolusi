@@ -1,155 +1,54 @@
-import type { ComponentProps } from "react";
-import { useEffect, useMemo, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
-import { getSkillDecision, readJourneyState } from "@/features/journey/journey";
-import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
-import { readConfirmedAnalysis } from "@/features/work-profile/userProfile";
-import { referenceService } from "@/services/referenceService";
-import type { WefSkill } from "@/types/reference";
-import ExposureCompareCard from "./components/ExposureCompareCard";
-import ExposureSkillCloud from "./components/ExposureSkillCloud";
+import { readJourneyProfile } from "@/features/journey/journey";
+import { checkWorkAiFindings } from "@/features/work-profile/checkWorkAiFindings";
 import ExposureTaskList from "./components/ExposureTaskList";
-import ScoreInfoModal from "./components/ScoreInfoModal";
-import { exposureCompareInsight } from "./lib/exposureCompare";
-import { taskOverview } from "./lib/taskOverview";
-import "@/pages/Analysis/analysis.css";
 import "./exposure.css";
 
 export default function AIExposure() {
-  const analysis = readConfirmedAnalysis();
-  const [scoreInfoOpen, setScoreInfoOpen] = useState(false);
-  const [skills, setSkills] = useState<WefSkill[]>([]);
-  const [skillsLoading, setSkillsLoading] = useState(true);
-  const [skillsError, setSkillsError] = useState<string | null>(null);
-  const [, setJourneyRevision] = useState(0);
-
+  const [, refresh] = useState(0);
+  const [checking, setChecking] = useState(false);
+  const [error, setError] = useState("");
+  const mounted = useRef(true);
   useEffect(() => {
-    const refresh = () => setJourneyRevision((value) => value + 1);
-    window.addEventListener("workspace-change", refresh);
-    return () => window.removeEventListener("workspace-change", refresh);
+    mounted.current = true;
+    const update = () => refresh(value => value + 1);
+    window.addEventListener("workspace-change", update);
+    return () => { mounted.current = false; window.removeEventListener("workspace-change", update); };
   }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    void referenceService
-      .wefSkills()
-      .then((rows) => {
-        if (cancelled) return;
-        setSkills(
-          [...rows].sort(
-            (left, right) => left.wef_skill_id - right.wef_skill_id,
-          ),
-        );
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setSkillsError(
-            "The skill framework could not be loaded. Please try again.",
-          );
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setSkillsLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const evidence = useMemo(
-    () => buildSkillEvidence(analysis?.tasks ?? [], skills),
-    [analysis?.tasks, skills],
-  );
-  const review = (() => {
-    try {
-      readJourneyState();
-      return {
-        evidence: evidence.filter(({ skill }) => getSkillDecision(skill.wef_skill_id) !== "rejected"),
-        error: "",
-      };
-    } catch {
-      return { evidence: [], error: "Your saved skill decisions could not be read. Reload your saved work before reviewing suggestions." };
-    }
-  })();
-  if (!analysis) {
-    return (
-      <Navigate
-        {...({ to: ROUTES.workProfile, replace: true } satisfies Partial<
-          ComponentProps<typeof Navigate>
-        >)}
-      />
-    );
+  let profile: ReturnType<typeof readJourneyProfile> | null = null;
+  let readError = "";
+  try { profile = readJourneyProfile(); }
+  catch (issue) { readError = issue instanceof Error ? issue.message : "Your saved work could not be read."; }
+  async function checkResearch() {
+    if (checking) return;
+    setChecking(true); setError("");
+    try { await checkWorkAiFindings(); }
+    catch (issue) { if (mounted.current) setError(issue instanceof Error ? issue.message : "Research could not be loaded. Try again."); }
+    finally { if (mounted.current) { setChecking(false); refresh(value => value + 1); } }
   }
-
-  const assessments = analysis.taskExposureAssessments ?? [];
-  const overview = taskOverview(analysis.tasks, assessments);
-  const insight = exposureCompareInsight({
-    occupationScore: analysis.meanScore2025,
-    overview,
-  });
-  const buttonPropsEdit = {
-    asChild: true,
-    variant: "outline",
-    className: "profile-outline-btn rounded-full",
-  } satisfies Partial<ComponentProps<typeof Button>>;
-  const exposureCompareCardProps = {
-    occupationTitle: analysis.occupationTitle,
-    insight,
-    onOpenDetails: () => setScoreInfoOpen(true),
-    onViewTasks: () => {
-      requestAnimationFrame(() => {
-        document.getElementById("task-list")?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      });
-    },
-  } satisfies Partial<ComponentProps<typeof ExposureCompareCard>>;
-  const exposureSkillCloudProps = { evidence: review.evidence, frameworkCount: skills.length };
-  const exposureTaskListProps = { tasks: analysis.tasks, assessments };
-  const scoreInfoModalProps = {
-    open: scoreInfoOpen,
-    onOpenChange: setScoreInfoOpen,
-  } satisfies Partial<ComponentProps<typeof ScoreInfoModal>>;
-
-  return (
-    <div className="analysis-page exposure-page mx-auto w-full max-w-[1400px]">
-      <PageHeader
-        className="exposure-page__header flex-col items-start sm:flex-row sm:items-center"
-        title="Where could AI affect my work?"
-        description="Understand one task, then decide what you want to learn."
-        actions={
-          <div className="exposure-page__actions">
-            <Button {...buttonPropsEdit}>
-              <Link to={ROUTES.task}>Edit tasks</Link>
-            </Button>
-          </div>
-        }
-      />
-
-      <div className="mx-auto grid w-full max-w-4xl gap-5">
-          <ExposureCompareCard {...exposureCompareCardProps} />
-          <div id="task-list" className="scroll-mt-32">
-            <ExposureTaskList {...exposureTaskListProps} />
-          </div>
-          {skillsError || review.error ? (
-            <div className="rounded-xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive" role="alert">
-              {skillsError || review.error}
-            </div>
-          ) : skillsLoading ? (
-            <section
-              className="exposure-glass-card min-h-72 animate-pulse p-6"
-              aria-label="Loading skills"
-            />
-          ) : (
-            <ExposureSkillCloud {...exposureSkillCloudProps} />
-          )}
-      </div>
-
-      <ScoreInfoModal {...scoreInfoModalProps} />
-    </div>
-  );
+  const analysis = profile?.analysis;
+  return <div className="exposure-page mx-auto w-full max-w-[1200px]">
+    <PageHeader className="flex-col items-start sm:flex-row sm:items-center" title="Where could AI change my work?"
+      description="Choose a task. See what AI might help with, what you need to check, and a useful next step."
+      actions={<Button asChild variant="outline"><Link to={ROUTES.task}>Review my tasks</Link></Button>} />
+    {readError ? <div role="alert" className="exposure-notice"><p>{readError}</p><Link to={ROUTES.continue}>Review recovery options</Link></div> : profile && <>
+      {(!analysis || error || checking) && <section className="exposure-notice" aria-label="Research status">
+        <h2>{error ? "The research check needs attention" : profile.tasksOccupationCode ? "Check the research when you are ready" : "Your work has no research occupation linked yet"}</h2>
+        <p>{profile.tasksOccupationCode ? "Your tasks are saved. You can check for research connections or explore your skills now." : "We cannot look up occupation research yet. You can still explore skills from the tasks you confirmed."}</p>
+        {profile.tasksOccupationCode && <Button disabled={checking} onClick={() => void checkResearch()}>{checking ? "Checking research…" : error ? "Retry research check" : "Check research"}</Button>}
+        {error && <p role="alert">{error} Your work is still saved. A failed request does not mean there is no research.</p>}
+      </section>}
+      <ExposureTaskList occupation={analysis ? {title: analysis.occupationTitle, code: analysis.occupationCode} : undefined} tasks={profile.tasks} assessments={(analysis?.taskExposureAssessments ?? []).filter(item => profile.tasks.some(task => task.id === item.task_id && analysis?.tasks.some(saved => saved.id === task.id && saved.wording === task.wording)))}
+        researchChecked={Boolean(analysis) && !checking} researchLoading={checking} researchUnavailable={Boolean(error)} />
+      <aside className="exposure-progress">
+        <h2>Progress means better work</h2>
+        <p>Build a skill, practise it, and review a real example. Learning does not lower the published research score.</p>
+        <details><summary>How could I check my progress?</summary><p>Compare similar work: what was correct, what needed fixing, and how long it took. Completing a course alone does not prove that your skills improved.</p><p>The research describes technical potential. It does not predict job loss, time saved, or whether your workplace will adopt AI.</p><a href="https://www.ilo.org/publications/workers%E2%80%99-exposure-ai-what-indicators-tell-us-%E2%80%93-and-what-they-don%E2%80%99t" target="_blank" rel="noreferrer">ILO: what exposure indicators can tell us</a></details>
+      </aside>
+    </>}
+  </div>;
 }

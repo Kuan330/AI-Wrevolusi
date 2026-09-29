@@ -32,8 +32,7 @@ export const PRIMARY_NAV_MENU: readonly JourneyMenuItem[] = [
 ];
 
 export const WORK_NAV_MENU = [
-  { key: "details", label: "Work details", path: ROUTES.workProfile },
-  { key: "tasks", label: "My tasks", path: ROUTES.task },
+  { key: "details", label: "Profile", path: ROUTES.workProfile },
   { key: "findings", label: "AI findings", path: ROUTES.aiExposure },
   { key: "skills", label: "My skills", path: ROUTES.skills },
 ] as const;
@@ -60,7 +59,7 @@ export function getWorkStepStatus(
   key: (typeof WORK_NAV_MENU)[number]["key"],
   state: WorkNavigationState,
 ): string | undefined {
-  if ((key === "details" || key === "tasks") && state.workConfirmed) {
+  if (key === "details" && state.workConfirmed) {
     return "Confirmed";
   }
   if (key === "findings" && state.assessmentChecked) return "Checked";

@@ -234,3 +234,25 @@ test('personal skill retry syncs one entry and a late save cannot cross accounts
   await assert.rejects(pending, /account changed/);
   assert.equal(readJourneyState().personalSkills, undefined);
 });
+
+test('unrelated task edits keep a saved work-learning link current',async()=>{
+  const initial=analysis(); initial.tasks.push({id:'task-2',wording:'Arrange deliveries'});
+  saveConfirmedAnalysis(initial);
+  await saveSkillDecision(1,'accepted'); await completeSkillReview(); await startWork();
+  const context=readLearningContext();
+  writeUserProfile({tasks:[initial.tasks[0],{id:'task-2',wording:'Arrange returns'}],analysis:null,tasksConfirmed:true});
+  assert.equal(learningContextNeedsReview(context),false);
+  writeUserProfile({tasks:[{...initial.tasks[0],wording:'Check new inventory data'}],analysis:null,tasksConfirmed:true});
+  assert.equal(learningContextNeedsReview(context),true);
+});
+
+test('generic entry resumes the saved work-draft stage without changing confirmed records',()=>{
+  saveConfirmedAnalysis(analysis());
+  const original=memory.get(profileKey);
+  const draft={version:1,stage:'tasks',jobTitle:'Clerk',occupation:null,tasks:[],baseProfileVersion:0,updatedAt:new Date().toISOString()};
+  memory.set('aiwrevolusi.workProfileDraft.v1',JSON.stringify(draft));
+  assert.equal(getContinueDestination(),'/profile/tasks');
+  memory.set('aiwrevolusi.workProfileDraft.v1',JSON.stringify({...draft,stage:'job'}));
+  assert.equal(getContinueDestination(),'/profile?edit=job');
+  assert.equal(memory.get(profileKey),original);
+});

@@ -21,6 +21,7 @@ let transientSelectedOccupation: SelectedOccupation | null = null;
 export type SelectedOccupation = {
   unit: ReferenceOccupation;
   path: ReferenceOccupation[];
+  source?: { name: string; version: string | null; recordId: string };
 };
 
 export type ConfirmedAnalysis = {
@@ -34,6 +35,12 @@ export type ConfirmedAnalysis = {
 };
 
 export type UserProfile = {
+  jobTitle?: string;
+  occupation?: SelectedOccupation | null;
+  confirmedAt?: string;
+  profileVersion?: number;
+  history?: Array<{ profileVersion: number; confirmedAt: string | null; jobTitle: string; occupationCode: string | null; tasks: ProfileTask[] }>;
+  changedTaskIds?: string[];
   tasks: ProfileTask[];
   tasksOccupationCode: string | null;
   analysis: ConfirmedAnalysis | null;
@@ -70,6 +77,12 @@ export const readUserProfile = (): UserProfile => {
   const stored = parseJson<UserProfile>(accountStorage.getItem(PROFILE_KEY));
   if (stored) {
     const cleaned: UserProfile = {
+      jobTitle: stored.jobTitle || stored.analysis?.occupationTitle || "",
+      occupation: stored.occupation ?? null,
+      confirmedAt: stored.confirmedAt,
+      profileVersion: stored.profileVersion ?? 0,
+      history: stored.history ?? [],
+      changedTaskIds: stored.changedTaskIds ?? [],
       tasks: Array.isArray(stored.tasks) ? stored.tasks : [],
       tasksOccupationCode: stored.tasksOccupationCode ?? null,
       analysis: stored.analysis ?? null,
@@ -81,6 +94,8 @@ export const readUserProfile = (): UserProfile => {
 
   const analysis = readLegacyAnalysis();
   const migrated: UserProfile = {
+    jobTitle: analysis?.occupationTitle ?? "",
+    profileVersion: 0,
     tasks: analysis?.tasks ?? [],
     tasksOccupationCode: analysis?.occupationCode ?? null,
     analysis,

@@ -8,7 +8,7 @@ import "@/pages/WorkProfile/workProfile.css";
 const ProfileLayout = () => {
   const { pathname } = useLocation();
   const isTasksPage = pathname === ROUTES.task;
-  const lockViewport = isTasksPage;
+  const lockViewport = false;
 
   return (
     <div

@@ -1,5 +1,4 @@
 import { Link, useLocation } from "react-router-dom";
-import { Check } from "lucide-react";
 import { useAccount } from "@/components/account/useAccount";
 import {
   getJourneyArea,
@@ -40,10 +39,10 @@ export default function JourneyNavigation() {
 
   return (
     <div className="journey-navigation">
-      <nav aria-label={area === "work" ? "My Work steps" : "My Learning pages"}>
-        <ol className={`journey-navigation__items journey-navigation__items--${area}`}>
-          {items.map((item, index) => {
-            const current = location.pathname === item.path;
+      <nav aria-label={area === "work" ? "My Work pages" : "My Learning pages"}>
+        <ul className={`journey-navigation__items journey-navigation__items--${area}`}>
+          {items.map((item) => {
+            const current = location.pathname === item.path || (item.path === ROUTES.workProfile && location.pathname.startsWith(`${ROUTES.workProfile}/`));
             const { savedStatus } = item;
             return (
               <li key={item.key}>
@@ -57,11 +56,6 @@ export default function JourneyNavigation() {
                   aria-current={current ? "page" : undefined}
                   className="journey-navigation__link"
                 >
-                  {area === "work" && (
-                    <span className="journey-navigation__number" aria-hidden="true">
-                      {savedStatus ? <Check size={15} /> : index + 1}
-                    </span>
-                  )}
                   <span className="journey-navigation__text">
                     <span>{item.label}</span>
                     {savedStatus && (
@@ -72,7 +66,7 @@ export default function JourneyNavigation() {
               </li>
             );
           })}
-        </ol>
+        </ul>
       </nav>
       {readError && (
         <p className="journey-navigation__hint" role="status">
@@ -83,8 +77,8 @@ export default function JourneyNavigation() {
       {area === "work" && !workConfirmed && !readError && (
         <p className="journey-navigation__hint">
           AI findings and skill suggestions use your confirmed work.{" "}
-          <Link to={profile?.tasksOccupationCode ? ROUTES.task : ROUTES.workProfile}>
-            {profile?.tasksOccupationCode ? "Review and confirm your tasks" : "Start with your work details"}
+          <Link to={ROUTES.workProfile}>
+            Review and confirm your profile
           </Link>
           .
         </p>

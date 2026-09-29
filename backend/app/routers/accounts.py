@@ -35,7 +35,7 @@ class WorkspaceUpdate(BaseModel):
     @field_validator('data')
     @classmethod
     def validate_data(cls, data: dict[str, str]) -> dict[str, str]:
-        allowed = {JOURNEY_KEY, 'aiwrevolusi.userProfile', 'aiwrevolusi.confirmedAnalysis', 'aiwrevolusi.learningCentre', 'aiwrevolusi.learningResourceSelections.v1', 'aiwrevolusi.courseLibrary.v1', 'aiwrevolusi.learningSkills.v1', 'aiwrevolusi.plan.courses.v1', 'aiwrevolusi.planner.v1', 'aiwrevolusi.possibilities.chosenDirection', 'aiwrevolusi.possibilities.shortlist', 'aiwrevolusi.possibilities.saved', 'aiwrevolusi.possibilities.intent'}
+        allowed = {'aiwrevolusi.workProfileDraft.v1', JOURNEY_KEY, 'aiwrevolusi.userProfile', 'aiwrevolusi.confirmedAnalysis', 'aiwrevolusi.learningCentre', 'aiwrevolusi.learningResourceSelections.v1', 'aiwrevolusi.courseLibrary.v1', 'aiwrevolusi.learningSkills.v1', 'aiwrevolusi.plan.courses.v1', 'aiwrevolusi.planner.v1', 'aiwrevolusi.possibilities.chosenDirection', 'aiwrevolusi.possibilities.shortlist', 'aiwrevolusi.possibilities.saved', 'aiwrevolusi.possibilities.intent'}
         if not data.keys() <= allowed or len(json.dumps(data)) > 2_000_000:
             raise ValueError('Workspace is invalid or too large.')
         for key, value in data.items():

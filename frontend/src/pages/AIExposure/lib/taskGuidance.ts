@@ -9,6 +9,48 @@ type Guidance = {
 };
 const guides: { match: RegExp; guidance: Guidance }[] = [
   {
+    match: /(?:cost|quantit|labour|labor|material).{0,90}estimat|estimat.{0,90}(?:cost|quantit|labour|labor|material)/i,
+    guidance: {
+      title: "Cost estimates",
+      help: "AI may help structure a draft estimate from approved quantities and rates, and list assumptions or missing inputs.",
+      steps: [
+        "Choose a small example with approved quantities, units and rates.",
+        "Ask for a draft table that leaves missing inputs blank and lists its assumptions.",
+        "Check the inputs and recalculate totals with a spreadsheet before approving the estimate.",
+      ],
+      tools: [{ name: "AI text assistant", purpose: "Structure a draft and list missing information." }, { name: "Spreadsheet", purpose: "Check units, quantities, rates and calculations." }],
+      review: "Check quantities, rates, units and calculations. Apply project requirements and approve the final estimate yourself.",
+    },
+  },
+  {
+    match: /test results|test readings|unusual readings|analys.{0,30}(?:measurements|readings)/i,
+    guidance: {
+      title: "Reviewing test results",
+      help: "AI may help organise readings and draft a summary of differences. It cannot establish why a result is unusual without the right evidence.",
+      steps: [
+        "Use a non-sensitive example with units, test conditions and approved limits.",
+        "Ask for a summary tied to the original readings, with missing context marked clearly.",
+        "Verify each reading, instrument status and explanation using the approved procedure.",
+      ],
+      tools: [{ name: "AI text assistant", purpose: "Draft a source-linked summary of readings." }],
+      review: "Check units, test conditions and instrument reliability. Investigate unusual results and leave safety decisions to the responsible person.",
+    },
+  },
+  {
+    match: /(?:assembl|install).{0,60}(?:mechanical|machine|equipment|hydraulic)|(?:mechanical|machine|equipment|hydraulic).{0,60}(?:assembl|install)/i,
+    guidance: {
+      title: "Mechanical assembly and installation",
+      help: "AI may help prepare written notes or a draft checklist from approved instructions. It cannot carry out the physical installation.",
+      steps: [
+        "Choose approved instructions for a non-sensitive example.",
+        "Ask for a preparation checklist that points to the original instructions.",
+        "Check every step with the approved procedure before using it.",
+      ],
+      tools: [{ name: "AI text assistant", purpose: "Help with written preparation only." }],
+      review: "Carry out physical work using approved safety procedures. Check equipment, measurements and authorisation before signing off.",
+    },
+  },
+  {
     // Match pricing/marketing intent before incidental words such as budgets or records.
     match: /pric(?:e|ing)|discount|marketing|promotion|campaign|sales methods/i,
     guidance: {
@@ -111,7 +153,7 @@ const guides: { match: RegExp; guidance: Guidance }[] = [
     },
   },
   {
-    match: /software|program|internet|web|code|develop/i,
+    match: /\bsoftware\b|\bprogramming\b|\binternet\b|\bwebsite\b|\bweb\b|\bcode\b|\bcoding\b/i,
     guidance: {
       title: "Software and website development",
       help: "AI may help outline an implementation, draft small code changes and suggest test cases.",

@@ -102,10 +102,11 @@ export default function LearningCentre() {
   }, [params, genericSearch, workspaceRevision]);
   const context = journey.context;
   const evidence = useMemo(() => buildSkillEvidence(journey.profile?.tasks ?? [], wefSkills), [journey.profile, wefSkills]);
-  const workSkills = useMemo(() => journey.reviewed
-    ? evidence.filter(({ skill }) => journey.decisions[String(skill.wef_skill_id)] === "accepted")
-      .map(({ skill }) => toLearningSkill(skill.core_skill, "work"))
-    : [], [evidence, journey.reviewed, journey.decisions]);
+  const workSkills = useMemo(() => evidence.filter(({ skill }) =>
+    journey.decisions[String(skill.wef_skill_id)] === "accepted" && (journey.reviewed ||
+      (journey.context?.origin === "work" && !journey.contextStale && journey.context.skill.id === skill.wef_skill_id)))
+    .map(({ skill }) => toLearningSkill(skill.core_skill, "work")),
+    [evidence, journey.reviewed, journey.decisions, journey.context, journey.contextStale]);
   const selectedWef = context ? wefSkills.find(item => item.wef_skill_id === context.skill.id && skillKey(item.core_skill) === context.skill.slug) : undefined;
   const rejected = Boolean(context?.origin === "work" && selectedWef && !journey.error && getSkillDecision(selectedWef.wef_skill_id) === "rejected");
   const contextValid = Boolean(context && selectedWef && !rejected);

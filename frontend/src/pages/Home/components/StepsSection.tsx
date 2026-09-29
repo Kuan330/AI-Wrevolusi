@@ -13,6 +13,10 @@ const StepsSection = () => {
     <section className="section" id="steps">
       <div className="container">
         <SectionHeader {...sectionHeaderProps1} />
+        <div className="mb-6 max-w-3xl text-sm leading-6">
+          <p><strong>For example:</strong> “I check customer orders for missing details.” Save that task, check any available AI research, review a related skill, then choose supported learning and record your study.</p>
+          <p className="mt-2">Practice records and a later progress comparison are planned next steps. Career exploration is optional. Research findings do not predict what will happen to your job.</p>
+        </div>
         <div className="steps-grid">
           {STEPS.map((step, index) => (
             <div className="step-flow-item" key={step.title}>

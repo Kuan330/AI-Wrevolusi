@@ -14,6 +14,8 @@ export interface ProfileTask {
   practice?: TaskPractice;
   source: ProfileTaskSource;
   iloTaskId?: string;
+  sourceOccupationCode?: string;
+  sourceVersion?: string;
   originalWording?: string;
   score2025?: number | null;
   potential25?: string | null;

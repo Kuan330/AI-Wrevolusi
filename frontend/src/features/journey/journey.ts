@@ -3,6 +3,7 @@ import { readUserProfile, type UserProfile } from "../work-profile/userProfile.t
 import { readPlanState } from "../learning-planning/planCourses.ts";
 import { readLibrary } from "../learning-planning/libraryStorage.ts";
 import { ROUTES } from "../../constants/routes.ts";
+import { readWorkDraft } from "../work-profile/workProfileDraft.ts";
 
 export const JOURNEY_KEY = "aiwrevolusi.journey.v1";
 export type SkillDecision = "accepted" | "rejected";
@@ -111,6 +112,13 @@ export function readJourneyProfile(): UserProfile {
     if (raw !== null) {
       const p: unknown = JSON.parse(raw);
       if (!record(p) || !Array.isArray(p.tasks) || !p.tasks.every(t => record(t) && text(t.id, 100) && text(t.wording, 5000))) throw new Error();
+      if (p.jobTitle !== undefined && !text(p.jobTitle, 200)) throw new Error();
+      if (p.profileVersion !== undefined && (!Number.isSafeInteger(p.profileVersion) || Number(p.profileVersion) < 0)) throw new Error();
+      if (p.confirmedAt !== undefined && !dated(p.confirmedAt)) throw new Error();
+      if (p.history !== undefined && (!Array.isArray(p.history) || !p.history.every(entry => record(entry) &&
+        Number.isSafeInteger(entry.profileVersion) && Number(entry.profileVersion) >= 0 && text(entry.jobTitle, 200) &&
+        (entry.confirmedAt === null || dated(entry.confirmedAt)) && Array.isArray(entry.tasks) &&
+        entry.tasks.every(task => record(task) && text(task.id, 200) && text(task.wording, 5000))))) throw new Error();
       if (p.tasksOccupationCode !== undefined && p.tasksOccupationCode !== null && typeof p.tasksOccupationCode !== "string") throw new Error();
       if (p.analysis !== null && p.analysis !== undefined && (!record(p.analysis) || !Array.isArray(p.analysis.tasks) || !p.analysis.tasks.every(t => record(t) && text(t.id, 100) && text(t.wording, 5000)))) throw new Error();
     } else if (legacy !== null) {
@@ -209,8 +217,13 @@ export function readLearningContext(id?: string | null): LearningContext | null 
 }
 export function learningContextNeedsReview(context: LearningContext): boolean {
   if (context.origin === "browse") return false;
-  return context.workKey !== currentWorkKey() ||
-    (context.origin === "work" && (!isSkillReviewCurrent() || getSkillDecision(context.skill.id) !== "accepted"));
+  const profile = readJourneyProfile();
+  if (context.origin === "career") return context.workKey !== workKeyFor(profile);
+  // A work learning choice depends on its own supporting tasks. Editing an
+  // unrelated task must not mark this saved connection as outdated.
+  return !profile.tasksConfirmed || !context.taskIds.length ||
+    context.taskIds.some((id, index) => !profile.tasks.some(task => task.id === id && task.wording === context.taskLabels[index])) ||
+    getSkillDecision(context.skill.id) !== "accepted";
 }
 export async function startLearning(input: LearningInput): Promise<string> {
   const state = readJourneyState();
@@ -265,6 +278,8 @@ export async function rememberIntent(kind: "work" | "skills", id?: string): Prom
 
 /** Only for generic entry/Continue. Intentional page visits must not use this. */
 export function getContinueDestination(): string {
+  const draft = readWorkDraft();
+  if (draft) return draft.stage === "tasks" && draft.jobTitle.trim() ? ROUTES.task : `${ROUTES.workProfile}?edit=job`;
   const state = readJourneyState();
   const profile = readJourneyProfile();
   const plan = readPlanState({ migrateLegacy: false });

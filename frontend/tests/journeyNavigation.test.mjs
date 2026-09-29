@@ -30,7 +30,8 @@ test("learning and career areas are separate and do not match unrelated prefixes
 
 test("global and local links remain available before confirmation", () => {
   assert.deepEqual(PRIMARY_NAV_MENU.map(({ label }) => label), ["My Work", "My Learning", "Career Options"]);
-  assert.deepEqual(WORK_NAV_MENU.map(({ path }) => path), ["/profile", "/profile/tasks", "/ai-exposure", "/skills"]);
+  assert.deepEqual(WORK_NAV_MENU.map(({ path }) => path), ["/profile", "/ai-exposure", "/skills"]);
+  assert.deepEqual(WORK_NAV_MENU.map(({ label }) => label), ["Profile", "AI findings", "My skills"]);
   assert.deepEqual(LEARNING_NAV_MENU.map(({ path }) => path), ["/plan", "/learning-centre"]);
   const pending = { workConfirmed: false, assessmentChecked: false, skillsReviewed: false };
   for (const { key } of WORK_NAV_MENU) assert.equal(getWorkStepStatus(key, pending), undefined);
@@ -39,7 +40,6 @@ test("global and local links remain available before confirmation", () => {
 test("a checked assessment can complete the check without a reliable exposure score", () => {
   const state = { workConfirmed: true, assessmentChecked: true, skillsReviewed: false };
   assert.equal(getWorkStepStatus("details", state), "Confirmed");
-  assert.equal(getWorkStepStatus("tasks", state), "Confirmed");
   assert.equal(getWorkStepStatus("findings", state), "Checked");
   assert.equal(getWorkStepStatus("skills", state), undefined);
 });

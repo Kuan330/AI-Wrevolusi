@@ -264,3 +264,21 @@ def test_needs_profile_response_can_be_explicitly_empty() -> None:
     )
     assert response.status == 'needs_profile'
     assert response.directions == []
+
+
+def test_confirmed_uncoded_work_supplies_tasks_without_inventing_a_role():
+    import json
+    from app.services.possibilities import confirmed_workspace_evidence
+    profile = {'jobTitle': 'My own job title', 'tasksOccupationCode': None, 'tasksConfirmed': True,
+               'tasks': [{'id': 't1', 'wording': 'Analyse sales records'}], 'analysis': None}
+    assert confirmed_workspace_evidence({'aiwrevolusi.userProfile': json.dumps(profile)}, []) == (['Analyse sales records'], None)
+    profile['tasksConfirmed'] = False
+    assert confirmed_workspace_evidence({'aiwrevolusi.userProfile': json.dumps(profile)}, []) == ([], None)
+
+
+def test_confirmed_uncoded_work_still_rejects_invalid_task_evidence():
+    import json
+    from app.services.possibilities import confirmed_workspace_evidence
+    profile = {'tasksOccupationCode': None, 'tasksConfirmed': True, 'tasks': [{'wording': ''}], 'analysis': None}
+    with pytest.raises(ValueError):
+        confirmed_workspace_evidence({'aiwrevolusi.userProfile': json.dumps(profile)}, [])

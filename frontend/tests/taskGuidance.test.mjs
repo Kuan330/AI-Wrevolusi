@@ -17,3 +17,15 @@ test('full task and working context remain in the prompt', () => {
   assert.ok(guidance.prompt.includes(wording));
   assert.ok(guidance.prompt.includes('Use the approved internal template.'));
 });
+
+test('developing safety procedures does not become software development advice', () => {
+  const guidance = taskGuidance({wording: 'Developing and monitoring safety standards for marine survey work'});
+  assert.doesNotMatch(guidance.help, /code changes/);
+  assert.match(taskGuidance({wording:'Developing software test cases'}).help, /code changes/);
+});
+
+test('engineering guidance separates drafting, measurement checks and physical work', () => {
+  assert.match(taskGuidance({wording:'Preparing detailed estimates of quantities and costs of materials and labour'}).review,/quantities, rates, units/);
+  assert.match(taskGuidance({wording:'Review test results and explain unusual readings'}).review,/instrument reliability/);
+  assert.match(taskGuidance({wording:'Assemble and install mechanical components'}).help,/cannot carry out the physical installation/);
+});

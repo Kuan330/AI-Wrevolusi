@@ -3,6 +3,7 @@ import { api } from "./api.ts";
 type Workspace = { data: Record<string, string>; revision: number };
 export const workspaceKeys = [
   "aiwrevolusi.journey.v1",
+  "aiwrevolusi.workProfileDraft.v1",
   "aiwrevolusi.userProfile",
   "aiwrevolusi.confirmedAnalysis",
   "aiwrevolusi.learningCentre",
@@ -20,6 +21,11 @@ let workspace: Workspace = { data: {}, revision: 0 };
 let saving: Promise<void> | null = null;
 let savingSession: number | null = null;
 let dirty = false;
+let committedKeys: { session: number; keys: Set<string> } | null = null;
+function checkPendingCommit(keys: string[]) {
+  if (committedKeys?.session === workspaceSession && keys.some(key => committedKeys!.keys.has(key)))
+    throw new Error("Your work is being saved. Wait before changing it again.");
+}
 let timer: ReturnType<typeof setTimeout> | undefined;
 export let syncError = "";
 const notify = () => {
@@ -118,6 +124,7 @@ export const accountStorage = {
     return userId ? (workspace.data[key] ?? null) : localStorage.getItem(key);
   },
   setItem(key: string, value: string) {
+    checkPendingCommit([key]);
     if (!userId) {
       localStorage.setItem(key, value);
       notify();
@@ -134,6 +141,7 @@ export const accountStorage = {
     }, 400);
   },
   removeItem(key: string) {
+    checkPendingCommit([key]);
     if (!userId) {
       localStorage.removeItem(key);
       return;
@@ -162,6 +170,7 @@ export function readGuestLegacyItem(key: string): string | null {
 
 /** Commit related course records together before notifying or scheduling sync. */
 export function saveWorkspaceItems(items: Record<string, string>) {
+  checkPendingCommit(Object.keys(items));
   if (userId) {
     if (Object.keys(items).some((key) => !workspaceKeys.includes(key)))
       throw new Error("This data cannot be saved in your account workspace.");
@@ -198,4 +207,62 @@ export function saveWorkspaceItems(items: Record<string, string>) {
     throw error;
   }
   notify();
+}
+
+/** Publish a confirmed record only after the account server accepts it. */
+export async function commitWorkspaceItems(items: Record<string, string | null>): Promise<void> {
+  const owner = workspaceSession;
+  if (!userId) throw new Error("Sign in before saving your work.");
+  const keys = Object.keys(items);
+  if (keys.some(key => !workspaceKeys.includes(key)))
+    throw new Error("This data cannot be saved in your account workspace.");
+  const expected = Object.fromEntries(keys.map(key => [key, workspace.data[key]]));
+  // Recheck after every await: another confirmation may have acquired the slot.
+  do {
+    await flushWorkspace();
+    if (owner !== workspaceSession || !userId) throw new Error("Your account changed. Please try again.");
+  } while (saving);
+  if (keys.some(key => workspace.data[key] !== expected[key]))
+    throw new Error("Your work changed while saving. Review it and try again.");
+  const before = { ...workspace.data };
+  const data = { ...before };
+  for (const [key, value] of Object.entries(items)) {
+    if (value === null) delete data[key];
+    else data[key] = value;
+  }
+  clearTimeout(timer);
+  const lock = { session: owner, keys: new Set(keys) };
+  committedKeys = lock;
+  savingSession = owner;
+  const request = (async () => {
+    const saved = await api.patch<Workspace>("/account/workspace", { owner_id: userId, data, revision: workspace.revision });
+    if (owner !== workspaceSession) throw new Error("Your account changed. Please try again.");
+    // Conflicting writes are blocked; unrelated edits are retained for later sync.
+    const concurrent = { ...workspace.data };
+    workspace = { data: { ...data }, revision: saved.revision };
+    for (const key of new Set([...Object.keys(before), ...Object.keys(concurrent)])) {
+      if (before[key] !== concurrent[key] && !(key in items)) {
+        if (concurrent[key] === undefined) delete workspace.data[key];
+        else workspace.data[key] = concurrent[key];
+      }
+    }
+    dirty = JSON.stringify(workspace.data) !== JSON.stringify(data);
+    syncError = "";
+    try { cache(); }
+    catch {
+      // The account server accepted this profile. Do not report a failed save
+      // or restore stale work just because the optional browser cache is full.
+      syncError = "Your work is saved to your account, but this browser could not keep a local copy. Reload to use the saved account copy.";
+    }
+  })();
+  saving = request;
+  try { await request; }
+  catch (error) {
+    if (owner === workspaceSession) syncError = error instanceof Error ? error.message : "Your work could not be saved.";
+    throw error;
+  } finally {
+    if (saving === request) { saving = null; savingSession = null; }
+    if (committedKeys === lock) committedKeys = null;
+    notify();
+  }
 }

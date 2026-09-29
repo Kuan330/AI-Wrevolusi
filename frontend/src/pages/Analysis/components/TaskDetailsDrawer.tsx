@@ -17,6 +17,7 @@ import { taskScore } from "@/pages/Analysis/lib/taskScore";
 import {
   DEFAULT_TASK_ASSIST_QUESTION,
   taskAssistContextKey,
+  taskAssistResponseLabel,
 } from "@/pages/AIExposure/lib/taskAssistState";
 import type { ProfileTask } from "@/features/work-profile/types";
 import { ApiError } from "@/services/api";
@@ -39,7 +40,7 @@ const formatTaskAssessmentMatchLayer = (
 const isAuthFailure = (caught: unknown) =>
   caught instanceof ApiError && caught.status === 401;
 
-const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
+const SignedInTaskAssistAccess = ({ task, inline = false }: { task: ProfileTask; inline?: boolean }) => {
   const [interaction, setInteraction] =
     useState<TaskAssistInteraction | null>(null);
   const [error, setError] = useState("");
@@ -212,6 +213,17 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
     );
   }
 
+  if (inline) return <div className="space-y-3" aria-label="AI guidance">
+    {interaction.status === "completed" && interaction.reply ? <>
+      <p className="text-sm font-semibold">{taskAssistResponseLabel(interaction.generated_by_model === true)}</p>
+      <p className="whitespace-pre-wrap text-sm leading-6">{interaction.reply}</p>
+    </> : <Button disabled={generating || interaction.status === "pending"} onClick={() => void requestGuidance()}>
+      {generating || interaction.status === "pending" ? "Preparing guidance…" : "Get AI guidance for this task"}
+    </Button>}
+    {generateError && <p role="alert">{generateError} You can try again.</p>}
+    {(generating || interaction.status === "pending") && <p role="status">Your task is saved. You can continue to skills while this loads.</p>}
+  </div>;
+
   return (
     <TaskAssistGuidePet
       status={interaction.status}
@@ -227,10 +239,10 @@ const SignedInTaskAssistAccess = ({ task }: { task: ProfileTask }) => {
   );
 };
 
-const TaskAssistAccess = ({ task }: { task: ProfileTask }) => {
+export const TaskAssistAccess = ({ task, inline = false }: { task: ProfileTask; inline?: boolean }) => {
   const { user, loading } = useAccount();
   if (loading || !user) return null;
-  return <SignedInTaskAssistAccess task={task} />;
+  return <SignedInTaskAssistAccess task={task} inline={inline} />;
 };
 
 export default function TaskDetailsDrawer(props: {

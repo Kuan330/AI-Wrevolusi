@@ -72,27 +72,27 @@ export const TRUST_ITEMS = [
 export const STEPS: StepItem[] = [
   {
     title: "Record your real work.",
-    description: "Choose an occupation and adjust its tasks to match your working day.",
+    description: "Add your job title and the tasks you actually do, then confirm your profile.",
     accent: "warm",
   },
   {
     title: "See where AI may change tasks.",
-    description: "Review task-level evidence for AI assistance, reshaping or human-led work.",
+    description: "Check available research for your tasks. If evidence is missing, you can still continue to skills.",
     accent: "blue",
   },
   {
     title: "Make your skills visible.",
-    description: "Connect your work to skills whose value can grow, stay steady or shift.",
+    description: "Review skill suggestions linked to your tasks and choose what fits your work.",
     accent: "warm",
   },
   {
-    title: "Explore your next options.",
-    description: "Find occupations where your current strengths can transfer.",
+    title: "Choose one skill to develop.",
+    description: "Find relevant learning and save a course you want to try.",
     accent: "blue",
   },
   {
-    title: "Build a plan that fits your life.",
-    description: "Turn your choices into practical learning steps around your real constraints.",
+    title: "Keep learning at your pace.",
+    description: "Return to saved courses and record your study. Career exploration is optional.",
     accent: "warm",
   },
 ];
@@ -164,10 +164,10 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: "Product",
     links: [
-      { label: "Start free analysis" },
-      { label: "Work profile (E1)" },
-      { label: "AI Impact (E2)" },
-      { label: "Learning resources (E3)" },
+      { label: "Start my profile" },
+      { label: "My Work" },
+      { label: "AI findings" },
+      { label: "My Learning" },
     ],
   },
   {

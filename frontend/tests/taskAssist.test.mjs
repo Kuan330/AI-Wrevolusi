@@ -94,7 +94,7 @@ test('drawer companion generates guidance without a Chat with AI dialog', () => 
   assert.match(service, /"\/ai\/task-assist\/details"/);
   assert.match(drawer, /useAccount/);
   assert.match(drawer, /if \(loading \|\| !user\) return null/);
-  assert.match(drawer, /return <SignedInTaskAssistAccess task=\{task\} \/>/);
+  assert.match(drawer, /return <SignedInTaskAssistAccess task=\{task\} inline=\{inline\} \/>/);
   assert.match(drawer, /task-details__assist-container/);
   const contentStart = drawer.indexOf('<DrawerContent');
   const savedAccess = drawer.lastIndexOf('<TaskAssistAccess');
