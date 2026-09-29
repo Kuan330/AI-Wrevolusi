@@ -1,5 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import text
+from sqlalchemy import select, text
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.services.specialist_catalogue import catalogue_for_occupation, search_catalogue
+from app.services.classification_alignment import require_ilo_title_agreement
 from sqlalchemy.ext.asyncio import AsyncSession
 import asyncio
 import logging
@@ -220,6 +224,7 @@ async def get_reference_occupation(code: str, db: AsyncSession = Depends(get_db)
 
 @router.get('/occupations/{code}/tasks')
 async def list_reference_tasks(code: str, db: AsyncSession = Depends(get_db)) -> list[dict]:
+    await require_ilo_title_agreement(db, code)
     result = await db.execute(
         text(
             'SELECT isco_08, task_id, task_text, score_2025, potential25, mean_score_2025 '
@@ -241,3 +246,43 @@ async def list_reference_wef_skills(db: AsyncSession = Depends(get_db)) -> list[
         )
     )
     return [dict(row) for row in result.mappings().all()]
+
+
+async def _specialist_response(operation):
+    try:
+        return await operation
+    except SQLAlchemyError as exc:
+        logger.warning('specialist_catalogue_unavailable', exc_info=True)
+        raise HTTPException(status_code=503, detail='Specialist skills are temporarily unavailable. Please try again.') from exc
+
+
+@router.get('/specialist-skills')
+async def list_specialist_skills(
+    occupation_code: str | None = Query(default=None, pattern=r'^\d{4}$'),
+    occupation_uri: str | None = Query(default=None, pattern=r'^http://data\.europa\.eu/esco/occupation/[0-9a-f-]{36}$'),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    if occupation_code is None and occupation_uri is None:
+        raise HTTPException(status_code=422, detail='Choose an occupation group or a reference occupation.')
+    return await _specialist_response(catalogue_for_occupation(db, occupation_code, occupation_uri))
+
+
+@router.get('/specialist-occupations')
+async def search_specialist_occupations(
+    q: str = Query(default='', max_length=120),
+    isco_code: str | None = Query(default=None, pattern=r'^\d{4}$'),
+    limit: int = Query(default=20, ge=1, le=50),
+    offset: int = Query(default=0, ge=0, le=20000),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    return await _specialist_response(search_catalogue(db, query=q, code=isco_code, limit=limit, offset=offset))
+
+
+@router.get('/specialist-skill-search')
+async def search_specialist_skills(
+    q: str = Query(default='', max_length=120),
+    limit: int = Query(default=20, ge=1, le=50),
+    offset: int = Query(default=0, ge=0, le=20000),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    return await _specialist_response(search_catalogue(db, concepts=True, query=q, limit=limit, offset=offset))

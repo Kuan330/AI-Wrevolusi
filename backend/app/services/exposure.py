@@ -18,6 +18,7 @@ from app.schemas.exposure import (
     TaskAssessmentMatchLayer,
 )
 from app.services.ai_task_judge import TaskMatchJudge
+from app.services.classification_alignment import require_ilo_title_agreement
 
 ILO_EXPOSURE_SOURCE_NAME = 'Gmyrek et al. 2025 · ILO Working Paper 140'
 ILO_EXPOSURE_SOURCE_YEAR = '2025'
@@ -483,6 +484,7 @@ async def load_ilo_task_exposure_references_for_occupation(
     db: AsyncSession,
     occupation_code: str,
 ) -> list[IloTaskExposureReference]:
+    await require_ilo_title_agreement(db, occupation_code)
     result = await db.execute(
         text(
             'SELECT task_id, task_text, score_2025, potential25, source '
@@ -512,6 +514,7 @@ async def assess_confirmed_tasks_against_ilo_references(
         request.occupation_code,
     )
     return ConfirmedTaskExposureAssessmentBatchResponse(
+        classification_check='same-title-v1',
         assessments=[
             assess_confirmed_task_against_ilo_references(
                 confirmed_task,

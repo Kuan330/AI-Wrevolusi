@@ -70,6 +70,7 @@ export interface ConfirmedTaskExposureAssessment {
 }
 
 export interface ConfirmedTaskExposureAssessmentBatchResponse {
+  classification_check?: "same-title-v1" | null;
   assessments: ConfirmedTaskExposureAssessment[];
 }
 

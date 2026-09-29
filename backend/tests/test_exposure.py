@@ -41,10 +41,15 @@ SHOP_SUPERVISOR_REFERENCE_TASKS = [
 
 
 class FakeIloTaskExposureReferenceQueryResult:
+    def __init__(self, alignment=False):
+        self.alignment = alignment
+
     def mappings(self) -> 'FakeIloTaskExposureReferenceQueryResult':
         return self
 
     def all(self) -> list[dict]:
+        if self.alignment:
+            return [{"masco_title": "Shop supervisors", "ilo_title": "Shop supervisors"}]
         return [
             {
                 'task_id': reference_task.ilo_task_id,
@@ -59,7 +64,7 @@ class FakeIloTaskExposureReferenceQueryResult:
 
 class FakeIloTaskExposureReferenceDatabaseSession:
     async def execute(self, *_args, **_kwargs) -> FakeIloTaskExposureReferenceQueryResult:
-        return FakeIloTaskExposureReferenceQueryResult()
+        return FakeIloTaskExposureReferenceQueryResult(alignment="masco_title" in str(_args[0]))
 
 
 def test_batch_task_exposure_assessment_route_is_published() -> None:

@@ -39,11 +39,15 @@ export async function checkWorkAiFindings(): Promise<void> {
     })),
   });
   assertCurrentWork();
+  if (response.classification_check !== "same-title-v1") {
+    throw new Error("The research service has not checked the occupation classification link. Your work is saved; you can continue to skills.");
+  }
   const currentReferenceTasks = profile.tasks.filter((task) => !task.sourceOccupationCode || task.sourceOccupationCode === code);
   const referenceTask = currentReferenceTasks.find((task) => typeof task.meanScore2025 === "number")
     ?? currentReferenceTasks.find((task) => task.potential25);
   const occupation = profile.occupation?.unit.occupation_code === code ? profile.occupation : null;
   saveConfirmedAnalysis({
+    classificationCheck: "same-title-v1",
     occupationCode: code,
     occupationTitle: occupation?.unit.title || profile.jobTitle || "Your work",
     occupationPath: occupation?.path.map((item) => item.title) ?? [],

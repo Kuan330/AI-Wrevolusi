@@ -109,4 +109,8 @@ class ConfirmedTaskExposureAssessment(BaseModel):
 
 
 class ConfirmedTaskExposureAssessmentBatchResponse(BaseModel):
+    classification_check: Literal['same-title-v1'] | None = Field(
+        default=None,
+        description='Same-code MASCO and ILO reference titles agreed; not a validated task mapping.',
+    )
     assessments: list[ConfirmedTaskExposureAssessment]

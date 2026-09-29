@@ -25,6 +25,8 @@ export type SelectedOccupation = {
 };
 
 export type ConfirmedAnalysis = {
+  /** Backend checked the MASCO and ILO group titles; not a task/proficiency validation. */
+  classificationCheck?: "same-title-v1";
   occupationTitle: string;
   occupationPath: string[];
   occupationCode: string;

@@ -296,10 +296,15 @@ def test_insufficient_assessment_has_no_score_context() -> None:
 
 
 class FakeReferenceQueryResult:
+    def __init__(self, alignment=False):
+        self.alignment = alignment
+
     def mappings(self) -> 'FakeReferenceQueryResult':
         return self
 
     def all(self) -> list[dict]:
+        if self.alignment:
+            return [{"masco_title": "Shop supervisors", "ilo_title": "Shop supervisors"}]
         return [
             {
                 'task_id': task.ilo_task_id,
@@ -314,7 +319,7 @@ class FakeReferenceQueryResult:
 
 class FakeDatabaseSession:
     async def execute(self, *_args, **_kwargs) -> FakeReferenceQueryResult:
-        return FakeReferenceQueryResult()
+        return FakeReferenceQueryResult(alignment="masco_title" in str(_args[0]))
 
 
 def test_exposure_endpoint_applies_the_llm_judge_when_opted_in() -> None:

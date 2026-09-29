@@ -7,16 +7,16 @@ import ts from 'typescript';
 const source = readFileSync(new URL('../src/features/work-profile/checkWorkAiFindings.ts', import.meta.url), 'utf8');
 const script = source.replace(/^import .*;\n/gm, '') + '\nreturn checkWorkAiFindings;';
 const compiled = ts.transpileModule(script, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText.replace('export async function', 'async function');
-let profile, owner, workKey, calls, saved, duringRequest, duringFlush;
+let profile, owner, workKey, calls, saved, duringRequest, duringFlush, classificationCheck;
 const check = new Function('readJourneyProfile', 'currentWorkKey', 'currentWorkspaceSession', 'flushWorkspace', 'exposureService', 'saveConfirmedAnalysis', compiled)(
   () => profile, () => workKey, () => owner,
   async () => { calls.push('flush'); duringFlush?.(); },
-  { assessConfirmedTasksAgainstIloReferences: async input => { calls.push(input); duringRequest?.(); return { assessments: [] }; } },
+  { assessConfirmedTasksAgainstIloReferences: async input => { calls.push(input); duringRequest?.(); return { assessments: [], classification_check: classificationCheck }; } },
   value => { saved = value; },
 );
 beforeEach(() => {
   profile = { jobTitle: 'My custom title', tasksConfirmed: true, tasksOccupationCode: '3115', tasks: [{ id: 't1', wording: 'Test equipment', timeSpent: '' }] };
-  owner = 1; workKey = 'work-v1'; calls = []; saved = undefined; duringRequest = undefined; duringFlush = undefined;
+  classificationCheck = 'same-title-v1'; owner = 1; workKey = 'work-v1'; calls = []; saved = undefined; duringRequest = undefined; duringFlush = undefined;
 });
 test('checking is explicit and preserves confirmed task text without re-confirming profile', async () => {
   assert.equal(calls.length, 0);
@@ -76,4 +76,14 @@ test('current occupation source and legacy task references remain supported', as
     assert.equal(calls[1].confirmed_tasks[0].ilo_task_id, 'current-ilo');
     assert.equal(saved.meanScore2025, 0.26);
   }
+});
+
+
+test('only a backend-checked classification link marks new analysis', async () => {
+  await check();
+  assert.equal(saved.classificationCheck, 'same-title-v1');
+  saved = undefined;
+  classificationCheck = undefined;
+  await assert.rejects(check(), /not checked the occupation classification/);
+  assert.equal(saved, undefined);
 });

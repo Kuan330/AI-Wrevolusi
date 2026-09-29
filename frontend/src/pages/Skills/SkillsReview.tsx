@@ -22,11 +22,13 @@ import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
 import { skillKey } from "./learningSkills";
 import { buildSkillEvidence } from "./lib/skillProfile";
+import SpecialistSkills from "./components/SpecialistSkills";
 import "./SkillsReview.css";
 
 type Decision = "accepted" | "rejected" | undefined;
 type WorkSnapshot = {
   tasks: ProfileTask[];
+  occupationCode: string | null;
   personalSkills: PersonalSkill[];
   workKey: string;
   needsReview: boolean;
@@ -41,6 +43,7 @@ function readWorkSnapshot(): { work: WorkSnapshot | null; error: string } {
     return {
       work: {
         tasks: readUserProfile().tasks,
+        occupationCode: readUserProfile().tasksOccupationCode ?? null,
         personalSkills: journey.personalSkills ?? [],
         workKey,
         needsReview: Boolean(journey.review && journey.review.workKey !== workKey),
@@ -184,6 +187,7 @@ export default function SkillsReview() {
   return (
     <div className="skills-review-page mx-auto w-full max-w-[1200px]">
       <PageHeader
+        className="flex-col items-start sm:flex-row sm:items-center"
         title="Review my skills"
         description="Check the suggestions from your confirmed work, then choose one skill to develop."
         actions={<Button asChild variant="outline" className="rounded-full"><Link to={ROUTES.task}>Edit my tasks</Link></Button>}
@@ -218,6 +222,11 @@ export default function SkillsReview() {
       <p className="skills-review-page__save-status" role="status" aria-live="polite">
         {saving ? "Saving your changes…" : saveMessage}
       </p>
+
+      {!readError && work && <SpecialistSkills tasks={work.tasks} occupationCode={work.occupationCode} focusTaskId={activeFocus?.id} onTaskChange={id => {
+        const task = work.tasks.find(item => item.id === id);
+        if (task) { setSearchParams(params => { params.set("task", id); return params; }, { state: { taskWording: task.wording } }); setSelectedId(null); }
+      }} />}
 
       {!readError && work && work.tasks.length > 0 && <section className="skills-review-page__card skills-review-page__personal" aria-labelledby="personal-skills-title">
         <div className="skills-review-page__section-heading">
@@ -268,7 +277,8 @@ export default function SkillsReview() {
         <h2>Start with your confirmed work</h2>
         <p>Confirm at least one task before reviewing skill suggestions.</p>
         <Button asChild><Link to={ROUTES.task}>Review my tasks</Link></Button>
-      </section> : <>
+      </section> : <details className="skills-review-page__broad">
+        <summary>Broad skills and general learning options</summary>
         <section aria-labelledby="skill-suggestions-title">
           <div className="skills-review-page__section-heading">
             <h2 id="skill-suggestions-title">Skills suggested from your tasks</h2>
@@ -328,7 +338,7 @@ export default function SkillsReview() {
           </div>
           <p className="skills-review-page__hint">You can leave suggestions undecided and return later. Independent learning is your own choice.</p>
         </section>
-      </>}
+      </details>}
     </div>
   );
 }

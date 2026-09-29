@@ -28,7 +28,7 @@ export default function JourneyNavigation() {
   const workConfirmed = Boolean(profile?.tasksConfirmed || profile?.analysis?.tasks.length);
   const status = {
     workConfirmed,
-    assessmentChecked: Boolean(profile?.analysis),
+    assessmentChecked: profile?.analysis?.classificationCheck === "same-title-v1",
     skillsReviewed,
   };
 

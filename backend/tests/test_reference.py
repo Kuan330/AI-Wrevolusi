@@ -19,7 +19,7 @@ def test_database_occupation_search_browsing_and_tasks():
         dict(code='2221', level='unit', parent='2', title='Nursing professionals', description='Provide patient care'),
     ]:
         connection.execute(text('INSERT INTO ref_occupations VALUES (:code, :level, :parent, :title, :description)'), row)
-    connection.execute(text('CREATE TABLE ref_ilo_tasks (isco_08 TEXT, task_id TEXT, task_text TEXT, score_2025 REAL, potential25 TEXT, mean_score_2025 REAL)'))
+    connection.execute(text('CREATE TABLE ref_ilo_tasks (isco_08 TEXT, title TEXT, task_id TEXT, task_text TEXT, score_2025 REAL, potential25 TEXT, mean_score_2025 REAL)'))
 
     class Database:
         async def execute(self, statement, parameters=None):
@@ -42,7 +42,7 @@ def test_database_occupation_search_browsing_and_tasks():
             assert client.get('/reference/occupations', params={'q': "' OR 1=1 --"}).json() == []
             assert client.get('/reference/occupations/2512').json()['title'] == 'Software developers'
             assert client.get('/reference/occupations/9999').status_code == 404
-            assert client.get('/reference/occupations/2512/tasks').json() == []
+            assert client.get('/reference/occupations/2512/tasks').status_code == 422
     finally:
         connection.close()
         engine.dispose()

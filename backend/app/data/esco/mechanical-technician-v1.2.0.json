@@ -1,0 +1,788 @@
+{
+  "source": "ESCO",
+  "version": "1.2.0",
+  "occupation_uri": "http://data.europa.eu/esco/occupation/b31e404e-9af6-457d-a58a-208f612eeba3",
+  "occupation_label": "mechanical engineering technician",
+  "isco_code": "3115",
+  "occupation_code": "3115.1",
+  "skills": [
+    {
+      "uri": "http://data.europa.eu/esco/skill/82313e12-9d39-47d1-b7c9-78bbd6bb50e2",
+      "label": "CAE software",
+      "description": "The software to perform computer-aided engineering (CAE) analysis tasks such as Finite Element Analysis and Computional Fluid Dynamics.",
+      "relation": "essential",
+      "skill_type": "knowledge",
+      "aliases": [
+        "computer-aided engineering softwares",
+        "computer-aided engineering software",
+        "CAE software tools"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F82313e12-9d39-47d1-b7c9-78bbd6bb50e2&language=en&selectedVersion=v1.2.0",
+        "sha256": "8b1b502451493619c0f495449798460d39964bfa162c5c6e77a980cee4b1afeb"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b",
+      "label": "adjust engineering designs",
+      "description": "Adjust designs of products or parts of products so that they meet requirements.",
+      "relation": "essential",
+      "skill_type": "skill",
+      "aliases": [
+        "adjust desings for engineering",
+        "adjust building designs",
+        "adjust manufacturing designs",
+        "adjust engineering models",
+        "adjust construction designs",
+        "adjust engineering schemes"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F42b23922-1c40-4dbe-9e0c-7a568dfdf06b&language=en&selectedVersion=v1.2.0",
+        "sha256": "c65b4efad3c29f88dbaed4be4870a17ba91e2e06161d9082f69c93ab54efac52"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/81a2db2c-7e55-44d0-9cd9-74c25147d7cd",
+      "label": "analyse test data",
+      "description": "Interpret and analyse data collected during testing in order to formulate conclusions, new insights or solutions.",
+      "relation": "essential",
+      "skill_type": "skill",
+      "aliases": [
+        "analysing test data",
+        "examine test data",
+        "analyze test data",
+        "evaluate test data",
+        "assess test data",
+        "analyzing test data",
+        "analyze  test data"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F81a2db2c-7e55-44d0-9cd9-74c25147d7cd&language=en&selectedVersion=v1.2.0",
+        "sha256": "c875e4c14955ea56edbc0e775e14ed1f35c7e65a290620c0ccaaf1c6885a7999"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/acc74047-f59f-4935-afc0-45ec43b9b57a",
+      "label": "define part requirements",
+      "description": "Calculate and determine the functional, physical, structural, geometrical and size dimensions for the parts necessary to create machines or equipment.",
+      "relation": "essential",
+      "skill_type": "skill",
+      "aliases": [
+        "spares requirements",
+        "unit specifications",
+        "component requirements",
+        "part requirements",
+        "spares specifications",
+        "element requirements",
+        "element specifications",
+        "component specifications",
+        "unit requirements"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2Facc74047-f59f-4935-afc0-45ec43b9b57a&language=en&selectedVersion=v1.2.0",
+        "sha256": "d6dfda3a467014ae84fd51f4d30d0c2fd7544245eaccc74742c41e3fea9010d3"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/87434439-c07d-48be-af34-b0cdd03121c4",
+      "label": "design engineering components",
+      "description": "Design engineering parts, assemblies, products, or systems.",
+      "relation": "essential",
+      "skill_type": "skill",
+      "aliases": [
+        "engineering component developing",
+        "engineering components designing",
+        "developing engineering components",
+        "engineering components developing",
+        "designing engineering components",
+        "engineering component designing",
+        "develop engineering components"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F87434439-c07d-48be-af34-b0cdd03121c4&language=en&selectedVersion=v1.2.0",
+        "sha256": "febc8e1fae29cd3f7aa632fc0fcc0d99d5c52138eff8666a95d5e3579caed0e5"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78",
+      "label": "engineering principles",
+      "description": "The engineering elements like functionality, replicability, and costs in relation to the design and how they are applied in the completion of engineering projects.",
+      "relation": "essential",
+      "skill_type": "knowledge",
+      "aliases": [
+        "engineering work principles",
+        "engineering research principles",
+        "engineering analysis principles",
+        "engineering studies principles",
+        "engineering principle",
+        "engineering fieldwork principles",
+        "engineering application principles"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F209a5498-3449-4689-8ed9-bd08cab4fd78&language=en&selectedVersion=v1.2.0",
+        "sha256": "8ad93e8032c3f0faafe92b33099fdb2102c8e6550c7b381cb25deee1dd79a9fe"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919",
+      "label": "engineering processes",
+      "description": "The systematic approach to the development and maintenance of engineering systems.",
+      "relation": "essential",
+      "skill_type": "knowledge",
+      "aliases": [],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F72a74f69-5cf1-43c5-99b9-62a444578919&language=en&selectedVersion=v1.2.0",
+        "sha256": "5161cfb4e5ce69f446e38328bc04e1b50949bd353f10f80a5813dcb395d7c849"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/c5c51528-ccfc-4c53-b409-c200aaa44222",
+      "label": "liaise with engineers",
+      "description": "Collaborate with engineers to ensure common understanding and discuss product design, development and improvement.",
+      "relation": "essential",
+      "skill_type": "skill",
+      "aliases": [
+        "seek advice from engineers",
+        "collaborate with engineers",
+        "communicate with engineers",
+        "exchange with engineers",
+        "liasing with engineers",
+        "work together with engineers",
+        "consult with engineers",
+        "cooperate with engineers",
+        "maintain contact with engineers"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2Fc5c51528-ccfc-4c53-b409-c200aaa44222&language=en&selectedVersion=v1.2.0",
+        "sha256": "84c5357cfda4ea14bfbfec944691ed8dcdb2b89684a987d59219a513154e22ee"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/4339176e-3acd-4f7f-a5d9-445bee3d23f2",
+      "label": "mathematics",
+      "description": "Mathematics is the study of topics such as quantity, structure, space, and change. It involves the identification of patterns and formulating new conjectures based on them. Mathematicians strive to prove the truth or falsity of these conjectures. There are many fields of mathematics, some of which are widely used for practical applications.",
+      "relation": "essential",
+      "skill_type": "knowledge",
+      "aliases": [
+        "calculation",
+        "study of mathematics",
+        "mathematical subjects",
+        "mathematics",
+        "solid modeling",
+        "maths",
+        "field of mathematics",
+        "numeracy",
+        "quantitative data"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F4339176e-3acd-4f7f-a5d9-445bee3d23f2&language=en&selectedVersion=v1.2.0",
+        "sha256": "b1e1b9964251478b50658b99b067ff58890e143acb3cdab4a01799a0469970ee"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9",
+      "label": "mechanical engineering",
+      "description": "Discipline that applies principles of physics, engineering and materials science to design, analyse, manufacture and maintain mechanical systems.",
+      "relation": "essential",
+      "skill_type": "knowledge",
+      "aliases": [
+        "engineering of mechanical systems",
+        "manufacture mechanisms",
+        "design mechanisms",
+        "mechanical system engineering",
+        "analyse mechanisms",
+        "maintain mechanisms",
+        "mechanism engineering",
+        "engineering of mechanisms"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F9c071f1d-eac3-449d-b004-c14775b5a3b9&language=en&selectedVersion=v1.2.0",
+        "sha256": "00588459d1a4ef05ca4925e0204157bef92bc50a5f34942ba4f5fcc93c9225e9"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669",
+      "label": "mechanics",
+      "description": "Theoretical and practical applications of the science studying the action of displacements and forces on physical bodies to the development of machinery and mechanical devices.",
+      "relation": "essential",
+      "skill_type": "knowledge",
+      "aliases": [
+        "production mechanics",
+        "mechanical theory",
+        "mechanics theory",
+        "fabrication mechanics",
+        "engineering mechanics",
+        "theory of mechanics"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2Fefa141df-f382-418f-9121-bd88fd735669&language=en&selectedVersion=v1.2.0",
+        "sha256": "2d1589d9061a630d9a84d0d228e921fa3f8dc131633d7175a33c74b042f6aedd"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/54804209-6aac-4ca4-bf3c-aef4fbe18f8c",
+      "label": "principles of mechanical engineering",
+      "description": "The principles of mechanical engineering, physics, and materials science.",
+      "relation": "essential",
+      "skill_type": "knowledge",
+      "aliases": [
+        "fundamentals of mechanical engineering",
+        "mechanical engineering foundations",
+        "mechanical engineering fundamentals",
+        "physics, materials science, and mechanical engineering",
+        "machinery engineering",
+        "engineering in machinery",
+        "foundations of mechanical engineering",
+        "engineering in mechanical systems",
+        "mechanical engineering principles",
+        "materials science, physics, and mechanical engineering"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F54804209-6aac-4ca4-bf3c-aef4fbe18f8c&language=en&selectedVersion=v1.2.0",
+        "sha256": "5d8d05179dec833b0cd89f07d79a84fe1f365bfb9e458520ea3ee9b83ee8f7fa"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/b07daddc-8625-4360-946e-ad2b0e56ebf6",
+      "label": "read engineering drawings",
+      "description": "Read the technical drawings of a product made by the engineer in order to suggest improvements, make models of the product or operate it.",
+      "relation": "essential",
+      "skill_type": "skill",
+      "aliases": [
+        "peruse engineering drawings",
+        "read of engineering drawings",
+        "read an engineering drawing",
+        "study engineering drawings",
+        "interpret engineering drawings",
+        "view engineering drawings",
+        "reading engineering drawings"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2Fb07daddc-8625-4360-946e-ad2b0e56ebf6&language=en&selectedVersion=v1.2.0",
+        "sha256": "41ed80220bcdd6943a32b93ca096cb65c044aa04f9648e96593c0d5160303d11"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/334e3e49-fb02-4051-809a-f06adfdc1c40",
+      "label": "troubleshoot",
+      "description": "Identify operating problems, decide what to do about it and report accordingly.",
+      "relation": "essential",
+      "skill_type": "skill",
+      "aliases": [
+        "troubleshoot problems",
+        "perform troubleshooting",
+        "solve problems",
+        "identify problems",
+        "troubleshooting",
+        "problem solve",
+        "identifying problems",
+        "deal with problems"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F334e3e49-fb02-4051-809a-f06adfdc1c40&language=en&selectedVersion=v1.2.0",
+        "sha256": "ae7d2ee2e8bff793427f37d8c7bed69e41f7c3162c75b30ceb4a39d9767c35ae"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1",
+      "label": "CAD software",
+      "description": "The computer-aided design (CAD) software for creating, modifying, analysing or optimising a design.",
+      "relation": "optional",
+      "skill_type": "knowledge",
+      "aliases": [
+        "CADD software",
+        "CAD software",
+        "computer assisted design",
+        "software computer assisted design and drafting software"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2Fa2b5dcf3-5b6a-453d-876c-cff540c0faf1&language=en&selectedVersion=v1.2.0",
+        "sha256": "e27eeffc22f9eb62eeda4482433a07ca444562be72fd2edfcb4f06c861e2a5c8"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/f1b5800e-b763-4740-9586-3fef30568e81",
+      "label": "analyse production processes for improvement",
+      "description": "Analyse production processes leading toward improvement. Analyse in order to reduce production losses and overall manufacturing costs.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "search production processes for improvement",
+        "analyse the production process for improvement",
+        "test production processes for improvement",
+        "investigate production processes for improvement",
+        "analyse a production processes for improvement",
+        "analyse production processes for improvements",
+        "scrutinise production processes for improvement",
+        "analyze  production processes for improvement"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2Ff1b5800e-b763-4740-9586-3fef30568e81&language=en&selectedVersion=v1.2.0",
+        "sha256": "0fff96bf3402858a74af2f19095542934d0b74675cd9bce3bdf7be75979d05c3"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/cfbde1b6-8e47-4b83-b430-3d5f7f38d69a",
+      "label": "assess operating cost",
+      "description": "Estimate the operating cost in terms of manpower, consumables and maintenance.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "operating cost estimation",
+        "operating cost assessment",
+        "estimating of operating cost",
+        "estimation of operating cost",
+        "assessing of operating cost",
+        "assessing operating cost",
+        "assessment of operating cost",
+        "estimating operating cost",
+        "estimate operating cost"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2Fcfbde1b6-8e47-4b83-b430-3d5f7f38d69a&language=en&selectedVersion=v1.2.0",
+        "sha256": "49fb0efc93e1af402147951271390bf41fa41a90a7f56b3b2553119bca84265a"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/d1072655-88ce-4445-8803-e6273da273e7",
+      "label": "blueprints",
+      "description": "Must be able to read and understand blueprints, drawings and plans and maintain simple written records.",
+      "relation": "optional",
+      "skill_type": "knowledge",
+      "aliases": [
+        "technical drawings",
+        "schematics",
+        "technical blueprints",
+        "technical plans"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2Fd1072655-88ce-4445-8803-e6273da273e7&language=en&selectedVersion=v1.2.0",
+        "sha256": "1db9b3ed74ac7508c4b62b68f87f4619975a1a1fa7223953ab5ebbf7bcae37a3"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/5c98825f-146d-4d35-97cf-207b2afd9ae2",
+      "label": "create technical plans",
+      "description": "Create detailed technical plans of machinery, equipment, tools and other products.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "create plans concerning technical details",
+        "create industrial plans",
+        "create mechanical plans",
+        "create technical blueprints"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F5c98825f-146d-4d35-97cf-207b2afd9ae2&language=en&selectedVersion=v1.2.0",
+        "sha256": "bf9d377da19caf3169f1891da6535f7a6857238b34069466092d16199f13518a"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/69f23426-9279-4fe6-a283-24c2aa4c855d",
+      "label": "ensure equipment availability",
+      "description": "Ensure that the necessary equipment is provided, ready and available for use before start of procedures.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "assure equipment availability",
+        "secure equipment availability",
+        "secure apparatus availability",
+        "provide equipment availability",
+        "assure apparatus availability",
+        "safeguard equipment availability",
+        "safeguard apparatus availability",
+        "provide apparatus availability"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F69f23426-9279-4fe6-a283-24c2aa4c855d&language=en&selectedVersion=v1.2.0",
+        "sha256": "90fa8da6429ff1ef0c473462254cb03cb2df0c1d67ff002170a12147499e2fe4"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/87b1c959-236d-4761-b3be-b1c729497f75",
+      "label": "fluid mechanics",
+      "description": "The characteristics and properties of fluids, including gases, liquids and plasmas, at rest and in motion, and the forces on them.",
+      "relation": "optional",
+      "skill_type": "knowledge",
+      "aliases": [
+        "solvent mechanics",
+        "solvent mechanisms",
+        "plasma mechanics",
+        "liquefied mechanisms",
+        "liquid mechanisms",
+        "liquid mechanics",
+        "liquefied mechanics",
+        "plasma mechanisms"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F87b1c959-236d-4761-b3be-b1c729497f75&language=en&selectedVersion=v1.2.0",
+        "sha256": "4cd507aec9bb67e2415f0df2697b3ea65e7adb7b302be732f41c0da0d3dcdf5c"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/198b614d-a9af-46f5-b3fd-2672b401dd8e",
+      "label": "health and safety in the workplace",
+      "description": "The body of rules, procedures and regulations related to safety, health and welfare of people in their workplace. ",
+      "relation": "optional",
+      "skill_type": "knowledge",
+      "aliases": [
+        "health and safety programmes and implementation",
+        "health and safety programmes",
+        "safety and health in the workplace",
+        "workplace health and safety",
+        "health and welfare in the workplace",
+        "health and safety"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F198b614d-a9af-46f5-b3fd-2672b401dd8e&language=en&selectedVersion=v1.2.0",
+        "sha256": "88b23e7a886474bbbe9077d4207ff264896e50b0e6e426cae4679dc475c67054"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/be48353d-25c7-4f86-bea9-7b9e248fbc6e",
+      "label": "interpret technical requirements",
+      "description": "Analyse, understand and apply the information provided regarding technical conditions.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "interpret technical requirement",
+        "clarify technical requirements",
+        "explain technical requirements",
+        "decipher technical requirements",
+        "interpreting technical requirements",
+        "interpretation of technical requirements",
+        "solve technical requirements"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2Fbe48353d-25c7-4f86-bea9-7b9e248fbc6e&language=en&selectedVersion=v1.2.0",
+        "sha256": "6d84d10bd5b64d9139a5e9cd69cb2f921be995b78c294ff1e74734438b527e84"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/9c3db86b-2cbf-4f8a-82e1-08533494c7a9",
+      "label": "maintain power plants",
+      "description": "Repair and perform routine maintenance on equipment and systems in power plants to ensure that everything functions safely and is compliant with legislation.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "power plant maintaining",
+        "power plants repairing",
+        "maintaining power plants",
+        "power plant repairing",
+        "repairing power plants",
+        "repair power plants",
+        "power plants maintaining"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F9c3db86b-2cbf-4f8a-82e1-08533494c7a9&language=en&selectedVersion=v1.2.0",
+        "sha256": "57d84d7bcb7ef8fb4baecafd8d4e40126f9da18626aa204221fbfc0b033aa8b7"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/020b3c27-bae1-4b85-9d6f-eccee0f5ed99",
+      "label": "manage supplies",
+      "description": "Monitor and control the flow of supplies that includes the purchase, storage and movement of the required quality of raw materials, and also work-in-progress inventory. Manage supply chain activities and synchronise supply with demand of production and customer.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "plan supplies",
+        "control and monitor supplies",
+        "monitor and control supplies",
+        "supply chain management",
+        "supplies planning",
+        "supplies managing",
+        "manage supply chain",
+        "supplies management"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F020b3c27-bae1-4b85-9d6f-eccee0f5ed99&language=en&selectedVersion=v1.2.0",
+        "sha256": "ca0bf9b78176eeff76108a28b5bd9f60c14cd04440e3616d8768f2f5235bfc8e"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/2964011e-f828-4c6c-b98b-51e984d66365",
+      "label": "material mechanics",
+      "description": "The behaviour of solid objects when subjected to stresses and strains, and the methods to calculate these stresses and strains.",
+      "relation": "optional",
+      "skill_type": "knowledge",
+      "aliases": [
+        "material workings",
+        "component mechanics",
+        "mechanics of materials",
+        "matter mechanics"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F2964011e-f828-4c6c-b98b-51e984d66365&language=en&selectedVersion=v1.2.0",
+        "sha256": "1575986a1a0358324c1bda1d17052c33f6c576244440415bfae9fe24b41b46c1"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/9a8043af-5b1c-4f16-9e00-39416b46f512",
+      "label": "monitor nuclear power plant systems",
+      "description": "Control nuclear plant systems, such as ventilation and water draining systems, to ensure proper functioning and identify irregularities.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "nuclear power plant system controlling",
+        "monitoring nuclear power plant systems",
+        "controlling nuclear power plant systems",
+        "nuclear power plant systems monitoring",
+        "nuclear power plant system monitoring",
+        "control nuclear power plant systems",
+        "nuclear power plant systems controlling"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F9a8043af-5b1c-4f16-9e00-39416b46f512&language=en&selectedVersion=v1.2.0",
+        "sha256": "e9c138778ca6348a1b186ad88ff64ac75bc630a8c7227f2a0a8469a99669ff33"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/81d274bc-6dbf-4003-bcba-f76478d5d930",
+      "label": "nuclear energy",
+      "description": "The generation of electrical energy through the use of nuclear reactors, by converting the energy released from nuclei of atoms in reactors which generate heat. This heat subsequently generates steam which can power a steam turbine to generate electricity.",
+      "relation": "optional",
+      "skill_type": "knowledge",
+      "aliases": [
+        "nuclear reactor energy",
+        "nuclear power",
+        "atomic power",
+        "energy from nuclear reactions",
+        "atomic energy",
+        "nuclear energy",
+        "energy from atoms"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F81d274bc-6dbf-4003-bcba-f76478d5d930&language=en&selectedVersion=v1.2.0",
+        "sha256": "dda248cf8535ddacaafc3df8191cb01852456688d5f16a7cb623bf7ddbd4cf0b"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/210827e3-3129-45a2-8683-70399f3f561f",
+      "label": "order supplies",
+      "description": "Command products from relevant suppliers to get convenient and profitable products to purchase.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "order of supplies",
+        "select supplies to be ordered",
+        "order supply",
+        "place a product order"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F210827e3-3129-45a2-8683-70399f3f561f&language=en&selectedVersion=v1.2.0",
+        "sha256": "9b2c676b89830209b720f990fdcdea42908dffe4425076dd3cd31907f28567b3"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/5d34adde-0b78-42b4-9d3d-69e9388d8398",
+      "label": "oversee quality control",
+      "description": "Monitor and assure the quality of the provided goods or services by overseeing that all the factors of the production meet quality requirements. Supervise product inspection and testing.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "supervise quality control",
+        "manage quality control",
+        "oversee quality controls",
+        "overseeing quality control",
+        "oversight of quality control",
+        "administer quality control",
+        "control quality control"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F5d34adde-0b78-42b4-9d3d-69e9388d8398&language=en&selectedVersion=v1.2.0",
+        "sha256": "f207f8e7792ef6c9f2342df0aa459543d0990553cbe187324efa5da61b079f02"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/79aa4ec0-399d-432e-aae8-7a390ce89bcc",
+      "label": "perform maintenance on installed equipment",
+      "description": "Perform the maintenance on installed equipment on-site. Follow procedures to avoid uninstalling equipment from machinery or vehicles.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "conduct maintenance activities on installed equipment",
+        "carry out maintenance on installed equipment",
+        "execute maintenance on installed equipment",
+        "undertake installed equipment maintenance activities",
+        "conduct maintenance activities on installed on-site equipment",
+        "perform maintenance on installed on-site equipment",
+        "carry out maintenance on installed on-site equipment",
+        "undertake maintenance activities on installed equipment",
+        "ensure functionality of installed on-site equipment",
+        "execute maintenance on installed on-site equipment",
+        "perform maintenance on on-site equipment",
+        "ensure functionality of installed equipment"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F79aa4ec0-399d-432e-aae8-7a390ce89bcc&language=en&selectedVersion=v1.2.0",
+        "sha256": "31e5f46c8ab4ffe640601270940a4377981f39a74341296ed92b90f88c826fcd"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/465ff64a-1271-4064-8ed1-e969cb68d8b4",
+      "label": "perform test run",
+      "description": "Perform tests putting a system, machine, tool or other equipment through a series of actions under actual operating conditions in order to assess its reliability and suitability to realise its tasks, and adjust settings accordingly.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "undertake system testing procedures",
+        "execute test run",
+        "execute system testing procedures",
+        "complete test run",
+        "complete system testing procedures",
+        "implement system testing procedures",
+        "implement test run",
+        "undertake test run"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F465ff64a-1271-4064-8ed1-e969cb68d8b4&language=en&selectedVersion=v1.2.0",
+        "sha256": "7dc1a5285d74a384b0849baac10321a7fddc4da8c7fc900c8ee7d1de40f97eae"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/68b6ef08-d823-489d-a95c-752ae6f6e6a7",
+      "label": "read standard blueprints",
+      "description": "Read and comprehend standard blueprints, machine, and process drawings.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "understand information presented in standard blueprints",
+        "make sense of standard blueprints",
+        "interpret standard blueprints",
+        "comprehend standard blueprints",
+        "extract information from blueprints",
+        "extract information from standard blueprints",
+        "comprehend information presented in standard blueprints",
+        "understand standard blueprints"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F68b6ef08-d823-489d-a95c-752ae6f6e6a7&language=en&selectedVersion=v1.2.0",
+        "sha256": "46353b237dd0cb7e1ccf0358cc7a1ef5534d8b131e58ca50d362a8b198b77807"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/328733a7-6d84-420d-a65c-2a8014fadc60",
+      "label": "record test data",
+      "description": "Record data which has been identified specifically during preceding tests in order to verify that outputs of the test produce specific results or to review the reaction of the subject under exceptional or unusual input.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "document test data",
+        "record experiment data",
+        "record data of tests",
+        "record trial data"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F328733a7-6d84-420d-a65c-2a8014fadc60&language=en&selectedVersion=v1.2.0",
+        "sha256": "5f547bfeb0a0630c374e6130a6d3261e78030745c6dd6039ff492b142da76c19"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532",
+      "label": "technical drawings",
+      "description": "Drawing software and the various symbols, perspectives, units of measurement, notation systems, visual styles and page layouts used in technical drawings.",
+      "relation": "optional",
+      "skill_type": "knowledge",
+      "aliases": [
+        "scientific drawings",
+        "mechanical drawings",
+        "technical drawing",
+        "specialised drawings"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F59ea80e1-463a-4dba-82c6-d0b6d577d532&language=en&selectedVersion=v1.2.0",
+        "sha256": "4e795df28463dd7909269007c78911b3e311d0beda919ac061c3354cbd0d9d9b"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/d8567009-7c6f-43fb-82fb-7154ed8ebca9",
+      "label": "technical terminology",
+      "description": "Type of language used in a certain context, containing terms that have a meaning specific to a particular group or activity, such as in industry, medicine, or law.",
+      "relation": "optional",
+      "skill_type": "knowledge",
+      "aliases": [
+        "technical vocabulary",
+        "technical lexicon",
+        "technical language",
+        "technical lingo",
+        "technical term"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2Fd8567009-7c6f-43fb-82fb-7154ed8ebca9&language=en&selectedVersion=v1.2.0",
+        "sha256": "1f1cd7ec09030d74f528735c5b3fd4d1ef595902d578faf120924ba4f133609e"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/b34e2ba1-9080-48c9-9b42-ee9192a4d3f1",
+      "label": "use CAD software",
+      "description": "Use computer-aided design (CAD) systems to assist in the creation, modification, analysis, or optimisation of a design.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "CAD software use",
+        "handle CAD software",
+        "operate CAD software",
+        "apply CAD software",
+        "adopt CAD software",
+        "using CAD software",
+        "use of CAD software"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2Fb34e2ba1-9080-48c9-9b42-ee9192a4d3f1&language=en&selectedVersion=v1.2.0",
+        "sha256": "8081918443fa0529090e53534f24213e7f567716b28aa77ba1c466adc21881cd"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/3c6fe585-7d12-4315-b579-e30c042088ce",
+      "label": "use computer-aided engineering systems",
+      "description": "Use computer-aided engineering software to conduct stress analyses on engineering designs.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "work with CAE systems",
+        "use a CAE system",
+        "deal with CAE systems",
+        "employ CAE systems",
+        "utilise computer-aided engineering systems",
+        "use a computer-aided engineering system",
+        "use CAE systems",
+        "operate computer-aided engineering systems",
+        "apply computer-aided engineering systems"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F3c6fe585-7d12-4315-b579-e30c042088ce&language=en&selectedVersion=v1.2.0",
+        "sha256": "813a92fcf31449b8216d9e2c09e173440432c1a0b264ef92fdc7b9ad26356678"
+      }
+    },
+    {
+      "uri": "http://data.europa.eu/esco/skill/74374d09-7a54-4a05-ae78-d5940423de7c",
+      "label": "use testing equipment",
+      "description": "Use equipment to test performance and operation of machinery.",
+      "relation": "optional",
+      "skill_type": "skill",
+      "aliases": [
+        "utilise testing equipment",
+        "employ testing tools",
+        "manage testing equipment",
+        "work with testing tools",
+        "apply testing equipment",
+        "use equipment for testing",
+        "deal with testing equipment",
+        "make use of testing equipment"
+      ],
+      "provenance": {
+        "url": "https://ec.europa.eu/esco/api/resource/skill?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Fskill%2F74374d09-7a54-4a05-ae78-d5940423de7c&language=en&selectedVersion=v1.2.0",
+        "sha256": "28c68a9efb802a4d0138e8b9b440ebe7fe60118fa52d69e6051f8ea1afe97cd3"
+      }
+    }
+  ],
+  "mapping_note": "ESCO ISCO group 3115 narrows the candidate occupation. It does not establish a validated Malaysian task-to-skill crosswalk. These occupation-level suggestions are not proof of your skills; review their relevance to your work.",
+  "attribution": "Source: European Commission, ESCO v1.2.0. English occupation and skill subset; fields selected and reformatted by AI-Wrevolusi. No endorsement implied.",
+  "license": "European Commission reuse policy; attribution required",
+  "license_url": "https://commission.europa.eu/legal-notice_en",
+  "provenance": {
+    "url": "https://ec.europa.eu/esco/api/resource/occupation?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Foccupation%2Fb31e404e-9af6-457d-a58a-208f612eeba3&language=en&selectedVersion=v1.2.0",
+    "sha256": "0205babb3e7aba2057852c264ad1b4ba2be4d1920bd70eb4db889fc901da6f2f"
+  },
+  "retrieved_at": "2026-09-29T03:17:13.579988+00:00"
+}

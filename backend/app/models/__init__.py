@@ -1,3 +1,4 @@
+from app.models.specialist import (SpecialistCatalogue, SpecialistRelease, SpecialistOccupation, SpecialistConcept, SpecialistRelation)
 from app.models.account import Account
 from app.models.catalogue import CatalogueChapter, CatalogueCourse
 from app.models.capability import Capability
@@ -11,6 +12,7 @@ from app.models.task_assist import TaskAssistInteraction
 from app.models.user import User
 
 __all__ = [
+    'SpecialistCatalogue', 'SpecialistRelease', 'SpecialistOccupation', 'SpecialistConcept', 'SpecialistRelation',
     'User',
     'RefreshToken',
     'Occupation',
