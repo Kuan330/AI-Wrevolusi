@@ -10,9 +10,7 @@ import CourseCard from "./components/CourseCard";
 import CourseDetailDrawer from "./components/CourseDetailDrawer";
 import AddSkillDialog from "./components/AddSkillDialog";
 import RemoveSkillDialog from "./components/RemoveSkillDialog";
-import BotPet from "@/components/common/BotPet";
 import { useCourseLibrary } from "./hooks/useCourseLibrary";
-import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
 import { loadLearningCatalogue, resetCourseDirectory } from "@/features/learning-planning/courseDirectory";
 import type { Course } from "../../features/learning-planning/types";
 import {
@@ -73,7 +71,6 @@ export default function LearningCentre() {
   const [workspaceRevision, setWorkspaceRevision] = useState(0);
   const mounted = useRef(true);
   const seededWork = useRef<string | null>(null);
-  const { speech: petSpeech, say: sayPet, dismiss: dismissPet, nudge: nudgePet } = useBotPetGreeting("learning");
 
   useEffect(() => {
     mounted.current = true;
@@ -199,7 +196,6 @@ export default function LearningCentre() {
     const wasSaved = state.saved.includes(courseId);
     if (!wasSaved && (contextStale || contextError)) return;
     if (!(await toggleSave(courseId, contextValid && !contextStale ? context!.id : undefined))) return;
-    sayPet(wasSaved ? "remove-item" : "add-course");
   };
 
   const selectSkill = async (id: string) => {
@@ -397,13 +393,6 @@ export default function LearningCentre() {
         onConfirm={confirmRemoveSkill}
       />
 
-      <BotPet
-        storageKey="aiwrevolusi.botPetPosition.learning.v4"
-        defaultCorner="top-right"
-        speech={petSpeech}
-        onSpeechDismiss={dismissPet}
-        onPetTap={nudgePet}
-      />
     </div>
   );
 }

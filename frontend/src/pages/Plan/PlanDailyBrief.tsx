@@ -94,7 +94,7 @@ function pushChunked(
   });
 }
 
-/** Split the server daily-brief into short BotPet speech pages (≤3 lines each). */
+/** Split the server daily brief into short, readable steps. */
 export function buildBriefTourSteps(brief: DailyBriefResponse): BriefTourStep[] {
   const steps: BriefTourStep[] = [];
 

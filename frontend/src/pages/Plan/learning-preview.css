@@ -507,3 +507,23 @@ button.lp-status{cursor:pointer;border:0}
   .lp-mini-grid>button{min-height:40px;padding:5px 6px;font-size:11px}
   .lp-mini-grid{gap:4px}
 }
+
+.lp-inline-brief {
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid #d7e1e8;
+  border-radius: 12px;
+  background: #f7fbfd;
+  color: #302d35;
+}
+.lp-inline-brief__heading, .lp-inline-brief__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+.lp-inline-brief__heading { justify-content: space-between; }
+.lp-inline-brief__heading h2 { margin: 0; font-size: 1rem; font-weight: 650; }
+.lp-inline-brief > p { margin: .75rem 0; line-height: 1.6; }
+.lp-inline-brief__actions > span { margin-right: auto; color: #655d69; font-size: .875rem; }
+.lp-inline-brief button { min-height: 44px; }

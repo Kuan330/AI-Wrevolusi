@@ -9,12 +9,10 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import BotPet from "@/components/common/BotPet";
 import DataTable from "@/components/common/DataTable";
 import type { DataTableColumn } from "@/components/common/DataTable";
 import PageHeader from "@/components/common/PageHeader";
 import { useAccount } from "@/components/account/useAccount";
-import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
 import ExposureScorePie from "@/pages/AIExposure/components/ExposureScorePie";
 import {
   Dialog,
@@ -148,33 +146,16 @@ export default function Plan() {
   const [briefLoading, setBriefLoading] = useState(false);
   const [briefStep, setBriefStep] = useState(0);
   const [briefTourOpen, setBriefTourOpen] = useState(false);
-  /** After finishing today's brief once this visit, don't chain into entry greeting. */
-  const [briefFinishedSession, setBriefFinishedSession] = useState(false);
   const [checkInBusy, setCheckInBusy] = useState(false);
   const [progressBusy, setProgressBusy] = useState(false);
   // The drawer opens programmatically, so Radix has no trigger to restore focus
   // to on close; remember the button that opened it instead.
   const detailOpener = useRef<HTMLButtonElement | null>(null);
-  const calendarRef = useRef<HTMLDivElement | null>(null);
   // Raw text of a chapter's percent field while it is being typed, so the value
   // is clamped on commit instead of fighting the caret on every keystroke.
   const [rawPercent, setRawPercent] = useState<Record<string, string>>({});
 
-  const planReady = !coursesLoading;
   const briefKey = brief ? briefTourStorageKey(brief) : null;
-  const briefTourPending =
-    Boolean(briefKey) && briefKey !== null && !hasSeenBriefTour(briefKey);
-  // Brief tour first; once finished for this variant, normal Plan entry tips apply.
-  const { speech: petSpeech, say: sayPet, dismiss: dismissPet, nudge: nudgePet } =
-    useBotPetGreeting("plan", {
-    ready: planReady && !briefLoading,
-    skipEntry:
-      briefLoading ||
-      briefTourOpen ||
-      briefTourPending ||
-      briefFinishedSession,
-  });
-
   const refreshCalendar = useCallback(async (targetMonth: Date) => {
     if (!hasAccountWorkspace()) return;
     const { from, to } = monthRange(targetMonth);
@@ -265,13 +246,11 @@ export default function Plan() {
     }
     setBriefStep(0);
     setBriefTourOpen(true);
-    setBriefFinishedSession(false);
   }, [brief, briefKey]);
 
   function finishBriefTour() {
     if (briefKey) markBriefTourSeen(briefKey);
     setBriefTourOpen(false);
-    setBriefFinishedSession(true);
   }
 
   useEffect(() => {
@@ -373,7 +352,6 @@ export default function Plan() {
       setState(next);
       setStreakDays(res.streak_days);
       message.success(res.created ? `Checked in · ${res.streak_days} day streak` : `Already checked in · ${res.streak_days} day streak`);
-      sayPet("plan-record");
       await refreshCalendar(month);
       await refreshBrief(state.courses, today);
     } catch (error) {
@@ -392,32 +370,10 @@ export default function Plan() {
   }
 
   const briefTourStep = briefSteps[briefStep];
-  const petTour =
-    briefTourOpen && briefSteps.length > 0 && briefTourStep
-      ? {
-          text: briefTourStep.text,
-          step: briefStep,
-          total: briefSteps.length,
-          widthRem: briefTourStep.widthRem,
-          onNext: () => {
-            if (briefStep >= briefSteps.length - 1) {
-              finishBriefTour();
-              return;
-            }
-            setBriefStep((current) => current + 1);
-          },
-          onDismiss: finishBriefTour,
-          primaryLabel:
-            briefTourStep.action === "checkin" ? "Check in" : undefined,
-          onPrimary:
-            briefTourStep.action === "checkin"
-              ? () => {
-                  void handleCheckIn();
-                }
-              : undefined,
-          primaryBusy: checkInBusy,
-        }
-      : null;
+  function nextBriefStep() {
+    if (briefStep >= briefSteps.length - 1) finishBriefTour();
+    else setBriefStep(current => current + 1);
+  }
 
   async function retryProgress() {
     if (progressBusy) return;
@@ -457,7 +413,6 @@ export default function Plan() {
       } else {
         setNotice(hasAccountWorkspace() ? "No new chapter progress to sync." : "Chapter progress saved on this browser.");
       }
-      sayPet("save-progress");
     } catch (error) {
       // No success message or closed drawer when the local save fails.
       const detail = error instanceof Error ? error.message : "Could not save progress. Your draft is still open.";
@@ -578,6 +533,16 @@ export default function Plan() {
 
       <LearningReviewNotice />
       <PlanContinuation courses={state.courses} loading={coursesLoading} onRecord={openCourse} />
+      {(briefLoading || (briefTourOpen && briefTourStep)) && <section className="lp-inline-brief" aria-labelledby="plan-brief-title">
+        <div className="lp-inline-brief__heading"><h2 id="plan-brief-title">Today’s learning brief</h2>{!briefLoading && <button type="button" className="lp-mini" onClick={finishBriefTour}>Dismiss brief</button>}</div>
+        {briefLoading ? <p role="status">Preparing your briefing…</p> : <>
+          <p aria-live="polite">{briefTourStep.text}</p>
+          <div className="lp-inline-brief__actions"><span>Step {briefStep + 1} of {briefSteps.length}</span>
+            {briefTourStep.action === "checkin" && <button type="button" className="lp-mini lp-mini--blue" disabled={checkInBusy} onClick={() => void handleCheckIn()}>{checkInBusy ? "Checking in…" : "Check in"}</button>}
+            <button type="button" className="lp-mini lp-mini--blue" onClick={nextBriefStep}>{briefStep >= briefSteps.length - 1 ? "Finish brief" : "Next"}</button>
+          </div>
+        </>}
+      </section>}
       {(state.pendingProgress?.length || state.progressSyncError) && <div role="status" className="mb-4 rounded-xl border p-3 text-sm">
         <p>{progressBusy ? "Syncing chapter progress…" : state.progressSyncError ? "Progress sync failed. Your changes are kept on this browser." : "Chapter progress is waiting to sync."}</p>
         {state.progressSyncError && <p>{state.progressSyncError}</p>}
@@ -621,7 +586,7 @@ export default function Plan() {
                 <h2>Learning calendar</h2>
               </div>
             </div>
-            <div className="lp-mini-month" ref={calendarRef}>
+            <div className="lp-mini-month">
               <div className="lp-month">
                 <button
                   type="button"
@@ -775,16 +740,6 @@ export default function Plan() {
         </section>
       </div>
 
-      <BotPet
-        storageKey="aiwrevolusi.botPetPosition.plan.v3"
-        defaultAnchorRef={calendarRef}
-        speech={
-          petSpeech ?? (briefLoading ? "Preparing your briefing…" : null)
-        }
-        tour={petTour}
-        onSpeechDismiss={dismissPet}
-        onPetTap={petTour ? undefined : nudgePet}
-      />
 
       <Drawer
         open={!!course}
@@ -1009,7 +964,6 @@ export default function Plan() {
                 setRemoveId(null);
                 setNotice("Course removed from your plan.");
                 message.success("Course removed from your plan.");
-                sayPet("remove-item");
               }}
             >
               Remove course

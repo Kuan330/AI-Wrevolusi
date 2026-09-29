@@ -53,7 +53,7 @@ test('task context key changes for same-id wording or note edits', () => {
   );
 });
 
-test('drawer companion generates guidance without a Chat with AI dialog', () => {
+test('drawer offers inline guidance without a floating companion or chat dialog', () => {
   const drawer = readFileSync(
     new URL(
       '../src/pages/Analysis/components/TaskDetailsDrawer.tsx',
@@ -61,9 +61,9 @@ test('drawer companion generates guidance without a Chat with AI dialog', () => 
     ),
     'utf8',
   );
-  const guidePet = readFileSync(
+  const guide = readFileSync(
     new URL(
-      '../src/pages/Analysis/components/TaskAssistGuidePet.tsx',
+      '../src/pages/Analysis/components/TaskAssistGuide.tsx',
       import.meta.url,
     ),
     'utf8',
@@ -74,16 +74,17 @@ test('drawer companion generates guidance without a Chat with AI dialog', () => 
   );
 
   assert.match(drawer, /registerTaskAssistDetails/);
-  assert.match(drawer, /TaskAssistGuidePet/);
+  assert.match(drawer, /TaskAssistGuide/);
   assert.match(drawer, /aiService\.taskAssist/);
   assert.match(drawer, /DEFAULT_TASK_ASSIST_QUESTION/);
   assert.doesNotMatch(drawer, /TaskAssistDialog|Chat with AI|setChatOpen|MessageSquare/);
-  assert.match(guidePet, /Saved AI guidance/);
-  assert.match(guidePet, /Thinking…/);
-  assert.match(guidePet, /onRequestGuidance/);
-  assert.match(guidePet, /setOpen/);
-  assert.doesNotMatch(guidePet, /onMouseEnter|setHovered|setPinned/);
-  assert.doesNotMatch(guidePet, /pickContextLine|composeGreeting|useBotPetGreeting/);
+  assert.match(guide, /Saved guidance/);
+  assert.match(guide, /Preparing guidance…/);
+  assert.match(guide, /onRequestGuidance/);
+  assert.match(guide, /<details open>/);
+  assert.doesNotMatch(guide, /bot-pet|task-assist-pet|sprite|avatar/);
+  assert.doesNotMatch(guide, /onMouseEnter|setHovered|setPinned/);
+  assert.doesNotMatch(guide, /pickContextLine|composeGreeting|useBotPetGreeting/);
   assert.match(drawer, /task_key: task\.id/);
   assert.match(drawer, /getTaskAssist/);
   assert.match(drawer, /setTimeout/);

@@ -2,9 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Check, ChevronDown, Plus } from "lucide-react";
 import { Popover } from "@base-ui/react/popover";
-import BotPet from "@/components/common/BotPet";
 import PageHeader from "@/components/common/PageHeader";
-import { useBotPetGreeting } from "@/hooks/useBotPetGreeting";
 import { possibilitiesService } from "@/services/possibilitiesService";
 import { referenceService } from "@/services/referenceService";
 import { accountStorage, currentWorkspaceSession, flushWorkspace } from "@/services/accountStorage";
@@ -43,12 +41,10 @@ function BuildSkillChip({
   skill,
   added,
   onChanged,
-  onAddedToLearning,
 }: {
   skill: WefSkill;
   added: boolean;
   onChanged: () => void;
-  onAddedToLearning?: () => void;
 }) {
   const actionsRef = useRef<Popover.Root.Actions | null>(null);
 
@@ -87,7 +83,6 @@ function BuildSkillChip({
               showAddToLearning
               onAddComplete={() => {
                 onChanged();
-                onAddedToLearning?.();
                 actionsRef.current?.close();
               }}
             />
@@ -235,12 +230,6 @@ export default function Possibilities() {
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const {
-    speech: petSpeech,
-    say: sayPet,
-    dismiss: dismissPet,
-    nudge: nudgePet,
-  } = useBotPetGreeting("possibilities", { ready: !loading });
 
   useEffect(() => {
     let cancelled = false;
@@ -528,7 +517,6 @@ export default function Possibilities() {
                                 skill={wef}
                                 added={isAdded(wef.core_skill)}
                                 onChanged={refreshLearningSkills}
-                                onAddedToLearning={() => sayPet("add-skill-chip")}
                               />
                             );
                           })}
@@ -574,13 +562,6 @@ export default function Possibilities() {
       </div>
 
       <p className="px-chosen-hint">Skill coverage is inferred from task wording against each role&apos;s skill map. Specialist skills, qualifications and experience have not been assessed. These suggestions do not indicate job readiness or hiring probability.</p>
-      <BotPet
-        storageKey="aiwrevolusi.botPetPosition.possibilities.v4"
-        defaultCorner="top-right"
-        speech={petSpeech}
-        onSpeechDismiss={dismissPet}
-        onPetTap={nudgePet}
-      />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { useAccount } from "@/components/account/useAccount";
-import TaskAssistGuidePet from "@/pages/Analysis/components/TaskAssistGuidePet";
+import TaskAssistGuide from "@/pages/Analysis/components/TaskAssistGuide";
 import TaskRelatedSkills from "@/pages/Analysis/components/TaskRelatedSkills";
 import {
   Drawer,
@@ -225,7 +225,7 @@ const SignedInTaskAssistAccess = ({ task, inline = false }: { task: ProfileTask;
   </div>;
 
   return (
-    <TaskAssistGuidePet
+    <TaskAssistGuide
       status={interaction.status}
       question={interaction.question}
       reply={interaction.reply}
@@ -360,7 +360,6 @@ export default function TaskDetailsDrawer(props: {
                   ) : null}
                 </div>
               </div>
-            </DrawerBody>
 
             <div className="task-details__assist-container">
               <TaskAssistAccess
@@ -372,6 +371,7 @@ export default function TaskDetailsDrawer(props: {
                 task={selectedTask}
               />
             </div>
+            </DrawerBody>
           </>
         ) : null}
       </DrawerContent>
