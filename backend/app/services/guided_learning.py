@@ -193,11 +193,17 @@ async def _task_suggestions(db, task: dict) -> dict:
 
 def goal_template(goal: dict) -> dict:
     label = goal['initial']['skill']['label']
+    if re.search(r'\b(?:software|automated|unit)\b.*\btests?\b|\btests?\b.*\bsoftware\b', label, re.I):
+        return {'goal_id':goal['id'],'revision':goal['revision'],'source':'template','generated_at':datetime.now(timezone.utc).isoformat(),'prompt_version':PROMPT_VERSION,
+                'goal':'Practise writing tests for a small example',
+                'action':{'kind':'practise','text':'Try a fictional function that adds two numbers. Check that 2 + 3 returns 5 and 0 + 0 returns 0. Decide how it should handle text such as "two".'},
+                'practice_idea':'Compare the expected and actual results. If a test fails, check the function or the requirement before changing it. Use a local practice environment.',
+                'notice':'General practice example, not a reviewed guide. Check that it fits your learning goal. Nothing has been saved.'}
     return {'goal_id':goal['id'],'revision':goal['revision'],'source':'template','generated_at':datetime.now(timezone.utc).isoformat(),'prompt_version':PROMPT_VERSION,
             'goal':f'Explore {label} using one small example',
-            'action':{'kind':'practise','text':f'Choose one fictional example related to {label}, try one step and note what needs checking.'},
-            'practice_idea':'Use a fictional or non-confidential example. Describe what you tried, what you checked and what you would change. Follow approved procedures for any real work.',
-            'notice':'This is a general starter template, not a model-reviewed or validated practice guide. Edit it to fit your goal. Nothing has been saved.'}
+            'action':{'kind':'practise','text':f'For {label}, use a small fictional sample. Compare its expected and actual result, check one missing detail, then try again with that detail corrected.'},
+            'practice_idea':'Use an existing example you can check without workplace or customer details. If you do not have a suitable sample, keep this goal for later. Follow approved procedures for real work.',
+            'notice':'General starting idea, not a reviewed guide. Check that it fits your learning goal. Nothing has been saved.'}
 
 
 async def goal_suggestion(db, goal: dict) -> dict:

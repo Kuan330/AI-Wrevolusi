@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { cleanDisplayText } from "@/lib/displayText";
 import { ROUTES } from "@/constants/routes";
 import { guidedLearningService, type GuidedTaskSuggestions, type GuidedSkillSuggestion } from "@/services/guidedLearningService";
 import { currentWorkspaceSession } from "@/services/accountStorage";
@@ -65,22 +66,22 @@ export default function GuidedSkillSuggestions({ task, occupationCode, disabled,
   }
   return <div className="specialist-skills__guided">
     <h3>Find a useful skill to develop</h3>
-    <p>We can read your full saved task and suggest up to three skills with a starting activity. You decide what fits.</p>
+    <p>Use your saved task to prepare a skill and a starting activity.</p>
     <details><summary>The task we will use</summary><p className="specialist-skills__full-task">{task.wording}</p></details>
     <p className="specialist-skills__reason">This uses AI to review catalogue candidates. Do not include confidential workplace information in your task.</p>
     <Button disabled={disabled || pending || saving} onClick={() => void suggest()}>{pending ? "Preparing suggestions…" : result ? "Show other suggestions" : "Suggest skills for this task"}</Button>
     {error && <p role="alert">{error} You can retry or use the optional catalogue search.</p>}
     {result && <>
       <p role="status">{result.status === "no_supported_match" || !result.suggestions.length ? "We could not support a suggestion for this task. You can browse the catalogue or keep your own skill." : "Suggested for your review"}</p>
-      {result.coverage.message && <p className="specialist-skills__reason">{result.coverage.message}</p>}
+      {result.coverage.message && <p className="specialist-skills__reason">{cleanDisplayText(result.coverage.message)}</p>}
       <div className="specialist-skills__cards">{result.suggestions.map(item => <article key={item.skill.uri} className="specialist-skills__card">
-        <h4>{item.skill.label}</h4><p>{item.reason}</p>
-        <p className="specialist-skills__reason"><strong>From your task:</strong> “{item.task_quote}”</p>
-        <p><strong>Starting activity:</strong> {item.practice_idea}</p>
-        <details><summary>Skill meaning and source</summary><p>{item.skill.description}</p><p>ESCO {result.version} · {item.skill.skill_type}. AI suggested this connection. It is not a verified skill or evidence of mastery.</p><a href={item.skill.uri} target="_blank" rel="noreferrer">Read the source concept</a></details>
+        <h4>{cleanDisplayText(item.skill.label)}</h4><p>{cleanDisplayText(item.reason)}</p>
+        <p className="specialist-skills__reason"><strong>From your task:</strong> “{cleanDisplayText(item.task_quote)}”</p>
+        <p><strong>Starting activity:</strong> {cleanDisplayText(item.practice_idea)}</p>
+        <details><summary>Skill meaning and source</summary><p>{cleanDisplayText(item.skill.description)}</p><p>ESCO {result.version} · {item.skill.skill_type}. AI suggested this connection. It is not a verified skill or evidence of mastery.</p><a href={item.skill.uri} target="_blank" rel="noreferrer">Read the source concept</a></details>
         <Button disabled={disabled || pending || saving} onClick={() => void develop(item)}>{saving ? "Saving…" : "Develop this skill"}</Button>
       </article>)}</div>
-      <p className="specialist-skills__reason">{result.notice} Choosing a learning goal does not say that you already use this skill.</p>
+      <p className="specialist-skills__reason">{cleanDisplayText(result.notice)} Choosing a learning goal does not say that you already use this skill.</p>
     </>}
   </div>;
 }

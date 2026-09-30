@@ -1779,3 +1779,5 @@ main:has(> .course-library) {
 .library-skill-card__copy .library-skill-source--work{background:#e7f2fa;color:#486f88}
 .library-skill-card__copy .library-skill-source--added{background:#f9eaf1;color:#98617c}
 .library-skill-card__copy .library-skill-source--role{background:#eee9f7;color:#79638f}
+
+.library-goal-resource{padding:22px;margin:16px 0 24px;max-width:860px}.library-goal-resource h2{font-size:1.3rem;font-weight:650;margin:8px 0;overflow-wrap:anywhere}.library-goal-resource p{margin:10px 0;line-height:1.6;overflow-wrap:anywhere}.library-goal-return a,.library-resource-actions a{color:#285d78;text-decoration:underline;text-underline-offset:3px}.library-resource-actions{display:flex;gap:18px;flex-wrap:wrap;margin-top:16px}.library-goal-return{margin:8px 0 16px}.library-course h3,.library-course p,.learning-about,.learning-course-outcomes li{overflow-wrap:anywhere}

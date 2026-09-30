@@ -41,3 +41,24 @@ test('a short practice example is retained in the accepted action without trunca
  assert.match(suggestedActivityText(idea),/Practice example: Use a made up table/);
  assert.equal(suggestedActivityText({...idea,practice_idea:'x'.repeat(1001)}),idea.action.text);
 });
+
+
+test('software testing fallback gives an actionable fictional exercise without claiming ability', () => {
+  const testing = { ...goal, initial: { ...goal.initial, skill: { label: 'write automated software tests' } } };
+  const before = structuredClone(testing);
+  const idea = templateGoalSuggestion(testing);
+  assert.match(idea.action.text, /2 \+ 3 returns 5/);
+  assert.match(idea.action.text, /0 \+ 0 returns 0/);
+  assert.match(idea.action.text, /text such as 'two'/);
+  assert.equal(idea.practice_idea, idea.action.text);
+  assert.match(idea.goal, /^Practise:/);
+  assert.deepEqual(testing, before);
+  assert.match(idea.notice, /not a reviewed practice guide/);
+});
+
+test('non software skills retain a generic sample instead of an unrelated software exercise', () => {
+  const other = { ...goal, initial: { ...goal.initial, skill: { label: 'test mechanical systems' } } };
+  const idea = templateGoalSuggestion(other);
+  assert.match(idea.action.text, /test mechanical systems/);
+  assert.doesNotMatch(idea.action.text, /function|2 \+ 3/);
+});

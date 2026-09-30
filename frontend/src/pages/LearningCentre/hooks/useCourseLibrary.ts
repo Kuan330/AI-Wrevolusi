@@ -1,3 +1,4 @@
+import { cleanDisplayText } from "@/lib/displayText";
 import { useEffect, useRef, useState } from "react";
 import { message } from "@/components/ui/message";
 import { changeSavedCourses, type SavedCourseChange } from "@/features/learning-planning/courseOperations";
@@ -66,7 +67,7 @@ export function useCourseLibrary() {
       return true;
     } catch (error) {
       if (!mounted.current || owner !== currentWorkspaceSession()) return false;
-      const detail = error instanceof Error ? error.message : "Please try again.";
+      const detail = error instanceof Error && !/(?:status|http|request failed|fetch|network|timeout)/i.test(error.message) ? cleanDisplayText(error.message) : "The course service is unavailable. Please try again.";
       const text = changedLocally
         ? `Your changes are kept on this browser but have not synced to your account. ${detail}`
         : detail;
@@ -95,7 +96,7 @@ export function useCourseLibrary() {
       return true;
     } catch (error) {
       if (!mounted.current || owner !== currentWorkspaceSession()) return false;
-      const detail = error instanceof Error ? error.message : "Please try again.";
+      const detail = error instanceof Error && !/(?:status|http|request failed|fetch|network|timeout)/i.test(error.message) ? cleanDisplayText(error.message) : "The course service is unavailable. Please try again.";
       setNotice(`Your changes are still kept on this browser and have not synced to your account. ${detail}`);
       return false;
     } finally {

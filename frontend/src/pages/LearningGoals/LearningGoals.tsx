@@ -14,6 +14,8 @@ import {
 import { ApiError } from "@/services/api";
 import { readGoalDraft, writeGoalDraft, draftHasChanges, draftNeedsReview, clearDraftPart, taskIdentity, attemptTaskOptions, type GoalDraft, type DraftAttempt } from "@/features/learning-goals/goalDraft";
 import { learningGoalDraftStorage } from "@/infrastructure/storage/learningGoalDraftStorage";
+import { cleanDisplayText, cleanMultilineDisplayText, goalDisplayLabel, shortTaskLabel } from "@/lib/displayText";
+import PendingLearningInterests from "./PendingLearningInterests";
 import GoalSuggestion from "./GoalSuggestion";
 import SavedGoalHistory from "./SavedGoalHistory";
 import { plannedActivityAttempt, hasMaterialGoalWarnings } from "@/features/learning-goals/guidedLearning";
@@ -28,7 +30,12 @@ const today = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 const displayDate = (date: string) => new Intl.DateTimeFormat("en-MY", { dateStyle: "medium" }).format(new Date(date.length === 10 ? `${date}T12:00:00` : date));
-const errorText = (error: unknown) => error instanceof Error ? error.message : "Your work could not be saved. Please try again.";
+const errorText = (error: unknown) => {
+  const text = error instanceof Error ? error.message : "";
+  return /(?:status|http|request failed|fetch|network|timeout)/i.test(text)
+    ? "Your work could not be saved right now. Keep this page open and try again."
+    : cleanDisplayText(text) || "Your work could not be saved. Please try again.";
+};
 type Task = { id: string; wording: string };
 type Run = (operation: () => Promise<void>, message: string) => Promise<boolean>;
 
@@ -121,21 +128,22 @@ function GoalsWorkspace() {
     if (ok && created) setParams({ goal: created.id });
   };
   return <div className="learning-goals">
-    <PageHeader title="My learning goals" description="Choose a small action or record something you tried. A course or schedule is optional." />
+    <PageHeader title="My learning goals" description="Continue a goal, try a small action and keep a record of what you learned." />
     <div role="status" aria-live="polite" className={notice ? "lg-notice" : ""}>{notice}</div>
     {error && <p role="alert" className="lg-error">{error}</p>}
     {needsReload && !goal && <div className="lg-warning"><p>Your account changed in another tab. Reload the saved account before trying again.</p><button onClick={reload}>Reload saved account</button></div>}
     {loadError ? <section className="lg-card"><h2>Your saved work needs attention</h2><p role="alert">{loadError}</p><Link to={ROUTES.skills}>Review my skills</Link></section> : goal ?
       <GoalDetail key={goal.id} goal={goal} tasks={tasks} run={run} busy={busy} needsReload={needsReload} /> : specialist || context || personal ?
-      <section className="lg-card"><p className="lg-eyebrow">Your saved learning interest</p><h2>{specialist?.skillLabel ?? context?.skill.name ?? personal?.name}</h2>
-        <p>{specialist ? specialist.taskWording : context?.goal || personal?.taskLabels.join(". ") || "Choose one small step to explore this skill."}</p>
+      <section className="lg-card"><p className="lg-eyebrow">Your saved learning interest</p><h2>{cleanDisplayText(specialist?.skillLabel ?? context?.skill.name ?? personal?.name ?? "")}</h2>
+        <p>{cleanDisplayText(specialist ? specialist.taskWording : context?.goal || personal?.taskLabels.join(". ") || "Choose one small step to explore this skill.")}</p>
         <p className="lg-muted">Save this choice as a goal to keep its starting context. You can change the goal wording later.</p>
         {params.get("new") === "1" && <p>This creates a new starting record. Your earlier goal and attempts stay available.</p>}
         <button className="lg-primary" disabled={busy} onClick={() => void create()}>{busy ? "Saving…" : "Save my goal"}</button>
-      </section> : <section className="lg-card"><h2>{goals.length ? "Continue a saved goal" : "Start with a skill that matters to you"}</h2><p>Choose a learning interest in your skills. Its task and reason will come with you.</p><Link className="lg-primary" to={ROUTES.skills}>Choose a skill</Link></section>}
-    <section className="lg-card"><h2>Your saved goals</h2>{goals.length ? <ul className="lg-goal-list">{[...goals].reverse().map(g => <li key={g.id}><Link aria-current={g.id === goal?.id ? "page" : undefined} to={`${ROUTES.learningGoals}?goal=${encodeURIComponent(g.id)}`}>{g.wording}</Link><span>{g.initial.skill.label} · {g.attempts.length} {g.attempts.length === 1 ? "attempt" : "attempts"}</span></li>)}</ul> : <p>No goals saved yet.</p>}</section>
+      </section> : null}
+    {!goal && !specialist && !context && !personal && !loadError && <PendingLearningInterests />}
+    {(!goal || goals.length > 1) && <section className="lg-card"><h2>{goal ? "Your other goals" : goals.length ? "Continue a saved goal" : "Your goals"}</h2>{goals.length ? <ul className="lg-goal-list">{[...goals].reverse().filter(g => g.id !== goal?.id).map(g => <li key={g.id}><Link aria-current={g.id === goal?.id ? "page" : undefined} to={`${ROUTES.learningGoals}?goal=${encodeURIComponent(g.id)}`}>{goalDisplayLabel(g.wording, g.initial.skill.label)}</Link><span>{cleanDisplayText(g.initial.skill.label)} · {g.attempts.length} {g.attempts.length === 1 ? "attempt" : "attempts"}</span></li>)}</ul> : <><p>No goals saved yet.</p><Link to={ROUTES.skills}>Find a skill</Link></>}</section>}
     <section className="lg-card"><h2>See what changed</h2><p>Review your saved study and practice without filling in another assessment.</p><Link className="lg-primary" to={ROUTES.progress}>Reassess My Situation</Link></section>
-    <aside className="lg-resources"><h2>Optional learning resources</h2><p>Your existing courses and history are still available. Browsing a course does not mean it has been checked for this exact skill.</p><div className="lg-buttons"><Link to={ROUTES.plan}>My courses and history</Link><Link to={`${ROUTES.learningCentre}?mode=browse`}>Browse courses</Link></div></aside>
+    <details className="lg-resources"><summary>Optional courses</summary><p>You can continue this goal without a course. Check any course content before using it for your skill.</p><div className="lg-buttons"><Link to={ROUTES.plan}>My courses and history</Link><Link to={`${ROUTES.learningCentre}?${goal ? `goal=${encodeURIComponent(goal.id)}${goal.sourceKey.startsWith("context:") ? `&context=${encodeURIComponent(goal.sourceKey.slice(8))}` : ""}` : "mode=browse"}`}>Find resources{goal ? " for this goal" : ""}</Link></div></details>
   </div>;
 }
 
@@ -208,18 +216,28 @@ function GoalDetail({ goal, tasks, run, busy, needsReload }: { goal: LearningGoa
   let warnings: string[];
   try { warnings = goalContextWarnings(goal); } catch (e) { warnings = [errorText(e)]; }
   const origin = goal.initial;
+  const suggestion = !hasMaterialGoalWarnings(warnings) && <GoalSuggestion key={`${goal.id}:${contextStamp}`} goal={goal} incoming={incoming} disabled={saveBlocked || draftHasChanges(draft)} onGoal={async text => {
+      changeDraft({ wording: text });
+      return savePart("wording", () => updateLearningGoal(goal.id, { wording: text }), "Suggested goal saved. Your starting record is unchanged.");
+    }} onAction={async (text, origin) => {
+      const next = { kind: "practise" as const, text, origin };
+      changeDraft({ action: next });
+      return savePart("action", () => updateLearningGoal(goal.id, { action: next }), "Activity saved as a plan. Record an attempt after you try it.");
+    }} />;
+  const recoveryNeedsAttention = reviewRequired || Boolean(draftError) || needsReload;
+  const RecoveryContainer = recoveryNeedsAttention ? "section" : "details";
   const sourceParams = goal.sourceKey.startsWith("personal:") ? `personal=${encodeURIComponent(goal.sourceKey.slice(9))}` : goal.sourceKey.startsWith("specialist:") ? `specialist=${encodeURIComponent(goal.sourceKey.slice(11))}` : `context=${encodeURIComponent(goal.sourceKey.slice(8))}`;
   return <>
-    {(draftHasChanges(draft) || draftError || needsReload) && <section className="lg-warning" aria-label="Unsaved draft recovery">
-      <h2>{needsReload ? "Reload your saved account to continue" : "Unsaved changes in this tab"}</h2>
+    {(draftHasChanges(draft) || draftError || needsReload) && <RecoveryContainer className="lg-warning" aria-label="Unsaved draft recovery">
+      {recoveryNeedsAttention ? <h2>{needsReload ? "Reload your saved account to continue" : "Unsaved changes need attention"}</h2> : <summary>Unsaved draft options</summary>}
       <p>Your draft is separate from saved learning evidence. It belongs to this account and goal in this tab.</p>
       {draftError && <p role="alert">{draftError}</p>}
-      {reviewRequired && <><p role="alert">Your saved goal or work context changed since you started this draft. Review the latest saved details before choosing to save your draft.</p><details open><summary>Latest saved details</summary><p>Goal: {goal.wording}</p><p>Action: {goal.action?.text ?? "None"}</p>{attempt.editing && <p>Attempt: {editing ? `${editing.date} · ${attemptLabels[editing.type]} · ${editing.description} · Notes: ${editing.notes || "None"} · Work task: ${editing.task?.wording ?? "None"}` : "This attempt was removed. It cannot be restored by saving this draft."}</p>}<p>Current confirmed tasks:</p><ul>{tasks.map(task => <li key={task.id}>{task.wording}</li>)}</ul></details><button disabled={busy || unreadable || needsReload} onClick={() => { if (draftRef.current) keepDraft({ ...draftRef.current, baseRevision: goal.revision, baseContext: contextStamp }); }}>I reviewed the saved changes</button></>}
+      {reviewRequired && <><p role="alert">Your saved goal or work context changed since you started this draft. Review the latest saved details before choosing to save your draft.</p><details open><summary>Latest saved details</summary><p>Goal: {goalDisplayLabel(goal.wording, goal.initial.skill.label)}</p><p>Action: {cleanMultilineDisplayText(goal.action?.text ?? "None")}</p>{attempt.editing && <p>Attempt: {editing ? `${editing.date} · ${attemptLabels[editing.type]} · ${editing.description} · Notes: ${editing.notes || "None"} · Work task: ${editing.task?.wording ?? "None"}` : "This attempt was removed. It cannot be restored by saving this draft."}</p>}<p>Current confirmed tasks:</p><ul>{tasks.map(task => <li key={task.id}>{cleanDisplayText(task.wording)}</li>)}</ul></details><button disabled={busy || unreadable || needsReload} onClick={() => { if (draftRef.current) keepDraft({ ...draftRef.current, baseRevision: goal.revision, baseContext: contextStamp }); }}>I reviewed the saved changes</button></>}
       {removedAttempt && <p role="alert">This attempt was removed from saved evidence. Copy any notes you want to keep, then discard this attempt draft. It will not be recreated.</p>}
       <div className="lg-buttons"><button disabled={busy || Boolean(draftError)} onClick={reload}>Reload saved account and keep draft</button>{draftError && !unreadable && <button disabled={busy} onClick={() => keepDraft(draftRef.current)}>Retry keeping draft</button>}<button disabled={busy} onClick={() => setDiscarding(true)}>Discard unsaved changes</button></div>
       {discarding && <div><p>Discard the wording, action and attempt draft in this tab? Saved account records stay unchanged.</p><button disabled={busy} onClick={discardDraft}>Confirm discard</button><button disabled={busy} onClick={() => setDiscarding(false)}>Keep editing</button></div>}
-    </section>}
-    <section className="lg-card"><p className="lg-eyebrow">My goal</p><h2>{goal.wording}</h2><p className="lg-muted">{origin.skill.label} · Saved {displayDate(goal.createdAt)}</p>
+    </RecoveryContainer>}
+    <section className="lg-card"><p className="lg-eyebrow">My goal</p><h2>{goalDisplayLabel(goal.wording, goal.initial.skill.label)}</h2><p className="lg-muted">{cleanDisplayText(origin.skill.label)} · Saved {displayDate(goal.createdAt)}</p>
       {warnings.length > 0 && <div className="lg-warning"><h3>Check the original context</h3>{warnings.map((w, i) => <p key={i}>{w}</p>)}<Link to={ROUTES.skills}>Review my skills</Link><p><Link to={`${ROUTES.learningGoals}?${sourceParams}&new=1`}>Create a new goal from my current saved choice</Link></p></div>}
       <details open={draft?.wording !== undefined || undefined}><summary>Edit my goal wording</summary>
       <form onSubmit={e => { e.preventDefault(); void savePart("wording", () => updateLearningGoal(goal.id, { wording }), "Goal wording saved. Your original starting record is unchanged."); }}>
@@ -228,43 +246,37 @@ function GoalDetail({ goal, tasks, run, busy, needsReload }: { goal: LearningGoa
       </form>
       </details>
       <details className="lg-starting"><summary>Why I chose this skill and my starting record</summary>
-        <p><strong>Original goal:</strong> {origin.wording}</p><p><strong>Skill source:</strong> {origin.skill.source === "personal" ? "Your own skill entry. No external source identity or version is claimed." : `${origin.skill.source.toUpperCase()} ${origin.skill.sourceVersion ? `version ${origin.skill.sourceVersion}` : "· source version not recorded"}`}</p>
+        <p><strong>Original goal:</strong> {goalDisplayLabel(origin.wording, origin.skill.label)}</p><p><strong>Skill source:</strong> {origin.skill.source === "personal" ? "Your own skill entry. No external source identity or version is claimed." : `${origin.skill.source.toUpperCase()} ${origin.skill.sourceVersion ? `version ${origin.skill.sourceVersion}` : "· source version not recorded"}`}</p>
         <p className="lg-muted lg-break">Skill identity: {origin.skill.id}</p><p><strong>My original choice:</strong> {origin.decision ? decisionLabels[origin.decision] ?? origin.decision : "Not recorded"}</p>
-        {origin.tasks.length ? <><h3>Tasks saved with this goal</h3><ul>{origin.tasks.map(t => <li key={t.id}>{t.wording}</li>)}</ul></> : <p>No confirmed work task was linked at the start. This is a gap in the record, not a lack of ability.</p>}
-        {origin.career ? <p><strong>Career reason:</strong> {origin.career.title} ({origin.career.code})</p> : <p>No career reason was saved.</p>}
+        {origin.tasks.length ? <><h3>Tasks saved with this goal</h3><ul>{origin.tasks.map(t => <li key={t.id}>{cleanDisplayText(t.wording)}</li>)}</ul></> : <p>No confirmed work task was linked at the start. This is a gap in the record, not a lack of ability.</p>}
+        {origin.career ? <p><strong>Career reason:</strong> {cleanDisplayText(origin.career.title)} ({origin.career.code})</p> : <p>No career reason was saved.</p>}
         {origin.sourceOccupationUri && <p>An ESCO role was used to discover this skill. That role is not a confirmed career goal.</p>}
         <p>Changing the goal wording does not change this starting record. A different skill or work context needs an explicit new goal.</p>
       </details>
     </section>
-    {!hasMaterialGoalWarnings(warnings) && <GoalSuggestion key={`${goal.id}:${contextStamp}`} goal={goal} incoming={incoming} disabled={saveBlocked || draftHasChanges(draft)} onGoal={async text => {
-      changeDraft({ wording: text });
-      return savePart("wording", () => updateLearningGoal(goal.id, { wording: text }), "Suggested goal saved. Your starting record is unchanged.");
-    }} onAction={async (text, origin) => {
-      const next = { kind: "practise" as const, text, origin };
-      changeDraft({ action: next });
-      return savePart("action", () => updateLearningGoal(goal.id, { action: next }), "Activity saved as a plan. Record an attempt after you try it.");
-    }} />}
-    <section className="lg-card"><h2>My next action <span className="lg-optional">Optional</span></h2>
-      {goal.action ? <><p className="lg-preserve">{goal.action.text}</p><p className="lg-muted">{goal.action.origin === "ai_suggestion" ? "AI suggested activity, accepted by you. Check it before using it." : goal.action.origin === "template" ? "General starting idea, accepted by you. Not a reviewed practice guide." : "Your saved action."} This is a plan, not completed practice.</p><button className="lg-primary" disabled={saveBlocked || Boolean(draft?.attempt)} onClick={() => {
+    {!goal.action && suggestion}
+    <section className="lg-card lg-next-action"><h2>My next action <span className="lg-optional">Optional</span></h2>
+      {goal.action ? <><p className="lg-preserve">{cleanMultilineDisplayText(goal.action.text)}</p><p className="lg-muted">{goal.action.origin === "ai_suggestion" ? "Accepted AI idea. Check it before trying it." : goal.action.origin === "template" ? "Accepted sample idea. Check that it fits your goal." : "Your saved action."} Ready to try.</p><button className="lg-primary" disabled={saveBlocked || Boolean(draft?.attempt)} onClick={() => {
         try { changeDraft({ attempt: plannedActivityAttempt(goal, tasks, today(), crypto.randomUUID()) }); setActivityError(""); requestAnimationFrame(() => document.getElementById("attempt-description")?.focus()); }
         catch (error) { setActivityError(errorText(error)); const form = document.getElementById("record-attempt"); if (form instanceof HTMLDetailsElement) form.open = true; }
-      }}>I tried this</button></> : <p>Choose a suggested activity above, keep this goal for later or record something you already tried.</p>}
+      }}>I tried this</button></> : <p>You can save the sample idea above, write your own action or record something you already tried.</p>}
       {activityError && <p role="alert">{activityError}</p>}
       <details open={draft?.action !== undefined || undefined}><summary>{goal.action ? "Edit or clear my action" : "Write my own action"}</summary>
       <form onSubmit={e => { e.preventDefault(); void savePart("action", () => updateLearningGoal(goal.id, { action: { kind: actionKind, text: actionText, ...(action?.origin ? { origin: action.origin } : {}) } }), "Next action saved."); }}>
         <label htmlFor="action-kind">I want to</label><select id="action-kind" value={actionKind} disabled={formBlocked} onChange={e => changeDraft({ action: { kind: e.target.value as keyof typeof actionLabels, text: actionText } })}>{Object.entries(actionLabels).map(([key, value]) => <option key={key} value={key}>{value}</option>)}</select>
         <label htmlFor="action-text">My small action</label><textarea id="action-text" value={actionText} required maxLength={1000} disabled={formBlocked} onChange={e => changeDraft({ action: { kind: actionKind, text: e.target.value } })} rows={2} placeholder="For example, try one step and note what I learned" />
-        <p className="lg-muted">This example is an idea for you to judge, not a checked practice guide.</p><div className="lg-buttons"><button className="lg-primary" disabled={saveBlocked}>Save action</button><button type="button" disabled={saveBlocked} onClick={() => { changeDraft({ action: null }); void savePart("action", () => updateLearningGoal(goal.id, { action: null }), "Goal kept for later. Your attempts are unchanged."); }}>{goal.action ? "Clear action and keep for later" : "Keep goal for later"}</button></div>
+        <div className="lg-buttons"><button className="lg-primary" disabled={saveBlocked}>Save action</button><button type="button" disabled={saveBlocked} onClick={() => { changeDraft({ action: null }); void savePart("action", () => updateLearningGoal(goal.id, { action: null }), "Goal kept for later. Your attempts are unchanged."); }}>{goal.action ? "Clear action and keep for later" : "Keep goal for later"}</button></div>
       </form>
       </details>
     </section>
+    {goal.action && suggestion}
     <details className="lg-card" id="record-attempt" open={Boolean(draft?.attempt) || undefined}><summary>{attempt.editing ? "Correct an attempt" : "Record what I tried"}</summary><p>Save only if this describes what you actually did. You can change the date, task and description. Leave out names, customer details and other confidential information.</p>
       <AttemptForm value={attempt} historical={editing?.task ?? null} tasks={tasks} busy={formBlocked} saveBlocked={saveBlocked || removedAttempt} onChange={value => changeDraft({ attempt: value })} onCancel={() => keepDraft(clearDraftPart(draftRef.current, "attempt", draftRef.current?.baseRevision ?? goal.revision))} onSave={async input => {
         await savePart("attempt", () => saveLearningAttempt(goal.id, input), attempt.editing ? "Attempt corrected. Earlier records are kept in history." : "Attempt saved.");
       }} />
     </details>
-    <section className="lg-card"><h2>My attempts</h2><p>{goal.attempts.length} saved {goal.attempts.length === 1 ? "attempt" : "attempts"}. These are your records, not a skill grade or a change in AI exposure.</p><p className="lg-muted">{Object.entries(attemptLabels).map(([type, label]) => `${label}: ${goal.attempts.filter(a => a.type === type).length}`).join(" · ")}</p>
-      {goal.attempts.length === 0 ? <p>No attempts recorded yet. This does not mean you lack the skill.</p> : <ul className="lg-attempts">{[...goal.attempts].sort((a, b) => b.date.localeCompare(a.date)).map(a => <li key={a.id}><div className="lg-attempt-heading"><strong>{attemptLabels[a.type]}</strong><time dateTime={a.date}>{displayDate(a.date)}</time></div><p className="lg-preserve">{a.description}</p>{a.task && <p><strong>Work task:</strong> {a.task.wording}</p>}{a.notes && <p className="lg-preserve lg-muted">{a.notes}</p>}
+    <section className="lg-card"><h2>My attempts</h2><p>{goal.attempts.length} saved {goal.attempts.length === 1 ? "attempt" : "attempts"}. These are your records, not a skill grade or a change in AI exposure.</p><ul className="lg-evidence-counts" aria-label="Attempts by type">{Object.entries(attemptLabels).map(([type, label]) => <li key={type}><strong>{goal.attempts.filter(a => a.type === type).length}</strong><span>{label}</span></li>)}</ul>
+      {goal.attempts.length === 0 ? <p>No attempts recorded yet. This does not mean you lack the skill.</p> : <ul className="lg-attempts">{[...goal.attempts].sort((a, b) => b.date.localeCompare(a.date)).map(a => <li key={a.id}><div className="lg-attempt-heading"><strong>{attemptLabels[a.type]}</strong><time dateTime={a.date}>{displayDate(a.date)}</time></div><p>{shortTaskLabel(a.description, 160)}</p>{(a.description.length > 160 || a.notes || a.task) && <details><summary>Full attempt and notes</summary><p className="lg-preserve">{cleanMultilineDisplayText(a.description)}</p>{a.task && <p><strong>Work task:</strong> {cleanDisplayText(a.task.wording)}</p>}{a.notes && <p className="lg-preserve lg-muted">{cleanMultilineDisplayText(a.notes)}</p>}</details>}
       <div className="lg-buttons"><button disabled={formBlocked || Boolean(draft?.attempt)} onClick={() => { changeDraft({ attempt: { id: a.id, editing: true, date: a.date, type: a.type, description: a.description, notes: a.notes, task: a.task } }); setRemoveId(null); requestAnimationFrame(() => document.getElementById("attempt-date")?.focus()); }}>Correct</button><button disabled={saveBlocked || Boolean(draft?.attempt)} onClick={() => setRemoveId(a.id)}>Remove</button></div>
       {removeId === a.id && <div className="lg-warning" role="group" aria-label="Confirm removal"><p>Remove this attempt from your current evidence? Its earlier version remains in history.</p><div className="lg-buttons"><button disabled={saveBlocked} onClick={() => { void savePart("attempt", () => removeLearningAttempt(goal.id, a.id), "Attempt removed from current evidence. History is kept.").then(ok => { if (ok) { setRemoveId(null);  } }); }}>Confirm removal</button><button disabled={busy} onClick={() => setRemoveId(null)}>Cancel</button></div></div>}</li>)}</ul>}
       {goal.needsReview && <p className="lg-muted">Your current records include these changes. Earlier versions remain below.</p>}
@@ -281,7 +293,7 @@ function AttemptForm({ value, historical, tasks, busy, saveBlocked, onChange, on
   return <form onSubmit={e => { e.preventDefault(); if (!saveBlocked) void onSave({ id, date, type, description, notes, ...(type === "workplace_practice" && task ? { task } : {}) }); }}>
     <div className="lg-form-grid"><div><label htmlFor="attempt-date">When did you try it?</label><input id="attempt-date" type="date" value={date} max={today()} required disabled={busy} onChange={e => onChange({ ...value, date: e.target.value })} /></div><div><label htmlFor="attempt-type">What kind of attempt?</label><select id="attempt-type" value={type} disabled={busy} onChange={e => onChange({ ...value, type: e.target.value as DraftAttempt["type"] })}>{Object.entries(attemptLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></div></div>
     <p className="lg-muted">{type === "study" ? "Reading, watching or learning about the skill. This does not prove mastery." : type === "course_practice" ? "An exercise with a sample, or a course project. No course is assumed. Choose workplace practice only if you used it in a real work task." : "An attempt using the skill in a real work task."}</p>
-    {type === "workplace_practice" && <><label htmlFor="attempt-task">Real work task</label><select id="attempt-task" required value={taskIdentity(task)} disabled={busy} onChange={e => onChange({ ...value, task: selectable.find(t => taskIdentity(t.task) === e.target.value)?.task ?? null })}><option value="">Choose a confirmed task</option>{selectable.map(option => <option key={taskIdentity(option.task)} value={taskIdentity(option.task)}>{option.historical ? "Earlier wording: " : "Current task: "}{option.task.wording}</option>)}</select>{task && !selectable.some(t => taskIdentity(t.task) === taskIdentity(task)) && <p role="alert">The task in your unsaved draft changed. Choose a current task before saving.</p>}{!selectable.length && <p>Add and confirm a real task in <Link to={ROUTES.task}>your work profile</Link> before saving workplace practice.</p>}</>}
+    {type === "workplace_practice" && <><label htmlFor="attempt-task">Real work task</label><select id="attempt-task" required value={taskIdentity(task)} disabled={busy} onChange={e => onChange({ ...value, task: selectable.find(t => taskIdentity(t.task) === e.target.value)?.task ?? null })}><option value="">Choose a confirmed task</option>{selectable.map(option => <option key={taskIdentity(option.task)} value={taskIdentity(option.task)}>{option.historical ? "Earlier wording: " : "Current task: "}{cleanDisplayText(option.task.wording)}</option>)}</select>{task && !selectable.some(t => taskIdentity(t.task) === taskIdentity(task)) && <p role="alert">The task in your unsaved draft changed. Choose a current task before saving.</p>}{!selectable.length && <p>Add and confirm a real task in <Link to={ROUTES.task}>your work profile</Link> before saving workplace practice.</p>}</>}
     <label htmlFor="attempt-description">What did you do?</label><textarea id="attempt-description" value={description} required maxLength={2000} rows={3} disabled={busy} onChange={e => onChange({ ...value, description: e.target.value })} />
     <label htmlFor="attempt-notes">Notes <span className="lg-optional">Optional</span></label><textarea id="attempt-notes" value={notes} maxLength={4000} rows={2} disabled={busy} onChange={e => onChange({ ...value, notes: e.target.value })} />
     {confirmDiscard && <div className="lg-warning"><p>Discard this unsaved attempt draft? Saved attempts stay unchanged.</p><button type="button" disabled={busy} onClick={() => { onCancel(); setConfirmDiscard(false); }}>Confirm discard attempt</button><button type="button" onClick={() => setConfirmDiscard(false)}>Keep draft</button></div>}

@@ -1,3 +1,4 @@
+import { cleanDisplayText } from "@/lib/displayText";
 import PlanContinuation from "./PlanContinuation";
 import { rememberCourse } from "@/features/journey/journey";
 import { checkInToPlan, refreshChapterProgress, saveChapterProgress, syncChapterProgress } from "@/features/learning-planning/progressOperations";
@@ -64,6 +65,11 @@ import "./learning-preview.css";
 type Course = PlanCourse;
 type RecordDay = PlanRecordDay;
 type Preview = PlanState;
+
+const learningErrorText = (error: unknown, fallback: string) => {
+  const text = error instanceof Error ? error.message : typeof error === "string" ? error : "";
+  return /(?:status|http|request failed|fetch|network|timeout)/i.test(text) ? fallback : cleanDisplayText(text) || fallback;
+};
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -138,6 +144,8 @@ export default function Plan() {
   const [notice, setNotice] = useState("");
   const [removeId, setRemoveId] = useState<string | null>(null);
   const [coursesLoading, setCoursesLoading] = useState(true);
+  const [coursesError, setCoursesError] = useState("");
+  const [courseRefresh, setCourseRefresh] = useState(0);
   const [calendarDays, setCalendarDays] = useState<Record<string, CalendarDay>>(
     {},
   );
@@ -206,6 +214,7 @@ export default function Plan() {
     if (loaded.error) { setCoursesLoading(false); return; }
     let cancelled = false;
     setCoursesLoading(true);
+    setCoursesError("");
     void syncPlanWithLearningCourses()
       .then((next) => {
         if (!cancelled) setState(next);
@@ -215,7 +224,7 @@ export default function Plan() {
         if (!cancelled) setState(next);
       })
       .catch((error: unknown) => {
-        if (!cancelled) setNotice(error instanceof Error ? error.message : "Could not refresh your saved courses.");
+        if (!cancelled) setCoursesError(learningErrorText(error, "Your courses could not be refreshed right now. Your saved records are kept. Try again."));
       })
       .finally(() => {
         if (!cancelled) setCoursesLoading(false);
@@ -223,7 +232,7 @@ export default function Plan() {
     return () => {
       cancelled = true;
     };
-  }, [location.key, loaded.error]);
+  }, [location.key, loaded.error, courseRefresh]);
 
   useEffect(() => {
     if (coursesLoading) return;
@@ -357,10 +366,7 @@ export default function Plan() {
     } catch (error) {
       try { setState(readPlanState()); } catch { /* Keep the visible plan. */ }
       if (error instanceof ApiError && error.status === 409) {
-        message.warning(
-          error.detail ||
-            "Log some chapter progress first, then check in.",
-        );
+        message.warning(cleanDisplayText(error.detail || "Log some chapter progress first, then check in."));
       } else {
         message.error("Could not check in. Please try again.");
       }
@@ -389,7 +395,7 @@ export default function Plan() {
       return true;
     } catch (error) {
       try { setState(readPlanState()); } catch { /* Keep the visible draft. */ }
-      const detail = error instanceof Error ? error.message : "Progress could not sync. Your changes are kept for retry.";
+      const detail = learningErrorText(error, "Progress could not sync. Your changes are kept for retry.");
       setNotice(detail);
       message.error(detail);
       return false;
@@ -415,7 +421,7 @@ export default function Plan() {
       }
     } catch (error) {
       // No success message or closed drawer when the local save fails.
-      const detail = error instanceof Error ? error.message : "Could not save progress. Your draft is still open.";
+      const detail = learningErrorText(error, "Could not save progress. Your draft is still open.");
       setNotice(detail);
       message.error(detail);
     }
@@ -438,8 +444,8 @@ export default function Plan() {
       cell: (c) => (
         <span className="lp-cell-course">
           <span className="lp-cell-course__copy">
-            <strong>{c.title}</strong>
-            <small>{c.provider}</small>
+            <strong>{cleanDisplayText(c.title)}</strong>
+            <small>{cleanDisplayText(c.provider)}</small>
           </span>
         </span>
       ),
@@ -455,7 +461,7 @@ export default function Plan() {
             size="sm"
             value={percent(c)}
             className="lp-bar"
-            aria-label={`${c.title} progress ${percent(c)}%`}
+            aria-label={`${cleanDisplayText(c.title)} progress ${percent(c)}%`}
           />
           <span className="lp-bar__value">{percent(c)}%</span>
         </span>
@@ -517,22 +523,24 @@ export default function Plan() {
     },
   ];
 
-  if (loaded.error) return <div className="lp-page"><PageHeader title="My Learning" description="Your saved data has been kept." /><p role="alert">{loaded.error}</p></div>;
+  if (loaded.error) return <div className="lp-page"><PageHeader title="My courses" description="Your saved data has been kept." /><p role="alert">{learningErrorText(loaded.error, "Your saved courses could not be read. Please reload and try again.")}</p></div>;
 
   return (
     <div className="lp-page">
       <PageHeader
         className="lp-page-header"
-        title="My Learning"
-        description="Small steps, steady progress. Make your learning journey your own."
+        title="My courses"
+        description="Continue optional courses and keep your learning records."
       />
 
-      <p className="lp-notice" role="status">
-        {notice}
-      </p>
+      {notice && <p className="lp-notice" role="status">
+        {learningErrorText(notice, "The course service is unavailable. Your saved records are kept. Please try again.")}
+      </p>}
 
-      <LearningReviewNotice />
-      <PlanContinuation courses={state.courses} loading={coursesLoading} onRecord={openCourse} />
+      <div className="lp-goal-return"><Link to={ROUTES.learningGoals}>Back to my goals</Link><span>Courses support your goal. You can also learn through a small activity.</span></div>
+      {coursesError && <section className="lp-course-error" role="alert"><p>{coursesError}</p><button type="button" className="lp-mini lp-mini--blue" disabled={coursesLoading} onClick={() => setCourseRefresh(value => value + 1)}>{coursesLoading ? "Refreshing…" : "Retry loading courses"}</button></section>}
+      {(state.courses.length > 0 || Object.keys(state.records).length > 0) && <LearningReviewNotice />}
+      {(state.courses.length > 0 || new URLSearchParams(location.search).has("course")) && <PlanContinuation courses={state.courses} loading={coursesLoading} onRecord={openCourse} />}
       {(briefLoading || (briefTourOpen && briefTourStep)) && <section className="lp-inline-brief" aria-labelledby="plan-brief-title">
         <div className="lp-inline-brief__heading"><h2 id="plan-brief-title">Today’s learning brief</h2>{!briefLoading && <button type="button" className="lp-mini" onClick={finishBriefTour}>Dismiss brief</button>}</div>
         {briefLoading ? <p role="status">Preparing your briefing…</p> : <>
@@ -545,20 +553,20 @@ export default function Plan() {
       </section>}
       {(state.pendingProgress?.length || state.progressSyncError) && <div role="status" className="mb-4 rounded-xl border p-3 text-sm">
         <p>{progressBusy ? "Syncing chapter progress…" : state.progressSyncError ? "Progress sync failed. Your changes are kept on this browser." : "Chapter progress is waiting to sync."}</p>
-        {state.progressSyncError && <p>{state.progressSyncError}</p>}
+        {state.progressSyncError && <p>{learningErrorText(state.progressSyncError, "The course service is unavailable. Please retry when it is ready.")}</p>}
         <button type="button" className="mt-2 underline" disabled={progressBusy} onClick={() => void retryProgress()}>Retry progress sync</button>
       </div>}
 
-      <div className="lp-layout">
-        <aside className="lp-left">
+      <div className={`lp-layout${state.courses.length || Object.values(state.records).some(dayHasProgress) ? "" : " lp-layout--empty"}`}>
+        {(state.courses.length > 0 || Object.values(state.records).some(dayHasProgress)) && <aside className="lp-left">
           <div className="lp-stats">
-            <ExposureScorePie
+            {state.courses.length > 0 && <ExposureScorePie
               className="lp-stats-pie"
               score={overall / 100}
               label="Overall chapter progress"
               meta={`${overall}% complete`}
               variant="tasks"
-            />
+            />}
             <article className="lp-stats-card lp-stats-card--checkins">
               <div className="lp-stats-card__icon" aria-hidden="true">
                 <Check size={18} />
@@ -681,7 +689,7 @@ export default function Plan() {
                 </div>
             </div>
           </section>
-        </aside>
+        </aside>}
 
         <section className="lp-courses">
           <div className="lp-heading">
@@ -707,14 +715,15 @@ export default function Plan() {
                   </h3>
                   {!coursesLoading ? (
                     <p>
-                      Add courses from Learning Resources, then return here to
-                      track progress.
+                      Continue a saved goal or browse a course when you need one.
+                      Your learning goals and practice records do not need a course.
                     </p>
                   ) : null}
+                  {!coursesLoading && <div className="lp-empty__actions"><Link className="lp-mini lp-mini--blue" to={ROUTES.learningGoals}>Continue my goals</Link><Link className="lp-mini" to={`${ROUTES.learningCentre}?mode=browse`}>Browse optional courses</Link></div>}
                 </div>
               }
             />
-            <div className="lp-courses-footer">
+            {state.courses.length > 0 && <div className="lp-courses-footer">
               <div className="lp-table-actions">
                 <span className="lp-table-actions__meta">
                   {inProgress} of {state.courses.length} in progress
@@ -735,7 +744,7 @@ export default function Plan() {
                   </Link>
                 </div>
               </div>
-            </div>
+            </div>}
           </div>
         </section>
       </div>
@@ -760,9 +769,9 @@ export default function Plan() {
           {course && (
             <>
               <DrawerHeader>
-                <p className="lp-kicker">{course.provider}</p>
+                <p className="lp-kicker">{cleanDisplayText(course.provider ?? "")}</p>
                 <DrawerTitle className="lp-drawer-title">
-                  {course.title}
+                  {cleanDisplayText(course.title)}
                 </DrawerTitle>
                 <DrawerDescription>
                   Chapter progress is a percentage and can only increase, so
@@ -780,7 +789,7 @@ export default function Plan() {
                       <li className="lp-drawer-chapter" key={ch.title}>
                         <div className="lp-drawer-chapter__head">
                           <span className="lp-drawer-chapter__name">
-                            {i + 1}. {ch.title}
+                            {i + 1}. {cleanDisplayText(ch.title)}
                           </span>
                           <SoftPercentField
                             min={floorPercent}
@@ -790,7 +799,7 @@ export default function Plan() {
                             value={
                               rawPercent[ch.title] ?? String(chapterPercent)
                             }
-                            aria-label={`${ch.title} progress percentage`}
+                            aria-label={`${cleanDisplayText(ch.title)} progress percentage`}
                             onValueChange={(next) =>
                               setRawPercent((prev) => ({
                                 ...prev,
@@ -806,7 +815,7 @@ export default function Plan() {
                           <GradientBar
                             size="sm"
                             value={chapterPercent}
-                            aria-label={`${ch.title} progress ${chapterPercent}%`}
+                            aria-label={`${cleanDisplayText(ch.title)} progress ${chapterPercent}%`}
                           />
                         </div>
                         <div className="lp-drawer-chapter__foot">
@@ -886,8 +895,8 @@ export default function Plan() {
                     className="lp-day-view__item"
                   >
                     <div>
-                      <strong>{entry.chapterTitle}</strong>
-                      <small>{entry.courseTitle}</small>
+                      <strong>{cleanDisplayText(entry.chapterTitle)}</strong>
+                      <small>{cleanDisplayText(entry.courseTitle)}</small>
                     </div>
                     <span>{entry.percent}%</span>
                   </li>
@@ -956,7 +965,7 @@ export default function Plan() {
                   const result = await changeSavedCourses({ remove: [removeId] });
                   setState(result.plan);
                 } catch (error) {
-                  const detail = error instanceof Error ? error.message : "Could not remove the course. Please try again.";
+                  const detail = learningErrorText(error, "Could not remove the course. Please try again.");
                   setNotice(detail);
                   message.error(detail);
                   return;

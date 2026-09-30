@@ -29,3 +29,19 @@ test('engineering guidance separates drafting, measurement checks and physical w
   assert.match(taskGuidance({wording:'Review test results and explain unusual readings'}).review,/instrument reliability/);
   assert.match(taskGuidance({wording:'Assemble and install mechanical components'}).help,/cannot carry out the physical installation/);
 });
+
+test('software testing takes precedence over the software business domain', () => {
+  const task = { wording: 'I test accounting software and write automated tests.', notes: 'I use Python and Playwright. I do not prepare financial accounts.' };
+  assert.equal(taskGuidance(task).title, 'Software testing and development');
+  assert.doesNotMatch(taskGuidance(task).review, /financial|stock|approve.*price/i);
+  assert.equal(taskGuidance({wording:'Maintain financial records using accounting software'}).title, 'Records and budgeting');
+  assert.equal(taskGuidance({wording:'Maintain financial records. I do not write automated tests.'}).title, 'Records and budgeting');
+});
+
+test('saved context clarifies a vague testing task without classifying by tool alone', () => {
+  assert.equal(taskGuidance({wording:'I review tests',notes:'Run unit tests with Python and Playwright.'}).title, 'Software testing and development');
+  assert.equal(taskGuidance({wording:'I maintain stock records',notes:'Use accounting software.'}).title, 'Records and budgeting');
+  assert.equal(taskGuidance({wording:'Review test results and explain unusual readings',notes:'I use Python for summaries.'}).title, 'Reviewing test results');
+  assert.notEqual(taskGuidance({wording:'I test chemical samples',notes:'I use Python for summaries.'}).title, 'Software testing and development');
+  assert.notEqual(taskGuidance({wording:'Review unusual readings',notes:'I do not use Python or Playwright.'}).title, 'Software testing and development');
+});

@@ -1,3 +1,4 @@
+import { cleanDisplayText } from "@/lib/displayText";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Bookmark, ExternalLink, Trash2 } from "lucide-react";
 import {
@@ -38,7 +39,7 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
   const outcomes = useMemo(
     () =>
       course.outcomes
-        .map((item) => item.trim().replace(/[.;]+$/, ""))
+        .map((item) => cleanDisplayText(item).replace(/[.;]+$/, ""))
         .filter(Boolean)
         .map((item) => item.charAt(0).toUpperCase() + item.slice(1)),
     [course.outcomes],
@@ -60,7 +61,7 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
       await rememberCourse(course.id);
       if (mounted.current && owner === currentWorkspaceSession()) navigate(planCourseUrl(course.id));
     } catch (error) {
-      if (mounted.current && owner === currentWorkspaceSession()) setContinueError(error instanceof Error ? error.message : "Could not save your place. Please try again.");
+      if (mounted.current && owner === currentWorkspaceSession()) setContinueError(error instanceof Error && !/(?:status|http|request failed|fetch|network)/i.test(error.message) ? cleanDisplayText(error.message) : "Could not save your place. Please try again.");
     } finally {
       if (mounted.current && owner === currentWorkspaceSession()) setContinuing(false);
     }
@@ -75,10 +76,10 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
     >
       <DrawerContent ref={sheetRef} className="learning-detail-drawer">
         <DrawerHeader>
-          <p className="library-kicker">{course.provider}</p>
-          <DrawerTitle>{course.title}</DrawerTitle>
+          <p className="library-kicker">{cleanDisplayText(course.provider)}</p>
+          <DrawerTitle>{cleanDisplayText(course.title)}</DrawerTitle>
           <DrawerDescription>
-            {courseLevelLabel(course.level)} · {course.language} ·{" "}
+            {courseLevelLabel(course.level)} · {cleanDisplayText(course.language)} ·{" "}
             {durationLabel(course.durationMin)}
           </DrawerDescription>
         </DrawerHeader>
@@ -103,7 +104,7 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
                 <p
                   className={`learning-about${aboutExpanded ? " is-expanded" : ""}`}
                 >
-                  {course.intro}
+                  {cleanDisplayText(course.intro)}
                 </p>
                 {aboutIsLong && (
                   <Button
@@ -133,14 +134,14 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
                 {skillName ? (
                   <p className="learning-course-skills__focus">
                     Currently browsing via focus skill:{" "}
-                    <strong>{skillName}</strong>
+                    <strong>{cleanDisplayText(skillName)}</strong>
                   </p>
                 ) : null}
               </section>
 
               <section>
                 <h3>Before you start</h3>
-                <p>{course.prereq}</p>
+                <p>{cleanDisplayText(course.prereq)}</p>
               </section>
             </TabsContent>
             <TabsContent value="chapters">
@@ -155,7 +156,7 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
                         {index + 1}
                       </span>
                       <span>
-                        {chapter.title}
+                        {cleanDisplayText(chapter.title)}
                         <small>{durationLabel(chapter.min)}</small>
                       </span>
                     </li>

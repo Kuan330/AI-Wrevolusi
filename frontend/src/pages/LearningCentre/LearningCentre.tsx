@@ -1,3 +1,6 @@
+import { cleanDisplayText, goalDisplayLabel } from "@/lib/displayText";
+import { ROUTES } from "@/constants/routes";
+import { readLearningGoals } from "@/features/learning-goals/learningGoals";
 import LearningReviewNotice from "@/components/common/LearningReviewNotice";
 import { useEffect, useMemo, useRef, useState } from "react";
 import PageHeader from "@/components/common/PageHeader";
@@ -81,7 +84,7 @@ export default function LearningCentre() {
 
   const journey = useMemo(() => {
     try {
-      const context = genericSearch ? null : readLearningContext(params.get("context"));
+      const context = genericSearch || (params.has("goal") && !params.has("context")) ? null : readLearningContext(params.get("context"));
       const contextStale = Boolean(context && learningContextNeedsReview(context));
       return {
         revision: workspaceRevision,
@@ -97,6 +100,17 @@ export default function LearningCentre() {
         error: error instanceof Error ? error.message : "Your saved learning context could not be read. Please reload." };
     }
   }, [params, genericSearch, workspaceRevision]);
+  const goalResource = useMemo(() => {
+    void workspaceRevision;
+    if (!params.has("goal")) return { goal: null, error: "" };
+    try {
+      const goal = readLearningGoals().find(item => item.id === params.get("goal")) ?? null;
+      const contextMatches = !goal || genericSearch || !goal.sourceKey.startsWith("context:") || params.get("context") === goal.sourceKey.slice(8);
+      return { goal, error: !goal ? "This goal could not be found. Open your saved goals to choose it again." : !contextMatches ? "The learning choice in this link does not match your goal. Open resources from your saved goal again." : "" };
+    } catch { return { goal: null, error: "Your saved goal could not be read. Return to your goals and try again." }; }
+  }, [params, workspaceRevision, genericSearch]);
+  const resourceGoal = goalResource.goal;
+  const unsupportedGoal = Boolean(resourceGoal && resourceGoal.initial.skill.source !== "wef" && !genericSearch);
   const context = journey.context;
   const evidence = useMemo(() => buildSkillEvidence(journey.profile?.tasks ?? [], wefSkills), [journey.profile, wefSkills]);
   const workSkills = useMemo(() => evidence.filter(({ skill }) =>
@@ -122,6 +136,7 @@ export default function LearningCentre() {
   useEffect(() => {
     let cancelled = false;
     const owner = currentWorkspaceSession();
+    if (unsupportedGoal || goalResource.error) return;
     void referenceService.wefSkills().then(rows => {
       if (cancelled || owner !== currentWorkspaceSession()) return;
       setWefSkills([...rows].sort((a, b) => a.wef_skill_id - b.wef_skill_id));
@@ -130,10 +145,10 @@ export default function LearningCentre() {
       if (!cancelled && owner === currentWorkspaceSession()) setSkillsError("The skill framework could not be loaded. Please reload and try again.");
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [unsupportedGoal, goalResource.error]);
 
   useEffect(() => {
-    if (!skillsLoaded || journey.error) return;
+    if (!skillsLoaded || journey.error || unsupportedGoal || goalResource.error) return;
     try {
       const saved = readLearningSkills();
       const workSeed = JSON.stringify(workSkills);
@@ -148,7 +163,7 @@ export default function LearningCentre() {
     } catch (error) {
       setSelectionError(error instanceof Error ? error.message : "Could not restore your learning skills.");
     }
-  }, [skillsLoaded, workSkills, context?.id, context?.skill.slug, context?.origin, contextValid, contextStale, selectedWef, journey.error, setSkills]);
+  }, [skillsLoaded, workSkills, context?.id, context?.skill.slug, context?.origin, contextValid, contextStale, selectedWef, journey.error, unsupportedGoal, goalResource.error, setSkills]);
 
   const focusSkills = skills.filter(item => {
     const wef = wefSkills.find(row => skillKey(row.core_skill) === item.id);
@@ -168,7 +183,7 @@ export default function LearningCentre() {
     setPageCourses([]);
     setCatalogueError("");
     setCatalogueNotice("");
-    if ((!genericSearch && !activeId) || contextError) { setCatalogueLoading(false); return; }
+    if ((!genericSearch && !activeId) || contextError || unsupportedGoal || goalResource.error) { setCatalogueLoading(false); return; }
     setCatalogueLoading(true);
     void loadLearningCatalogue(genericSearch ? null : activeId).then(result => {
       if (cancelled || owner !== currentWorkspaceSession()) return;
@@ -181,7 +196,7 @@ export default function LearningCentre() {
       setCatalogueLoading(false);
     });
     return () => { cancelled = true; };
-  }, [activeId, genericSearch, contextError, catalogueRefresh]);
+  }, [activeId, genericSearch, contextError, unsupportedGoal, goalResource.error, catalogueRefresh]);
 
   const matching = pageCourses;
   const visible = matching.filter(course =>
@@ -240,23 +255,29 @@ export default function LearningCentre() {
   };
   const filterProps = { value: filters, courses: matching, onChange: setFilters };
 
+  const displayLearningError = (text: string) => /(?:status|http|request failed|fetch|network|timeout)/i.test(text) ? "The learning service is unavailable. Your saved choices are kept. Please try again." : cleanDisplayText(text);
   const headerProps = {
     title: "Find learning",
     description:
-      "Browse courses for skills reflected in your work, or add skills you want to grow.",
+      "Optional courses to support your learning. Your saved goals stay available.",
   };
 
   return (
     <div className="course-library">
       <PageHeader {...headerProps} className="library-page-header" />
-      <LearningReviewNotice />
+      <p className="library-goal-return"><Link to={resourceGoal ? `${ROUTES.learningGoals}?goal=${encodeURIComponent(resourceGoal.id)}` : ROUTES.learningGoals}>{resourceGoal ? "Back to this goal" : "Back to my goals"}</Link></p>
+      {(!resourceGoal || resourceGoal.initial.skill.source === "wef") && <LearningReviewNotice />}
+      {goalResource.error && <section className="library-glass library-goal-resource"><h2>Check your saved goal</h2><p role="alert">{goalResource.error}</p><Link to={ROUTES.learningGoals}>Open my goals</Link></section>}
+      {resourceGoal && <section className="library-glass library-goal-resource" aria-label="Resources for your saved goal"><p className="library-kicker">Your saved goal</p><h2>{goalDisplayLabel(resourceGoal.wording, resourceGoal.initial.skill.label)}</h2><p>{cleanDisplayText(resourceGoal.initial.skill.label)}</p>
+        {resourceGoal.initial.skill.source !== "wef" && <><p>There are no reviewed course links for this exact skill yet. You can still try your saved action and record what you learn.</p><div className="library-resource-actions"><Link to={`${ROUTES.learningGoals}?goal=${encodeURIComponent(resourceGoal.id)}`}>Continue my action</Link>{!genericSearch && <Link to={`${ROUTES.learningCentre}?mode=browse&goal=${encodeURIComponent(resourceGoal.id)}`}>Browse all courses</Link>}</div>{genericSearch && <p className="library-muted">These are general courses. Adding one does not link it to this goal or prove that it covers this skill.</p>}</>}
+      </section>}
       {context && contextValid && (
         <section className="library-glass mb-4 p-4" aria-label="Your learning choice">
           <p className="library-kicker">{context.origin === "career" ? "Career learning" : context.origin === "work" ? "From your reviewed skills" : "Your own learning choice"}</p>
-          <h2>{selectedWef?.core_skill}</h2>
-          {context.career && <p>For your chosen direction: {context.career.title}</p>}
-          {context.taskLabels.length > 0 && <p>Connected work: {context.taskLabels.join("; ")}</p>}
-          {context.goal && <p>Your goal: {context.goal}</p>}
+          <h2>{cleanDisplayText(selectedWef?.core_skill ?? "")}</h2>
+          {context.career && <p>For your chosen direction: {cleanDisplayText(context.career.title)}</p>}
+          {context.taskLabels.length > 0 && <p>Connected work: {context.taskLabels.map(cleanDisplayText).join(". ")}</p>}
+          {context.goal && <p>Your goal: {goalDisplayLabel(context.goal)}</p>}
           <p className="library-muted">This uses the current WEF skill and course links. It does not establish specialist skill coverage or job readiness.</p>
           {contextStale && <p role="alert">Your work or skill review changed. Review this choice before adding a new course; your saved courses are still available.</p>}
           <Link className="underline" to={context.origin === "career" ? "/possibilities" : "/skills"}>
@@ -266,15 +287,15 @@ export default function LearningCentre() {
       )}
       {genericSearch && <p className="mb-4" role="status">You are browsing the course catalogue on your own. Added courses are self-selected, not skill or career recommendations.</p>}
       {contextError && <div role="alert" className="mb-4"><p>{contextError}</p><Link className="underline" to="/skills">Review your skills</Link></div>}
-      {!journey.reviewed && !context && !genericSearch && <p className="mb-4">Review your work skills to use them here, or add a skill to explore your own learning. <Link className="underline" to="/skills">Review skills</Link></p>}
-      {(selectionError || selecting) && <p role={selectionError ? "alert" : "status"}>{selectionError || "Saving your skill choice…"}</p>}
-      <button type="button" className="mb-3 text-sm underline" disabled={catalogueLoading} onClick={() => { resetCourseDirectory(); setCatalogueRefresh(value => value + 1); }}>Refresh course catalogue</button>
-      {(skillsError || notice) && (
-        <p role="alert">{skillsError || notice}</p>
+      {!resourceGoal && !journey.reviewed && !context && !genericSearch && <p className="mb-4">Review your work skills to use them here, or add a skill to explore your own learning. <Link className="underline" to="/skills">Review skills</Link></p>}
+      {(selectionError || selecting) && <p role={selectionError ? "alert" : "status"}>{selectionError ? displayLearningError(selectionError) : "Saving your skill choice…"}</p>}
+      {!unsupportedGoal && !goalResource.error && <button type="button" className="mb-3 text-sm underline" disabled={catalogueLoading} onClick={() => { resetCourseDirectory(); setCatalogueRefresh(value => value + 1); }}>Refresh course catalogue</button>}
+      {!unsupportedGoal && !goalResource.error && (skillsError || notice) && (
+        <p role="alert">{displayLearningError(skillsError || notice)}</p>
       )}
 
       {pendingSync && <Button variant="outline" disabled={busy} onClick={() => { void retrySync(); }}>{busy ? "Syncing…" : "Retry course sync"}</Button>}
-      {!focusSkills.length && !genericSearch ? (
+      {unsupportedGoal || goalResource.error ? null : !focusSkills.length && !genericSearch ? (
         <section className="learning-empty-skills library-glass">
           <p className="library-kicker">Ready when you are</p>
           <h2>Add skills to explore courses</h2>
@@ -328,7 +349,7 @@ export default function LearningCentre() {
                   {matching.length
                     ? "Try another format, provider or search term."
                     : !skill && !genericSearch
-                      ? "Choose a skill in the sidebar to browse its verified courses."
+                      ? "Choose a skill in the sidebar to browse the catalogue links."
                       : "This skill stays in your learning list. The current catalogue has no linked courses yet."}
                 </p>
                 <Button
@@ -362,11 +383,11 @@ export default function LearningCentre() {
         <CourseDetailDrawer
           key={detailCourse.id}
           course={detailCourse}
-          skillName={skill?.en ?? ""}
+          skillName={cleanDisplayText(skill?.en ?? "")}
           saved={state.saved.includes(detailCourse.id)}
           busy={busy}
           pendingSync={pendingSync}
-          saveNotice={notice}
+          saveNotice={displayLearningError(notice)}
           onRetrySync={() => { void retrySync(); }}
           saveDisabled={contextStale || Boolean(contextError)}
           onClose={() => setDetailId(null)}

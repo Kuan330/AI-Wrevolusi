@@ -6,6 +6,7 @@ import { ROUTES } from "@/constants/routes";
 import { readJourneyProfile } from "@/features/journey/journey";
 import { checkWorkAiFindings } from "@/features/work-profile/checkWorkAiFindings";
 import ExposureTaskList from "./components/ExposureTaskList";
+import ResearchCoverage from "./components/ResearchCoverage";
 import "./exposure.css";
 
 export default function AIExposure() {
@@ -31,6 +32,7 @@ export default function AIExposure() {
     finally { if (mounted.current) { setChecking(false); refresh(value => value + 1); } }
   }
   const analysis = profile?.analysis?.classificationCheck === "same-title-v1" ? profile.analysis : null;
+  const assessments = (analysis?.taskExposureAssessments ?? []).filter(item => profile?.tasks.some(task => task.id === item.task_id && analysis?.tasks.some(saved => saved.id === task.id && saved.wording === task.wording)));
   return <div className="exposure-page mx-auto w-full max-w-[1200px]">
     <PageHeader className="flex-col items-start sm:flex-row sm:items-center" title="Where could AI change my work?"
       description="Choose a task. See what AI might help with, what you need to check, and a useful next step."
@@ -43,12 +45,11 @@ export default function AIExposure() {
         {profile.tasksOccupationCode && <Button disabled={checking} onClick={() => void checkResearch()}>{checking ? "Checking research…" : error ? "Retry research check" : "Check research"}</Button>}
         {error && <p role="alert">{error} Your work is still saved. A failed request does not mean there is no research.</p>}
       </section>}
-      <ExposureTaskList occupation={analysis ? {title: analysis.occupationTitle, code: analysis.occupationCode} : undefined} tasks={profile.tasks} assessments={(analysis?.taskExposureAssessments ?? []).filter(item => profile.tasks.some(task => task.id === item.task_id && analysis?.tasks.some(saved => saved.id === task.id && saved.wording === task.wording)))}
+      {analysis && !checking && !error && <ResearchCoverage tasks={profile.tasks} assessments={assessments} />}
+      <ExposureTaskList occupation={analysis ? {title: analysis.occupationTitle, code: analysis.occupationCode} : undefined} tasks={profile.tasks} assessments={assessments}
         researchChecked={Boolean(analysis) && !checking} researchLoading={checking} researchUnavailable={Boolean(error)} />
       <aside className="exposure-progress">
-        <h2>Progress means better work</h2>
-        <p>Build a skill, practise it, and review a real example. Learning does not lower the published research score.</p>
-        <details><summary>How could I check my progress?</summary><p>Compare similar work: what was correct, what needed fixing, and how long it took. Completing a course alone does not prove that your skills improved.</p><p>The research describes technical potential. It does not predict job loss, time saved, or whether your workplace will adopt AI.</p><a href="https://www.ilo.org/publications/workers%E2%80%99-exposure-ai-what-indicators-tell-us-%E2%80%93-and-what-they-don%E2%80%99t" target="_blank" rel="noreferrer">ILO: what exposure indicators can tell us</a></details>
+        <details><summary>How can I review progress?</summary><p>Build a skill, try an activity and review your saved records in <Link to={ROUTES.progress}>My progress</Link>. Learning does not lower the published research score.</p><p>Compare similar work: what was correct, what needed fixing, and how long it took. Completing a course alone does not prove that your skills improved.</p><a href="https://www.ilo.org/publications/workers%E2%80%99-exposure-ai-what-indicators-tell-us-%E2%80%93-and-what-they-don%E2%80%99t" target="_blank" rel="noreferrer">ILO: what exposure indicators can tell us</a></details>
       </aside>
     </>}
   </div>;

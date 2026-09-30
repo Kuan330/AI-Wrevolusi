@@ -23,6 +23,7 @@ import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
 import { skillKey } from "./learningSkills";
 import { buildSkillEvidence } from "./lib/skillProfile";
+import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
 import SpecialistSkills from "./components/SpecialistSkills";
 import "./SkillsReview.css";
 
@@ -193,10 +194,6 @@ export default function SkillsReview() {
         description="Check the suggestions from your confirmed work, then choose one skill to develop."
         actions={<Button asChild variant="outline" className="rounded-full"><Link to={ROUTES.task}>Edit my tasks</Link></Button>}
       />
-      <p className="skills-review-page__intro">
-        Check which suggestions fit your work. Add specific skills we missed, using a task as an example.
-        This is a record of your work, not an ability score.
-      </p>
 
       {focusId && <section className="skills-review-page__notice" aria-label="Task carried from AI findings">
         <h2>{activeFocus ? "Skills for your selected task" : "Your selected task needs review"}</h2>
@@ -240,9 +237,9 @@ export default function SkillsReview() {
             const current = item.taskIds.every((id, index) => work.tasks.some(task => task.id === id && task.wording === item.taskLabels[index]));
             return <li key={item.id}>
               <div>
-                <strong>{item.name}</strong> <span className="skills-review-page__state">Your own words</span>
+                <strong>{cleanDisplayText(item.name)}</strong> <span className="skills-review-page__state">Your own words</span>
                 {!current && <p className="skills-review-page__hint">From earlier work. Add a new entry with a current task to make a new learning choice. Earlier goals keep their original context.</p>}
-                <details><summary>Supporting task</summary><p>{item.taskLabels.join("; ")}</p></details>
+                <details><summary>Supporting task</summary><p>{cleanDisplayText(item.taskLabels.join(". "))}</p></details>
                 <div className="skills-review-page__decisions" role="group" aria-label={`Review personal skill ${item.name}`}>
                   {([['use', 'I use this'], ['no', 'Does not fit'], ['unsure', 'Not sure']] as const).map(([value, label]) => <Button key={value} variant={item.decision === value ? "default" : "outline"} aria-pressed={item.decision === value} disabled={saving || !current} onClick={() => void runSave(() => savePersonalSkillChoice(item.id, { decision: item.decision === value ? null : value }))}>{label}</Button>)}
                 </div>
@@ -272,7 +269,7 @@ export default function SkillsReview() {
             <label htmlFor="personal-skill-task">Which task relates to this skill?</label>
             <select id="personal-skill-task" value={personalTask || activeFocus?.id || ""} required disabled={saving} onChange={event => setPersonalTask(event.target.value)}>
               <option value="">Choose one of your tasks</option>
-              {work.tasks.map(task => <option key={task.id} value={task.id}>{task.wording}</option>)}
+              {work.tasks.map(task => <option key={task.id} value={task.id}>{shortTaskLabel(task.wording)}</option>)}
             </select>
             <Button type="submit" disabled={saving || !personalName.trim() || !(personalTask || activeFocus?.id)}>Save my skill</Button>
           </form>
@@ -305,7 +302,7 @@ export default function SkillsReview() {
               const status = staleAccepted ? "Needs review" : decision === "accepted" ? "Accepted" : decision === "rejected" ? "Rejected" : "Not reviewed";
               return <article className="skills-review-page__card" key={skill.wef_skill_id}>
                 <div className="skills-review-page__skill-heading">
-                  <h3>{skill.core_skill}</h3>
+                  <h3>{cleanDisplayText(skill.core_skill)}</h3>
                   <span className={`skills-review-page__state${decision && !staleAccepted ? ` is-${decision}` : ""}`}>{status}</span>
                 </div>
                 <p className="skills-review-page__source">WEF skill framework · Suggested from task wording</p>

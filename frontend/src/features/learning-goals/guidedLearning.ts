@@ -9,12 +9,17 @@ export function taskSuggestionsAreCurrent(result: GuidedTaskSuggestions, task: {
 /** A starting idea, never a claim that this is a checked guide or completed work. */
 export function templateGoalSuggestion(goal: LearningGoal, alternative = false): GuidedGoalSuggestion {
   const skill = goal.initial.skill.label;
-  const text = alternative
-    ? `Choose a small example related to ${skill}. Try one step and note what you would change.`
-    : `Choose a small example related to ${skill}. Describe how you would approach it and one thing to check.`;
-  return { goal_id: goal.id, revision: goal.revision, source: "template", goal: `Explore how to use ${skill} in a small example`,
+  const softwareTesting = /test/i.test(skill) && /software|automat|application/i.test(skill);
+  const text = softwareTesting
+    ? alternative
+      ? "Try a small function that adds two numbers. Check a negative number and a decimal, then compare the result with the answer you expect."
+      : "Try a small function that adds two numbers. Check that 2 + 3 returns 5 and 0 + 0 returns 0. Decide how it should handle text such as 'two'."
+    : alternative
+      ? `Use one small sample for ${skill}. Change one detail, repeat the same step and compare the two results.`
+      : `Use one small sample for ${skill}. Try one step, compare the result with what you expected and check one missing detail.`;
+  return { goal_id: goal.id, revision: goal.revision, source: "template", goal: `Practise: ${skill}`,
     action: { kind: "practise", text }, practice_idea: text,
-    notice: "General starting idea. Check that it fits your work. It is not a reviewed practice guide." };
+    notice: "Sample idea. Check that it fits your goal. This is not a reviewed practice guide." };
 }
 export function plannedActivityAttempt(goal: LearningGoal, tasks: { id: string; wording: string }[], date: string, id: string): DraftAttempt {
   if (!goal.action) throw new Error("Choose a saved activity first.");

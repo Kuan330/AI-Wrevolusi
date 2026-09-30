@@ -889,6 +889,32 @@
 }
 
 /* Task-first research review: one selected task, with evidence on demand. */
+.exposure-coverage { margin:20px 0 24px;padding:18px 0;border-bottom:1px solid #cbd7df; }
+.exposure-coverage h2 { font-size:1rem;font-weight:650; }
+.exposure-coverage__bar { display:flex;height:10px;overflow:hidden;border-radius:5px;margin:14px 0;gap:3px; }
+.coverage-linked { background:#35667f; }.coverage-candidate { background:#b19a65; }.coverage-gap { background:#bec8cf; }
+.exposure-coverage ul { display:flex;gap:12px 24px;flex-wrap:wrap;font-size:.9rem; }
+.exposure-coverage li { display:flex;gap:7px;align-items:center; }
+.coverage-dot { width:10px;height:10px;display:inline-block;flex:none;border-radius:50%; }
+.exposure-coverage p { margin-top:10px;color:#525964;font-size:.85rem;max-width:75ch; }
+.exposure-full-task { margin:8px 0;font-size:.9rem; }
+.exposure-full-task p { line-height:1.6;margin:8px 0; }
+.exposure-source-scale { border-top:1px solid #dce1e6;padding:16px 0 12px; }
+.exposure-source-scale h3 { font-size:.9rem;font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap; }
+.exposure-source-scale strong { font-size:1.6rem;font-variant-numeric:tabular-nums;color:#285d78; }
+.exposure-source-scale small { color:#525964;font-weight:400; }
+.exposure-source-scale meter { width:100%;height:20px;margin:8px 0;accent-color:#35667f; }
+.exposure-source-scale meter::-webkit-meter-bar { background:#e5ecf1;border:0; }
+.exposure-source-scale meter::-webkit-meter-optimum-value { background:#35667f; }
+.exposure-source-scale meter::-moz-meter-bar { background:#35667f; }
+.exposure-scale-ends { display:flex;justify-content:space-between;gap:16px;font-size:.75rem;color:#525964; }
+.exposure-scale-ends span:last-child { text-align:right; }
+.exposure-source-scale p { font-size:.85rem;color:#525964;line-height:1.6;margin-top:10px;max-width:75ch; }
+.exposure-interpretation { display:grid;grid-template-columns:1fr 1fr;gap:24px; }
+.exposure-interpretation .exposure-question { padding:16px 0; }
+.exposure-next { display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap; }
+.exposure-next h3 { margin:0; }
+@media(max-width:767px) { .exposure-interpretation { grid-template-columns:1fr;gap:0; }.exposure-next { display:block; }.exposure-next h3 { margin-bottom:10px; }.exposure-coverage ul { display:grid;gap:8px; } }
 .exposure-task-browser { display:grid;grid-template-columns:minmax(220px, .8fr) minmax(0, 2fr);gap:24px;align-items:start; }
 .exposure-task-picker { min-width:0; }
 .exposure-task-picker h2,.exposure-progress h2,.exposure-notice h2 { font-size:1rem;font-weight:650; }

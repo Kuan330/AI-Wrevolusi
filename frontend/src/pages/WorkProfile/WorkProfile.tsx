@@ -10,6 +10,7 @@ import { startWorkDraft, updateWorkDraft, discardWorkDraft, workDraftNeedsMatchR
 import { currentWorkspaceSession, flushWorkspace, syncError } from "@/services/accountStorage";
 import { taskSourceLabel } from "@/features/work-profile/taskSourceLabel";
 import type { ReferenceOccupation } from "@/types/reference";
+import { cleanDisplayText, cleanMultilineDisplayText, shortTaskLabel } from "@/lib/displayText";
 
 const workAreaLabels: Record<string, string> = {
   "0": "Armed forces", "1": "Management", "2": "Professional roles",
@@ -98,7 +99,7 @@ export default function WorkProfile() {
       <p className="text-sm text-muted-foreground"><strong>Reference match:</strong> {profile.tasksOccupationCode ? profile.occupation?.unit.title || profile.analysis?.occupationTitle || `Saved occupation ${profile.tasksOccupationCode}` : "No reference match — using your own title"}</p>
       <div className="flex flex-wrap gap-3"><Button variant="outline" onClick={() => edit("job")}>Edit job</Button><Button variant="outline" onClick={() => edit("tasks")}>Edit tasks</Button></div>
       <h3 className="font-semibold">Tasks you confirmed</h3>
-      <ul className="divide-y divide-border">{profile.tasks.map(task => <li key={task.id} className="py-3"><p>{task.wording}</p><p className="mt-1 text-xs text-muted-foreground">{taskSourceLabel(task)}</p></li>)}</ul>
+      <ul className="divide-y divide-border">{profile.tasks.map(task => <li key={task.id} className="py-3"><p>{shortTaskLabel(task.wording, 100)}</p><p className="mt-1 text-xs text-muted-foreground">{taskSourceLabel(task)}</p>{(cleanDisplayText(task.wording).length > 100 || task.notes) && <details className="mt-2 text-sm"><summary className="cursor-pointer text-[#315f79]">Full task and working context</summary><p className="mt-2">{cleanDisplayText(task.wording)}</p>{task.notes && <p className="mt-2 whitespace-pre-wrap">{cleanMultilineDisplayText(task.notes)}</p>}</details>}</li>)}</ul>
     </section>
     {Boolean(profile.history?.length) && <details className="profile-glass-card p-5">
       <summary className="cursor-pointer font-medium">Earlier confirmed work</summary>

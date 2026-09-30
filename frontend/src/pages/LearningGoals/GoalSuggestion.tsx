@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { guidedLearningService, type GuidedGoalSuggestion } from "@/services/guidedLearningService";
 import { currentWorkspaceSession } from "@/services/accountStorage";
 import { templateGoalSuggestion, suggestedActivityText } from "@/features/learning-goals/guidedLearning";
+import { cleanDisplayText, cleanMultilineDisplayText } from "@/lib/displayText";
 import type { LearningGoal } from "@/features/learning-goals/learningGoals";
 
 type Props = { goal: LearningGoal; incoming?: GuidedGoalSuggestion; disabled: boolean; onGoal: (text: string) => Promise<boolean>; onAction: (text: string, origin: "ai_suggestion" | "template") => Promise<boolean> };
@@ -30,15 +31,16 @@ export default function GoalSuggestion({ goal, incoming, disabled, onGoal, onAct
     } finally { if (alive.current && owner === currentWorkspaceSession()) setPending(false); }
   }
   const savedActivityText = suggestedActivityText(suggestion);
-  return <section className="lg-card lg-guided" aria-label="Suggested next step">
-    <p className="lg-eyebrow">{suggestion.source === "model" ? "AI suggestion for your review" : "A simple starting idea"}</p>
-    <h2>A ready starting point</h2><p>{suggestion.notice}</p>
-    {error && <p role="alert">{error} A general starting idea is shown below.</p>}
-    <h3>Suggested goal</h3><p>{suggestion.goal}</p>
-    <button disabled={disabled || pending || suggestion.goal === goal.wording} onClick={() => void onGoal(suggestion.goal)}>Use this goal</button>
-    <h3>One small activity</h3><p>{suggestion.action.text}</p>
-    {suggestion.practice_idea !== suggestion.action.text && <><h3>Practice example</h3><p>{suggestion.practice_idea}</p>{savedActivityText === suggestion.action.text && <p className="lg-muted">The saved plan will contain the short activity above. This longer example stays here for you to read.</p>}</>}
-    <p className="lg-muted">Save this as a plan. Only record it as an attempt after you have tried it. Your existing records stay unchanged until you choose to save.</p>
-    <div className="lg-buttons"><button className="lg-primary" disabled={disabled || pending || goal.action?.text === savedActivityText} onClick={() => void onAction(savedActivityText, suggestion.source === "model" ? "ai_suggestion" : "template")}>Try this activity</button><button disabled={disabled || pending} onClick={() => void another()}>{pending ? "Preparing another idea…" : "Show another"}</button></div>
-  </section>;
+  const content = <>
+    <p className="lg-eyebrow">{suggestion.source === "model" ? "AI suggested activity" : "Sample activity"}</p>
+    {error && <p role="alert">A tailored idea is unavailable. You can use the sample activity or try again.</p>}
+    <h2>Try one small example</h2><p className="lg-preserve">{cleanMultilineDisplayText(suggestion.action.text)}</p>
+    {suggestion.practice_idea !== suggestion.action.text && <details><summary>See the example</summary><p className="lg-preserve">{cleanMultilineDisplayText(suggestion.practice_idea)}</p></details>}
+    <div className="lg-buttons"><button className="lg-primary" disabled={disabled || pending || goal.action?.text === savedActivityText} onClick={() => void onAction(savedActivityText, suggestion.source === "model" ? "ai_suggestion" : "template")}>Save as my next action</button><button disabled={disabled || pending} onClick={() => void another()}>{pending ? "Preparing another idea…" : "Show another idea"}</button></div>
+    <p className="lg-muted">{cleanDisplayText(suggestion.notice)} Save it as a plan, then record an attempt after you try it.</p>
+    <details><summary>Change my goal to fit this idea</summary><p>{cleanDisplayText(suggestion.goal)}</p><button disabled={disabled || pending || suggestion.goal === goal.wording} onClick={() => void onGoal(suggestion.goal)}>Use this goal wording</button></details>
+  </>;
+  return goal.action
+    ? <details className="lg-card lg-guided lg-alternatives"><summary>Other activity ideas</summary>{content}</details>
+    : <section className="lg-card lg-guided" aria-label="Suggested next step">{content}</section>;
 }

@@ -6,11 +6,14 @@ import { currentWorkspaceSession } from "@/services/accountStorage";
 import { ApiError } from "@/services/api";
 import { ROUTES } from "@/constants/routes";
 import { progressReviewService, type ProgressPreview, type ProgressReview, type ReviewList, type ProgressSummary, type ProgressGoal, type ProgressEvidence } from "@/services/progressReviewService";
+import { cleanDisplayText, goalDisplayLabel } from "@/lib/displayText";
+import { activityGroups, attemptChanges, comparisonRows, evidenceTimeline, progressHeadline } from "./progressPresentation";
 import "./progress.css";
 
 const date = (value: string) => new Intl.DateTimeFormat("en-MY", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+const cleanedNotes = (value: string) => value.split(/\r?\n/).map(cleanDisplayText).join("\n").trim();
 const goalsLabel = (count: number) => `${count} ${count === 1 ? "goal" : "goals"}`;
-const errorText = (e: unknown) => e instanceof Error ? e.message : "Your review could not be loaded. Please try again.";
+const errorText = (e: unknown) => e instanceof ApiError ? e.status === 409 ? "Your saved records changed. Refresh this preview before saving." : "Your review could not be loaded or saved. Your existing records are kept. Please try again." : e instanceof Error ? cleanDisplayText(e.message) : "Your review could not be loaded. Please try again.";
 const statusLabels = { starting_point: "Starting point", comparable: "Same goal", new_goal: "New goal", needs_starting_point: "New starting point needed", source_needs_review: "Check the source context" };
 
 export default function Progress() {
@@ -89,10 +92,11 @@ function ProgressWorkspace() {
   }
   const content = preview ?? selected?.snapshot;
   return <div className="progress-page">
-    <PageHeader title="My progress" description="See what your saved learning and practice records show. You do not need to fill in another assessment." />
+    <PageHeader title="My progress" description="See what you recorded, what changed and your next step." />
     {notice && <p role="status" className="progress-success">{notice}</p>}
     {error && <div role="alert" className="progress-warning"><p>{error}</p><button disabled={saving || preparing} onClick={() => { setError(""); if (failedOperation === "save" && !conflict) void save(); else if (conflict || failedOperation === "prepare") void prepare(); else setRefresh(v => v + 1); }}>{conflict ? "Refresh this preview" : "Retry"}</button></div>}
     {(loading && !list) && <p role="status">Loading your saved reviews…</p>}
+    {content && <Summary summary={content.summary} goals={content.goals} historicalNeedsReview={selected?.status === "needs_review"} />}
     {selected && <section className="progress-card">
       <p className="progress-kicker">Saved review · {date(selected.created_at)}</p>
       {selected.status === "needs_review" ? <><h2>This review needs checking</h2><p>Some evidence was corrected or its context changed. This is a historical record, not current evidence.</p></> : selected.status === "new_evidence_available" ? <><h2>You have new records to review</h2><p>Your earlier review stays unchanged until you choose to save another.</p></> : <><h2>Your saved evidence</h2><p>This review describes records available on its saved date.</p></>}
@@ -101,27 +105,66 @@ function ProgressWorkspace() {
     </section>}
     {preview && <section className="progress-card">
       <p className="progress-kicker">Preview · {date(preview.reviewed_at)}</p><h2>{preview.previous_review_id ? "Review your latest records" : "Keep your first starting point"}</h2>
-      <p>{preview.notice}</p><p>Nothing is saved until you confirm. Your AI exposure findings are not changed by this review.</p>
+      <p>Check the records below, then save this dated review.</p>
+      {!preview.can_save && <p className="progress-warning">{cleanDisplayText(preview.notice)}</p>}
+      <details><summary>About this review</summary><p>{cleanDisplayText(preview.notice)}</p><p>Nothing is saved until you confirm.</p></details>
       {!preview.goals.length && <p><Link to={ROUTES.learningGoals}>Choose a learning goal first</Link>. Your existing courses remain available in My courses.</p>}
-      {preview.required_reset_goal_ids.length > 0 && <div className="progress-warning"><p>{goalsLabel(preview.required_reset_goal_ids.length)} {preview.required_reset_goal_ids.length === 1 ? "needs" : "need"} a new starting point. Their earlier reviews stay in history and will not be described as an improvement or decline.</p><label><input type="checkbox" checked={approvedReset} disabled={saving} onChange={e => setApprovedReset(e.target.checked)} /> Use current records as the new starting point for these goals</label></div>}
+      {preview.required_reset_goal_ids.length > 0 && <div className="progress-warning"><p>{goalsLabel(preview.required_reset_goal_ids.length)} {preview.required_reset_goal_ids.length === 1 ? "needs" : "need"} a new starting point. Earlier reviews stay in history.</p><label><input type="checkbox" checked={approvedReset} disabled={saving} onChange={e => setApprovedReset(e.target.checked)} /> Use current records as the new starting point for these goals</label></div>}
       {preview.goals.some(g => g.status === "source_needs_review") && <p className="progress-warning">Goals with changed work or skill connections stay visible but are excluded from this comparison. You can review the remaining goals. <Link to={ROUTES.skills}>Review my skills</Link></p>}
       <button className="progress-primary" disabled={saving || preparing || conflict || !preview.can_save || (preview.required_reset_goal_ids.length > 0 && !approvedReset)} onClick={() => void save()}>{saving ? "Saving…" : preview.previous_review_id ? "Save this review" : "Save my starting point"}</button>
     </section>}
     {preparing && <p role="status">Preparing a review from your saved records…</p>}
-    {content && <><Summary summary={content.summary} /><GoalComparisons key={preview ? `preview:${preview.reviewed_at}` : selected?.id} goals={content.goals} /></>}
+    {content && <><GoalComparisons key={preview ? `preview:${preview.reviewed_at}` : selected?.id} goals={content.goals} /></>}
     {list && list.items.length > 0 && <section className="progress-card"><h2>Earlier reviews</h2><p>Opening a review does not change it.</p><ul className="progress-history">{list.items.map(item => <li key={item.id}><button disabled={saving || preparing} onClick={() => { ++prepareRun.current; setPreview(null); setSelected(null); setSelectedId(item.id); setError(""); setNotice(""); }}>{date(item.created_at)}</button><span>{item.status === "needs_review" ? "Needs review" : item.status === "new_evidence_available" ? "New records available" : "Saved record"}</span></li>)}</ul><div className="progress-actions">{offset > 0 && <button disabled={loading} onClick={() => setOffset(v => Math.max(0,v-20))}>Newer reviews</button>}{offset + list.items.length < list.total && <button disabled={loading} onClick={() => setOffset(v => v+20)}>Older reviews</button>}</div></section>}
     <p className="progress-footnote">These are your recorded activities, not a skill grade, a job readiness score or proof of mastery. You can <Link to={ROUTES.learningGoals}>continue learning</Link> or <Link to={ROUTES.possibilities}>explore career options</Link> at any time.</p>
   </div>;
 }
-function Summary({ summary: s }: { summary: ProgressSummary }) {
-  const counts = [["Work linked to skills you reported using",s.with_task_evidence],["Reported study",s.with_study],["Reported completed learning",s.with_completed_learning],["Course or sample practice",s.with_course_practice],["Workplace practice",s.with_workplace_practice],["Without usable supporting evidence",s.needing_evidence]] as const;
-  return <section className="progress-card"><h2>What your records show</h2><p>{s.with_study ? `You have recorded study for ${s.with_study} of your ${goalsLabel(s.goals_total)}.` : `No study has been recorded for these ${goalsLabel(s.goals_total)} yet.`}</p><p>{s.with_workplace_practice ? `Workplace practice is recorded for ${goalsLabel(s.with_workplace_practice)}.` : "No workplace practice is recorded yet. This does not mean you lack the skill."}</p>{Boolean(s.excluded_goals) && <p>{goalsLabel(s.excluded_goals ?? 0)} need their source context checked and are excluded from the evidence counts.</p>}{s.new_goals > 0 && <p>{goalsLabel(s.new_goals)} added since the earlier review {s.new_goals === 1 ? "is" : "are"} shown separately. They are not an improvement or decline in your earlier goals.</p>}<details><summary>How these counts work</summary><p>Each number counts goals, not attempts. A goal can appear in several rows, so these numbers must not be added into one score. A work link is context, not proof of skill. No record does not mean no ability.</p><dl className="progress-counts">{counts.map(([label,value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></details></section>;
+function Summary({ summary: s, goals, historicalNeedsReview }: { summary: ProgressSummary; goals: ProgressGoal[]; historicalNeedsReview?: boolean }) {
+  const changes = goals.flatMap(attemptChanges);
+  const corrected = changes.filter(item => item.kind === "corrected").length;
+  const removed = changes.filter(item => item.kind === "removed").length;
+  const hasComparison = goals.some(g => g.status === "comparable" && g.earlier);
+  const counts = [["Reported study",s.with_study],["Reported completed learning",s.with_completed_learning],["Course or sample practice",s.with_course_practice],["Workplace practice",s.with_workplace_practice],["Work linked to reported skill use",s.with_task_evidence],["Without usable supporting evidence",s.needing_evidence]] as const;
+  return <section className="progress-card progress-overview" aria-label="Review summary">
+    <p className="progress-kicker">{historicalNeedsReview ? "Historical comparison · needs review" : "Your activity records"}</p>
+    <h2>{progressHeadline(goals)}</h2>
+    <p>{historicalNeedsReview ? "This describes the saved review. Some of its evidence has since changed." : hasComparison ? "Based on records for the same goal at two review dates. These are activity counts, not a skill grade." : "These saved activities can become a dated starting point. They describe your records, not a skill grade."}</p>
+    {corrected + removed > 0 && <p>{corrected > 0 && `${corrected} ${corrected === 1 ? "record was" : "records were"} corrected. `}{removed > 0 && `${removed} ${removed === 1 ? "record was" : "records were"} removed. `}Corrections are shown separately from new attempts.</p>}
+    <div className="progress-summary-metrics"><div><strong>{s.goals_total}</strong><span> {s.goals_total === 1 ? "goal in this review" : "goals in this review"}</span></div>{s.new_goals > 0 && <div><strong>{s.new_goals}</strong><span> {s.new_goals === 1 ? "new goal" : "new goals"}, shown separately</span></div>}{Boolean(s.excluded_goals) && <div><strong>{s.excluded_goals}</strong><span> {s.excluded_goals === 1 ? "goal needs" : "goals need"} a source check</span></div>}</div>
+    <details><summary>See evidence across your goals</summary><p>These numbers count goals with at least one supporting record. A goal may appear in more than one row. The comparison below counts attempts for each goal.</p><dl className="progress-counts">{counts.map(([label,value]) => <div key={label}><dt>{label}</dt><dd>{goalsLabel(value)}</dd></div>)}</dl></details>
+  </section>;
 }
 function GoalComparisons({ goals }: { goals: ProgressGoal[] }) {
   const [limit,setLimit] = useState(10);
-  return <section aria-label="Goal comparisons"><h2 className="progress-section-title">Your goals</h2>{goals.slice(0,limit).map(g => <article className="progress-card" key={g.goal_id}><p className="progress-kicker">{statusLabels[g.status]}</p><h3>{g.current.goal_wording}</h3><p className="progress-muted">{g.label}</p><p>{g.reason}</p>{g.next_step && <p><strong>Next step:</strong> {g.next_step}</p>}<div className="progress-compare">{g.earlier ? <Evidence label="Earlier record" evidence={g.earlier} /> : <div><h4>No earlier comparison</h4><p>{g.status === "new_goal" ? "This goal was added after the earlier review." : "The current records can become a dated starting point."}</p></div>}<Evidence label={g.status === "source_needs_review" ? "Records needing context review" : "Current record"} evidence={g.current} /></div><Link to={`${ROUTES.learningGoals}?goal=${encodeURIComponent(g.goal_id)}`}>Continue this goal</Link></article>)}{goals.length > limit && <button onClick={() => setLimit(v=>v+10)}>Show more goals</button>}</section>;
+  const ordered = [...goals.filter(g => g.status === "comparable"), ...goals.filter(g => g.status !== "comparable")];
+  return <section aria-label="Goal comparisons"><h2 className="progress-section-title">Your goals</h2>{ordered.slice(0,limit).map(g => <GoalCard goal={g} key={g.goal_id} />)}{goals.length > limit && <button onClick={() => setLimit(v=>v+10)}>Show more goals</button>}</section>;
+}
+function GoalCard({ goal: g }: { goal: ProgressGoal }) {
+  const comparable = g.status === "comparable" && Boolean(g.earlier);
+  const timeline = evidenceTimeline(g);
+  const removed = attemptChanges(g).filter(item => item.kind === "removed");
+  return <article className="progress-card">
+    <p className="progress-kicker">{statusLabels[g.status]}</p><h3>{goalDisplayLabel(g.current.goal_wording, g.current.skill.label)}</h3>
+    {cleanDisplayText(g.label) !== goalDisplayLabel(g.current.goal_wording, g.current.skill.label) && <p className="progress-muted">Skill: {cleanDisplayText(g.label)}</p>}
+    {!comparable && <p>{g.status === "new_goal" ? "Added after the earlier review. Its records are shown as a starting point." : g.status === "source_needs_review" ? "The work or skill connection changed. These records are excluded from the progress comparison." : g.status === "needs_starting_point" ? "Earlier evidence or goal context changed. Keep a new starting point before comparing progress." : "Your first saved records for this goal. Future reviews can compare against this starting point."}</p>}
+    <ActivityComparison goal={g} />
+    {g.next_step && <div className="progress-next-step"><strong>Next step</strong><p>{cleanDisplayText(g.next_step)}</p><Link to={`${ROUTES.learningGoals}?goal=${encodeURIComponent(g.goal_id)}`}>Continue this goal</Link></div>}
+    {timeline.length > 0 && <details className="progress-timeline"><summary>Activity timeline · {timeline.length} {timeline.length === 1 ? "record" : "records"}</summary><ol>{timeline.map(({attempt:a,group,change})=><li key={a.id}><div className="progress-timeline-meta"><time dateTime={a.date}>{a.date}</time><span>{activityGroups.find(([key])=>key===group)?.[1]}</span><strong>{change === "added" ? "New attempt" : change === "corrected" ? "Corrected record" : comparable ? "Earlier saved record" : "Recorded activity"}</strong></div><p>{cleanDisplayText(a.description)}</p>{(a.task || a.notes) && <details><summary>Attempt details</summary>{a.task && <p>Work task: {cleanDisplayText(a.task.wording)}</p>}{a.notes && <p className="progress-attempt-notes">{cleanedNotes(a.notes)}</p>}</details>}</li>)}</ol></details>}
+    {removed.length > 0 && <details><summary>{removed.length} {removed.length === 1 ? "removed record" : "removed records"}</summary><p>These were in the earlier review. Removing a record does not show a change in ability.</p><ul>{removed.map(item=><li key={item.attempt.id}>{item.attempt.date}: {cleanDisplayText(item.attempt.description)}</li>)}</ul></details>}
+    <details><summary>Work connections and evidence gaps</summary><p>{cleanDisplayText(g.reason)}</p><div className="progress-compare">{g.earlier && <Evidence label="Earlier saved evidence" evidence={g.earlier} />}<Evidence label={g.status === "source_needs_review" ? "Evidence needing context review" : "Current saved evidence"} evidence={g.current} /></div></details>
+  </article>;
+}
+function ActivityComparison({ goal: g }: { goal: ProgressGoal }) {
+  const {rows,scale} = comparisonRows(g);
+  const comparable = g.status === "comparable" && Boolean(g.earlier);
+  return <div className="progress-activity-chart">
+    <p className="progress-muted">{comparable ? `Earlier review: ${date(g.earlier!.recorded_at)} · Current review: ${date(g.current.recorded_at)}` : `Recorded by ${date(g.current.recorded_at)}`}</p>
+    <table><caption>{comparable ? "Activity records for the same goal" : g.status === "source_needs_review" ? "Records awaiting a source check" : "Records at this starting point"}. Study and practice count attempts. Completed learning counts linked courses.</caption><thead><tr><th scope="col">Activity</th>{comparable && <th scope="col">Earlier</th>}<th scope="col">Current</th></tr></thead><tbody>{rows.map(row=><tr key={row.key}><th scope="row">{row.label}</th>{row.earlier !== null && <td><CountBar value={row.earlier} scale={scale} earlier /></td>}<td><CountBar value={row.value} scale={scale} /></td></tr>)}</tbody></table>
+  </div>;
+}
+function CountBar({value,scale,earlier=false}: {value:number;scale:number;earlier?:boolean}) {
+  return <div className={`progress-bar-count${earlier ? " progress-bar-count-earlier" : ""}`}><strong>{value}</strong><span className="progress-bar-track" aria-hidden="true"><span style={{width:`${value / scale * 100}%`}} /></span></div>;
 }
 function Evidence({ label, evidence: e }: { label: string; evidence: ProgressEvidence }) {
-  const groups = [["Study",e.study],["Course or sample practice",e.course_practice],["Workplace practice",e.workplace_practice]] as const;
-  return <div className="progress-evidence"><h4>{label}</h4><p className="progress-muted">{date(e.recorded_at)}</p><p>{e.goal_wording}</p><ul>{groups.map(([name,records])=><li key={name}>{name}: {records.length} record(s)</li>)}<li>Reported completed learning: {e.completed_learning.length}</li></ul><details><summary>See the supporting records</summary><p>{e.skill.label} · {e.skill.source === "personal" ? "Your own skill entry" : e.skill.source.toUpperCase()}{e.skill.sourceVersion ? ` ${e.skill.sourceVersion}` : ""}</p>{e.task_evidence.length ? <><h5>Linked work</h5><ul>{e.task_evidence.map(t=><li key={t.id}>{t.wording}</li>)}</ul></> : <p>No task evidence has a reported current skill connection.</p>}{e.confirmed_tasks && e.confirmed_tasks.length > 0 && e.task_evidence.length === 0 && <p>Work context saved with this goal: {e.confirmed_tasks.map(t => t.wording).join(". ")}</p>}{groups.map(([name,records])=>records.length>0&&<div key={name}><h5>{name}</h5><ul>{records.map(a=><li key={a.id}><time dateTime={a.date}>{a.date}</time>: {a.description}{a.task && <p>Work task: {a.task.wording}</p>}{a.notes && <p>{a.notes}</p>}</li>)}</ul></div>)}{e.completed_learning.map(course=><p key={course.id}>{course.title} · {course.source_label}{course.completed_at ? ` · ${course.completed_at}` : " · completion date not recorded"}</p>)}</details>{e.gaps.length>0&&<ul className="progress-muted">{e.gaps.map((gap,i)=><li key={i}>{gap}</li>)}</ul>}</div>;
+  return <div className="progress-evidence"><h4>{label}</h4><p className="progress-muted">{date(e.recorded_at)}</p><p>{cleanDisplayText(e.skill.label)} · {e.skill.source === "personal" ? "Your own skill entry" : e.skill.source.toUpperCase()}{e.skill.sourceVersion ? ` ${e.skill.sourceVersion}` : ""}</p>{e.task_evidence.length ? <><h5>Linked work</h5><ul>{e.task_evidence.map(t=><li key={t.id}>{cleanDisplayText(t.wording)}</li>)}</ul></> : <p>No task evidence has a reported current skill connection.</p>}{e.confirmed_tasks && e.confirmed_tasks.length > 0 && e.task_evidence.length === 0 && <details><summary>Saved work context</summary><ul>{e.confirmed_tasks.map(t=><li key={t.id}>{cleanDisplayText(t.wording)}</li>)}</ul></details>}{e.completed_learning.map(course=><p key={course.id}>{cleanDisplayText(course.title)} · {cleanDisplayText(course.source_label)}{course.completed_at ? ` · ${course.completed_at}` : " · completion date not recorded"}</p>)}{e.gaps.length>0 && <><h5>Evidence gaps</h5><ul className="progress-muted">{e.gaps.map((gap,i)=><li key={i}>{cleanDisplayText(gap)}</li>)}</ul></>}</div>;
 }

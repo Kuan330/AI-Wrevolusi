@@ -87,12 +87,12 @@ export const STEPS: StepItem[] = [
   },
   {
     title: "Choose one skill to develop.",
-    description: "Find relevant learning and save a course you want to try.",
+    description: "Save a goal and choose a small action. A course is optional.",
     accent: "blue",
   },
   {
     title: "Keep learning at your pace.",
-    description: "Return to saved courses and record your study. Career exploration is optional.",
+    description: "Record what you tried and compare your progress over time. Career exploration is optional.",
     accent: "warm",
   },
 ];

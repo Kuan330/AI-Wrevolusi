@@ -1,3 +1,4 @@
+import { cleanDisplayText } from "@/lib/displayText";
 import { Bookmark } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ export default function CourseCard(props: CourseCardProps) {
   return (
     <Card className="library-course library-glass">
       <div className="library-row">
-        <p className="library-kicker">{course.provider}</p>
+        <p className="library-kicker">{cleanDisplayText(course.provider)}</p>
         <Button
           className={
             saved
@@ -40,13 +41,13 @@ export default function CourseCard(props: CourseCardProps) {
           {busy ? "Saving…" : saved ? pendingSync ? "Added on this browser" : "Added" : "Add to My Learning"}
         </Button>
       </div>
-      <h3>{course.title}</h3>
+      <h3>{cleanDisplayText(course.title)}</h3>
       <div className="library-tags">
         <span className={courseLevelClassName(course.level)}>
           {courseLevelLabel(course.level)}
         </span>
         <span>{durationLabel(course.durationMin)}</span>
-        <span>{course.language}</span>
+        <span>{cleanDisplayText(course.language)}</span>
         <span>{course.selfPaced ? "Self-paced" : "Scheduled course"}</span>
       </div>
       <div className="library-row">

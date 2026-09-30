@@ -527,3 +527,5 @@ button.lp-status{cursor:pointer;border:0}
 .lp-inline-brief > p { margin: .75rem 0; line-height: 1.6; }
 .lp-inline-brief__actions > span { margin-right: auto; color: #655d69; font-size: .875rem; }
 .lp-inline-brief button { min-height: 44px; }
+
+.lp-layout.lp-layout--empty{grid-template-columns:minmax(0,1fr)}.lp-goal-return{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin:12px 0 20px;font-size:.92rem}.lp-goal-return a{font-weight:650;color:#285d78;text-decoration:underline;text-underline-offset:3px}.lp-goal-return span{color:#655f69}.lp-course-error{padding:16px 20px;margin:16px 0;border:1px solid #e5d399;border-radius:12px;background:#fffaec}.lp-course-error p{margin-bottom:12px}.lp-empty__actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:20px 0 8px}.lp-empty{line-height:1.6}.lp-empty p{max-width:580px;margin:12px auto}.lp-courses h2,.lp-courses-table td{overflow-wrap:anywhere}

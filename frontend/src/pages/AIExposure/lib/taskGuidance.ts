@@ -9,6 +9,17 @@ type Guidance = {
 };
 const guides: { match: RegExp; guidance: Guidance }[] = [
   {
+    // An explicit software activity takes priority over its business domain.
+    match: /(?:test|debug|automat).{0,60}(?:software|application|code)|(?:software|application|code).{0,60}(?:test|debug)|(?:write|develop|creat).{0,40}(?:automated tests|unit tests|test cases|code)|\bprogramming\b/i,
+    guidance: {
+      title: "Software testing and development",
+      help: "AI may suggest test cases, explain failures and draft small code changes from a requirement you provide.",
+      steps: ["Choose a fictional requirement and its expected result.", "Ask for test cases, including missing or invalid inputs.", "Run the tests in a test environment and review every suggested change."],
+      tools: [{ name: "AI coding assistant", purpose: "Suggest tests or explain a small code change." }, { name: "Test environment", purpose: "Check actual behaviour against the expected result." }],
+      review: "You decide the expected behaviour, check test coverage and verify the code before approving a release.",
+    },
+  },
+  {
     match: /(?:cost|quantit|labour|labor|material).{0,90}estimat|estimat.{0,90}(?:cost|quantit|labour|labor|material)/i,
     guidance: {
       title: "Cost estimates",
@@ -179,7 +190,14 @@ const guides: { match: RegExp; guidance: Guidance }[] = [
   },
 ];
 export function taskGuidance(task: Pick<ProfileTask, "wording" | "notes">) {
-  const matched = guides.find((item) => item.match.test(task.wording));
+  const affirmative = (value: string) => value.replace(/\b(?:do not|does not|don't|never|not responsible for)\b[^.;!?]*/gi, "");
+  const wording = affirmative(task.wording);
+  const notes = affirmative(task.notes ?? "");
+  // Context can clarify an otherwise vague testing task, without treating the
+  // mention of a tool as proof that the user's main task is programming.
+  const vagueTesting = /^\s*(?:I\s+)?(?:run|review|check|write|develop|perform)?\s*(?:tests?|testing)(?:\s+results)?[.;\s]*$/i.test(wording);
+  const softwareContext = vagueTesting && /\b(?:Python|Playwright|Selenium|unit tests|test automation)\b/i.test(notes);
+  const matched = guides.find((item) => item.match.test(wording)) ?? (softwareContext ? guides[0] : undefined);
   const guidance = matched?.guidance ?? {
     title:
       /policies/i.test(task.wording)
