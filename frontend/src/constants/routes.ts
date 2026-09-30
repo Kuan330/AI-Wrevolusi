@@ -9,4 +9,5 @@ export const ROUTES = {
   aiExposure: "/ai-exposure",
   learningCentre: "/learning-centre",
   learningGoals: "/learning-goals",
+  progress: "/progress",
 } as const;

@@ -15,6 +15,7 @@ import { ApiError } from "@/services/api";
 import { readGoalDraft, writeGoalDraft, draftHasChanges, draftNeedsReview, clearDraftPart, taskIdentity, attemptTaskOptions, type GoalDraft, type DraftAttempt } from "@/features/learning-goals/goalDraft";
 import { learningGoalDraftStorage } from "@/infrastructure/storage/learningGoalDraftStorage";
 import GoalSuggestion from "./GoalSuggestion";
+import SavedGoalHistory from "./SavedGoalHistory";
 import { plannedActivityAttempt, hasMaterialGoalWarnings } from "@/features/learning-goals/guidedLearning";
 import type { GuidedGoalSuggestion } from "@/services/guidedLearningService";
 import "./learning-goals.css";
@@ -133,6 +134,7 @@ function GoalsWorkspace() {
         <button className="lg-primary" disabled={busy} onClick={() => void create()}>{busy ? "Saving…" : "Save my goal"}</button>
       </section> : <section className="lg-card"><h2>{goals.length ? "Continue a saved goal" : "Start with a skill that matters to you"}</h2><p>Choose a learning interest in your skills. Its task and reason will come with you.</p><Link className="lg-primary" to={ROUTES.skills}>Choose a skill</Link></section>}
     <section className="lg-card"><h2>Your saved goals</h2>{goals.length ? <ul className="lg-goal-list">{[...goals].reverse().map(g => <li key={g.id}><Link aria-current={g.id === goal?.id ? "page" : undefined} to={`${ROUTES.learningGoals}?goal=${encodeURIComponent(g.id)}`}>{g.wording}</Link><span>{g.initial.skill.label} · {g.attempts.length} {g.attempts.length === 1 ? "attempt" : "attempts"}</span></li>)}</ul> : <p>No goals saved yet.</p>}</section>
+    <section className="lg-card"><h2>See what changed</h2><p>Review your saved study and practice without filling in another assessment.</p><Link className="lg-primary" to={ROUTES.progress}>Reassess My Situation</Link></section>
     <aside className="lg-resources"><h2>Optional learning resources</h2><p>Your existing courses and history are still available. Browsing a course does not mean it has been checked for this exact skill.</p><div className="lg-buttons"><Link to={ROUTES.plan}>My courses and history</Link><Link to={`${ROUTES.learningCentre}?mode=browse`}>Browse courses</Link></div></aside>
   </div>;
 }
@@ -266,7 +268,7 @@ function GoalDetail({ goal, tasks, run, busy, needsReload }: { goal: LearningGoa
       <div className="lg-buttons"><button disabled={formBlocked || Boolean(draft?.attempt)} onClick={() => { changeDraft({ attempt: { id: a.id, editing: true, date: a.date, type: a.type, description: a.description, notes: a.notes, task: a.task } }); setRemoveId(null); requestAnimationFrame(() => document.getElementById("attempt-date")?.focus()); }}>Correct</button><button disabled={saveBlocked || Boolean(draft?.attempt)} onClick={() => setRemoveId(a.id)}>Remove</button></div>
       {removeId === a.id && <div className="lg-warning" role="group" aria-label="Confirm removal"><p>Remove this attempt from your current evidence? Its earlier version remains in history.</p><div className="lg-buttons"><button disabled={saveBlocked} onClick={() => { void savePart("attempt", () => removeLearningAttempt(goal.id, a.id), "Attempt removed from current evidence. History is kept.").then(ok => { if (ok) { setRemoveId(null);  } }); }}>Confirm removal</button><button disabled={busy} onClick={() => setRemoveId(null)}>Cancel</button></div></div>}</li>)}</ul>}
       {goal.needsReview && <p className="lg-muted">Your current records include these changes. Earlier versions remain below.</p>}
-      {goal.history.length > 0 && <details className="lg-starting"><summary>Earlier saved versions ({goal.history.length})</summary><p>These versions preserve corrections. They are not counted as current attempts.</p>{[...goal.history].reverse().map(h => <div className="lg-history" key={h.revision}><h3>Version {h.revision} · {displayDate(h.recordedAt)}</h3><p>{h.wording}</p><p>Action: {h.action?.text ?? "None"}{h.action?.origin === "ai_suggestion" ? " · AI suggestion accepted by you" : h.action?.origin === "template" ? " · General starting idea accepted by you" : ""}</p>{h.attempts.map(a => <p key={a.id}>{displayDate(a.date)} · {attemptLabels[a.type]}: {a.description}{a.task ? ` · Task: ${a.task.wording}` : ""}{a.notes ? ` · Notes: ${a.notes}` : ""}</p>)}</div>)}</details>}
+      <SavedGoalHistory history={goal.history} />
     </section>
   </>;
 }

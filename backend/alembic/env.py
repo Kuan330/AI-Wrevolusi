@@ -16,6 +16,7 @@ from app.models import (  # noqa: F401
     learning,
     occupation,
     preparation,
+    progress_review,
     refresh_token,
     schedule,
     task,

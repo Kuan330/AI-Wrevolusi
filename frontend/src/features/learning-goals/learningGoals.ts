@@ -1,3 +1,4 @@
+import { compactGoalState, expandGoalState, MAX_GOAL_REVISIONS } from "./goalHistoryCodec.ts";
 import { accountStorage, commitWorkspaceItems, currentWorkspaceSession } from "../../services/accountStorage.ts";
 import { readJourneyProfile, readJourneyState, readLearningContext, learningContextNeedsReview, personalSkillIsCurrent } from "../journey/journey.ts";
 import type { LearningContext, PersonalSkill } from "../journey/journey.ts";
@@ -44,10 +45,10 @@ function snapshotValid(v: unknown): v is GoalSnapshot {
 export function parseLearningGoals(raw: string | null): LearningGoal[] {
   if (raw === null) return [];
   try {
-    const state: unknown = JSON.parse(raw);
+    const state: unknown = expandGoalState(JSON.parse(raw), attemptValid);
     if (!obj(state) || !keys(state,["version","goals"]) || state.version !== 1 || !Array.isArray(state.goals) || state.goals.length > 100) throw Error();
     for (const g of state.goals) {
-      if (!obj(g) || !keys(g,["id","sourceKey","createdAt","initial","wording","action","attempts","history","revision","needsReview","updatedAt"]) || !str(g.id,100) || !str(g.sourceKey,500) || !dated(g.createdAt) || !dated(g.updatedAt) || !snapshotValid(g.initial) || !str(g.wording,1000) || !actionValid(g.action) || !attemptsValid(g.attempts) || !Number.isSafeInteger(g.revision) || Number(g.revision)<1 || typeof g.needsReview !== "boolean" || !Array.isArray(g.history) || g.history.length !== Number(g.revision)-1 || g.history.length > 200) throw Error();
+      if (!obj(g) || !keys(g,["id","sourceKey","createdAt","initial","wording","action","attempts","history","revision","needsReview","updatedAt"]) || !str(g.id,100) || !str(g.sourceKey,500) || !dated(g.createdAt) || !dated(g.updatedAt) || !snapshotValid(g.initial) || !str(g.wording,1000) || !actionValid(g.action) || !attemptsValid(g.attempts) || !Number.isSafeInteger(g.revision) || Number(g.revision)<1 || typeof g.needsReview !== "boolean" || !Array.isArray(g.history) || g.history.length !== Number(g.revision)-1 || g.history.length >= MAX_GOAL_REVISIONS) throw Error();
       for (const [i,h] of g.history.entries()) if (!obj(h) || !keys(h,["revision","recordedAt","wording","action","attempts"]) || h.revision !== i+1 || !dated(h.recordedAt) || !str(h.wording,1000) || !actionValid(h.action) || !attemptsValid(h.attempts)) throw Error();
     }
     if (new Set(state.goals.map(g=>g.id)).size !== state.goals.length) throw Error();
@@ -60,7 +61,7 @@ async function persist(goals: LearningGoal[]) {
   const owner = currentWorkspaceSession();
   if (savingOwner === owner) throw Error("A goal is being saved. Please wait.");
   savingOwner = owner;
-  try { const raw=JSON.stringify({version:1,goals}); parseLearningGoals(raw); await commitWorkspaceItems({[LEARNING_GOALS_KEY]:raw}); }
+  try { const raw=JSON.stringify(compactGoalState(goals)); parseLearningGoals(raw); await commitWorkspaceItems({[LEARNING_GOALS_KEY]:raw}); }
   finally { if (savingOwner === owner) savingOwner=null; }
 }
 const same = (a: unknown,b: unknown) => JSON.stringify(a) === JSON.stringify(b);
@@ -69,6 +70,7 @@ async function create(sourceKey: string, initial: GoalSnapshot, newGoal = false)
   const matching=goals.find(g=>g.sourceKey===sourceKey && same(g.initial,initial));
   if (matching) return matching;
   if (!newGoal && goals.some(g=>g.sourceKey===sourceKey)) throw Error("This source has changed. Open your existing goal or explicitly start a new goal to keep a new starting record.");
+  if (goals.length >= 100) throw Error("Your account has reached the limit of 100 learning goals. Existing records and history are kept.");
   const now=new Date().toISOString();
   const goal: LearningGoal={id:crypto.randomUUID(),sourceKey,initial,createdAt:now,updatedAt:now,wording:initial.wording,action:null,attempts:[],history:[],revision:1,needsReview:false};
   await persist([...goals,goal]); return goal;
@@ -95,8 +97,9 @@ export async function createContextGoal(context: LearningContext, options: {newG
 async function mutate(id:string, change:(goal:LearningGoal)=>void) {
   const goals=readLearningGoals(), goal=goals.find(g=>g.id===id);
   if (!goal) throw Error("This goal is no longer available.");
-  const before=structuredClone(goal); change(goal);
-  if (same(before,goal)) return;
+  const before={revision:goal.revision,wording:goal.wording,action:structuredClone(goal.action),attempts:structuredClone(goal.attempts)}; change(goal);
+  if (same([before.wording,before.action,before.attempts],[goal.wording,goal.action,goal.attempts])) return;
+  if (goal.revision >= MAX_GOAL_REVISIONS) throw Error("This goal has reached its history limit of 1000 versions. Your records are kept. Additional storage is needed before more changes can be saved.");
   goal.history.push({revision:before.revision,recordedAt:new Date().toISOString(),wording:before.wording,action:before.action,attempts:before.attempts});
   goal.revision++; goal.needsReview=true; goal.updatedAt=new Date().toISOString();
   await persist(goals);
@@ -121,6 +124,7 @@ export const saveLearningAttempt = (goalId:string,input:AttemptInput) => mutate(
   if (!attemptValid(a)) throw Error("Enter a valid date, attempt type and short description. Workplace practice also needs its real task.");
   if (same(previous,a)) return;
   a.updatedAt=now;
+  if (!previous && g.attempts.length >= 200) throw Error("This goal has reached the limit of 200 current attempts. Your records are kept. Start a new goal for further attempts.");
   g.attempts=previous?g.attempts.map(item=>item.id===a.id?a:item):[...g.attempts,a];
 });
 export const removeLearningAttempt = (goalId:string,attemptId:string) => mutate(goalId,g=>{g.attempts=g.attempts.filter(a=>a.id!==attemptId);});

@@ -5,6 +5,8 @@ import re
 
 LEARNING_GOALS_KEY = 'aiwrevolusi.learningGoals.v1'
 ERROR = 'Saved learning goals are invalid. Reload your saved account before changing them.'
+MAX_GOAL_REVISIONS = 1000
+MAX_ATTEMPT_VERSIONS = 5000
 
 
 def text(v, maximum, empty=False):
@@ -67,15 +69,57 @@ def snapshot(v):
             and (v['workKey'] is None or text(v['workKey'], 100000, True)) and text(v['wording'], 1000))
 
 
+def expand_learning_goal_storage(value):
+    """Read compact attempt references without changing the supplied stored document."""
+    if not fields(value, 'version goals') or type(value['version']) is not int or value['version'] not in (1, 2) or not isinstance(value['goals'], list) or len(value['goals']) > 100:
+        raise ValueError(ERROR)
+    if value['version'] == 1:
+        return value
+    expanded = []
+    for raw in value['goals']:
+        if isinstance(raw, dict) and type(raw.get('revision')) is int and raw['revision'] > MAX_GOAL_REVISIONS:
+            raise ValueError('This goal has reached its history limit of 1000 versions. Your records are kept. Additional storage is needed before more changes can be saved.')
+        if (not fields(raw, 'id sourceKey createdAt initial wording action attemptPool attemptRefs history revision needsReview updatedAt')
+                or not isinstance(raw['attemptPool'], list) or len(raw['attemptPool']) > MAX_ATTEMPT_VERSIONS
+                or not all(attempt(a) for a in raw['attemptPool']) or not isinstance(raw['history'], list)
+                or len(raw['history']) >= MAX_GOAL_REVISIONS):
+            raise ValueError(ERROR)
+        pool = raw['attemptPool']
+        if len({json.dumps(a, sort_keys=True, separators=(',', ':')) for a in pool}) != len(pool):
+            raise ValueError(ERROR)
+        used = set()
+
+        def resolve(refs):
+            if not isinstance(refs, list) or len(refs) > 200 or any(type(i) is not int or not 0 <= i < len(pool) for i in refs):
+                raise ValueError(ERROR)
+            used.update(refs)
+            return [pool[i] for i in refs]
+
+        current = resolve(raw['attemptRefs'])
+        history = []
+        for record in raw['history']:
+            if not fields(record, 'revision recordedAt wording action attemptRefs'):
+                raise ValueError(ERROR)
+            history.append({key: item for key, item in record.items() if key != 'attemptRefs'} | {'attempts': resolve(record['attemptRefs'])})
+        if len(used) != len(pool):
+            raise ValueError(ERROR)
+        goal = {key: item for key, item in raw.items() if key not in ('attemptPool', 'attemptRefs', 'history')}
+        expanded.append(goal | {'attempts': current, 'history': history})
+    return {'version': 1, 'goals': expanded}
+
+
 def validate_learning_goals(value):
+    value = expand_learning_goal_storage(value)
     if not fields(value, 'version goals') or type(value['version']) is not int or value['version'] != 1 or not isinstance(value['goals'], list) or len(value['goals']) > 100:
         raise ValueError(ERROR)
     ids = set()
     for g in value['goals']:
+        if isinstance(g, dict) and type(g.get('revision')) is int and g['revision'] > MAX_GOAL_REVISIONS:
+            raise ValueError('This goal has reached its history limit of 1000 versions. Your records are kept. Additional storage is needed before more changes can be saved.')
         if (not fields(g, 'id sourceKey createdAt initial wording action attempts history revision needsReview updatedAt')
                 or not text(g['id'], 100) or not text(g['sourceKey'], 500) or not dated(g['createdAt']) or not dated(g['updatedAt'])
                 or not snapshot(g['initial']) or not text(g['wording'], 1000) or not action(g['action']) or not attempts(g['attempts'])
-                or type(g['revision']) is not int or not 1 <= g['revision'] <= 201 or type(g['needsReview']) is not bool
+                or type(g['revision']) is not int or not 1 <= g['revision'] <= MAX_GOAL_REVISIONS or type(g['needsReview']) is not bool
                 or not isinstance(g['history'], list) or len(g['history']) != g['revision'] - 1 or g['id'] in ids):
             raise ValueError(ERROR)
         ids.add(g['id'])

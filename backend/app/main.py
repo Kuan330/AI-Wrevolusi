@@ -15,6 +15,7 @@ from app.routers import (
     occupations,
     possibilities,
     preparation,
+    progress_reviews,
     reference,
     schedule,
     skill_directions,
@@ -57,6 +58,7 @@ def create_app(api_root: str = '/api') -> FastAPI:
     application.include_router(reference.router, prefix=api_prefix)
     application.include_router(skill_directions.router, prefix=api_prefix)
     application.include_router(learning.router, prefix=api_prefix)
+    application.include_router(progress_reviews.router, prefix=api_prefix)
     application.include_router(guided_learning.router, prefix=api_prefix)
 
     @application.on_event('startup')

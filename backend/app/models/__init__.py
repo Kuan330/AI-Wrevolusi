@@ -1,4 +1,5 @@
 from app.models.specialist import (SpecialistCatalogue, SpecialistRelease, SpecialistOccupation, SpecialistConcept, SpecialistRelation)
+from app.models.progress_review import ProgressReview
 from app.models.account import Account
 from app.models.catalogue import CatalogueChapter, CatalogueCourse
 from app.models.capability import Capability
@@ -21,6 +22,7 @@ __all__ = [
     'Preparation',
     'Schedule',
     'Account',
+    'ProgressReview',
     'CatalogueCourse',
     'CatalogueChapter',
     'LearningProgress',

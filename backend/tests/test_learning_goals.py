@@ -163,3 +163,125 @@ def test_action_cannot_claim_an_unsupported_origin(origin):
     state['goals'][0]['action'] = {'kind': 'practise', 'text': 'Try an example', 'origin': origin}
     with pytest.raises(ValueError):
         validate_learning_goals(state)
+
+
+def compact_state(value):
+    """Fixture encoder for the frontend v2 wire format."""
+    result = {'version': 2, 'goals': []}
+    for original in value['goals']:
+        goal = copy.deepcopy(original)
+        pool, indexes = [], {}
+        def refs(items):
+            references = []
+            for item in items:
+                key = json.dumps(item, sort_keys=True, separators=(',', ':'))
+                if key not in indexes:
+                    indexes[key] = len(pool)
+                    pool.append(item)
+                references.append(indexes[key])
+            return references
+        for history in goal['history']:
+            history['attemptRefs'] = refs(history.pop('attempts'))
+        goal['attemptRefs'] = refs(goal.pop('attempts'))
+        goal['attemptPool'] = pool
+        result['goals'].append(goal)
+    return result
+
+
+def compact_workspace(data):
+    result = copy.deepcopy(data)
+    result[KEY] = json.dumps(compact_state(validate_learning_goals(json.loads(data[KEY]))), separators=(',', ':'))
+    return result
+
+
+def test_compact_read_is_lossless_and_does_not_mutate_storage():
+    data = workspace()
+    attempt = {'id':'a1','date':'2026-01-01','type':'study','description':'Original study','notes':'Context','task':None,'createdAt':'2026-01-01T00:00:00Z','updatedAt':'2026-01-01T00:00:00Z'}
+    second = changed(data, lambda g: g['attempts'].append(attempt))
+    third = changed(second, lambda g: g.update(wording='Edited wording'))
+    compact = compact_state(json.loads(third[KEY]))
+    before = copy.deepcopy(compact)
+    assert validate_learning_goals(compact) == json.loads(third[KEY])
+    assert compact == before
+    assert len(compact['goals'][0]['attemptPool']) == 1
+    validate_learning_goal_transition(second, compact_workspace(third))
+    validate_learning_goal_transition(compact_workspace(second), compact_workspace(third))
+    # A serialization change alone does not alter the semantic record.
+    validate_learning_goal_transition(third, compact_workspace(third))
+
+
+def test_new_compact_goal_keeps_source_and_initial_state_checks():
+    data = compact_workspace(workspace())
+    validate_learning_goal_transition({}, data)
+    WorkspaceUpdate(owner_id=uuid4(), revision=0, data=data)
+    forged = copy.deepcopy(data)
+    state = json.loads(forged[KEY])
+    state['goals'][0]['initial']['skill']['label'] = 'Invented skill'
+    forged[KEY] = json.dumps(state)
+    with pytest.raises(ValueError):
+        validate_learning_goal_transition({}, forged)
+
+
+@pytest.mark.parametrize('corrupt', [
+    lambda g: g['attemptRefs'].append(999),
+    lambda g: g['attemptRefs'].append(0),
+    lambda g: g['attemptRefs'].__setitem__(0, True),
+    lambda g: g['attemptPool'].append(g['attemptPool'][0] | {'id':'unused'}),
+    lambda g: g['attemptPool'].append(copy.deepcopy(g['attemptPool'][0])),
+])
+def test_compact_pool_references_are_checked(corrupt):
+    data = workspace()
+    a = {'id':'a1','date':'2026-01-01','type':'study','description':'Original','notes':'','task':None,'createdAt':'2026-01-01T00:00:00Z','updatedAt':'2026-01-01T00:00:00Z'}
+    state = compact_state(json.loads(changed(data, lambda g:g['attempts'].append(a))[KEY]))
+    corrupt(state['goals'][0])
+    with pytest.raises(ValueError):
+        validate_learning_goals(state)
+
+
+def test_forged_pool_or_history_reference_cannot_rewrite_past_evidence():
+    data = workspace()
+    a = {'id':'a1','date':'2026-01-01','type':'study','description':'Original','notes':'','task':None,'createdAt':'2026-01-01T00:00:00Z','updatedAt':'2026-01-01T00:00:00Z'}
+    second = changed(data, lambda g:g['attempts'].append(a))
+    third = changed(second, lambda g:g.update(wording='New wording'))
+    for corrupt in [lambda g:g['attemptPool'][0].update(description='Rewritten past'), lambda g:g['history'][-1].update(attemptRefs=[]), lambda g:g['initial'].update(wording='New baseline')]:
+        forged = compact_workspace(third)
+        state = json.loads(forged[KEY]); corrupt(state['goals'][0]); forged[KEY] = json.dumps(state)
+        with pytest.raises(ValueError):
+            validate_learning_goal_transition(compact_workspace(second), forged)
+
+
+def test_compact_removal_still_prevents_resurrection():
+    data=workspace()
+    a={'id':'a1','date':'2026-01-01','type':'study','description':'Original','notes':'','task':None,'createdAt':'2026-01-01T00:00:00Z','updatedAt':'2026-01-01T00:00:00Z'}
+    second=changed(data,lambda g:g['attempts'].append(a));third=changed(second,lambda g:g.update(attempts=[]))
+    with pytest.raises(ValueError):
+        validate_learning_goal_transition(compact_workspace(third),compact_workspace(changed(third,lambda g:g['attempts'].append(a))))
+
+
+def test_compact_history_supports_100_long_attempts_and_220_edits_under_workspace_limit():
+    state=json.loads(workspace()[KEY]);g=state['goals'][0]
+    for i in range(220):
+        g['history'].append({key:copy.deepcopy(g[key]) for key in ('revision','wording','action','attempts')} | {'recordedAt':g['createdAt']})
+        g['revision'] += 1;g['needsReview']=True
+        if i < 100:
+            g['attempts'].append({'id':f'a{i}','date':'2026-01-01','type':'study','description':f'Entry {i}: '+('d'*1900),'notes':'n'*3900,'task':None,'createdAt':g['createdAt'],'updatedAt':g['updatedAt']})
+        else:
+            g['wording']=f'Revised goal {i}'
+    compact=compact_state(state)
+    data={KEY:json.dumps(compact,separators=(',',':'))}
+    assert len(json.dumps(data)) < 2_000_000
+    WorkspaceUpdate(owner_id=uuid4(),revision=0,data=data)
+    assert validate_learning_goals(compact) == state
+    assert len(compact['goals'][0]['attemptPool']) == 100
+    # Historical repeated prose no longer counts against every saved version.
+    assert len(json.dumps(state)) > 2_000_000
+
+
+def test_revision_capacity_failure_explains_limit_and_never_prunes():
+    state=json.loads(workspace()[KEY]);g=state['goals'][0]
+    g['revision']=1001;g['history']=[{'revision':i+1,'recordedAt':g['createdAt'],'wording':g['wording'],'action':None,'attempts':[]} for i in range(1000)]
+    for raw in [state,compact_state(state)]:
+        before=copy.deepcopy(raw)
+        with pytest.raises(ValueError, match='history limit of 1000'):
+            validate_learning_goals(raw)
+        assert raw == before

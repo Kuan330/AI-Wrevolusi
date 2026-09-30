@@ -38,8 +38,10 @@ class WorkspaceUpdate(BaseModel):
     @classmethod
     def validate_data(cls, data: dict[str, str]) -> dict[str, str]:
         allowed = {LEARNING_GOALS_KEY, SPECIALIST_KEY, 'aiwrevolusi.workProfileDraft.v1', JOURNEY_KEY, 'aiwrevolusi.userProfile', 'aiwrevolusi.confirmedAnalysis', 'aiwrevolusi.learningCentre', 'aiwrevolusi.learningResourceSelections.v1', 'aiwrevolusi.courseLibrary.v1', 'aiwrevolusi.learningSkills.v1', 'aiwrevolusi.plan.courses.v1', 'aiwrevolusi.planner.v1', 'aiwrevolusi.possibilities.chosenDirection', 'aiwrevolusi.possibilities.shortlist', 'aiwrevolusi.possibilities.saved', 'aiwrevolusi.possibilities.intent'}
-        if not data.keys() <= allowed or len(json.dumps(data)) > 2_000_000:
-            raise ValueError('Workspace is invalid or too large.')
+        if not data.keys() <= allowed:
+            raise ValueError('Workspace contains unsupported records.')
+        if len(json.dumps(data)) > 2_000_000:
+            raise ValueError('Your account storage limit has been reached. Your saved records are unchanged. Keep a backup and ask the project team to increase storage.')
         for key, value in data.items():
             parsed = json.loads(value)
             if key == SHORTLIST_KEY:
