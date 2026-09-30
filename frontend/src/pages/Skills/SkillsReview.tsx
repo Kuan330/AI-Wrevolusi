@@ -25,6 +25,7 @@ import { skillKey } from "./learningSkills";
 import { buildSkillEvidence } from "./lib/skillProfile";
 import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
 import SpecialistSkills from "./components/SpecialistSkills";
+import SkillsOverview from "./components/SkillsOverview";
 import "./SkillsReview.css";
 
 type Decision = "accepted" | "rejected" | undefined;
@@ -110,7 +111,8 @@ export default function SkillsReview() {
   const focusedTask = work?.tasks.find(task => task.id === focusId);
   const incomingWording = typeof location.state?.taskWording === "string" ? location.state.taskWording : null;
   const focusChanged = Boolean(focusedTask && incomingWording && incomingWording !== focusedTask.wording);
-  const activeFocus = focusChanged ? undefined : focusedTask;
+  const reviewMode = searchParams.get("view") === "task";
+  const activeFocus = reviewMode && !focusChanged ? focusedTask : undefined;
   const visibleEvidence = activeFocus ? evidence.map(item => ({ ...item, tasks: item.tasks.filter(task => task.id === activeFocus.id) })).filter(item => item.tasks.length > 0) : evidence;
   const accepted = visibleEvidence.filter(({ skill }) =>
     !work?.needsReview && work?.decisions[skill.wef_skill_id] === "accepted",
@@ -190,16 +192,16 @@ export default function SkillsReview() {
     <div className="skills-review-page mx-auto w-full max-w-[1200px]">
       <PageHeader
         className="flex-col items-start sm:flex-row sm:items-center"
-        title="Review my skills"
-        description="Check the suggestions from your confirmed work, then choose one skill to develop."
+        title={reviewMode ? "Review skills for a task" : "My skills"}
+        description={reviewMode ? "Check the task connections and choose what fits your work." : "An overview of your saved skills and suggestions across your work."}
         actions={<Button asChild variant="outline" className="rounded-full"><Link to={ROUTES.task}>Edit my tasks</Link></Button>}
       />
 
-      {focusId && <section className="skills-review-page__notice" aria-label="Task carried from AI findings">
+      {focusId && reviewMode && <section className="skills-review-page__notice" aria-label="Selected work task">
         <h2>{activeFocus ? "Skills for your selected task" : "Your selected task needs review"}</h2>
         <p>{activeFocus ? activeFocus.wording : "This task changed or is no longer in your work profile. Showing your current tasks instead."}</p>
         <p className="skills-review-page__hint">Research exposure does not prove that you have or lack a skill. Check the task evidence below.</p>
-        <Button variant="outline" onClick={() => { setSearchParams(params => { params.delete("task"); return params; }); setSelectedId(null); }}>Show skills from all my tasks</Button>
+        <Button variant="outline" onClick={() => { setSearchParams(params => { params.delete("task"); params.delete("view"); return params; }); setSelectedId(null); }}>Back to my skills overview</Button>
       </section>}
 
       {readError && <div className="skills-review-page__notice is-error" role="alert">
@@ -221,9 +223,17 @@ export default function SkillsReview() {
         {saving ? "Saving your changes…" : saveMessage}
       </p>
 
+      {!reviewMode && focusedTask && !focusChanged && <div className="skills-overview__carried"><p>Selected task: {shortTaskLabel(focusedTask.wording)}</p><Button variant="outline" onClick={() => setSearchParams({ view: "task", task: focusedTask.id }, { state: { taskWording: focusedTask.wording } })}>Review this selected task</Button></div>}
+      {!readError && work && !reviewMode && <SkillsOverview tasks={work.tasks} occupationCode={work.occupationCode} personal={work.personalSkills} evidence={evidence} decisions={work.decisions} broadNeedsReview={work.needsReview} onReview={id => {
+        const task = work.tasks.find(item => item.id === id);
+        if (task) setSearchParams({ view: "task", task: id }, { state: { taskWording: task.wording } });
+      }} />}
+
+      {reviewMode && <>
+      {!focusId && <Button variant="outline" onClick={() => setSearchParams({})}>Back to my skills overview</Button>}
       {!readError && work && <SpecialistSkills tasks={work.tasks} occupationCode={work.occupationCode} focusTaskId={activeFocus?.id} onTaskChange={id => {
         const task = work.tasks.find(item => item.id === id);
-        if (task) { setSearchParams(params => { params.set("task", id); return params; }, { state: { taskWording: task.wording } }); setSelectedId(null); }
+        if (task) { setSearchParams(params => { params.set("task", id); params.set("view", "task"); return params; }, { state: { taskWording: task.wording } }); setSelectedId(null); }
       }} />}
 
       {!readError && work && work.tasks.length > 0 && <section id="personal-skills" className="skills-review-page__card skills-review-page__personal" aria-labelledby="personal-skills-title">
@@ -346,6 +356,7 @@ export default function SkillsReview() {
           <p className="skills-review-page__hint">You can leave suggestions undecided and return later. Independent learning is your own choice.</p>
         </section>
       </details>}
+      </>}
     </div>
   );
 }
