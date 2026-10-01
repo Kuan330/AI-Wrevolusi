@@ -1,21 +1,24 @@
-import asyncio
 import json
 import logging
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.models.user import User
+from app.models.specialist import SpecialistConcept, SpecialistOccupation, SpecialistRelation, SpecialistRelease
 from app.services.auth import get_current_user
 from app.services.occupation_text import occupation_description_sql
 from app.services.possibilities import (
     MODERN_PROFILE_KEY,
     PROFILE_RECOVERY_MESSAGE,
-    chosen_direction_score,
     confirmed_workspace_evidence,
+    ESCO_SOURCE_NOTE,
+    ESCO_SOURCE_URL,
+    ESCO_VERSION,
     occupation_required_skills,
-    recommend_occupations,
+    rank_esco_directions,
+    reviewed_esco_evidence,
 )
 from app.schemas.possibilities import PossibilitiesResponse
 from app.services.workspace import SHORTLIST_KEY, read_workspace_shortlist
@@ -136,6 +139,7 @@ async def get_possibilities(
     shortlist = read_workspace_shortlist(shortlist_raw, allowed_skill_ids=set(skills))
     chosen_raw = _json_value(workspace, 'aiwrevolusi.possibilities.chosenDirection', {})
     chosen_code = chosen_raw.get('occupation_code') if isinstance(chosen_raw, dict) else None
+    chosen_uri = chosen_raw.get('occupation_uri') if isinstance(chosen_raw, dict) else None
     role = workspace_role
     if not modern_profile and role is None and current_user.occupation_id:
         try:
@@ -148,34 +152,77 @@ async def get_possibilities(
             logger.error(f"Error loading occupation for user {current_user.id}: {str(e)}")
             # Continue without role - don't fail the entire request
 
-    exclude_codes = {role['occupation_code']} if role and role.get('occupation_code') else set()
-    # CPU-heavy ranking — keep the async event loop free on cold cache fills.
     try:
-        recommendations = await asyncio.to_thread(
-            recommend_occupations, occupation_rows, owned, skills, 3, exclude_codes=exclude_codes
-        )
-    except Exception as e:
-        logger.error(f"Error generating recommendations for user {current_user.id}: {str(e)}")
-        recommendations = []
-    allowed_codes = {row['occupation_code'] for row in recommendations}
-    if chosen_code not in allowed_codes:
-        chosen_code = None
+        current_esco, developing_esco = reviewed_esco_evidence(workspace)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from None
+
+    directions = []
+    reviewed_esco_skills = []
+    career_source_note = ESCO_SOURCE_NOTE
+    release = await db.get(SpecialistRelease, ESCO_VERSION)
+    if release is None:
+        career_source_note = 'Verified career-source data is not available yet. Career directions are withheld until the reviewed ESCO catalogue is installed.'
+    else:
+        metadata = release.source_metadata or {}
+        source = {
+            'name': 'ESCO', 'version': ESCO_VERSION,
+            'retrieved_at': metadata.get('retrieved_at') or 'date not recorded',
+            'source_url': (metadata.get('provenance') or {}).get('url') or ESCO_SOURCE_URL,
+            'attribution': metadata.get('attribution') or 'European Commission, ESCO classification.',
+        }
+        evidence_uris = current_esco | developing_esco
+        valid_skill_labels = {}
+        if evidence_uris:
+            rows = (await db.execute(
+                select(SpecialistConcept.uri, SpecialistConcept.label)
+                .where(SpecialistConcept.version == ESCO_VERSION, SpecialistConcept.uri.in_(evidence_uris))
+            )).mappings().all()
+            valid_skill_labels = {row['uri']: row['label'] for row in rows}
+            current_esco &= set(valid_skill_labels)
+            developing_esco &= set(valid_skill_labels)
+            reviewed_esco_skills = [
+                {'uri': uri, 'label': valid_skill_labels[uri],
+                 'state': 'current' if uri in current_esco else 'developing'}
+                for uri in sorted(current_esco | developing_esco, key=lambda item: valid_skill_labels[item].casefold())
+            ]
+        relevant_uris = current_esco | developing_esco
+        if current_esco:
+            candidate_uris = (await db.scalars(
+                select(SpecialistRelation.occupation_uri).where(
+                    SpecialistRelation.version == ESCO_VERSION,
+                    SpecialistRelation.skill_uri.in_(relevant_uris),
+                ).distinct()
+            )).all()
+            if candidate_uris:
+                role_rows = (await db.execute(
+                    select(SpecialistOccupation.uri, SpecialistOccupation.label, SpecialistOccupation.description,
+                           SpecialistOccupation.isco_code)
+                    .where(SpecialistOccupation.version == ESCO_VERSION, SpecialistOccupation.uri.in_(candidate_uris))
+                )).mappings().all()
+                relation_rows = (await db.execute(
+                    select(SpecialistRelation.occupation_uri, SpecialistRelation.skill_uri, SpecialistRelation.relation)
+                    .where(SpecialistRelation.version == ESCO_VERSION,
+                           SpecialistRelation.occupation_uri.in_(candidate_uris))
+                )).mappings().all()
+                required_uris = {row['skill_uri'] for row in relation_rows}
+                concept_rows = (await db.execute(
+                    select(SpecialistConcept.uri, SpecialistConcept.label)
+                    .where(SpecialistConcept.version == ESCO_VERSION, SpecialistConcept.uri.in_(required_uris))
+                )).mappings().all() if required_uris else []
+                directions = rank_esco_directions(
+                    [dict(row) for row in role_rows], [dict(row) for row in relation_rows],
+                    {row['uri']: dict(row) for row in concept_rows}, current_esco,
+                    developing_esco, source,
+                )
+        allowed_uris = {row['occupation_uri'] for row in directions}
+        if chosen_uri not in allowed_uris:
+            chosen_uri = None
+        selected_direction = next((row for row in directions if row['occupation_uri'] == chosen_uri), None)
+        chosen_code = selected_direction['occupation_code'] if selected_direction else None
     from app.services.possibilities import slugify_skill_name
     skill_items = [{'skill_id': i, 'skill_slug': slugify_skill_name(str(row['core_skill'])), 'name': row['core_skill'], 'state': 'have' if i in owned else ('shortlisted' if i in shortlist else 'missing')} for i, row in skills.items()]
-    for row in recommendations:
-        row['skill_states'] = {
-            skill_id: 'have' if skill_id in owned else ('shortlisted' if skill_id in shortlist else 'missing')
-            for skill_id in row['required_skill_ids']
-        }
-    directions = [build_direction_payload(row, skills) for row in recommendations]
-    chosen_score = next(
-        (
-            chosen_direction_score(owned, set(row['required_skill_ids']))
-            for row in recommendations
-            if row['occupation_code'] == chosen_code
-        ),
-        None,
-    )
+    chosen_score = None
     current_role_coverage_pct = None
     if role:
         current_ref = next(
@@ -191,12 +238,15 @@ async def get_possibilities(
     return PossibilitiesResponse(
         disclaimer=DISCLAIMER,
         source='live',
-        status='ready' if owned else ('unavailable' if has_confirmed_tasks else 'needs_profile'),
+        status='ready' if current_esco and release is not None else ('needs_skill_review' if has_confirmed_tasks else 'needs_profile'),
         current_role=role,
         current_role_coverage_pct=current_role_coverage_pct,
         skills=skill_items,
         directions=directions,
         chosen_direction_code=chosen_code,
+        chosen_direction_uri=chosen_uri,
         chosen_direction_coverage_pct=chosen_score if chosen_score is not None else None,
         shortlisted_skill_ids=shortlist,
+        reviewed_esco_skills=reviewed_esco_skills,
+        career_source_note=career_source_note,
     )

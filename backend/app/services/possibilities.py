@@ -11,6 +11,11 @@ SkillState = Literal['have', 'learning', 'shortlisted', 'missing']
 
 MODERN_PROFILE_KEY = 'aiwrevolusi.userProfile'
 PROFILE_RECOVERY_MESSAGE = 'Your saved work profile could not be read. Reload your saved account or restore a valid profile before viewing Possibilities.'
+ESCO_VERSION = '1.2.0'
+ESCO_SOURCE_URL = 'https://ec.europa.eu/esco/portal'
+ESCO_SOURCE_NOTE = ('Career directions use ESCO v1.2.0 occupation-to-skill links and skill connections you explicitly said you use for current confirmed tasks. '
+                    'ESCO describes European occupations; this is exploratory transferability evidence, not a validated Malaysian occupation match, hiring prediction or job-readiness assessment. '
+                    'Only roles with at least one reviewed shared skill are shown. Skills without a current-use record are not assumed absent.')
 
 
 def confirmed_workspace_evidence(workspace: object, occupations: Iterable[Mapping]) -> tuple[list[str], dict | None]:
@@ -82,6 +87,96 @@ def confirmed_workspace_evidence(workspace: object, occupations: Iterable[Mappin
 
 def slugify_skill_name(name: str) -> str:
     return re.sub(r'-+', '-', re.sub(r'[^a-z0-9]+', '-', name.lower())).strip('-')
+
+
+def reviewed_esco_evidence(workspace: object) -> tuple[set[str], set[str]]:
+    """Return only current, task-linked ESCO self-reports and learning interests."""
+    from app.services.specialist_review import SPECIALIST_KEY, validate_specialist_review
+
+    if not isinstance(workspace, Mapping):
+        raise ValueError('Your saved work profile could not be read. Reload your account before viewing career options.')
+    try:
+        raw_profile = workspace.get(MODERN_PROFILE_KEY)
+        if raw_profile is not None:
+            profile = json.loads(raw_profile)
+            if not isinstance(profile, dict):
+                raise ValueError()
+            analysis = profile.get('analysis') or {}
+            tasks = profile.get('tasks') if isinstance(profile.get('tasks'), list) else analysis.get('tasks', [])
+            occupation_code = profile.get('tasksOccupationCode') or analysis.get('occupationCode')
+            confirmed = profile.get('tasksConfirmed') is True or bool(analysis.get('tasks'))
+        else:
+            analysis = json.loads(workspace.get('aiwrevolusi.confirmedAnalysis', 'null')) or {}
+            tasks = analysis.get('tasks', [])
+            occupation_code = analysis.get('occupationCode')
+            confirmed = bool(tasks)
+        if not confirmed or not isinstance(tasks, list):
+            return set(), set()
+        current_tasks = {task['id']: task['wording'] for task in tasks
+                         if isinstance(task, dict) and isinstance(task.get('id'), str)
+                         and isinstance(task.get('wording'), str)}
+        raw_specialist = workspace.get(SPECIALIST_KEY)
+        specialist = validate_specialist_review(json.loads(raw_specialist)) if raw_specialist else {'entries': []}
+    except (TypeError, ValueError, KeyError, AttributeError) as error:
+        raise ValueError('Your saved ESCO skill review could not be read. Reload your account before viewing career options.') from error
+
+    current: set[str] = set()
+    developing: set[str] = set()
+    for entry in specialist['entries']:
+        if (entry['sourceVersion'] != ESCO_VERSION
+                or entry['occupationCode'] != occupation_code
+                or current_tasks.get(entry['taskId']) != entry['taskWording']):
+            continue
+        if entry['decision'] == 'use':
+            current.add(entry['skillUri'])
+        if entry['wantsLearning']:
+            developing.add(entry['skillUri'])
+    return current, developing - current
+
+
+def rank_esco_directions(occupations, relations, skills, current_skill_uris, developing_skill_uris, source):
+    """Rank source-linked ESCO roles using only reviewed current skill evidence."""
+    by_occupation: dict[str, list[dict]] = {}
+    for relation in relations:
+        if relation['skill_uri'] in skills:
+            by_occupation.setdefault(relation['occupation_uri'], []).append(relation)
+
+    ranked = []
+    for occupation in occupations:
+        role_relations = by_occupation.get(occupation['uri'], [])
+        essential = {r['skill_uri'] for r in role_relations if r['relation'] == 'essential'}
+        optional = {r['skill_uri'] for r in role_relations if r['relation'] == 'optional'}
+        required = essential | optional
+        overlap = required & current_skill_uris
+        if not overlap:
+            continue
+        developing_overlap = required & developing_skill_uris
+        not_yet_evidenced = essential - current_skill_uris - developing_skill_uris
+        requirements = [
+            {'uri': uri, 'label': skills[uri]['label'], 'relation': relation,
+             'state': 'current' if uri in current_skill_uris else ('developing' if uri in developing_skill_uris else 'not_yet_evidenced')}
+            for uri, relation in sorted(((uri, 'essential') for uri in essential), key=lambda item: skills[item[0]]['label'].casefold())
+        ]
+        requirements.extend(
+            {'uri': uri, 'label': skills[uri]['label'], 'relation': 'optional',
+             'state': 'current' if uri in current_skill_uris else ('developing' if uri in developing_skill_uris else 'not_yet_evidenced')}
+            for uri in sorted(optional - essential, key=lambda item: skills[item]['label'].casefold())
+        )
+        ranked.append({
+            'occupation_code': occupation['isco_code'], 'occupation_uri': occupation['uri'],
+            'title': occupation['label'], 'area': 'ESCO occupation',
+            'description': occupation['description'], 'coverage_pct': None, 'skills': [],
+            'requirements': requirements, 'source': source,
+            'current_skill_overlap': len(overlap),
+            'developing_skill_overlap': len(developing_overlap),
+            'essential_not_yet_evidenced': len(not_yet_evidenced),
+        })
+    ranked.sort(key=lambda row: (
+        -sum(skill['relation'] == 'essential' and skill['state'] == 'current' for skill in row['requirements']),
+        -row['current_skill_overlap'], row['essential_not_yet_evidenced'],
+        -row['developing_skill_overlap'], row['title'].casefold(), row['occupation_uri'],
+    ))
+    return ranked[:3]
 
 
 def classify_skill_state(*, has_skill: bool, learning: bool, shortlisted: bool) -> SkillState:
