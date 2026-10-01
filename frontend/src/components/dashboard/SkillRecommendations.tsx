@@ -43,7 +43,7 @@ function SkillCard({ item, index, compact }: { item: ReturnType<typeof recommend
     void loadLearningCatalogue(skillKey(item.skill.core_skill), attempt > 0).then(value => { if (alive) setCourses(value.courses); }).catch(() => { if (alive) setError("Courses are temporarily unavailable. Please try again."); });
     return () => { alive = false; };
   }, [open,item.skill.core_skill,attempt]);
-  const link = `${ROUTES.skills}?${new URLSearchParams({ view: "task", task: item.tasks[0].id })}`;
+  const link = `${ROUTES.skills}?${new URLSearchParams({ view: "task", task: item.tasks[0].id, skill: String(item.skill.wef_skill_id) })}`;
   return <Card className="dashboard-skill-card"><span className={`dashboard-skill-icon tone-${index % 3}`}><Sprout size={20} /></span><h3>{item.skill.core_skill}</h3>
     <p>{item.highTaskCount ? `Connected to ${item.highTaskCount} highly AI-assisted ${item.highTaskCount === 1 ? "task" : "tasks"}.` : `Connected to ${item.tasks.length} of your work ${item.tasks.length === 1 ? "tasks" : "tasks"}.`} Confirm whether this skill fits your work.</p>
     <p className="dashboard-skill-evidence">“{item.tasks[0].wording}”</p>

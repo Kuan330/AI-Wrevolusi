@@ -4,12 +4,14 @@
 .skills-review-page__notice { display: grid; justify-items: start; gap: .75rem; padding: 1rem 1.25rem; border: 1px solid #d5c7dd; border-radius: 14px; background: #f7f0fa; line-height: 1.6; }
 .skills-review-page__notice.is-error { border-color: #d99494; background: #fff3f2; color: #8f2e2e; }
 .skills-review-page__save-status { min-height: 1.5rem; font-size: .875rem; color: #645868; }
+.skills-review-page__save-status:empty { display:none; }
 .skills-review-page__section-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1rem; margin-bottom: 1rem; }
 .skills-review-page h2 { font-size: 1.15rem; font-weight: 650; line-height: 1.4; }
 .skills-review-page__section-heading p { font-size: .875rem; color: #645868; }
 .skills-review-page__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .skills-review-page__card { min-width: 0; display: grid; align-content: start; gap: .85rem; border: 1px solid rgba(255,255,255,.9); border-radius: 20px; padding: 1.4rem; background: rgba(255,255,255,.76); box-shadow: 0 8px 24px rgba(61,43,54,.06); }
 .skills-review-page__card h3 { font-size: 1.05rem; font-weight: 650; line-height: 1.45; }
+.skills-review-page__card.is-focused { border-color:#7ca6c7; background:#f1f7fc; box-shadow:0 0 0 2px #a8c7df55; }
 .skills-review-page__card p { line-height: 1.6; }
 .skills-review-page__skill-heading { display: flex; align-items: start; justify-content: space-between; gap: .75rem; }
 .skills-review-page__state { flex-shrink: 0; border: 1px solid #d5c7dd; border-radius: 99px; padding: .2rem .55rem; font-size: .75rem; color: #645868; background: #f7f2f8; }
