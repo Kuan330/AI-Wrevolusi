@@ -14,7 +14,7 @@ from app.services.possibilities import (
     confirmed_workspace_evidence,
     occupation_required_skills,
     recommend_occupations,
-    reviewed_wef_career_evidence,
+    wef_career_evidence,
 )
 from app.schemas.possibilities import PossibilitiesResponse
 from app.services.workspace import SHORTLIST_KEY, read_workspace_shortlist
