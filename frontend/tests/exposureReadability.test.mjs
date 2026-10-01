@@ -11,7 +11,7 @@ const dataUrl = text => `data:text/javascript;base64,${Buffer.from(text).toStrin
 const packageUrl = name => pathToFileURL(require.resolve(name)).href;
 const imports = {
   '@/components/ui/button': dataUrl(`import {createElement} from ${JSON.stringify(packageUrl('react'))}; export const Button=({children,variant,asChild,...props})=>createElement('div',props,children);`),
-  'react-router-dom': dataUrl(`import {createElement} from ${JSON.stringify(packageUrl('react'))}; export const Link=({children,to,state,...props})=>createElement('a',{href:to,...props},children);`),
+  'react-router-dom': dataUrl(`import {createElement} from ${JSON.stringify(packageUrl('react'))}; export const links=[]; export const Link=({children,to,state,...props})=>{links.push({to,state});return createElement('a',{href:to,...props},children)};`),
   '@/pages/Analysis/components/TaskDetailsDrawer': dataUrl('export function TaskAssistAccess(){return null}'),
   '@/constants/routes': new URL('../src/constants/routes.ts', import.meta.url).href,
   '@/features/work-profile/taskSourceLabel': new URL('../src/features/work-profile/taskSourceLabel.ts', import.meta.url).href,
@@ -29,6 +29,7 @@ const Impact=(await import(imports['./TaskImpact'])).default;
 const TaskList=(await import(compiled('ExposureTaskList'))).default;
 const Coverage=(await import(compiled('ResearchCoverage'))).default;
 const render=(Component,props)=>renderToStaticMarkup(React.createElement(Component,props));
+const { links } = await import(imports['react-router-dom']);
 const task={id:'one',wording:'Check a machine',source:'ilo',originalWording:'Check a machine',iloTaskId:'6',score2025:.9};
 const assessment={task_id:'one',match_layer:'exact',missing_data_status:'complete',source_year:'2025',matched_reference_tasks:[{ilo_task_id:'6',task_text:task.wording,score_2025:.1375,source_method:'predicted'}],adjusted_score:.95,baseline_score:.8};
 test('first task follows confirmed order; all tasks are available without score ranking',()=>{
@@ -48,7 +49,17 @@ test('published scale is visible and further evidence remains collapsed',()=>{
   assert.match(html,/0\.1375 on a 0–1 scale/);
   assert.doesNotMatch(html,/<details[^>]*\bopen|0\.95|0\.8|13\.75%/);
   assert.match(html,/not a probability of job loss/);
-  assert.match(html,/href="\/skills\?task=one"/);
+  assert.match(html,/href="\/skills\?view=task&amp;task=one"/);
+});
+test('task handoff opens skill review directly with the exact task identity and saved wording',()=>{
+  const selected={...task,id:'task /?&',wording:'Check a machine\nwith the approved safety procedure'};
+  render(Impact,{task:selected,researchChecked:true,researchUnavailable:false});
+  const handoff=links.findLast(link=>link.to.startsWith('/skills?'));
+  const destination=new URL(handoff.to,'https://example.test');
+  assert.equal(destination.pathname,'/skills');
+  assert.equal(destination.searchParams.get('view'),'task');
+  assert.equal(destination.searchParams.get('task'),selected.id);
+  assert.deepEqual(handoff.state,{taskWording:selected.wording});
 });
 test('candidate source values stay hidden and no personal estimate is invented',()=>{
   const html=render(Impact,{task,assessment:{...assessment,match_layer:'llm'},researchChecked:true});

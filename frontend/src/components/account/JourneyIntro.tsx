@@ -5,11 +5,12 @@ import {
 } from "@/features/work-profile/userProfile";
 import { readLearningCentreItems } from "@/pages/Skills/skillDirections";
 import { useState, type ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { AppButton } from "@/components/ui/app-button";
+import { Button } from "@/components/ui/button";
 import { useAccount } from "./useAccount";
 import { AuthDialog } from "./AuthDialog";
 import { ROUTES } from "@/constants/routes";
@@ -84,6 +85,7 @@ export default function JourneyIntro(props: {
   const { kind, children } = props;
   const data = content[kind];
   const { user, error } = useAccount();
+  const location = useLocation();
   let action = data.action;
   let path: string = data.path;
   if (
@@ -100,7 +102,8 @@ export default function JourneyIntro(props: {
       path = ROUTES.learningCentre;
     }
   }
-  const [authOpen, setAuthOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(location.state?.authMode === "register");
+  const [authMode, setAuthMode] = useState<"login" | "register">("register");
   const pageHeaderProps1 = {
     title: data.name,
     description: "Your next step, at your own pace.",
@@ -130,11 +133,14 @@ export default function JourneyIntro(props: {
                   <AppButton
                     {...({
                       tone: "gradient",
-                      onClick: () => setAuthOpen(true),
+                      onClick: () => { setAuthMode("register"); setAuthOpen(true); },
                     } satisfies Partial<ComponentProps<typeof AppButton>>)}
                   >
-                    Log in / Create account <ArrowRight className="size-4" />
+                    Create a free account <ArrowRight className="size-4" />
                   </AppButton>
+                  <Button variant="link" className="mt-3 block" onClick={() => { setAuthMode("login"); setAuthOpen(true); }}>
+                    Already have an account? Log in
+                  </Button>
                   <p className="mt-3 text-xs text-[#7f7280]">
                     Save your choices and return to them later. No email
                     required.
@@ -185,8 +191,9 @@ export default function JourneyIntro(props: {
         <AuthDialog
           {...({
             open: true,
+            initialMode: authMode,
             onClose: () => setAuthOpen(false),
-            destination: window.location.pathname + window.location.search + window.location.hash,
+            destination: location.pathname + location.search + location.hash,
           } satisfies Partial<ComponentProps<typeof AuthDialog>>)}
         />
       )}

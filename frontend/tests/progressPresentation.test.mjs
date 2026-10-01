@@ -1,9 +1,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { attemptChanges, comparisonRows, evidenceTimeline, progressHeadline } from '../src/pages/Progress/progressPresentation.ts';
+import { attemptChanges, comparisonRows, evidenceTimeline, progressErrorText, progressHeadline } from '../src/pages/Progress/progressPresentation.ts';
+import { ApiError } from '../src/services/api.ts';
 const attempt = (id, overrides={}) => ({id,date:'2026-09-29',type:'course_practice',description:'Try a sample',notes:'',task:null,...overrides});
 const evidence = (overrides={}) => ({recorded_at:'2026-09-29T12:00:00Z',goal_wording:'Practice reports',skill:{label:'Reports',source:'personal',id:'s1',sourceVersion:null},task_evidence:[],confirmed_tasks:[],decision:null,study:[],course_practice:[],workplace_practice:[],completed_learning:[],gaps:[],...overrides});
 const goal = (overrides={}) => ({goal_id:'g1',label:'Reports',status:'comparable',reason:'',earlier:evidence(),current:evidence(),...overrides});
+test('failed reads, preparation and saves describe the actual operation',()=>{
+ const failed=new ApiError('Request failed with status 500',500);
+ assert.match(progressErrorText(failed,'load'),/could not load your saved reviews/);
+ assert.doesNotMatch(progressErrorText(failed,'load'),/confirm that this review was saved/);
+ assert.match(progressErrorText(failed,'prepare'),/could not prepare your progress review/);
+ assert.match(progressErrorText(failed,'save'),/Retry to check this same review/);
+});
+test('only a save conflict asks for a fresh preview; safe source errors explain recovery',()=>{
+ assert.match(progressErrorText(new ApiError('changed',409),'save'),/Refresh this preview/);
+ assert.doesNotMatch(progressErrorText(new ApiError('changed',409),'load'),/Refresh this preview/);
+ assert.match(progressErrorText(new ApiError('Saved progress source data is invalid.',422),'prepare'),/Saved progress source data is invalid/);
+ assert.match(progressErrorText(new ApiError('Progress reviews are temporarily unavailable.',503),'load'),/temporarily unavailable/);
+});
 test('headline leads with a new attempt even when no study or workplace practice exists',()=>{
  const g=goal({current:evidence({course_practice:[attempt('a1')]})});
  assert.equal(progressHeadline([g]),'You added 1 new course or sample practice attempt');
@@ -33,6 +47,11 @@ test('paired bars use one scale and count attempts separately from linked comple
  const {rows,scale}=comparisonRows(g);
  assert.equal(scale,2);
  assert.deepEqual(rows.map(r=>[r.label,r.earlier,r.value]),[['Study',1,2],['Course or sample practice',0,1],['Workplace practice',0,0],['Reported completed learning',0,1]]);
+});
+test('a retained workplace attempt without confirmed work stays on the timeline but is excluded from current evidence counts',()=>{
+ const g=goal({status:'starting_point',earlier:null,current:evidence({workplace_practice:[attempt('work',{type:'workplace_practice',task:{id:'t1',wording:'Prepare reports'}})],current_workplace_practice_count:0})});
+ assert.equal(comparisonRows(g).rows.find(r=>r.key==='workplace_practice').value,0);
+ assert.equal(evidenceTimeline(g).length,1);
 });
 test('timeline keeps date order and distinguishes existing records from new attempts',()=>{
  const g=goal({earlier:evidence({course_practice:[attempt('a1')]}),current:evidence({course_practice:[attempt('a1'),attempt('a2',{date:'2026-09-30'})]})});

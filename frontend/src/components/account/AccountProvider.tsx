@@ -52,7 +52,7 @@ export function AccountProvider(props: { children: ReactNode }) {
           setUser(null);
           if (!(e instanceof ApiError) || e.status !== 401)
             setError(
-              "Account service is unavailable. You can still explore your work as a guest.",
+              "Account service is unavailable. Please try again to load your saved work.",
             );
         }
       } finally {

@@ -19,12 +19,13 @@ export function AuthDialog(props: {
   open: boolean;
   onClose: () => void;
   destination?: string;
+  initialMode?: "login" | "register";
 }) {
   const { open, onClose, destination } = props;
   const { authenticate } = useAccount();
   const navigate = useNavigate();
   const location = useLocation();
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register">(props.initialMode ?? "login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");

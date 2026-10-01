@@ -19,6 +19,7 @@ export type GoalSnapshot = {
 export type GoalHistory = { revision: number; recordedAt: string; wording: string; action: GoalAction | null; attempts: LearningAttempt[] };
 export type LearningGoal = { id: string; sourceKey: string; createdAt: string; initial: GoalSnapshot; wording: string; action: GoalAction | null; attempts: LearningAttempt[]; history: GoalHistory[]; revision: number; needsReview: boolean; updatedAt: string };
 export type AttemptInput = { id?: string; date: string; type: AttemptType; description: string; notes?: string; task?: GoalTask | null };
+type GoalCreationOptions = { newGoal?: boolean; creationId?: string };
 const obj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
 const str = (v: unknown, max: number, empty = false): v is string => typeof v === "string" && v.length <= max && (empty || !!v.trim());
 const keys = (v: Record<string, unknown>, names: string[]) => Object.keys(v).length === names.length && names.every(k => Object.hasOwn(v, k));
@@ -65,34 +66,45 @@ async function persist(goals: LearningGoal[]) {
   finally { if (savingOwner === owner) savingOwner=null; }
 }
 const same = (a: unknown,b: unknown) => JSON.stringify(a) === JSON.stringify(b);
-async function create(sourceKey: string, initial: GoalSnapshot, newGoal = false): Promise<LearningGoal> {
+async function create(sourceKey: string, initial: GoalSnapshot, { newGoal = false, creationId }: GoalCreationOptions = {}): Promise<LearningGoal> {
   const goals=readLearningGoals();
-  const matching=goals.find(g=>g.sourceKey===sourceKey && same(g.initial,initial));
-  if (matching) return matching;
+  if (creationId !== undefined) {
+    if (!newGoal || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(creationId))
+      throw Error("This new goal link is invalid. Open a new goal from your saved skill choice again.");
+    const existing=goals.find(g=>g.id===creationId);
+    if (existing) {
+      if (existing.sourceKey===sourceKey && same(existing.initial,initial)) return existing;
+      throw Error("This new goal choice has changed. Review your saved goals and open a new goal from your current skill choice.");
+    }
+  }
+  if (!newGoal) {
+    const matching=[...goals].reverse().find(g=>g.sourceKey===sourceKey && same(g.initial,initial));
+    if (matching) return matching;
+  }
   if (!newGoal && goals.some(g=>g.sourceKey===sourceKey)) throw Error("This source has changed. Open your existing goal or explicitly start a new goal to keep a new starting record.");
   if (goals.length >= 100) throw Error("Your account has reached the limit of 100 learning goals. Existing records and history are kept.");
   const now=new Date().toISOString();
-  const goal: LearningGoal={id:crypto.randomUUID(),sourceKey,initial,createdAt:now,updatedAt:now,wording:initial.wording,action:null,attempts:[],history:[],revision:1,needsReview:false};
+  const goal: LearningGoal={id:creationId??crypto.randomUUID(),sourceKey,initial,createdAt:now,updatedAt:now,wording:initial.wording,action:null,attempts:[],history:[],revision:1,needsReview:false};
   await persist([...goals,goal]); return goal;
 }
-export async function createSpecialistGoal(entry: SpecialistEntry, options: {newGoal?:boolean} = {}) {
+export async function createSpecialistGoal(entry: SpecialistEntry, options: GoalCreationOptions = {}) {
   const saved=readSpecialistState().entries.find(e=>specialistEntryKey(e)===specialistEntryKey(entry));
   if (!saved || !same(saved,entry) || !saved.wantsLearning) throw Error("Choose a saved learning interest first.");
   const p=readJourneyProfile();
   if (!p.tasksConfirmed || !specialistEntryIsCurrent(entry,p.tasks,p.tasksOccupationCode)) throw Error("Your work changed. Review the saved skill choice first.");
-  return create(`specialist:${specialistEntryKey(entry)}`,{skill:{source:"esco",id:entry.skillUri,label:entry.skillLabel,sourceVersion:entry.sourceVersion},decision:entry.decision,tasks:[{id:entry.taskId,wording:entry.taskWording}],occupationCode:entry.occupationCode,sourceOccupationUri:entry.sourceOccupationUri??null,career:null,origin:"work",workKey:null,wording:`Develop ${entry.skillLabel}`},options.newGoal);
+  return create(`specialist:${specialistEntryKey(entry)}`,{skill:{source:"esco",id:entry.skillUri,label:entry.skillLabel,sourceVersion:entry.sourceVersion},decision:entry.decision,tasks:[{id:entry.taskId,wording:entry.taskWording}],occupationCode:entry.occupationCode,sourceOccupationUri:entry.sourceOccupationUri??null,career:null,origin:"work",workKey:null,wording:`Develop ${entry.skillLabel}`},options);
 }
-export async function createPersonalGoal(entry: PersonalSkill, options: {newGoal?:boolean} = {}) {
+export async function createPersonalGoal(entry: PersonalSkill, options: GoalCreationOptions = {}) {
   const saved = readJourneyState().personalSkills?.find(item => item.id === entry.id);
   if (!saved || !same(saved,entry) || !saved.wantsLearning) throw Error("Choose a saved learning interest for this personal skill first.");
   if (!personalSkillIsCurrent(entry)) throw Error("Your work changed. Review the personal skill against a current task first.");
-  return create(`personal:${entry.id}`, {skill:{source:"personal",id:entry.id,label:entry.name,sourceVersion:null},decision:entry.decision??null,tasks:entry.taskIds.map((id,index)=>({id,wording:entry.taskLabels[index]})),occupationCode:null,sourceOccupationUri:null,career:null,origin:"work",workKey:entry.workKey,wording:`Develop ${entry.name}`}, options.newGoal);
+  return create(`personal:${entry.id}`, {skill:{source:"personal",id:entry.id,label:entry.name,sourceVersion:null},decision:entry.decision??null,tasks:entry.taskIds.map((id,index)=>({id,wording:entry.taskLabels[index]})),occupationCode:null,sourceOccupationUri:null,career:null,origin:"work",workKey:entry.workKey,wording:`Develop ${entry.name}`}, options);
 }
-export async function createContextGoal(context: LearningContext, options: {newGoal?:boolean} = {}) {
+export async function createContextGoal(context: LearningContext, options: GoalCreationOptions = {}) {
   const saved=readLearningContext(context.id);
   if (!saved || !same(saved,context)) throw Error("This learning choice changed. Reload before continuing.");
   if (learningContextNeedsReview(context)) throw Error("Review this learning choice against your current work first.");
-  return create(`context:${context.id}`,{skill:{source:"wef",id:String(context.skill.id),label:context.skill.name,sourceVersion:null},decision:context.origin==="work"?"accepted":null,tasks:context.taskIds.map((id,i)=>({id,wording:context.taskLabels[i]})),occupationCode:null,sourceOccupationUri:null,career:context.origin==="career"?context.career??null:null,origin:context.origin,workKey:context.workKey,wording:context.goal.trim()||`Develop ${context.skill.name}`},options.newGoal);
+  return create(`context:${context.id}`,{skill:{source:"wef",id:String(context.skill.id),label:context.skill.name,sourceVersion:null},decision:context.origin==="work"?"accepted":null,tasks:context.taskIds.map((id,i)=>({id,wording:context.taskLabels[i]})),occupationCode:null,sourceOccupationUri:null,career:context.origin==="career"?context.career??null:null,origin:context.origin,workKey:context.workKey,wording:context.goal.trim()||`Develop ${context.skill.name}`},options);
 }
 async function mutate(id:string, change:(goal:LearningGoal)=>void) {
   const goals=readLearningGoals(), goal=goals.find(g=>g.id===id);
@@ -143,6 +155,6 @@ export function goalContextWarnings(goal:LearningGoal):string[] {
     const c=readLearningContext(goal.sourceKey.slice("context:".length));
     if (!c || learningContextNeedsReview(c) || String(c.skill.id)!==goal.initial.skill.id || c.skill.name!==goal.initial.skill.label || !same(c.origin==="career"?c.career??null:null,goal.initial.career) || c.workKey!==goal.initial.workKey || !same(c.taskIds,goal.initial.tasks.map(t=>t.id)) || !same(c.taskLabels,goal.initial.tasks.map(t=>t.wording))) warnings.push("Your learning context has changed. This goal keeps its original starting record.");
   }
-  if (!goal.initial.tasks.length && !goal.initial.career) warnings.push("No confirmed work task or career reason was saved with this goal.");
+  if (goal.initial.origin !== "browse" && !goal.initial.tasks.length && !goal.initial.career) warnings.push("No confirmed work task or career reason was saved with this goal.");
   return warnings;
 }

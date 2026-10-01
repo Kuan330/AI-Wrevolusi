@@ -15,6 +15,7 @@ import AddSkillDialog from "./components/AddSkillDialog";
 import RemoveSkillDialog from "./components/RemoveSkillDialog";
 import { useCourseLibrary } from "./hooks/useCourseLibrary";
 import { loadLearningCatalogue, resetCourseDirectory } from "@/features/learning-planning/courseDirectory";
+import { courseGroupRecord, groupProviderCourses } from "@/features/learning-planning/courseGroups";
 import type { Course } from "../../features/learning-planning/types";
 import {
   readLearningSkills,
@@ -198,13 +199,18 @@ export default function LearningCentre() {
     return () => { cancelled = true; };
   }, [activeId, genericSearch, contextError, unsupportedGoal, goalResource.error, catalogueRefresh]);
 
-  const matching = pageCourses;
-  const visible = matching.filter(course =>
-    [course.title, course.provider, course.intro, ...course.outcomes].join(" ").toLowerCase().includes(filters.query.trim().toLowerCase()) &&
+  const skillLabel = (id: string) => wefSkills.find(row => skillKey(row.core_skill) === id)?.core_skill ?? id.replace(/-/g, " ");
+  const courseGroups = useMemo(() => genericSearch ? groupProviderCourses(pageCourses) : pageCourses.map(course => ({ course, mappings: [course] })), [pageCourses, genericSearch]);
+  const matching = courseGroups.map(group => group.course);
+  const visibleIds = new Set(pageCourses.filter(course =>
+    [course.title, course.provider, course.intro, ...course.outcomes, ...course.skills.map(skillLabel)].join(" ").toLowerCase().includes(filters.query.trim().toLowerCase()) &&
     (!filters.level || course.level === filters.level) && (!filters.provider || course.provider === filters.provider) &&
     (!filters.format || course.format === filters.format) && (!filters.language || course.language === filters.language) &&
-    (!filters.registration || course.register === filters.registration));
+    (!filters.registration || course.register === filters.registration)).map(course => course.id));
+  const visible = courseGroups.filter(group => group.mappings.some(course => visibleIds.has(course.id)));
   const detailCourse = pageCourses.find(course => course.id === detailId) ?? null;
+  const detailGroup = courseGroups.find(group => group.mappings.some(course => course.id === detailId));
+  const showSidebar = !genericSearch || focusSkills.length > 0;
   const addedIds = new Set(skills.map(item => item.id));
 
   const onToggleSave = async (courseId: string) => {
@@ -236,6 +242,15 @@ export default function LearningCentre() {
     } finally {
       if (mounted.current && owner === currentWorkspaceSession()) setSelecting(false);
     }
+  };
+
+  const addLearningSkill = (name: string, source: LearningSkill["source"]) => {
+    const added = addSkill(name, source);
+    if (added && genericSearch) {
+      setAddOpen(false);
+      void selectSkill(skillKey(name));
+    }
+    return added;
   };
 
   const confirmRemoveSkill = async () => {
@@ -285,7 +300,10 @@ export default function LearningCentre() {
           </Link>
         </section>
       )}
-      {genericSearch && <p className="mb-4" role="status">You are browsing the course catalogue on your own. Added courses are self-selected, not skill or career recommendations.</p>}
+      {genericSearch && <div className="library-browse-actions">
+        <p className="library-browse-note">Browse courses on your own. Linked skills describe catalogue connections, not a recommendation for you.</p>
+        <Button type="button" variant="outline" disabled={selecting || !skillsLoaded || Boolean(journey.error)} onClick={() => setAddOpen(true)}>Choose a skill for a goal</Button>
+      </div>}
       {contextError && <div role="alert" className="mb-4"><p>{contextError}</p><Link className="underline" to="/skills">Review your skills</Link></div>}
       {!resourceGoal && !journey.reviewed && !context && !genericSearch && <p className="mb-4">Review your work skills to use them here, or add a skill to explore your own learning. <Link className="underline" to="/skills">Review skills</Link></p>}
       {(selectionError || selecting) && <p role={selectionError ? "alert" : "status"}>{selectionError ? displayLearningError(selectionError) : "Saving your skill choice…"}</p>}
@@ -307,8 +325,8 @@ export default function LearningCentre() {
           </AppButton>
         </section>
       ) : (
-        <div className="library-layout">
-          <SkillSidebar {...sidebarProps} />
+        <div className={`library-layout${genericSearch ? " library-layout--browse" : ""}${genericSearch && showSidebar ? " library-layout--with-skills" : ""}`}>
+          {showSidebar && (genericSearch ? <details className="library-browse-skills"><summary>Choose a saved skill for a goal</summary><SkillSidebar {...sidebarProps} /></details> : <SkillSidebar {...sidebarProps} />)}
           <div
             className="library-results"
             role="region"
@@ -334,7 +352,7 @@ export default function LearningCentre() {
             {!catalogueError && <p className="library-muted" role="status">
               {skill
                 ? `${visible.length} of ${matching.length} courses for ${skill.en}`
-                : `${visible.length} of ${matching.length} courses in the catalogue`}
+                : `${visible.length} of ${matching.length} ${genericSearch ? "provider courses" : "courses"} in the catalogue`}
             </p>}
             {!visible.length && !catalogueLoading && !catalogueError ? (
               <div className="library-empty library-glass">
@@ -361,18 +379,24 @@ export default function LearningCentre() {
               </div>
             ) : (
               <div className="library-course-list">
-                {visible.map((course) => (
-                  <CourseCard
-                    key={course.id}
+                {visible.map((group) => {
+                  const matchingRecord = group.mappings.find(course => visibleIds.has(course.id)) ?? group.course;
+                  const course = { ...matchingRecord, skills: group.course.skills };
+                  const record = courseGroupRecord(group, state.saved, matchingRecord.id);
+                  const saved = state.saved.includes(record.id);
+                  return <CourseCard
+                    key={group.course.id}
                     course={course}
-                    saved={state.saved.includes(course.id)}
+                    saved={saved}
                     busy={busy}
                     pendingSync={pendingSync}
                     saveDisabled={contextStale || Boolean(contextError)}
-                    onSave={() => { if (!busy) void onToggleSave(course.id); }}
-                    onDetails={() => setDetailId(course.id)}
-                  />
-                ))}
+                    linkedSkills={genericSearch ? course.skills.map(skillLabel) : undefined}
+                    openSaved={genericSearch}
+                    onSave={() => { if (!busy) { if (genericSearch && saved) setDetailId(record.id); else void onToggleSave(record.id); } }}
+                    onDetails={() => setDetailId(record.id)}
+                  />;
+                })}
               </div>
             )}
           </div>
@@ -384,6 +408,9 @@ export default function LearningCentre() {
           key={detailCourse.id}
           course={detailCourse}
           skillName={cleanDisplayText(skill?.en ?? "")}
+          linkedSkills={genericSearch ? detailGroup?.course.skills.map(skillLabel) : undefined}
+          learningRecords={genericSearch ? detailGroup?.mappings.map(course => ({ id: course.id, label: course.skills.map(skillLabel).join(" · ") || "Course", saved: state.saved.includes(course.id) })) : undefined}
+          onSelectRecord={setDetailId}
           saved={state.saved.includes(detailCourse.id)}
           busy={busy}
           pendingSync={pendingSync}
@@ -402,7 +429,7 @@ export default function LearningCentre() {
           if (!open) refresh();
         }}
         addedIds={addedIds}
-        onAdd={(name, source) => addSkill(name, source)}
+        onAdd={addLearningSkill}
       />
 
       <RemoveSkillDialog

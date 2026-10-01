@@ -7,20 +7,21 @@ import { possibilitiesService } from "@/services/possibilitiesService";
 import { referenceService } from "@/services/referenceService";
 import { accountStorage, currentWorkspaceSession, flushWorkspace } from "@/services/accountStorage";
 import { PAGE_GRADIENT_CSS } from "@/constants/palette";
-import { GradientBar } from "@/components/ui/gradient-bar";
 import SkillOutlookSummary from "@/pages/Skills/components/SkillOutlookSummary";
-import { useLearningSkills } from "@/pages/Skills/useLearningSkills";
+import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
 import {
   readTaskWorkspace,
 } from "@/features/work-profile/userProfile";
 import type { WefSkill } from "@/types/reference";
 import {
+  acceptedCareerEvidence,
+  acceptedDirectionSkills,
   loadSavedPossibilities,
   possibilitiesProfilePath,
   toPossibilitiesData,
   type PossibilitiesData,
 } from "./possibilitiesModel";
-import { getSkillDecision, isSkillReviewCurrent, readLearningContext, startLearning } from "@/features/journey/journey";
+import { isSkillReviewCurrent, readJourneyProfile, readJourneyState, readLearningContext, startLearning } from "@/features/journey/journey";
 import { skillKey } from "@/pages/Skills/learningSkills";
 import "./exploration.css";
 
@@ -36,15 +37,15 @@ const readJson = <T,>(key: string, fallback: T): T => {
   }
 };
 
-/** Outlook card + add to Learning Resources — same pattern as AI Impact. */
+/** Skill outlook with the same career learning action as the page. */
 function BuildSkillChip({
   skill,
-  added,
-  onChanged,
+  continuing,
+  onLearn,
 }: {
   skill: WefSkill;
-  added: boolean;
-  onChanged: () => void;
+  continuing: boolean;
+  onLearn: () => void;
 }) {
   const actionsRef = useRef<Popover.Root.Actions | null>(null);
 
@@ -53,13 +54,9 @@ function BuildSkillChip({
       <Popover.Trigger
         nativeButton
         type="button"
-        className={`px-chip missing${added ? " is-learning" : ""}`}
+        className="px-chip missing"
         aria-haspopup="dialog"
-        title={
-          added
-            ? "View outlook · already in your learning skills"
-            : "View outlook · add to your learning skills"
-        }
+        title="View outlook and learn this skill for your chosen direction"
       >
         {skill.core_skill}
         <Plus size={13} aria-hidden />
@@ -80,12 +77,16 @@ function BuildSkillChip({
             <SkillOutlookSummary
               skill={skill}
               compact
-              showAddToLearning
-              onAddComplete={() => {
-                onChanged();
-                actionsRef.current?.close();
-              }}
+              showAddToLearning={false}
             />
+            <button
+              type="button"
+              className="px-primary mt-3"
+              disabled={continuing}
+              onClick={() => { onLearn(); actionsRef.current?.close(); }}
+            >
+              {continuing ? "Saving your choice…" : "Learn this skill for this direction"}
+            </button>
           </Popover.Popup>
         </Popover.Positioner>
       </Popover.Portal>
@@ -96,25 +97,23 @@ function BuildSkillChip({
 function JourneyCompanion({
   currentTitle,
   targetTitle,
-  coveragePct,
+  acceptedSkills,
   onExplore,
   canExplore,
   continuing,
 }: {
   currentTitle: string;
   targetTitle: string | null;
-  coveragePct: number | null;
+  acceptedSkills: { skill_id: number; name: string }[];
   onExplore: () => void;
   canExplore: boolean;
   continuing: boolean;
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const coverage = coveragePct ?? 0;
-  const hasCoverage = coveragePct != null;
 
   useEffect(() => {
     setDetailsOpen(false);
-  }, [targetTitle, coveragePct]);
+  }, [targetTitle]);
 
   return (
     <aside className="px-companion">
@@ -136,20 +135,9 @@ function JourneyCompanion({
             <span>{targetTitle}</span>
           </p>
 
-          <div className="px-companion-coverage">
-            <div className="px-companion-coverage-meta">
-              <strong>{hasCoverage ? `${coverage}%` : "—"}</strong>
-              <span>Skill coverage</span>
-            </div>
-            <GradientBar
-              value={hasCoverage ? coverage : 0}
-              size="md"
-              aria-label={
-                hasCoverage
-                  ? `Skill coverage ${coverage} percent`
-                  : "Skill coverage unavailable"
-              }
-            />
+          <div className="px-companion-evidence">
+            <strong>{acceptedSkills.length ? `${acceptedSkills.length} accepted connection${acceptedSkills.length === 1 ? "" : "s"}` : "Needs review"}</strong>
+            <p className="px-chosen-hint">Broad connections to explore</p>
             <button
               type="button"
               className={`px-companion-details-btn${detailsOpen ? " is-open" : ""}`}
@@ -163,30 +151,11 @@ function JourneyCompanion({
               <div className="px-companion-story" id="px-companion-details">
                 <h3>What this path suggests</h3>
                 <p>
-                  Your confirmed tasks already overlap with skills used in{" "}
-                  <strong>{targetTitle}</strong>. These are detected skill
-                  signals. Other requirements have not been assessed.
+                  This direction uses broad WEF skill links from occupation and task wording.
+                  {acceptedSkills.length ? " These connections match skills you accepted in your current review." : " No accepted skill connections are shown in your current review yet."}
                 </p>
-                <ul>
-                  <li>
-                    {hasCoverage ? (
-                      <>
-                        <strong>{coverage}% skill coverage</strong> comes from
-                        overlapping task wording with this role&apos;s skill
-                        map.
-                      </>
-                    ) : (
-                      <>
-                        Skill overlap is inferred from your confirmed task
-                        wording.
-                      </>
-                    )}
-                  </li>
-                  <li>
-                    When you are ready, open Find learning to explore a small
-                    next step.
-                  </li>
-                </ul>
+                {acceptedSkills.length > 0 && <ul>{acceptedSkills.map(skill => <li key={skill.skill_id}>{skill.name}</li>)}</ul>}
+                <p>Other skills, qualifications and experience have not been assessed. Choose a skill to explore a useful next step.</p>
               </div>
             ) : null}
           </div>
@@ -253,16 +222,21 @@ export default function Possibilities() {
     };
   }, []);
 
+  const [workspaceRevision, setWorkspaceRevision] = useState(0);
+  useEffect(() => {
+    const changed = () => setWorkspaceRevision(value => value + 1);
+    window.addEventListener("workspace-change", changed);
+    return () => window.removeEventListener("workspace-change", changed);
+  }, []);
   const reviewedEvidence = useMemo(() => {
+    void workspaceRevision;
     try {
-      const current = isSkillReviewCurrent();
-      return { skills: (data?.skills ?? [])
-        .filter(skill => skill.state === "have" && current && getSkillDecision(skill.skill_id) === "accepted")
-        .map(skill => ({ skill: { wef_skill_id: skill.skill_id, core_skill: skill.name } })), error: "" };
+      const evidence = buildSkillEvidence(readJourneyProfile()?.tasks ?? [], wefSkills);
+      return { skills: acceptedCareerEvidence(evidence, isSkillReviewCurrent(), readJourneyState().review?.decisions ?? {}), error: "" };
     } catch (error) {
       return { skills: [], error: error instanceof Error ? error.message : "Could not read your skill review." };
     }
-  }, [data]);
+  }, [wefSkills, workspaceRevision]);
   const reflectedSkills = reviewedEvidence.skills;
   const reflectedSkillIds = useMemo(
     () => new Set(reflectedSkills.map(({ skill }) => skill.wef_skill_id)),
@@ -272,7 +246,6 @@ export default function Possibilities() {
     () => new Map(wefSkills.map(skill => [skill.wef_skill_id, skill])),
     [wefSkills],
   );
-  const { isAdded, refresh: refreshLearningSkills } = useLearningSkills();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -360,19 +333,20 @@ export default function Possibilities() {
 
   const selected = data.directions.find(item => item.occupation_code === selectedCode);
   const currentTitle = data.currentRole?.title ?? "Your current role";
-  const selectedCoverage = selected?.coverage_pct ?? data.chosenDirectionCoverage;
+  const selectedAcceptedSkills = acceptedDirectionSkills(selected?.skills ?? [], reflectedSkillIds);
   const availableSkills = (selected?.skills ?? []).filter(item => {
     const wef = wefById.get(item.skill_id);
     return wef && item.skill_slug === skillKey(wef.core_skill);
   });
   const selectedSkill = skillChoice?.careerCode === selected?.occupation_code
     ? availableSkills.find(item => item.skill_id === skillChoice?.id) : undefined;
-  const goLearning = async () => {
-    if (!selected || !selectedSkill || continuing) return;
-    const wef = wefById.get(selectedSkill.skill_id);
+  const goLearning = async (skillId = selectedSkill?.skill_id) => {
+    if (!selected || skillId == null || continuing || !availableSkills.some(item => item.skill_id === skillId)) return;
+    const wef = wefById.get(skillId);
     if (!wef) return;
     const owner = currentWorkspaceSession();
     setContinuing(true);
+    setSkillChoice({ careerCode: selected.occupation_code, id: skillId });
     setNavigationError("");
     try {
       const url = await startLearning({ origin: "career",
@@ -431,7 +405,7 @@ export default function Possibilities() {
             <div className="px-direction-grid">
               {data.directions.slice(0, 3).map((direction, index) => {
                 const chosen = selected?.occupation_code === direction.occupation_code;
-                const coverage = direction.coverage_pct;
+                const acceptedSkills = acceptedDirectionSkills(direction.skills, reflectedSkillIds);
                 return (
                   <article
                     className={`px-direction-card px-accent-${index} ${chosen ? "is-chosen" : ""}`}
@@ -439,12 +413,10 @@ export default function Possibilities() {
                   >
                     {direction.area ? <p className="px-eyebrow">{direction.area}</p> : null}
                     <h3>{direction.title}</h3>
-                    <div className="px-card-score">
-                      <strong>
-                        {coverage != null ? coverage : "—"}
-                      </strong>
-                      {coverage != null ? <small>%</small> : null}
-                      <span>SKILL COVERAGE</span>
+                    <div className="px-card-evidence">
+                      <strong>{acceptedSkills.length ? `${acceptedSkills.length} accepted connection${acceptedSkills.length === 1 ? "" : "s"}` : "Needs review"}</strong>
+                      <span>Broad connections to explore</span>
+                      {acceptedSkills.length > 0 && <p>{acceptedSkills.map(skill => skill.name).join(" · ")}</p>}
                     </div>
                     <p className="px-direction-description">{direction.description}</p>
                     <button
@@ -466,8 +438,8 @@ export default function Possibilities() {
               <h2 id="px-chosen-title">Your path to {selected.title}</h2>
               <p className="px-chosen-lead">
                 {selected.area
-                  ? `${selected.area} · exploratory skill overlap from your confirmed work profile.`
-                  : "Exploratory skill overlap from your confirmed work profile and ILO task evidence."}
+                  ? `${selected.area} · broad WEF skill connections to explore.`
+                  : "Broad WEF skill connections from occupation and task wording."}
               </p>
               {selected.description ? (
                 <p className="px-chosen-copy">{selected.description}</p>
@@ -476,10 +448,9 @@ export default function Possibilities() {
                 <div className="px-chosen-skills">
                   <div className="px-skill-split">
                     <div>
-                      <h3>Skills you bring</h3>
+                      <h3>Accepted skill connections</h3>
                       <div className="px-chips px-chips--path">
-                        {selected.skills
-                          .filter(skill => reflectedSkillIds.has(skill.skill_id))
+                        {selectedAcceptedSkills
                           .map(skill => (
                             <span className="px-chip have" key={skill.skill_id}>
                               <Check size={13} aria-hidden />
@@ -490,20 +461,20 @@ export default function Possibilities() {
                       {selected.skills.every(
                         skill => !reflectedSkillIds.has(skill.skill_id),
                       ) ? (
-                        <p className="px-chosen-hint">No overlapping skills yet for this direction.</p>
+                        <p className="px-chosen-hint">No accepted skill connections in your current review yet. This does not establish a skill gap.</p>
                       ) : null}
                     </div>
                     <div>
-                      <h3>Skills to build</h3>
+                      <h3>Other connections to explore</h3>
                       <p className="px-chosen-hint">
-                        Open a skill to see its outlook and add it to your learning skills.
+                        These connections need review. Open a skill to see its outlook or learn it for this direction.
                       </p>
                       <div className="px-chips px-chips--path">
                         {selected.skills
                           .filter(skill => !reflectedSkillIds.has(skill.skill_id))
                           .map(skill => {
                             const wef = wefById.get(skill.skill_id);
-                            if (!wef) {
+                            if (!wef || skill.skill_slug !== skillKey(wef.core_skill)) {
                               return (
                                 <span className="px-chip missing" key={skill.skill_id}>
                                   {skill.name}
@@ -515,8 +486,8 @@ export default function Possibilities() {
                               <BuildSkillChip
                                 key={skill.skill_id}
                                 skill={wef}
-                                added={isAdded(wef.core_skill)}
-                                onChanged={refreshLearningSkills}
+                                continuing={continuing}
+                                onLearn={() => { void goLearning(skill.skill_id); }}
                               />
                             );
                           })}
@@ -554,14 +525,14 @@ export default function Possibilities() {
         <JourneyCompanion
           currentTitle={currentTitle}
           targetTitle={selected?.title ?? null}
-          coveragePct={selectedCoverage}
+          acceptedSkills={selectedAcceptedSkills}
           onExplore={() => { void goLearning(); }}
           canExplore={Boolean(selectedSkill)}
           continuing={continuing}
         />
       </div>
 
-      <p className="px-chosen-hint">Skill coverage is inferred from task wording against each role&apos;s skill map. Specialist skills, qualifications and experience have not been assessed. These suggestions do not indicate job readiness or hiring probability.</p>
+      <p className="px-chosen-hint">Career connections use broad WEF skill links from occupation and task wording. Accepted connections use your current skill review. Specialist skills, qualifications and experience have not been assessed. These suggestions do not indicate job readiness or hiring probability.</p>
     </div>
   );
 }

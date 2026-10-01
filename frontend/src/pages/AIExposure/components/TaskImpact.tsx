@@ -38,7 +38,7 @@ export default function TaskImpact({ task, assessment, researchChecked, research
     <section className="exposure-question"><h3>Your judgement still matters</h3><p>{guidance.review}</p></section></div>
     <p className="exposure-caption">These practical ideas use your task wording. Check that they fit your work and approved procedures.</p>
     <section className="exposure-question exposure-next"><h3>Your next step</h3>
-      <Button asChild><Link to={`${ROUTES.skills}?task=${encodeURIComponent(task.id)}`} state={{ taskWording: task.wording }}>Explore skills for this task →</Link></Button>
+      <Button asChild><Link to={`${ROUTES.skills}?view=task&task=${encodeURIComponent(task.id)}`} state={{ taskWording: task.wording }}>Explore skills for this task →</Link></Button>
     </section>
     <details className="exposure-evidence"><summary>Why are we showing this?</summary>
       {occupation && <p><strong>Research occupation:</strong> {occupation.title} · {occupation.code}. This reference may not cover every part of your job.</p>}

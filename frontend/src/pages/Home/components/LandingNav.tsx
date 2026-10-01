@@ -16,13 +16,14 @@ const LandingNav = () => {
 
   const linkProps1 = {
     to: user ? ROUTES.aiExposure : ROUTES.workProfile,
+    state: user ? undefined : { authMode: "register" },
     className: "btn btn-primary btn-sm",
-    style: { color: "#fff" },
   } satisfies Partial<ComponentProps<typeof Link>>;
   const linkProps2 = {
     to: user ? ROUTES.aiExposure : ROUTES.workProfile,
+    state: user ? undefined : { authMode: "register" },
     className: "btn btn-primary btn-sm",
-    style: { color: "#fff", alignSelf: "flex-start" },
+    style: { alignSelf: "flex-start" },
   } satisfies Partial<ComponentProps<typeof Link>>;
   return (
     <nav className="landing-nav">
@@ -34,7 +35,7 @@ const LandingNav = () => {
               {link.label}
             </a>
           ))}
-          <Link {...linkProps1}>Start free analysis</Link>
+          <Link {...linkProps1}>{user ? "Continue my work review" : "Create a free account"}</Link>
           <AccountMenu iconOnly />
         </div>
         <button
@@ -60,7 +61,7 @@ const LandingNav = () => {
             {link.label}
           </a>
         ))}
-        <Link {...linkProps2}>Start free analysis</Link>
+        <Link {...linkProps2}>{user ? "Continue my work review" : "Create a free account"}</Link>
         <AccountMenu iconOnly />
       </div>
     </nav>

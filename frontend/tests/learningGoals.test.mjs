@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 import { compactGoalState, expandGoalState, MAX_GOAL_REVISIONS } from '../src/features/learning-goals/goalHistoryCodec.ts';
-let stored,profile,entry,fail,context,contextNeedsReview,personal;
+let stored,profile,entry,fail,context,contextNeedsReview,personal,commitHold,lostResponse,acceptedWorkspace;
 const source=readFileSync(new URL('../src/features/learning-goals/learningGoals.ts',import.meta.url),'utf8').replace(/^import .*;\n/gm,'')+'\nreturn {readLearningGoals,parseLearningGoals,createPersonalGoal,createSpecialistGoal,createContextGoal,updateLearningGoal,saveLearningAttempt,removeLearningAttempt,goalContextWarnings};';
 const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText.replace(/export /g,'');
-const api=new Function('accountStorage','commitWorkspaceItems','currentWorkspaceSession','readJourneyProfile','readLearningContext','learningContextNeedsReview','readSpecialistState','specialistEntryKey','specialistEntryIsCurrent','readJourneyState','personalSkillIsCurrent','compactGoalState','expandGoalState','MAX_GOAL_REVISIONS',compiled)({getItem:k=>stored.get(k)??null},async values=>{if(fail)throw Error('save failed');for(const [k,v] of Object.entries(values))stored.set(k,v);},()=>1,()=>profile,id=>context?.id===id?context:null,()=>contextNeedsReview,()=>({entries:[entry]}),e=>JSON.stringify([e.taskId,e.skillUri]),(e,ts,code)=>code===e.occupationCode&&ts.some(t=>t.id===e.taskId&&t.wording===e.taskWording),()=>({personalSkills:personal?[personal]:[]}),e=>profile.tasksConfirmed&&e.taskIds.every((id,i)=>profile.tasks.some(t=>t.id===id&&t.wording===e.taskLabels[i])),compactGoalState,expandGoalState,MAX_GOAL_REVISIONS);
-beforeEach(()=>{stored=new Map();personal=null;fail=false;context=null;contextNeedsReview=false;entry={taskId:'t1',taskWording:'Prepare reports',occupationCode:'3115',skillUri:'http://data.europa.eu/esco/skill/12345678-1234-1234-1234-123456789abc',skillLabel:'Write reports',sourceVersion:'1.2.0',sourceOccupationUri:null,decision:null,wantsLearning:true,updatedAt:'2026-09-29T00:00:00Z'};profile={tasksConfirmed:true,tasksOccupationCode:'3115',tasks:[{id:'t1',wording:'Prepare reports'}]};});
+const api=new Function('accountStorage','commitWorkspaceItems','currentWorkspaceSession','readJourneyProfile','readLearningContext','learningContextNeedsReview','readSpecialistState','specialistEntryKey','specialistEntryIsCurrent','readJourneyState','personalSkillIsCurrent','compactGoalState','expandGoalState','MAX_GOAL_REVISIONS',compiled)({getItem:k=>stored.get(k)??null},async values=>{if(commitHold)await commitHold;if(fail)throw Error('save failed');if(lostResponse){acceptedWorkspace=values;throw Error('response lost');}for(const [k,v] of Object.entries(values))stored.set(k,v);},()=>1,()=>profile,id=>context?.id===id?context:null,()=>contextNeedsReview,()=>({entries:[entry]}),e=>JSON.stringify([e.taskId,e.skillUri]),(e,ts,code)=>code===e.occupationCode&&ts.some(t=>t.id===e.taskId&&t.wording===e.taskWording),()=>({personalSkills:personal?[personal]:[]}),e=>profile.tasksConfirmed&&e.taskIds.every((id,i)=>profile.tasks.some(t=>t.id===id&&t.wording===e.taskLabels[i])),compactGoalState,expandGoalState,MAX_GOAL_REVISIONS);
+beforeEach(()=>{stored=new Map();personal=null;fail=false;commitHold=null;lostResponse=false;acceptedWorkspace=null;context=null;contextNeedsReview=false;entry={taskId:'t1',taskWording:'Prepare reports',occupationCode:'3115',skillUri:'http://data.europa.eu/esco/skill/12345678-1234-1234-1234-123456789abc',skillLabel:'Write reports',sourceVersion:'1.2.0',sourceOccupationUri:null,decision:null,wantsLearning:true,updatedAt:'2026-09-29T00:00:00Z'};profile={tasksConfirmed:true,tasksOccupationCode:'3115',tasks:[{id:'t1',wording:'Prepare reports'}]};});
 test('creation is idempotent and keeps missing career link honest',async()=>{const g=await api.createSpecialistGoal(entry);assert.equal((await api.createSpecialistGoal(entry)).id,g.id);assert.equal(g.initial.career,null);assert.equal(g.initial.decision,null);assert.equal(api.readLearningGoals().length,1);});
 test('study without action or course saves and failed save retains records',async()=>{const g=await api.createSpecialistGoal(entry);fail=true;await assert.rejects(api.saveLearningAttempt(g.id,{id:'a1',date:'2026-01-01',type:'study',description:'Read a guide'}));assert.equal(api.readLearningGoals()[0].attempts.length,0);fail=false;await api.saveLearningAttempt(g.id,{id:'a1',date:'2026-01-01',type:'study',description:'Read a guide'});assert.equal(api.readLearningGoals()[0].action,null);});
 test('workplace practice requires a real task and course practice does not invent one',async()=>{const g=await api.createSpecialistGoal(entry);await assert.rejects(api.saveLearningAttempt(g.id,{date:'2026-01-01',type:'workplace_practice',description:'Tried'}),/real work task/);await api.saveLearningAttempt(g.id,{date:'2026-01-01',type:'course_practice',description:'Tried'});assert.equal(api.readLearningGoals()[0].attempts[0].task,null);});
@@ -41,15 +41,27 @@ test('WEF career carries the saved career reason without inventing current work 
  assert.equal(goal.initial.sourceOccupationUri,null);
  assert.equal(goal.initial.skill.sourceVersion,null);
 });
-test('WEF browse preserves missing task and career evidence and fallback goal wording',async()=>{
+test('WEF browse preserves independent learning without requiring task or career evidence',async()=>{
  context={...savedContext('browse'),goal:''};
+ profile={tasksConfirmed:false,tasksOccupationCode:null,tasks:[]};
  const goal=await api.createContextGoal(context);
  assert.deepEqual(goal.initial.tasks,[]);
  assert.equal(goal.initial.career,null);
  assert.equal(goal.initial.decision,null);
  assert.equal(goal.initial.skill.sourceVersion,null);
  assert.equal(goal.wording,'Develop Analytical thinking');
- assert.match(api.goalContextWarnings(goal).join(' '),/No confirmed work task or career reason/);
+ assert.deepEqual(api.goalContextWarnings(goal),[]);
+});
+test('independent browse goals still warn when their saved source is missing changed or stale',async()=>{
+ context=savedContext('browse');
+ const goal=await api.createContextGoal(context);
+ contextNeedsReview=true;
+ assert.match(api.goalContextWarnings(goal).join(' '),/learning context has changed/);
+ contextNeedsReview=false;
+ context={...context,skill:{...context.skill,id:2}};
+ assert.match(api.goalContextWarnings(goal).join(' '),/learning context has changed/);
+ context=null;
+ assert.match(api.goalContextWarnings(goal).join(' '),/learning context has changed/);
 });
 test('WEF stale or replaced source cannot create a goal until reviewed',async()=>{
  context=savedContext('work');contextNeedsReview=true;
@@ -86,6 +98,88 @@ test('corrupt enum arrays cannot masquerade as supported evidence or action type
 });
 
 const personalEntry = () => ({id:'p1',name:'My local reporting method',taskIds:['t1'],taskLabels:['Prepare reports'],workKey:'original-work',updatedAt:'2026-01-01T00:00:00Z',wantsLearning:true});
+for (const [source, setup, create] of [
+ ['specialist',()=>{},options=>api.createSpecialistGoal(entry,options)],
+ ['personal',()=>{personal=personalEntry();},options=>api.createPersonalGoal(personal,options)],
+ ['work',()=>{context=savedContext('work');},options=>api.createContextGoal(context,options)],
+ ['career',()=>{context=savedContext('career');},options=>api.createContextGoal(context,options)],
+ ['browse',()=>{context=savedContext('browse');},options=>api.createContextGoal(context,options)],
+]) test(`${source} explicit new goal keeps the earlier goal and ordinary retries use the latest goal`,async()=>{
+ setup();
+ const first=await create();
+ await api.updateLearningGoal(first.id,{action:{kind:'practise',text:'Try a sample'}});
+ await api.saveLearningAttempt(first.id,{id:'earlier-attempt',date:'2026-01-01',type:'study',description:'Read the first chapter'});
+ const earlier=api.readLearningGoals()[0];
+ const options={newGoal:true,creationId:crypto.randomUUID()};
+ const second=await create(options);
+ assert.equal(second.id,options.creationId);
+ assert.notEqual(second.id,first.id);
+ assert.deepEqual(second.initial,first.initial);
+ assert.equal(second.revision,1);
+ assert.deepEqual(second.attempts,[]);
+ assert.deepEqual(second.history,[]);
+ assert.equal(second.action,null);
+ assert.equal((await create(options)).id,second.id);
+ assert.equal((await create()).id,second.id);
+ assert.equal(api.readLearningGoals().length,2);
+ assert.deepEqual(api.readLearningGoals()[0],earlier);
+});
+test('failed explicit new goal keeps previous records and can be saved again',async()=>{
+ const first=await api.createSpecialistGoal(entry);
+ const before=api.readLearningGoals();
+ fail=true;
+ await assert.rejects(api.createSpecialistGoal(entry,{newGoal:true}),/save failed/);
+ assert.deepEqual(api.readLearningGoals(),before);
+ fail=false;
+ assert.notEqual((await api.createSpecialistGoal(entry,{newGoal:true})).id,first.id);
+ assert.equal(api.readLearningGoals().length,2);
+});
+test('explicit new goal retry after a lost response and account reload keeps the same creation ID',async()=>{
+ await api.createSpecialistGoal(entry);
+ const options={newGoal:true,creationId:'11111111-1111-4111-8111-111111111111'};
+ lostResponse=true;
+ await assert.rejects(api.createSpecialistGoal(entry,options),/response lost/);
+ assert.equal(api.readLearningGoals().length,1);
+ // Reload the accepted server copy after the response was lost.
+ for(const [key,value] of Object.entries(acceptedWorkspace))stored.set(key,value);
+ const accepted=stored.get('aiwrevolusi.learningGoals.v1');
+ const retry=await api.createSpecialistGoal(entry,options);
+ assert.equal(retry.id,options.creationId);
+ assert.equal(api.readLearningGoals().length,2);
+ assert.equal(stored.get('aiwrevolusi.learningGoals.v1'),accepted);
+ lostResponse=false;
+ const distinct=await api.createSpecialistGoal(entry,{newGoal:true,creationId:'22222222-2222-4222-8222-222222222222'});
+ assert.notEqual(distinct.id,retry.id);
+ assert.equal(api.readLearningGoals().length,3);
+});
+test('creation ID cannot be reused for another source or starting record',async()=>{
+ const options={newGoal:true,creationId:'11111111-1111-4111-8111-111111111111'};
+ await api.createSpecialistGoal(entry,options);
+ const saved=stored.get('aiwrevolusi.learningGoals.v1');
+ personal=personalEntry();
+ await assert.rejects(api.createPersonalGoal(personal,options),/changed/);
+ entry={...entry,sourceVersion:'1.3.0'};
+ await assert.rejects(api.createSpecialistGoal(entry,options),/changed/);
+ assert.equal(stored.get('aiwrevolusi.learningGoals.v1'),saved);
+});
+test('creation ID is accepted only for an explicit new goal with a valid ID',async()=>{
+ for(const options of [{creationId:'11111111-1111-4111-8111-111111111111'},{newGoal:true,creationId:'bad-id'}])
+  await assert.rejects(api.createSpecialistGoal(entry,options),/new goal link/);
+ assert.equal(api.readLearningGoals().length,0);
+});
+test('overlapping explicit new saves cannot overwrite each other or earlier goals',async()=>{
+ const first=await api.createSpecialistGoal(entry);
+ let release;
+ commitHold=new Promise(resolve=>{release=resolve;});
+ const saving=api.createSpecialistGoal(entry,{newGoal:true});
+ try {
+  await assert.rejects(api.createSpecialistGoal(entry,{newGoal:true}),/being saved/);
+  assert.equal(api.readLearningGoals().length,1);
+ } finally { release(); }
+ const second=await saving;
+ assert.notEqual(first.id,second.id);
+ assert.deepEqual(api.readLearningGoals().map(goal=>goal.id),[first.id,second.id]);
+});
 test('personal learning carries exact user evidence without inventing catalogue identity or ability',async()=>{
  personal=personalEntry();
  const goal=await api.createPersonalGoal(personal);

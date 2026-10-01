@@ -15,7 +15,7 @@ const buttonVariants = cva(
         secondary: "soft-btn-brown",
         ghost:
           "border border-transparent bg-transparent shadow-none hover:bg-[#eaf3fb] hover:text-[#35617c]",
-        link: "rounded-md border-0 bg-transparent p-0 font-medium text-[#4f91ba] shadow-none underline-offset-4 hover:underline hover:transform-none",
+        link: "rounded-md border-0 bg-transparent p-0 font-medium text-[#326889] shadow-none underline-offset-4 hover:underline hover:transform-none",
       },
       size: {
         default: "h-10 px-5 py-2",

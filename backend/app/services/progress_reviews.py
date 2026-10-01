@@ -116,6 +116,8 @@ def resolve_source(goal, records, checked):
     current_tasks={t['id']:t['wording'] for t in records['profile'].get('tasks',[])}
     if expected_tasks and (records['profile'].get('tasksConfirmed') is not True or any(current_tasks.get(t['id'])!=t['wording'] for t in expected_tasks)):
         valid=False
+    if initial['origin']!='browse' and (records['profile'].get('tasksConfirmed') is not True or not current_tasks):
+        valid=False
     return valid, decision, deepcopy(expected_tasks) if valid else []
 
 
@@ -154,13 +156,14 @@ def current_evidence(records, checked, recorded_at):
         if not work:gaps.append('No workplace practice is recorded. This is not evidence that you lack ability.')
         # Initial task context can be valid while a later practice task has changed.
         actual_tasks={t['id']:t['wording'] for t in records['profile'].get('tasks',[])}
-        stale_practice=any(a['task'] and actual_tasks.get(a['task']['id'])!=a['task']['wording'] for a in work)
-        if stale_practice:gaps.append('Some workplace attempts retain earlier task wording. Review that context before treating them as current work evidence.')
+        current_work=[a for a in work if records['profile'].get('tasksConfirmed') is True and a['task'] and actual_tasks.get(a['task']['id'])==a['task']['wording']]
+        stale_practice=len(current_work)!=len(work)
+        if stale_practice:gaps.append('Some workplace attempts lack current confirmed task context. Their records are kept but excluded from current workplace evidence counts.')
         meaning={'skill':goal['initial']['skill'],'wording':goal['wording'],'tasks':goal['initial']['tasks'],
                  'career':goal['initial']['career'],'origin':goal['initial']['origin'],'sourceOccupationUri':goal['initial']['sourceOccupationUri']}
         evidence[goal['id']]={'recorded_at':recorded_at,'goal_wording':goal['wording'],'skill':deepcopy(goal['initial']['skill']),
             'goal_created_at':goal['createdAt'],'confirmed_tasks':tasks,'task_evidence':tasks if decision in ('use','accepted') else [],
-            'decision':decision,'study':study,'course_practice':course,'workplace_practice':work,'completed_learning':completed,'gaps':gaps,
+            'decision':decision,'study':study,'course_practice':course,'workplace_practice':work,'current_workplace_practice_count':len(current_work),'completed_learning':completed,'gaps':gaps,
             'source_valid':valid,'stale_practice_context':stale_practice,'meaning_fingerprint':fingerprint(meaning)}
     return evidence
 
@@ -171,8 +174,8 @@ def summary_for(evidence, rows=None):
     result={'goals_total':len(all_values),'excluded_goals':len(all_values)-len(values),'with_task_evidence':sum(bool(v['task_evidence']) for v in values),
             'with_current_use':sum(v['decision'] in ('use','accepted') for v in values),
             'with_study':sum(bool(v['study']) for v in values),'with_completed_learning':sum(bool(v['completed_learning']) for v in values),
-            'with_course_practice':sum(bool(v['course_practice']) for v in values),'with_workplace_practice':sum(bool(v['workplace_practice']) for v in values),
-            'needing_evidence':sum(not v['source_valid'] or (not v['task_evidence'] and not v['study'] and not v['course_practice'] and not v['workplace_practice'] and not v['completed_learning']) for v in all_values),'new_goals':sum(r['status']=='new_goal' for r in (rows or []))}
+            'with_course_practice':sum(bool(v['course_practice']) for v in values),'with_workplace_practice':sum(bool(v['current_workplace_practice_count']) for v in values),
+            'needing_evidence':sum(not v['source_valid'] or (not v['task_evidence'] and not v['study'] and not v['course_practice'] and not v['current_workplace_practice_count'] and not v['completed_learning']) for v in all_values),'new_goals':sum(r['status']=='new_goal' for r in (rows or []))}
     return result
 
 
@@ -180,6 +183,8 @@ def suggested_next_step(item):
     if not item['source_valid']:
         return 'Review this goal’s work and skill connection before using it in a comparison.'
     if item['workplace_practice']:
+        if item.get('current_workplace_practice_count',len(item['workplace_practice']))==0:
+            return 'Check the work context behind your earlier attempt. You can still record study or practise with a sample.'
         return 'Look at your last workplace attempt, then choose whether to repeat or adjust the activity.'
     if item['course_practice']:
         return 'Keep practising with a sample, or consider a real work task if it is appropriate for your role.'
@@ -207,9 +212,11 @@ def build_preview(records, checked, workspace_revision, previous=None, recorded_
         rows.append({'goal_id':id,'label':item['skill']['label'],'status':status,'reason':reason,'earlier':deepcopy(earlier),'current':item,
                      'next_step':suggested_next_step(item)})
     confirmed=records['profile'].get('tasksConfirmed') is True and bool(records['profile'].get('tasks'))
-    can_save=confirmed and any(r['status']!='source_needs_review' for r in rows)
+    can_save=any(r['status']!='source_needs_review' for r in rows)
     notice=NOTICE
-    if not confirmed:notice='Confirm your work profile before saving a progress review. '+notice
+    if not confirmed:
+        notice=('This review describes recorded learning activity. Confirm your work profile before adding work-based evidence. ' if can_save
+                else 'Confirm work-based goal connections or choose an independent learning goal before saving a progress review. ')+notice
     if any(r['status']=='source_needs_review' for r in rows):notice='Flagged source connections remain visible but are excluded from comparison and evidence counts. You can save a review of the other goals. '+notice
     if not rows:notice='Save a learning goal before creating your first progress starting point. '+notice
     return {'workspace_revision':workspace_revision,'previous_review_id':str(previous.id) if previous else None,'reviewed_at':now,
@@ -245,7 +252,7 @@ def review_status(snapshot,current):
         if after is None or not after['source_valid'] or before['meaning_fingerprint']!=after['meaning_fingerprint']:
             reasons.append(f'{label}: the goal or its source context changed.');continue
         if after['stale_practice_context'] and not before.get('stale_practice_context'):
-            reasons.append(f'{label}: a workplace task used in the review changed.')
+            reasons.append(f'{label}: a workplace task used in the review changed or is no longer confirmed.')
         if before['decision'] in ('use','accepted') and after['decision'] not in ('use','accepted'):
             reasons.append(f'{label}: the earlier report of current skill use was changed.')
         elif before['decision']!=after['decision']:additions=True
@@ -261,7 +268,9 @@ def review_status(snapshot,current):
 
 def present_review(review,current,detail=False):
     status,reasons=review_status(review.snapshot,current)
-    result={'id':str(review.id),'created_at':review.created_at.isoformat(),'previous_review_id':str(review.previous_review_id) if review.previous_review_id else None,
+    # Review dates are UTC; SQLite drops tzinfo from timezone-aware columns.
+    created_at=review.created_at if review.created_at.tzinfo is not None else review.created_at.replace(tzinfo=timezone.utc)
+    result={'id':str(review.id),'created_at':created_at.isoformat(),'previous_review_id':str(review.previous_review_id) if review.previous_review_id else None,
             'summary':review.snapshot['summary'],'status':status,'status_reasons':reasons}
     if detail:result['snapshot']=deepcopy(review.snapshot)
     return result

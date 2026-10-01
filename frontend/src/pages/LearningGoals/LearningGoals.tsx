@@ -56,12 +56,23 @@ function GoalsWorkspace() {
   const { reload } = useAccount();
   const [needsReload, setNeedsReload] = useState(false);
   const [params, setParams] = useSearchParams();
+  const location = useLocation();
+  const newGoal = params.get("new") === "1";
+  const creationId = newGoal ? params.get("creation") || undefined : undefined;
   const [version, setVersion] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const alive = useRef(true);
   const lock = useRef(false);
+  useEffect(() => {
+    if (newGoal && !creationId) {
+      const next = new URLSearchParams(params);
+      next.set("creation", crypto.randomUUID());
+      // Keep one creation intent through failed saves and account reloads.
+      setParams(next, { replace: true, state: location.state });
+    }
+  }, [newGoal, creationId, params, setParams, location.state]);
   useEffect(() => {
     alive.current = true;
     const refresh = () => setVersion(v => v + 1);
@@ -120,9 +131,11 @@ function GoalsWorkspace() {
   const create = async () => {
     let created: LearningGoal | undefined;
     const ok = await run(async () => {
-      if (specialist) created = await createSpecialistGoal(specialist, { newGoal: params.get("new") === "1" });
-      else if (context) created = await createContextGoal(context, { newGoal: params.get("new") === "1" });
-      else if (personal) created = await createPersonalGoal(personal, { newGoal: params.get("new") === "1" });
+      if (newGoal && !creationId) throw new Error("Your new goal is being prepared. Please try again.");
+      const options = { newGoal, ...(creationId ? { creationId } : {}) };
+      if (specialist) created = await createSpecialistGoal(specialist, options);
+      else if (context) created = await createContextGoal(context, options);
+      else if (personal) created = await createPersonalGoal(personal, options);
       else throw new Error("Choose a saved skill first.");
     }, "Your goal is saved. You can add an action or record an attempt.");
     if (ok && created) setParams({ goal: created.id });
@@ -136,13 +149,15 @@ function GoalsWorkspace() {
       <GoalDetail key={goal.id} goal={goal} tasks={tasks} run={run} busy={busy} needsReload={needsReload} /> : specialist || context || personal ?
       <section className="lg-card"><p className="lg-eyebrow">Your saved learning interest</p><h2>{cleanDisplayText(specialist?.skillLabel ?? context?.skill.name ?? personal?.name ?? "")}</h2>
         <p>{cleanDisplayText(specialist ? specialist.taskWording : context?.goal || personal?.taskLabels.join(". ") || "Choose one small step to explore this skill.")}</p>
+        {context?.origin === "career" && context.career && <p>Chosen career direction: <strong>{cleanDisplayText(context.career.title)}</strong></p>}
+        {context?.origin === "browse" && <p>Independent learning · Work tasks and a career reason are optional.</p>}
         <p className="lg-muted">Save this choice as a goal to keep its starting context. You can change the goal wording later.</p>
         {params.get("new") === "1" && <p>This creates a new starting record. Your earlier goal and attempts stay available.</p>}
-        <button className="lg-primary" disabled={busy} onClick={() => void create()}>{busy ? "Saving…" : "Save my goal"}</button>
+        <button className="lg-primary" disabled={busy || (newGoal && !creationId)} onClick={() => void create()}>{busy ? "Saving…" : "Save my goal"}</button>
       </section> : null}
     {!goal && !specialist && !context && !personal && !loadError && <PendingLearningInterests />}
     {(!goal || goals.length > 1) && <section className="lg-card"><h2>{goal ? "Your other goals" : goals.length ? "Continue a saved goal" : "Your goals"}</h2>{goals.length ? <ul className="lg-goal-list">{[...goals].reverse().filter(g => g.id !== goal?.id).map(g => <li key={g.id}><Link aria-current={g.id === goal?.id ? "page" : undefined} to={`${ROUTES.learningGoals}?goal=${encodeURIComponent(g.id)}`}>{goalDisplayLabel(g.wording, g.initial.skill.label)}</Link><span>{cleanDisplayText(g.initial.skill.label)} · {g.attempts.length} {g.attempts.length === 1 ? "attempt" : "attempts"}</span></li>)}</ul> : <><p>No goals saved yet.</p><Link to={ROUTES.skills}>Find a skill</Link></>}</section>}
-    <section className="lg-card"><h2>See what changed</h2><p>Review your saved study and practice without filling in another assessment.</p><Link className="lg-primary" to={ROUTES.progress}>Reassess My Situation</Link></section>
+    <section className="lg-card"><h2>See what changed</h2><p>Review your saved study and practice without filling in another assessment.</p><Link className="lg-primary" to={ROUTES.progress}>Review my progress</Link></section>
     <details className="lg-resources"><summary>Optional courses</summary><p>You can continue this goal without a course. Check any course content before using it for your skill.</p><div className="lg-buttons"><Link to={ROUTES.plan}>My courses and history</Link><Link to={`${ROUTES.learningCentre}?${goal ? `goal=${encodeURIComponent(goal.id)}${goal.sourceKey.startsWith("context:") ? `&context=${encodeURIComponent(goal.sourceKey.slice(8))}` : ""}` : "mode=browse"}`}>Find resources{goal ? " for this goal" : ""}</Link></div></details>
   </div>;
 }
@@ -227,6 +242,7 @@ function GoalDetail({ goal, tasks, run, busy, needsReload }: { goal: LearningGoa
   const recoveryNeedsAttention = reviewRequired || Boolean(draftError) || needsReload;
   const RecoveryContainer = recoveryNeedsAttention ? "section" : "details";
   const sourceParams = goal.sourceKey.startsWith("personal:") ? `personal=${encodeURIComponent(goal.sourceKey.slice(9))}` : goal.sourceKey.startsWith("specialist:") ? `specialist=${encodeURIComponent(goal.sourceKey.slice(11))}` : `context=${encodeURIComponent(goal.sourceKey.slice(8))}`;
+  const newGoalLink = <p><Link to={`${ROUTES.learningGoals}?${sourceParams}&new=1`}>Create a new goal from my current saved choice</Link></p>;
   return <>
     {(draftHasChanges(draft) || draftError || needsReload) && <RecoveryContainer className="lg-warning" aria-label="Unsaved draft recovery">
       {recoveryNeedsAttention ? <h2>{needsReload ? "Reload your saved account to continue" : "Unsaved changes need attention"}</h2> : <summary>Unsaved draft options</summary>}
@@ -238,7 +254,9 @@ function GoalDetail({ goal, tasks, run, busy, needsReload }: { goal: LearningGoa
       {discarding && <div><p>Discard the wording, action and attempt draft in this tab? Saved account records stay unchanged.</p><button disabled={busy} onClick={discardDraft}>Confirm discard</button><button disabled={busy} onClick={() => setDiscarding(false)}>Keep editing</button></div>}
     </RecoveryContainer>}
     <section className="lg-card"><p className="lg-eyebrow">My goal</p><h2>{goalDisplayLabel(goal.wording, goal.initial.skill.label)}</h2><p className="lg-muted">{cleanDisplayText(origin.skill.label)} · Saved {displayDate(goal.createdAt)}</p>
-      {warnings.length > 0 && <div className="lg-warning"><h3>Check the original context</h3>{warnings.map((w, i) => <p key={i}>{w}</p>)}<Link to={ROUTES.skills}>Review my skills</Link><p><Link to={`${ROUTES.learningGoals}?${sourceParams}&new=1`}>Create a new goal from my current saved choice</Link></p></div>}
+      {origin.career && <p>Chosen career direction: <strong>{cleanDisplayText(origin.career.title)}</strong></p>}
+      {origin.origin === "browse" && <p>Independent learning · Work tasks and a career reason are optional.</p>}
+      {warnings.length > 0 && <div className="lg-warning"><h3>Check the original context</h3>{warnings.map((w, i) => <p key={i}>{w}</p>)}<Link to={ROUTES.skills}>Review my skills</Link>{newGoalLink}</div>}
       <details open={draft?.wording !== undefined || undefined}><summary>Edit my goal wording</summary>
       <form onSubmit={e => { e.preventDefault(); void savePart("wording", () => updateLearningGoal(goal.id, { wording }), "Goal wording saved. Your original starting record is unchanged."); }}>
         <label htmlFor="goal-wording">What do you want to work on?</label><textarea id="goal-wording" required maxLength={1000} value={wording} onChange={e => changeDraft({ wording: e.target.value })} disabled={formBlocked} rows={2} />
@@ -248,10 +266,11 @@ function GoalDetail({ goal, tasks, run, busy, needsReload }: { goal: LearningGoa
       <details className="lg-starting"><summary>Why I chose this skill and my starting record</summary>
         <p><strong>Original goal:</strong> {goalDisplayLabel(origin.wording, origin.skill.label)}</p><p><strong>Skill source:</strong> {origin.skill.source === "personal" ? "Your own skill entry. No external source identity or version is claimed." : `${origin.skill.source.toUpperCase()} ${origin.skill.sourceVersion ? `version ${origin.skill.sourceVersion}` : "· source version not recorded"}`}</p>
         <p className="lg-muted lg-break">Skill identity: {origin.skill.id}</p><p><strong>My original choice:</strong> {origin.decision ? decisionLabels[origin.decision] ?? origin.decision : "Not recorded"}</p>
-        {origin.tasks.length ? <><h3>Tasks saved with this goal</h3><ul>{origin.tasks.map(t => <li key={t.id}>{cleanDisplayText(t.wording)}</li>)}</ul></> : <p>No confirmed work task was linked at the start. This is a gap in the record, not a lack of ability.</p>}
-        {origin.career ? <p><strong>Career reason:</strong> {cleanDisplayText(origin.career.title)} ({origin.career.code})</p> : <p>No career reason was saved.</p>}
+        {origin.tasks.length ? <><h3>Tasks saved with this goal</h3><ul>{origin.tasks.map(t => <li key={t.id}>{cleanDisplayText(t.wording)}</li>)}</ul></> : <p>{origin.origin === "browse" ? "No work task was linked. Independent learning does not require one." : "No confirmed work task was linked at the start. This is a gap in the record, not a lack of ability."}</p>}
+        {origin.career ? <p><strong>Career reason:</strong> {cleanDisplayText(origin.career.title)} ({origin.career.code})</p> : <p>{origin.origin === "browse" ? "No career reason was linked. This is optional for independent learning." : "No career reason was saved."}</p>}
         {origin.sourceOccupationUri && <p>An ESCO role was used to discover this skill. That role is not a confirmed career goal.</p>}
         <p>Changing the goal wording does not change this starting record. A different skill or work context needs an explicit new goal.</p>
+        {warnings.length === 0 && newGoalLink}
       </details>
     </section>
     {!goal.action && suggestion}

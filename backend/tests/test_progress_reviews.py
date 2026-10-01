@@ -1,6 +1,6 @@
 import asyncio
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 import runpy
@@ -11,6 +11,7 @@ import pytest
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, select
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 
@@ -26,6 +27,19 @@ KEY=H['KEY']
 
 
 def data():return H['personal_workspace']()
+
+
+def browse_workspace():
+    workspace=H['context_workspace']('browse')
+    workspace.pop(service.PROFILE_KEY)
+    journey=json.loads(workspace[service.JOURNEY_KEY])
+    journey['contexts']['c1'].update(taskIds=[],taskLabels=[],workKey='')
+    journey.pop('review')
+    workspace[service.JOURNEY_KEY]=json.dumps(journey)
+    goals=json.loads(workspace[KEY])
+    goals['goals'][0]['initial'].update(tasks=[],workKey='')
+    workspace[KEY]=json.dumps(goals)
+    return workspace
 
 
 def evidence(workspace):
@@ -53,6 +67,72 @@ def test_first_review_is_a_starting_point_without_invented_earlier_counts():
     assert result['summary']['with_study']==0 and result['summary']['goals_total']==1
     assert result['goals'][0]['current']['confirmed_tasks']==[{'id':'t1','wording':'Prepare reports'}]
     assert result['summary']['with_task_evidence']==0  # No claimed current use yet.
+
+
+@pytest.mark.parametrize('created_at,expected',[
+    (datetime(2026,10,1,0,56),'2026-10-01T00:56:00+00:00'),
+    (datetime(2026,10,1,8,56,tzinfo=timezone(timedelta(hours=8))),'2026-10-01T08:56:00+08:00'),
+])
+def test_review_dates_mark_naive_utc_and_preserve_aware_offsets(created_at,expected):
+    saved=review(data());saved.created_at=created_at
+    result=service.present_review(saved,evidence(data()),True)
+    assert result['created_at']==expected
+    assert saved.created_at==created_at
+
+
+def test_browse_learning_can_save_a_study_starting_point_without_work_profile():
+    result=service.build_preview(service.read_records(add(browse_workspace())),{('wef','1',None):True},1)
+    assert result['can_save']
+    assert result['goals'][0]['status']=='starting_point'
+    assert result['summary']['with_study']==1
+    assert result['summary']['with_task_evidence']==result['summary']['with_workplace_practice']==0
+    assert result['goals'][0]['current']['confirmed_tasks']==[]
+    assert 'Confirm your work profile before saving' not in result['notice']
+    assert 'recorded learning activity' in result['notice']
+
+
+def test_browse_review_keeps_catalogue_and_source_identity_checks():
+    workspace=browse_workspace()
+    for checked in ({},{('wef','1',None):False}):
+        result=service.build_preview(service.read_records(workspace),checked,1)
+        assert not result['can_save'] and result['goals'][0]['status']=='source_needs_review'
+    journey=json.loads(workspace[service.JOURNEY_KEY])
+    journey['contexts'].pop('c1')
+    workspace[service.JOURNEY_KEY]=json.dumps(journey)
+    assert not service.build_preview(service.read_records(workspace),{('wef','1',None):True},1)['can_save']
+
+
+def test_browse_review_does_not_make_unconfirmed_work_goals_valid():
+    workspace=browse_workspace()
+    personal=data()
+    journey=json.loads(workspace[service.JOURNEY_KEY])
+    journey['personalSkills']=json.loads(personal[service.JOURNEY_KEY])['personalSkills']
+    workspace[service.JOURNEY_KEY]=json.dumps(journey)
+    goals=json.loads(workspace[KEY])
+    other=json.loads(personal[KEY])['goals'][0];other['id']='work-goal'
+    goals['goals'].append(other)
+    workspace[KEY]=json.dumps(goals)
+    result=service.build_preview(service.read_records(workspace),{('wef','1',None):True},1)
+    assert result['can_save']
+    assert result['goals'][1]['status']=='source_needs_review'
+    assert result['summary']['excluded_goals']==1
+    assert result['summary']['with_task_evidence']==0
+
+
+@pytest.mark.parametrize('study',[False,True])
+def test_browse_review_retains_unconfirmed_work_attempt_without_counting_work_evidence(study):
+    workspace=add(browse_workspace(),'work','workplace_practice')
+    if study:workspace=add(workspace,'study','study')
+    workspace[service.PROFILE_KEY]=json.dumps({'tasksConfirmed':False,'tasks':[{'id':'t1','wording':'Prepare reports'}]})
+    result=service.build_preview(service.read_records(workspace),{('wef','1',None):True},1)
+    current=result['goals'][0]['current']
+    assert result['can_save']
+    assert current['stale_practice_context']
+    assert len(current['workplace_practice'])==1 and current['current_workplace_practice_count']==0
+    assert result['summary']['with_workplace_practice']==0
+    assert result['summary']['with_study']==int(study)
+    assert result['summary']['needing_evidence']==int(not study)
+    assert 'Check the work context' in result['goals'][0]['next_step']
 
 
 def test_new_attempt_is_new_evidence_and_does_not_rewrite_prior_snapshot():
@@ -182,6 +262,24 @@ def body(revision=1,previous=None):
     return {'request_id':str(uuid.uuid4()),'expected_workspace_revision':revision,'expected_previous_review_id':previous,'reset_goal_ids':[]}
 
 
+@pytest.mark.parametrize('method,path',[('get','/progress-reviews'),('get','/progress-reviews/preview'),('get','/progress-reviews/'+str(uuid.uuid4())),('post','/progress-reviews')])
+def test_missing_progress_storage_is_an_actionable_error_not_empty_success(client,method,path):
+    http,_,account=client
+    class MissingTable(Exception):sqlstate='42P01'
+    class DB:
+        async def scalar(self,query):
+            if 'app_accounts' in str(query):return account
+            raise ProgrammingError('SELECT progress_reviews.id FROM progress_reviews',{},MissingTable('missing table'))
+        async def execute(self,_query):raise ProgrammingError('SELECT count(*) FROM progress_reviews',{},MissingTable('missing table'))
+    async def db():yield DB()
+    http.app.dependency_overrides[get_db]=db
+    response=http.post(path,json=body()) if method=='post' else http.get(path)
+    assert response.status_code==503
+    assert 'storage is temporarily unavailable' in response.json()['detail']
+    assert 'items' not in response.json()
+    assert 'SELECT' not in response.json()['detail']
+
+
 def test_preview_and_history_never_save_and_post_is_idempotent(client):
     http,session,account=client
     assert http.get('/progress-reviews/preview').json()['can_save']
@@ -189,12 +287,32 @@ def test_preview_and_history_never_save_and_post_is_idempotent(client):
     payload=body();first=http.post('/progress-reviews',json=payload)
     assert first.status_code==201,first.text
     saved=first.json();assert saved['snapshot']['goals'][0]['earlier'] is None
+    assert saved['created_at'].endswith('+00:00')  # SQLite returns naive stored UTC dates.
     assert http.post('/progress-reviews',json=payload).json()['id']==saved['id']
     assert http.get('/progress-reviews').json()['total']==1
     assert 'snapshot' not in http.get('/progress-reviews').json()['items'][0]
     assert account.revision==1  # Review creation never writes workspace evidence.
     changed={**payload,'expected_workspace_revision':2}
     assert http.post('/progress-reviews',json=changed).status_code==409
+
+
+def test_browse_review_save_retry_and_comparison_keep_earlier_records(client,monkeypatch):
+    http,session,account=client
+    account.workspace=add(browse_workspace());session.commit()
+    async def checked(_db,_goals):return {('wef','1',None):True}
+    monkeypatch.setattr(service,'catalogue_checks',checked)
+    payload=body()
+    first=http.post('/progress-reviews',json=payload)
+    assert first.status_code==201,first.text
+    saved=first.json();snapshot=deepcopy(saved['snapshot'])
+    assert http.post('/progress-reviews',json=payload).json()['id']==saved['id']
+    account.workspace=add(account.workspace,'a2');account.revision=2;session.commit()
+    next=http.post('/progress-reviews',json=body(2,saved['id']))
+    assert next.status_code==201,next.text
+    assert next.json()['snapshot']['goals'][0]['status']=='comparable'
+    assert len(next.json()['snapshot']['goals'][0]['current']['study'])==2
+    assert http.get('/progress-reviews/'+saved['id']).json()['snapshot']==snapshot
+    assert account.revision==2 and http.get('/progress-reviews').json()['total']==2
 
 
 def test_expected_workspace_and_previous_review_block_stale_or_concurrent_requests(client):

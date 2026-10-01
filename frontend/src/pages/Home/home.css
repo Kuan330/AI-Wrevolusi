@@ -128,22 +128,49 @@
 }
 
 .landing-page .landing-hero-carousel__dot {
-  width: 8px;
-  height: 8px;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: 999px;
-  background: rgba(47, 36, 48, 0.22);
+  background: transparent;
+  display: grid;
+  place-items: center;
   cursor: pointer;
+}
+
+.landing-page .landing-hero-carousel__dot::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(47, 36, 48, 0.22);
   transition: transform 0.2s ease, background 0.2s ease;
 }
 
-.landing-page .landing-hero-carousel__dot:hover {
+.landing-page .landing-hero-carousel__dot:hover::before {
   background: rgba(79, 145, 186, 0.45);
 }
 
-.landing-page .landing-hero-carousel__dot.is-active {
+.landing-page .landing-hero-carousel__dot.is-active::before {
   transform: scale(1.15);
   background: var(--c-deep-blue);
+}
+
+.landing-page .landing-hero-carousel__pause {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgba(47, 36, 48, 0.25);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--c-text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.landing-page .landing-hero-carousel__dot:focus-visible,
+.landing-page .landing-hero-carousel__pause:focus-visible {
+  outline: 2px solid #326889;
+  outline-offset: 2px;
 }
 
 .landing-page .landing-hero-scene::after {
@@ -172,14 +199,14 @@
   align-items: center;
 }
 
-.landing-page .nav-links a {
+.landing-page .nav-links a:not(.btn) {
   font-size: 14px;
   color: var(--c-text-secondary);
   text-decoration: none;
   transition: color 0.2s;
 }
 
-.landing-page .nav-links a:hover {
+.landing-page .nav-links a:not(.btn):hover {
   color: var(--c-text);
 }
 
@@ -213,26 +240,26 @@
 
 .landing-page .btn-primary {
   background: #c99589;
-  color: #fff;
+  color: var(--c-text);
   box-shadow: 0 4px 16px rgba(201, 149, 137, 0.28);
 }
 
 .landing-page .btn-primary:hover {
   background: var(--c-hover);
-  color: var(--c-deep-blue);
+  color: #326889;
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(79, 145, 186, 0.24);
 }
 
 .landing-page .btn-warm {
   background: var(--c-brown);
-  color: #fff;
+  color: var(--c-text);
   box-shadow: 0 4px 16px rgba(199, 149, 139, 0.3);
 }
 
 .landing-page .btn-warm:hover {
   background: var(--c-hover);
-  color: var(--c-deep-blue);
+  color: #326889;
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(79, 145, 186, 0.24);
 }
@@ -312,6 +339,13 @@
 
 .landing-page .hero-card {
   padding: 28px;
+}
+
+.landing-page .hero-card .hero-example-label {
+  margin-bottom: 8px;
+  color: var(--c-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .landing-page .hero-card h3 {
@@ -846,7 +880,7 @@
   position: relative;
   z-index: 1;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  color: #fff;
+  color: var(--c-text);
   font-weight: 600;
 }
 
@@ -972,7 +1006,7 @@
     padding: 12px 24px 20px;
   }
 
-  .landing-page .mobile-panel a {
+  .landing-page .mobile-panel a:not(.btn) {
     font-size: 14px;
     color: var(--c-text-secondary);
     text-decoration: none;
@@ -1072,6 +1106,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .landing-page .landing-hero-carousel__slide,
+  .landing-page .landing-hero-carousel__dot::before {
+    transition: none;
+  }
   .landing-page .scroll-reveal,
   .landing-page .scroll-reveal.is-visible {
     opacity: 1;

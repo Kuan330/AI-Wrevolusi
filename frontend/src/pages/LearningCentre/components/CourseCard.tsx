@@ -17,10 +17,12 @@ export type CourseCardProps = {
   busy?: boolean;
   saveDisabled?: boolean;
   pendingSync?: boolean;
+  linkedSkills?: string[];
+  openSaved?: boolean;
 };
 
 export default function CourseCard(props: CourseCardProps) {
-  const { course, saved, onSave, onDetails, busy, saveDisabled, pendingSync } = props;
+  const { course, saved, onSave, onDetails, busy, saveDisabled, pendingSync, linkedSkills, openSaved } = props;
   return (
     <Card className="library-course library-glass">
       <div className="library-row">
@@ -33,15 +35,16 @@ export default function CourseCard(props: CourseCardProps) {
           }
           variant="ghost"
           size="sm"
-          aria-pressed={saved}
+          aria-pressed={openSaved && saved ? undefined : saved}
           disabled={busy || pendingSync || (!saved && saveDisabled)}
           onClick={onSave}
         >
           <Bookmark size={16} fill={saved ? "currentColor" : "none"} />{" "}
-          {busy ? "Saving…" : saved ? pendingSync ? "Added on this browser" : "Added" : "Add to My Learning"}
+          {busy ? "Saving…" : saved ? pendingSync ? "Added on this browser" : openSaved ? "View saved course" : "Added" : "Add to My Learning"}
         </Button>
       </div>
       <h3>{cleanDisplayText(course.title)}</h3>
+      {linkedSkills && linkedSkills.length > 0 && <p className="library-linked-skills"><strong>Linked skills:</strong> {linkedSkills.map(cleanDisplayText).join(" · ")}</p>}
       <div className="library-tags">
         <span className={courseLevelClassName(course.level)}>
           {courseLevelLabel(course.level)}

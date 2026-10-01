@@ -15,6 +15,19 @@ export function possibilitiesProfilePath(workspace: { tasksOccupationCode?: stri
   return workspace?.tasksOccupationCode ? "/profile/tasks" : "/profile";
 }
 
+/** Accepted evidence must come from the current review, not a model score. */
+export function acceptedCareerEvidence<T extends { skill: { wef_skill_id: number } }>(
+  evidence: T[],
+  reviewCurrent: boolean,
+  decisions: Record<string, string>,
+): T[] {
+  return reviewCurrent ? evidence.filter(item => decisions[String(item.skill.wef_skill_id)] === "accepted") : [];
+}
+
+export function acceptedDirectionSkills(skills: PossibilitySkill[], acceptedIds: ReadonlySet<number>): PossibilitySkill[] {
+  return skills.filter(skill => acceptedIds.has(skill.skill_id));
+}
+
 export async function loadSavedPossibilities(options: {
   signal: AbortSignal;
   flush: () => Promise<void>;

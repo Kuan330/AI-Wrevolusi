@@ -7,13 +7,12 @@ import { ApiError } from "@/services/api";
 import { ROUTES } from "@/constants/routes";
 import { progressReviewService, type ProgressPreview, type ProgressReview, type ReviewList, type ProgressSummary, type ProgressGoal, type ProgressEvidence } from "@/services/progressReviewService";
 import { cleanDisplayText, goalDisplayLabel } from "@/lib/displayText";
-import { activityGroups, attemptChanges, comparisonRows, evidenceTimeline, progressHeadline } from "./progressPresentation";
+import { activityGroups, attemptChanges, comparisonRows, evidenceTimeline, progressErrorText, progressHeadline, type ProgressOperation } from "./progressPresentation";
 import "./progress.css";
 
 const date = (value: string) => new Intl.DateTimeFormat("en-MY", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 const cleanedNotes = (value: string) => value.split(/\r?\n/).map(cleanDisplayText).join("\n").trim();
 const goalsLabel = (count: number) => `${count} ${count === 1 ? "goal" : "goals"}`;
-const errorText = (e: unknown) => e instanceof ApiError ? e.status === 409 ? "Your saved records changed. Refresh this preview before saving." : "Your review could not be loaded or saved. Your existing records are kept. Please try again." : e instanceof Error ? cleanDisplayText(e.message) : "Your review could not be loaded. Please try again.";
 const statusLabels = { starting_point: "Starting point", comparable: "Same goal", new_goal: "New goal", needs_starting_point: "New starting point needed", source_needs_review: "Check the source context" };
 
 export default function Progress() {
@@ -34,12 +33,18 @@ function ProgressWorkspace() {
   const [conflict, setConflict] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [failedOperation, setFailedOperation] = useState<"load" | "prepare" | "save" | null>(null);
+  const [failedOperation, setFailedOperation] = useState<ProgressOperation | null>(null);
+  const errorAlert = useRef<HTMLDivElement | null>(null);
   const requestId = useRef<string | null>(null);
   const alive = useRef(true);
   const saveLock = useRef(false);
   const autoSelect = useRef(true);
   const prepareRun = useRef(0);
+  useEffect(() => {
+    if (!error) return;
+    errorAlert.current?.focus();
+    errorAlert.current?.scrollIntoView({ block: "start" });
+  }, [error]);
   useEffect(() => {
     alive.current = true;
     const changed = () => setRefresh(value => value + 1);
@@ -55,7 +60,7 @@ function ProgressWorkspace() {
       const next = await progressReviewService.preview();
       if (!alive.current || owner !== currentWorkspaceSession() || run !== prepareRun.current) return;
       setPreview(next); setSelected(null); setSelectedId(null); setApprovedReset(false); setConflict(false); requestId.current = crypto.randomUUID();
-    } catch (e) { if (alive.current && owner === currentWorkspaceSession() && run === prepareRun.current) { setError(errorText(e)); setFailedOperation("prepare"); } }
+    } catch (e) { if (alive.current && owner === currentWorkspaceSession() && run === prepareRun.current) { setError(progressErrorText(e, "prepare")); setFailedOperation("prepare"); } }
     finally { if (alive.current && owner === currentWorkspaceSession() && run === prepareRun.current) setPreparing(false); }
   }
   useEffect(() => {
@@ -66,7 +71,7 @@ function ProgressWorkspace() {
       setList(next); setLoading(false);
       if (!next.total && !preview) void prepare();
       else if (autoSelect.current && next.items.length) { autoSelect.current = false; setSelectedId(next.items[0].id); }
-    }).catch(e => { if (!abort.signal.aborted && owner === currentWorkspaceSession()) { setError(errorText(e)); setFailedOperation("load"); setLoading(false); } });
+    }).catch(e => { if (!abort.signal.aborted && owner === currentWorkspaceSession()) { setError(progressErrorText(e, "load")); setFailedOperation("load"); setLoading(false); } });
     return () => abort.abort();
     // Changing the viewed snapshot is deliberate; refresh never saves a review.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -76,7 +81,7 @@ function ProgressWorkspace() {
     const abort = new AbortController(), owner = currentWorkspaceSession();
     void progressReviewService.get(selectedId, abort.signal).then(next => {
       if (!abort.signal.aborted && owner === currentWorkspaceSession()) setSelected(next);
-    }).catch(e => { if (!abort.signal.aborted && owner === currentWorkspaceSession()) { setError(errorText(e)); setFailedOperation("load"); } });
+    }).catch(e => { if (!abort.signal.aborted && owner === currentWorkspaceSession()) { setError(progressErrorText(e, "load")); setFailedOperation("load"); } });
     return () => abort.abort();
   }, [selectedId, refresh]);
   async function save() {
@@ -87,21 +92,21 @@ function ProgressWorkspace() {
       if (!alive.current || owner !== currentWorkspaceSession()) return;
       setSelected(saved); setSelectedId(saved.id); setPreview(null); requestId.current = null; setFailedOperation(null); setNotice("Your dated review is saved."); setOffset(0); setRefresh(v => v + 1);
     } catch (e) {
-      if (alive.current && owner === currentWorkspaceSession()) { setError(errorText(e)); setFailedOperation("save"); if (e instanceof ApiError && e.status === 409) setConflict(true); }
+      if (alive.current && owner === currentWorkspaceSession()) { setError(progressErrorText(e, "save")); setFailedOperation("save"); if (e instanceof ApiError && e.status === 409) setConflict(true); }
     } finally { saveLock.current = false; if (alive.current && owner === currentWorkspaceSession()) setSaving(false); }
   }
   const content = preview ?? selected?.snapshot;
   return <div className="progress-page">
     <PageHeader title="My progress" description="See what you recorded, what changed and your next step." />
     {notice && <p role="status" className="progress-success">{notice}</p>}
-    {error && <div role="alert" className="progress-warning"><p>{error}</p><button disabled={saving || preparing} onClick={() => { setError(""); if (failedOperation === "save" && !conflict) void save(); else if (conflict || failedOperation === "prepare") void prepare(); else setRefresh(v => v + 1); }}>{conflict ? "Refresh this preview" : "Retry"}</button></div>}
+    {error && <div ref={errorAlert} tabIndex={-1} role="alert" className="progress-warning"><p>{error}</p><button disabled={saving || preparing} onClick={() => { setError(""); if (failedOperation === "save") { if (conflict) void prepare(); else void save(); } else if (failedOperation === "prepare") void prepare(); else setRefresh(v => v + 1); }}>{failedOperation === "save" && conflict ? "Refresh this preview" : "Retry"}</button></div>}
     {(loading && !list) && <p role="status">Loading your saved reviews…</p>}
     {content && <Summary summary={content.summary} goals={content.goals} historicalNeedsReview={selected?.status === "needs_review"} />}
     {selected && <section className="progress-card">
       <p className="progress-kicker">Saved review · {date(selected.created_at)}</p>
       {selected.status === "needs_review" ? <><h2>This review needs checking</h2><p>Some evidence was corrected or its context changed. This is a historical record, not current evidence.</p></> : selected.status === "new_evidence_available" ? <><h2>You have new records to review</h2><p>Your earlier review stays unchanged until you choose to save another.</p></> : <><h2>Your saved evidence</h2><p>This review describes records available on its saved date.</p></>}
       {selected.status_reasons.length > 0 && <details><summary>What changed?</summary><ul>{selected.status_reasons.map((reason, i) => <li key={i}>{reason}</li>)}</ul></details>}
-      <button className="progress-primary" disabled={saving || preparing} onClick={() => void prepare()}>{preparing ? "Preparing your review…" : "Reassess My Situation"}</button>
+      <button className="progress-primary" disabled={saving || preparing} onClick={() => void prepare()}>{preparing ? "Preparing your review…" : "Review my progress"}</button>
     </section>}
     {preview && <section className="progress-card">
       <p className="progress-kicker">Preview · {date(preview.reviewed_at)}</p><h2>{preview.previous_review_id ? "Review your latest records" : "Keep your first starting point"}</h2>
@@ -159,7 +164,7 @@ function ActivityComparison({ goal: g }: { goal: ProgressGoal }) {
   const comparable = g.status === "comparable" && Boolean(g.earlier);
   return <div className="progress-activity-chart">
     <p className="progress-muted">{comparable ? `Earlier review: ${date(g.earlier!.recorded_at)} · Current review: ${date(g.current.recorded_at)}` : `Recorded by ${date(g.current.recorded_at)}`}</p>
-    <table><caption>{comparable ? "Activity records for the same goal" : g.status === "source_needs_review" ? "Records awaiting a source check" : "Records at this starting point"}. Study and practice count attempts. Completed learning counts linked courses.</caption><thead><tr><th scope="col">Activity</th>{comparable && <th scope="col">Earlier</th>}<th scope="col">Current</th></tr></thead><tbody>{rows.map(row=><tr key={row.key}><th scope="row">{row.label}</th>{row.earlier !== null && <td><CountBar value={row.earlier} scale={scale} earlier /></td>}<td><CountBar value={row.value} scale={scale} /></td></tr>)}</tbody></table>
+    <table><caption>{comparable ? "Activity records for the same goal" : g.status === "source_needs_review" ? "Records awaiting a source check" : "Records at this starting point"}. Study and practice count attempts. Workplace practice needs current confirmed work context. Completed learning counts linked courses.</caption><thead><tr><th scope="col">Activity</th>{comparable && <th scope="col">Earlier</th>}<th scope="col">Current</th></tr></thead><tbody>{rows.map(row=><tr key={row.key}><th scope="row">{row.label}</th>{row.earlier !== null && <td><CountBar value={row.earlier} scale={scale} earlier /></td>}<td><CountBar value={row.value} scale={scale} /></td></tr>)}</tbody></table>
   </div>;
 }
 function CountBar({value,scale,earlier=false}: {value:number;scale:number;earlier?:boolean}) {

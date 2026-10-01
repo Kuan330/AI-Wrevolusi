@@ -29,10 +29,13 @@ export type CourseDetailDrawerProps = {
   pendingSync?: boolean;
   saveNotice?: string;
   onRetrySync?: () => void;
+  linkedSkills?: string[];
+  learningRecords?: { id: string; label: string; saved: boolean }[];
+  onSelectRecord?: (id: string) => void;
 };
 
 export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
-  const { course, skillName, saved, onClose, onSave, busy, saveDisabled, pendingSync, saveNotice, onRetrySync } = props;
+  const { course, skillName, saved, onClose, onSave, busy, saveDisabled, pendingSync, saveNotice, onRetrySync, linkedSkills, learningRecords, onSelectRecord } = props;
   // Providers publish outcomes as one semicolon-separated sentence, so only the
   // first clause is capitalised and only the last one keeps its full stop.
   // Normalise them into standalone list items.
@@ -93,6 +96,12 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
             Open provider course
             <ExternalLink size={14} />
           </a>
+          {linkedSkills && linkedSkills.length > 0 && <p className="library-linked-skills"><strong>Linked skills:</strong> {linkedSkills.map(cleanDisplayText).join(" · ")}</p>}
+          {learningRecords && learningRecords.length > 1 && <section className="learning-course-records" aria-label="Learning records for linked skills">
+            <h3>Learning records for linked skills</h3>
+            <p className="library-muted">Each linked skill keeps its own saved course. Choose a record to view or change it.</p>
+            <div className="library-record-options">{learningRecords.map(record => <Button key={record.id} size="sm" variant="outline" aria-pressed={record.id === course.id} disabled={busy || continuing || pendingSync} onClick={() => onSelectRecord?.(record.id)}>{cleanDisplayText(record.label)}{record.saved ? " · Added" : ""}</Button>)}</div>
+          </section>}
           <Tabs defaultValue="overview">
             <TabsList className="learning-detail-tabs">
               <TabsTrigger value="overview">Overview</TabsTrigger>

@@ -8,6 +8,7 @@ const HeroSection = () => {
   const { user } = useAccount();
   const linkProps1 = {
     to: user ? ROUTES.aiExposure : ROUTES.workProfile,
+    state: user ? undefined : { authMode: "register" },
     className: "btn btn-warm",
   } satisfies Partial<ComponentProps<typeof Link>>;
   return (
@@ -24,17 +25,18 @@ const HeroSection = () => {
               but change is not only risk.
             </h1>
             <p className="lead">
-              In about 5 minutes, see how tasks may change, where you are
-              strong, and what to grow next.
+              Start with your real tasks, review related skills, and choose
+              one useful learning step.
             </p>
             <div>
-              <Link {...linkProps1}>Start free analysis</Link>
+              <Link {...linkProps1}>{user ? "Continue my work review" : "Create a free account"}</Link>
             </div>
             <div className="hero-note">
-              No CV upload - Results stay with you
+              No CV upload · An account keeps your choices together
             </div>
           </div>
           <div className="hero-card glass-strong">
+            <p className="hero-example-label">Example result</p>
             <h3>Task-change snapshot</h3>
             <div className="number">
               6<span>everyday tasks may be changing</span>
@@ -47,7 +49,7 @@ const HeroSection = () => {
               <li className="shift">2 need a new way of working</li>
             </ul>
             <div className="advantage">
-              Your edge: <strong>judgement and collaboration</strong>
+              Example focus: <strong>judgement and collaboration</strong>
             </div>
           </div>
         </div>

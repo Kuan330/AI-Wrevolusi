@@ -10,6 +10,7 @@ export type ProgressEvidence = {
   skill: { source: string; id: string; label: string; sourceVersion: string | null };
   task_evidence: { id: string; wording: string }[]; confirmed_tasks?: { id: string; wording: string }[]; decision: string | null;
   study: ProgressAttempt[]; course_practice: ProgressAttempt[]; workplace_practice: ProgressAttempt[];
+  current_workplace_practice_count?: number;
   completed_learning: { id: string; title: string; completed_at: string | null; source_label: string }[];
   gaps: string[];
 };

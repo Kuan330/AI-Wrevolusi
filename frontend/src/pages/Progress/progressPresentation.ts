@@ -1,4 +1,18 @@
 import type { ProgressAttempt, ProgressEvidence, ProgressGoal } from "../../services/progressReviewService.ts";
+import { ApiError } from "../../services/api.ts";
+import { cleanDisplayText } from "../../lib/displayText.ts";
+
+export type ProgressOperation = "load" | "prepare" | "save";
+export function progressErrorText(error: unknown, operation: ProgressOperation): string {
+  if (error instanceof ApiError && error.status === 409 && operation === "save") {
+    return "Your saved records or latest review changed. Refresh this preview before saving.";
+  }
+  const message = operation === "load" ? "We could not load your saved reviews. Your saved records are kept."
+    : operation === "prepare" ? "We could not prepare your progress review. Your saved records are kept."
+    : "We could not confirm that this review was saved. Your earlier reviews are kept. Retry to check this same review.";
+  return error instanceof ApiError && (error.status === 422 || error.status === 503)
+    ? `${message} ${cleanDisplayText(error.detail)}` : message;
+}
 
 export const activityGroups = [
   ["study", "Study"],
@@ -43,7 +57,7 @@ export function progressHeadline(goals: ProgressGoal[]): string {
 }
 
 export function evidenceCounts(e: ProgressEvidence) {
-  return [...activityGroups.map(([group, label]) => ({ key: group, label, value: e[group].length })), { key: "completed_learning", label: "Reported completed learning", value: e.completed_learning.length }];
+  return [...activityGroups.map(([group, label]) => ({ key: group, label, value: group === "workplace_practice" ? e.current_workplace_practice_count ?? e[group].length : e[group].length })), { key: "completed_learning", label: "Reported completed learning", value: e.completed_learning.length }];
 }
 
 export function comparisonRows(goal: ProgressGoal) {

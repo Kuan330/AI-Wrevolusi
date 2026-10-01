@@ -153,7 +153,7 @@ test('page loads live data, restores and persists approved workspace keys', () =
   assert.match(page, /possibilitiesService\.getPossibilities/);
   assert.match(page, /accountStorage\.getItem/);
   assert.match(page, /aiwrevolusi\.possibilities\.chosenDirection/);
-  assert.match(page, /useLearningSkills/);
+  assert.match(page, /acceptedCareerEvidence/);
   assert.match(page, /loadSavedPossibilities\(\{/);
   assert.match(page, /flush: flushWorkspace/);
   assert.match(page, /get: possibilitiesService\.getPossibilities/);
@@ -162,7 +162,7 @@ test('page loads live data, restores and persists approved workspace keys', () =
   assert.ok((page.match(/to=\{profilePath\}/g) ?? []).length >= 1);
   assert.doesNotMatch(page, /to="\/profile"/);
   assert.match(page, /setError\(""\)/);
-  assert.match(page, /SKILL COVERAGE/);
-  assert.match(page, /<small>%<\/small>/);
+  assert.match(page, /Broad connections to explore/);
+  assert.doesNotMatch(page, /SKILL COVERAGE|coveragePct|coverage_pct|<small>%<\/small>/);
   assert.doesNotMatch(page, /sessionStorage/);
 });

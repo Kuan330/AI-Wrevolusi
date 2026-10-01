@@ -4,6 +4,7 @@ from datetime import datetime
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
@@ -14,6 +15,15 @@ from app.schemas.progress_reviews import CreateProgressReview
 from app.services import progress_reviews as service
 
 router = APIRouter(prefix='/progress-reviews', tags=['Progress reviews'])
+
+
+async def progress_db(db: AsyncSession=Depends(get_db)):
+    try:
+        yield db
+    except ProgrammingError as error:
+        if getattr(error.orig,'sqlstate',None)=='42P01' and any(name in (error.statement or '') for name in ('progress_reviews','ref_specialist_concepts','ref_wef_skills')):
+            raise HTTPException(503,'Progress review storage is temporarily unavailable. Your saved learning records are kept. Please try again later.') from error
+        raise
 
 
 async def records_for(db, account):
@@ -27,13 +37,13 @@ async def latest(db, user_id):
 
 
 @router.get('/preview')
-async def preview(account: Account=Depends(current_account),db: AsyncSession=Depends(get_db)):
+async def preview(account: Account=Depends(current_account),db: AsyncSession=Depends(progress_db)):
     records,checks=await records_for(db,account)
     return service.build_preview(records,checks,account.revision,await latest(db,account.user_id))
 
 
 @router.get('')
-async def history(limit: int=Query(20,ge=1,le=50),offset: int=Query(0,ge=0,le=10000),account: Account=Depends(current_account),db: AsyncSession=Depends(get_db)):
+async def history(limit: int=Query(20,ge=1,le=50),offset: int=Query(0,ge=0,le=10000),account: Account=Depends(current_account),db: AsyncSession=Depends(progress_db)):
     records,checks=await records_for(db,account)
     evidence=service.current_evidence(records,checks,service.stamp())
     total=(await db.execute(select(func.count()).select_from(ProgressReview).where(ProgressReview.user_id==account.user_id))).scalar_one()
@@ -42,7 +52,7 @@ async def history(limit: int=Query(20,ge=1,le=50),offset: int=Query(0,ge=0,le=10
 
 
 @router.get('/{review_id}')
-async def detail(review_id: uuid.UUID,account: Account=Depends(current_account),db: AsyncSession=Depends(get_db)):
+async def detail(review_id: uuid.UUID,account: Account=Depends(current_account),db: AsyncSession=Depends(progress_db)):
     row=await db.scalar(select(ProgressReview).where(ProgressReview.id==review_id,ProgressReview.user_id==account.user_id))
     if row is None:raise HTTPException(404,'This progress review was not found in your account.')
     records,checks=await records_for(db,account)
@@ -50,7 +60,7 @@ async def detail(review_id: uuid.UUID,account: Account=Depends(current_account),
 
 
 @router.post('',status_code=201)
-async def create(payload: CreateProgressReview,account: Account=Depends(current_account),db: AsyncSession=Depends(get_db)):
+async def create(payload: CreateProgressReview,account: Account=Depends(current_account),db: AsyncSession=Depends(progress_db)):
     # Account saves use this same lock. The review and its expected workspace
     # version are checked together, including another tab's simultaneous review.
     account=await db.scalar(select(Account).where(Account.user_id==account.user_id).with_for_update().execution_options(populate_existing=True))
@@ -66,7 +76,7 @@ async def create(payload: CreateProgressReview,account: Account=Depends(current_
         raise HTTPException(409,'Your records or latest review changed. Refresh the preview before saving a new review.')
     preview=service.build_preview(records,checks,account.revision,previous)
     if not preview['can_save']:
-        raise HTTPException(409,'Review your confirmed work and the flagged skill connections before saving a progress review.')
+        raise HTTPException(409,'Review the flagged skill connections or choose a learning goal before saving a progress review. Work-based goals need confirmed work context.')
     required=set(preview['required_reset_goal_ids'])
     if set(payload.reset_goal_ids)!=required:
         raise HTTPException(409,'Confirm exactly the goals marked as needing a new starting point. Earlier reviews will be kept.')
