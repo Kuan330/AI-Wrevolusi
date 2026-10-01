@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
 import Logo from "@/components/common/Logo";
-import StartWorkspaceButton from "./StartWorkspaceButton";
 
 import { NAV_LINKS } from "./homeData";
 
@@ -20,7 +19,6 @@ const LandingNav = () => {
               {link.label}
             </a>
           ))}
-          <StartWorkspaceButton />
           <AccountMenu />
         </div>
         <button
@@ -46,7 +44,6 @@ const LandingNav = () => {
             {link.label}
           </a>
         ))}
-        <StartWorkspaceButton />
         <AccountMenu />
       </div>
     </nav>
