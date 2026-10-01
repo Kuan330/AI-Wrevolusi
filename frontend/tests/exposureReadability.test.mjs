@@ -74,6 +74,34 @@ test('assistance chart keeps candidate and missing evidence unverified',()=>{
   assert.match(html, /<strong>2<\/strong> Unverified/);
   assert.doesNotMatch(html,/0\.1375|0\.95|<meter|job loss score/);
 });
+test('chart keeps every task visible as Unverified before research is checked',()=>{
+  const tasks=[task,{...task,id:'two'},{...task,id:'three'}];
+  const html=render(Coverage,{tasks,assessments:[],showUnverifiedBar:true});
+  assert.equal((html.match(/assistance-chart-row/g)??[]).length,4);
+  assert.match(html, /Unverified<\/dt><dd><span[^>]*><span class="assistance-fill assistance-unverified-fill" style="width:100%"/);
+  assert.match(html, /<strong>3<span class="sr-only"> tasks<\/span><\/strong>/);
+  for(const label of ['Highly AI-assisted','Partially AI-assisted','Human-led']) assert.ok(html.includes(label));
+});
+test('four bar widths reflect the current task distribution',()=>{
+  const tasks=[task,{...task,id:'partial'},{...task,id:'unverified-1'},{...task,id:'unverified-2'}];
+  const partial={...assessment,task_id:'partial',matched_reference_tasks:[{...assessment.matched_reference_tasks[0],score_2025:.3375}]};
+  const html=render(Coverage,{tasks,assessments:[assessment,partial],showUnverifiedBar:true});
+  assert.match(html,/assistance-human" style="width:25%"/);
+  assert.match(html,/assistance-partial" style="width:25%"/);
+  assert.match(html,/assistance-unverified-fill" style="width:50%"/);
+});
+test('task-row category agrees with the matching chart category',()=>{
+  const taskHtml=render(TaskList,{tasks:[task],assessments:[assessment]});
+  const chartHtml=render(Coverage,{tasks:[task],assessments:[assessment]});
+  assert.match(taskHtml,/Human-led/);
+  assert.match(chartHtml,/Human-led/);
+});
+test('task chooser keeps every task as an accessible row when the list grows',()=>{
+  const tasks=Array.from({length:8},(_,index)=>({...task,id:`task-${index}`,wording:`Task number ${index + 1}`}));
+  const html=render(TaskList,{tasks,assessments:[]});
+  assert.equal((html.match(/aria-pressed=/g)??[]).length,8);
+  assert.match(html,/Task number 8/);
+});
 test('a real source zero is retained while missing and unchecked research stay unknown',()=>{
   const zero={...assessment,matched_reference_tasks:[{...assessment.matched_reference_tasks[0],score_2025:0}]};
   assert.match(render(Impact,{task,assessment:zero,researchChecked:true}),/0 on a 0–1 scale/);
