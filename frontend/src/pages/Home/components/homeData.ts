@@ -3,33 +3,6 @@ export interface HomeNavLink {
   label: string;
 }
 
-export interface StepItem {
-  title: string;
-  description: string;
-  accent: "warm" | "blue";
-}
-
-export interface StepEvidenceItem {
-  label: string;
-  detail: string;
-}
-
-export interface TestimonialItem {
-  avatar: string;
-  name: string;
-  role: string;
-  quote: string;
-}
-
-export interface FooterLinkItem {
-  label: string;
-}
-
-export interface FooterColumn {
-  title: string;
-  links: FooterLinkItem[];
-}
-
 export interface HeroCarouselSlide {
   id: string;
   src: string;
@@ -61,7 +34,6 @@ export const HERO_CAROUSEL_SLIDES: HeroCarouselSlide[] = [
 
 export const NAV_LINKS: HomeNavLink[] = [
   { href: "#steps", label: "How it works" },
-  { href: "#report", label: "Sample report" },
 ];
 
 export const TRUST_ITEMS = [
@@ -69,139 +41,8 @@ export const TRUST_ITEMS = [
   "Based on your actual tasks",
 ];
 
-export const STEPS: StepItem[] = [
-  {
-    title: "Record your real work.",
-    description: "Add your job title and the tasks you actually do, then confirm your profile.",
-    accent: "warm",
-  },
-  {
-    title: "See where AI may change tasks.",
-    description: "Check available research for your tasks. If evidence is missing, you can still continue to skills.",
-    accent: "blue",
-  },
-  {
-    title: "Make your skills visible.",
-    description: "Review skill suggestions linked to your tasks and choose what fits your work.",
-    accent: "warm",
-  },
-  {
-    title: "Choose one skill to develop.",
-    description: "Save a goal and choose a small action. A course is optional.",
-    accent: "blue",
-  },
-  {
-    title: "Keep learning at your pace.",
-    description: "Record what you tried and compare your progress over time. Career exploration is optional.",
-    accent: "warm",
-  },
-];
-
-export const STEP_EVIDENCE: StepEvidenceItem[] = [
-  {
-    label: "MASCO",
-    detail: "Malaysia's official occupation classification helps anchor your work profile.",
-  },
-  {
-    label: "ILO",
-    detail: "Task-level evidence shows where generative AI may change work.",
-  },
-  {
-    label: "WEF",
-    detail: "Future of Jobs 2025 informs the skills and opportunity view.",
-  },
-];
-
-export const REPORT_ROWS = [
-  {
-    task: "Competitor research",
-    influence: "Higher",
-    influenceClass: "tag tag-high",
-    suggestion: "Let AI draft first",
-  },
-  {
-    task: "Cross-team coordination",
-    influence: "Lower",
-    influenceClass: "tag tag-low",
-    suggestion: "Keep building influence",
-  },
-  {
-    task: "Strategy judgement",
-    influence: "AI-assisted",
-    influenceClass: "tag tag-assist",
-    suggestion: "You keep the decision",
-  },
-];
-
-export const ACTION_PLAN = [
-  { period: "Days 1-30", detail: "Learn an AI research workflow" },
-  { period: "Days 31-60", detail: "Finish one real project" },
-  { period: "Days 61-90", detail: "Capture the outcome and show its value" },
-];
-
-export const TESTIMONIALS: TestimonialItem[] = [
-  {
-    avatar: "A",
-    name: "Admin officer",
-    role: "Age 28",
-    quote: "I finally knew which skills to grow, instead of sitting with the anxiety.",
-  },
-  {
-    avatar: "H",
-    name: "HR manager",
-    role: "Age 35",
-    quote: "The report helped me walk into a promotion conversation with a plan.",
-  },
-  {
-    avatar: "D",
-    name: "Designer",
-    role: "Age 31",
-    quote: "Seeing an opportunity list, not a threat list, changed how I looked at AI.",
-  },
-];
-
-export const FOOTER_COLUMNS: FooterColumn[] = [
-  {
-    title: "Product",
-    links: [
-      { label: "Start my profile" },
-      { label: "My Work" },
-      { label: "AI findings" },
-      { label: "My Learning" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      { label: "Evidence sources" },
-      { label: "Task priorities" },
-      { label: "Future iterations" },
-      { label: "Project methodology" },
-    ],
-  },
-  {
-    title: "Explore",
-    links: [
-      { label: "How it works" },
-      { label: "Sample report" },
-      { label: "Read your results" },
-      { label: "Review task evidence" },
-    ],
-  },
-  {
-    title: "Evidence",
-    links: [
-      { label: "IMF Malaysia Article IV (2025)" },
-      { label: "ILO Working Paper 140" },
-      { label: "ISIS Malaysia + World Bank" },
-      { label: "SDG 5.b alignment" },
-    ],
-  },
-];
-
 export const FOOTER_CONTACT = {
   projectName: "AI-Wrevolusi",
   teamName: "United6",
   teamMeta: "FIT5120 Team 11",
-  note: "Designed for working women in Malaysia navigating AI-driven task change.",
 };

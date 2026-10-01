@@ -1,67 +1,57 @@
-import type { ComponentProps } from "react";
-import type { CSSProperties } from "react";
-import SectionHeader from "@/components/ui/section-header";
-import { STEP_EVIDENCE, STEPS } from "./homeData";
+import { Link } from "react-router-dom";
+import ScrollReveal from "@/components/ui/scroll-reveal";
+import { ROUTES } from "@/constants/routes";
+
+const EXAMPLE_TASKS = [
+  "Build pages from a design",
+  "Implement page interactions",
+  "Adapt layouts across screens",
+];
 
 const StepsSection = () => {
-  const sectionHeaderProps1 = {
-    title: "Understand Your Work. Know What to Do Next.",
-    subtitle:
-      "AI is changing work — but not every task, and not every skill, in the same way. Start from the work you actually do, and we’ll take it step by step to a plan that fits your real life.",
-  } satisfies Partial<ComponentProps<typeof SectionHeader>>;
   return (
-    <section className="section" id="steps">
-      <div className="container">
-        <SectionHeader {...sectionHeaderProps1} />
-        <div className="mb-6 max-w-3xl text-sm leading-6">
-          <p><strong>For example:</strong> “I check customer orders for missing details.” Save that task, check any available AI research, review a related skill, then choose a small learning action and record what you tried. A course is optional.</p>
-          <p className="mt-2">You can return to saved practice records and compare progress over time. Career exploration is optional. Research findings do not predict what will happen to your job.</p>
-        </div>
-        <div className="steps-grid">
-          {STEPS.map((step, index) => (
-            <div className="step-flow-item" key={step.title}>
-              <article className={`step-card glass step-card-${step.accent}`}>
-                <div className="step-card-top">
-                  <div className="step-num">
-                    {String(index + 1).padStart(2, "0")}
-                  </div>
-                </div>
-                <h3>{step.title}</h3>
-                <p className="step-description">{step.description}</p>
-              </article>
-              {index < STEPS.length - 1 && (
-                <div
-                  className="step-connector"
-                  aria-hidden="true"
-                  style={
-                    { "--step-delay": `${index * 160}ms` } as CSSProperties
-                  }
-                >
-                  <span className="step-connector-icon">›</span>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="steps-evidence glass">
-          <div className="steps-evidence-heading">
-            <span className="steps-evidence-kicker">
-              Evidence behind the flow
-            </span>
-            <p>
-              Three references keep the journey grounded in your work and
-              current research.
+    <section className="section home-profile" id="steps" aria-labelledby="home-profile-title">
+      <div className="container home-profile-grid">
+        <ScrollReveal className="home-reveal" threshold={0.12}>
+          <div className="home-profile-copy">
+            <div className="home-eyebrow">01 / Your starting point</div>
+            <h2 id="home-profile-title">Your work, in your words.</h2>
+            <p className="home-profile-lead">
+              Describe your role, then review, edit or add tasks. Only what you confirm becomes your work profile — the starting point for your AI analysis and learning.
             </p>
+            <div className="home-profile-points">
+              <span>Keep your own job title</span>
+              <span>Change tasks any time</span>
+            </div>
+            <Link className="home-profile-link" to={ROUTES.aiExposure}>
+              See AI impact and assistance
+              <span className="home-profile-arrow" aria-hidden="true">→</span>
+            </Link>
           </div>
-          <div className="steps-evidence-list">
-            {STEP_EVIDENCE.map((item) => (
-              <div className="steps-evidence-item" key={item.label}>
-                <strong>{item.label}</strong>
-                <span>{item.detail}</span>
+        </ScrollReveal>
+        <ScrollReveal className="home-reveal" threshold={0.12} delay={120}>
+          <article className="home-profile-card" aria-label="Example of confirmed work">
+            <div className="home-profile-card-head">
+              <div>
+                <div className="home-profile-kicker">Your confirmed work</div>
+                <h3>Front-end engineer</h3>
               </div>
-            ))}
-          </div>
-        </div>
+              <span className="home-profile-example">Example</span>
+            </div>
+            <ul className="home-profile-list">
+              {EXAMPLE_TASKS.map((task) => (
+                <li key={task}>
+                  <span className="home-profile-check" aria-hidden="true">✓</span>
+                  {task}
+                </li>
+              ))}
+            </ul>
+            <div className="home-profile-foot">
+              <span>Reviewed by you · Saved together</span>
+              <span>One profile, reused throughout</span>
+            </div>
+          </article>
+        </ScrollReveal>
       </div>
     </section>
   );

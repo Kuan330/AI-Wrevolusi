@@ -1,14 +1,18 @@
-
 import StartWorkspaceButton from "./StartWorkspaceButton";
 
 const CtaSection = () => {
   return (
-    <section className="section" style={{ paddingBottom: 20 }}>
+    <section className="home-cta" aria-labelledby="home-cta-title">
       <div className="container">
-        <div className="cta-bottom">
-          <h2>See the change - and the choices still yours.</h2>
-          <p>A free account keeps your work review and learning choices together.</p>
-          <StartWorkspaceButton />
+        <div className="home-cta-card">
+          <div>
+            <h2 id="home-cta-title">Your next move starts with your work.</h2>
+            <p>Understand the impact. Build relevant skills. Keep moving forward.</p>
+          </div>
+          <div className="home-cta-action">
+            <StartWorkspaceButton>Start with my work <span aria-hidden="true">↗</span></StartWorkspaceButton>
+            <span>Your role. Your tasks. Your starting point.</span>
+          </div>
         </div>
       </div>
     </section>
