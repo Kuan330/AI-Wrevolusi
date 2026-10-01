@@ -132,8 +132,12 @@ def reviewed_esco_evidence(workspace: object) -> tuple[set[str], set[str]]:
     return current, developing - current
 
 
-def reviewed_wef_career_evidence(workspace: object, allowed_skill_ids: set[int]) -> tuple[set[int], set[int]]:
-    """Return accepted current-work WEF skills and WEF skills chosen for career learning."""
+def wef_career_evidence(
+    workspace: object,
+    inferred_skill_ids: set[int],
+    allowed_skill_ids: set[int],
+) -> tuple[set[int], set[int], set[int]]:
+    """Return accepted, task-suggested, and saved-learning WEF skills."""
     from app.services.journey import JOURNEY_KEY, _review_matches_work, validate_journey
 
     if not isinstance(workspace, Mapping):
@@ -141,24 +145,31 @@ def reviewed_wef_career_evidence(workspace: object, allowed_skill_ids: set[int])
     try:
         raw = workspace.get(JOURNEY_KEY)
         if raw is None:
-            return set(), set()
+            return set(), inferred_skill_ids & allowed_skill_ids, set()
         state = validate_journey(json.loads(raw))
     except (TypeError, ValueError) as error:
         raise ValueError('Your saved skill review could not be read. Reload your account before viewing career options.') from error
 
     current: set[int] = set()
+    rejected: set[int] = set()
     review = state.get('review')
-    if (review and review['completed'] and _review_matches_work(review['workKey'], dict(workspace))):
+    review_is_current = bool(review and _review_matches_work(review['workKey'], dict(workspace)))
+    if review_is_current:
         current = {
             int(skill_id) for skill_id, decision in review['decisions'].items()
             if decision == 'accepted' and int(skill_id) in allowed_skill_ids
         }
+        rejected = {
+            int(skill_id) for skill_id, decision in review['decisions'].items()
+            if decision == 'rejected' and int(skill_id) in allowed_skill_ids
+        }
     developing = {
         context['skill']['id'] for context in state['contexts'].values()
-        if context['origin'] == 'career' and context['skill']['id'] in allowed_skill_ids
+        if context['skill']['id'] in allowed_skill_ids
         and _review_matches_work(context['workKey'], dict(workspace))
     }
-    return current, developing - current
+    suggested = (inferred_skill_ids & allowed_skill_ids) - current - rejected - developing
+    return current, suggested, developing - current
 
 
 def rank_esco_directions(occupations, relations, skills, current_skill_uris, developing_skill_uris, source):
@@ -366,8 +377,9 @@ def recommend_occupations(
     *,
     exclude_codes: set[str] | None = None,
     developing_skill_ids: set[int] | None = None,
+    suggested_skill_ids: set[int] | None = None,
 ) -> list[dict]:
-    """Rank occupations by current WEF skills, then skills chosen for development.
+    """Rank occupations by current, task-suggested, and developing WEF skills.
 
     Coverage is the current and developing overlap / required skills, using every WEF skill matched
     from the occupation's title, description, and ILO tasks (not a 3-skill cap).
@@ -376,6 +388,7 @@ def recommend_occupations(
     candidates = _match_candidates(skills)
     excluded = exclude_codes or set()
     developing = developing_skill_ids or set()
+    suggested = suggested_skill_ids or set()
     ranked: list[dict] = []
     for occupation in occupations:
         code = str(occupation.get('occupation_code') or occupation.get('masco_code') or '')
@@ -389,7 +402,8 @@ def recommend_occupations(
             continue
         owned = confirmed_skill_ids & required
         learning = developing & required
-        if not owned and not learning:
+        task_suggestions = suggested & required
+        if not owned and not learning and not task_suggestions:
             continue
         ranked.append({
             'occupation_code': code,
@@ -397,19 +411,20 @@ def recommend_occupations(
             'area': occupation.get('industry'),
             'description': str(occupation.get('description') or ''),
             # Coverage = shared / required — matches the direction skill map.
-            'coverage_pct': round(len(owned | learning) * 100 / len(required)),
+            'coverage_pct': round(len(owned | learning | task_suggestions) * 100 / len(required)),
             'required_skill_ids': sorted(required),
             'overlap_count': len(owned),
             'developing_overlap_count': len(learning),
-            'missing_count': len(required - owned - learning),
+            'suggested_overlap_count': len(task_suggestions),
+            'missing_count': len(required - owned - learning - task_suggestions),
             'skill_states': {
-                skill_id: 'have' if skill_id in owned else 'learning' if skill_id in learning else 'missing'
+                skill_id: 'have' if skill_id in owned else 'learning' if skill_id in learning else 'suggested' if skill_id in task_suggestions else 'missing'
                 for skill_id in required
             },
         })
     # Current matches lead; developing skills improve future-fit ranking.
     ranked.sort(key=lambda row: (
-        -(row['overlap_count'] + row['developing_overlap_count']),
+        -(row['overlap_count'] + row['developing_overlap_count'] + row['suggested_overlap_count']),
         -row['overlap_count'], row['missing_count'], -row['coverage_pct'], row['title'].casefold(),
     ))
     return ranked[:limit]

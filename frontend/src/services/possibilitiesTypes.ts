@@ -1,4 +1,4 @@
-export type PossibilitySkillState = "have" | "learning" | "shortlisted" | "missing";
+export type PossibilitySkillState = "have" | "learning" | "suggested" | "shortlisted" | "missing";
 export type PossibilitySkill = { skill_id: number; skill_slug: string; name: string; state: PossibilitySkillState };
 export type CareerSkill = { uri: string; label: string; relation: "essential" | "optional"; state: "current" | "developing" | "not_yet_evidenced" };
 export type ReviewedCareerSkill = { uri: string; label: string; state: "current" | "developing" };
@@ -7,10 +7,10 @@ export type PossibilityDirection = {
   occupation_code: string; occupation_uri: string | null; title: string; area: string | null;
   description: string; coverage_pct: number | null; skills: PossibilitySkill[];
   requirements: CareerSkill[]; source: CareerSource | null;
-  current_skill_overlap: number; developing_skill_overlap: number; essential_not_yet_evidenced: number;
+  current_skill_overlap: number; developing_skill_overlap: number; suggested_skill_overlap: number; essential_not_yet_evidenced: number;
 };
 export type PossibilitiesResponse = {
-  contract_version: "2"; score_semantics: "current_and_developing_wef_overlap"; disclaimer: string;
+  contract_version: "2"; score_semantics: "task_suggested_current_and_developing_wef_overlap"; disclaimer: string;
   source: "live" | "demo"; status: "ready" | "needs_profile" | "needs_skill_review" | "unavailable";
   current_role: { occupation_code: string; title: string } | null;
   current_role_coverage_pct: number | null; skills: PossibilitySkill[]; directions: PossibilityDirection[];

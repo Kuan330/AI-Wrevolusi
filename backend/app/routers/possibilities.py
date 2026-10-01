@@ -126,6 +126,7 @@ async def get_possibilities(
         for task_text in task_texts
         for item in match_skills(task_text, candidates, limit=None)
     }
+    inferred_wef = set(owned)
     try:
         owned = apply_skill_review(owned, workspace)
     except ValueError as exc:
@@ -149,13 +150,16 @@ async def get_possibilities(
             # Continue without role - don't fail the entire request
 
     try:
-        current_wef, developing_wef = reviewed_wef_career_evidence(workspace, set(skills))
+        current_wef, suggested_wef, developing_wef = wef_career_evidence(
+            workspace, inferred_wef, set(skills)
+        )
     except ValueError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from None
 
     ranked = recommend_occupations(
         occupation_rows, current_wef, skills, limit=3,
         developing_skill_ids=developing_wef,
+        suggested_skill_ids=suggested_wef,
         exclude_codes={role['occupation_code']} if role else None,
     )
     directions = []
@@ -167,6 +171,7 @@ async def get_possibilities(
             'source': None,
             'current_skill_overlap': row['overlap_count'],
             'developing_skill_overlap': row['developing_overlap_count'],
+            'suggested_skill_overlap': row['suggested_overlap_count'],
             'essential_not_yet_evidenced': row['missing_count'],
         })
         directions.append(direction)
@@ -178,7 +183,7 @@ async def get_possibilities(
     reviewed_esco_skills = []
     career_source_note = 'Roles are matched from WEF skills and occupation task descriptions.'
     from app.services.possibilities import slugify_skill_name
-    skill_items = [{'skill_id': i, 'skill_slug': slugify_skill_name(str(row['core_skill'])), 'name': row['core_skill'], 'state': 'have' if i in owned else ('learning' if i in developing_wef else ('shortlisted' if i in shortlist else 'missing'))} for i, row in skills.items()]
+    skill_items = [{'skill_id': i, 'skill_slug': slugify_skill_name(str(row['core_skill'])), 'name': row['core_skill'], 'state': 'have' if i in current_wef else ('learning' if i in developing_wef else ('suggested' if i in suggested_wef else ('shortlisted' if i in shortlist else 'missing')))} for i, row in skills.items()]
     chosen_score = None
     current_role_coverage_pct = None
     if role:
@@ -195,7 +200,7 @@ async def get_possibilities(
     return PossibilitiesResponse(
         disclaimer=DISCLAIMER,
         source='live',
-        status='ready' if (current_wef or developing_wef) else ('needs_skill_review' if has_confirmed_tasks else 'needs_profile'),
+        status='ready' if (current_wef or suggested_wef or developing_wef) else ('needs_skill_review' if has_confirmed_tasks else 'needs_profile'),
         current_role=role,
         current_role_coverage_pct=current_role_coverage_pct,
         skills=skill_items,

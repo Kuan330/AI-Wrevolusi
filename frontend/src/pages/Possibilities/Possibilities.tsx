@@ -36,6 +36,8 @@ function JourneyCompanion({
   currentTitle,
   targetTitle,
   acceptedSkills,
+  suggestedSkillCount,
+  developingSkillCount,
   onExplore,
   canExplore,
   continuing,
@@ -43,6 +45,8 @@ function JourneyCompanion({
   currentTitle: string;
   targetTitle: string | null;
   acceptedSkills: { skill_id: number; name: string }[];
+  suggestedSkillCount: number;
+  developingSkillCount: number;
   onExplore: () => void;
   canExplore: boolean;
   continuing: boolean;
@@ -74,7 +78,7 @@ function JourneyCompanion({
           </p>
 
           <div className="px-companion-evidence">
-            <strong>{acceptedSkills.length} current skill{acceptedSkills.length === 1 ? "" : "s"} in common</strong>
+            <strong>{acceptedSkills.length} current · {suggestedSkillCount} task suggestions · {developingSkillCount} to develop</strong>
             <p className="px-chosen-hint">WEF skills · occupation task matches</p>
             <button type="button" className="px-info-button"
               aria-label={detailsOpen ? "Hide career details" : "Show career details"}
@@ -248,6 +252,7 @@ export default function Possibilities() {
 
   const selected = data.directions.find(item => item.occupation_code === selectedCode);
   const currentTitle = data.currentRole?.title ?? "Your current role";
+  const taskSuggestedSkills = data.skills.filter(item => item.state === "suggested");
   const developingProfileSkills = data.skills.filter(item => item.state === "learning");
   const selectedAcceptedSkills = (selected?.skills ?? []).filter(item => item.state === "have");
   const availableSkills = (selected?.skills ?? []).filter(item => item.state !== "have");
@@ -300,7 +305,7 @@ export default function Possibilities() {
                 <h3>Skills in your profile</h3>
                 <details className="px-info-disclosure">
                   <summary aria-label="Show skill source information" title="Skill source information"><Info size={16} aria-hidden /></summary>
-                  <p>Directions use accepted WEF skills and skills saved for career learning.</p>
+                  <p>Directions use WEF skills suggested by your confirmed tasks. No review is needed.</p>
                 </details>
               </div>
               <div className="px-chips">
@@ -315,6 +320,10 @@ export default function Possibilities() {
                 )}
               </div>
               {wefError && <p role="status" className="px-chosen-hint">{wefError}</p>}
+              {taskSuggestedSkills.length > 0 && <>
+                <h3 className="mt-4">Suggested from your tasks</h3>
+                <div className="px-chips">{taskSuggestedSkills.map(skill => <span className="px-chip missing" key={skill.skill_id}>{skill.name}</span>)}</div>
+              </>}
               {developingProfileSkills.length > 0 && <>
                 <h3 className="mt-4">Skills to develop</h3>
                 <div className="px-chips">{developingProfileSkills.map(skill => <span className="px-chip missing" key={skill.skill_id}>{skill.name}</span>)}</div>
@@ -326,7 +335,7 @@ export default function Possibilities() {
             <p className="px-eyebrow">EXPLORE OTHER DIRECTIONS</p>
             <h2>Where could you go next?</h2>
             {!data.directions.length && <div className="px-no-direction">
-              {data.status === "needs_skill_review" ? <><h3>Review skills to see career options</h3><Link className="px-light" to={ROUTES.skills}>Review skills for my tasks</Link></> : <><h3>No matching career options yet</h3><Link className="px-light" to={ROUTES.skills}>Review skills for my tasks</Link></>}
+              {data.status === "needs_skill_review" ? <><h3>No task skills found yet</h3><Link className="px-light" to={ROUTES.workProfile}>Update my tasks</Link></> : <><h3>No matching career options yet</h3><Link className="px-light" to={ROUTES.workProfile}>Update my tasks</Link></>}
             </div>}
             <div className="px-direction-grid">
               {data.directions.slice(0, 3).map((direction, index) => {
@@ -341,7 +350,7 @@ export default function Possibilities() {
                     <h3>{direction.title}</h3>
                     <div className="px-card-evidence">
                       <strong>{acceptedSkills.length} current skill{acceptedSkills.length === 1 ? "" : "s"} in common</strong>
-                      <span>{direction.developing_skill_overlap} developing · {direction.essential_not_yet_evidenced} other role skill{direction.essential_not_yet_evidenced === 1 ? "" : "s"}</span>
+                      <span>{direction.suggested_skill_overlap} task suggestions · {direction.developing_skill_overlap} to develop</span>
                       <p>{acceptedSkills.map(skill => skill.name).join(" · ")}</p>
                     </div>
                     {direction.description && <details className="px-info-disclosure px-role-info">
@@ -431,6 +440,8 @@ export default function Possibilities() {
           currentTitle={currentTitle}
           targetTitle={selected?.title ?? null}
           acceptedSkills={selectedAcceptedSkills}
+          suggestedSkillCount={selected?.suggested_skill_overlap ?? 0}
+          developingSkillCount={selected?.developing_skill_overlap ?? 0}
           onExplore={() => { void goLearning(); }}
           canExplore={Boolean(selectedSkill)}
           continuing={continuing}
