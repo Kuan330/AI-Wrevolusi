@@ -48,7 +48,7 @@ export default function AIExposure() {
         {error && <p role="alert">{error} Your work is still saved. A failed request does not mean there is no research.</p>}
       </section>}
       <div className="exposure-epic-layout">
-      <Card className="exposure-overview"><h2>Tasks by AI assistance category</h2><p className="exposure-caption">{profile.tasks.length} confirmed tasks</p>{checking || error || !analysis ? <p className="exposure-caption" role="status">{checking ? "Checking research…" : error ? "Research unavailable. Retry the research check to see categories." : "Check research to see your task categories."}</p> : <AssistanceChart tasks={profile.tasks} assessments={assessments} />}</Card>
+      <Card className="exposure-overview"><h2>Tasks by AI assistance category</h2><p className="exposure-caption">{profile.tasks.length} confirmed tasks</p>{(checking || error || !analysis) && <p className="exposure-caption" role="status">{checking ? "Checking research…" : error ? "Research unavailable. Tasks are shown as Unverified until the check succeeds." : "Tasks are shown as Unverified until you check the research."}</p>}<AssistanceChart tasks={profile.tasks} assessments={checking || error ? [] : assessments} /></Card>
       <ExposureTaskList occupation={analysis ? {title: analysis.occupationTitle, code: analysis.occupationCode} : undefined} tasks={profile.tasks} assessments={assessments}
         researchChecked={Boolean(analysis) && !checking} researchLoading={checking} researchUnavailable={Boolean(error)} />
       </div>
