@@ -4,13 +4,13 @@ export type CareerSkill = { uri: string; label: string; relation: "essential" | 
 export type ReviewedCareerSkill = { uri: string; label: string; state: "current" | "developing" };
 export type CareerSource = { name: "ESCO"; version: string; retrieved_at: string; occupation_uri: string; source_url: string; attribution: string };
 export type PossibilityDirection = {
-  occupation_code: string; occupation_uri: string; title: string; area: string | null;
+  occupation_code: string; occupation_uri: string | null; title: string; area: string | null;
   description: string; coverage_pct: number | null; skills: PossibilitySkill[];
-  requirements: CareerSkill[]; source: CareerSource;
+  requirements: CareerSkill[]; source: CareerSource | null;
   current_skill_overlap: number; developing_skill_overlap: number; essential_not_yet_evidenced: number;
 };
 export type PossibilitiesResponse = {
-  contract_version: "2"; score_semantics: "reviewed_source_skill_overlap"; disclaimer: string;
+  contract_version: "2"; score_semantics: "current_and_developing_wef_overlap"; disclaimer: string;
   source: "live" | "demo"; status: "ready" | "needs_profile" | "needs_skill_review" | "unavailable";
   current_role: { occupation_code: string; title: string } | null;
   current_role_coverage_pct: number | null; skills: PossibilitySkill[]; directions: PossibilityDirection[];

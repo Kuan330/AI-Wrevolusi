@@ -70,7 +70,7 @@ class PossibilityDirection(PossibilitiesSchema):
 
 class PossibilitiesResponse(PossibilitiesSchema):
     contract_version: Literal['2'] = '2'
-    score_semantics: Literal['direction_skill_coverage', 'reviewed_source_skill_overlap'] = 'reviewed_source_skill_overlap'
+    score_semantics: Literal['direction_skill_coverage', 'reviewed_source_skill_overlap', 'current_and_developing_wef_overlap'] = 'current_and_developing_wef_overlap'
     disclaimer: str = Field(min_length=1, max_length=500)
     source: Literal['live', 'demo']
     status: Literal['ready', 'needs_profile', 'needs_skill_review', 'unavailable']
