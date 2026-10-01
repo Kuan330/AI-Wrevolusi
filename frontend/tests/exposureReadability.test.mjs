@@ -43,7 +43,7 @@ test('first task follows confirmed order; all tasks are available without score 
 });
 test('published scale is visible and further evidence remains collapsed',()=>{
   const html=render(Impact,{task,assessment,researchChecked:true,researchUnavailable:false});
-  assert.match(html,/AI may help with/);assert.match(html,/Your judgement still matters/);assert.match(html,/Your next step/);
+  assert.match(html,/AI can assist with/);assert.match(html,/Your judgement matters/);assert.match(html,/Your next step/);
   const before=html.split('<details')[0];
   assert.match(before,/<meter[^>]+value="0\.1375"/);
   assert.doesNotMatch(before,/0\.95|0\.8/);
@@ -64,7 +64,7 @@ test('task handoff opens skill review directly with the exact task identity and 
 });
 test('candidate source values stay hidden and no personal estimate is invented',()=>{
   const html=render(Impact,{task,assessment:{...assessment,match_layer:'llm'},researchChecked:true});
-  assert.match(html,/Possible research link/);assert.match(html,/No score is shown while the match is uncertain/);
+  assert.match(html,/Unverified/);assert.match(html,/No score is shown while the match is uncertain/);
   assert.doesNotMatch(html,/0\.1375|0\.95|0\.8/);
 });
 
