@@ -4,7 +4,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator
 
-SkillState = Literal['have', 'learning', 'shortlisted', 'missing']
+SkillState = Literal['have', 'learning', 'suggested', 'shortlisted', 'missing']
 PositiveStrictInt = Annotated[StrictInt, Field(gt=0)]
 
 
@@ -65,12 +65,13 @@ class PossibilityDirection(PossibilitiesSchema):
     source: CareerSource | None = None
     current_skill_overlap: int = Field(default=0, ge=0)
     developing_skill_overlap: int = Field(default=0, ge=0)
+    suggested_skill_overlap: int = Field(default=0, ge=0)
     essential_not_yet_evidenced: int = Field(default=0, ge=0)
 
 
 class PossibilitiesResponse(PossibilitiesSchema):
     contract_version: Literal['2'] = '2'
-    score_semantics: Literal['direction_skill_coverage', 'reviewed_source_skill_overlap'] = 'reviewed_source_skill_overlap'
+    score_semantics: Literal['direction_skill_coverage', 'reviewed_source_skill_overlap', 'current_and_developing_wef_overlap', 'task_suggested_current_and_developing_wef_overlap'] = 'task_suggested_current_and_developing_wef_overlap'
     disclaimer: str = Field(min_length=1, max_length=500)
     source: Literal['live', 'demo']
     status: Literal['ready', 'needs_profile', 'needs_skill_review', 'unavailable']

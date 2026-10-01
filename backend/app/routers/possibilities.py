@@ -1,24 +1,20 @@
 import json
 import logging
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.models.user import User
-from app.models.specialist import SpecialistConcept, SpecialistOccupation, SpecialistRelation, SpecialistRelease
 from app.services.auth import get_current_user
 from app.services.occupation_text import occupation_description_sql
 from app.services.possibilities import (
     MODERN_PROFILE_KEY,
     PROFILE_RECOVERY_MESSAGE,
     confirmed_workspace_evidence,
-    ESCO_SOURCE_NOTE,
-    ESCO_SOURCE_URL,
-    ESCO_VERSION,
     occupation_required_skills,
-    rank_esco_directions,
-    reviewed_esco_evidence,
+    recommend_occupations,
+    wef_career_evidence,
 )
 from app.schemas.possibilities import PossibilitiesResponse
 from app.services.workspace import SHORTLIST_KEY, read_workspace_shortlist
@@ -130,6 +126,7 @@ async def get_possibilities(
         for task_text in task_texts
         for item in match_skills(task_text, candidates, limit=None)
     }
+    inferred_wef = set(owned)
     try:
         owned = apply_skill_review(owned, workspace)
     except ValueError as exc:
@@ -153,75 +150,40 @@ async def get_possibilities(
             # Continue without role - don't fail the entire request
 
     try:
-        current_esco, developing_esco = reviewed_esco_evidence(workspace)
+        current_wef, suggested_wef, developing_wef = wef_career_evidence(
+            workspace, inferred_wef, set(skills)
+        )
     except ValueError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from None
 
+    ranked = recommend_occupations(
+        occupation_rows, current_wef, skills, limit=3,
+        developing_skill_ids=developing_wef,
+        suggested_skill_ids=suggested_wef,
+        exclude_codes={role['occupation_code']} if role else None,
+    )
     directions = []
+    for row in ranked:
+        direction = build_direction_payload(row, skills)
+        direction.update({
+            'occupation_uri': None,
+            'requirements': [],
+            'source': None,
+            'current_skill_overlap': row['overlap_count'],
+            'developing_skill_overlap': row['developing_overlap_count'],
+            'suggested_skill_overlap': row['suggested_overlap_count'],
+            'essential_not_yet_evidenced': row['missing_count'],
+        })
+        directions.append(direction)
+    if chosen_code not in {direction['occupation_code'] for direction in directions}:
+        chosen_code = None
+    chosen_uri = None
+    selected_direction = next((row for row in directions if row['occupation_code'] == chosen_code), None)
+    chosen_score = selected_direction['coverage_pct'] if selected_direction else None
     reviewed_esco_skills = []
-    career_source_note = ESCO_SOURCE_NOTE
-    release = await db.get(SpecialistRelease, ESCO_VERSION)
-    if release is None:
-        career_source_note = 'Verified career-source data is not available yet. Career directions are withheld until the reviewed ESCO catalogue is installed.'
-    else:
-        metadata = release.source_metadata or {}
-        source = {
-            'name': 'ESCO', 'version': ESCO_VERSION,
-            'retrieved_at': metadata.get('retrieved_at') or 'date not recorded',
-            'source_url': (metadata.get('provenance') or {}).get('url') or ESCO_SOURCE_URL,
-            'attribution': metadata.get('attribution') or 'European Commission, ESCO classification.',
-        }
-        evidence_uris = current_esco | developing_esco
-        valid_skill_labels = {}
-        if evidence_uris:
-            rows = (await db.execute(
-                select(SpecialistConcept.uri, SpecialistConcept.label)
-                .where(SpecialistConcept.version == ESCO_VERSION, SpecialistConcept.uri.in_(evidence_uris))
-            )).mappings().all()
-            valid_skill_labels = {row['uri']: row['label'] for row in rows}
-            current_esco &= set(valid_skill_labels)
-            developing_esco &= set(valid_skill_labels)
-            reviewed_esco_skills = [
-                {'uri': uri, 'label': valid_skill_labels[uri],
-                 'state': 'current' if uri in current_esco else 'developing'}
-                for uri in sorted(current_esco | developing_esco, key=lambda item: valid_skill_labels[item].casefold())
-            ]
-        relevant_uris = current_esco | developing_esco
-        if relevant_uris:
-            candidate_uris = (await db.scalars(
-                select(SpecialistRelation.occupation_uri).where(
-                    SpecialistRelation.version == ESCO_VERSION,
-                    SpecialistRelation.skill_uri.in_(relevant_uris),
-                ).distinct()
-            )).all()
-            if candidate_uris:
-                role_rows = (await db.execute(
-                    select(SpecialistOccupation.uri, SpecialistOccupation.label, SpecialistOccupation.description,
-                           SpecialistOccupation.isco_code)
-                    .where(SpecialistOccupation.version == ESCO_VERSION, SpecialistOccupation.uri.in_(candidate_uris))
-                )).mappings().all()
-                relation_rows = (await db.execute(
-                    select(SpecialistRelation.occupation_uri, SpecialistRelation.skill_uri, SpecialistRelation.relation)
-                    .where(SpecialistRelation.version == ESCO_VERSION,
-                           SpecialistRelation.occupation_uri.in_(candidate_uris))
-                )).mappings().all()
-                required_uris = {row['skill_uri'] for row in relation_rows}
-                concept_rows = (await db.execute(
-                    select(SpecialistConcept.uri, SpecialistConcept.label)
-                    .where(SpecialistConcept.version == ESCO_VERSION, SpecialistConcept.uri.in_(required_uris))
-                )).mappings().all() if required_uris else []
-                directions = rank_esco_directions(
-                    [dict(row) for row in role_rows], [dict(row) for row in relation_rows],
-                    {row['uri']: dict(row) for row in concept_rows}, current_esco,
-                    developing_esco, source,
-                )
-        allowed_uris = {row['occupation_uri'] for row in directions}
-        if chosen_uri not in allowed_uris:
-            chosen_uri = None
-        selected_direction = next((row for row in directions if row['occupation_uri'] == chosen_uri), None)
-        chosen_code = selected_direction['occupation_code'] if selected_direction else None
+    career_source_note = 'Roles are matched from WEF skills and occupation task descriptions.'
     from app.services.possibilities import slugify_skill_name
-    skill_items = [{'skill_id': i, 'skill_slug': slugify_skill_name(str(row['core_skill'])), 'name': row['core_skill'], 'state': 'have' if i in owned else ('shortlisted' if i in shortlist else 'missing')} for i, row in skills.items()]
+    skill_items = [{'skill_id': i, 'skill_slug': slugify_skill_name(str(row['core_skill'])), 'name': row['core_skill'], 'state': 'have' if i in current_wef else ('learning' if i in developing_wef else ('suggested' if i in suggested_wef else ('shortlisted' if i in shortlist else 'missing')))} for i, row in skills.items()]
     chosen_score = None
     current_role_coverage_pct = None
     if role:
@@ -238,7 +200,7 @@ async def get_possibilities(
     return PossibilitiesResponse(
         disclaimer=DISCLAIMER,
         source='live',
-        status='ready' if (current_esco or developing_esco) and release is not None else ('needs_skill_review' if has_confirmed_tasks else 'needs_profile'),
+        status='ready' if (current_wef or suggested_wef or developing_wef) else ('needs_skill_review' if has_confirmed_tasks else 'needs_profile'),
         current_role=role,
         current_role_coverage_pct=current_role_coverage_pct,
         skills=skill_items,

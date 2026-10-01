@@ -17,16 +17,12 @@ import {
   toPossibilitiesData,
   type PossibilitiesData,
 } from "./possibilitiesModel";
-import { isSkillReviewCurrent, readJourneyProfile, readJourneyState } from "@/features/journey/journey";
+import { isSkillReviewCurrent, readJourneyProfile, readJourneyState, startLearning } from "@/features/journey/journey";
 import { ROUTES } from "@/constants/routes";
 import "./exploration.css";
 
 const DIRECTION_KEY = "aiwrevolusi.possibilities.chosenDirection";
 const COMPANION_AVATAR = "/images/possibilities-companion.png";
-const sourceRetrievedDate = (value: string) => Number.isNaN(Date.parse(value))
-  ? "date not recorded"
-  : new Intl.DateTimeFormat("en-MY", { dateStyle: "medium" }).format(new Date(value));
-
 const readJson = <T,>(key: string, fallback: T): T => {
   try {
     const value = accountStorage.getItem(key);
@@ -40,13 +36,17 @@ function JourneyCompanion({
   currentTitle,
   targetTitle,
   acceptedSkills,
+  suggestedSkillCount,
+  developingSkillCount,
   onExplore,
   canExplore,
   continuing,
 }: {
   currentTitle: string;
   targetTitle: string | null;
-  acceptedSkills: { uri: string; label: string }[];
+  acceptedSkills: { skill_id: number; name: string }[];
+  suggestedSkillCount: number;
+  developingSkillCount: number;
   onExplore: () => void;
   canExplore: boolean;
   continuing: boolean;
@@ -78,8 +78,8 @@ function JourneyCompanion({
           </p>
 
           <div className="px-companion-evidence">
-            <strong>{acceptedSkills.length} current skill{acceptedSkills.length === 1 ? "" : "s"} in common</strong>
-            <p className="px-chosen-hint">ESCO source links · exploratory</p>
+            <strong>{acceptedSkills.length} current · {suggestedSkillCount} task suggestions · {developingSkillCount} to develop</strong>
+            <p className="px-chosen-hint">WEF skills · occupation task matches</p>
             <button type="button" className="px-info-button"
               aria-label={detailsOpen ? "Hide career details" : "Show career details"}
               title={detailsOpen ? "Hide career details" : "Show career details"}
@@ -89,11 +89,8 @@ function JourneyCompanion({
             {detailsOpen ? (
               <div className="px-companion-story" id="px-companion-details">
                 <h3>What this path suggests</h3>
-                <p>
-                  This direction uses ESCO occupation-skill relationships. Shared skills below are ones you said you use in current confirmed work.
-                </p>
-                {acceptedSkills.length > 0 && <ul>{acceptedSkills.map(skill => <li key={skill.uri}>{skill.label}</li>)}</ul>}
-                <p>Other requirements are not evidence that you lack a skill. Choose one to explore learning.</p>
+                {acceptedSkills.length > 0 && <ul>{acceptedSkills.map(skill => <li key={skill.skill_id}>{skill.name}</li>)}</ul>}
+                <p>Other role skills can be chosen for learning.</p>
               </div>
             ) : null}
           </div>
@@ -118,11 +115,11 @@ export default function Possibilities() {
   const [data, setData] = useState<PossibilitiesData | null>(null);
   const [wefSkills, setWefSkills] = useState<WefSkill[]>([]);
   const [selectedCode, setSelectedCode] = useState<string | null>(
-    () => readJson<{ occupation_uri?: string } | null>(DIRECTION_KEY, null)?.occupation_uri ?? null,
+    () => readJson<{ occupation_code?: string } | null>(DIRECTION_KEY, null)?.occupation_code ?? null,
   );
-  const [skillChoice, setSkillChoice] = useState<{ careerUri: string; skillUri: string } | null>(() => {
-    const saved = readJson<{ occupation_uri?: string; skill_uri?: string } | null>(DIRECTION_KEY, null);
-    return saved?.occupation_uri && saved.skill_uri ? { careerUri: saved.occupation_uri, skillUri: saved.skill_uri } : null;
+  const [skillChoice, setSkillChoice] = useState<{ careerCode: string; skillId: number } | null>(() => {
+    const saved = readJson<{ occupation_code?: string; skill_id?: number } | null>(DIRECTION_KEY, null);
+    return saved?.occupation_code && saved.skill_id ? { careerCode: saved.occupation_code, skillId: saved.skill_id } : null;
   });
   const [navigationError, setNavigationError] = useState("");
   const [continuing, setContinuing] = useState(false);
@@ -183,8 +180,8 @@ export default function Possibilities() {
         setError("");
         setLoading(false);
         setSelectedCode(current => {
-          const candidate = current ?? response.chosen_direction_uri;
-          return mapped.directions.some(direction => direction.occupation_uri === candidate)
+          const candidate = current ?? response.chosen_direction_code;
+          return mapped.directions.some(direction => direction.occupation_code === candidate)
             ? candidate
             : null;
         });
@@ -202,14 +199,14 @@ export default function Possibilities() {
     return () => controller.abort();
   }, []);
 
-  const choose = (uri: string) => {
+  const choose = (code: string) => {
     if (continuing) return;
-    const direction = data?.directions.find(item => item.occupation_uri === uri);
+    const direction = data?.directions.find(item => item.occupation_code === code);
     if (!direction) return;
     try {
-      accountStorage.setItem(DIRECTION_KEY, JSON.stringify({ occupation_uri: uri, occupation_code: direction.occupation_code, title: direction.title }));
-      setSelectedCode(uri);
-      setSkillChoice(current => current?.careerUri === uri ? current : null);
+      accountStorage.setItem(DIRECTION_KEY, JSON.stringify({ occupation_code: code, title: direction.title }));
+      setSelectedCode(code);
+      setSkillChoice(current => current?.careerCode === code ? current : null);
       setNavigationError("");
     } catch (error) {
       setNavigationError(error instanceof Error ? error.message : "Could not save this direction.");
@@ -253,31 +250,28 @@ export default function Possibilities() {
     );
   }
 
-  const selected = data.directions.find(item => item.occupation_uri === selectedCode);
+  const selected = data.directions.find(item => item.occupation_code === selectedCode);
   const currentTitle = data.currentRole?.title ?? "Your current role";
-  const selectedAcceptedSkills = (selected?.requirements ?? []).filter(item => item.state === "current");
-  const availableSkills = (selected?.requirements ?? []).filter(item => item.relation === "essential" && item.state !== "current");
-  const selectedSkill = skillChoice?.careerUri === selected?.occupation_uri
-    ? availableSkills.find(item => item.uri === skillChoice?.skillUri) : undefined;
-  const goLearning = (skillUri = selectedSkill?.uri) => {
-    if (!selected || !skillUri || continuing) return;
-    const skill = availableSkills.find(item => item.uri === skillUri);
+  const taskSuggestedSkills = data.skills.filter(item => item.state === "suggested");
+  const developingProfileSkills = data.skills.filter(item => item.state === "learning");
+  const selectedAcceptedSkills = (selected?.skills ?? []).filter(item => item.state === "have");
+  const availableSkills = (selected?.skills ?? []).filter(item => item.state !== "have");
+  const selectedSkill = skillChoice?.careerCode === selected?.occupation_code
+    ? availableSkills.find(item => item.skill_id === skillChoice?.skillId) : undefined;
+  const goLearning = async (skillId = selectedSkill?.skill_id) => {
+    if (!selected || !skillId || continuing) return;
+    const skill = availableSkills.find(item => item.skill_id === skillId);
     if (!skill) return;
-    const saved = { occupation_uri: selected.occupation_uri, occupation_code: selected.occupation_code,
-      title: selected.title, skill_uri: skill.uri, skill_label: skill.label,
-      source_version: selected.source.version };
     try {
-      accountStorage.setItem(DIRECTION_KEY, JSON.stringify(saved));
-      setSelectedCode(selected.occupation_uri);
-      setSkillChoice({ careerUri: selected.occupation_uri, skillUri: skill.uri });
       setContinuing(true);
       setNavigationError("");
-      const query = new URLSearchParams({
-        mode: "browse", search: skill.label, careerSkill: skill.label,
-        careerSkillUri: skill.uri, careerRole: selected.title,
-        careerRoleUri: selected.occupation_uri, careerSourceVersion: selected.source.version,
+      const destination = await startLearning({
+        origin: "career",
+        skill: { id: skill.skill_id, slug: skill.skill_slug, name: skill.name },
+        career: { code: selected.occupation_code, title: selected.title },
+        goal: `Develop ${skill.name} for ${selected.title}`,
       });
-      navigate(`${ROUTES.learningCentre}?${query.toString()}`);
+      navigate(destination);
     } catch (error) {
       setNavigationError(error instanceof Error ? error.message : "Could not open learning resources.");
       setContinuing(false);
@@ -311,7 +305,7 @@ export default function Possibilities() {
                 <h3>Skills in your profile</h3>
                 <details className="px-info-disclosure">
                   <summary aria-label="Show skill source information" title="Skill source information"><Info size={16} aria-hidden /></summary>
-                  <p>These are WEF skills from your current review. Career directions use ESCO skills.</p>
+                  <p>Directions use WEF skills suggested by your confirmed tasks. No review is needed.</p>
                 </details>
               </div>
               <div className="px-chips">
@@ -326,13 +320,13 @@ export default function Possibilities() {
                 )}
               </div>
               {wefError && <p role="status" className="px-chosen-hint">{wefError}</p>}
-              {data.reviewedEscoSkills.length > 0 && <>
-                <h3 className="mt-4">ESCO skills linked to confirmed tasks</h3>
-                <details className="px-info-disclosure">
-                  <summary aria-label="Show ESCO skill information" title="ESCO skill information"><Info size={16} aria-hidden /></summary>
-                  <p>“Current” means you said you use the skill for a confirmed task. It is not a proficiency rating.</p>
-                </details>
-                <div className="px-chips">{data.reviewedEscoSkills.map(skill => <span className={`px-chip ${skill.state === "current" ? "have" : "missing"}`} key={skill.uri}>{skill.label}{skill.state === "developing" ? " · developing" : ""}</span>)}</div>
+              {taskSuggestedSkills.length > 0 && <>
+                <h3 className="mt-4">Suggested from your tasks</h3>
+                <div className="px-chips">{taskSuggestedSkills.map(skill => <span className="px-chip missing" key={skill.skill_id}>{skill.name}</span>)}</div>
+              </>}
+              {developingProfileSkills.length > 0 && <>
+                <h3 className="mt-4">Skills to develop</h3>
+                <div className="px-chips">{developingProfileSkills.map(skill => <span className="px-chip missing" key={skill.skill_id}>{skill.name}</span>)}</div>
               </>}
             </div>
           </section>
@@ -341,34 +335,33 @@ export default function Possibilities() {
             <p className="px-eyebrow">EXPLORE OTHER DIRECTIONS</p>
             <h2>Where could you go next?</h2>
             {!data.directions.length && <div className="px-no-direction">
-              {data.status === "needs_skill_review" ? <><h3>Review skills to see career options</h3><Link className="px-light" to={ROUTES.skills}>Review skills for my tasks</Link></> : <><h3>No matching career options yet</h3><Link className="px-light" to={ROUTES.skills}>Review skills for my tasks</Link></>}
+              {data.status === "needs_skill_review" ? <><h3>No task skills found yet</h3><Link className="px-light" to={ROUTES.workProfile}>Update my tasks</Link></> : <><h3>No matching career options yet</h3><Link className="px-light" to={ROUTES.workProfile}>Update my tasks</Link></>}
             </div>}
             <div className="px-direction-grid">
               {data.directions.slice(0, 3).map((direction, index) => {
-                const chosen = selected?.occupation_uri === direction.occupation_uri;
-                const acceptedSkills = direction.requirements.filter(skill => skill.state === "current");
+                const chosen = selected?.occupation_code === direction.occupation_code;
+                const acceptedSkills = direction.skills.filter(skill => skill.state === "have");
                 return (
                   <article
                     className={`px-direction-card px-accent-${index} ${chosen ? "is-chosen" : ""}`}
-                    key={direction.occupation_uri}
+                    key={direction.occupation_code}
                   >
                     {direction.area ? <p className="px-eyebrow">{direction.area}</p> : null}
                     <h3>{direction.title}</h3>
                     <div className="px-card-evidence">
                       <strong>{acceptedSkills.length} current skill{acceptedSkills.length === 1 ? "" : "s"} in common</strong>
-                      <span>{direction.developing_skill_overlap} developing connection{direction.developing_skill_overlap === 1 ? "" : "s"} · {direction.essential_not_yet_evidenced} essential skill{direction.essential_not_yet_evidenced === 1 ? "" : "s"} not yet evidenced</span>
-                      <p>{acceptedSkills.map(skill => skill.label).join(" · ")}</p>
+                      <span>{direction.suggested_skill_overlap} task suggestions · {direction.developing_skill_overlap} to develop</span>
+                      <p>{acceptedSkills.map(skill => skill.name).join(" · ")}</p>
                     </div>
                     {direction.description && <details className="px-info-disclosure px-role-info">
                       <summary aria-label={`Show ${direction.title} description`} title="Role description"><Info size={16} aria-hidden /></summary>
                       <p>{direction.description}</p>
                     </details>}
-                    <p className="px-card-source">Source: ESCO {direction.source.version} · snapshot retrieved {sourceRetrievedDate(direction.source.retrieved_at)}</p>
-                    <a className="px-card-source-link" href={direction.occupation_uri} target="_blank" rel="noreferrer">View this ESCO occupation record</a>
+                    <p className="px-card-source">WEF skills · occupation task matches</p>
                     <button
                       className={chosen ? "px-primary" : "px-outline"}
                       type="button"
-                      onClick={() => choose(direction.occupation_uri)}
+                      onClick={() => choose(direction.occupation_code)}
                     >
                       {chosen ? "Chosen direction" : "Explore this direction"}
                     </button>
@@ -386,7 +379,7 @@ export default function Possibilities() {
                 <summary aria-label={`Show ${selected.title} description`} title="Role description"><Info size={16} aria-hidden /></summary>
                 <p>{selected.description}</p>
               </details>}
-              {selected.requirements.length > 0 ? (
+              {selected.skills.length > 0 ? (
                 <div className="px-chosen-skills">
                   <div className="px-skill-split">
                     <div>
@@ -394,53 +387,50 @@ export default function Possibilities() {
                       <div className="px-chips px-chips--path">
                         {selectedAcceptedSkills
                           .map(skill => (
-                            <span className="px-chip have" key={skill.uri}>
+                            <span className="px-chip have" key={skill.skill_id}>
                               <Check size={13} aria-hidden />
-                              {skill.label}
+                              {skill.name}
                             </span>
                           ))}
                       </div>
-                      {!selectedAcceptedSkills.length && <p className="px-chosen-hint">No current-use skill evidence is linked to this role. This does not establish a skill gap.</p>}
+                      {!selectedAcceptedSkills.length && <p className="px-chosen-hint">No current skills in common yet.</p>}
                     </div>
                     <div>
-                      <h3>Role skills and their source labels</h3>
-                      <ul className="px-requirement-list">{selected.requirements.map(skill => <li key={skill.uri}>
-                        <strong><a href={skill.uri} target="_blank" rel="noreferrer">{skill.label}</a></strong><span>{skill.relation} · {skill.state === "current" ? "you said you use this" : skill.state === "developing" ? "you marked this to develop" : "not evidenced in this review"}</span>
+                      <h3>Skills for this role</h3>
+                      <ul className="px-requirement-list">{selected.skills.map(skill => <li key={skill.skill_id}>
+                        <strong>{skill.name}</strong><span>{skill.state === "have" ? "Fits my work" : skill.state === "learning" ? "To develop" : "Not yet selected"}</span>
                       </li>)}</ul>
                     </div>
                   </div>
                 </div>
               ) : null}
               <fieldset className="mt-5 space-y-3" disabled={continuing}>
-                <legend className="font-semibold">Choose one essential skill to explore</legend>
+                <legend className="font-semibold">Choose a skill to develop</legend>
                 <details className="px-info-disclosure">
                   <summary aria-label="Show role skill information" title="Role skill information"><Info size={16} aria-hidden /></summary>
-                  <p>Role skills are from ESCO v{selected.source.version}. Skills absent from your review are not assumed missing.</p>
+                  <p>Skills are matched from WEF labels and occupation task descriptions.</p>
                 </details>
                 {availableSkills.map(item => (
-                  <label key={item.uri} className="flex items-center gap-2">
-                    <input type="radio" name="career-learning-skill" value={item.uri}
-                      checked={selectedSkill?.uri === item.uri}
+                  <label key={item.skill_id} className="flex items-center gap-2">
+                    <input type="radio" name="career-learning-skill" value={item.skill_id}
+                      checked={selectedSkill?.skill_id === item.skill_id}
                       onChange={() => {
-                        setSkillChoice({ careerUri: selected.occupation_uri, skillUri: item.uri });
-                        try { accountStorage.setItem(DIRECTION_KEY, JSON.stringify({ occupation_uri: selected.occupation_uri, occupation_code: selected.occupation_code, title: selected.title, skill_uri: item.uri, skill_label: item.label, source_version: selected.source.version })); setNavigationError(""); }
+                        setSkillChoice({ careerCode: selected.occupation_code, skillId: item.skill_id });
+                        try { accountStorage.setItem(DIRECTION_KEY, JSON.stringify({ occupation_code: selected.occupation_code, title: selected.title, skill_id: item.skill_id })); setNavigationError(""); }
                         catch (error) { setNavigationError(error instanceof Error ? error.message : "Could not save your skill choice."); }
                       }} />
-                    {item.label}
+                    {item.name}{item.state === "learning" ? " · already in development" : ""}
                   </label>
                 ))}
-                {!availableSkills.length && <p role="status">No essential skills to explore.</p>}
+                {!availableSkills.length && <p role="status">No additional skills to explore.</p>}
               </fieldset>
               <details className="px-info-disclosure px-source-details">
                 <summary aria-label="Show career source and date" title="Career source and date"><Info size={16} aria-hidden /></summary>
-                <p>{selected.source.attribution}</p>
-                <p>ESCO {selected.source.version} · snapshot retrieved {sourceRetrievedDate(selected.source.retrieved_at)}</p>
-                <a href={selected.source.occupation_uri} target="_blank" rel="noreferrer">Open this occupation in ESCO</a><br />
-                <a href={selected.source.source_url} target="_blank" rel="noreferrer">Open the source catalogue archive</a>
+                <p>WEF skill labels matched against occupation task descriptions.</p>
               </details>
               {navigationError && <p role="alert" className="mt-3">{navigationError}</p>}
               <button className="px-primary mt-4" type="button" disabled={!selectedSkill || continuing} onClick={() => { void goLearning(); }}>
-                {continuing ? "Opening learning resources…" : selectedSkill ? `Find learning for ${selectedSkill.label}` : "Choose a skill to continue"}
+                {continuing ? "Opening learning resources…" : selectedSkill ? `Develop ${selectedSkill.name}` : "Choose a skill to continue"}
               </button>
             </section>
           ) : null}
@@ -450,6 +440,8 @@ export default function Possibilities() {
           currentTitle={currentTitle}
           targetTitle={selected?.title ?? null}
           acceptedSkills={selectedAcceptedSkills}
+          suggestedSkillCount={selected?.suggested_skill_overlap ?? 0}
+          developingSkillCount={selected?.developing_skill_overlap ?? 0}
           onExplore={() => { void goLearning(); }}
           canExplore={Boolean(selectedSkill)}
           continuing={continuing}
