@@ -187,7 +187,7 @@ async def get_possibilities(
                 for uri in sorted(current_esco | developing_esco, key=lambda item: valid_skill_labels[item].casefold())
             ]
         relevant_uris = current_esco | developing_esco
-        if current_esco:
+        if relevant_uris:
             candidate_uris = (await db.scalars(
                 select(SpecialistRelation.occupation_uri).where(
                     SpecialistRelation.version == ESCO_VERSION,
@@ -238,7 +238,7 @@ async def get_possibilities(
     return PossibilitiesResponse(
         disclaimer=DISCLAIMER,
         source='live',
-        status='ready' if current_esco and release is not None else ('needs_skill_review' if has_confirmed_tasks else 'needs_profile'),
+        status='ready' if (current_esco or developing_esco) and release is not None else ('needs_skill_review' if has_confirmed_tasks else 'needs_profile'),
         current_role=role,
         current_role_coverage_pct=current_role_coverage_pct,
         skills=skill_items,

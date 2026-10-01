@@ -13,9 +13,7 @@ MODERN_PROFILE_KEY = 'aiwrevolusi.userProfile'
 PROFILE_RECOVERY_MESSAGE = 'Your saved work profile could not be read. Reload your saved account or restore a valid profile before viewing Possibilities.'
 ESCO_VERSION = '1.2.0'
 ESCO_SOURCE_URL = 'https://ec.europa.eu/esco/portal'
-ESCO_SOURCE_NOTE = ('Career directions use ESCO v1.2.0 occupation-to-skill links and skill connections you explicitly said you use for current confirmed tasks. '
-                    'ESCO describes European occupations; this is exploratory transferability evidence, not a validated Malaysian occupation match, hiring prediction or job-readiness assessment. '
-                    'Only roles with at least one reviewed shared skill are shown. Skills without a current-use record are not assumed absent.')
+ESCO_SOURCE_NOTE = ('Career directions use ESCO v1.2.0 occupation-to-skill links. Matches are exploratory; ESCO is not a validated Malaysian job-readiness or hiring assessment.')
 
 
 def confirmed_workspace_evidence(workspace: object, occupations: Iterable[Mapping]) -> tuple[list[str], dict | None]:
@@ -135,7 +133,7 @@ def reviewed_esco_evidence(workspace: object) -> tuple[set[str], set[str]]:
 
 
 def rank_esco_directions(occupations, relations, skills, current_skill_uris, developing_skill_uris, source):
-    """Rank source-linked ESCO roles using only reviewed current skill evidence."""
+    """Rank source-linked ESCO roles using current skills and learning interests."""
     by_occupation: dict[str, list[dict]] = {}
     for relation in relations:
         if relation['skill_uri'] in skills:
@@ -147,10 +145,10 @@ def rank_esco_directions(occupations, relations, skills, current_skill_uris, dev
         essential = {r['skill_uri'] for r in role_relations if r['relation'] == 'essential'}
         optional = {r['skill_uri'] for r in role_relations if r['relation'] == 'optional'}
         required = essential | optional
-        overlap = required & current_skill_uris
-        if not overlap:
-            continue
+        current_overlap = required & current_skill_uris
         developing_overlap = required & developing_skill_uris
+        if not current_overlap and not developing_overlap:
+            continue
         not_yet_evidenced = essential - current_skill_uris - developing_skill_uris
         requirements = [
             {'uri': uri, 'label': skills[uri]['label'], 'relation': relation,
@@ -167,7 +165,7 @@ def rank_esco_directions(occupations, relations, skills, current_skill_uris, dev
             'title': occupation['label'], 'area': 'ESCO occupation',
             'description': occupation['description'], 'coverage_pct': None, 'skills': [],
             'requirements': requirements, 'source': source,
-            'current_skill_overlap': len(overlap),
+            'current_skill_overlap': len(current_overlap),
             'developing_skill_overlap': len(developing_overlap),
             'essential_not_yet_evidenced': len(not_yet_evidenced),
         })

@@ -78,7 +78,7 @@ function JourneyCompanion({
           </p>
 
           <div className="px-companion-evidence">
-            <strong>{acceptedSkills.length} reviewed skill{acceptedSkills.length === 1 ? "" : "s"} in common</strong>
+            <strong>{acceptedSkills.length} current skill{acceptedSkills.length === 1 ? "" : "s"} in common</strong>
             <p className="px-chosen-hint">ESCO source links · exploratory</p>
             <button type="button" className="px-info-button"
               aria-label={detailsOpen ? "Hide career details" : "Show career details"}
@@ -322,7 +322,7 @@ export default function Possibilities() {
                     </span>
                   ))
                 ) : (
-                  <p className="px-chosen-hint">No reviewed skills yet.</p>
+                  <p className="px-chosen-hint">No accepted WEF skills yet.</p>
                 )}
               </div>
               {wefError && <p role="status" className="px-chosen-hint">{wefError}</p>}
@@ -355,7 +355,7 @@ export default function Possibilities() {
                     {direction.area ? <p className="px-eyebrow">{direction.area}</p> : null}
                     <h3>{direction.title}</h3>
                     <div className="px-card-evidence">
-                      <strong>{acceptedSkills.length} reviewed skill{acceptedSkills.length === 1 ? "" : "s"} in common</strong>
+                      <strong>{acceptedSkills.length} current skill{acceptedSkills.length === 1 ? "" : "s"} in common</strong>
                       <span>{direction.developing_skill_overlap} developing connection{direction.developing_skill_overlap === 1 ? "" : "s"} · {direction.essential_not_yet_evidenced} essential skill{direction.essential_not_yet_evidenced === 1 ? "" : "s"} not yet evidenced</span>
                       <p>{acceptedSkills.map(skill => skill.label).join(" · ")}</p>
                     </div>
