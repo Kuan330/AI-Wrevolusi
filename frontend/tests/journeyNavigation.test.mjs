@@ -3,16 +3,16 @@ import test from 'node:test';
 import { SIDEBAR_GROUPS, navigationPath, pageLabel } from '../src/constants/menu.ts';
 import { ROUTES, LEGACY_ROUTES } from '../src/constants/routes.ts';
 
-test('work overview, skills, plans and records have distinct sidebar destinations', () => {
+test('personal overview, skills, plans and records have distinct sidebar destinations', () => {
   const paths = SIDEBAR_GROUPS.flatMap(group=>group.items.map(item=>item.path));
   assert.equal(new Set(paths).size,paths.length);
   for (const path of [ROUTES.dashboard,ROUTES.workProfile,ROUTES.aiExposure,ROUTES.skills,ROUTES.learningGoals,ROUTES.progress,ROUTES.possibilities]) assert.ok(paths.includes(path));
 });
 test('task editor and course library highlight the correct parent menu', () => {
-  assert.equal(navigationPath(ROUTES.task),ROUTES.workProfile);
+  assert.equal(navigationPath(ROUTES.workProfile),ROUTES.workProfile);
   assert.equal(navigationPath(ROUTES.learningCentre),ROUTES.learningGoals);
   assert.equal(navigationPath(ROUTES.aiExposure),ROUTES.aiExposure);
-  assert.equal(pageLabel(ROUTES.progress),'Learning history & progress');
+  assert.equal(pageLabel(ROUTES.progress),'Learning records');
 });
 test('legacy bookmarks redirect without creating duplicate destinations or redirect loops', () => {
   for (const [from,to] of Object.entries(LEGACY_ROUTES)) {
@@ -20,7 +20,7 @@ test('legacy bookmarks redirect without creating duplicate destinations or redir
     assert.ok(Object.values(ROUTES).includes(to));
     assert.equal(LEGACY_ROUTES[to],undefined);
   }
-  assert.equal(LEGACY_ROUTES['/profile/tasks'],ROUTES.task);
+  assert.equal(LEGACY_ROUTES['/profile/tasks'],ROUTES.workProfile);
   assert.equal(LEGACY_ROUTES['/progress'],ROUTES.progressReviews);
 });
 

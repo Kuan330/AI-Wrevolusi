@@ -300,13 +300,13 @@ export async function rememberIntent(kind: "work" | "skills", id?: string): Prom
 /** Only for generic entry/Continue. Intentional page visits must not use this. */
 export function getContinueDestination(): string {
   const draft = readWorkDraft();
-  if (draft) return draft.stage === "tasks" && draft.jobTitle.trim() ? ROUTES.task : `${ROUTES.workProfile}?edit=job`;
+  if (draft) return draft.stage === "tasks" && draft.jobTitle.trim() ? ROUTES.workProfile : `${ROUTES.workProfile}?edit=job`;
   const state = readJourneyState();
   const profile = readJourneyProfile();
   const plan = readPlanState({ migrateLegacy: false });
   const library = readLibrary();
   const unfinished = plan.courses.filter(c => c.chapters.length === 0 || c.chapters.some(ch => ch.value < 10));
-  const taskPath = profile.tasksOccupationCode && profile.tasks.length ? ROUTES.task : ROUTES.workProfile;
+  const taskPath = ROUTES.workProfile;
   if (state.resume?.kind === "work" && !profile.analysis && !profile.tasksConfirmed) return taskPath;
   if (state.resume?.kind === "skills" && profile.tasks.length && !isSkillReviewCurrent()) return ROUTES.skills;
   if (state.resume?.kind === "learning" && state.resume.id) {

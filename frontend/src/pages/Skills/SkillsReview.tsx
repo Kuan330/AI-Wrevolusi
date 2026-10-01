@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import SkillRecommendations from "@/components/dashboard/SkillRecommendations";
+import SkillPathMatching from "./components/SkillPathMatching";
 import { currentAssessments } from "@/features/ai-impact/assistance";
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ import { buildSkillEvidence } from "../../features/skills/skillProfile.ts";
 import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
 import SpecialistSkills from "./components/SpecialistSkills";
 import SkillsOverview from "./components/SkillsOverview";
+import { ChevronDown, LoaderCircle } from "lucide-react";
 import "./SkillsReview.css";
 
 type Decision = "accepted" | "rejected" | undefined;
@@ -66,8 +67,9 @@ export default function SkillsReview() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const [skills, setSkills] = useState<WefSkill[]>([]);
-  const [loading, setLoading] = useState(true);
+  // A cached reference list renders the path at once; the load below still refreshes it.
+  const [skills, setSkills] = useState<WefSkill[]>(() => referenceService.cachedWefSkills() ?? []);
+  const [loading, setLoading] = useState(() => !referenceService.cachedWefSkills());
   const [loadError, setLoadError] = useState("");
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [snapshot, setSnapshot] = useState(readWorkSnapshot);
@@ -79,6 +81,8 @@ export default function SkillsReview() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [saveMessage, setSaveMessage] = useState("");
+  // Collapsed by default so the skill path stays the main step; mounting on open also skips catalogue requests.
+  const [showOverview, setShowOverview] = useState(false);
   const retrySave = useRef<(() => Promise<void>) | null>(null);
   const mounted = useRef(true);
 
@@ -116,6 +120,12 @@ export default function SkillsReview() {
   const reviewMode = searchParams.get("view") === "task";
   const activeFocus = reviewMode && !focusChanged ? focusedTask : undefined;
   const visibleEvidence = activeFocus ? evidence.map(item => ({ ...item, tasks: item.tasks.filter(task => task.id === activeFocus.id) })).filter(item => item.tasks.length > 0) : evidence;
+  const focusedSkill = reviewMode && !focusChanged ? visibleEvidence.find(item => item.skill.wef_skill_id === Number(searchParams.get("skill")))?.skill : undefined;
+  const focusedSkillId = focusedSkill?.wef_skill_id;
+  useEffect(() => {
+    if (focusedSkillId === undefined) return;
+    document.getElementById(`review-skill-${focusedSkillId}`)?.scrollIntoView({ block: "center", behavior: "auto" });
+  }, [focusedSkillId]);
   const accepted = visibleEvidence.filter(({ skill }) =>
     !work?.needsReview && work?.decisions[skill.wef_skill_id] === "accepted",
   );
@@ -194,16 +204,16 @@ export default function SkillsReview() {
     <div className="skills-review-page mx-auto w-full max-w-[1200px]">
       <PageHeader
         className="flex-col items-start sm:flex-row sm:items-center"
-        title={reviewMode ? "Review skills for a task" : "Skill path & matching"}
-        description={reviewMode ? "Check the task connections and choose what fits your work." : "Connect your work to skills, confirm what you already use and choose what to learn next."}
-        actions={<Button asChild variant="outline" className="rounded-full"><Link to={ROUTES.task}>Edit my tasks</Link></Button>}
+        title={reviewMode ? "Review skills for a task" : "Your skill path"}
+        description={reviewMode ? "Check the task connections and choose what fits your work." : undefined}
+        actions={<Button asChild variant="outline" className="rounded-full"><Link to={ROUTES.workProfile}>Edit my tasks</Link></Button>}
       />
 
       {focusId && reviewMode && <section className="skills-review-page__notice" aria-label="Selected work task">
         <h2>{activeFocus ? "Skills for your selected task" : "Your selected task needs review"}</h2>
         <p>{activeFocus ? activeFocus.wording : "This task changed or is no longer in your work profile. Showing your current tasks instead."}</p>
         <p className="skills-review-page__hint">Research exposure does not prove that you have or lack a skill. Check the task evidence below.</p>
-        <Button variant="outline" onClick={() => { setSearchParams(params => { params.delete("task"); params.delete("view"); return params; }); setSelectedId(null); }}>Back to my skills overview</Button>
+        <Button variant="outline" onClick={() => { setShowOverview(true); setSearchParams(params => { params.delete("task"); params.delete("view"); params.delete("skill"); return params; }); setSelectedId(null); }}>Back to my skills overview</Button>
       </section>}
 
       {readError && <div className="skills-review-page__notice is-error" role="alert">
@@ -226,18 +236,17 @@ export default function SkillsReview() {
       </p>
 
       {!reviewMode && focusedTask && !focusChanged && <div className="skills-overview__carried"><p>Selected task: {shortTaskLabel(focusedTask.wording)}</p><Button variant="outline" onClick={() => setSearchParams({ view: "task", task: focusedTask.id }, { state: { taskWording: focusedTask.wording } })}>Review this selected task</Button></div>}
-      {!readError && work && !reviewMode && <section className="mb-8" aria-labelledby="recommended-skills-heading">
-        <div className="dashboard-section-heading"><div><p className="dashboard-eyebrow">FROM YOUR WORK TO YOUR NEXT STEP</p><h2 id="recommended-skills-heading" className="text-xl font-semibold">Recommended skill directions</h2></div><Button asChild variant="outline"><Link to={ROUTES.learningGoals}>My learning plan</Link></Button></div>
-        <p className="mb-5 text-sm text-muted-foreground">Start with skills linked to highly AI-assisted tasks, then explore other task connections. Confirm suggestions before treating them as your current skills.</p>
-        <SkillRecommendations tasks={work.tasks} assessments={currentAssessments(readUserProfile())} decisions={Object.fromEntries(Object.entries(work.decisions).filter((entry): entry is [string, "accepted" | "rejected"] => entry[1] !== undefined))} />
-      </section>}
-      {!readError && work && !reviewMode && <SkillsOverview tasks={work.tasks} occupationCode={work.occupationCode} personal={work.personalSkills} evidence={evidence} decisions={work.decisions} broadNeedsReview={work.needsReview} onReview={id => {
+      {!readError && work && !reviewMode && <SkillPathMatching tasks={work.tasks} skills={skills} loading={loading} assessments={currentAssessments(readUserProfile())} decisions={Object.fromEntries(Object.entries(work.decisions).filter((entry): entry is [string, "accepted" | "rejected"] => entry[1] !== undefined))} />}
+      {!readError && work && !reviewMode && work.tasks.length > 0 && <details className="skills-overview-disclosure" open={showOverview} onToggle={event => setShowOverview(event.currentTarget.open)}>
+        <summary><h2>All my skills</h2><ChevronDown size={18} aria-hidden="true" /></summary>
+        {showOverview && <SkillsOverview tasks={work.tasks} occupationCode={work.occupationCode} personal={work.personalSkills} evidence={evidence} decisions={work.decisions} broadNeedsReview={work.needsReview} onReview={id => {
         const task = work.tasks.find(item => item.id === id);
         if (task) setSearchParams({ view: "task", task: id }, { state: { taskWording: task.wording } });
       }} />}
+      </details>}
 
       {reviewMode && <>
-      {!focusId && <Button variant="outline" onClick={() => setSearchParams({})}>Back to my skills overview</Button>}
+      {!focusId && <Button variant="outline" onClick={() => { setShowOverview(true); setSearchParams({}); }}>Back to my skills overview</Button>}
       {!readError && work && <SpecialistSkills tasks={work.tasks} occupationCode={work.occupationCode} focusTaskId={activeFocus?.id} onTaskChange={id => {
         const task = work.tasks.find(item => item.id === id);
         if (task) { setSearchParams(params => { params.set("task", id); params.set("view", "task"); return params; }, { state: { taskWording: task.wording } }); setSelectedId(null); }
@@ -293,21 +302,22 @@ export default function SkillsReview() {
         </details>
       </section>}
 
-      {readError ? null : loading ? <p role="status">Loading skill suggestions…</p> : loadError ? <div className="skills-review-page__notice is-error" role="alert">
+      {readError ? null : loading ? reviewMode && <p className="skills-review-page__loading" role="status"><LoaderCircle size={15} aria-hidden="true" />Loading skill suggestions…</p> : loadError ? <div className="skills-review-page__notice is-error" role="alert">
         <p>{loadError}</p><Button variant="outline" onClick={() => {
           setLoading(true); setLoadError(""); setLoadAttempt((value) => value + 1);
         }}>Try again</Button>
       </div> : !work?.tasks.length ? <section className="skills-review-page__card">
         <h2>Start with your confirmed work</h2>
         <p>Confirm at least one task before reviewing skill suggestions.</p>
-        <Button asChild><Link to={ROUTES.task}>Review my tasks</Link></Button>
-      </section> : <details className="skills-review-page__broad">
+        <Button asChild><Link to={ROUTES.workProfile}>Review my tasks</Link></Button>
+      </section> : <details className="skills-review-page__broad" open={Boolean(focusedSkill)}>
         <summary>Broad skills and general learning options</summary>
         <section aria-labelledby="skill-suggestions-title">
           <div className="skills-review-page__section-heading">
             <h2 id="skill-suggestions-title">Skills suggested from your tasks</h2>
             <p>{accepted.length} broad {accepted.length === 1 ? "skill" : "skills"} accepted · {visibleEvidence.length} suggestions</p>
           </div>
+          <p className="skills-review-page__hint">A broad skill choice applies to all its connections in your current work. The task below shows why it was suggested.</p>
           {visibleEvidence.length === 0 ? <div className="skills-review-page__card">
             <h3>No supported suggestion yet</h3>
             <p>The current matching rules found no skill connection in these tasks. This does not mean you have no skills.
@@ -317,7 +327,7 @@ export default function SkillsReview() {
               const decision = work.decisions[skill.wef_skill_id];
               const staleAccepted = work.needsReview && decision === "accepted";
               const status = staleAccepted ? "Needs review" : decision === "accepted" ? "Accepted" : decision === "rejected" ? "Rejected" : "Not reviewed";
-              return <article className="skills-review-page__card" key={skill.wef_skill_id}>
+              return <article id={`review-skill-${skill.wef_skill_id}`} className={`skills-review-page__card${focusedSkill?.wef_skill_id === skill.wef_skill_id ? " is-focused" : ""}`} key={skill.wef_skill_id}>
                 <div className="skills-review-page__skill-heading">
                   <h3>{cleanDisplayText(skill.core_skill)}</h3>
                   <span className={`skills-review-page__state${decision && !staleAccepted ? ` is-${decision}` : ""}`}>{status}</span>

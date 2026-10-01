@@ -16,10 +16,10 @@ export function learningActivities(plan: PlanState, goals: LearningGoal[]): Lear
   const attempts: LearningActivity[] = goals.flatMap(goal => goal.attempts.map(attempt => ({ id: `attempt:${goal.id}:${attempt.id}`, date: attempt.date, label: attempt.description, detail: goal.wording, kind: attempt.type === "study" ? "study" : "practice", goalId: goal.id })));
   return [...course, ...attempts].sort((a,b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
 }
-export function activityDays(activities: LearningActivity[], today = dateKey(new Date())) {
+export function activityDays(activities: LearningActivity[], today = dateKey(new Date()), weeks = 12) {
   const counts = new Map<string, number>();
   for (const item of activities) counts.set(item.date, (counts.get(item.date) ?? 0) + 1);
-  return Array.from({ length: 84 }, (_, index) => { const date = addDays(today, index - 83); return { date, count: counts.get(date) ?? 0 }; });
+  return Array.from({ length: weeks * 7 }, (_, index) => { const date = addDays(today, index - (weeks * 7 - 1)); return { date, count: counts.get(date) ?? 0 }; });
 }
 export function learningSummary(plan: PlanState, goals: LearningGoal[], resumeCourseId?: string) {
   const active = plan.courses.filter(course => courseStatus(course) !== "completed");

@@ -5,15 +5,19 @@ export type PossibilitiesData = {
   source: "live" | "demo"; disclaimer: string; status: PossibilitiesResponse["status"];
   currentRole: PossibilitiesResponse["current_role"]; currentRoleCoverage: number | null;
   skills: PossibilitySkill[]; directions: PossibilityDirection[];
-  chosenDirectionCode: string | null; chosenDirectionCoverage: number | null; shortlistedSkillIds: number[];
+  chosenDirectionCode: string | null; chosenDirectionUri: string | null; chosenDirectionCoverage: number | null; shortlistedSkillIds: number[];
+  reviewedEscoSkills: PossibilitiesResponse["reviewed_esco_skills"]; careerSourceNote: string | null;
 };
 export function toPossibilitiesData(response: PossibilitiesResponse): PossibilitiesData {
   return { source: response.source, disclaimer: response.disclaimer, status: response.status,
     currentRole: response.current_role, currentRoleCoverage: response.current_role_coverage_pct,
-    skills: response.skills, directions: response.directions, chosenDirectionCode: response.chosen_direction_code, chosenDirectionCoverage: response.chosen_direction_coverage_pct, shortlistedSkillIds: response.shortlisted_skill_ids };
+    skills: response.skills, directions: response.directions, chosenDirectionCode: response.chosen_direction_code,
+    chosenDirectionUri: response.chosen_direction_uri, chosenDirectionCoverage: response.chosen_direction_coverage_pct,
+    shortlistedSkillIds: response.shortlisted_skill_ids, reviewedEscoSkills: response.reviewed_esco_skills,
+    careerSourceNote: response.career_source_note };
 }
 export function possibilitiesProfilePath(workspace: { tasksOccupationCode?: string | null } | null | undefined): string {
-  return workspace?.tasksOccupationCode ? ROUTES.task : ROUTES.workProfile;
+  return workspace?.tasksOccupationCode ? ROUTES.workProfile : ROUTES.workProfile;
 }
 
 /** Accepted evidence must come from the current review, not a model score. */
@@ -52,11 +56,12 @@ export async function loadSavedPossibilities(options: {
   }
 }
 
-export type PossibilitiesViewState = "loading" | "error" | "needs-profile" | "unavailable" | "ready";
+export type PossibilitiesViewState = "loading" | "error" | "needs-profile" | "needs-skill-review" | "unavailable" | "ready";
 export function possibilitiesViewState(input: { loading: boolean; error: string; data: PossibilitiesResponse | null }): PossibilitiesViewState {
   if (input.loading) return "loading";
   if (input.error || !input.data) return "error";
   if (input.data.status === "needs_profile") return "needs-profile";
+  if (input.data.status === "needs_skill_review") return "needs-skill-review";
   if (input.data.status === "unavailable") return "unavailable";
   return "ready";
 }

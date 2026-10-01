@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 from fastapi import APIRouter, Depends, HTTPException
@@ -8,13 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.models.user import User
 from app.services.auth import get_current_user
+from app.services.occupation_text import occupation_description_sql
 from app.services.possibilities import (
     MODERN_PROFILE_KEY,
     PROFILE_RECOVERY_MESSAGE,
-    chosen_direction_score,
     confirmed_workspace_evidence,
     occupation_required_skills,
     recommend_occupations,
+    reviewed_wef_career_evidence,
 )
 from app.schemas.possibilities import PossibilitiesResponse
 from app.services.workspace import SHORTLIST_KEY, read_workspace_shortlist
@@ -70,7 +70,7 @@ async def _load_reference_data(db: AsyncSession) -> tuple[dict[int, dict], list[
 
     # Unit occupations only — major/minor tree nodes have no ILO tasks and inflate matching.
     occupation_rows = (await db.execute(text(
-        "SELECT o.occupation_code, o.title, o.description, NULL AS industry, "
+        f"SELECT o.occupation_code, o.title, {occupation_description_sql('o.description')}, NULL AS industry, "
         "COALESCE(array_agg(i.task_text ORDER BY i.task_id) FILTER (WHERE i.task_text IS NOT NULL), '{}') AS tasks "
         "FROM ref_occupations o LEFT JOIN ref_ilo_tasks i ON i.isco_08=o.occupation_code "
         "WHERE o.level = 'unit' "
@@ -126,6 +126,7 @@ async def get_possibilities(
         for task_text in task_texts
         for item in match_skills(task_text, candidates, limit=None)
     }
+    inferred_wef = set(owned)
     try:
         owned = apply_skill_review(owned, workspace)
     except ValueError as exc:
@@ -135,6 +136,7 @@ async def get_possibilities(
     shortlist = read_workspace_shortlist(shortlist_raw, allowed_skill_ids=set(skills))
     chosen_raw = _json_value(workspace, 'aiwrevolusi.possibilities.chosenDirection', {})
     chosen_code = chosen_raw.get('occupation_code') if isinstance(chosen_raw, dict) else None
+    chosen_uri = chosen_raw.get('occupation_uri') if isinstance(chosen_raw, dict) else None
     role = workspace_role
     if not modern_profile and role is None and current_user.occupation_id:
         try:
@@ -147,34 +149,42 @@ async def get_possibilities(
             logger.error(f"Error loading occupation for user {current_user.id}: {str(e)}")
             # Continue without role - don't fail the entire request
 
-    exclude_codes = {role['occupation_code']} if role and role.get('occupation_code') else set()
-    # CPU-heavy ranking — keep the async event loop free on cold cache fills.
     try:
-        recommendations = await asyncio.to_thread(
-            recommend_occupations, occupation_rows, owned, skills, 3, exclude_codes=exclude_codes
+        current_wef, suggested_wef, developing_wef = wef_career_evidence(
+            workspace, inferred_wef, set(skills)
         )
-    except Exception as e:
-        logger.error(f"Error generating recommendations for user {current_user.id}: {str(e)}")
-        recommendations = []
-    allowed_codes = {row['occupation_code'] for row in recommendations}
-    if chosen_code not in allowed_codes:
-        chosen_code = None
-    from app.services.possibilities import slugify_skill_name
-    skill_items = [{'skill_id': i, 'skill_slug': slugify_skill_name(str(row['core_skill'])), 'name': row['core_skill'], 'state': 'have' if i in owned else ('shortlisted' if i in shortlist else 'missing')} for i, row in skills.items()]
-    for row in recommendations:
-        row['skill_states'] = {
-            skill_id: 'have' if skill_id in owned else ('shortlisted' if skill_id in shortlist else 'missing')
-            for skill_id in row['required_skill_ids']
-        }
-    directions = [build_direction_payload(row, skills) for row in recommendations]
-    chosen_score = next(
-        (
-            chosen_direction_score(owned, set(row['required_skill_ids']))
-            for row in recommendations
-            if row['occupation_code'] == chosen_code
-        ),
-        None,
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from None
+
+    ranked = recommend_occupations(
+        occupation_rows, current_wef, skills, limit=3,
+        developing_skill_ids=developing_wef,
+        suggested_skill_ids=suggested_wef,
+        exclude_codes={role['occupation_code']} if role else None,
     )
+    directions = []
+    for row in ranked:
+        direction = build_direction_payload(row, skills)
+        direction.update({
+            'occupation_uri': None,
+            'requirements': [],
+            'source': None,
+            'current_skill_overlap': row['overlap_count'],
+            'developing_skill_overlap': row['developing_overlap_count'],
+            'suggested_skill_overlap': row['suggested_overlap_count'],
+            'essential_not_yet_evidenced': row['missing_count'],
+        })
+        directions.append(direction)
+    if chosen_code not in {direction['occupation_code'] for direction in directions}:
+        chosen_code = None
+    chosen_uri = None
+    selected_direction = next((row for row in directions if row['occupation_code'] == chosen_code), None)
+    chosen_score = selected_direction['coverage_pct'] if selected_direction else None
+    reviewed_esco_skills = []
+    career_source_note = 'Roles are matched from WEF skills and occupation task descriptions.'
+    from app.services.possibilities import slugify_skill_name
+    skill_items = [{'skill_id': i, 'skill_slug': slugify_skill_name(str(row['core_skill'])), 'name': row['core_skill'], 'state': 'have' if i in current_wef else ('learning' if i in developing_wef else ('suggested' if i in suggested_wef else ('shortlisted' if i in shortlist else 'missing')))} for i, row in skills.items()]
+    chosen_score = None
     current_role_coverage_pct = None
     if role:
         current_ref = next(
@@ -190,12 +200,15 @@ async def get_possibilities(
     return PossibilitiesResponse(
         disclaimer=DISCLAIMER,
         source='live',
-        status='ready' if owned else ('unavailable' if has_confirmed_tasks else 'needs_profile'),
+        status='ready' if (current_wef or suggested_wef or developing_wef) else ('needs_skill_review' if has_confirmed_tasks else 'needs_profile'),
         current_role=role,
         current_role_coverage_pct=current_role_coverage_pct,
         skills=skill_items,
         directions=directions,
         chosen_direction_code=chosen_code,
+        chosen_direction_uri=chosen_uri,
         chosen_direction_coverage_pct=chosen_score if chosen_score is not None else None,
         shortlisted_skill_ids=shortlist,
+        reviewed_esco_skills=reviewed_esco_skills,
+        career_source_note=career_source_note,
     )

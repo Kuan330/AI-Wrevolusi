@@ -8,11 +8,12 @@ export type TooltipProps = {
   children: ReactElement;
   side?: "top" | "bottom" | "left" | "right";
   className?: string;
+  contentClassName?: string;
 };
 
 /** Lightweight hover/focus hint. Usage: `<Tooltip title="Edit"><button /></Tooltip>`. */
 export function Tooltip(props: TooltipProps) {
-  const { title, children, side = "top", className } = props;
+  const { title, children, side = "top", className, contentClassName } = props;
 
   return (
     <BaseTooltip.Provider>
@@ -25,7 +26,7 @@ export function Tooltip(props: TooltipProps) {
         />
         <BaseTooltip.Portal>
           <BaseTooltip.Positioner side={side} sideOffset={6} className="z-[80]">
-            <BaseTooltip.Popup className="max-w-[16rem] rounded-lg border border-[#dfd5e4] bg-[#2f2430] px-2.5 py-1.5 text-xs font-medium leading-snug text-white shadow-lg outline-none">
+            <BaseTooltip.Popup className={cn("max-w-[16rem] rounded-lg border border-[#dfd5e4] bg-[#2f2430] px-2.5 py-1.5 text-xs font-medium leading-snug text-white shadow-lg outline-none", contentClassName)}>
               {title}
             </BaseTooltip.Popup>
           </BaseTooltip.Positioner>

@@ -41,6 +41,14 @@ export default function LearningCentre() {
   const { skills, setSkills, addSkill, removeSkill, refresh } = useLearningSkills();
   const [params, setParams] = useSearchParams();
   const genericSearch = (params.has("q") || params.get("mode") === "browse") && !params.has("context");
+  const careerSkill = params.get("careerSkill")?.slice(0, 300) ?? "";
+  const careerSkillUri = params.get("careerSkillUri") ?? "";
+  const careerRole = params.get("careerRole")?.slice(0, 200) ?? "";
+  const careerRoleUri = params.get("careerRoleUri") ?? "";
+  const careerSourceVersion = params.get("careerSourceVersion")?.slice(0, 40) ?? "";
+  const careerExploration = Boolean(careerSkill && careerRole && careerSourceVersion === "1.2.0"
+    && /^http:\/\/data\.europa\.eu\/esco\/skill\/[0-9a-f-]{36}$/.test(careerSkillUri)
+    && /^http:\/\/data\.europa\.eu\/esco\/occupation\/[0-9a-f-]{36}$/.test(careerRoleUri));
   const filters: Filters = {
     query: params.get("search") ?? params.get("q") ?? "",
     level: params.get("level") ?? "",
@@ -280,7 +288,14 @@ export default function LearningCentre() {
   return (
     <div className="course-library">
       <PageHeader {...headerProps} className="library-page-header" />
-      <p className="library-goal-return"><Link to={resourceGoal ? `${ROUTES.learningGoals}?goal=${encodeURIComponent(resourceGoal.id)}` : ROUTES.learningGoals}>{resourceGoal ? "Back to this goal" : "Back to my goals"}</Link></p>
+      {careerExploration && <section className="library-glass library-goal-resource" aria-label="Career skill exploration">
+        <p className="library-kicker">Career skill exploration · ESCO {careerSourceVersion}</p>
+        <h2>{cleanDisplayText(careerSkill)}</h2>
+        <p>Chosen from <strong>{cleanDisplayText(careerRole)}</strong>.</p>
+        <p>Courses below are found by searching this skill name in the learning catalogue. The project does not have a reviewed ESCO-skill-to-course crosswalk yet, so check each course before adding it to a plan.</p>
+        <Link to={ROUTES.possibilities}>Back to career options</Link>
+      </section>}
+      <p className="library-goal-return"><Link to={careerExploration ? ROUTES.possibilities : resourceGoal ? `${ROUTES.learningGoals}?goal=${encodeURIComponent(resourceGoal.id)}` : ROUTES.learningGoals}>{careerExploration ? "Back to career options" : resourceGoal ? "Back to this goal" : "Back to my goals"}</Link></p>
       {(!resourceGoal || resourceGoal.initial.skill.source === "wef") && <LearningReviewNotice />}
       {goalResource.error && <section className="library-glass library-goal-resource"><h2>Check your saved goal</h2><p role="alert">{goalResource.error}</p><Link to={ROUTES.learningGoals}>Open my goals</Link></section>}
       {resourceGoal && <section className="library-glass library-goal-resource" aria-label="Resources for your saved goal"><p className="library-kicker">Your saved goal</p><h2>{goalDisplayLabel(resourceGoal.wording, resourceGoal.initial.skill.label)}</h2><p>{cleanDisplayText(resourceGoal.initial.skill.label)}</p>

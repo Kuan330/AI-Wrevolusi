@@ -39,12 +39,14 @@ def setup_client(monkeypatch, workspace, *, fail_workspace=False):
         else:
             raise AssertionError(query)
         return result
-    db = SimpleNamespace(execute=execute)
+    # The current route reads the installed ESCO release with AsyncSession.get.
+    # Returning no release keeps these workspace-ownership tests independent of
+    # the specialist catalogue while still exercising the route.
+    db = SimpleNamespace(execute=execute, get=AsyncMock(return_value=None))
     monkeypatch.setattr(route, '_load_reference_data', AsyncMock(return_value=(
         {1: {'core_skill': 'Modern skill'}, 2: {'core_skill': 'Legacy skill'}},
         [{'occupation_code': '1111', 'title': 'Modern role'}, {'occupation_code': '2222', 'title': 'Legacy role'}],
     )))
-    monkeypatch.setattr(route, 'recommend_occupations', lambda *args, **kwargs: [])
     monkeypatch.setattr(route, 'occupation_required_skills', lambda *args, **kwargs: set())
     monkeypatch.setattr(skill_matching, 'match_skills', lambda text, *args, **kwargs: [
         SimpleNamespace(wef_skill_id=1 if text == 'modern evidence' else 2),

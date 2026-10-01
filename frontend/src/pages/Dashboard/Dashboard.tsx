@@ -1,42 +1,37 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, BriefcaseBusiness, Check, Compass, History, Plus, Sparkles, Sprout } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import PageHeader from "@/components/common/PageHeader";
+import ContinueLearningCard from "@/components/dashboard/ContinueLearningCard";
+import LearningActivityCard from "@/components/dashboard/LearningActivityCard";
+import LearningTimeline from "@/components/dashboard/LearningTimeline";
 import { useAccount } from "@/components/account/useAccount";
-import { useWorkspaceSnapshot } from "@/hooks/useWorkspaceSnapshot";
+import { useLearningOverviewSnapshot } from "@/hooks/useWorkspaceSnapshot";
 import { ROUTES } from "@/constants/routes";
-import { assistanceOverview, currentAssessments } from "@/features/ai-impact/assistance";
-import { learningSummary, coursePercent } from "@/features/dashboard/learningSummary";
+import { learningSummary } from "@/features/dashboard/learningSummary";
 import { planCourseUrl } from "@/features/journey/journey";
-import AssistanceChart from "@/components/dashboard/AssistanceChart";
-import SkillRecommendations from "@/components/dashboard/SkillRecommendations";
-import { taskGuidance } from "@/pages/AIExposure/lib/taskGuidance";
 
 export default function Dashboard() {
   const { user, reload } = useAccount();
-  const { data, error } = useWorkspaceSnapshot();
+  const { data, error } = useLearningOverviewSnapshot();
   if (error) return <Card className="dashboard-panel" role="alert"><h1 className="text-xl font-semibold">Your workspace needs attention</h1><p>{error}</p><div className="mt-4 flex flex-wrap gap-3"><Button onClick={reload}>Reload saved work</Button><Button asChild variant="outline"><Link to={ROUTES.progress}>View learning records</Link></Button></div></Card>;
-  const profile = data?.profile;
-  const ready = Boolean(profile?.tasksConfirmed && profile.tasks.length);
-  const tasks = ready ? profile!.tasks : [];
-  const assessments = profile ? currentAssessments(profile) : [];
-  const summary = data ? learningSummary(data.plan, data.goals, data.journey.resume?.kind === "course" ? data.journey.resume.id : undefined) : null;
-  const priorities = assistanceOverview(tasks,assessments).items.sort((a,b) => (b.score ?? -1) - (a.score ?? -1)).slice(0,3);
+  if (!data) return <p role="status">Loading your overview…</p>;
+  const summary = learningSummary(data.plan, data.goals, data.journey.resume?.kind === "course" ? data.journey.resume.id : undefined);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const latestGoal = data?.goals.slice().sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt))[0];
   const learningPath = summary?.nextCourse ? planCourseUrl(summary.nextCourse.id) : latestGoal ? `${ROUTES.learningGoals}?${new URLSearchParams({goal:latestGoal.id})}` : ROUTES.skills;
   return <div className="dashboard-page">
-    <section className="dashboard-welcome"><div><p className="dashboard-eyebrow">YOUR NEXT CHAPTER STARTS HERE</p><h1>{greeting}{user ? `, ${user.username}` : ""}.</h1><p>Understand your work. Discover your strengths.<br />Make room for what comes next.</p><Button asChild><Link to={ready ? ROUTES.aiExposure : ROUTES.workProfile}>{ready ? "Explore my AI impact" : "Start with my work"}<ArrowRight size={17} /></Link></Button></div><div className="dashboard-welcome-art" aria-hidden="true"><div className="welcome-orbit" /><div className="welcome-tile welcome-tile-blue"><BriefcaseBusiness size={35} /></div><div className="welcome-tile welcome-tile-pink"><Sprout size={30} /></div><div className="welcome-tile welcome-tile-white"><Sparkles size={25} /></div><span className="welcome-dot" /></div></section>
-    {!ready && !error && <Card className="dashboard-panel dashboard-onboarding"><div><p className="dashboard-eyebrow">A CLEAR PATH FORWARD</p><h2>Let’s start with what you do.</h2><p>A job title and your everyday tasks are all you need to begin.</p></div><ol>{[[BriefcaseBusiness,"Confirm your work"],[Sparkles,"Explore AI assistance"],[Sprout,"Choose your skills"],[Check,"Build your plan"]].map(([Icon,label],i) => { const StepIcon=Icon as typeof Check; return <li key={String(label)}><span><StepIcon size={18} /></span><small>0{i+1}</small><strong>{String(label)}</strong></li>; })}</ol></Card>}
-    <div className="dashboard-overview-grid">
-      <Card className="dashboard-panel dashboard-work-card"><div className="dashboard-section-heading"><span className="dashboard-icon tone-0"><BriefcaseBusiness size={21} /></span><span className="dashboard-soft-badge">{ready ? "Confirmed work" : "Your starting point"}</span></div><p className="dashboard-eyebrow">MY WORK</p><h2>{profile?.jobTitle || "What does your work look like?"}</h2><p>{ready ? "Your everyday tasks are the foundation for your skill path." : "Tell us your job title, then confirm the tasks you actually do."}</p><div className="dashboard-work-metrics"><div><strong>{tasks.length}</strong><span>confirmed tasks</span></div><div><strong>{assessments.length}</strong><span>tasks checked for research</span></div></div><Button asChild variant="outline"><Link to={ROUTES.workProfile}>{ready ? "Edit my work" : "Add my work"}<ArrowRight size={16} /></Link></Button></Card>
-      <Card className="dashboard-panel"><div className="dashboard-section-heading"><div><p className="dashboard-eyebrow">UNDERSTAND THE CHANGE</p><h2>AI impact & assistance</h2></div><Sparkles className="text-primary" size={23} /></div><p>How AI could support the tasks you do.</p><AssistanceChart tasks={tasks} assessments={assessments} /><Link className="dashboard-text-link" to={ready ? ROUTES.aiExposure : ROUTES.workProfile}>{ready ? "View full analysis" : "Confirm tasks to see your analysis"}<ArrowRight size={16} /></Link></Card>
-    </div>
-    {ready && <Card className="dashboard-panel"><div className="dashboard-section-heading"><div><p className="dashboard-eyebrow">START WITH ONE SMALL CHANGE</p><h2>Tasks worth exploring</h2></div><Link className="dashboard-text-link" to={ROUTES.aiExposure}>All tasks <ArrowRight size={15} /></Link></div><div className="dashboard-task-list">{priorities.map(({ task,label,category }) => <Link key={task.id} to={`${ROUTES.aiExposure}?${new URLSearchParams({task:task.id})}`}><span className="dashboard-task-icon"><Sparkles size={18} /></span><span><strong>{task.wording}</strong><small>{taskGuidance(task).help}</small></span><span className={`dashboard-task-badge assistance-badge-${category}`}>{label}</span><ArrowRight size={17} /></Link>)}</div></Card>}
-    <section><div className="dashboard-section-heading"><div><p className="dashboard-eyebrow">YOUR SKILLS, YOUR DIRECTION</p><h2>Skills to explore next</h2></div><Link className="dashboard-text-link" to={ROUTES.skills}>View skill matching <ArrowRight size={16} /></Link></div>{ready ? <SkillRecommendations tasks={tasks} assessments={assessments} decisions={data?.journey.review?.decisions} compact /> : <Card className="dashboard-panel dashboard-empty-inline"><Sprout size={25} /><div><h3>A skill path shaped around you</h3><p>Confirm your tasks to discover skills connected to your work and recommended learning resources.</p></div><Button asChild variant="outline"><Link to={ROUTES.workProfile}>Get started</Link></Button></Card>}</section>
-    <Card className="dashboard-learning-card"><div className="dashboard-learning-cover"><span><Sprout size={18} /> YOUR LEARNING JOURNEY</span><Link to={ROUTES.skills}><Plus size={16} /> New learning goal</Link></div><div className="dashboard-panel"><p className="dashboard-eyebrow">{summary?.nextCourse || latestGoal ? "PICK UP WHERE YOU LEFT OFF" : "MAKE YOUR NEXT MOVE"}</p><h2>{summary?.nextCourse?.title || latestGoal?.wording || "Turn a skill into your next learning goal."}</h2><p>{summary?.nextChapter ? `Next: ${summary.nextChapter.title}` : latestGoal?.action?.text || "Choose a skill, explore a course and build a plan that fits your day."}</p>{summary?.nextCourse && <div className="dashboard-learning-progress"><Progress value={coursePercent(summary.nextCourse)} aria-label="Current course progress" /><span>{coursePercent(summary.nextCourse)}%</span></div>}<div className="dashboard-learning-actions"><Button asChild><Link to={learningPath}>{summary?.nextCourse || latestGoal ? "Continue learning" : "Explore my skill path"}<ArrowRight size={16} /></Link></Button><Link className="dashboard-text-link" to={ROUTES.learningGoals}>View my plan</Link><Link className="dashboard-text-link" to={ROUTES.progress}><History size={16} /> View learning records</Link></div></div></Card>
-    <Card className="dashboard-career-card"><span className="dashboard-icon tone-1"><Compass /></span><div><h3>Where could your skills take you?</h3><p>Explore career possibilities and see the skills that connect you.</p></div><Button asChild variant="outline"><Link to={ROUTES.possibilities}>Explore possibilities <ArrowRight size={16} /></Link></Button></Card>
+    <PageHeader title={`${greeting}${user ? `, ${user.username}` : ""}`} description="Your learning plan, your progress, your next step." actions={<Button asChild variant="outline"><Link to={ROUTES.skills}><Plus size={16} /> New learning goal</Link></Button>} />
+    <ContinueLearningCard summary={summary} latestGoal={latestGoal} learningPath={learningPath} courseContext={summary?.nextCourse ? data.journey.contexts[data.journey.courseContexts[summary.nextCourse.id]] : undefined} />
+    {summary && <LearningActivityCard summary={summary} />}
+
+
+    {summary && data && <div className="dashboard-overview-grid">
+      <Card className="dashboard-panel dashboard-progress-summary"><p className="dashboard-eyebrow">YOUR LEARNING PROGRESS</p><h2>Small steps add up.</h2><div className="dashboard-work-metrics"><div><strong>{summary.completedChapters}</strong><span>completed chapters</span></div><div><strong>{summary.completedCourses}</strong><span>completed courses</span></div></div><p>See the chapters and courses you have completed, and continue at your own pace.</p><Link className="dashboard-text-link" to={ROUTES.plan}>View my courses <ArrowRight size={16} /></Link></Card>
+      <Card className="dashboard-panel"><div className="dashboard-section-heading"><div><p className="dashboard-eyebrow">KEEP YOUR MOMENTUM</p><h2>Recent learning activity</h2></div><Link className="dashboard-text-link" to={ROUTES.progress}>View all <ArrowRight size={16} /></Link></div><LearningTimeline activities={summary.activities.slice(0,3)} courses={data.plan.courses} /></Card>
+    </div>}
+
   </div>;
 }

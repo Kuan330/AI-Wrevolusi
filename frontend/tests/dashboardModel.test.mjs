@@ -6,14 +6,15 @@ import { recommendSkills } from '../src/features/skills/recommendations.ts';
 
 const task=(id,wording='Analyse sales data')=>({id,wording,iloTaskId:`source-${id}`,source:'ilo'});
 const evidence=(t,score,layer='exact')=>({task_id:t.id,match_layer:layer,missing_data_status:'complete',matched_reference_tasks:[{ilo_task_id:t.iloTaskId,task_text:t.wording,score_2025:score}],baseline_score:.9,adjusted_score:.95});
-test('overview groups linked evidence and keeps candidate, missing and stale matches unverified',()=>{
+test('overview sorts by descending task count and keeps candidate, missing and stale matches unverified',()=>{
   const tasks=Array.from({length:6},(_,i)=>task(String(i)));
-  const values=[0,.25,.55,.8];
+  const values=[0,.1,.25,.55];
   const assessments=values.map((value,i)=>evidence(tasks[i],value));
   assessments.push(evidence(tasks[4],1,'llm'));
   const result=assistanceOverview(tasks,assessments);
+  assert.deepEqual(result.groups.map(g=>g.category),['human','high','partial']);
   assert.deepEqual(result.groups.map(g=>g.count),[2,1,1]);
-  assert.equal(result.groups[0].category,'high');
+  assert.equal(result.groups[0].category,'human');
   assert.equal(result.unverified,2);
   assert.equal(result.items[0].score,0);
   assert.equal(result.items[4].score,null);
@@ -58,4 +59,14 @@ test('activity timeline includes learning attempts and retained chapter records 
   assert.equal(days.at(-1).count,1);
   assert.equal(days.at(-2).count,2);
   assert.equal(activityDays([],'2026-01-01').at(-1).date,'2026-01-01');
+});
+
+test('annual activity calendar preserves dates and counts across the year boundary', () => {
+  const activities = [{ id:'a', date:'2025-12-31', label:'Study', detail:'', kind:'study' }, { id:'b', date:'2025-12-31', label:'Practice', detail:'', kind:'practice' }];
+  const days = activityDays(activities, '2026-01-01', 52);
+  assert.equal(days.length,364);
+  assert.equal(new Set(days.map(day=>day.date)).size,364);
+  assert.equal(days.at(-1).date,'2026-01-01');
+  assert.equal(days.at(-2).count,2);
+  assert.equal(days.filter(day=>day.count>0).length,1);
 });

@@ -11,7 +11,7 @@ import * as model from '../src/pages/Possibilities/possibilitiesModel.ts';
 
 test('work profile destination restores an existing occupation workspace', () => {
   assert.equal(typeof model.possibilitiesProfilePath, 'function');
-  assert.equal(model.possibilitiesProfilePath({ tasksOccupationCode: '2512' }), '/work/tasks');
+  assert.equal(model.possibilitiesProfilePath({ tasksOccupationCode: '2512' }), '/work');
   for (const workspace of [null, undefined, {}, { tasksOccupationCode: '' }]) {
     assert.equal(model.possibilitiesProfilePath(workspace), '/work');
   }
@@ -100,7 +100,7 @@ test('cancellation prevents requests and ignores late save or GET outcomes', asy
 });
 
 const ready = {
-  contract_version: '1',
+  contract_version: '2',
   score_semantics: 'direction_skill_coverage',
   disclaimer: 'Exploratory skill connections only; not job readiness or hiring probability.',
   source: 'live',
@@ -162,7 +162,8 @@ test('page loads live data, restores and persists approved workspace keys', () =
   assert.ok((page.match(/to=\{profilePath\}/g) ?? []).length >= 1);
   assert.doesNotMatch(page, /to="\/profile"/);
   assert.match(page, /setError\(""\)/);
-  assert.match(page, /Broad connections to explore/);
+  assert.match(page, /px-info-button/);
+  assert.match(page, /Show career details/);
   assert.doesNotMatch(page, /SKILL COVERAGE|coveragePct|coverage_pct|<small>%<\/small>/);
   assert.doesNotMatch(page, /sessionStorage/);
 });

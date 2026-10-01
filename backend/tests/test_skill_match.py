@@ -116,7 +116,7 @@ def test_frontend_and_backend_use_identical_task_skill_rules() -> None:
     from pathlib import Path
     from app.services.skill_matching import SKILL_RULES
 
-    source = (Path(__file__).resolve().parents[2] / "frontend/src/pages/Analysis/lib/matchSkills.ts").read_text()
+    source = (Path(__file__).resolve().parents[2] / "frontend/src/features/skills/matchSkills.ts").read_text()
     parsed = re.findall(r"skillId: (\d+),\s*phrases: \[(.*?)\],\s*confidence: ([0-9.]+)", source, re.S)
     frontend_rules = [(int(skill_id), tuple(re.findall(r'"([^"]+)"', phrases)), float(confidence)) for skill_id, phrases, confidence in parsed]
     assert frontend_rules == [(rule.skill_id, rule.phrases, rule.confidence) for rule in SKILL_RULES]

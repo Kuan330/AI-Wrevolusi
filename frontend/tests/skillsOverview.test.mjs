@@ -47,8 +47,11 @@ test('goals join existing identities without inventing extra current skills', ()
  assert.equal(result.rows.length,1); assert.deepEqual(result.rows[0].goalIds,['g1']);
 });
 test('stale statements remain separate when a fresh candidate uses the same URI and task', () => {
- const result=buildSkillsOverview(base({specialist:[entry('t1',{occupationCode:'9999'})],candidates:[{taskId:'t1',taskWording:tasks[0].wording,version:'1.2.0',skills:[skill]}]}));
+ const result=buildSkillsOverview(base({specialist:[entry('t1',{occupationCode:'9999',wantsLearning:true})],candidates:[{taskId:'t1',taskWording:tasks[0].wording,version:'1.2.0',skills:[skill]}]}));
  assert.equal(result.rows[0].tasks.length,2); assert.equal(result.counts.confirmed,0); assert.equal(result.counts.suggested,1); assert.equal(result.counts.needsReview,1);
+ assert.equal(result.rows[0].wantsLearning,false); assert.equal(result.counts.wantsLearning,0);
+ assert.equal(result.rows[0].tasks.find(task=>task.needsReview).wantsLearning,true);
+ assert.equal(result.rows[0].tasks.find(task=>!task.needsReview).wantsLearning,false);
 });
 test('old candidate task wording is ignored while multiple personal task links are retained', () => {
  const result=buildSkillsOverview(base({candidates:[{taskId:'t1',taskWording:'Old task',version:'1.2.0',skills:[skill]}],personal:[{id:'p1',name:'Reporting',taskIds:['t1','t2'],taskLabels:[tasks[0].wording,'Previous wording'],decision:'use',wantsLearning:true}]}));

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, BriefcaseBusiness, Check, CheckCheck, ChevronDown, ClipboardList, LoaderCircle, Pencil, Plus, Search, ShieldCheck, Trash2, X } from "lucide-react";
+import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { referenceService } from "@/services/referenceService";
 import { currentWorkspaceSession } from "@/services/accountStorage";
@@ -122,14 +123,13 @@ export default function WorkSceneEditor({ confirmed, cancelling, onSaved, onCanc
   return <div className="work-scene">
     <header className="work-scene-heading">
       <p className="work-scene-eyebrow">YOUR WORK, IN YOUR WORDS</p>
-      <h1>Make this work profile yours.</h1>
-      <p>Find your role, then shape the task list around what you actually do.</p>
+      <PageHeader title="Make this work profile yours." description="Find your role, then shape the task list around what you actually do." />
     </header>
     {confirmed && <div className="work-scene-preserved"><ShieldCheck size={18} /><span>Your confirmed profile stays safe. Saving this version keeps your previous work in history.</span></div>}
     <fieldset disabled={locked} className="work-scene-layout">
       <legend className="sr-only">Your job and everyday tasks</legend>
       <section className="work-scene-role" aria-labelledby="role-heading">
-        <div className="work-scene-section-heading"><span className="work-scene-step">01</span><div><h2 id="role-heading">Find your role</h2><p>A starting point for your real work.</p></div></div>
+        <div className="work-scene-section-heading"><div><h2 id="role-heading">Find your role</h2><p>A starting point for your real work.</p></div></div>
         <div className="work-scene-search" ref={searchBox} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}>
           <label htmlFor="scene-job-title">Job title</label>
           <div className="work-scene-input-wrap"><Search size={18} aria-hidden="true" />
@@ -163,7 +163,7 @@ export default function WorkSceneEditor({ confirmed, cancelling, onSaved, onCanc
         <p className="work-scene-switch-note">Choosing a different role replaces the tasks in this draft.</p>
       </section>
       <section className="work-scene-tasks" aria-labelledby="tasks-heading" aria-busy={loading}>
-        <div className="work-scene-task-heading"><div className="work-scene-section-heading"><span className="work-scene-step">02</span><div><h2 id="tasks-heading">Your everyday tasks <span className="work-scene-count">{ready ? tasks.length : "—"}</span></h2><p>Keep what fits. Edit the details. Remove the rest.</p></div></div><Button variant="outline" disabled={!ready || tasks.length >= 50} onClick={() => setEditor({ task: null, values: emptyValues })}><Plus />Add task</Button></div>
+        <div className="work-scene-task-heading"><div className="work-scene-section-heading"><div><h2 id="tasks-heading">Your everyday tasks <span className="work-scene-count">{ready ? tasks.length : "—"}</span></h2><p>Keep what fits. Edit the details. Remove the rest.</p></div></div><Button variant="outline" disabled={!ready || tasks.length >= 50} onClick={() => setEditor({ task: null, values: emptyValues })}><Plus />Add task</Button></div>
         <div className="work-scene-task-search"><Search size={16} aria-hidden="true" /><input aria-label="Search your tasks" placeholder="Find a task in this list" disabled={!ready} value={filter} onChange={event => setFilter(event.target.value)} />{filter && <button type="button" aria-label="Clear task search" onClick={() => setFilter("")}><X size={16} /></button>}</div>
         <div className="work-scene-task-list" ref={list} tabIndex={0} role="region" aria-label="Scrollable task list">
           {loading ? <div className="work-scene-task-empty" role="status"><LoaderCircle className="animate-spin" size={28} /><h3>Loading tasks for your role…</h3><p>Preparing a copy you can make your own.</p></div> : failedOccupation ? <div className="work-scene-task-empty"><ClipboardList size={30} /><h3>Tasks could not load</h3><p>Your confirmed work has not changed.</p><Button variant="outline" onClick={() => { void choose(failedOccupation, true); }}>Retry tasks</Button></div> : !ready ? <div className="work-scene-task-empty"><span className="work-scene-empty-icon"><ClipboardList size={32} strokeWidth={1.4} /></span><h3>Your work takes shape here</h3><p>Choose a role on the left to see its tasks. Then adjust them to reflect your day.</p></div> : filtered.length ? <ol>{filtered.map(task => <li key={task.id} className="work-scene-task-card">

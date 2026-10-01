@@ -1,5 +1,6 @@
 import { PILOT_WEF_SKILLS } from "@/data/pilotWefSkills";
 import { api } from "@/services/api";
+import { createRequestCache } from "@/lib/requestCache";
 import type { ReferenceOccupation, ReferenceTask, WefSkill } from "@/types/reference";
 
 const withPilotFallback = async <T>(request: () => Promise<T>, fallback: () => T): Promise<T> => {
@@ -9,6 +10,9 @@ const withPilotFallback = async <T>(request: () => Promise<T>, fallback: () => T
     return fallback();
   }
 };
+
+// The WEF list is shared reference data, so a repeat visit can show it at once.
+const wefSkillCache = createRequestCache<WefSkill[]>({ maxAgeMs: 24 * 60 * 60_000, storageKey: "aiwrevolusi.reference.wefSkills.v1" });
 
 const onlyUnits = (rows: ReferenceOccupation[]) => rows.filter((item) => item.level === "unit");
 
@@ -33,8 +37,10 @@ export const referenceService = {
     ),
   wefSkills: () =>
     withPilotFallback(
-      () => api.get<WefSkill[]>("/reference/wef-skills"),
-      () => PILOT_WEF_SKILLS,
+      () => wefSkillCache.load("all", () => api.get<WefSkill[]>("/reference/wef-skills")),
+      () => wefSkillCache.peek("all")?.value ?? PILOT_WEF_SKILLS,
     ),
+  /** The last loaded WEF list, if any, for a first render without a loading state. */
+  cachedWefSkills: () => wefSkillCache.peek("all")?.value,
 };
 

@@ -121,7 +121,7 @@ def test_skill_names_are_normalized_to_safe_slugs() -> None:
 
 def test_response_contract_rejects_demo_skill_ids_and_bounds_scores() -> None:
     valid = PossibilitiesResponse(
-        contract_version='1',
+        contract_version='2',
         score_semantics='direction_skill_coverage',
         disclaimer='Exploratory skill connections only; not job readiness or hiring probability.',
         source='live',
@@ -250,7 +250,7 @@ def test_direction_payload_maps_database_industry_to_schema_area() -> None:
 
 def test_needs_profile_response_can_be_explicitly_empty() -> None:
     response = PossibilitiesResponse(
-        contract_version='1',
+        contract_version='2',
         score_semantics='direction_skill_coverage',
         disclaimer='Exploratory skill connections only; not job readiness or hiring probability.',
         source='live',

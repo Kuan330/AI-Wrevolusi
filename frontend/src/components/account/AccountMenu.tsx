@@ -92,7 +92,7 @@ export default function AccountMenu(props: { iconOnly?: boolean }) {
             </Popover.Title>
             {[
               [ROUTES.workProfile, "My work profile"],
-              [ROUTES.task, "Edit my tasks"],
+              [ROUTES.workProfile, "Edit my tasks"],
             ].map(([path, label]) => (
               <Link
                 key={label}
