@@ -1,12 +1,15 @@
 import { JOURNEY_KEY, journeyForAddedCourse, readLearningContext } from "../journey/journey.ts";
-import { currentWorkspaceSession, saveWorkspaceItems } from "../../services/accountStorage.ts";
+import { currentWorkspaceSession, saveWorkspaceItems, commitWorkspaceItems } from "../../services/accountStorage.ts";
 import { loadCourseDirectory } from "./courseDirectory.ts";
 import { readLibrary } from "./libraryStorage.ts";
 import { planForSavedCourses, readPlanState } from "./planCourses.ts";
+import { activePersonalPlan, personalPlanWorkspaceItems, type PersonalLearningPlan } from "../learning-goals/personalLearningPlan.ts";
 import type { Course } from "./types";
 
 export type SavedCourseChange = {
   learningContextId?: string;
+  /** Accept a reviewed blueprint atomically with its courses. */
+  personalPlan?: PersonalLearningPlan;
   add?: string[];
   remove?: string[];
   removeSkill?: { id: string; remainingIds: string[] };
@@ -51,10 +54,21 @@ export async function changeSavedCourses(change: SavedCourseChange) {
       throw new Error("This course has no supported link to the selected skill.");
     journeyItems[JOURNEY_KEY] = journeyForAddedCourse(courseId, context.id);
   }
-  saveWorkspaceItems({
+  const personalPlan = change.personalPlan ? activePersonalPlan(change.personalPlan) : undefined;
+  if (personalPlan && (personalPlan.courseIds.length !== (change.add ?? []).length || personalPlan.courseIds.some(id => !change.add?.includes(id))))
+    throw new Error("The selected courses changed. Review your plan before accepting it.");
+  const choices = { ...current.choices };
+  if (personalPlan) for (const id of personalPlan.courseIds) {
+    if (!choices[id]) choices[id] = { chapters: [], weekdays: [], minutesPerDay: personalPlan.inputs.minutesPerDay, scheduleMode: "later" };
+  }
+  const updatedLibrary = { ...library, choices };
+  const items = {
     ...journeyItems,
-    "aiwrevolusi.courseLibrary.v1": JSON.stringify(library),
+    ...(personalPlan ? personalPlanWorkspaceItems(personalPlan) : {}),
+    "aiwrevolusi.courseLibrary.v1": JSON.stringify(updatedLibrary),
     "aiwrevolusi.plan.courses.v1": JSON.stringify(plan),
-  });
-  return { library, plan };
+  };
+  if (personalPlan) await commitWorkspaceItems(items);
+  else saveWorkspaceItems(items);
+  return { library: updatedLibrary, plan, personalPlan };
 }

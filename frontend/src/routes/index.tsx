@@ -10,6 +10,7 @@ import SkillsReview from "@/pages/Skills/SkillsReview";
 import AIExposure from "@/pages/AIExposure/AIExposure";
 import LearningCentre from "@/pages/LearningCentre/LearningCentre";
 import LearningGoals from "@/pages/LearningGoals/LearningGoals";
+import LearningPlanOnboarding from "@/pages/LearningPlanOnboarding/LearningPlanOnboarding";
 import LearningHistory from "@/pages/LearningHistory/LearningHistory";
 import Progress from "@/pages/Progress/Progress";
 import Possibilities from "@/pages/Possibilities/Possibilities";
@@ -35,7 +36,7 @@ export default function AppRoutes() {
         <Route path={ROUTES.skills} element={<SkillsReview />} />
         <Route path={ROUTES.aiExposure} element={<AIExposure />} />
       </Route></Route>
-      <Route path={ROUTES.learningGoals} element={<AccountGate kind="plan"><LearningGoals /></AccountGate>} />
+      <Route path={ROUTES.learningGoals} element={<AccountGate kind="plan"><LearningPlanOnboarding><LearningGoals /></LearningPlanOnboarding></AccountGate>} />
       <Route path={ROUTES.plan} element={<AccountGate kind="plan"><Plan /></AccountGate>} />
       <Route path={ROUTES.learningCentre} element={<AccountGate kind="resources"><LearningCentre /></AccountGate>} />
       <Route path={ROUTES.progress} element={<AccountGate kind="plan"><LearningHistory /></AccountGate>} />

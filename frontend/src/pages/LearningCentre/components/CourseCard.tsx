@@ -40,11 +40,12 @@ export default function CourseCard(props: CourseCardProps) {
           onClick={onSave}
         >
           <Bookmark size={16} fill={saved ? "currentColor" : "none"} />{" "}
-          {busy ? "Saving…" : saved ? pendingSync ? "Added on this browser" : openSaved ? "View saved course" : "Added" : "Add to My Learning"}
+          {busy ? "Saving…" : saved ? pendingSync ? "Added on this browser" : openSaved ? "View saved course" : "Added" : "Add to My courses"}
         </Button>
       </div>
       <h3>{cleanDisplayText(course.title)}</h3>
       {linkedSkills && linkedSkills.length > 0 && <p className="library-linked-skills"><strong>Linked skills:</strong> {linkedSkills.map(cleanDisplayText).join(" · ")}</p>}
+      {course.intro && <p className="find-course-summary">{cleanDisplayText(course.intro)}</p>}
       <div className="library-tags">
         <span className={courseLevelClassName(course.level)}>
           {courseLevelLabel(course.level)}

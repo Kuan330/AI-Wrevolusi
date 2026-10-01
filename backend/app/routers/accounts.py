@@ -16,6 +16,9 @@ from app.services.journey import JOURNEY_KEY, validate_journey
 from app.services.specialist_review import SPECIALIST_KEY, validate_specialist_review
 from app.services.learning_goals import LEARNING_GOALS_KEY, validate_learning_goals, validate_learning_goal_transition
 
+from app.services.learning_onboarding import LEARNING_ONBOARDING_KEY, validate_learning_onboarding
+from app.services.personal_learning_plans import LEARNING_PLAN_KEY, validate_learning_plans
+
 router = APIRouter(prefix='/account', tags=['Account'])
 
 
@@ -37,7 +40,7 @@ class WorkspaceUpdate(BaseModel):
     @field_validator('data')
     @classmethod
     def validate_data(cls, data: dict[str, str]) -> dict[str, str]:
-        allowed = {LEARNING_GOALS_KEY, SPECIALIST_KEY, 'aiwrevolusi.workProfileDraft.v1', JOURNEY_KEY, 'aiwrevolusi.userProfile', 'aiwrevolusi.confirmedAnalysis', 'aiwrevolusi.learningCentre', 'aiwrevolusi.learningResourceSelections.v1', 'aiwrevolusi.courseLibrary.v1', 'aiwrevolusi.learningSkills.v1', 'aiwrevolusi.plan.courses.v1', 'aiwrevolusi.planner.v1', 'aiwrevolusi.possibilities.chosenDirection', 'aiwrevolusi.possibilities.shortlist', 'aiwrevolusi.possibilities.saved', 'aiwrevolusi.possibilities.intent'}
+        allowed = {LEARNING_ONBOARDING_KEY, LEARNING_PLAN_KEY, LEARNING_GOALS_KEY, SPECIALIST_KEY, 'aiwrevolusi.workProfileDraft.v1', JOURNEY_KEY, 'aiwrevolusi.userProfile', 'aiwrevolusi.confirmedAnalysis', 'aiwrevolusi.learningCentre', 'aiwrevolusi.learningResourceSelections.v1', 'aiwrevolusi.courseLibrary.v1', 'aiwrevolusi.learningSkills.v1', 'aiwrevolusi.plan.courses.v1', 'aiwrevolusi.planner.v1', 'aiwrevolusi.possibilities.chosenDirection', 'aiwrevolusi.possibilities.shortlist', 'aiwrevolusi.possibilities.saved', 'aiwrevolusi.possibilities.intent'}
         if not data.keys() <= allowed:
             raise ValueError('Workspace contains unsupported records.')
         if len(json.dumps(data)) > 2_000_000:
@@ -46,6 +49,10 @@ class WorkspaceUpdate(BaseModel):
             parsed = json.loads(value)
             if key == SHORTLIST_KEY:
                 validate_workspace_shortlist(parsed)
+            elif key == LEARNING_ONBOARDING_KEY:
+                validate_learning_onboarding(parsed, data)
+            elif key == LEARNING_PLAN_KEY:
+                validate_learning_plans(parsed)
             elif key == LEARNING_GOALS_KEY:
                 validate_learning_goals(parsed)
             elif key == SPECIALIST_KEY:

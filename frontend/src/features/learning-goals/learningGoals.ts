@@ -141,6 +141,8 @@ export const saveLearningAttempt = (goalId:string,input:AttemptInput) => mutate(
 });
 export const removeLearningAttempt = (goalId:string,attemptId:string) => mutate(goalId,g=>{g.attempts=g.attempts.filter(a=>a.id!==attemptId);});
 export function goalContextWarnings(goal:LearningGoal):string[] {
+  // A free learning goal carries no confirmed workplace or skill evidence.
+  if (goal.sourceKey === `onboarding:${goal.id}` && goal.initial.origin === "browse" && goal.initial.skill.source === "personal" && !goal.initial.tasks.length && !goal.initial.career) return [];
   const warnings:string[]=[];
   if (goal.initial.skill.source==="esco") {
     const e=readSpecialistState().entries.find(e=>`specialist:${specialistEntryKey(e)}`===goal.sourceKey), p=readJourneyProfile();
