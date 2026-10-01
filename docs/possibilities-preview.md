@@ -1,6 +1,12 @@
-# Possibilities preview
+# Possibilities and career exploration
 
-Route: `/possibilities?demo=1` (direct entry in development). All profiles, skills, experiences and career connections are explicitly fictional demo data. No recommendation API, user skill inference, job readiness score or live vacancies. Demo favourites use `aiwrevolusi.possibilities.demo.saved` and do not write to the real skill profile.
+Live route: `/possibilities`. It uses the signed-in account's confirmed tasks and current ESCO skill review. Career roles and their essential or optional skill links come from the pinned ESCO v1.2.0 catalogue. A current skill connection is included only when the user said “I use this” for a still-confirmed task. Developing interests are shown separately and do not count as current skill evidence.
+
+Recommendations require at least one reviewed shared skill and return up to three roles. They are exploratory transferability directions, not a Malaysian occupation crosswalk, hiring prediction, salary or vacancy claim, or job-readiness rating. ESCO's official role-skill links describe European occupations. The UI shows the ESCO attribution, version, and the catalogue snapshot's retrieval date. If the catalogue or sufficient current skill evidence is unavailable, the page explains the evidence gap instead of falling back to generated WEF/ILO keyword matches.
+
+Selecting an essential skill opens the learning catalogue with the skill name and chosen ESCO role carried into the search. The project does not have a reviewed ESCO-to-course crosswalk; the learning page labels results as name-search results and asks the user to assess each course. The progress-review flow remains an explicit, dated review of study and practice records.
+
+The generated design preview at `/possibilities?demo=1` uses fictional profiles, skills, experiences and connections. Demo favourites use `aiwrevolusi.possibilities.demo.saved` and do not write to the real skill profile.
 
 The central character is a generated raster portrait with a 3D appearance, not a WebGL model. Skill tags use CSS elliptical motion with upright labels, pause on hover/focus/selection, a manual pause control and static positions for small screens and reduced-motion preferences.
 
