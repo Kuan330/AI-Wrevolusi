@@ -30,9 +30,9 @@ beforeEach(()=>{
 afterEach(()=>activateWorkspace(null));
 
 test('new accounts start with work, evidence gaps continue to skills, reads do not write',()=>{
-  assert.equal(getContinueDestination(),'/profile');
+  assert.equal(getContinueDestination(),'/work');
   saveConfirmedAnalysis(analysis()); writes=[];
-  assert.equal(getContinueDestination(),'/skills');
+  assert.equal(getContinueDestination(),'/learning/skills');
   assert.ok(currentWorkKey().includes('task-1'));
   assert.deepEqual(writes,[]);
 });
@@ -49,13 +49,13 @@ test('starter drafts are not confirmed; explicit confirmation survives an eviden
 
 test('confirmed work continues to skills when the ILO assessment has not completed',async()=>{
   saveProfileTasks('4110',analysis().tasks);
-  assert.equal(getContinueDestination(),'/profile/tasks');
+  assert.equal(getContinueDestination(),'/work/tasks');
   await rememberIntent('work');
   confirmProfileTasks();
   assert.equal(readUserProfile().analysis,null);
-  assert.equal(getContinueDestination(),'/skills');
+  assert.equal(getContinueDestination(),'/learning/skills');
   memory.delete(key);
-  assert.equal(getContinueDestination(),'/skills');
+  assert.equal(getContinueDestination(),'/learning/skills');
 });
 
 test('unconfirmed tasks cannot be accepted as current skills',async()=>{
@@ -82,7 +82,7 @@ test('accepted work skill and goal survive refresh and preserve exact task conte
   saveConfirmedAnalysis(analysis());
   await saveSkillDecision(1,'accepted');await completeSkillReview();
   const url=await startWork();
-  assert.equal(new URL(url,'https://local').pathname, '/learning-goals');
+  assert.equal(new URL(url,'https://local').pathname, '/learning/plan');
   const id=new URL(url,'https://local').searchParams.get('context');
   const context=readLearningContext(id);
   assert.equal(context.goal,'Check report conclusions');assert.deepEqual(context.taskIds,['task-1']);
@@ -118,7 +118,7 @@ test('course, plan and recommendation origin are committed together',async()=>{
   await changeSavedCourses({add:['course-1'],learningContextId:context.id});
   assert.equal(getCourseContext('course-1').id,context.id);
   assert.equal(JSON.parse(memory.get(planKey)).courses[0].id,'course-1');
-  assert.equal(getContinueDestination(),'/plan?course=course-1');
+  assert.equal(getContinueDestination(),'/learning/plan/courses?course=course-1');
 });
 
 test('unsupported course-skill link does not save a course or replace the learning goal',async()=>{
@@ -130,19 +130,19 @@ test('unsupported course-skill link does not save a course or replace the learni
 
 test('two active courses do not default to an arbitrary first course; explicit course wins',async()=>{
   saveConfirmedAnalysis(analysis());savePlanState(plan([course('a'),course('b')]));
-  assert.equal(getContinueDestination(),'/plan');
-  await rememberCourse('b');assert.equal(getContinueDestination(),'/plan?course=b');
+  assert.equal(getContinueDestination(),'/learning/plan/courses');
+  await rememberCourse('b');assert.equal(getContinueDestination(),'/learning/plan/courses?course=b');
 });
 
 test('a work edit does not prevent returning to an active saved course',()=>{
   savePlanState(plan([course()]));
   memory.set(profileKey,JSON.stringify({tasks:[],tasksOccupationCode:null,analysis:null,learningReviewNeeded:true}));
-  assert.equal(getContinueDestination(),'/plan?course=course-1');
+  assert.equal(getContinueDestination(),'/learning/plan/courses?course=course-1');
 });
 
 test('completed courses lead to the learning overview, not forced reassessment',()=>{
   saveConfirmedAnalysis(analysis());savePlanState(plan([course('course-1',10)]));
-  assert.equal(getContinueDestination(),'/plan');
+  assert.equal(getContinueDestination(),'/learning/plan/courses');
 });
 
 test('lookup never treats inherited object properties as a saved context',()=>{
@@ -151,8 +151,8 @@ test('lookup never treats inherited object properties as a saved context',()=>{
 });
 
 test('only known internal deep links survive login, with their query and anchor',()=>{
-  assert.equal(safeJourneyDestination('/learning-centre?context=abc&skill=writing#courses'),'/learning-centre?context=abc&skill=writing#courses');
-  for(const value of ['https://example.com','//example.com','/\\example.com','/unknown','/continue','/','/plan\n'])assert.equal(safeJourneyDestination(value),null);
+  assert.equal(safeJourneyDestination('/learning/resources?context=abc&skill=writing#courses'),'/learning/resources?context=abc&skill=writing#courses');
+  for(const value of ['https://example.com','//example.com','/\\example.com','/unknown','/resume','/','/learning/plan/courses\n'])assert.equal(safeJourneyDestination(value),null);
 });
 
 test('failed sync keeps pending context and a late acknowledgement cannot navigate another account',async()=>{
@@ -252,9 +252,9 @@ test('generic entry resumes the saved work-draft stage without changing confirme
   const original=memory.get(profileKey);
   const draft={version:1,stage:'tasks',jobTitle:'Clerk',occupation:null,tasks:[],baseProfileVersion:0,updatedAt:new Date().toISOString()};
   memory.set('aiwrevolusi.workProfileDraft.v1',JSON.stringify(draft));
-  assert.equal(getContinueDestination(),'/profile/tasks');
+  assert.equal(getContinueDestination(),'/work/tasks');
   memory.set('aiwrevolusi.workProfileDraft.v1',JSON.stringify({...draft,stage:'job'}));
-  assert.equal(getContinueDestination(),'/profile?edit=job');
+  assert.equal(getContinueDestination(),'/work?edit=job');
   assert.equal(memory.get(profileKey),original);
 });
 

@@ -1,16 +1,7 @@
-import type { ComponentProps } from "react";
-import { useAccount } from "@/components/account/useAccount";
-import { Link } from "react-router-dom";
 
-import { ROUTES } from "@/constants/routes";
+import StartWorkspaceButton from "./StartWorkspaceButton";
 
 const HeroSection = () => {
-  const { user } = useAccount();
-  const linkProps1 = {
-    to: user ? ROUTES.aiExposure : ROUTES.workProfile,
-    state: user ? undefined : { authMode: "register" },
-    className: "btn btn-warm",
-  } satisfies Partial<ComponentProps<typeof Link>>;
   return (
     <section className="hero">
       <div className="container">
@@ -29,7 +20,7 @@ const HeroSection = () => {
               one useful learning step.
             </p>
             <div>
-              <Link {...linkProps1}>{user ? "Continue my work review" : "Create a free account"}</Link>
+              <StartWorkspaceButton />
             </div>
             <div className="hero-note">
               No CV upload · An account keeps your choices together

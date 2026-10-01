@@ -6,7 +6,9 @@ import { ROUTES } from "@/constants/routes";
 import { readJourneyProfile } from "@/features/journey/journey";
 import { checkWorkAiFindings } from "@/features/work-profile/checkWorkAiFindings";
 import ExposureTaskList from "./components/ExposureTaskList";
-import ResearchCoverage from "./components/ResearchCoverage";
+import AssistanceChart from "@/components/dashboard/AssistanceChart";
+import { currentAssessments } from "@/features/ai-impact/assistance";
+import { Card } from "@/components/ui/card";
 import "./exposure.css";
 
 export default function AIExposure() {
@@ -32,9 +34,9 @@ export default function AIExposure() {
     finally { if (mounted.current) { setChecking(false); refresh(value => value + 1); } }
   }
   const analysis = profile?.analysis?.classificationCheck === "same-title-v1" ? profile.analysis : null;
-  const assessments = (analysis?.taskExposureAssessments ?? []).filter(item => profile?.tasks.some(task => task.id === item.task_id && analysis?.tasks.some(saved => saved.id === task.id && saved.wording === task.wording)));
+  const assessments = profile ? currentAssessments(profile) : [];
   return <div className="exposure-page mx-auto w-full max-w-[1200px]">
-    <PageHeader className="flex-col items-start sm:flex-row sm:items-center" title="Where could AI change my work?"
+    <PageHeader className="flex-col items-start sm:flex-row sm:items-center" title="AI impact & assistance"
       description="Choose a task. See what AI might help with, what you need to check, and a useful next step."
       actions={<Button asChild variant="outline"><Link to={ROUTES.task}>Review my tasks</Link></Button>} />
     {readError ? <div role="alert" className="exposure-notice"><p>{readError}</p><Link to={ROUTES.continue}>Review recovery options</Link></div> : profile && <>
@@ -45,7 +47,7 @@ export default function AIExposure() {
         {profile.tasksOccupationCode && <Button disabled={checking} onClick={() => void checkResearch()}>{checking ? "Checking research…" : error ? "Retry research check" : "Check research"}</Button>}
         {error && <p role="alert">{error} Your work is still saved. A failed request does not mean there is no research.</p>}
       </section>}
-      {analysis && !checking && !error && <ResearchCoverage tasks={profile.tasks} assessments={assessments} />}
+      <Card className="dashboard-panel mb-6"><div className="dashboard-section-heading"><h2 className="text-xl font-semibold">Tasks by AI assistance category</h2><Button asChild variant="outline"><Link to={ROUTES.skills}>Explore related skills</Link></Button></div><AssistanceChart tasks={profile.tasks} assessments={checking || error ? [] : assessments} /></Card>
       <ExposureTaskList occupation={analysis ? {title: analysis.occupationTitle, code: analysis.occupationCode} : undefined} tasks={profile.tasks} assessments={assessments}
         researchChecked={Boolean(analysis) && !checking} researchLoading={checking} researchUnavailable={Boolean(error)} />
       <aside className="exposure-progress">

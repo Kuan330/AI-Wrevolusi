@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { skillsForTask } from "@/pages/Analysis/lib/matchSkills";
+import { skillsForTask } from "../../../features/skills/matchSkills.ts";
 import { getSkillDecision } from "@/features/journey/journey";
 import { ROUTES } from "@/constants/routes";
 import { referenceService } from "@/services/referenceService";

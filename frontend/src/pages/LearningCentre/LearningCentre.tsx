@@ -26,7 +26,7 @@ import {
   type LearningSkill,
 } from "@/pages/Skills/learningSkills";
 import { rateWefSkills } from "./lib/skillStars";
-import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
+import { buildSkillEvidence } from "../../features/skills/skillProfile.ts";
 import { useLearningSkills } from "@/pages/Skills/useLearningSkills";
 import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
@@ -258,7 +258,7 @@ export default function LearningCentre() {
     const removedId = removeTarget.id;
     const remainingIds = skills.filter(item => item.id !== removedId).map(item => item.id);
     removeSkill(removedId);
-    if (removedId === activeId) navigate("/learning-centre?mode=browse", { replace: true });
+    if (removedId === activeId) navigate(`${ROUTES.learningCentre}?mode=browse`, { replace: true });
     setRemoveTarget(null);
     await removeSavedCoursesForSkill(removedId, remainingIds);
   };
@@ -295,7 +295,7 @@ export default function LearningCentre() {
           {context.goal && <p>Your goal: {goalDisplayLabel(context.goal)}</p>}
           <p className="library-muted">This uses the current WEF skill and course links. It does not establish specialist skill coverage or job readiness.</p>
           {contextStale && <p role="alert">Your work or skill review changed. Review this choice before adding a new course; your saved courses are still available.</p>}
-          <Link className="underline" to={context.origin === "career" ? "/possibilities" : "/skills"}>
+          <Link className="underline" to={context.origin === "career" ? ROUTES.possibilities : ROUTES.skills}>
             {context.origin === "career" ? "Back to your career direction" : "Review your skills"}
           </Link>
         </section>
@@ -304,8 +304,8 @@ export default function LearningCentre() {
         <p className="library-browse-note">Browse courses on your own. Linked skills describe catalogue connections, not a recommendation for you.</p>
         <Button type="button" variant="outline" disabled={selecting || !skillsLoaded || Boolean(journey.error)} onClick={() => setAddOpen(true)}>Choose a skill for a goal</Button>
       </div>}
-      {contextError && <div role="alert" className="mb-4"><p>{contextError}</p><Link className="underline" to="/skills">Review your skills</Link></div>}
-      {!resourceGoal && !journey.reviewed && !context && !genericSearch && <p className="mb-4">Review your work skills to use them here, or add a skill to explore your own learning. <Link className="underline" to="/skills">Review skills</Link></p>}
+      {contextError && <div role="alert" className="mb-4"><p>{contextError}</p><Link className="underline" to={ROUTES.skills}>Review your skills</Link></div>}
+      {!resourceGoal && !journey.reviewed && !context && !genericSearch && <p className="mb-4">Review your work skills to use them here, or add a skill to explore your own learning. <Link className="underline" to={ROUTES.skills}>Review skills</Link></p>}
       {(selectionError || selecting) && <p role={selectionError ? "alert" : "status"}>{selectionError ? displayLearningError(selectionError) : "Saving your skill choice…"}</p>}
       {!unsupportedGoal && !goalResource.error && <button type="button" className="mb-3 text-sm underline" disabled={catalogueLoading} onClick={() => { resetCourseDirectory(); setCatalogueRefresh(value => value + 1); }}>Refresh course catalogue</button>}
       {!unsupportedGoal && !goalResource.error && (skillsError || notice) && (

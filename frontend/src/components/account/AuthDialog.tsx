@@ -122,7 +122,7 @@ export function AuthDialog(props: {
               onClose();
               const intended = safeJourneyDestination(destination) ??
                 safeJourneyDestination(location.pathname + location.search + location.hash);
-              navigate(intended ?? ROUTES.continue, { replace: true });
+              navigate(intended ?? ROUTES.dashboard, { replace: true });
             } catch (issue) {
               setError(
                 issue instanceof Error

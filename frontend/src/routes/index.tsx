@@ -1,103 +1,50 @@
-import type { ComponentProps } from "react";
-import { useAccount } from "@/components/account/useAccount";
+import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import AccountGate from "@/components/account/AccountGate";
 import { AccountProvider } from "@/components/account/AccountProvider";
-import {
-  BrowserRouter,
-  Navigate,
-  Outlet,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
-
-import ContinueJourney from "@/pages/Journey/ContinueJourney";
-import SkillsReview from "@/pages/Skills/SkillsReview";
 import RequireWorkTasks from "@/components/layout/RequireWorkTasks";
 import MainLayout from "@/components/layout/MainLayout";
-import ProfileLayout from "@/components/layout/ProfileLayout";
-import { ROUTES } from "@/constants/routes";
-import AIExposure from "@/pages/AIExposure/AIExposure";
+import ContinueJourney from "@/pages/Journey/ContinueJourney";
 import Home from "@/pages/Home/Home";
+import Dashboard from "@/pages/Dashboard/Dashboard";
+import SkillsReview from "@/pages/Skills/SkillsReview";
+import AIExposure from "@/pages/AIExposure/AIExposure";
 import LearningCentre from "@/pages/LearningCentre/LearningCentre";
 import LearningGoals from "@/pages/LearningGoals/LearningGoals";
+import LearningHistory from "@/pages/LearningHistory/LearningHistory";
 import Progress from "@/pages/Progress/Progress";
 import Possibilities from "@/pages/Possibilities/Possibilities";
 import Plan from "@/pages/Plan/Plan";
 import WorkProfile from "@/pages/WorkProfile/WorkProfile";
 import ProfileTasks from "@/pages/WorkProfile/ProfileTasks";
+import { LEGACY_ROUTES, ROUTES } from "@/constants/routes";
 
-const HomeRoute = () => {
-  const { user } = useAccount();
+function LegacyRedirect({ to }: { to: string }) {
   const location = useLocation();
-  return user && !location.state?.showHome ? (
-    <Navigate
-      {...({ to: ROUTES.continue, replace: true } satisfies Partial<
-        ComponentProps<typeof Navigate>
-      >)}
-    />
-  ) : (
-    <Home />
-  );
-};
-
-const AppRoutes = () => {
-  const navigateProps1 = {
-    to: ROUTES.workProfile,
-    replace: true,
-  } satisfies Partial<ComponentProps<typeof Navigate>>;
-  return (
-    <BrowserRouter>
-      <AccountProvider>
-        <Routes>
-          <Route path={ROUTES.home} element={<HomeRoute />} />
-          <Route element={<ProfileLayout />}>
-            <Route path={ROUTES.workProfile} element={<AccountGate kind="work"><WorkProfile /></AccountGate>} />
-            <Route path={ROUTES.task} element={<AccountGate kind="work"><ProfileTasks /></AccountGate>} />
-          </Route>
-          <Route
-            path="/work-profile"
-            element={<Navigate {...navigateProps1} />}
-          />
-          <Route element={<MainLayout />}>
-            <Route path={ROUTES.progress} element={<AccountGate kind="plan"><Progress /></AccountGate>} />
-            <Route path={ROUTES.learningGoals} element={<AccountGate kind="plan"><LearningGoals /></AccountGate>} />
-            <Route path={ROUTES.continue} element={<AccountGate kind="plan"><ContinueJourney /></AccountGate>} />
-            <Route element={<AccountGate kind="work"><Outlet /></AccountGate>}>
-              <Route element={<RequireWorkTasks />}>
-                <Route path={ROUTES.skills} element={<SkillsReview />} />
-                <Route path={ROUTES.aiExposure} element={<AIExposure />} />
-              </Route>
-            </Route>
-            <Route
-              path={ROUTES.learningCentre}
-              element={
-                <AccountGate kind="resources">
-                  <LearningCentre />
-                </AccountGate>
-              }
-            />
-            <Route
-              path={ROUTES.plan}
-              element={
-                <AccountGate kind="plan">
-                  <Plan />
-                </AccountGate>
-              }
-            />
-            <Route
-              path={ROUTES.possibilities}
-              element={
-                <AccountGate kind="possibilities">
-                  <Possibilities />
-                </AccountGate>
-              }
-            />
-          </Route>
-        </Routes>
-      </AccountProvider>
-    </BrowserRouter>
-  );
-};
-
-export default AppRoutes;
+  return <Navigate replace to={to + location.search + location.hash} state={location.state} />;
+}
+function NotFound() {
+  return <section className="workspace-empty"><p className="dashboard-eyebrow">404</p><h1>We couldn’t find this page.</h1><p>Your saved work is still available.</p><Link to={ROUTES.dashboard}>Back to work overview →</Link></section>;
+}
+export default function AppRoutes() {
+  return <BrowserRouter><AccountProvider><Routes>
+    {Object.entries(LEGACY_ROUTES).map(([from, to]) => <Route key={from} path={from} element={<LegacyRedirect to={to} />} />)}
+    <Route path={ROUTES.home} element={<Home />} />
+    <Route element={<MainLayout />}>
+      <Route path={ROUTES.dashboard} element={<AccountGate kind="work"><Dashboard /></AccountGate>} />
+      <Route path={ROUTES.workProfile} element={<AccountGate kind="work"><WorkProfile /></AccountGate>} />
+      <Route path={ROUTES.task} element={<AccountGate kind="work"><ProfileTasks /></AccountGate>} />
+      <Route element={<AccountGate kind="work"><Outlet /></AccountGate>}><Route element={<RequireWorkTasks />}>
+        <Route path={ROUTES.skills} element={<SkillsReview />} />
+        <Route path={ROUTES.aiExposure} element={<AIExposure />} />
+      </Route></Route>
+      <Route path={ROUTES.learningGoals} element={<AccountGate kind="plan"><LearningGoals /></AccountGate>} />
+      <Route path={ROUTES.plan} element={<AccountGate kind="plan"><Plan /></AccountGate>} />
+      <Route path={ROUTES.learningCentre} element={<AccountGate kind="resources"><LearningCentre /></AccountGate>} />
+      <Route path={ROUTES.progress} element={<AccountGate kind="plan"><LearningHistory /></AccountGate>} />
+      <Route path={ROUTES.progressReviews} element={<AccountGate kind="plan"><Progress /></AccountGate>} />
+      <Route path={ROUTES.possibilities} element={<AccountGate kind="possibilities"><Possibilities /></AccountGate>} />
+      <Route path={ROUTES.continue} element={<AccountGate kind="plan"><ContinueJourney /></AccountGate>} />
+      <Route path="*" element={<NotFound />} />
+    </Route>
+  </Routes></AccountProvider></BrowserRouter>;
+}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { skillsForTask } from '../src/pages/Analysis/lib/matchSkills.ts';
+import { skillsForTask } from '../src/features/skills/matchSkills.ts';
 
 const skills = Array.from({ length: 26 }, (_, index) => ({ wef_skill_id: index + 1, core_skill: `Skill ${index + 1}` }));
 const ids = text => skillsForTask(text, skills, null).map(skill => skill.wef_skill_id);

@@ -13,7 +13,7 @@ const moduleUrl = source => `data:text/javascript;base64,${Buffer.from(source).t
 const packageUrl = name => pathToFileURL(require.resolve(name)).href;
 let signedIn = false;
 let guardVisits = 0;
-let requestedPath = '/skills';
+let requestedPath = '/learning/skills';
 
 // Exercise the real route tree. Only page content and account state are doubled;
 // a prerequisite check before login must fail, rather than read a guest profile.
@@ -40,7 +40,7 @@ globalThis.journeyRouteFixtures = {
   },
 };
 Object.defineProperty(globalThis.journeyRouteFixtures, 'requestedPath', { get: () => requestedPath });
-for (const name of ['ContinueJourney', 'SkillsReview', 'AIExposure', 'Home', 'LearningCentre', 'Possibilities', 'Plan', 'WorkProfile', 'ProfileTasks']) {
+for (const name of ['ContinueJourney', 'SkillsReview', 'AIExposure', 'Home', 'LearningCentre', 'Possibilities', 'Plan', 'WorkProfile', 'ProfileTasks', 'Dashboard', 'LearningHistory', 'LearningGoals', 'Progress']) {
   globalThis.journeyRouteFixtures[name] = () => React.createElement('div', { 'data-page': name });
 }
 const routerModule = moduleUrl(`
@@ -66,7 +66,7 @@ const transpiled = ts.transpileModule(readFileSync(new URL('../src/routes/index.
   });
 const { default: AppRoutes } = await import(moduleUrl(transpiled));
 
-for (const [path, page] of [['/skills?step=review#current', 'SkillsReview'], ['/ai-exposure?view=tasks', 'AIExposure']]) {
+for (const [path, page] of [['/learning/skills?step=review#current', 'SkillsReview'], ['/work/ai-impact?view=tasks', 'AIExposure']]) {
   test(`account access precedes saved-work checks and preserves ${path}`, () => {
     signedIn = false; guardVisits = 0; requestedPath = path;
     const entry = renderToString(React.createElement(AppRoutes));
@@ -77,3 +77,18 @@ for (const [path, page] of [['/skills?step=review#current', 'SkillsReview'], ['/
     assert.equal(guardVisits, 1);
   });
 }
+
+
+test('public introduction remains separate from the authenticated dashboard', () => {
+  for (const account of [false, true]) {
+    signedIn = account; requestedPath = '/'; guardVisits = 0;
+    assert.ok(renderToString(React.createElement(AppRoutes)).includes('data-page="Home"'));
+    assert.equal(guardVisits, 0);
+  }
+  signedIn = false; requestedPath = '/dashboard';
+  const guest = renderToString(React.createElement(AppRoutes));
+  assert.ok(guest.includes('data-login-destination="/dashboard"'));
+  assert.ok(!guest.includes('data-page="Dashboard"'));
+  signedIn = true;
+  assert.ok(renderToString(React.createElement(AppRoutes)).includes('data-page="Dashboard"'));
+});

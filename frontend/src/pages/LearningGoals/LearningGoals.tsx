@@ -141,7 +141,7 @@ function GoalsWorkspace() {
     if (ok && created) setParams({ goal: created.id });
   };
   return <div className="learning-goals">
-    <PageHeader title="My learning goals" description="Continue a goal, try a small action and keep a record of what you learned." />
+    <PageHeader title="My learning plan" description="Continue a goal, try a small action and keep a record of what you learned." />
     <div role="status" aria-live="polite" className={notice ? "lg-notice" : ""}>{notice}</div>
     {error && <p role="alert" className="lg-error">{error}</p>}
     {needsReload && !goal && <div className="lg-warning"><p>Your account changed in another tab. Reload the saved account before trying again.</p><button onClick={reload}>Reload saved account</button></div>}

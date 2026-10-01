@@ -1,4 +1,4 @@
-import { skillsForTask } from "@/pages/Analysis/lib/matchSkills";
+import { skillsForTask } from "./matchSkills.ts";
 import type { ProfileTask } from "@/features/work-profile/types";
 import type { WefSkill } from "@/types/reference";
 

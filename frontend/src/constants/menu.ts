@@ -1,70 +1,36 @@
-import { ROUTES } from "@/constants/routes";
+import { ROUTES } from "./routes.ts";
 
-export type JourneyArea = "work" | "learning" | "careers";
-
-type JourneyMenuItem = {
-  key: JourneyArea;
-  label: string;
-  path: string;
-  paths: readonly string[];
-};
-
-/** Areas stay in the same order before and after work confirmation. */
-export const PRIMARY_NAV_MENU: readonly JourneyMenuItem[] = [
-  {
-    key: "work",
-    label: "My Work",
-    path: ROUTES.workProfile,
-    paths: [ROUTES.workProfile, ROUTES.aiExposure, ROUTES.skills, "/work-profile"],
-  },
-  {
-    key: "learning",
-    label: "My Learning",
-    path: ROUTES.learningGoals,
-    paths: [ROUTES.learningGoals, ROUTES.progress, ROUTES.plan, ROUTES.learningCentre],
-  },
-  {
-    key: "careers",
-    label: "Career Options",
-    path: ROUTES.possibilities,
-    paths: [ROUTES.possibilities],
-  },
-];
-
-export const WORK_NAV_MENU = [
-  { key: "details", label: "Profile", path: ROUTES.workProfile },
-  { key: "findings", label: "AI findings", path: ROUTES.aiExposure },
-  { key: "skills", label: "My skills", path: ROUTES.skills },
+export const SIDEBAR_GROUPS = [
+  { key: "overview", label: "Overview", collapsible: false, icon: "dashboard", items: [
+    { label: "Work overview", path: ROUTES.dashboard, icon: "dashboard", exact: true },
+  ] },
+  { key: "work", label: "My work & AI", collapsible: true, icon: "work", items: [
+    { label: "My work", path: ROUTES.workProfile, icon: "work", exact: true },
+    { label: "AI impact & assistance", path: ROUTES.aiExposure, icon: "ai", exact: true },
+  ] },
+  { key: "learning", label: "Learning & growth", collapsible: true, icon: "plan", items: [
+    { label: "Skill path & matching", path: ROUTES.skills, icon: "skills", exact: false },
+    { label: "My learning plan", path: ROUTES.learningGoals, icon: "plan", exact: false },
+    { label: "Learning history & progress", path: ROUTES.progress, icon: "history", exact: false },
+  ] },
+  { key: "career", label: "Career", collapsible: false, icon: "career", items: [
+    { label: "Possibilities", path: ROUTES.possibilities, icon: "career", exact: false },
+  ] },
 ] as const;
 
-export const LEARNING_NAV_MENU = [
-  { key: "goals", label: "My goals", path: ROUTES.learningGoals },
-  { key: "progress", label: "My progress", path: ROUTES.progress },
-  { key: "plan", label: "My courses", path: ROUTES.plan },
-  { key: "resources", label: "Find learning", path: ROUTES.learningCentre },
-] as const;
-
-export function getJourneyArea(pathname: string): JourneyArea | undefined {
-  return PRIMARY_NAV_MENU.find((item) =>
-    item.paths.some((path) => pathname === path || pathname.startsWith(`${path}/`)),
-  )?.key;
+export function navigationPath(pathname: string): string {
+  if (pathname === ROUTES.task) return ROUTES.workProfile;
+  if (pathname === ROUTES.learningCentre) return ROUTES.learningGoals;
+  return pathname;
 }
-
-export type WorkNavigationState = {
-  workConfirmed: boolean;
-  assessmentChecked: boolean;
-  skillsReviewed: boolean;
-};
-
-/** Status describes saved decisions, never a page visit or a reliable score. */
-export function getWorkStepStatus(
-  key: (typeof WORK_NAV_MENU)[number]["key"],
-  state: WorkNavigationState,
-): string | undefined {
-  if (key === "details" && state.workConfirmed) {
-    return "Confirmed";
+export function pageLabel(pathname: string): string {
+  if (pathname === ROUTES.task) return "Confirm your tasks";
+  if (pathname === ROUTES.learningCentre) return "Learning resources";
+  if (pathname === ROUTES.plan) return "My courses";
+  if (pathname === ROUTES.progressReviews) return "Progress reviews";
+  for (const group of SIDEBAR_GROUPS) {
+    const item = group.items.find(item => item.path === pathname);
+    if (item) return item.label;
   }
-  if (key === "findings" && state.assessmentChecked) return "Checked";
-  if (key === "skills" && state.skillsReviewed) return "Reviewed";
-  return undefined;
+  return "Your workspace";
 }

@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import { useEffect, type ComponentProps } from "react";
 
 import {
   HeroCarouselBackground,
@@ -21,6 +21,7 @@ import { useHeroCarousel } from "./useHeroCarousel";
 import "./home.css";
 
 const Home = () => {
+  useEffect(() => { document.title = "AI-Wrevolusi — Your work. Your next move."; }, []);
   const { activeIndex, goToSlide, paused, reducedMotion, togglePause } = useHeroCarousel();
 
   const heroCarouselDotsProps1 = {

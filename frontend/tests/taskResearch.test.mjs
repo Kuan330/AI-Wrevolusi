@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { taskResearch } from '../src/pages/AIExposure/lib/taskResearch.ts';
+import { taskResearch } from '../src/features/ai-impact/taskResearch.ts';
 
 const task = { id: 'my-task', iloTaskId: '3', wording: 'Prepare cost estimates', score2025: 0.9 };
 const reference = {

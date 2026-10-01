@@ -1,30 +1,15 @@
-import type { ComponentProps } from "react";
 import AccountMenu from "@/components/account/AccountMenu";
-import { useAccount } from "@/components/account/useAccount";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 
 import Logo from "@/components/common/Logo";
-import { ROUTES } from "@/constants/routes";
+import StartWorkspaceButton from "./StartWorkspaceButton";
 
 import { NAV_LINKS } from "./homeData";
 
 const LandingNav = () => {
-  const { user } = useAccount();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const linkProps1 = {
-    to: user ? ROUTES.aiExposure : ROUTES.workProfile,
-    state: user ? undefined : { authMode: "register" },
-    className: "btn btn-primary btn-sm",
-  } satisfies Partial<ComponentProps<typeof Link>>;
-  const linkProps2 = {
-    to: user ? ROUTES.aiExposure : ROUTES.workProfile,
-    state: user ? undefined : { authMode: "register" },
-    className: "btn btn-primary btn-sm",
-    style: { alignSelf: "flex-start" },
-  } satisfies Partial<ComponentProps<typeof Link>>;
   return (
     <nav className="landing-nav">
       <div className="nav-inner">
@@ -35,8 +20,8 @@ const LandingNav = () => {
               {link.label}
             </a>
           ))}
-          <Link {...linkProps1}>{user ? "Continue my work review" : "Create a free account"}</Link>
-          <AccountMenu iconOnly />
+          <StartWorkspaceButton />
+          <AccountMenu />
         </div>
         <button
           type="button"
@@ -61,8 +46,8 @@ const LandingNav = () => {
             {link.label}
           </a>
         ))}
-        <Link {...linkProps2}>{user ? "Continue my work review" : "Create a free account"}</Link>
-        <AccountMenu iconOnly />
+        <StartWorkspaceButton />
+        <AccountMenu />
       </div>
     </nav>
   );

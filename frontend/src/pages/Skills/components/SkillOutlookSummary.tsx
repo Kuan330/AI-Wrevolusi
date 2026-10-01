@@ -6,7 +6,7 @@ import {
   AI_CAPACITIES,
   aiCapacityFromCategory,
 } from "@/pages/Analysis/lib/skillAxes";
-import { signedPoints } from "@/pages/Skills/lib/skillProfile";
+import { signedPoints } from "../../../features/skills/skillProfile.ts";
 import {
   capacityExplanation,
   skillPosition,

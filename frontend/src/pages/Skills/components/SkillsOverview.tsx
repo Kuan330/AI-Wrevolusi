@@ -8,7 +8,7 @@ import { readLearningGoals } from "@/features/learning-goals/learningGoals";
 import type { ProfileTask } from "@/features/work-profile/types";
 import type { PersonalSkill } from "@/features/journey/journey";
 import { specialistSkillService, type SpecialistSkill } from "@/services/specialistSkillService";
-import type { SkillEvidence } from "../lib/skillProfile";
+import type { SkillEvidence } from "../../../features/skills/skillProfile.ts";
 import { buildSkillsOverview } from "../lib/skillsOverview";
 import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
 

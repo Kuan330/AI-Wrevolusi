@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import SkillRecommendations from "@/components/dashboard/SkillRecommendations";
+import { currentAssessments } from "@/features/ai-impact/assistance";
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
@@ -22,7 +24,7 @@ import { currentWorkspaceSession } from "@/services/accountStorage";
 import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
 import { skillKey } from "./learningSkills";
-import { buildSkillEvidence } from "./lib/skillProfile";
+import { buildSkillEvidence } from "../../features/skills/skillProfile.ts";
 import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
 import SpecialistSkills from "./components/SpecialistSkills";
 import SkillsOverview from "./components/SkillsOverview";
@@ -192,8 +194,8 @@ export default function SkillsReview() {
     <div className="skills-review-page mx-auto w-full max-w-[1200px]">
       <PageHeader
         className="flex-col items-start sm:flex-row sm:items-center"
-        title={reviewMode ? "Review skills for a task" : "My skills"}
-        description={reviewMode ? "Check the task connections and choose what fits your work." : "An overview of your saved skills and suggestions across your work."}
+        title={reviewMode ? "Review skills for a task" : "Skill path & matching"}
+        description={reviewMode ? "Check the task connections and choose what fits your work." : "Connect your work to skills, confirm what you already use and choose what to learn next."}
         actions={<Button asChild variant="outline" className="rounded-full"><Link to={ROUTES.task}>Edit my tasks</Link></Button>}
       />
 
@@ -224,6 +226,11 @@ export default function SkillsReview() {
       </p>
 
       {!reviewMode && focusedTask && !focusChanged && <div className="skills-overview__carried"><p>Selected task: {shortTaskLabel(focusedTask.wording)}</p><Button variant="outline" onClick={() => setSearchParams({ view: "task", task: focusedTask.id }, { state: { taskWording: focusedTask.wording } })}>Review this selected task</Button></div>}
+      {!readError && work && !reviewMode && <section className="mb-8" aria-labelledby="recommended-skills-heading">
+        <div className="dashboard-section-heading"><div><p className="dashboard-eyebrow">FROM YOUR WORK TO YOUR NEXT STEP</p><h2 id="recommended-skills-heading" className="text-xl font-semibold">Recommended skill directions</h2></div><Button asChild variant="outline"><Link to={ROUTES.learningGoals}>My learning plan</Link></Button></div>
+        <p className="mb-5 text-sm text-muted-foreground">Start with skills linked to highly AI-assisted tasks, then explore other task connections. Confirm suggestions before treating them as your current skills.</p>
+        <SkillRecommendations tasks={work.tasks} assessments={currentAssessments(readUserProfile())} decisions={Object.fromEntries(Object.entries(work.decisions).filter((entry): entry is [string, "accepted" | "rejected"] => entry[1] !== undefined))} />
+      </section>}
       {!readError && work && !reviewMode && <SkillsOverview tasks={work.tasks} occupationCode={work.occupationCode} personal={work.personalSkills} evidence={evidence} decisions={work.decisions} broadNeedsReview={work.needsReview} onReview={id => {
         const task = work.tasks.find(item => item.id === id);
         if (task) setSearchParams({ view: "task", task: id }, { state: { taskWording: task.wording } });

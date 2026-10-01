@@ -8,7 +8,7 @@ import { referenceService } from "@/services/referenceService";
 import { accountStorage, currentWorkspaceSession, flushWorkspace } from "@/services/accountStorage";
 import { PAGE_GRADIENT_CSS } from "@/constants/palette";
 import SkillOutlookSummary from "@/pages/Skills/components/SkillOutlookSummary";
-import { buildSkillEvidence } from "@/pages/Skills/lib/skillProfile";
+import { buildSkillEvidence } from "../../features/skills/skillProfile.ts";
 import {
   readTaskWorkspace,
 } from "@/features/work-profile/userProfile";

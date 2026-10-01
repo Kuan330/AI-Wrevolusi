@@ -7,7 +7,7 @@ import { taskSourceLabel } from "@/features/work-profile/taskSourceLabel";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 import { TaskAssistAccess } from "@/pages/Analysis/components/TaskDetailsDrawer";
 import { taskGuidance } from "../lib/taskGuidance";
-import { taskResearch } from "../lib/taskResearch";
+import { taskResearch } from "../../../features/ai-impact/taskResearch.ts";
 import { ILO_OCCUPATION_EXPOSURE_SOURCE } from "@/pages/Analysis/lib/dataSources";
 import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
 

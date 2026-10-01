@@ -45,3 +45,8 @@ test('saved context clarifies a vague testing task without classifying by tool a
   assert.notEqual(taskGuidance({wording:'I test chemical samples',notes:'I use Python for summaries.'}).title, 'Software testing and development');
   assert.notEqual(taskGuidance({wording:'Review unusual readings',notes:'I do not use Python or Playwright.'}).title, 'Software testing and development');
 });
+
+test('sales data analysis does not become customer-facing sales advice', () => {
+  assert.equal(taskGuidance({ wording: 'Analyse sales data and prepare reports' }).title,'Data analysis and reporting');
+  assert.equal(taskGuidance({ wording: 'Analyzing customer data' }).title,'Data analysis and reporting');
+});

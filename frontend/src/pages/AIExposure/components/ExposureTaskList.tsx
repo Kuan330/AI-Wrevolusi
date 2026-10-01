@@ -1,18 +1,21 @@
-import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { assistanceForTask } from "@/features/ai-impact/assistance";
 import type { ProfileTask } from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
-import { taskResearch } from "../lib/taskResearch";
+
 import TaskImpact from "./TaskImpact";
 import { shortTaskLabel } from "@/lib/displayText";
 
 type Props = { tasks: ProfileTask[]; assessments: ConfirmedTaskExposureAssessment[]; researchChecked?: boolean; researchLoading?: boolean; researchUnavailable?: boolean; occupation?: { title: string; code: string } };
 
 export default function ExposureTaskList({ tasks, assessments, researchChecked = true, researchLoading = false, researchUnavailable = false, occupation }: Props) {
-  const [selectedId, setSelectedId] = useState(tasks[0]?.id ?? "");
+  const [params, setParams] = useSearchParams();
+  const selectedId = params.get("task");
+  const setSelectedId = (id: string) => setParams(previous => { previous.set("task", id); return previous; });
   const task = tasks.find(item => item.id === selectedId) ?? tasks[0];
   const byId = new Map(assessments.map(item => [item.task_id, item]));
   if (!task) return <p>Add and confirm a task in My Work to get started.</p>;
-  const label = (item: ProfileTask) => researchLoading ? "Checking research…" : researchUnavailable ? "Research unavailable" : !researchChecked ? "Research not checked" : taskResearch(item, byId.get(item.id)).label;
+  const label = (item: ProfileTask) => researchLoading ? "Checking research…" : researchUnavailable ? "Research unavailable" : !researchChecked ? "Research not checked" : assistanceForTask(item, byId.get(item.id)).label;
   return <div className="exposure-task-browser">
     <aside className="exposure-task-picker" aria-label="Choose a task">
       <h2>Choose a task</h2>

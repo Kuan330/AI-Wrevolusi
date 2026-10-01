@@ -97,7 +97,7 @@ function ProgressWorkspace() {
   }
   const content = preview ?? selected?.snapshot;
   return <div className="progress-page">
-    <PageHeader title="My progress" description="See what you recorded, what changed and your next step." />
+    <PageHeader title="Progress reviews" description="See what you recorded, what changed and your next step." />
     {notice && <p role="status" className="progress-success">{notice}</p>}
     {error && <div ref={errorAlert} tabIndex={-1} role="alert" className="progress-warning"><p>{error}</p><button disabled={saving || preparing} onClick={() => { setError(""); if (failedOperation === "save") { if (conflict) void prepare(); else void save(); } else if (failedOperation === "prepare") void prepare(); else setRefresh(v => v + 1); }}>{failedOperation === "save" && conflict ? "Refresh this preview" : "Retry"}</button></div>}
     {(loading && !list) && <p role="status">Loading your saved reviews…</p>}

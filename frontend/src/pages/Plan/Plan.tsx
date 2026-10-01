@@ -1,3 +1,4 @@
+import { coursePercent as percent } from "@/features/dashboard/learningSummary";
 import { cleanDisplayText } from "@/lib/displayText";
 import PlanContinuation from "./PlanContinuation";
 import { rememberCourse } from "@/features/journey/journey";
@@ -110,14 +111,6 @@ function initial(): { state: Preview; error: string } {
   }
 }
 
-const percent = (c: Course) =>
-  c.chapters.length
-    ? Math.round(
-        (c.chapters.reduce((n, ch) => n + ch.value, 0) /
-          (c.chapters.length * 10)) *
-          100,
-      )
-    : 0;
 
 const doneCount = (c: Course) => c.chapters.filter((ch) => ch.value === 10).length;
 

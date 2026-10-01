@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
-import type { SkillEvidence } from "@/pages/Skills/lib/skillProfile";
+import type { SkillEvidence } from "../../../features/skills/skillProfile.ts";
 
 type Props = { evidence: SkillEvidence[]; frameworkCount: number };
 

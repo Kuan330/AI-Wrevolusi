@@ -88,6 +88,20 @@ const guides: { match: RegExp; guidance: Guidance }[] = [
     },
   },
   {
+    match: /\b(?:data analysis|analysis of|analy[sz](?:e|ing) (?:sales |customer |financial )?data|data visuali[sz]ation)\b/i,
+    guidance: {
+      title: "Data analysis and reporting",
+      help: "AI may help organise data, suggest visualisations and draft explanations of patterns for you to verify.",
+      steps: [
+        "Prepare an approved sample, define the question and explain what each column means.",
+        "Ask for a clear analysis or chart, with calculations and assumptions shown.",
+        "Check the source rows, calculations and interpretation before sharing the findings.",
+      ],
+      tools: [{ name: "AI analysis assistant", purpose: "Explore patterns in an approved data sample." }, { name: "Spreadsheet", purpose: "Verify calculations and chart source data." }],
+      review: "You verify data quality and calculations, explain the business context and make the final decision.",
+    },
+  },
+  {
     match: /budget|record|stock|financial|bookkeep|account|data entry/i,
     guidance: {
       title: "Records and budgeting",

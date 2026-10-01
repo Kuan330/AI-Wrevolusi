@@ -22,8 +22,8 @@ visit(source);
 assert.ok(callbacks.journey && callbacks.evidence && callbacks.workSkills && callbacks.selectSkill, 'test the actual protected page read and skill-selection callbacks');
 const journeyUrl = new URL('../src/features/journey/journey.ts', import.meta.url).href;
 const toModuleUrl = text => `data:text/javascript;base64,${Buffer.from(ts.transpileModule(text, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText).toString('base64')}`;
-const matcherUrl = toModuleUrl(readFileSync(new URL('../src/pages/Analysis/lib/matchSkills.ts', import.meta.url), 'utf8'));
-const skillProfileUrl = toModuleUrl(readFileSync(new URL('../src/pages/Skills/lib/skillProfile.ts', import.meta.url), 'utf8').replace('@/pages/Analysis/lib/matchSkills', matcherUrl));
+const matcherUrl = toModuleUrl(readFileSync(new URL('../src/features/skills/matchSkills.ts', import.meta.url), 'utf8'));
+const skillProfileUrl = toModuleUrl(readFileSync(new URL('../src/features/skills/skillProfile.ts', import.meta.url), 'utf8').replace('./matchSkills.ts', matcherUrl));
 const learningSkillsUrl = new URL('../src/pages/Skills/learningSkills.ts', import.meta.url).href;
 const script = `
 import { readJourneyState, readJourneyProfile, readLearningContext, learningContextNeedsReview, isSkillReviewCurrent } from ${JSON.stringify(journeyUrl)};
