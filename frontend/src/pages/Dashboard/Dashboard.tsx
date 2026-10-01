@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,7 +13,6 @@ import { learningSummary } from "@/features/dashboard/learningSummary";
 import { planCourseUrl } from "@/features/journey/journey";
 
 export default function Dashboard() {
-  const navigate = useNavigate();
   const { user, reload } = useAccount();
   const { data, error } = useLearningOverviewSnapshot();
   if (error) return <Card className="dashboard-panel" role="alert"><h1 className="text-xl font-semibold">Your workspace needs attention</h1><p>{error}</p><div className="mt-4 flex flex-wrap gap-3"><Button onClick={reload}>Reload saved work</Button><Button asChild variant="outline"><Link to={ROUTES.progress}>View learning records</Link></Button></div></Card>;
@@ -26,7 +25,7 @@ export default function Dashboard() {
   return <div className="dashboard-page">
     <PageHeader title={`${greeting}${user ? `, ${user.username}` : ""}`} description="Your learning plan, your progress, your next step." actions={<Button asChild variant="outline"><Link to={ROUTES.skills}><Plus size={16} /> New learning goal</Link></Button>} />
     <ContinueLearningCard summary={summary} latestGoal={latestGoal} learningPath={learningPath} courseContext={summary?.nextCourse ? data.journey.contexts[data.journey.courseContexts[summary.nextCourse.id]] : undefined} />
-    {summary && <LearningActivityCard summary={summary} onSelect={date => navigate(`${ROUTES.progress}?${new URLSearchParams({date})}`)} />}
+    {summary && <LearningActivityCard summary={summary} />}
 
 
     {summary && data && <div className="dashboard-overview-grid">

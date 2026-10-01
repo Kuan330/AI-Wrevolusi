@@ -149,8 +149,6 @@
 .activity-calendar-heading { display:flex; justify-content:space-between; gap:8px; font-size:10px; color:#8b97a9; margin-bottom:13px; }
 .activity-calendar-grid { display:grid; grid-template-rows:repeat(7,1fr); grid-auto-flow:column; grid-template-columns:repeat(12,1fr); gap:6px; }
 .activity-day { height:22px; border-radius:4px; border:1px solid transparent; }
-.activity-day[aria-pressed=true] { outline:2px solid #457eab; outline-offset:1px; }
-.activity-day:enabled:hover { border-color:#688faf; }
 .activity-level-0 { background:#edf1f7; }
 .activity-level-1 { background:#d5e5f6; }
 .activity-level-2 { background:#a6c7e4; }
@@ -225,7 +223,6 @@
 .activity-calendar-body .activity-calendar-grid { grid-column:2; min-width:0; }
 .activity-weekdays { display:grid; grid-template-rows:repeat(7,1fr); gap:4px; grid-row:2; align-items:center; color:#8b97a9; font-size:10px; }
 .activity-day[aria-current=date] { outline:2px solid #4f91ba; outline-offset:1px; }
-.activity-day[aria-pressed=true] { outline-color:#b77f9d; }
 .activity-day:disabled { opacity:1; cursor:default; }
 
 /* Desktop growth plan: learning, skill context and persistent shortcuts. */
@@ -259,3 +256,11 @@
 .records-filter-bar { display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:16px 20px; border:1px solid var(--workspace-line); border-radius:14px; background:#fff; }
 .records-filter-bar label { font-size:13px; font-weight:500; }
 .records-filter-bar > span { margin-left:auto; font-size:12px; color:#7a8799; }
+
+.activity-calendar-grid .activity-day { display:block; cursor:default; transition:box-shadow .15s ease; }
+.activity-calendar-grid .activity-day:hover,
+.activity-calendar-grid .activity-day:focus-visible { box-shadow:0 0 0 2px #8cb6d4; outline-offset:2px; }
+.activity-calendar-tooltip { border:1px solid #dbe5ef; border-radius:12px; background:linear-gradient(120deg,#f0f7ff,#fff4f9); color:#425c75; padding:10px 14px; box-shadow:0 8px 24px #41577520; }
+.activity-tooltip-content { display:flex; flex-direction:column; gap:5px; }
+.activity-calendar-tooltip .activity-tooltip-content strong { color:#263c53; font-size:13px; font-weight:700; line-height:1.5; }
+.activity-calendar-tooltip .activity-tooltip-content > span { color:#52677d; font-size:12px; line-height:1.5; }

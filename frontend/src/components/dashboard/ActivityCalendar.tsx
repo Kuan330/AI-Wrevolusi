@@ -1,8 +1,9 @@
 import type { CSSProperties } from "react";
+import { Tooltip } from "@/components/ui/tooltip";
 import { activityDays, type LearningActivity } from "@/features/dashboard/learningSummary";
 import { addDays, dateKey } from "@/features/learning-planning/planModel";
 
-export default function ActivityCalendar({ activities, selectedDate, onSelect, weeks = 12 }: { activities: LearningActivity[]; weeks?: 12 | 52; selectedDate?: string; onSelect?: (date: string) => void }) {
+export default function ActivityCalendar({ activities, weeks = 12 }: { activities: LearningActivity[]; weeks?: 12 | 52 }) {
   const today = dateKey(new Date());
   const year = Number(today.slice(0,4));
   const first = `${year}-01-01`;
@@ -29,7 +30,28 @@ export default function ActivityCalendar({ activities, selectedDate, onSelect, w
         <div className="activity-weekdays" aria-hidden="true"><span style={{gridRow:2}}>Mon</span><span style={{gridRow:4}}>Wed</span><span style={{gridRow:6}}>Fri</span></div>
         <div className="activity-calendar-grid">
           {Array.from({length:leading},(_,i)=><span key={`blank-${i}`} />)}
-          {days.map(day => <button key={day.date} type="button" title={`${day.date}: ${day.count} records`} aria-label={`${day.date}: ${day.count} learning records${day.date === today ? ", today" : ""}`} aria-current={day.date === today ? "date" : undefined} aria-pressed={selectedDate === day.date} className={`activity-day activity-level-${Math.min(day.count,3)}`} onClick={()=>onSelect?.(day.date)} disabled={!onSelect || day.date > today} />)}
+          {days.map((day) => {
+            const label = `${day.date}: ${day.count} learning ${day.count === 1 ? "record" : "records"}${day.date === today ? ", today" : ""}`;
+            return (
+              <Tooltip
+                key={day.date}
+                contentClassName="activity-calendar-tooltip"
+                title={
+                  <span className="activity-tooltip-content">
+                    <strong>{new Date(`${day.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}{day.date === today ? " · Today" : ""}</strong>
+                    <span>{day.count} learning {day.count === 1 ? "record" : "records"}</span>
+                  </span>
+                }
+              >
+                <span
+                  tabIndex={0}
+                  aria-label={label}
+                  aria-current={day.date === today ? "date" : undefined}
+                  className={`activity-day activity-level-${Math.min(day.count, 3)}`}
+                />
+              </Tooltip>
+            );
+          })}
         </div>
       </div>
     </div>
