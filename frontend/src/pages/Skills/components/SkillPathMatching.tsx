@@ -24,8 +24,6 @@ function PathNode({ item, start = false, onExplore }: { item: SkillRecommendatio
   return <button type="button" className={`skill-path__node${start ? " is-start" : ""}`} onClick={onExplore} aria-label={`Explore ${item.skill.core_skill}`}>
     <span className="skill-path__node-label">{start ? <><Sparkles size={13} /> Suggested start</> : <><GitBranch size={13} /> Connected through your work</>}</span>
     <strong>{cleanDisplayText(item.skill.core_skill)}</strong>
-    <span>{skillPathDescription(item.skill.wef_skill_id)}</span>
-    <span className="skill-path__node-link">Explore skill <ArrowRight size={15} /></span>
   </button>;
 }
 
@@ -88,7 +86,7 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
     <div className="skill-path__intro"><p>{recommendations.length} skill {recommendations.length === 1 ? "area" : "areas"} recommended from your confirmed tasks. {hasHighAssistance ? "Areas linked to highly AI-assisted tasks come first." : "Choose the area that matters most to you."}</p><Link className="skill-path__plan-link" to={ROUTES.learningGoals}>My learning plan <ArrowUpRight size={16} /></Link></div>
 
     <section className="skill-path__map" aria-labelledby="skill-path-heading">
-      <header><div><h3 id="skill-path-heading">Your suggested starting point</h3><p>Pick a skill to explore. You can start anywhere.</p></div><span className="skill-path__map-key"><span /> Shared task connection</span></header>
+      <header><div><h3 id="skill-path-heading">Your suggested starting point</h3></div></header>
       <div className={`skill-path__graph${path.connected.length ? " has-connections" : ""}`}>
         <PathNode item={path.start} start onExplore={() => explore(path.start!.skill.wef_skill_id)} />
         {path.connected.length > 0 && <><svg className="skill-path__connections" viewBox="0 0 90 240" preserveAspectRatio="none" aria-hidden="true">
@@ -96,18 +94,18 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
         </svg><div className="skill-path__branches">{path.connected.map(item => <PathNode key={item.skill.wef_skill_id} item={item} onExplore={() => explore(item.skill.wef_skill_id)} />)}</div></>}
       </div>
       {path.additional.length > 0 && <div className="skill-path__additional"><p>Other areas to explore</p><div>{path.additional.map(item => <button type="button" key={item.skill.wef_skill_id} onClick={() => explore(item.skill.wef_skill_id)}><span>{cleanDisplayText(item.skill.core_skill)}</span><ArrowDown size={16} /></button>)}</div></div>}
-      <p className="skill-path__map-note"><GitBranch size={14} /> Connected skills share a task in your profile. The lines do not show prerequisites or a required order.</p>
+      <p className="skill-path__map-note"><GitBranch size={14} /> Lines show skills that share a task. Start anywhere.</p>
     </section>
 
     <section className="skill-path__areas" aria-labelledby="skill-areas-heading">
-      <header><div><h3 id="skill-areas-heading">Turn a skill into your next step</h3><p>Check the connection, then choose courses that suit you.</p></div><span>{recommendations.length} areas to explore</span></header>
+      <header><div><h3 id="skill-areas-heading">Turn a skill into your next step</h3><p>Check the connection, then choose courses that suit you.</p></div></header>
       <div className="skill-path__cards">{recommendations.map((item, index) => {
         const id = item.skill.wef_skill_id;
         const open = openIds.includes(id);
         const matches = groups.filter(group => group.course.skills.includes(skillKey(item.skill.core_skill)));
         const reviewLink = `${ROUTES.skills}?${new URLSearchParams({ view: "task", task: item.tasks[0].id, skill: String(id) })}`;
         return <article className={`skill-path__card tone-${index % 3}${open ? " is-open" : ""}`} id={`skill-area-${id}`} key={id} style={{ "--path-delay": `${index * 55}ms` } as CSSProperties}>
-          <div className="skill-path__card-top"><span className="skill-path__icon"><BookOpen size={20} /></span><span className="skill-path__card-badge">{index === 0 ? "Suggested start" : item.highTaskCount ? "AI-assisted task link" : "From your work"}</span></div>
+          <div className="skill-path__card-top"><span className="skill-path__icon"><BookOpen size={20} /></span></div>
           <h4>{cleanDisplayText(item.skill.core_skill)}</h4><p>{skillPathDescription(id)}</p>
           <details className="skill-path__evidence"><summary>Why this area? · {item.tasks.length} {item.tasks.length === 1 ? "task" : "tasks"}</summary><ul>{item.tasks.map(task => <li key={task.id}>{shortTaskLabel(task.wording, 180)}</li>)}</ul><p>Suggested from task wording. Check whether it fits your work.</p><Link className="skill-path__review" to={reviewLink} state={{ taskWording: item.tasks[0].wording }}>Review this skill connection <ArrowUpRight size={14} /></Link></details>
           <button className="skill-path__expand" type="button" id={`skill-area-toggle-${id}`} aria-expanded={open} aria-controls={`skill-area-courses-${id}`} onClick={() => setOpenIds(current => current.includes(id) ? current.filter(value => value !== id) : [...current, id])}>{open ? "Hide courses" : "Explore courses"}<ChevronDown size={16} /></button>
@@ -122,6 +120,6 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
     </section>
 
     <div className={`skill-path__planbar${pendingIds.length || saveError ? " has-selection" : ""}`}><div><span><BookOpen size={19} /><strong>{pendingIds.length ? `${pendingIds.length} ${pendingIds.length === 1 ? "course" : "courses"} selected for your next step` : "Ready to build your learning plan?"}</strong></span><p>{saveError ? "Your choices are kept here. Retry to confirm they are saved to your account." : pendingIds.length ? "Add these courses to your plan, then choose when to learn." : "Select one or more courses. Your existing learning stays in your plan."}</p></div><button type="button" disabled={saving || Boolean(savedError) || (!pendingIds.length && !saveError)} onClick={() => { void buildPlan(); }}>{saving ? "Saving your courses…" : saveError ? "Retry saving courses" : "Build my plan"}<ArrowRight size={17} /></button>{(saveError || savedError) && <p role="alert">{saveError || savedError}</p>}</div>
-    <p className="skill-path__footnote">Skill areas come from the WEF framework and your task wording. These suggestions do not assess mastery or establish a skill gap.</p>
+    <p className="skill-path__footnote">Suggestions come from your task wording and the WEF skills framework. They do not measure your skill level.</p>
   </section>;
 }
