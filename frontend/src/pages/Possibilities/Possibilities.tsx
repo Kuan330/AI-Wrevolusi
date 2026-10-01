@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Check, ChevronDown } from "lucide-react";
+import { ArrowRight, Check, Info } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
 import { possibilitiesService } from "@/services/possibilitiesService";
 import { referenceService } from "@/services/referenceService";
@@ -80,14 +80,11 @@ function JourneyCompanion({
           <div className="px-companion-evidence">
             <strong>{acceptedSkills.length} reviewed skill{acceptedSkills.length === 1 ? "" : "s"} in common</strong>
             <p className="px-chosen-hint">ESCO source links · exploratory</p>
-            <button
-              type="button"
-              className={`px-companion-details-btn${detailsOpen ? " is-open" : ""}`}
-              aria-expanded={detailsOpen}
-              onClick={() => setDetailsOpen((open) => !open)}
-            >
-              {detailsOpen ? "Hide explanation" : "Details"}
-              <ChevronDown size={14} aria-hidden />
+            <button type="button" className="px-info-button"
+              aria-label={detailsOpen ? "Hide career details" : "Show career details"}
+              title={detailsOpen ? "Hide career details" : "Show career details"}
+              aria-expanded={detailsOpen} onClick={() => setDetailsOpen((open) => !open)}>
+              <Info size={17} aria-hidden />
             </button>
             {detailsOpen ? (
               <div className="px-companion-story" id="px-companion-details">
@@ -108,11 +105,7 @@ function JourneyCompanion({
       ) : (
         <div className="px-companion-story">
           <h3>Pick a direction to begin</h3>
-          <p className="px-companion-empty">
-            Choose one of the roles below. Your companion will show how your
-            current experience connects, then guide you to skills and learning
-            steps for that path.
-          </p>
+
         </div>
       )}
     </aside>
@@ -297,7 +290,10 @@ export default function Possibilities() {
         title="Career options"
         description="Grow in your current role, or explore where your experience could take you next."
       />
-      {data.careerSourceNote && <p className="px-chosen-hint">{data.careerSourceNote}</p>}
+      {data.careerSourceNote && <details className="px-info-disclosure px-source-note">
+        <summary aria-label="Show career source information" title="Career source information"><Info size={17} aria-hidden /></summary>
+        <p>{data.careerSourceNote}</p>
+      </details>}
       {reviewedEvidence.error && <p role="alert">{reviewedEvidence.error}</p>}
       <div className="px-body">
         <div className="px-main-col">
@@ -305,16 +301,19 @@ export default function Possibilities() {
             <div className="px-current-intro">
               <p className="px-eyebrow">YOUR STARTING POINT</p>
               <h2>{currentTitle}</h2>
-              <p>These connections come from your confirmed Work Profile.</p>
+
               <Link className="px-light" to={profilePath}>
                 Review work profile
               </Link>
             </div>
             <div className="px-current-skills">
-              <h3>Skills in your profile</h3>
-              <p className="px-chosen-hint">
-                WEF skills accepted in your current review. These are separate from the ESCO links used below.
-              </p>
+              <div className="px-profile-skills-heading">
+                <h3>Skills in your profile</h3>
+                <details className="px-info-disclosure">
+                  <summary aria-label="Show skill source information" title="Skill source information"><Info size={16} aria-hidden /></summary>
+                  <p>These are WEF skills from your current review. Career directions use ESCO skills.</p>
+                </details>
+              </div>
               <div className="px-chips">
                 {reflectedSkills.length > 0 ? (
                   reflectedSkills.map(({ skill }) => (
@@ -323,15 +322,16 @@ export default function Possibilities() {
                     </span>
                   ))
                 ) : (
-                  <p className="px-chosen-hint">
-                    No accepted skills from a current review yet. Review your skills before treating detected connections as current strengths.
-                  </p>
+                  <p className="px-chosen-hint">No reviewed skills yet.</p>
                 )}
               </div>
               {wefError && <p role="status" className="px-chosen-hint">{wefError}</p>}
               {data.reviewedEscoSkills.length > 0 && <>
                 <h3 className="mt-4">ESCO skills linked to confirmed tasks</h3>
-                <p className="px-chosen-hint">“Current” means you told us you use this skill for a confirmed task; it is not a proficiency assessment.</p>
+                <details className="px-info-disclosure">
+                  <summary aria-label="Show ESCO skill information" title="ESCO skill information"><Info size={16} aria-hidden /></summary>
+                  <p>“Current” means you said you use the skill for a confirmed task. It is not a proficiency rating.</p>
+                </details>
                 <div className="px-chips">{data.reviewedEscoSkills.map(skill => <span className={`px-chip ${skill.state === "current" ? "have" : "missing"}`} key={skill.uri}>{skill.label}{skill.state === "developing" ? " · developing" : ""}</span>)}</div>
               </>}
             </div>
@@ -341,7 +341,7 @@ export default function Possibilities() {
             <p className="px-eyebrow">EXPLORE OTHER DIRECTIONS</p>
             <h2>Where could you go next?</h2>
             {!data.directions.length && <div className="px-no-direction">
-              {data.status === "needs_skill_review" ? <><h3>Review skills before career suggestions</h3><p>Career directions appear when at least one ESCO skill connected to a current confirmed task is marked “I use this”. Other skills are not assumed absent.</p><Link className="px-light" to={ROUTES.skills}>Review skills for my tasks</Link></> : <><h3>No sourced directions match your reviewed skills yet</h3><p>We show a role only when the ESCO source links it to a skill you said you use. You can keep exploring learning or review more skill connections.</p><Link className="px-light" to={ROUTES.skills}>Review skills for my tasks</Link></>}
+              {data.status === "needs_skill_review" ? <><h3>Review skills to see career options</h3><Link className="px-light" to={ROUTES.skills}>Review skills for my tasks</Link></> : <><h3>No matching career options yet</h3><Link className="px-light" to={ROUTES.skills}>Review skills for my tasks</Link></>}
             </div>}
             <div className="px-direction-grid">
               {data.directions.slice(0, 3).map((direction, index) => {
@@ -359,7 +359,10 @@ export default function Possibilities() {
                       <span>{direction.developing_skill_overlap} developing connection{direction.developing_skill_overlap === 1 ? "" : "s"} · {direction.essential_not_yet_evidenced} essential skill{direction.essential_not_yet_evidenced === 1 ? "" : "s"} not yet evidenced</span>
                       <p>{acceptedSkills.map(skill => skill.label).join(" · ")}</p>
                     </div>
-                    <p className="px-direction-description">{direction.description}</p>
+                    {direction.description && <details className="px-info-disclosure px-role-info">
+                      <summary aria-label={`Show ${direction.title} description`} title="Role description"><Info size={16} aria-hidden /></summary>
+                      <p>{direction.description}</p>
+                    </details>}
                     <p className="px-card-source">Source: ESCO {direction.source.version} · snapshot retrieved {sourceRetrievedDate(direction.source.retrieved_at)}</p>
                     <a className="px-card-source-link" href={direction.occupation_uri} target="_blank" rel="noreferrer">View this ESCO occupation record</a>
                     <button
@@ -379,10 +382,10 @@ export default function Possibilities() {
             <section className="px-chosen" aria-labelledby="px-chosen-title">
               <p className="px-eyebrow">03 · MY CHOSEN DIRECTION</p>
               <h2 id="px-chosen-title">Your path to {selected.title}</h2>
-              <p className="px-chosen-lead">Strongest reviewed skill overlap in the sourced roles shown. This is an exploratory direction, not a ranking of Malaysian vacancies.</p>
-              {selected.description ? (
-                <p className="px-chosen-copy">{selected.description}</p>
-              ) : null}
+              {selected.description && <details className="px-info-disclosure px-role-info">
+                <summary aria-label={`Show ${selected.title} description`} title="Role description"><Info size={16} aria-hidden /></summary>
+                <p>{selected.description}</p>
+              </details>}
               {selected.requirements.length > 0 ? (
                 <div className="px-chosen-skills">
                   <div className="px-skill-split">
@@ -410,7 +413,10 @@ export default function Possibilities() {
               ) : null}
               <fieldset className="mt-5 space-y-3" disabled={continuing}>
                 <legend className="font-semibold">Choose one essential skill to explore</legend>
-                <p className="px-chosen-hint">Role skills are from ESCO v{selected.source.version}. A skill not recorded in your current review may still be one you have.</p>
+                <details className="px-info-disclosure">
+                  <summary aria-label="Show role skill information" title="Role skill information"><Info size={16} aria-hidden /></summary>
+                  <p>Role skills are from ESCO v{selected.source.version}. Skills absent from your review are not assumed missing.</p>
+                </details>
                 {availableSkills.map(item => (
                   <label key={item.uri} className="flex items-center gap-2">
                     <input type="radio" name="career-learning-skill" value={item.uri}
@@ -423,9 +429,15 @@ export default function Possibilities() {
                     {item.label}
                   </label>
                 ))}
-                {!availableSkills.length && <p role="status">All essential ESCO links are already in your current-use evidence. You can explore optional links in this role description.</p>}
+                {!availableSkills.length && <p role="status">No essential skills to explore.</p>}
               </fieldset>
-              <details className="px-source-details"><summary>Career source and date</summary><p>{selected.source.attribution}</p><p>ESCO {selected.source.version} · catalogue snapshot retrieved {sourceRetrievedDate(selected.source.retrieved_at)}</p><a href={selected.source.occupation_uri} target="_blank" rel="noreferrer">Open this occupation in ESCO</a><br /><a href={selected.source.source_url} target="_blank" rel="noreferrer">Open the source catalogue archive</a></details>
+              <details className="px-info-disclosure px-source-details">
+                <summary aria-label="Show career source and date" title="Career source and date"><Info size={16} aria-hidden /></summary>
+                <p>{selected.source.attribution}</p>
+                <p>ESCO {selected.source.version} · snapshot retrieved {sourceRetrievedDate(selected.source.retrieved_at)}</p>
+                <a href={selected.source.occupation_uri} target="_blank" rel="noreferrer">Open this occupation in ESCO</a><br />
+                <a href={selected.source.source_url} target="_blank" rel="noreferrer">Open the source catalogue archive</a>
+              </details>
               {navigationError && <p role="alert" className="mt-3">{navigationError}</p>}
               <button className="px-primary mt-4" type="button" disabled={!selectedSkill || continuing} onClick={() => { void goLearning(); }}>
                 {continuing ? "Opening learning resources…" : selectedSkill ? `Find learning for ${selectedSkill.label}` : "Choose a skill to continue"}
@@ -444,7 +456,6 @@ export default function Possibilities() {
         />
       </div>
 
-      <p className="px-chosen-hint">Role requirements come from ESCO occupation-skill relationships. Current skills come from your own “I use this” choices linked to confirmed tasks. Developing and not-yet-evidenced skills are separate. ESCO is a European classification and is not a validated Malaysian occupation crosswalk; no Malaysian hiring, salary or demand claim is made.</p>
     </div>
   );
 }

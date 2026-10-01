@@ -221,3 +221,14 @@
   .px-companion{grid-template-columns:1fr}
   .px-companion-avatar{max-width:220px;margin:0 auto}
 }
+.px-info-disclosure{display:grid;justify-items:start;gap:8px;color:var(--px-muted)}
+.px-info-disclosure>summary{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(79,145,186,.28);border-radius:50%;background:#fff;color:var(--px-blue);cursor:pointer;list-style:none}
+.px-info-disclosure>summary::-webkit-details-marker{display:none}
+.px-info-disclosure>summary:hover{background:#f2f8fc;border-color:rgba(79,145,186,.55)}
+.px-info-disclosure>p{max-width:58rem;margin:0;font-size:12px;line-height:1.7;color:var(--px-muted)}
+.px-source-note{justify-items:end;margin:-8px 0 10px}
+.px-profile-skills-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.px-profile-skills-heading h3{margin:0}
+.px-role-info{margin:0 0 10px}
+.px-source-details{width:auto;justify-items:end;border-top:0;padding-top:0;margin-top:0}
+.px-source-details>a{font-size:12px}
