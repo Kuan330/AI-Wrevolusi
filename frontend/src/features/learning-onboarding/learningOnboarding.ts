@@ -7,6 +7,8 @@ import type { LearningPlanInputs, PersonalLearningPlan } from "../learning-goals
 import type { LearningPlanResource } from "../learning-goals/learningPlanSetup.ts";
 import { setupInputs } from "../learning-goals/learningPlanSetup.ts";
 import type { Course } from "../learning-planning/types.ts";
+import type { WefSkill } from "../../types/reference.ts";
+import { resolveCatalogueSkill } from "../learning-planning/catalogueSkill.ts";
 
 export const LEARNING_ONBOARDING_KEY = "aiwrevolusi.learningPlanOnboarding.v1";
 export type LearningOnboardingCompletion = { version: 1; completedAt: string; goalId: string; planId: string };
@@ -45,28 +47,8 @@ export function validateLearningRequest(value: string): string {
   if (value.trim().length > 300) return "Keep your goal to 300 characters or fewer.";
   return "";
 }
-const STOP_WORDS = new Set("a an and as at be become build can develop do for from get good how i in improve learn learning master me my of on or more skill skills some the this to use want with work would".split(" "));
-function topicWords(value: string): string[] {
-  const lower = value.toLowerCase().replace(/artificial intelligence/g, "ai");
-  return [...new Set(lower.match(/[\p{L}\p{N}]+/gu) ?? [])].filter(word => !STOP_WORDS.has(word) && (word.length >= 3 || word === "ai" || word === "sql"));
-}
-/** Conservative keyword match, not an AI assessment or a claim of proficiency. */
-export function matchLearningTopic(goalText: string, courses: Course[]): { skillId: string; skillLabel: string } {
-  const words = topicWords(goalText);
-  const scores = new Map<string, number>();
-  for (const course of courses) {
-    const titles = new Set(topicWords(`${course.title} ${course.skills.join(" ")}`));
-    const context = new Set(topicWords(`${course.intro} ${course.outcomes.join(" ")}`));
-    const score = words.reduce((sum, word) => sum + (titles.has(word) ? 3 : context.has(word) ? 1 : 0), 0);
-    if (score < 3) continue;
-    for (const skillId of course.skills) scores.set(skillId, Math.max(scores.get(skillId) ?? 0, score));
-  }
-  const skillId = [...scores].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ?? "";
-  return { skillId, skillLabel: skillId ? skillId.replace(/-/g, " ") : goalText.trim() };
-}
-
-export function createOnboardingRecords({ inputs, resources, courses, goalId = crypto.randomUUID() }: {
-  inputs: LearningPlanInputs; resources: LearningPlanResource[]; courses: Course[]; goalId?: string;
+export function createOnboardingRecords({ inputs, resources, courses, selectedSkill = null, referenceSkills = [], goalId = crypto.randomUUID() }: {
+  inputs: LearningPlanInputs; resources: LearningPlanResource[]; courses: Course[]; selectedSkill?: string | number | null; referenceSkills?: WefSkill[]; goalId?: string;
 }): { goal: LearningGoal; plan: PersonalLearningPlan; completion: LearningOnboardingCompletion } {
   const checked = setupInputs(inputs);
   const now = new Date().toISOString();
@@ -78,7 +60,9 @@ export function createOnboardingRecords({ inputs, resources, courses, goalId = c
   };
   // Validate the baseline using the existing goal contract before writing anything.
   parseLearningGoals(JSON.stringify(compactGoalState([goal])));
-  const topic = matchLearningTopic(checked.goalText, courses);
+  const selected = resolveCatalogueSkill(selectedSkill, referenceSkills);
+  if (selectedSkill !== null && !selected) throw new Error("The selected skill is not in the current WEF framework. Choose a supported skill or build a practice-only plan.");
+  const topic = { skillId: selected?.slug ?? "", skillLabel: selected?.name ?? checked.goalText };
   const plan = generatePersonalPlan({ goalId, goalTitle: checked.goalText, ...topic, courses, inputs: checked, resources });
   return { goal, plan, completion: { version: 1, completedAt: now, goalId, planId: plan.id } };
 }

@@ -4,13 +4,14 @@ import { readFileSync } from 'node:fs';
 import { activateWorkspace, accountStorage } from '../src/services/accountStorage.ts';
 import { parseLearningGoals, goalContextWarnings, LEARNING_GOALS_KEY } from '../src/features/learning-goals/learningGoals.ts';
 import { readPersonalPlans } from '../src/features/learning-goals/personalLearningPlan.ts';
-import { LEARNING_ONBOARDING_KEY, parseOnboardingCompletion, onboardingStatus, validateLearningRequest, matchLearningTopic, createOnboardingRecords, completeLearningOnboarding } from '../src/features/learning-onboarding/learningOnboarding.ts';
+import { LEARNING_ONBOARDING_KEY, parseOnboardingCompletion, onboardingStatus, validateLearningRequest, createOnboardingRecords, completeLearningOnboarding } from '../src/features/learning-onboarding/learningOnboarding.ts';
 
 const memory = new Map();
 const originalFetch = globalThis.fetch;
 const inputs = { goalText: 'Learn AI for my current job', experience: 'new', minutesPerDay: 30, goalKind: 'career' };
 const course = (overrides={}) => ({ id:'course-ai',title:'Introduction to artificial intelligence',skills:['ai-and-big-data'],intro:'Understand artificial intelligence and apply it in your work.',outcomes:[],level:'beginner',provider:'Provider',url:'https://example.com/course',durationMin:45,chapters:[{title:'Getting started',min:45}],format:'online',language:'English',selfPaced:true,register:'not-required',match:{},prereq:'',advice:'',...overrides });
-const records = (overrides={}) => createOnboardingRecords({ inputs, resources:[], courses:[course()], goalId:'12345678-1234-1234-1234-123456789abc', ...overrides });
+const referenceSkills = [{wef_skill_id:11,core_skill:'AI and big data'}];
+const records = (overrides={}) => createOnboardingRecords({ inputs, resources:[], courses:[course()], selectedSkill:'ai-and-big-data', referenceSkills, goalId:'12345678-1234-1234-1234-123456789abc', ...overrides });
 const response = (data,status=200) => new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}});
 
 beforeEach(() => {
@@ -50,13 +51,16 @@ test('free goals preserve the user request without claiming confirmed skills or 
   assert.deepEqual(goalContextWarnings(goal),[]);
   assert.deepEqual(parseLearningGoals(JSON.stringify({version:1,goals:[goal]})),[goal]);
 });
-test('catalogue matching is explainable and unmatched topics get no invented courses', () => {
-  assert.equal(matchLearningTopic('Understand artificial intelligence',[course()]).skillId,'ai-and-big-data');
-  assert.equal(matchLearningTopic('Learn ceramics',[course()]).skillId,'');
-  assert.equal(matchLearningTopic('I want to learn more skills at work',[course()]).skillId,'');
-  const result=records({inputs:{...inputs,goalText:'Learn ceramics'}});
-  assert.deepEqual(result.plan.courseIds,[]);
-  assert.equal(result.plan.activities[0].kind,'practice');
+test('course recommendations require an explicit current skill, not a keyword guess', () => {
+  const selected=records();
+  assert.equal(selected.plan.skillId,'ai-and-big-data');
+  assert.deepEqual(selected.plan.courseIds,['course-ai']);
+  const independent=records({selectedSkill:null});
+  assert.deepEqual(independent.plan.courseIds,[]);
+  assert.equal(independent.plan.skillId,'');
+  assert.equal(independent.plan.activities[0].kind,'practice');
+  assert.throws(()=>records({selectedSkill:'unknown-skill'}),/current WEF framework/);
+  assert.equal(records({selectedSkill:11}).plan.skillId,'ai-and-big-data');
 });
 test('setup commit atomically saves goal, plan and marker, then hides the first-use screen', async () => {
   const result=records(); let payload;

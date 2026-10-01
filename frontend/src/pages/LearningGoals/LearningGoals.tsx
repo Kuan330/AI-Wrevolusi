@@ -357,7 +357,7 @@ function PersonalPlanManager({ goal, run, busy, needsReload }: { goal: LearningG
   const blocked = busy || needsReload || Boolean(saved.error);
   const generate = async (inputs: LearningPlanInputs, resources: LearningPlanResource[]) => {
     if (blocked || catalogueLoading) return;
-    const next = generatePersonalPlan({ goalId: goal.id, goalTitle: goal.wording, skillId, skillLabel: goal.initial.skill.label, courses, inputs, resources });
+    const next = generatePersonalPlan({ goalId: goal.id, goalTitle: goal.wording, skillId, skillLabel: plan?.skillLabel ?? goal.initial.skill.label, courses, inputs, resources });
     const ok = await run(async () => { await savePersonalPlan(next); }, "Your personalised plan is saved and ready to review.");
     if (ok) { setPlan(next); setSelectedIds(next.courseIds); setExpanded(true); setEditing(false); }
     else throw new Error("The plan could not be saved. Your answers are still here; review the message above before trying again.");

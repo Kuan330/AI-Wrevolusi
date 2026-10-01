@@ -115,18 +115,17 @@ test('an old progress read cannot change the new account', async () => {
   assert.equal(accountStorage.getItem(planKey),null);
 });
 
-test('catalogue refresh is shared by the page and save operation and expires after one minute', async () => {
+test('scoped and complete catalogue snapshots stay separate and refresh after one minute', async () => {
   let clock=1000; Date.now=()=>clock; let version=1; let calls=0;
   globalThis.fetch=async()=>{calls++; return response({found:true,courses:[{course_id:`c${version}`,skill_id:'writing',title:'Course',chapters:[]}]});};
   const first=await loadLearningCatalogue('writing');
   assert.equal(first.courses[0].id,'c1');
-  version=2;
   assert.equal((await loadCourseDirectory()).has('c1'),true);
-  assert.equal(calls,1);
-  clock+=60001;
+  assert.equal(calls,2,'a scoped response cannot pretend to be the complete directory');
+  clock+=60001; version=2;
   assert.equal((await loadLearningCatalogue('writing')).courses[0].id,'c2');
   await changeSavedCourses({add:['c2']});
-  assert.equal(calls,2);
+  assert.equal(calls,4,'save validation refreshes the expired complete directory');
   version=3; resetCourseDirectory();
   assert.equal((await loadLearningCatalogue('writing')).courses[0].id,'c3');
   assert.equal((await loadCourseDirectory()).has('c3'),true);

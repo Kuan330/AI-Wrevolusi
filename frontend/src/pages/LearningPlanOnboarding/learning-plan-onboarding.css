@@ -36,3 +36,8 @@
 .learning-plan-onboarding .learning-plan-setup .lps-goal-title { font-size: 1.3rem; }
 .learning-plan-onboarding [hidden] { display: none !important; }
 @media (max-width: 640px) { .learning-plan-onboarding { padding: 18px 12px 40px; } .learning-plan-onboarding .lpo-card { padding: 20px 16px; } .learning-plan-onboarding .lpo-goal-footer > button { width: 100%; } .learning-plan-onboarding .lpo-steps { gap: 20px; } }
+.learning-plan-onboarding .lpo-skill-choice { padding: 16px 18px; margin: 20px 0; background: #f7fafc; border: 1px solid #d7e5ed; border-radius: 12px; }
+.learning-plan-onboarding .lpo-skill-choice h3 { font-size: .96rem; font-weight: 650; margin: 0; }
+.learning-plan-onboarding .lpo-skill-choice h3 span { color: #655f69; font-size: .82rem; font-weight: 400; margin-left: 6px; }
+.learning-plan-onboarding .lpo-skill-choice select { display: block; width: 100%; min-height: 44px; border: 1px solid #abb9c4; border-radius: 9px; padding: 10px; background: white; color: #302d35; font: inherit; font-size: .87rem; }
+.learning-plan-onboarding .lpo-skill-choice p { font-size: .8rem; line-height: 1.55; margin: 10px 0 0; color: #655f69; }

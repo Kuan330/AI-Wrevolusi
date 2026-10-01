@@ -33,6 +33,7 @@ import type { WefSkill } from "@/types/reference";
 import { currentWorkspaceSession } from "@/services/accountStorage";
 import { getSkillDecision, isSkillReviewCurrent, learningContextNeedsReview, readLearningContext, readJourneyProfile, readJourneyState, startLearning, type SkillDecision } from "@/features/journey/journey";
 import type { CourseFilters as Filters } from "@/features/learning-planning/types";
+import { resolveCatalogueSkill } from "@/features/learning-planning/catalogueSkill";
 import "./course-library.css";
 
 export default function LearningCentre() {
@@ -40,7 +41,7 @@ export default function LearningCentre() {
   const { state, notice, busy, pendingSync, retrySync, toggleSave, removeSavedCoursesForSkill } = useCourseLibrary();
   const { skills, setSkills, addSkill, removeSkill, refresh } = useLearningSkills();
   const [params, setParams] = useSearchParams();
-  const genericSearch = !params.has("context") && (params.has("q") || params.get("mode") === "browse" || (!params.has("goal") && !params.has("skill")));
+  const genericSearch = !params.has("context") && (params.has("q") || params.get("mode") === "browse" || !params.has("goal"));
   const careerSkill = params.get("careerSkill")?.slice(0, 300) ?? "";
   const careerSkillUri = params.get("careerSkillUri") ?? "";
   const careerRole = params.get("careerRole")?.slice(0, 200) ?? "";
@@ -131,8 +132,10 @@ export default function LearningCentre() {
   const rejected = Boolean(context?.origin === "work" && selectedWef && !journey.error && getSkillDecision(selectedWef.wef_skill_id) === "rejected");
   const contextValid = Boolean(context && selectedWef && !rejected);
   const contextStale = journey.contextStale;
+  const browseSkill = genericSearch ? resolveCatalogueSkill(params.get("skill"), wefSkills) : null;
+  const catalogueSkillId = genericSearch ? browseSkill?.slug ?? null : contextValid ? context!.skill.slug : null;
   const activeId = contextValid ? context!.skill.slug : "";
-  const contextError = journey.error || (rejected
+  const contextError = journey.error || (genericSearch && params.has("skill") && skillsLoaded && !browseSkill ? "This skill link is not in the current WEF framework. Choose a current skill or browse all courses." : "") || (rejected
     ? "This skill was rejected in your review. Choose another skill or review that decision."
     : context && skillsLoaded && !selectedWef
       ? "This saved skill is not in the current WEF framework. Review your choice before continuing."
@@ -192,9 +195,10 @@ export default function LearningCentre() {
     setPageCourses([]);
     setCatalogueError("");
     setCatalogueNotice("");
+    if (genericSearch && params.has("skill") && !skillsLoaded) { setCatalogueLoading(true); return; }
     if ((!genericSearch && !activeId) || contextError || unsupportedGoal || goalResource.error) { setCatalogueLoading(false); return; }
     setCatalogueLoading(true);
-    void loadLearningCatalogue(genericSearch ? null : activeId).then(result => {
+    void loadLearningCatalogue(catalogueSkillId, catalogueRefresh > 0).then(result => {
       if (cancelled || owner !== currentWorkspaceSession()) return;
       setPageCourses(result.courses);
       setCatalogueNotice(result.notice ?? "");
@@ -205,7 +209,7 @@ export default function LearningCentre() {
       setCatalogueLoading(false);
     });
     return () => { cancelled = true; };
-  }, [activeId, genericSearch, contextError, unsupportedGoal, goalResource.error, catalogueRefresh]);
+  }, [activeId, genericSearch, catalogueSkillId, skillsLoaded, params, contextError, unsupportedGoal, goalResource.error, catalogueRefresh]);
 
   const skillLabel = (id: string) => wefSkills.find(row => skillKey(row.core_skill) === id)?.core_skill ?? id.replace(/-/g, " ");
   const courseGroups = useMemo(() => genericSearch ? groupProviderCourses(pageCourses) : pageCourses.map(course => ({ course, mappings: [course] })), [pageCourses, genericSearch]);
@@ -289,6 +293,7 @@ export default function LearningCentre() {
   return (
     <div className="course-library find-courses">
       <PageHeader {...headerProps} className="library-page-header" />
+      {browseSkill && <section className="library-glass library-goal-resource" aria-label="Courses for selected skill"><p className="library-kicker">From Skill path &amp; matching</p><h2>{cleanDisplayText(browseSkill.name)}</h2><p>These are catalogue links for this skill, not a skill assessment or a confirmed learning goal.</p><div className="library-resource-actions"><Link to={ROUTES.skills}>Back to Skill path &amp; matching</Link><Link to={`${ROUTES.learningCentre}?mode=browse`}>Browse all courses</Link><Link to={`${ROUTES.learningGoals}?${new URLSearchParams({ skill: browseSkill.slug })}`}>My learning plan for this skill</Link></div></section>}
       {careerExploration && <section className="library-glass library-goal-resource" aria-label="Career skill exploration">
         <p className="library-kicker">Career skill exploration · ESCO {careerSourceVersion}</p>
         <h2>{cleanDisplayText(careerSkill)}</h2>
