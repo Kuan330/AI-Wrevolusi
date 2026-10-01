@@ -28,7 +28,7 @@ import { buildSkillEvidence } from "../../features/skills/skillProfile.ts";
 import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
 import SpecialistSkills from "./components/SpecialistSkills";
 import SkillsOverview from "./components/SkillsOverview";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, LoaderCircle } from "lucide-react";
 import "./SkillsReview.css";
 
 type Decision = "accepted" | "rejected" | undefined;
@@ -67,8 +67,9 @@ export default function SkillsReview() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const [skills, setSkills] = useState<WefSkill[]>([]);
-  const [loading, setLoading] = useState(true);
+  // A cached reference list renders the path at once; the load below still refreshes it.
+  const [skills, setSkills] = useState<WefSkill[]>(() => referenceService.cachedWefSkills() ?? []);
+  const [loading, setLoading] = useState(() => !referenceService.cachedWefSkills());
   const [loadError, setLoadError] = useState("");
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [snapshot, setSnapshot] = useState(readWorkSnapshot);
@@ -301,7 +302,7 @@ export default function SkillsReview() {
         </details>
       </section>}
 
-      {readError ? null : loading ? <p role="status">Loading skill suggestions…</p> : loadError ? <div className="skills-review-page__notice is-error" role="alert">
+      {readError ? null : loading ? reviewMode && <p className="skills-review-page__loading" role="status"><LoaderCircle size={15} aria-hidden="true" />Loading skill suggestions…</p> : loadError ? <div className="skills-review-page__notice is-error" role="alert">
         <p>{loadError}</p><Button variant="outline" onClick={() => {
           setLoading(true); setLoadError(""); setLoadAttempt((value) => value + 1);
         }}>Try again</Button>

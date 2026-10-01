@@ -105,3 +105,10 @@
 /* The summary already names this section; keep only the heading row's action. */
 .skills-overview-disclosure .skills-overview__heading>div{display:none}
 @media(prefers-reduced-motion:reduce){.skills-overview-disclosure>summary svg{transition:none}}
+.skills-review-page__loading,.skills-overview__progress p{display:flex;align-items:center;gap:8px;color:#5d6f82;font-size:.9rem}
+.skills-review-page__loading svg,.skills-overview__progress svg{flex-shrink:0;color:#356f99;animation:skills-spin .9s linear infinite}
+.skills-overview__progress{display:grid;gap:8px}
+.skills-overview__progress>span{display:block;height:3px;border-radius:3px;background:#e6ecf1;overflow:hidden}
+.skills-overview__progress>span>span{display:block;height:100%;min-width:8%;border-radius:inherit;background:#356f99;transition:width .3s ease}
+@keyframes skills-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.skills-review-page__loading svg,.skills-overview__progress svg{animation:none}.skills-overview__progress>span>span{transition:none}}

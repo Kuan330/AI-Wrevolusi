@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { currentWorkspaceSession } from "@/services/accountStorage";
@@ -11,8 +12,13 @@ import { specialistSkillService, type SpecialistSkill } from "@/services/special
 import type { SkillEvidence } from "../../../features/skills/skillProfile.ts";
 import { buildSkillsOverview } from "../lib/skillsOverview";
 import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
+import { createRequestCache } from "@/lib/requestCache";
 
 type CandidateSet = { taskId: string; taskWording: string; version: string; skills: SpecialistSkill[] };
+type SkillSearch = Awaited<ReturnType<typeof specialistSkillService.skills>>;
+// Memory only: keys are a person's task wording, which should not outlive the tab.
+const searchCache = createRequestCache<SkillSearch>({ maxAgeMs: 10 * 60_000 });
+const cachedSearch = (query: string) => { const hit = searchCache.peek(query); return hit?.fresh ? hit.value : undefined; };
 type OverviewRow = ReturnType<typeof buildSkillsOverview>["rows"][number];
 const FILTERS = [["all", "All entries"], ["work", "Fits my work"], ["learning", "To develop"], ["review", "To review"]] as const;
 function inFilter(row: OverviewRow, filter: string) {
@@ -26,7 +32,7 @@ export default function SkillsOverview({ tasks, occupationCode, personal, eviden
   const owner = currentWorkspaceSession();
   const taskKey = JSON.stringify(tasks.map(task => [task.id, task.wording]));
   const context = JSON.stringify([owner, occupationCode, taskKey]);
-  const [result, setResult] = useState<{ context: string; candidates: CandidateSet[]; version: string | null; failed: string[]; skipped: string[]; loading: boolean } | null>(null);
+  const [result, setResult] = useState<{ context: string; candidates: CandidateSet[]; version: string | null; failed: string[]; skipped: string[]; loading: boolean; total: number } | null>(null);
   const [retry, setRetry] = useState(0);
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
@@ -36,16 +42,29 @@ export default function SkillsOverview({ tasks, occupationCode, personal, eviden
     const snapshot = JSON.parse(taskKey) as [string, string][];
     const searchable = snapshot.filter(([, wording]) => wording.length <= 300);
     const skipped = snapshot.filter(([, wording]) => wording.length > 300).map(([id]) => id);
-    const state = { context, candidates: [] as CandidateSet[], version: null as string | null, failed: [] as string[], skipped, loading: true };
+    const state = { context, candidates: [] as CandidateSet[], version: null as string | null, failed: [] as string[], skipped, loading: true, total: searchable.length };
+    // Tasks searched recently in this tab show at once; only the rest are requested.
+    const queue = searchable.filter(([taskId, taskWording]) => {
+      const hit = cachedSearch(taskWording);
+      if (!hit) return true;
+      state.version = hit.version;
+      state.candidates.push({ taskId, taskWording, version: hit.version, skills: hit.items.slice(0, 3) });
+      return false;
+    });
+    const versionHit = searchable.length ? undefined : cachedSearch("");
+    if (versionHit) state.version = versionHit.version;
+    state.loading = queue.length > 0 || (!searchable.length && !versionHit);
     setResult({ ...state });
+    if (!state.loading) return;
     let next = 0;
     const publish = () => { if (!controller.signal.aborted && owner === currentWorkspaceSession()) setResult({ ...state, candidates: [...state.candidates], failed: [...state.failed] }); };
     async function worker() {
-      while (!controller.signal.aborted && next < searchable.length) {
-        const [taskId, taskWording] = searchable[next++];
+      while (!controller.signal.aborted && next < queue.length) {
+        const [taskId, taskWording] = queue[next++];
         try {
           const response = await specialistSkillService.skills(taskWording, 0, controller.signal);
           if (controller.signal.aborted || owner !== currentWorkspaceSession()) return;
+          searchCache.set(taskWording, response);
           state.version = response.version;
           state.candidates.push({ taskId, taskWording, version: response.version, skills: response.items.slice(0, 3) });
         } catch { if (!controller.signal.aborted) state.failed.push(taskId); }
@@ -56,7 +75,11 @@ export default function SkillsOverview({ tasks, occupationCode, personal, eviden
       if (controller.signal.aborted || owner !== currentWorkspaceSession()) return;
       // With only long tasks, a small catalogue read still checks saved source versions.
       if (!searchable.length) {
-        try { state.version = (await specialistSkillService.skills("", 0, controller.signal)).version; }
+        try {
+          const response = await specialistSkillService.skills("", 0, controller.signal);
+          searchCache.set("", response);
+          state.version = response.version;
+        }
         catch { if (!controller.signal.aborted) state.failed.push(...skipped); }
       }
       state.loading = false; publish();
@@ -80,7 +103,7 @@ export default function SkillsOverview({ tasks, occupationCode, personal, eviden
   return <section className="skills-overview" aria-label="Skills across your work">
     <div className="skills-overview__heading"><div><h2>Your skills across your work</h2><p>Saved choices and suggestions from all {tasks.length} confirmed {tasks.length === 1 ? "task" : "tasks"}.</p></div><Button variant="outline" onClick={() => onReview(tasks[0].id)}>Review a task</Button></div>
     {storedError && <p role="alert">{storedError}</p>}
-    {(!current || current.loading) && <p role="status">Finding suggestions across your tasks. Saved choices stay visible.</p>}
+    {(!current || current.loading) && <div className="skills-overview__progress" role="status"><p><LoaderCircle size={14} aria-hidden="true" />Finding suggestions across your tasks{current?.total ? ` · ${Math.min(current.candidates.length + current.failed.length, current.total)} of ${current.total}` : ""}. Saved choices stay visible.</p>{current && current.total > 0 && <span aria-hidden="true"><span style={{ width: `${Math.min(current.candidates.length + current.failed.length, current.total) / current.total * 100}%` }} /></span>}</div>}
     {current && !current.loading && current.failed.length > 0 && <div className="skills-overview__status" role="status"><p>Some new suggestions are unavailable. Your saved skills are still shown, with source checks marked where needed.</p><Button variant="outline" onClick={() => setRetry(value => value + 1)}>Retry suggestions</Button></div>}
     <div className="skills-overview__toolbar">
       <div className="skills-overview__filters" role="group" aria-label="Filter skill overview">{FILTERS.map(([value, label]) => <button type="button" key={value} aria-pressed={filter === value} onClick={() => { setFilter(value); setLimit(6); }}>{label} <span>{overview.rows.filter(row => inFilter(row, value)).length}</span></button>)}</div>

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowDown, ArrowRight, ArrowUpRight, BookOpen, Check, ChevronDown, Clock3, GitBranch, Sparkles } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUpRight, BookOpen, Check, ChevronDown, Clock3, GitBranch, LoaderCircle, Sparkles } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 import { recommendSkills } from "@/features/skills/recommendations";
 import { buildSkillPath, skillPathDescription, type SkillRecommendation } from "@/features/skills/skillPath";
-import { loadLearningCatalogue } from "@/features/learning-planning/courseDirectory";
+import { cachedCourseDirectory, loadLearningCatalogue } from "@/features/learning-planning/courseDirectory";
 import { courseGroupRecord, groupProviderCourses } from "@/features/learning-planning/courseGroups";
 import { changeSavedCourses } from "@/features/learning-planning/courseOperations";
 import { readLibrary } from "@/features/learning-planning/libraryStorage";
@@ -27,12 +27,31 @@ function PathNode({ item, start = false, onExplore }: { item: SkillRecommendatio
   </button>;
 }
 
+const boneDelay = (index: number) => ({ "--bone-delay": `${index * 120}ms` } as CSSProperties);
+
+/** Mirrors the path layout so the page shape is clear while the path is built. */
+function PathSkeleton() {
+  return <section className="skill-path is-loading" aria-busy="true" aria-label="Your recommended skill path">
+    <p className="skill-path__loading-label" role="status"><LoaderCircle size={15} className="skill-path__spinner" aria-hidden="true" />Finding skill areas connected to your work…</p>
+    <div className="skill-path__map" aria-hidden="true">
+      <span className="skill-path__bone is-heading" />
+      <div className="skill-path__graph has-connections">
+        <span className="skill-path__bone is-node is-start" />
+        <svg className="skill-path__connections" viewBox="0 0 90 240" preserveAspectRatio="none"><path d="M0 120 C45 120 45 56 90 56" /><path d="M0 120 C45 120 45 184 90 184" /></svg>
+        <div className="skill-path__branches"><span className="skill-path__bone is-node" style={boneDelay(1)} /><span className="skill-path__bone is-node" style={boneDelay(2)} /></div>
+      </div>
+    </div>
+    <div className="skill-path__cards" aria-hidden="true">{[0, 1, 2].map(index => <span key={index} className="skill-path__bone is-card" style={boneDelay(index)} />)}</div>
+  </section>;
+}
+
 export default function SkillPathMatching({ tasks, skills, assessments, decisions, loading }: Props) {
   const navigate = useNavigate();
   const recommendations = useMemo(() => recommendSkills(tasks, skills, assessments, decisions), [tasks, skills, assessments, decisions]);
   const path = buildSkillPath(recommendations);
   const [openIds, setOpenIds] = useState<number[]>([]);
-  const [courses, setCourses] = useState<Course[] | null>(null);
+  // A repeat visit shows the last catalogue at once; the effect below refreshes it quietly.
+  const [courses, setCourses] = useState<Course[] | null>(() => { const directory = cachedCourseDirectory(); return directory ? [...directory.values()] : null; });
   const [courseError, setCourseError] = useState("");
   const [attempt, setAttempt] = useState(0);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -47,7 +66,7 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
     let active = true;
     void loadLearningCatalogue(null, attempt > 0).then(result => {
       if (active) { setCourses(result.courses); setCourseError(""); }
-    }).catch(() => { if (active) setCourseError("We could not load the course catalogue. Your selected courses are still here. Try again."); });
+    }).catch(() => { if (active && !cachedCourseDirectory()) setCourseError("We could not load the course catalogue. Your selected courses are still here. Try again."); });
     return () => { active = false; };
   }, [hasOpenCard, attempt]);
   let savedIds: string[] = [];
@@ -79,7 +98,7 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
     } finally { lock.current = false; if (mounted.current) setSaving(false); }
   }
 
-  if (loading) return <section className="skill-path__loading" role="status"><Sparkles size={20} /><p>Finding skill areas connected to your work…</p></section>;
+  if (loading) return <PathSkeleton />;
   if (!path.start) return <section className="skill-path__empty"><BookOpen size={28} /><h2>Your path starts with one task</h2><p>No supported skill areas were found in your current task wording. Review a task to search the catalogue or add a skill in your own words.</p><Link to={`${ROUTES.skills}?view=task`}>Review my tasks <ArrowRight size={16} /></Link></section>;
 
   return <section className="skill-path" aria-label="Your recommended skill path">
@@ -108,7 +127,7 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
           <h3>{cleanDisplayText(item.skill.core_skill)}</h3><p>{skillPathDescription(id)}</p>
           <details className="skill-path__evidence"><summary>Why this area? · {item.tasks.length} {item.tasks.length === 1 ? "task" : "tasks"}</summary><ul>{item.tasks.map(task => <li key={task.id}>{shortTaskLabel(task.wording, 180)}</li>)}</ul><p>Suggested from task wording. Check whether it fits your work.</p><Link className="skill-path__review" to={reviewLink} state={{ taskWording: item.tasks[0].wording }}>Review this skill connection <ArrowUpRight size={14} /></Link></details>
           <button className="skill-path__expand" type="button" id={`skill-area-toggle-${id}`} aria-expanded={open} aria-controls={`skill-area-courses-${id}`} onClick={() => setOpenIds(current => current.includes(id) ? current.filter(value => value !== id) : [...current, id])}>{open ? "Hide courses" : "Explore courses"}<ChevronDown size={16} /></button>
-          {open && <div className="skill-path__courses" id={`skill-area-courses-${id}`}>{courseError ? <div role="alert"><p>{courseError}</p><button type="button" onClick={() => setAttempt(value => value + 1)}>Try again</button></div> : !courses ? <p role="status">Loading courses…</p> : !matches.length ? <div className="skill-path__no-courses"><p>No verified courses are linked to this area yet. You can still create a learning goal from your task review.</p><Link to={reviewLink} state={{ taskWording: item.tasks[0].wording }}>Choose a learning goal <ArrowRight size={14} /></Link></div> : <>{matches.slice(0, 3).map(group => {
+          {open && <div className="skill-path__courses" id={`skill-area-courses-${id}`}>{courseError ? <div role="alert"><p>{courseError}</p><button type="button" onClick={() => setAttempt(value => value + 1)}>Try again</button></div> : !courses ? <div className="skill-path__course-loading" role="status"><span className="sr-only">Loading courses…</span>{[0, 1, 2].map(index => <span key={index} className="skill-path__bone is-course" aria-hidden="true" style={boneDelay(index)} />)}</div> : !matches.length ? <div className="skill-path__no-courses"><p>No verified courses are linked to this area yet. You can still create a learning goal from your task review.</p><Link to={reviewLink} state={{ taskWording: item.tasks[0].wording }}>Choose a learning goal <ArrowRight size={14} /></Link></div> : <>{matches.slice(0, 3).map(group => {
             const course = courseGroupRecord(group, savedIds);
             const saved = savedIds.includes(course.id);
             const checked = saved || selectedIds.includes(course.id);

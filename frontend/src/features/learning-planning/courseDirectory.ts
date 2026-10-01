@@ -8,6 +8,7 @@ import type { Course } from "./types";
  * ids never matched the backend ones, which silently dropped saved courses.
  */
 let directory: Promise<Map<string, Course>> | null = null;
+let lastLoaded: Map<string, Course> | null = null;
 let loadedAt = 0;
 const MAX_AGE_MS = 60_000;
 
@@ -15,10 +16,10 @@ export function loadCourseDirectory(refresh = false): Promise<Map<string, Course
   if (!directory || refresh || Date.now() - loadedAt > MAX_AGE_MS) {
     loadedAt = Date.now();
     const request = fetchPageCatalogue(null)
-      .then(
-        (result) =>
-          new Map(result.courses.map((course) => [course.id, course])),
-      )
+      .then((result) => {
+        lastLoaded = new Map(result.courses.map((course) => [course.id, course]));
+        return lastLoaded;
+      })
       .catch((error: unknown) => {
         // Let a later call retry instead of caching the failure forever.
         if (directory === request) directory = null;
@@ -29,9 +30,15 @@ export function loadCourseDirectory(refresh = false): Promise<Map<string, Course
   return directory;
 }
 
+/** The last loaded catalogue, any age, so a page can show it while a refresh runs. */
+export function cachedCourseDirectory() {
+  return lastLoaded;
+}
+
 /** Drop the cached catalogue, e.g. after the backend data changes. */
 export function resetCourseDirectory() {
   directory = null;
+  lastLoaded = null;
 }
 
 /** Pages and save operations resolve courses from the same bounded snapshot. */

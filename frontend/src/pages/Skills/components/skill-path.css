@@ -69,9 +69,23 @@
 .skill-path__planbar>button:disabled { opacity:.6; cursor:not-allowed; }
 .skill-path__planbar>[role=alert] { width:100%; color:#fff2d2; }
 .skill-path__footnote { color:#5d6f82; font-size:11px; line-height:1.7; max-width:90ch; }
-.skill-path__empty,.skill-path__loading { display:grid; justify-items:start; gap:14px; padding:28px; border-radius:20px; border:1px solid #dce6ef; background:#fff; color:var(--path-ink); }
+.skill-path__empty { display:grid; justify-items:start; gap:14px; padding:28px; border-radius:20px; border:1px solid #dce6ef; background:#fff; color:var(--path-ink); }
 .skill-path__empty p { font-size:14px; color:var(--path-muted); line-height:1.8; max-width:65ch; }
 .skill-path__empty a { display:inline-flex; align-items:center; gap:10px; padding-block:12px; color:var(--path-blue); }
+.skill-path__loading-label { display:flex; align-items:center; gap:8px; color:var(--path-muted); font-size:14px; line-height:1.7; }
+.skill-path__spinner { flex-shrink:0; color:var(--path-blue); animation:skill-path-spin .9s linear infinite; }
+.skill-path__bone { display:block; min-width:0; border-radius:17px; background:linear-gradient(90deg,#edf2f7 0%,#f8fafc 45%,#edf2f7 90%); background-size:220% 100%; animation:skill-path-shimmer 1.5s ease-in-out infinite; animation-delay:var(--bone-delay,0ms); }
+.skill-path__bone.is-heading { width:180px; height:22px; border-radius:8px; margin-bottom:24px; background-color:#ffffff80; }
+.skill-path__bone.is-node { height:76px; background-image:linear-gradient(90deg,#fff 0%,#eef4fa 45%,#fff 90%); border:1px solid #dfe8f0; }
+.skill-path__bone.is-node.is-start { height:104px; }
+.skill-path__bone.is-card { height:210px; border-radius:20px; border:1px solid #e3eaf1; }
+.skill-path__bone.is-course { height:62px; border-radius:12px; }
+.skill-path__course-loading { display:grid; gap:10px; }
+/* While loading, the connections flow to show the path is being built. */
+.skill-path.is-loading .skill-path__connections path { stroke:#b5cbe0; stroke-dasharray:5 7; animation:skill-path-flow .9s linear infinite; }
+@keyframes skill-path-shimmer { from { background-position:100% 0; } to { background-position:-120% 0; } }
+@keyframes skill-path-flow { to { stroke-dashoffset:-24; } }
+@keyframes skill-path-spin { to { transform:rotate(360deg); } }
 @keyframes skill-path-enter { from { transform:translateY(6px); } to { transform:translateY(0); } }
 @keyframes skill-path-line { from { stroke-dashoffset:400; } to { stroke-dashoffset:0; } }
 @media(min-width:1500px) { .skill-path__map { padding:32px; } }
