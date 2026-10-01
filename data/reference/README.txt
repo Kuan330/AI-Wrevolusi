@@ -32,3 +32,15 @@ After reference CSV refresh, load lookup tables into Neon / Postgres:
   uv run --project backend --group database python db/seed_reference.py --init    # first time (creates tables)
   uv run --project backend --group database python db/seed_reference.py           # later updates
 See db/README.txt.
+
+Live occupation descriptions (fixed 2026-10-01):
+  The live ref_occupations table uses ISCO-08 codes, and an earlier import left a
+  placeholder sentence in its descriptions. They were replaced as follows:
+  - 320 unit codes whose titles match MASCO 2020: description from ref_occupations.csv
+    (db/fix_20261001_masco_descriptions.sql).
+  - 104 unit codes with no matching MASCO title: official ILO ISCO-08 definitions,
+    kept in ref_occupations_isco08_descriptions.csv
+    (db/fix_20261001_isco08_descriptions.sql).
+  Source: ILO, "ISCO-08 EN Structure and definitions.xlsx" (ilostat-files).
+  Do not run seed_reference.py --replace against the live table without reviewing
+  this: the same code can mean a different job in MASCO and ISCO-08 (e.g. 3151).

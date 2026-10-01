@@ -4,6 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.services.specialist_catalogue import catalogue_for_occupation, search_catalogue
 from app.services.classification_alignment import require_ilo_title_agreement
+from app.services.occupation_text import occupation_description_sql
 from sqlalchemy.ext.asyncio import AsyncSession
 import asyncio
 import logging
@@ -21,7 +22,7 @@ from app.services.occupation_search import (
 router = APIRouter(prefix='/reference', tags=['Reference Data'])
 logger = logging.getLogger(__name__)
 
-OCCUPATION_COLUMNS = 'occupation_code, level, parent_code, title, description'
+OCCUPATION_COLUMNS = f'occupation_code, level, parent_code, title, {occupation_description_sql()}'
 
 # Unit occupations are stable reference data — cache once per process so every
 # search keystroke does not re-scan the full table.
