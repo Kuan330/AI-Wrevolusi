@@ -8,6 +8,7 @@ import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService
 import { TaskAssistAccess } from "@/pages/Analysis/components/TaskDetailsDrawer";
 import { taskGuidance } from "../lib/taskGuidance";
 import { taskResearch } from "../../../features/ai-impact/taskResearch.ts";
+import { assistanceForTask } from "@/features/ai-impact/assistance";
 import { ILO_OCCUPATION_EXPOSURE_SOURCE } from "@/pages/Analysis/lib/dataSources";
 import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
 
@@ -17,7 +18,7 @@ export default function TaskImpact({ task, assessment, researchChecked, research
   const research = taskResearch(task, assessment);
   const guidance = taskGuidance(task);
   const [showAi, setShowAi] = useState(false);
-  const status = researchLoading ? "Checking research…" : researchUnavailable ? "Research unavailable" : !researchChecked ? "Research not checked" : research.label;
+  const status = researchLoading ? "Checking research…" : researchUnavailable ? "Research unavailable" : !researchChecked ? "Research not checked" : assistanceForTask(task, assessment).label;
   const published = research.kind === "linked" && researchChecked && !researchUnavailable && !researchLoading ? research.references[0] : null;
   const label = shortTaskLabel(task.wording, 65);
   return <article className="exposure-task-impact" aria-label="Selected task">
@@ -31,16 +32,16 @@ export default function TaskImpact({ task, assessment, researchChecked, research
       <div className="exposure-scale-ends"><span>0 · Lower technical potential</span><span>1 · Higher technical potential</span></div>
       <p>Estimated potential for generative AI to automate this reference task under the study’s assumptions. This is not your chance of losing a job or time saved.</p>
     </section>}
-    <div className="exposure-interpretation"><section className="exposure-question"><h3>AI may help with</h3>
+    <div className="exposure-interpretation"><section className="exposure-question"><h3>AI can assist with</h3>
       <p>{guidance.help}</p>
       {(research.kind !== "linked" || !researchChecked || researchUnavailable) && <p className="exposure-evidence-note">{researchLoading ? "Checking source connections and saving the result. You can still explore skills." : researchUnavailable ? "The research request failed. We cannot show a new finding yet." : !researchChecked ? "Research has not been checked for this work yet." : research.kind === "candidate" ? "Related research was found, but the task match needs checking. We have not assigned its score to your work." : "There is no supported research match here. This does not mean zero exposure or no useful skills."}</p>}
     </section>
-    <section className="exposure-question"><h3>Your judgement still matters</h3><p>{guidance.review}</p></section></div>
+    <section className="exposure-question"><h3>Your judgement matters</h3><p>{guidance.review}</p></section></div>
     <p className="exposure-caption">These practical ideas use your task wording. Check that they fit your work and approved procedures.</p>
     <section className="exposure-question exposure-next"><h3>Your next step</h3>
       <Button asChild><Link to={`${ROUTES.skills}?view=task&task=${encodeURIComponent(task.id)}`} state={{ taskWording: task.wording }}>Explore skills for this task →</Link></Button>
     </section>
-    <details className="exposure-evidence"><summary>Why are we showing this?</summary>
+    <details className="exposure-evidence"><summary>View research basis</summary>
       {occupation && <p><strong>Research occupation:</strong> {occupation.title} · {occupation.code}. This reference may not cover every part of your job.</p>}
       {task.sourceVersion && <p className="exposure-caption">Saved reference version: {task.sourceVersion}</p>}
       <p>Practical ideas above use simple task-wording rules. Research below is a separate source of evidence.</p>

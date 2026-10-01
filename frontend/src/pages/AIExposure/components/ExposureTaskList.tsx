@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router-dom";
-import { assistanceForTask } from "@/features/ai-impact/assistance";
+import { assistanceForTask, ASSISTANCE_DESCRIPTIONS } from "@/features/ai-impact/assistance";
 import type { ProfileTask } from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 
@@ -18,10 +18,19 @@ export default function ExposureTaskList({ tasks, assessments, researchChecked =
   const label = (item: ProfileTask) => researchLoading ? "Checking research…" : researchUnavailable ? "Research unavailable" : !researchChecked ? "Research not checked" : assistanceForTask(item, byId.get(item.id)).label;
   return <div className="exposure-task-browser">
     <aside className="exposure-task-picker" aria-label="Choose a task">
-      <h2>Choose a task</h2>
+      <h2>Your work tasks · {tasks.length}</h2>
       <p>{tasks.length} confirmed {tasks.length === 1 ? "task" : "tasks"} · explore one at a time</p>
       <div className="exposure-task-picker__mobile"><label htmlFor="impact-task">Your task</label><select id="impact-task" value={task.id} onChange={event => setSelectedId(event.target.value)}>{tasks.map((item, index) => <option key={item.id} value={item.id}>{index + 1}. {shortTaskLabel(item.wording, 55)}</option>)}</select></div>
-      <ul className="exposure-task-picker__list">{tasks.map(item => <li key={item.id}><button type="button" aria-pressed={task.id === item.id} onClick={() => setSelectedId(item.id)}><span>{shortTaskLabel(item.wording)}</span><small>{label(item)}</small></button></li>)}</ul>
+      <ul className="exposure-task-picker__list">{tasks.map((item, index) => {
+        const category = assistanceForTask(item, byId.get(item.id)).category;
+        const ready = researchChecked && !researchLoading && !researchUnavailable;
+        return <li key={item.id}><button type="button" aria-pressed={task.id === item.id} onClick={() => setSelectedId(item.id)}>
+          <span className="exposure-task-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+          <span className="exposure-task-name">{shortTaskLabel(item.wording)}</span>
+          <span className={`exposure-task-category category-${ready ? category : "unverified"}`}><strong>{label(item)}</strong>{ready && <small>{ASSISTANCE_DESCRIPTIONS[category]}</small>}</span>
+          <span className="exposure-task-arrow" aria-hidden="true">→</span>
+        </button></li>;
+      })}</ul>
     </aside>
     <TaskImpact key={JSON.stringify([task.id, task.wording, task.notes, byId.get(task.id), researchChecked, researchUnavailable, researchLoading])} occupation={occupation} task={task} assessment={byId.get(task.id)} researchChecked={researchChecked} researchLoading={researchLoading} researchUnavailable={researchUnavailable} />
   </div>;

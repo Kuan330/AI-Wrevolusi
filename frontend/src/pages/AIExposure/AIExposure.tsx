@@ -35,8 +35,8 @@ export default function AIExposure() {
   }
   const analysis = profile?.analysis?.classificationCheck === "same-title-v1" ? profile.analysis : null;
   const assessments = profile ? currentAssessments(profile) : [];
-  return <div className="exposure-page mx-auto w-full max-w-[1200px]">
-    <PageHeader className="flex-col items-start sm:flex-row sm:items-center" title="AI impact & assistance"
+  return <div className="exposure-page w-full">
+    <PageHeader className="exposure-page__header flex-col items-start sm:flex-row sm:items-center" title="AI impact & assistance"
       description="Choose a task. See what AI might help with, what you need to check, and a useful next step."
       actions={<Button asChild variant="outline"><Link to={ROUTES.task}>Review my tasks</Link></Button>} />
     {readError ? <div role="alert" className="exposure-notice"><p>{readError}</p><Link to={ROUTES.continue}>Review recovery options</Link></div> : profile && <>
@@ -47,9 +47,11 @@ export default function AIExposure() {
         {profile.tasksOccupationCode && <Button disabled={checking} onClick={() => void checkResearch()}>{checking ? "Checking research…" : error ? "Retry research check" : "Check research"}</Button>}
         {error && <p role="alert">{error} Your work is still saved. A failed request does not mean there is no research.</p>}
       </section>}
-      <Card className="dashboard-panel mb-6"><div className="dashboard-section-heading"><h2 className="text-xl font-semibold">Tasks by AI assistance category</h2><Button asChild variant="outline"><Link to={ROUTES.skills}>Explore related skills</Link></Button></div><AssistanceChart tasks={profile.tasks} assessments={checking || error ? [] : assessments} /></Card>
+      <div className="exposure-epic-layout">
+      <Card className="exposure-overview"><h2>Tasks by AI assistance category</h2><p className="exposure-caption">{profile.tasks.length} confirmed tasks</p>{(checking || error || !analysis) && <p className="exposure-caption" role="status">{checking ? "Checking research…" : error ? "Research unavailable. Tasks are shown as Unverified until the check succeeds." : "Tasks are shown as Unverified until you check the research."}</p>}<AssistanceChart tasks={profile.tasks} assessments={checking || error ? [] : assessments} showUnverifiedBar /></Card>
       <ExposureTaskList occupation={analysis ? {title: analysis.occupationTitle, code: analysis.occupationCode} : undefined} tasks={profile.tasks} assessments={assessments}
         researchChecked={Boolean(analysis) && !checking} researchLoading={checking} researchUnavailable={Boolean(error)} />
+      </div>
       <aside className="exposure-progress">
         <details><summary>How can I review progress?</summary><p>Build a skill, try an activity and review your saved records in <Link to={ROUTES.progress}>My progress</Link>. Learning does not lower the published research score.</p><p>Compare similar work: what was correct, what needed fixing, and how long it took. Completing a course alone does not prove that your skills improved.</p><a href="https://www.ilo.org/publications/workers%E2%80%99-exposure-ai-what-indicators-tell-us-%E2%80%93-and-what-they-don%E2%80%99t" target="_blank" rel="noreferrer">ILO: what exposure indicators can tell us</a></details>
       </aside>
