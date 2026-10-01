@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.models.user import User
 from app.services.auth import get_current_user
+from app.services.occupation_text import occupation_description_sql
 from app.services.possibilities import (
     MODERN_PROFILE_KEY,
     PROFILE_RECOVERY_MESSAGE,
@@ -70,7 +71,7 @@ async def _load_reference_data(db: AsyncSession) -> tuple[dict[int, dict], list[
 
     # Unit occupations only — major/minor tree nodes have no ILO tasks and inflate matching.
     occupation_rows = (await db.execute(text(
-        "SELECT o.occupation_code, o.title, o.description, NULL AS industry, "
+        f"SELECT o.occupation_code, o.title, {occupation_description_sql('o.description')}, NULL AS industry, "
         "COALESCE(array_agg(i.task_text ORDER BY i.task_id) FILTER (WHERE i.task_text IS NOT NULL), '{}') AS tasks "
         "FROM ref_occupations o LEFT JOIN ref_ilo_tasks i ON i.isco_08=o.occupation_code "
         "WHERE o.level = 'unit' "

@@ -46,3 +46,40 @@ def test_database_occupation_search_browsing_and_tasks():
     finally:
         connection.close()
         engine.dispose()
+
+
+def test_ilo_placeholder_description_is_not_returned():
+    from app.services.occupation_text import ILO_PLACEHOLDER_DESCRIPTION
+
+    clear_occupation_search_caches()
+    engine = create_engine('sqlite://', connect_args={'check_same_thread': False})
+    connection = engine.connect()
+    connection.execute(text('CREATE TABLE ref_occupations (occupation_code TEXT, level TEXT, parent_code TEXT, title TEXT, description TEXT)'))
+    for row in [
+        dict(code='3', level='major', parent=None, title='Technicians', description=''),
+        dict(code='3151', level='unit', parent='3', title="Ships' engineers", description=ILO_PLACEHOLDER_DESCRIPTION),
+        dict(code='3152', level='unit', parent='3', title="Ships' deck officers", description='Command and navigate ships'),
+    ]:
+        connection.execute(text('INSERT INTO ref_occupations VALUES (:code, :level, :parent, :title, :description)'), row)
+
+    class Database:
+        async def execute(self, statement, parameters=None):
+            return connection.execute(text(str(statement).replace('ILIKE', 'LIKE')), parameters or {})
+
+    async def database():
+        yield Database()
+
+    app = FastAPI()
+    app.include_router(router)
+    app.dependency_overrides[get_db] = database
+    try:
+        with TestClient(app) as client:
+            assert client.get('/reference/occupations/3151').json()['description'] is None
+            assert client.get('/reference/occupations/3152').json()['description'] == 'Command and navigate ships'
+            children = client.get('/reference/occupations', params={'parent': '3'}).json()
+            assert [row['description'] for row in children] == [None, 'Command and navigate ships']
+            area = client.get('/reference/occupations', params={'area': '3'}).json()
+            assert {row['occupation_code']: row['description'] for row in area}['3151'] is None
+    finally:
+        connection.close()
+        engine.dispose()
