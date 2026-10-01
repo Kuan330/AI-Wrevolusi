@@ -2,7 +2,7 @@ import { ROUTES } from "./routes.ts";
 
 export const SIDEBAR_GROUPS = [
   { key: "overview", label: "Overview", collapsible: false, icon: "dashboard", items: [
-    { label: "Work overview", path: ROUTES.dashboard, icon: "dashboard", exact: true },
+    { label: "Learning overview", path: ROUTES.dashboard, icon: "dashboard", exact: true },
   ] },
   { key: "work", label: "My work & AI", collapsible: true, icon: "work", items: [
     { label: "My work", path: ROUTES.workProfile, icon: "work", exact: true },
@@ -11,7 +11,7 @@ export const SIDEBAR_GROUPS = [
   { key: "learning", label: "Learning & growth", collapsible: true, icon: "plan", items: [
     { label: "Skill path & matching", path: ROUTES.skills, icon: "skills", exact: false },
     { label: "My learning plan", path: ROUTES.learningGoals, icon: "plan", exact: false },
-    { label: "Learning history & progress", path: ROUTES.progress, icon: "history", exact: false },
+    { label: "Learning records", path: ROUTES.progress, icon: "history", exact: false },
   ] },
   { key: "career", label: "Career", collapsible: false, icon: "career", items: [
     { label: "Possibilities", path: ROUTES.possibilities, icon: "career", exact: false },

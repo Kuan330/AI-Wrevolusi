@@ -28,3 +28,8 @@ export function useWorkspaceSnapshot() {
 export function useLearningSnapshot() {
   return useAccountSnapshot(readLearning);
 }
+
+/** Learning overview needs course context, but does not depend on the work profile. */
+export function useLearningOverviewSnapshot() {
+  return useAccountSnapshot(() => ({ journey: readJourneyState(), ...readLearning() }));
+}
