@@ -11,7 +11,7 @@ import * as model from '../src/pages/Possibilities/possibilitiesModel.ts';
 
 test('work profile destination restores an existing occupation workspace', () => {
   assert.equal(typeof model.possibilitiesProfilePath, 'function');
-  assert.equal(model.possibilitiesProfilePath({ tasksOccupationCode: '2512' }), '/work/tasks');
+  assert.equal(model.possibilitiesProfilePath({ tasksOccupationCode: '2512' }), '/work');
   for (const workspace of [null, undefined, {}, { tasksOccupationCode: '' }]) {
     assert.equal(model.possibilitiesProfilePath(workspace), '/work');
   }

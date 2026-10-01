@@ -49,7 +49,7 @@ test('starter drafts are not confirmed; explicit confirmation survives an eviden
 
 test('confirmed work continues to skills when the ILO assessment has not completed',async()=>{
   saveProfileTasks('4110',analysis().tasks);
-  assert.equal(getContinueDestination(),'/work/tasks');
+  assert.equal(getContinueDestination(),'/work');
   await rememberIntent('work');
   confirmProfileTasks();
   assert.equal(readUserProfile().analysis,null);
@@ -252,7 +252,7 @@ test('generic entry resumes the saved work-draft stage without changing confirme
   const original=memory.get(profileKey);
   const draft={version:1,stage:'tasks',jobTitle:'Clerk',occupation:null,tasks:[],baseProfileVersion:0,updatedAt:new Date().toISOString()};
   memory.set('aiwrevolusi.workProfileDraft.v1',JSON.stringify(draft));
-  assert.equal(getContinueDestination(),'/work/tasks');
+  assert.equal(getContinueDestination(),'/work');
   memory.set('aiwrevolusi.workProfileDraft.v1',JSON.stringify({...draft,stage:'job'}));
   assert.equal(getContinueDestination(),'/work?edit=job');
   assert.equal(memory.get(profileKey),original);

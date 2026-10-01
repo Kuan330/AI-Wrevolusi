@@ -29,7 +29,6 @@
 .workspace-breadcrumb-home { color:#8b97a7; }
 .workspace-topbar > div { max-width:calc(100% - 80px); }
 .workspace-content { max-width:1376px; min-height:calc(100dvh - 150px); margin:0 auto; padding:34px 38px; outline:none; }
-.workspace-content.workspace-work { max-width:920px; }
 .workspace-content > div { min-width:0; }
 .workspace-footer { padding:16px 38px 24px; color:#8893a2; font-size:11px; text-align:center; }
 .workspace-page-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:25px; }

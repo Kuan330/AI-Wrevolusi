@@ -3,7 +3,7 @@ import { currentWorkspaceSession, flushWorkspace } from "../../services/accountS
 import { exposureService } from "../../services/exposureService.ts";
 import { saveConfirmedAnalysis } from "./userProfile.ts";
 
-/** Runs only after the person explicitly asks to check their confirmed work. */
+/** Checks confirmed work on AI impact entry or an explicit retry. */
 export async function checkWorkAiFindings(): Promise<void> {
   const profile = readJourneyProfile();
   if (!profile.tasksConfirmed || !profile.tasks.length) {

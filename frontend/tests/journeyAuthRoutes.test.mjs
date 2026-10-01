@@ -40,7 +40,7 @@ globalThis.journeyRouteFixtures = {
   },
 };
 Object.defineProperty(globalThis.journeyRouteFixtures, 'requestedPath', { get: () => requestedPath });
-for (const name of ['ContinueJourney', 'SkillsReview', 'AIExposure', 'Home', 'LearningCentre', 'Possibilities', 'Plan', 'WorkProfile', 'ProfileTasks', 'Dashboard', 'LearningHistory', 'LearningGoals', 'Progress']) {
+for (const name of ['ContinueJourney', 'SkillsReview', 'AIExposure', 'Home', 'LearningCentre', 'Possibilities', 'Plan', 'WorkProfile', 'Dashboard', 'LearningHistory', 'LearningGoals', 'Progress']) {
   globalThis.journeyRouteFixtures[name] = () => React.createElement('div', { 'data-page': name });
 }
 const routerModule = moduleUrl(`

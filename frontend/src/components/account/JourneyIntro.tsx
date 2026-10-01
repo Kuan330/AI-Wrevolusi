@@ -96,7 +96,7 @@ export default function JourneyIntro(props: {
     if (!hasConfirmedAnalysis()) {
       const hasTasks = Boolean(readTaskWorkspace()?.tasksOccupationCode);
       action = hasTasks ? "Analyse your tasks" : "Build your work profile";
-      path = hasTasks ? ROUTES.task : ROUTES.workProfile;
+      path = ROUTES.workProfile;
     } else if (kind === "plan") {
       action = "Choose a skill";
       path = ROUTES.learningCentre;

@@ -13,7 +13,7 @@ export function toPossibilitiesData(response: PossibilitiesResponse): Possibilit
     skills: response.skills, directions: response.directions, chosenDirectionCode: response.chosen_direction_code, chosenDirectionCoverage: response.chosen_direction_coverage_pct, shortlistedSkillIds: response.shortlisted_skill_ids };
 }
 export function possibilitiesProfilePath(workspace: { tasksOccupationCode?: string | null } | null | undefined): string {
-  return workspace?.tasksOccupationCode ? ROUTES.task : ROUTES.workProfile;
+  return workspace?.tasksOccupationCode ? ROUTES.workProfile : ROUTES.workProfile;
 }
 
 /** Accepted evidence must come from the current review, not a model score. */

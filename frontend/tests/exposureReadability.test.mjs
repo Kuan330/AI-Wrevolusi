@@ -10,6 +10,8 @@ const require = createRequire(import.meta.url);
 const dataUrl = text => `data:text/javascript;base64,${Buffer.from(text).toString('base64')}`;
 const packageUrl = name => pathToFileURL(require.resolve(name)).href;
 const imports = {
+  '@/components/ui/card': dataUrl(`import {createElement} from ${JSON.stringify(packageUrl('react'))}; export const Card=({children,...props})=>createElement('div',props,children);`),
+  '@/components/ui/tooltip': dataUrl(`export const Tooltip=({children})=>children;`),
   '@/components/ui/button': dataUrl(`import {createElement} from ${JSON.stringify(packageUrl('react'))}; export const Button=({children,variant,asChild,...props})=>createElement('div',props,children);`),
   'react-router-dom': dataUrl(`import {createElement} from ${JSON.stringify(packageUrl('react'))}; export const useSearchParams=()=>[new URLSearchParams(),()=>{}]; export const links=[]; export const Link=({children,to,state,...props})=>{links.push({to,state});return createElement('a',{href:to,...props},children)};`),
   '@/pages/Analysis/components/TaskDetailsDrawer': dataUrl('export function TaskAssistAccess(){return null}'),
@@ -41,11 +43,12 @@ test('first task follows confirmed order; all tasks are available without score 
   assert.match(html,/label for="impact-task"/);
   assert.doesNotMatch(html,/Highest|Research score:|slider/);
 });
-test('published scale is visible and further evidence remains collapsed',()=>{
+test('advice is visible while the published scale and evidence stay collapsed',()=>{
   const html=render(Impact,{task,assessment,researchChecked:true,researchUnavailable:false});
-  assert.match(html,/AI may help with/);assert.match(html,/Your judgement still matters/);assert.match(html,/Your next step/);
+  assert.match(html,/AI can assist with/);assert.match(html,/Your judgement matters/);
   const before=html.split('<details')[0];
-  assert.match(before,/<meter[^>]+value="0\.1375"/);
+  assert.doesNotMatch(before,/<meter/);
+  assert.match(html,/<meter[^>]+value="0\.1375"/);
   assert.doesNotMatch(before,/0\.95|0\.8/);
   assert.match(html,/0\.1375 on a 0–1 scale/);
   assert.doesNotMatch(html,/<details[^>]*\bopen|0\.95|0\.8|13\.75%/);
@@ -64,7 +67,7 @@ test('task handoff opens skill review directly with the exact task identity and 
 });
 test('candidate source values stay hidden and no personal estimate is invented',()=>{
   const html=render(Impact,{task,assessment:{...assessment,match_layer:'llm'},researchChecked:true});
-  assert.match(html,/Possible research link/);assert.match(html,/No score is shown while the match is uncertain/);
+  assert.match(html,/Unverified/);assert.match(html,/No score is shown while the match is uncertain/);
   assert.doesNotMatch(html,/0\.1375|0\.95|0\.8/);
 });
 
@@ -74,6 +77,34 @@ test('assistance chart keeps candidate and missing evidence unverified',()=>{
   assert.match(html, /<strong>2<\/strong> Unverified/);
   assert.doesNotMatch(html,/0\.1375|0\.95|<meter|job loss score/);
 });
+test('chart keeps every task visible as Unverified before research is checked',()=>{
+  const tasks=[task,{...task,id:'two'},{...task,id:'three'}];
+  const html=render(Coverage,{tasks,assessments:[],showUnverifiedBar:true});
+  assert.equal((html.match(/assistance-chart-row/g)??[]).length,4);
+  assert.match(html, /Unverified<\/dt><dd><span[^>]*><span class="assistance-fill assistance-unverified-fill" style="width:100%"/);
+  assert.match(html, /<strong>3<span class="sr-only"> tasks<\/span><\/strong>/);
+  for(const label of ['Highly AI-assisted','Partially AI-assisted','Human-led']) assert.ok(html.includes(label));
+});
+test('four bar widths reflect the current task distribution',()=>{
+  const tasks=[task,{...task,id:'partial'},{...task,id:'unverified-1'},{...task,id:'unverified-2'}];
+  const partial={...assessment,task_id:'partial',matched_reference_tasks:[{...assessment.matched_reference_tasks[0],score_2025:.3375}]};
+  const html=render(Coverage,{tasks,assessments:[assessment,partial],showUnverifiedBar:true});
+  assert.match(html,/assistance-human" style="width:25%"/);
+  assert.match(html,/assistance-partial" style="width:25%"/);
+  assert.match(html,/assistance-unverified-fill" style="width:50%"/);
+});
+test('task-row category agrees with the matching chart category',()=>{
+  const taskHtml=render(TaskList,{tasks:[task],assessments:[assessment]});
+  const chartHtml=render(Coverage,{tasks:[task],assessments:[assessment]});
+  assert.match(taskHtml,/Human-led/);
+  assert.match(chartHtml,/Human-led/);
+});
+test('task chooser keeps every task as an accessible row when the list grows',()=>{
+  const tasks=Array.from({length:8},(_,index)=>({...task,id:`task-${index}`,wording:`Task number ${index + 1}`}));
+  const html=render(TaskList,{tasks,assessments:[]});
+  assert.equal((html.match(/aria-pressed=/g)??[]).length,8);
+  assert.match(html,/Task number 8/);
+});
 test('a real source zero is retained while missing and unchecked research stay unknown',()=>{
   const zero={...assessment,matched_reference_tasks:[{...assessment.matched_reference_tasks[0],score_2025:0}]};
   assert.match(render(Impact,{task,assessment:zero,researchChecked:true}),/0 on a 0–1 scale/);
@@ -82,4 +113,19 @@ test('a real source zero is retained while missing and unchecked research stay u
     assert.doesNotMatch(html,/0\.1375|0 on a 0–1 scale/);
     assert.match(html,/Explore skills for this task/);
   }
+});
+
+test('interactive donut exposes category buttons and matching active segments',()=>{
+  const html=render(Coverage,{tasks:[task],assessments:[assessment],showUnverifiedBar:true,selectedCategory:'human',onCategoryChange:()=>{}});
+  assert.equal((html.match(/<button /g)??[]).length,4);
+  assert.equal((html.match(/class="assistance-donut-segment"/g)??[]).length,1);
+  assert.equal((html.match(/aria-pressed="true"/g)??[]).length,2);
+  assert.match(html,/filter-human/);
+});
+test('category filter excludes unrelated tasks and handles an empty category',()=>{
+  const unknown={...task,id:'unknown',wording:'Unknown work task'};
+  const html=render(TaskList,{tasks:[task,unknown],assessments:[assessment],category:'unverified',sortByExposure:true});
+  assert.match(html,/Unknown work task/);
+  assert.equal((html.match(/aria-pressed=/g)??[]).length,1);
+  assert.match(render(TaskList,{tasks:[task],assessments:[assessment],category:'high'}),/No tasks in this category/);
 });
