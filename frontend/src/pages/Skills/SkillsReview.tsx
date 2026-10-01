@@ -28,6 +28,7 @@ import { buildSkillEvidence } from "../../features/skills/skillProfile.ts";
 import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
 import SpecialistSkills from "./components/SpecialistSkills";
 import SkillsOverview from "./components/SkillsOverview";
+import { ChevronDown } from "lucide-react";
 import "./SkillsReview.css";
 
 type Decision = "accepted" | "rejected" | undefined;
@@ -79,6 +80,8 @@ export default function SkillsReview() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [saveMessage, setSaveMessage] = useState("");
+  // Collapsed by default so the skill path stays the main step; mounting on open also skips catalogue requests.
+  const [showOverview, setShowOverview] = useState(false);
   const retrySave = useRef<(() => Promise<void>) | null>(null);
   const mounted = useRef(true);
 
@@ -201,7 +204,7 @@ export default function SkillsReview() {
       <PageHeader
         className="flex-col items-start sm:flex-row sm:items-center"
         title={reviewMode ? "Review skills for a task" : "Your skill path"}
-        description={reviewMode ? "Check the task connections and choose what fits your work." : "From the work you do today to the skills you want to build next."}
+        description={reviewMode ? "Check the task connections and choose what fits your work." : undefined}
         actions={<Button asChild variant="outline" className="rounded-full"><Link to={ROUTES.task}>Edit my tasks</Link></Button>}
       />
 
@@ -209,7 +212,7 @@ export default function SkillsReview() {
         <h2>{activeFocus ? "Skills for your selected task" : "Your selected task needs review"}</h2>
         <p>{activeFocus ? activeFocus.wording : "This task changed or is no longer in your work profile. Showing your current tasks instead."}</p>
         <p className="skills-review-page__hint">Research exposure does not prove that you have or lack a skill. Check the task evidence below.</p>
-        <Button variant="outline" onClick={() => { setSearchParams(params => { params.delete("task"); params.delete("view"); return params; }); setSelectedId(null); }}>Back to my skills overview</Button>
+        <Button variant="outline" onClick={() => { setShowOverview(true); setSearchParams(params => { params.delete("task"); params.delete("view"); params.delete("skill"); return params; }); setSelectedId(null); }}>Back to my skills overview</Button>
       </section>}
 
       {readError && <div className="skills-review-page__notice is-error" role="alert">
@@ -233,13 +236,16 @@ export default function SkillsReview() {
 
       {!reviewMode && focusedTask && !focusChanged && <div className="skills-overview__carried"><p>Selected task: {shortTaskLabel(focusedTask.wording)}</p><Button variant="outline" onClick={() => setSearchParams({ view: "task", task: focusedTask.id }, { state: { taskWording: focusedTask.wording } })}>Review this selected task</Button></div>}
       {!readError && work && !reviewMode && <SkillPathMatching tasks={work.tasks} skills={skills} loading={loading} assessments={currentAssessments(readUserProfile())} decisions={Object.fromEntries(Object.entries(work.decisions).filter((entry): entry is [string, "accepted" | "rejected"] => entry[1] !== undefined))} />}
-      {!readError && work && !reviewMode && <SkillsOverview tasks={work.tasks} occupationCode={work.occupationCode} personal={work.personalSkills} evidence={evidence} decisions={work.decisions} broadNeedsReview={work.needsReview} onReview={id => {
+      {!readError && work && !reviewMode && work.tasks.length > 0 && <details className="skills-overview-disclosure" open={showOverview} onToggle={event => setShowOverview(event.currentTarget.open)}>
+        <summary><h2>All my skills</h2><ChevronDown size={18} aria-hidden="true" /></summary>
+        {showOverview && <SkillsOverview tasks={work.tasks} occupationCode={work.occupationCode} personal={work.personalSkills} evidence={evidence} decisions={work.decisions} broadNeedsReview={work.needsReview} onReview={id => {
         const task = work.tasks.find(item => item.id === id);
         if (task) setSearchParams({ view: "task", task: id }, { state: { taskWording: task.wording } });
       }} />}
+      </details>}
 
       {reviewMode && <>
-      {!focusId && <Button variant="outline" onClick={() => setSearchParams({})}>Back to my skills overview</Button>}
+      {!focusId && <Button variant="outline" onClick={() => { setShowOverview(true); setSearchParams({}); }}>Back to my skills overview</Button>}
       {!readError && work && <SpecialistSkills tasks={work.tasks} occupationCode={work.occupationCode} focusTaskId={activeFocus?.id} onTaskChange={id => {
         const task = work.tasks.find(item => item.id === id);
         if (task) { setSearchParams(params => { params.set("task", id); params.set("view", "task"); return params; }, { state: { taskWording: task.wording } }); setSelectedId(null); }
