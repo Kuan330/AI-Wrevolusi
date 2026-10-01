@@ -59,3 +59,13 @@ test('activity timeline includes learning attempts and retained chapter records 
   assert.equal(days.at(-2).count,2);
   assert.equal(activityDays([],'2026-01-01').at(-1).date,'2026-01-01');
 });
+
+test('annual activity calendar preserves dates and counts across the year boundary', () => {
+  const activities = [{ id:'a', date:'2025-12-31', label:'Study', detail:'', kind:'study' }, { id:'b', date:'2025-12-31', label:'Practice', detail:'', kind:'practice' }];
+  const days = activityDays(activities, '2026-01-01', 52);
+  assert.equal(days.length,364);
+  assert.equal(new Set(days.map(day=>day.date)).size,364);
+  assert.equal(days.at(-1).date,'2026-01-01');
+  assert.equal(days.at(-2).count,2);
+  assert.equal(days.filter(day=>day.count>0).length,1);
+});
