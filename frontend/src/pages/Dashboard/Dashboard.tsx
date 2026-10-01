@@ -30,7 +30,7 @@ export default function Dashboard() {
 
 
     {summary && data && <div className="dashboard-overview-grid">
-      <Card className="dashboard-panel dashboard-progress-summary"><p className="dashboard-eyebrow">YOUR LEARNING PROGRESS</p><h2>Small steps add up.</h2><div className="dashboard-work-metrics"><div><strong>{summary.completedChapters}</strong><span>completed chapters</span></div><div><strong>{summary.completedCourses}</strong><span>completed courses</span></div></div><p>Course progress and practice records show what you have worked on. Revisit your reflections to decide what comes next.</p><Link className="dashboard-text-link" to={ROUTES.progressReviews}>View progress reviews <ArrowRight size={16} /></Link></Card>
+      <Card className="dashboard-panel dashboard-progress-summary"><p className="dashboard-eyebrow">YOUR LEARNING PROGRESS</p><h2>Small steps add up.</h2><div className="dashboard-work-metrics"><div><strong>{summary.completedChapters}</strong><span>completed chapters</span></div><div><strong>{summary.completedCourses}</strong><span>completed courses</span></div></div><p>See the chapters and courses you have completed, and continue at your own pace.</p><Link className="dashboard-text-link" to={ROUTES.plan}>View my courses <ArrowRight size={16} /></Link></Card>
       <Card className="dashboard-panel"><div className="dashboard-section-heading"><div><p className="dashboard-eyebrow">KEEP YOUR MOMENTUM</p><h2>Recent learning activity</h2></div><Link className="dashboard-text-link" to={ROUTES.progress}>View all <ArrowRight size={16} /></Link></div><LearningTimeline activities={summary.activities.slice(0,3)} courses={data.plan.courses} /></Card>
     </div>}
 
