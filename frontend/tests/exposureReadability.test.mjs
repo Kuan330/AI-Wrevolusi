@@ -32,7 +32,10 @@ const Impact=(await import(imports['./TaskImpact'])).default;
 const TaskList=(await import(compiled('ExposureTaskList'))).default;
 const Coverage=(await import(compiled('AssistanceChart'))).default;
 const render=(Component,props)=>renderToStaticMarkup(React.createElement(Component,props));
-const { links } = await import(imports['react-router-dom']);
+await import(imports['react-router-dom']);
+const exposurePageSource=readFileSync(new URL('../src/pages/AIExposure/AIExposure.tsx',import.meta.url),'utf8');
+const taskImpactSource=readFileSync(new URL('../src/pages/AIExposure/components/TaskImpact.tsx',import.meta.url),'utf8');
+const exposureCss=readFileSync(new URL('../src/pages/AIExposure/exposure.css',import.meta.url),'utf8');
 const task={id:'one',wording:'Check a machine',source:'ilo',originalWording:'Check a machine',iloTaskId:'6',score2025:.9};
 const assessment={task_id:'one',match_layer:'exact',missing_data_status:'complete',source_year:'2025',matched_reference_tasks:[{ilo_task_id:'6',task_text:task.wording,score_2025:.1375,source_method:'predicted'}],adjusted_score:.95,baseline_score:.8};
 test('first task follows confirmed order; all tasks are available without score ranking',()=>{
@@ -53,17 +56,16 @@ test('advice is visible while the published scale and evidence stay collapsed',(
   assert.match(html,/0\.1375 on a 0–1 scale/);
   assert.doesNotMatch(html,/<details[^>]*\bopen|0\.95|0\.8|13\.75%/);
   assert.match(html,/not a probability of job loss/);
-  assert.match(html,/href="\/learning\/skills\?view=task&amp;task=one"/);
+  assert.doesNotMatch(html,/Explore skills for this task|\/learning\/skills\?view=task/);
 });
-test('task handoff opens skill review directly with the exact task identity and saved wording',()=>{
-  const selected={...task,id:'task /?&',wording:'Check a machine\nwith the approved safety procedure'};
-  render(Impact,{task:selected,researchChecked:true,researchUnavailable:false});
-  const handoff=links.findLast(link=>link.to.startsWith('/learning/skills?'));
-  const destination=new URL(handoff.to,'https://example.test');
-  assert.equal(destination.pathname,'/learning/skills');
-  assert.equal(destination.searchParams.get('view'),'task');
-  assert.equal(destination.searchParams.get('task'),selected.id);
-  assert.deepEqual(handoff.state,{taskWording:selected.wording});
+test('AI impact has one page-level canonical skills CTA and no task-specific handoff',()=>{
+  assert.doesNotMatch(taskImpactSource,/Explore skills for this task|ROUTES\.skills\?view=task|taskWording/);
+  assert.equal((exposurePageSource.match(/<Link to=\{ROUTES\.skills\}>Explore skill path & matching →<\/Link>/g)??[]).length,1);
+  assert.doesNotMatch(exposurePageSource,/ROUTES\.skills\?view=task|taskWording|encodeURIComponent\(task\.id\)/);
+  assert.match(exposurePageSource,/Explore skill areas connected to all of your confirmed tasks/);
+});
+test('mobile guidance stacks despite the desktop-specific selector',()=>{
+  assert.match(exposureCss,/@media\(max-width:767px\)[\s\S]*\.exposure-page \.exposure-interpretation \{ grid-template-columns:1fr;gap:0; \}/);
 });
 test('candidate source values stay hidden and no personal estimate is invented',()=>{
   const html=render(Impact,{task,assessment:{...assessment,match_layer:'llm'},researchChecked:true});
@@ -111,7 +113,7 @@ test('a real source zero is retained while missing and unchecked research stay u
   for(const props of [{},{assessment:{...assessment,match_layer:'insufficient_data'}},{assessment,researchChecked:false},{assessment,researchUnavailable:true}]) {
     const html=render(Impact,{task,researchChecked:true,...props});
     assert.doesNotMatch(html,/0\.1375|0 on a 0–1 scale/);
-    assert.match(html,/Explore skills for this task/);
+    assert.doesNotMatch(html,/Explore skills for this task|\/learning\/skills\?view=task/);
   }
 });
 

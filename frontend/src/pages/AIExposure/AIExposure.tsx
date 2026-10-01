@@ -67,6 +67,10 @@ export default function AIExposure() {
       <ExposureTaskList category={category} sortByExposure occupation={analysis ? {title: analysis.occupationTitle, code: analysis.occupationCode} : undefined} tasks={profile.tasks} assessments={checking || error ? [] : assessments}
         researchChecked={Boolean(analysis) && !checking} researchLoading={checking} researchUnavailable={Boolean(error)} />
       </div>
+      <section className="exposure-page-skills-cta" aria-label="Explore your skill path">
+        <div><h2>Ready to build on your work?</h2><p>Explore skill areas connected to all of your confirmed tasks.</p></div>
+        <Button asChild><Link to={ROUTES.skills}>Explore skill path & matching →</Link></Button>
+      </section>
 
     </>}
   </div>;

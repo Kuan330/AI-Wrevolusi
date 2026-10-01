@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import type { ProfileTask } from "@/features/work-profile/types";
 import { taskSourceLabel } from "@/features/work-profile/taskSourceLabel";
@@ -27,9 +26,6 @@ export default function TaskImpact({ task, assessment, researchChecked, research
 
     </section>
     <section className="exposure-question"><h3>Your judgement matters</h3><p>{guidance.review}</p></section></div>
-    <section className="exposure-question exposure-next">
-      <Button asChild><Link to={`${ROUTES.skills}?view=task&task=${encodeURIComponent(task.id)}`} state={{ taskWording: task.wording }}>Explore skills for this task →</Link></Button>
-    </section>
     <details className="exposure-evidence"><summary>View research basis</summary>
     <p className="exposure-evidence-label">{status}</p>
     <h2>{label}</h2>

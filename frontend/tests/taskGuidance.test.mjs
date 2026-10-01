@@ -50,3 +50,58 @@ test('sales data analysis does not become customer-facing sales advice', () => {
   assert.equal(taskGuidance({ wording: 'Analyse sales data and prepare reports' }).title,'Data analysis and reporting');
   assert.equal(taskGuidance({ wording: 'Analyzing customer data' }).title,'Data analysis and reporting');
 });
+
+test('ICT task families receive specific, ordered guidance', () => {
+  const cases = [
+    ["Evaluate technology needs and recommend system upgrades", /technology needs/i, /fitness for purpose|stakeholder impact/i],
+    ["Oversee ICT security controls and incident compliance", /security oversight/i, /protect sensitive information|assess risk/i],
+    ["Set ICT operations workflow priorities for service delivery", /operations and priorities/i, /set priorities|operational risk/i],
+    ["Select and deploy ICT resources, then train users", /selecting and deploying/i, /authorise changes|approve selection/i],
+    ["Maintain operational and administrative procedures", /operational and administrative/i, /approvals, records|responsibility/i],
+    ["Develop the ICT strategy and technology roadmap", /strategy and planning/i, /set the strategy|organisational trade-offs/i],
+    ["Consult with users, management, vendors and technicians", /consultation with stakeholders/i, /listen to people|requirements/i],
+    ["Develop software and write automated unit tests", /software testing and development/i, /expected behaviour|test coverage/i],
+  ];
+  const seen = new Set();
+  for (const [wording, title, review] of cases) {
+    const guidance = taskGuidance({ wording });
+    assert.match(guidance.title, title);
+    assert.match(guidance.review, review);
+    assert.ok(guidance.help.length > 40);
+    seen.add(`${guidance.help}|${guidance.review}`);
+  }
+  assert.equal(seen.size, cases.length);
+});
+
+test('fallback guidance carries the selected task wording instead of using one generic message', () => {
+  const first = taskGuidance({ wording: 'Coordinate archival handover for the regional project' });
+  const second = taskGuidance({ wording: 'Inspect the public display before opening the venue' });
+  assert.match(first.help, /Coordinate archival handover/i);
+  assert.match(second.review, /Inspect the public display/i);
+  assert.notEqual(`${first.help}|${first.review}`, `${second.help}|${second.review}`);
+});
+
+test('business-services management tasks use semantically distinct guidance families', () => {
+  const cases = [
+    ['Developing and implementing administrative and procedural statements and guidelines for use by staff in the organization;', 'Administrative policy and procedure design', /policy draft structure|roles and hand-offs/i, /policy intent|obligations/i],
+    ['Providing information and support for the preparation of financial reports and budgets;', 'Financial reporting preparation', /reporting outline|source schedules/i, /accounting treatment|disclosures/i],
+    ['Analysing complex resource management issues and initiatives that affect the organization, and preparing associated reports, correspondence and submissions;', 'Resource-management analysis', /options paper|issue evidence/i, /operational consequences|evidence quality/i],
+    ["Developing and managing the organization's administrative and physical resources;", 'Administrative and physical resource management', /asset or facilities action plan|maintenance requests/i, /safety impacts|allocated/i],
+    ['Leading, managing and developing administrative staff to ensure smooth business operations and the provision of accurate and timely information;', 'Administrative staff leadership', /workload handover|development goals/i, /staffing decisions|sensitive conversations/i],
+    ['Representing the enterprise or organization in negotiations, and at conventions, seminars, public hearings and forums;', 'Organisational representation and negotiation', /briefing pack|agreed positions/i, /make commitments|represent the organisation/i],
+    ['Establishing and managing budgets, controlling expenditure and ensuring the efficient use of resources;', 'Budget and expenditure control', /budget lines|material variances/i, /control expenditure|value for money/i],
+    ['Planning and directing daily operations;', 'Daily operational planning', /shift or daily run-sheet|handover summary/i, /direct daily work|operational decisions/i],
+    ['Providing administrative, strategic planning and operational support, research and advice to senior management on matters such as the management of building facilities and administrative services;', 'Strategic and management advice', /decision brief|senior-management consideration/i, /organisational priorities|decision-makers/i],
+    ['Overseeing the selection, training and performance of staff.', 'Staff selection, training and performance', /interview questions|training plan/i, /employment and performance decisions|legal obligations/i],
+  ];
+  const pairs = new Set();
+  for (const [wording, title, help, review] of cases) {
+    const guidance = taskGuidance({ wording });
+    assert.equal(guidance.title, title);
+    assert.match(guidance.help, help);
+    assert.match(guidance.review, review);
+    assert.doesNotMatch(guidance.help, /For “.*”, AI may help draft a checklist, summary or small planning step/i);
+    pairs.add(`${guidance.help}|${guidance.review}`);
+  }
+  assert.equal(pairs.size, cases.length);
+});

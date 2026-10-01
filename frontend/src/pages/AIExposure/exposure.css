@@ -972,6 +972,10 @@
 .exposure-reference h4 { font-size:.85rem;font-weight:650; }
 .exposure-progress { padding:18px 24px;background:#eef4f8;border-radius:12px;font-size:.9rem; }
 .exposure-notice { padding:20px;border:1px solid #c5d6e1;background:#f5f9fc;border-radius:12px; }
+.exposure-page-skills-cta { display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 24px;border:1px solid #d8e3ee;border-radius:14px;background:linear-gradient(110deg,#eff6fb,#f8f3fa); }
+.exposure-page-skills-cta h2 { font-size:1rem;font-weight:650; }
+.exposure-page-skills-cta p { margin-top:5px;color:#566574;font-size:.875rem; }
+.exposure-page-skills-cta a { white-space:nowrap; }
 .exposure-page button:focus-visible,.exposure-page summary:focus-visible,.exposure-page select:focus-visible { outline:3px solid #507c97;outline-offset:3px; }
 .exposure-ai-help { min-height:140px;position:relative; }
 @media(max-width:767px) {
@@ -981,6 +985,7 @@
   .exposure-task-picker select { width:100%;min-height:48px;border:1px solid #abbfce;border-radius:10px;background:white;padding:12px;color:#292b38; }
   .exposure-task-impact { padding:20px; }
   .exposure-progress { padding:18px; }
+  .exposure-page-skills-cta { align-items:flex-start;flex-direction:column; }
 }
 
 /* Shared My Work palette, with a persistent category rail and task detail. */
@@ -1113,3 +1118,8 @@
 /* SVG focus is indicated on the arc, never by its rectangular bounding box. */
 .exposure-page .assistance-donut svg:focus,
 .exposure-page .assistance-donut-segment:focus { outline:none; }
+
+/* This follows the compact desktop rules above, which otherwise restore two columns. */
+@media(max-width:767px) {
+  .exposure-page .exposure-interpretation { grid-template-columns:1fr;gap:0; }
+}

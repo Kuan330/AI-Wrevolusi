@@ -5,7 +5,7 @@ import ts from 'typescript';
 
 // Exercise the actual explicit check with controlled account and API boundaries.
 const source = readFileSync(new URL('../src/features/work-profile/checkWorkAiFindings.ts', import.meta.url), 'utf8');
-const script = source.replace(/^import .*;\n/gm, '') + '\nreturn checkWorkAiFindings;';
+const script = source.replace(/^import .*;\r?\n/gm, '') + '\nreturn checkWorkAiFindings;';
 const compiled = ts.transpileModule(script, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText.replace('export async function', 'async function');
 let profile, owner, workKey, calls, saved, duringRequest, duringFlush, classificationCheck;
 const check = new Function('readJourneyProfile', 'currentWorkKey', 'currentWorkspaceSession', 'flushWorkspace', 'exposureService', 'saveConfirmedAnalysis', compiled)(
