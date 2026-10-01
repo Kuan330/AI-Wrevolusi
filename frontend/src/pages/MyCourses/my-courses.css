@@ -15,3 +15,13 @@
 @media(max-width:760px){.my-courses{gap:18px}.courses-heading h1{font-size:26px}.courses-overview{gap:8px}.courses-overview>div{padding:14px 10px;grid-template-columns:1fr;text-align:center}.courses-overview svg{display:none}.courses-overview span{font-size:10px}.courses-resume{padding:23px;flex-direction:column;gap:18px;align-items:stretch}.courses-resume h2{font-size:20px}.courses-resume>div{max-width:none}.saved-courses-grid,.course-study-layout{grid-template-columns:1fr}.courses-status-filter{width:100%;flex-wrap:wrap}.courses-status-filter button{flex:1 1 auto;padding:9px}.course-outline nav{max-height:235px;overflow-y:auto}.course-study-content>h2{font-size:24px}.course-outcomes,.course-study-card,.course-record-card{padding:21px}.course-record-card>.courses-primary{margin-left:0}.course-section-nav .courses-secondary{padding:10px;font-size:11px}}
 
 @media(min-width:761px) and (max-width:1100px){.course-study-layout{grid-template-columns:1fr}.course-outline nav{max-height:220px;overflow-y:auto}}
+
+/* Keep the course landing heading and its actions inside the available width. */
+.courses-heading { flex-wrap: wrap; align-items: flex-start; }
+.courses-heading > div:first-child { flex: 1 1 280px; min-width: 0; }
+.courses-heading h1, .courses-heading p { overflow-wrap: anywhere; }
+.courses-heading-actions { min-width: 0; }
+@media (max-width: 480px) {
+  .courses-heading-actions { width: 100%; }
+  .courses-heading-actions > a { flex: 1 1 140px; }
+}
