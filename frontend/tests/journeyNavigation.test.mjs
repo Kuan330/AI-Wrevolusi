@@ -9,7 +9,7 @@ test('personal overview, skills, plans and records have distinct sidebar destina
   for (const path of [ROUTES.dashboard,ROUTES.workProfile,ROUTES.aiExposure,ROUTES.skills,ROUTES.learningGoals,ROUTES.progress,ROUTES.possibilities]) assert.ok(paths.includes(path));
 });
 test('task editor and course library highlight the correct parent menu', () => {
-  assert.equal(navigationPath(ROUTES.task),ROUTES.workProfile);
+  assert.equal(navigationPath(ROUTES.workProfile),ROUTES.workProfile);
   assert.equal(navigationPath(ROUTES.learningCentre),ROUTES.learningGoals);
   assert.equal(navigationPath(ROUTES.aiExposure),ROUTES.aiExposure);
   assert.equal(pageLabel(ROUTES.progress),'Learning records');
@@ -20,7 +20,7 @@ test('legacy bookmarks redirect without creating duplicate destinations or redir
     assert.ok(Object.values(ROUTES).includes(to));
     assert.equal(LEGACY_ROUTES[to],undefined);
   }
-  assert.equal(LEGACY_ROUTES['/profile/tasks'],ROUTES.task);
+  assert.equal(LEGACY_ROUTES['/profile/tasks'],ROUTES.workProfile);
   assert.equal(LEGACY_ROUTES['/progress'],ROUTES.progressReviews);
 });
 

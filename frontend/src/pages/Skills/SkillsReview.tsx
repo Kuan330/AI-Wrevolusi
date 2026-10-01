@@ -196,7 +196,7 @@ export default function SkillsReview() {
         className="flex-col items-start sm:flex-row sm:items-center"
         title={reviewMode ? "Review skills for a task" : "Skill path & matching"}
         description={reviewMode ? "Check the task connections and choose what fits your work." : "Connect your work to skills, confirm what you already use and choose what to learn next."}
-        actions={<Button asChild variant="outline" className="rounded-full"><Link to={ROUTES.task}>Edit my tasks</Link></Button>}
+        actions={<Button asChild variant="outline" className="rounded-full"><Link to={ROUTES.workProfile}>Edit my tasks</Link></Button>}
       />
 
       {focusId && reviewMode && <section className="skills-review-page__notice" aria-label="Selected work task">
@@ -300,7 +300,7 @@ export default function SkillsReview() {
       </div> : !work?.tasks.length ? <section className="skills-review-page__card">
         <h2>Start with your confirmed work</h2>
         <p>Confirm at least one task before reviewing skill suggestions.</p>
-        <Button asChild><Link to={ROUTES.task}>Review my tasks</Link></Button>
+        <Button asChild><Link to={ROUTES.workProfile}>Review my tasks</Link></Button>
       </section> : <details className="skills-review-page__broad">
         <summary>Broad skills and general learning options</summary>
         <section aria-labelledby="skill-suggestions-title">

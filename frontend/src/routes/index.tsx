@@ -15,7 +15,6 @@ import Progress from "@/pages/Progress/Progress";
 import Possibilities from "@/pages/Possibilities/Possibilities";
 import Plan from "@/pages/Plan/Plan";
 import WorkProfile from "@/pages/WorkProfile/WorkProfile";
-import ProfileTasks from "@/pages/WorkProfile/ProfileTasks";
 import { LEGACY_ROUTES, ROUTES } from "@/constants/routes";
 
 function LegacyRedirect({ to }: { to: string }) {
@@ -32,7 +31,6 @@ export default function AppRoutes() {
     <Route element={<MainLayout />}>
       <Route path={ROUTES.dashboard} element={<AccountGate kind="work"><Dashboard /></AccountGate>} />
       <Route path={ROUTES.workProfile} element={<AccountGate kind="work"><WorkProfile /></AccountGate>} />
-      <Route path={ROUTES.task} element={<AccountGate kind="work"><ProfileTasks /></AccountGate>} />
       <Route element={<AccountGate kind="work"><Outlet /></AccountGate>}><Route element={<RequireWorkTasks />}>
         <Route path={ROUTES.skills} element={<SkillsReview />} />
         <Route path={ROUTES.aiExposure} element={<AIExposure />} />

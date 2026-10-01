@@ -10,6 +10,8 @@ const require = createRequire(import.meta.url);
 const dataUrl = text => `data:text/javascript;base64,${Buffer.from(text).toString('base64')}`;
 const packageUrl = name => pathToFileURL(require.resolve(name)).href;
 const imports = {
+  '@/components/ui/card': dataUrl(`import {createElement} from ${JSON.stringify(packageUrl('react'))}; export const Card=({children,...props})=>createElement('div',props,children);`),
+  '@/components/ui/tooltip': dataUrl(`export const Tooltip=({children})=>children;`),
   '@/components/ui/button': dataUrl(`import {createElement} from ${JSON.stringify(packageUrl('react'))}; export const Button=({children,variant,asChild,...props})=>createElement('div',props,children);`),
   'react-router-dom': dataUrl(`import {createElement} from ${JSON.stringify(packageUrl('react'))}; export const useSearchParams=()=>[new URLSearchParams(),()=>{}]; export const links=[]; export const Link=({children,to,state,...props})=>{links.push({to,state});return createElement('a',{href:to,...props},children)};`),
   '@/pages/Analysis/components/TaskDetailsDrawer': dataUrl('export function TaskAssistAccess(){return null}'),
@@ -41,11 +43,12 @@ test('first task follows confirmed order; all tasks are available without score 
   assert.match(html,/label for="impact-task"/);
   assert.doesNotMatch(html,/Highest|Research score:|slider/);
 });
-test('published scale is visible and further evidence remains collapsed',()=>{
+test('advice is visible while the published scale and evidence stay collapsed',()=>{
   const html=render(Impact,{task,assessment,researchChecked:true,researchUnavailable:false});
-  assert.match(html,/AI can assist with/);assert.match(html,/Your judgement matters/);assert.match(html,/Your next step/);
+  assert.match(html,/AI can assist with/);assert.match(html,/Your judgement matters/);
   const before=html.split('<details')[0];
-  assert.match(before,/<meter[^>]+value="0\.1375"/);
+  assert.doesNotMatch(before,/<meter/);
+  assert.match(html,/<meter[^>]+value="0\.1375"/);
   assert.doesNotMatch(before,/0\.95|0\.8/);
   assert.match(html,/0\.1375 on a 0–1 scale/);
   assert.doesNotMatch(html,/<details[^>]*\bopen|0\.95|0\.8|13\.75%/);
@@ -110,4 +113,19 @@ test('a real source zero is retained while missing and unchecked research stay u
     assert.doesNotMatch(html,/0\.1375|0 on a 0–1 scale/);
     assert.match(html,/Explore skills for this task/);
   }
+});
+
+test('interactive donut exposes category buttons and matching active segments',()=>{
+  const html=render(Coverage,{tasks:[task],assessments:[assessment],showUnverifiedBar:true,selectedCategory:'human',onCategoryChange:()=>{}});
+  assert.equal((html.match(/<button /g)??[]).length,4);
+  assert.equal((html.match(/class="assistance-donut-segment"/g)??[]).length,1);
+  assert.equal((html.match(/aria-pressed="true"/g)??[]).length,2);
+  assert.match(html,/filter-human/);
+});
+test('category filter excludes unrelated tasks and handles an empty category',()=>{
+  const unknown={...task,id:'unknown',wording:'Unknown work task'};
+  const html=render(TaskList,{tasks:[task,unknown],assessments:[assessment],category:'unverified',sortByExposure:true});
+  assert.match(html,/Unknown work task/);
+  assert.equal((html.match(/aria-pressed=/g)??[]).length,1);
+  assert.match(render(TaskList,{tasks:[task],assessments:[assessment],category:'high'}),/No tasks in this category/);
 });

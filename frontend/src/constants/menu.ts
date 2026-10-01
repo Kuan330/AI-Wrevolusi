@@ -19,12 +19,10 @@ export const SIDEBAR_GROUPS = [
 ] as const;
 
 export function navigationPath(pathname: string): string {
-  if (pathname === ROUTES.task) return ROUTES.workProfile;
   if (pathname === ROUTES.learningCentre) return ROUTES.learningGoals;
   return pathname;
 }
 export function pageLabel(pathname: string): string {
-  if (pathname === ROUTES.task) return "Confirm your tasks";
   if (pathname === ROUTES.learningCentre) return "Learning resources";
   if (pathname === ROUTES.plan) return "My courses";
   if (pathname === ROUTES.progressReviews) return "Progress reviews";
