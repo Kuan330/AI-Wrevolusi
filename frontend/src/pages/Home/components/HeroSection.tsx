@@ -6,24 +6,24 @@ const HeroSection = () => {
     <section className="hero">
       <div className="container">
         <div className="hero-grid">
-          <div>
+          <div className="hero-copy">
             <div className="hero-badge">
-              Designed for women's career development
+              FOR WORKING WOMEN IN MALAYSIA
             </div>
             <h1>
-              AI is changing your work,
-              <br />
-              but change is not only risk.
+              <span className="hero-title-primary">Stay competitive.</span>
+              <span className="hero-title-accent">As AI changes<br />your work.</span>
             </h1>
             <p className="lead">
-              Start with your real tasks, review related skills, and choose
-              one useful learning step.
+              See how AI may affect the work you do. Build useful skills
+              through free learning, and turn what you learn into progress at work.
             </p>
-            <div>
-              <StartWorkspaceButton />
+            <div className="hero-actions">
+              <StartWorkspaceButton>Start with my work <span aria-hidden="true">↗</span></StartWorkspaceButton>
+              <a className="hero-secondary-link" href="#steps">See how it works <span aria-hidden="true">→</span></a>
             </div>
             <div className="hero-note">
-              No CV upload · An account keeps your choices together
+              Your role and everyday tasks are all you need to begin.
             </div>
           </div>
           <div className="hero-card glass-strong">

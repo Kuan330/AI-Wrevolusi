@@ -70,7 +70,7 @@ export default function ProfileTasks() {
   async function finish() {
     const owner = currentWorkspaceSession();
     setBusy(true); setError("");
-    try { await confirmWorkDraft(); if (mounted.current && owner === currentWorkspaceSession()) navigate(`${ROUTES.workProfile}?saved=1`, { replace: true }); }
+    try { await confirmWorkDraft(); if (mounted.current && owner === currentWorkspaceSession()) navigate(ROUTES.aiExposure, { replace: true }); }
     catch (issue) { if (mounted.current && owner === currentWorkspaceSession()) setError(issue instanceof Error ? issue.message : "Your work could not be saved. Your draft is kept; please retry."); }
     finally { if (mounted.current && owner === currentWorkspaceSession()) setBusy(false); }
   }
@@ -127,6 +127,6 @@ export default function ProfileTasks() {
         <Button asChild variant="link" className="px-0"><Link to={`${ROUTES.workProfile}?edit=job`}>Back to my job</Link></Button>
       </section>
     </fieldset>
-    {editor && <TaskEditorDialog open mode={editor.task ? "edit" : "add"} initialValues={editor.values} onClose={() => setEditor(null)} onSave={saveTask} />}
+    {editor && <TaskEditorDialog open mode={editor.task ? "edit" : "add"} initialValues={editor.values} occupationCode={code} existingTasks={draft.tasks} editingTaskId={editor.task?.id} onClose={() => setEditor(null)} onSave={saveTask} />}
   </div>;
 }

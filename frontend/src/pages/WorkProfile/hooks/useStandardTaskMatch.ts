@@ -20,6 +20,7 @@ import type { ReferenceTask } from "@/types/reference";
  */
 
 export type StandardTaskMatch = {
+  taskId: string;
   taskText: string;
   confidence: number;
   reason: string;
@@ -48,6 +49,7 @@ export const useStandardTaskMatch = ({
 }: Options) => {
   const [status, setStatus] = useState<StandardTaskMatchStatus>("idle");
   const [match, setMatch] = useState<StandardTaskMatch | null>(null);
+  const [question, setQuestion] = useState<string | null>(null);
   const [retryNonce, setRetryNonce] = useState(0);
 
   const abortRef = useRef<AbortController | null>(null);
@@ -62,6 +64,7 @@ export const useStandardTaskMatch = ({
 
     if (!enabled || !occupationCode) {
       setStatus("idle");
+      setQuestion(null);
       return;
     }
 
@@ -70,6 +73,7 @@ export const useStandardTaskMatch = ({
       // Back to the "keep typing" state: no request, no stale suggestion.
       setStatus("below_minimum");
       setMatch(null);
+      setQuestion(null);
       lastMatchRef.current = null;
       return;
     }
@@ -112,6 +116,7 @@ export const useStandardTaskMatch = ({
             // Server-side double check of the same word gate.
             setStatus("below_minimum");
             setMatch(null);
+            setQuestion(response.clarifying_question);
             lastMatchRef.current = null;
             return;
           }
@@ -120,6 +125,7 @@ export const useStandardTaskMatch = ({
             rows.find((task) => task.task_id === response.candidate_id) ?? null;
           const next = chosen
             ? {
+                taskId: chosen.task_id,
                 taskText: chosen.task_text,
                 confidence: response.confidence,
                 reason: response.reason,
@@ -127,6 +133,7 @@ export const useStandardTaskMatch = ({
             : null;
           lastMatchRef.current = next;
           setMatch(next);
+          setQuestion(chosen ? null : response.clarifying_question);
           setStatus(chosen ? "matched" : "no_match");
         } catch {
           if (sequenceRef.current !== sequence) return;
@@ -146,5 +153,5 @@ export const useStandardTaskMatch = ({
     setRetryNonce((current) => current + 1);
   }, []);
 
-  return { status, match, retry };
+  return { status, match, question, retry };
 };

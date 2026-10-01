@@ -304,37 +304,123 @@
   margin-top: 2.5rem;
 }
 
+/* Reference-inspired typography, using the existing warm landing palette. */
+.landing-page .hero-copy {
+  min-width: 0;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
 .landing-page .hero-badge {
-  display: inline-block;
-  background: rgba(199, 149, 139, 0.15);
-  color: #8b5e55;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 6px 14px;
-  border-radius: 100px;
-  margin-bottom: 20px;
-  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #84645d;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.6;
+  margin-bottom: 28px;
+  letter-spacing: 1.8px;
+}
+
+.landing-page .hero-badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .landing-page .hero h1 {
-  font-size: 38px;
+  font-size: clamp(34px, 4.4vw, 56px);
   font-weight: 600;
-  line-height: 1.35;
-  color: var(--c-text);
-  margin-bottom: 16px;
+  line-height: 1.08;
+  letter-spacing: -2px;
+  color: #352d35;
+  margin-bottom: 30px;
+}
+
+.landing-page .hero-title-primary,
+.landing-page .hero-title-accent {
+  display: block;
+}
+
+.landing-page .hero-title-accent {
+  margin-top: 14px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: -1.6px;
+  color: #94675e;
 }
 
 .landing-page .hero p.lead {
+  max-width: 46ch;
   font-size: 16px;
-  line-height: 1.7;
-  color: var(--c-text-secondary);
-  margin-bottom: 28px;
+  line-height: 1.8;
+  color: #605761;
+  margin-bottom: 32px;
+}
+
+.landing-page .hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px 24px;
+}
+
+.landing-page .hero-actions .btn {
+  border-radius: 8px;
+  min-width: 208px;
+  min-height: 54px;
+  justify-content: center;
+  padding: 16px 23px;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 600;
+  gap: 22px;
+}
+
+.landing-page .hero-actions .btn-warm {
+  background: #94675e;
+  color: #fffaf7;
+  box-shadow: 0 6px 18px rgba(148, 103, 94, 0.18);
+}
+
+.landing-page .hero-actions .btn-warm:hover {
+  background: #80574f;
+  color: #fffaf7;
+  box-shadow: 0 8px 22px rgba(148, 103, 94, 0.22);
+}
+
+.landing-page .hero-secondary-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: #825e56;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.landing-page .hero-secondary-link:hover {
+  color: var(--c-text);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.landing-page .hero-actions a:focus-visible {
+  outline: 2px solid #8b5e55;
+  outline-offset: 5px;
 }
 
 .landing-page .hero-note {
   font-size: 12px;
-  color: var(--c-text-muted);
-  margin-top: 14px;
+  line-height: 1.7;
+  color: #746873;
+  margin-top: 20px;
 }
 
 .landing-page .hero-card {
@@ -1072,7 +1158,8 @@
   }
 
   .landing-page .hero h1 {
-    font-size: 28px;
+    font-size: clamp(32px, 7vw, 56px);
+    letter-spacing: -1.2px;
   }
 
   .landing-page .hero-card .number span {
