@@ -6,13 +6,14 @@ import { recommendSkills } from '../src/features/skills/recommendations.ts';
 
 const task=(id,wording='Analyse sales data')=>({id,wording,iloTaskId:`source-${id}`,source:'ilo'});
 const evidence=(t,score,layer='exact')=>({task_id:t.id,match_layer:layer,missing_data_status:'complete',matched_reference_tasks:[{ilo_task_id:t.iloTaskId,task_text:t.wording,score_2025:score}],baseline_score:.9,adjusted_score:.95});
-test('overview groups linked evidence and keeps candidate, missing and stale matches unverified',()=>{
+test('overview keeps the assistance-level order and candidate, missing and stale matches unverified',()=>{
   const tasks=Array.from({length:6},(_,i)=>task(String(i)));
-  const values=[0,.25,.55,.8];
+  const values=[0,.1,.25,.55];
   const assessments=values.map((value,i)=>evidence(tasks[i],value));
   assessments.push(evidence(tasks[4],1,'llm'));
   const result=assistanceOverview(tasks,assessments);
-  assert.deepEqual(result.groups.map(g=>g.count),[2,1,1]);
+  assert.deepEqual(result.groups.map(g=>g.category),['high','partial','human']);
+  assert.deepEqual(result.groups.map(g=>g.count),[1,1,2]);
   assert.equal(result.groups[0].category,'high');
   assert.equal(result.unverified,2);
   assert.equal(result.items[0].score,0);

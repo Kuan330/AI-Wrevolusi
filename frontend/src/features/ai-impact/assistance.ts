@@ -27,6 +27,6 @@ export function assistanceForTask(task: ProfileTask, assessment?: ConfirmedTaskE
 export function assistanceOverview(tasks: ProfileTask[], assessments: ConfirmedTaskExposureAssessment[]) {
   const byId = new Map(assessments.map(item => [item.task_id, item]));
   const items = tasks.map(task => assistanceForTask(task, byId.get(task.id)));
-  const groups = (["human", "partial", "high"] as const).map(category => ({ category, label: ASSISTANCE_LABELS[category], count: items.filter(item => item.category === category).length })).sort((a,b) => b.count - a.count);
+  const groups = (["high", "partial", "human"] as const).map(category => ({ category, label: ASSISTANCE_LABELS[category], count: items.filter(item => item.category === category).length }));
   return { items, groups, unverified: items.filter(item => item.category === "unverified").length };
 }
