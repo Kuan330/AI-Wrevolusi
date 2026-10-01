@@ -25,7 +25,7 @@ import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";
 import { skillKey } from "./learningSkills";
 import { buildSkillEvidence } from "../../features/skills/skillProfile.ts";
-import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
+import { cleanDisplayText, shortTaskLabel, taskDisplayText, taskListText } from "@/lib/displayText";
 import SpecialistSkills from "./components/SpecialistSkills";
 import SkillsOverview from "./components/SkillsOverview";
 import { ChevronDown, LoaderCircle } from "lucide-react";
@@ -211,7 +211,7 @@ export default function SkillsReview() {
 
       {focusId && reviewMode && <section className="skills-review-page__notice" aria-label="Selected work task">
         <h2>{activeFocus ? "Skills for your selected task" : "Your selected task needs review"}</h2>
-        <p>{activeFocus ? activeFocus.wording : "This task changed or is no longer in your work profile. Showing your current tasks instead."}</p>
+        <p>{activeFocus ? taskDisplayText(activeFocus.wording) : "This task changed or is no longer in your work profile. Showing your current tasks instead."}</p>
         <p className="skills-review-page__hint">Research exposure does not prove that you have or lack a skill. Check the task evidence below.</p>
         <Button variant="outline" onClick={() => { setShowOverview(true); setSearchParams(params => { params.delete("task"); params.delete("view"); params.delete("skill"); return params; }); setSelectedId(null); }}>Back to my skills overview</Button>
       </section>}
@@ -265,7 +265,7 @@ export default function SkillsReview() {
               <div>
                 <strong>{cleanDisplayText(item.name)}</strong> <span className="skills-review-page__state">Your own words</span>
                 {!current && <p className="skills-review-page__hint">From earlier work. Add a new entry with a current task to make a new learning choice. Earlier goals keep their original context.</p>}
-                <details><summary>Supporting task</summary><p>{cleanDisplayText(item.taskLabels.join(". "))}</p></details>
+                <details><summary>Supporting task</summary><p>{taskListText(item.taskLabels)}</p></details>
                 <div className="skills-review-page__decisions" role="group" aria-label={`Review personal skill ${item.name}`}>
                   {([['use', 'I use this'], ['no', 'Does not fit'], ['unsure', 'Not sure']] as const).map(([value, label]) => <Button key={value} variant={item.decision === value ? "default" : "outline"} aria-pressed={item.decision === value} disabled={saving || !current} onClick={() => void runSave(() => savePersonalSkillChoice(item.id, { decision: item.decision === value ? null : value }))}>{label}</Button>)}
                 </div>

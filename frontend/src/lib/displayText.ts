@@ -13,8 +13,17 @@ export function cleanDisplayText(value: string): string {
   }).replace(/[\u200b\u00ad\ufeff]/g, "").replace(/\s+/g, " ").trim();
 }
 
+/** Task wording for display: source list punctuation at the end becomes a full stop. */
+export function taskDisplayText(value: string): string {
+  return cleanDisplayText(value).replace(/\s*[;:；：]+$/, ".");
+}
+
+export function taskListText(values: string[]): string {
+  return values.map(taskDisplayText).filter(Boolean).map(text => /[.!?…]$/.test(text) ? text : `${text}.`).join(" ");
+}
+
 export function shortTaskLabel(value: string, max = 80): string {
-  const text = cleanDisplayText(value).replace(/[;\s]+$/, "");
+  const text = cleanDisplayText(value).replace(/[;:；：\s]+$/, "");
   if (text.length <= max) return text;
   const shortened = text.slice(0, max - 1);
   const lastSpace = shortened.lastIndexOf(" ");

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { cleanDisplayText } from "@/lib/displayText";
+import { cleanDisplayText, taskDisplayText } from "@/lib/displayText";
 import { ROUTES } from "@/constants/routes";
 import { guidedLearningService, type GuidedTaskSuggestions, type GuidedSkillSuggestion } from "@/services/guidedLearningService";
 import { currentWorkspaceSession } from "@/services/accountStorage";
@@ -67,7 +67,7 @@ export default function GuidedSkillSuggestions({ task, occupationCode, disabled,
   return <div className="specialist-skills__guided">
     <h3>Find a useful skill to develop</h3>
     <p>Use your saved task to prepare a skill and a starting activity.</p>
-    <details><summary>The task we will use</summary><p className="specialist-skills__full-task">{task.wording}</p></details>
+    <details><summary>The task we will use</summary><p className="specialist-skills__full-task">{taskDisplayText(task.wording)}</p></details>
     <p className="specialist-skills__reason">This uses AI to review catalogue candidates. Do not include confidential workplace information in your task.</p>
     <Button disabled={disabled || pending || saving} onClick={() => void suggest()}>{pending ? "Preparing suggestions…" : result ? "Show other suggestions" : "Suggest skills for this task"}</Button>
     {error && <p role="alert">{error} You can retry or use the optional catalogue search.</p>}

@@ -9,7 +9,7 @@ import { taskGuidance } from "../lib/taskGuidance";
 import { taskResearch } from "../../../features/ai-impact/taskResearch.ts";
 import { assistanceForTask } from "@/features/ai-impact/assistance";
 import { ILO_OCCUPATION_EXPOSURE_SOURCE } from "@/pages/Analysis/lib/dataSources";
-import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
+import { cleanDisplayText, shortTaskLabel, taskDisplayText } from "@/lib/displayText";
 
 export default function TaskImpact({ task, assessment, researchChecked, researchLoading = false, researchUnavailable, occupation }: {
   task: ProfileTask; assessment?: ConfirmedTaskExposureAssessment; researchChecked: boolean; researchLoading?: boolean; researchUnavailable: boolean; occupation?: { title: string; code: string };
@@ -29,7 +29,7 @@ export default function TaskImpact({ task, assessment, researchChecked, research
     <details className="exposure-evidence"><summary>View research basis</summary>
     <p className="exposure-evidence-label">{status}</p>
     <h2>{label}</h2>
-    {label !== cleanDisplayText(task.wording) && <details className="exposure-full-task"><summary>Read the full task</summary><p>{cleanDisplayText(task.wording)}</p>{task.notes && <p>Working context: {cleanDisplayText(task.notes)}</p>}</details>}
+    {label.endsWith("…") && <details className="exposure-full-task"><summary>Read the full task</summary><p>{taskDisplayText(task.wording)}</p>{task.notes && <p>Working context: {cleanDisplayText(task.notes)}</p>}</details>}
     <p className="exposure-task-source">{taskSourceLabel(task)}</p>
     {published && <section className="exposure-source-scale" aria-label="Published research estimate">
       <h3>ILO {assessment?.source_year || "2025"} source estimate <strong>{published.score_2025}</strong> <small>out of 1</small></h3>
@@ -45,7 +45,7 @@ export default function TaskImpact({ task, assessment, researchChecked, research
         <p>{research.kind === "linked" ? "Your wording matches the linked ILO reference task. This is a text and reference-ID match, not a workplace validation." : `The system suggested related tasks using ${assessment?.match_layer === "llm" ? "an AI model" : "text similarity"}. A possible match is not proof that the source describes your work.`}</p>
         <p><strong>ILO research · {assessment?.source_year || "2025"}</strong></p>
         {research.references.map(reference => <div className="exposure-reference" key={reference.ilo_task_id}>
-          <h4>{research.kind === "candidate" ? "Possible reference task" : "Reference task"} · {reference.ilo_task_id}</h4><p>{cleanDisplayText(reference.task_text)}</p>
+          <h4>{research.kind === "candidate" ? "Possible reference task" : "Reference task"} · {reference.ilo_task_id}</h4><p>{taskDisplayText(reference.task_text)}</p>
           {research.kind === "linked" && <p><strong>{reference.score_2025} on a 0–1 scale</strong> · source estimate for this reference task</p>}
           <p className="exposure-caption">Source method: {reference.source_method || "Not recorded"}. This describes how the source produced the value, not how your task was matched.</p>
         </div>)}

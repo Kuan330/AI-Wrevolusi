@@ -1,4 +1,4 @@
-import { cleanDisplayText, goalDisplayLabel } from "@/lib/displayText";
+import { cleanDisplayText, goalDisplayLabel, taskListText } from "@/lib/displayText";
 import { ROUTES } from "@/constants/routes";
 import { readLearningGoals } from "@/features/learning-goals/learningGoals";
 import LearningReviewNotice from "@/components/common/LearningReviewNotice";
@@ -306,7 +306,7 @@ export default function LearningCentre() {
           <p className="library-kicker">{context.origin === "career" ? "Career learning" : context.origin === "work" ? "From your reviewed skills" : "Your own learning choice"}</p>
           <h2>{cleanDisplayText(selectedWef?.core_skill ?? "")}</h2>
           {context.career && <p>For your chosen direction: {cleanDisplayText(context.career.title)}</p>}
-          {context.taskLabels.length > 0 && <p>Connected work: {context.taskLabels.map(cleanDisplayText).join(". ")}</p>}
+          {context.taskLabels.length > 0 && <p>Connected work: {taskListText(context.taskLabels)}</p>}
           {context.goal && <p>Your goal: {goalDisplayLabel(context.goal)}</p>}
           <p className="library-muted">This uses the current WEF skill and course links. It does not establish specialist skill coverage or job readiness.</p>
           {contextStale && <p role="alert">Your work or skill review changed. Review this choice before adding a new course; your saved courses are still available.</p>}

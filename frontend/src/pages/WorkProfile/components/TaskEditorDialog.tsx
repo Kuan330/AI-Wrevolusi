@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { ProfileTask, TaskEditorValues } from "@/features/work-profile/types";
-import { cleanDisplayText } from "@/lib/displayText";
+import { taskDisplayText } from "@/lib/displayText";
 import { useStandardTaskMatch } from "@/pages/WorkProfile/hooks/useStandardTaskMatch";
 import { countTaskMatchWords, MIN_TASK_MATCH_WORDS } from "@/pages/WorkProfile/taskMatchWords";
 import { validateTaskTitle } from "@/utils/validation";
@@ -37,12 +37,13 @@ export default function TaskEditorDialog({
 }: Props) {
   const [values, setValues] = useState(initialValues);
   const [error, setError] = useState<string | null>(null);
+  const changed = mode === "add" || !sameTaskText(values.wording, initialValues.wording);
   const { status, match, retry } = useStandardTaskMatch({
-    enabled: open && Boolean(occupationCode),
+    enabled: open && Boolean(occupationCode) && changed,
     occupationCode,
     wording: values.wording,
   });
-  const needsWords = countTaskMatchWords(values.wording) < MIN_TASK_MATCH_WORDS;
+  const needsWords = changed && countTaskMatchWords(values.wording) < MIN_TASK_MATCH_WORDS;
   const wordMessage = `Write at least ${MIN_TASK_MATCH_WORDS} words that describe what you actually do.`;
   const duplicateMessage = "This task is already in your list.";
   const duplicate = existingTasks.some(task => {
@@ -51,17 +52,19 @@ export default function TaskEditorDialog({
     if (listed.some(text => sameTaskText(text, values.wording))) return true;
     return status === "matched" && Boolean(match && (listed.some(text => sameTaskText(text, match.taskText)) || task.iloTaskId === match.taskId));
   });
-  const saveIssue = needsWords
-    ? wordMessage
-    : duplicate
-      ? duplicateMessage
-      : !occupationCode || status === "matched" || status === "no_match"
-        ? null
-        : status === "below_minimum"
-          ? wordMessage
-          : status === "error"
-            ? "The check could not finish. Try again before saving."
-            : "Looking for a matching standard task…";
+  const saveIssue = !changed
+    ? null
+    : needsWords
+      ? wordMessage
+      : duplicate
+        ? duplicateMessage
+        : !occupationCode || status === "matched" || status === "no_match"
+          ? null
+          : status === "below_minimum"
+            ? wordMessage
+            : status === "error"
+              ? "The check could not finish. Try again before saving."
+              : "Looking for a matching standard task…";
 
   return (
     <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
@@ -107,11 +110,11 @@ export default function TaskEditorDialog({
           {values.wording.trim() && saveIssue && status !== "loading" && <div className="task-editor-match" role="alert"><p>{saveIssue}{status === "error" && <> <button type="button" onClick={retry}>Try again</button></>}</p></div>}
           {status === "loading" && <div className="task-editor-match" role="status"><p>Looking for a matching standard task…</p></div>}
           {status === "no_match" && !duplicate && <div className="task-editor-match" role="status"><p>No matching standard task was found. Your wording will be kept.</p></div>}
-          {status === "matched" && match && !duplicate && <div className="task-editor-match" role="status"><strong>Closest standard task</strong><p>{cleanDisplayText(match.taskText)}</p></div>}
+          {status === "matched" && match && !duplicate && <div className="task-editor-match" role="status"><strong>Closest standard task</strong><p>{taskDisplayText(match.taskText)}</p></div>}
           {error && error !== saveIssue && <p role="alert" className="task-editor-error">{error}</p>}
           <div className="task-editor-actions">
             <button type="button" onClick={onClose}>Cancel</button>
-            <button type="submit" disabled={Boolean(saveIssue)}>{mode === "add" ? "Add task" : "Save changes"}</button>
+            <button type="submit" disabled={!changed || Boolean(saveIssue)}>{mode === "add" ? "Add task" : "Save changes"}</button>
           </div>
         </form>
       </DialogContent>

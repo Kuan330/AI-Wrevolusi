@@ -8,7 +8,7 @@ import type { ProfileTask } from "@/features/work-profile/types";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 
 import TaskImpact from "./TaskImpact";
-import { shortTaskLabel } from "@/lib/displayText";
+import { shortTaskLabel, taskDisplayText } from "@/lib/displayText";
 
 type Props = { category?: AssistanceCategory; sortByExposure?: boolean; tasks: ProfileTask[]; assessments: ConfirmedTaskExposureAssessment[]; researchChecked?: boolean; researchLoading?: boolean; researchUnavailable?: boolean; occupation?: { title: string; code: string } };
 
@@ -50,7 +50,7 @@ export default function ExposureTaskList({ tasks, assessments, researchChecked =
         const ready = researchChecked && !researchLoading && !researchUnavailable;
         return <li key={item.id}><button type="button" aria-pressed={task.id === item.id} onClick={() => setSelectedId(item.id)}>
           <span className="exposure-task-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-          <Tooltip title={item.wording}><span tabIndex={0} className="exposure-task-name">{item.wording}</span></Tooltip>
+          <Tooltip title={taskDisplayText(item.wording)}><span tabIndex={0} className="exposure-task-name">{taskDisplayText(item.wording)}</span></Tooltip>
           <span className={`exposure-task-category category-${ready ? category : "unverified"}`}><Tooltip title={ready ? ASSISTANCE_DESCRIPTIONS[category] : label(item)}><span className="exposure-category-pill">{label(item)}</span></Tooltip></span>
           <span className="exposure-task-arrow" aria-hidden="true">→</span>
         </button></li>;

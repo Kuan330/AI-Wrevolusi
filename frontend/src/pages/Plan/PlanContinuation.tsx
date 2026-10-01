@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
+import { taskListText } from "@/lib/displayText";
 import { getCourseContext, learningContextNeedsReview, learningContextUrl, readJourneyState, rememberCourse } from "@/features/journey/journey";
 import { loadCourseDirectory } from "@/features/learning-planning/courseDirectory";
 import type { PlanCourse } from "@/features/learning-planning/planCourses";
@@ -49,7 +50,7 @@ export default function PlanContinuation({ courses, loading, onRecord }: {
       {context && <div className="mt-3 space-y-1 text-sm">
         <p><strong>Selected skill:</strong> {context.skill.name}</p>
         {context.goal && <p><strong>Your goal:</strong> {context.goal}</p>}
-        {context.career ? <p><strong>Career direction:</strong> {context.career.title}</p> : context.taskLabels.length > 0 ? <p><strong>Based on your work:</strong> {context.taskLabels.join("; ")}</p> : <p>Learning you chose to explore.</p>}
+        {context.career ? <p><strong>Career direction:</strong> {context.career.title}</p> : context.taskLabels.length > 0 ? <p><strong>Based on your work:</strong> {taskListText(context.taskLabels)}</p> : <p>Learning you chose to explore.</p>}
         {stale && <p role="status" className="text-amber-900">This connection was saved before your work or skill review changed. Your course and progress remain available. <Link className="underline" to={ROUTES.skills}>Review my skills</Link></p>}
       </div>}
       {selected && <p className="mt-3 text-sm">{selected.provider} · {selected.chapters.filter(chapter => chapter.value === 10).length} of {selected.chapters.length} recorded steps completed{nextChapter ? ` · Next: ${nextChapter.title}` : ""}</p>}
