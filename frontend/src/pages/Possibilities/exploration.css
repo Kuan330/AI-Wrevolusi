@@ -232,3 +232,93 @@
 .px-role-info{margin:0 0 10px}
 .px-source-details{width:auto;justify-items:end;border-top:0;padding-top:0;margin-top:0}
 .px-source-details>a{font-size:12px}
+
+/* Career matching → a deliberate next learning step. */
+.px-hint { display:inline-flex; vertical-align:middle; }
+.px-hint button { display:inline-flex; padding:4px; border:0; border-radius:50%; color:#527895; background:transparent; }
+.px-hint button:hover,.px-hint button[aria-pressed=true] { background:#e4effa; color:#315e7c; }
+.px-direction-card { display:flex; flex-direction:column; gap:12px; }
+.px-direction-card>button { margin-top:auto; }
+.px-match-heading { display:flex; align-items:center; gap:8px; color:#426783; }
+.px-match-heading strong { font-size:32px; line-height:1.3; }
+.px-match-bar { width:100%; height:8px; border:0; border-radius:999px; overflow:hidden; background:#e8eef5; appearance:none; }
+.px-match-bar::-webkit-progress-bar { background:#e8eef5; }
+.px-match-bar::-webkit-progress-value { background:linear-gradient(90deg,#6b9ec3,#c28cae); border-radius:999px; }
+.px-match-bar::-moz-progress-bar { background:#6b9ec3; border-radius:999px; }
+.px-gap-count { display:inline-flex; width:fit-content; padding:5px 10px; border-radius:999px; background:#f5dfeb; color:#8b426b; font-size:12px; font-weight:600; }
+.px-matched-chips { display:flex; flex-wrap:wrap; gap:10px; margin:16px 0 28px; }
+.px-matched-chips>div { display:grid; gap:4px; background:#edf5fc; border:1px solid #d8e6f3; border-radius:12px; padding:12px 16px; }
+.px-matched-chips small { color:#627c91; }
+.px-development { margin-top:24px; min-width:0; }
+.px-development legend { font-size:18px; font-weight:650; }
+.px-development>p { margin:10px 0 16px; color:#687c90; }
+.px-development-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.px-development-card { display:flex; align-items:flex-start; gap:12px; padding:20px; border:1px solid #dbe5ef; background:#f7faff; border-radius:16px; cursor:pointer; }
+.px-development-card.is-missing { background:#fff5fa; border-color:#ecd2e0; }
+.px-development-card.is-selected { background:linear-gradient(110deg,#eaf4fd,#fcf0f7); border-color:#4f91ba; box-shadow:0 0 0 1px #4f91ba; }
+.px-development-card input { margin-top:4px; accent-color:#4f91ba; }
+.px-development-card>span { flex:1; min-width:0; }
+.px-development-card strong { display:block; }
+.px-development-card p { margin-top:10px; color:#62748a; line-height:1.6; font-size:13px; }
+.px-skill-badges { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:8px; }
+.px-skill-action { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:24px; padding-top:20px; border-top:1px solid #e4eaf2; }
+@media(max-width:700px) { .px-development-grid { grid-template-columns:1fr; } .px-skill-action { align-items:stretch; flex-direction:column; } }
+
+/* Home-style career cards, with the original companion beside the next step. */
+.px-direction-grid .px-direction-card { padding:26px; border:1px solid #dce5f0; border-radius:24px; background:#ffffffdd; gap:24px; box-shadow:0 8px 25px #45688508; }
+.px-direction-grid .px-direction-card.is-chosen { border-color:#9cbedb; box-shadow:0 10px 30px #45688515; }
+.px-career-top { display:flex; align-items:flex-start; gap:16px; }
+.px-career-top>div:first-child { flex:1; min-width:0; }
+.px-career-top h3 { font-size:20px; line-height:1.4; margin:0; overflow-wrap:anywhere; }
+.px-career-area { color:#827887; margin-top:6px; font-size:13px; }
+.px-best-match { display:inline-block; padding:5px 11px; border-radius:999px; background:#eaf4fc; color:#437eaa; font-size:11px; font-weight:600; margin-bottom:12px; }
+.px-career-score { width:78px; flex-shrink:0; text-align:center; }
+.px-career-score svg { width:100%; }
+.px-career-score text { font-size:23px; font-weight:700; fill:#293a52; }
+.px-career-score .px-hint svg { width:16px; }
+.px-career-description { color:#697b92; line-height:1.7; font-size:14px; margin:0; }
+.px-career-skill-group h4 { font-size:11px; letter-spacing:.09em; color:#827887; margin:0 0 10px; }
+.px-career-tags { display:flex; flex-wrap:wrap; gap:8px; }
+.px-career-tags>span { display:inline-flex; align-items:center; gap:5px; border-radius:999px; padding:6px 10px; background:#eaf4fc; color:#477da5; font-size:12px; }
+.px-career-tags.is-building>span { border:1px dashed #d2aac2; background:#fff7fb; color:#905776; }
+.px-career-tags small { color:#708198; }
+.px-career-bottom { display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:24px; align-items:start; margin-top:26px; }
+.px-career-bottom>.px-chosen { margin-top:0; }
+.px-career-bottom>.px-companion:only-child { grid-column:1/-1; position:static; max-width:420px; justify-self:center; }
+@media(max-width:1100px) { .px-career-top { gap:10px; } .px-career-score { width:62px; } .px-direction-grid .px-direction-card { padding:20px; } }
+@media(max-width:900px) { .px-career-bottom { grid-template-columns:1fr; } .px-career-bottom .px-companion { order:0; } .px-direction-grid { grid-template-columns:1fr; } }
+
+/* Compact exploration workspace with a persistent companion. */
+.px-career-layout { display:grid; grid-template-columns:minmax(0,1fr) 260px; gap:24px; align-items:start; }
+.px-career-main { min-width:0; display:grid; gap:24px; }
+.px-career-layout>.px-companion { position:sticky; top:88px; display:flex; flex-direction:column; order:0; gap:16px; max-height:calc(100dvh - 108px); overflow-y:auto; }
+.px-career-layout .px-companion-avatar { width:100%; height:220px; min-height:180px; aspect-ratio:auto; max-width:none; flex-shrink:0; }
+.px-career-layout .px-companion-avatar img { object-fit:cover; }
+.px-career-main .px-direction-card { height:420px; gap:14px; padding:20px; }
+.px-career-main .px-career-top { height:104px; flex-shrink:0; }
+.px-career-main .px-career-top h3 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:17px; }
+.px-career-main .px-career-score { width:62px; }
+.px-career-main .px-best-match { font-size:10px; margin-bottom:6px; }
+.px-description-row { display:flex; align-items:flex-start; gap:5px; height:66px; flex-shrink:0; }
+.px-description-row .px-career-description { flex:1; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; font-size:13px; line-height:22px; }
+.px-match-summary { font-size:12px; color:#55728b; margin:0; }
+.px-career-main .px-career-tags.is-building { max-height:60px; overflow-y:auto; }
+.px-career-main .px-direction-card>button { font-size:12px; white-space:normal; min-height:40px; }
+.px-career-main .px-chosen { margin:0; }
+.px-other-skills { margin-top:22px; border-top:1px solid #e0e7f0; padding-top:18px; }
+.px-other-skills summary { cursor:pointer; font-weight:600; color:#4a7595; }
+.px-other-skills .px-development-grid { margin-top:16px; }
+@media(max-width:1350px) { .px-career-main .px-direction-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:1000px) { .px-career-layout { grid-template-columns:1fr; } .px-career-layout>.px-companion { position:static; max-height:none; } .px-career-layout .px-companion-avatar { max-width:240px; } }
+@media(max-width:650px) { .px-career-main .px-direction-grid { grid-template-columns:1fr; } }
+
+/* Keep explanation icons at section level, not repeated across every card. */
+.px-match-help { display:flex; align-items:center; gap:6px; margin:10px 0 0; color:#718297; font-size:12px; }
+.px-career-main .px-direction-card { display:grid; grid-template-rows:100px 66px 24px minmax(0,1fr) 42px; gap:12px; height:420px; }
+.px-career-main .px-career-top { height:auto; }
+.px-career-main .px-direction-card>button { margin:0; width:100%; height:42px; }
+.px-career-main .px-match-summary { display:block; margin:0; text-align:left; line-height:24px; cursor:help; }
+.px-career-main .px-career-skill-group { min-height:0; overflow:auto; }
+.px-career-main .px-career-skill-group h4 { margin-bottom:8px; }
+.px-career-main .px-career-tags.is-building { max-height:none; overflow:visible; }
+.px-description-row .px-career-description { cursor:help; margin:0; }
