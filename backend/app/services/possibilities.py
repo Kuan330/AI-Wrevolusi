@@ -172,6 +172,33 @@ def wef_career_evidence(
     return current, suggested, developing - current
 
 
+def completed_course_wef_skill_ids(
+    skills: Mapping[int, Mapping],
+    catalogue_scope: Mapping[str, Mapping[str, set[int]]],
+    progress_rows: Iterable[Mapping],
+) -> set[int]:
+    """Return WEF skills with at least one fully completed linked course."""
+    progress: dict[tuple[str, str], dict[int, int]] = {}
+    for row in progress_rows:
+        key = (str(row['skill_id']), str(row['course_id']))
+        progress.setdefault(key, {})[int(row['chapter_index'])] = int(row['value'])
+
+    completed_slugs = {
+        skill_slug
+        for skill_slug, courses in catalogue_scope.items()
+        for course_id, chapter_indexes in courses.items()
+        if chapter_indexes and all(
+            progress.get((skill_slug, course_id), {}).get(chapter_index, 0) >= 10
+            for chapter_index in chapter_indexes
+        )
+    }
+    return {
+        int(skill_id)
+        for skill_id, skill in skills.items()
+        if slugify_skill_name(str(skill.get('core_skill') or '')) in completed_slugs
+    }
+
+
 def rank_esco_directions(occupations, relations, skills, current_skill_uris, developing_skill_uris, source):
     """Rank source-linked ESCO roles using current skills and learning interests."""
     by_occupation: dict[str, list[dict]] = {}

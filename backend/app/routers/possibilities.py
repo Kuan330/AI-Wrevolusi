@@ -11,6 +11,7 @@ from app.services.occupation_text import occupation_description_sql
 from app.services.possibilities import (
     MODERN_PROFILE_KEY,
     PROFILE_RECOVERY_MESSAGE,
+    completed_course_wef_skill_ids,
     confirmed_workspace_evidence,
     occupation_required_skills,
     recommend_occupations,
@@ -155,6 +156,20 @@ async def get_possibilities(
         )
     except ValueError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from None
+
+    try:
+        from app.services.catalogue import load_catalogue_scope
+
+        catalogue_scope = await load_catalogue_scope(db)
+        progress_rows = (await db.execute(text(
+            'SELECT skill_id, course_id, chapter_index, value '
+            'FROM learning_progress WHERE user_id=:user_id'
+        ), {'user_id': current_user.id})).mappings().all()
+        course_skills = completed_course_wef_skill_ids(skills, catalogue_scope, progress_rows)
+        developing_wef |= course_skills - current_wef
+        suggested_wef -= developing_wef
+    except Exception:
+        logger.exception('Failed to load completed-course evidence for Possibilities')
 
     ranked = recommend_occupations(
         occupation_rows, current_wef, skills, limit=3,
