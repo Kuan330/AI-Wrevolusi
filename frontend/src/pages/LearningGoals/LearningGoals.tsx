@@ -261,7 +261,7 @@ function GoalDetail({ goal, tasks, run, busy, needsReload }: { goal: LearningGoa
       <div className="lg-buttons"><button disabled={busy || Boolean(draftError)} onClick={reload}>Reload saved account and keep draft</button>{draftError && !unreadable && <button disabled={busy} onClick={() => keepDraft(draftRef.current)}>Retry keeping draft</button>}<button disabled={busy} onClick={() => setDiscarding(true)}>Discard unsaved changes</button></div>
       {discarding && <div><p>Discard the wording, action and attempt draft in this tab? Saved account records stay unchanged.</p><button disabled={busy} onClick={discardDraft}>Confirm discard</button><button disabled={busy} onClick={() => setDiscarding(false)}>Keep editing</button></div>}
     </RecoveryContainer>}
-    <section className="lg-card"><p className="lg-eyebrow">My goal</p><h2>{goalDisplayLabel(goal.wording, goal.initial.skill.label)}</h2><p className="lg-muted">{cleanDisplayText(origin.skill.label)} · Saved {displayDate(goal.createdAt)}</p>
+    <section className="lg-card" hidden><p className="lg-eyebrow">My goal</p><h2>{goalDisplayLabel(goal.wording, goal.initial.skill.label)}</h2><p className="lg-muted">{cleanDisplayText(origin.skill.label)} · Saved {displayDate(goal.createdAt)}</p>
       {origin.career && <p>Chosen career direction: <strong>{cleanDisplayText(origin.career.title)}</strong></p>}
       {origin.origin === "browse" && <p>Independent learning · Work tasks and a career reason are optional.</p>}
       {warnings.length > 0 && <div className="lg-warning"><h3>Check the original context</h3>{warnings.map((w, i) => <p key={i}>{w}</p>)}<Link to={ROUTES.skills}>Review my skills</Link>{newGoalLink}</div>}

@@ -47,8 +47,8 @@ export function validateLearningRequest(value: string): string {
   if (value.trim().length > 300) return "Keep your goal to 300 characters or fewer.";
   return "";
 }
-export function createOnboardingRecords({ inputs, resources, courses, selectedSkill = null, referenceSkills = [], goalId = crypto.randomUUID() }: {
-  inputs: LearningPlanInputs; resources: LearningPlanResource[]; courses: Course[]; selectedSkill?: string | number | null; referenceSkills?: WefSkill[]; goalId?: string;
+export function createOnboardingRecords({ inputs, resources, courses, selectedCourseIds, selectedSkill = null, referenceSkills = [], goalId = crypto.randomUUID() }: {
+  inputs: LearningPlanInputs; resources: LearningPlanResource[]; courses: Course[]; selectedCourseIds?: string[]; selectedSkill?: string | number | null; referenceSkills?: WefSkill[]; goalId?: string;
 }): { goal: LearningGoal; plan: PersonalLearningPlan; completion: LearningOnboardingCompletion } {
   const checked = setupInputs(inputs);
   const now = new Date().toISOString();
@@ -63,13 +63,13 @@ export function createOnboardingRecords({ inputs, resources, courses, selectedSk
   const selected = resolveCatalogueSkill(selectedSkill, referenceSkills);
   if (selectedSkill !== null && !selected) throw new Error("The selected skill is not in the current WEF framework. Choose a supported skill or build a practice-only plan.");
   const topic = { skillId: selected?.slug ?? "", skillLabel: selected?.name ?? checked.goalText };
-  const plan = generatePersonalPlan({ goalId, goalTitle: checked.goalText, ...topic, courses, inputs: checked, resources });
+  const plan = generatePersonalPlan({ goalId, goalTitle: checked.goalText, ...topic, courses, selectedCourseIds, inputs: checked, resources });
   return { goal, plan, completion: { version: 1, completedAt: now, goalId, planId: plan.id } };
 }
 
 /** Complete only after a single server-confirmed transaction saves all three records. */
-export async function completeLearningOnboarding(records: ReturnType<typeof createOnboardingRecords>): Promise<void> {
-  if (onboardingStatus() === "completed") throw new Error("Your learning setup has already been completed. Reload your saved plan.");
+export async function completeLearningOnboarding(records: ReturnType<typeof createOnboardingRecords>, allowNewPlan = false): Promise<void> {
+  if (onboardingStatus() === "completed" && !allowNewPlan) throw new Error("Your learning setup has already been completed. Reload your saved plan.");
   const goals = readLearningGoals();
   if (goals.length >= 100) throw new Error("Your account has reached its learning goal limit. Existing records have been kept.");
   if (goals.some(goal => goal.id === records.goal.id)) throw new Error("This setup was already saved. Reload your learning plan.");

@@ -94,7 +94,9 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
       if (pendingIds.length) await changeSavedCourses({ add: pendingIds });
       await flushWorkspace();
       if (mounted.current && owner === currentWorkspaceSession()) {
-        navigate(ROUTES.plan);
+        const params = new URLSearchParams({ setup: "courses" });
+        selectedIds.forEach(id => params.append("course", id));
+        navigate(`${ROUTES.learningGoals}?${params}`);
         message.success(`${selectedIds.length} ${selectedIds.length === 1 ? "course" : "courses"} added to your learning plan.`, 4500);
       }
     } catch (error) {
@@ -141,7 +143,7 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
       })}</div>
     </section>
 
-    <div className={`skill-path__planbar${pendingIds.length || saveError ? " has-selection" : ""}`}><div><span><BookOpen size={19} /><strong>{pendingIds.length ? `${pendingIds.length} ${pendingIds.length === 1 ? "course" : "courses"} selected for your next step` : "Choose your next courses"}</strong></span><p>{saveError ? "Your choices are kept here. Retry to confirm they are saved to your account." : pendingIds.length ? "Save your selections and continue in My courses." : "Select at least one course to add to your learning plan."}</p></div><button type="button" disabled={saving || Boolean(savedError) || (!pendingIds.length && !saveError)} onClick={() => { void addToLearningPlan(); }}>{saving ? "Saving your courses…" : saveError ? "Retry saving courses" : "Add to my learning plan"}<ArrowRight size={17} /></button>{(saveError || savedError) && <p role="alert">{saveError || savedError}</p>}</div>
+    <div className={`skill-path__planbar${pendingIds.length || saveError ? " has-selection" : ""}`}><div><span><BookOpen size={19} /><strong>{pendingIds.length ? `${pendingIds.length} ${pendingIds.length === 1 ? "course" : "courses"} selected for your next step` : "Choose your next courses"}</strong></span><p>{saveError ? "Your choices are kept here. Retry to confirm they are saved to your account." : pendingIds.length ? "Add these courses to your plan, then choose when to learn." : "Select at least one course to add to your learning plan."}</p></div><button type="button" disabled={saving || Boolean(savedError) || (!pendingIds.length && !saveError)} onClick={() => { void addToLearningPlan(); }}>{saving ? "Saving your courses…" : saveError ? "Retry saving courses" : "Build my plan"}<ArrowRight size={17} /></button>{(saveError || savedError) && <p role="alert">{saveError || savedError}</p>}</div>
     <p className="skill-path__footnote">Suggestions come from your task wording and the WEF skills framework. They do not measure your skill level.</p>
   </section>;
 }
