@@ -1,0 +1,55 @@
+.learning-plan-setup { color: #302d35; max-width: 720px; margin: 20px 0 0; }
+.learning-plan-setup .lps-controls, .learning-plan-setup .lps-question { min-width: 0; padding: 0; border: 0; margin: 0; }
+.learning-plan-setup .lps-kicker { display: block; font-size: .74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #366681; }
+.learning-plan-setup .lps-goal { padding: 20px 22px; background: #f3f8fb; border: 1px solid #d7e5ed; border-radius: 14px; }
+.learning-plan-setup .lps-goal-title { font-size: 1.5rem; line-height: 1.4; font-weight: 650; margin: 6px 0 10px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.learning-plan-setup .lps-text-button { border: 0; background: transparent; padding: 4px 0; min-height: 36px; font-size: .88rem; text-decoration: underline; text-underline-offset: 3px; color: #285d78; }
+.learning-plan-setup button { gap: 7px; }
+.learning-plan-setup .lps-intro { margin: 24px 0 26px; color: #655f69; }
+.learning-plan-setup .lps-question { margin-top: 26px; }
+.learning-plan-setup .lps-question legend, .learning-plan-setup .lps-question h4 { font-size: .97rem; font-weight: 650; margin: 0 0 12px; padding: 0; }
+.learning-plan-setup .lps-optional { color: #655f69; font-weight: 400; margin-left: 5px; font-size: .87rem; }
+.learning-plan-setup .lps-level-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.learning-plan-setup .lps-pill-options { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.learning-plan-setup .lps-choice { position: relative; display: block; margin: 0; font-weight: 500; cursor: pointer; }
+.learning-plan-setup .lps-choice input { position: absolute; width: 1px; height: 1px; opacity: 0; margin: 0; padding: 0; pointer-events: none; }
+.learning-plan-setup .lps-choice-content { display: flex; border: 1px solid #abbfcf; background: #fff; padding: 12px 15px; border-radius: 10px; min-height: 46px; gap: 8px; align-items: center; transition: background .12s, border-color .12s; }
+.learning-plan-setup .lps-level .lps-choice-content { flex-direction: column; align-items: stretch; height: 100%; gap: 6px; padding: 15px; }
+.learning-plan-setup .lps-choice-title { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: .9rem; font-weight: 650; }
+.learning-plan-setup .lps-choice-detail { color: #655f69; font-size: .77rem; line-height: 1.5; }
+.learning-plan-setup .lps-pill .lps-choice-content { padding: 9px 15px; border-radius: 999px; font-size: .86rem; }
+.learning-plan-setup .lps-choice:hover .lps-choice-content { border-color: #285d78; background: #f5fafc; }
+.learning-plan-setup .lps-selected-icon { visibility: hidden; flex-shrink: 0; }
+.learning-plan-setup .lps-choice input:checked + .lps-choice-content { background: #eaf4fa; border-color: #285d78; color: #204c66; box-shadow: inset 0 0 0 1px #285d78; }
+.learning-plan-setup .lps-choice input:checked + .lps-choice-content .lps-selected-icon { visibility: visible; }
+.learning-plan-setup .lps-choice input:focus-visible + .lps-choice-content { outline: 3px solid #5d96b5; outline-offset: 3px; }
+.learning-plan-setup .lps-choice input:disabled + .lps-choice-content { opacity: .6; cursor: not-allowed; }
+.learning-plan-setup .lps-hint { color: #655f69; font-size: .82rem; line-height: 1.55; margin: 9px 0 12px; }
+.learning-plan-setup .lps-resource-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.learning-plan-setup .lps-resource-actions button { font-size: .86rem; border-radius: 999px; font-weight: 500; }
+.learning-plan-setup .lps-file-input { display: none; }
+.learning-plan-setup .lps-link-editor { margin-top: 14px; padding: 14px; border: 1px solid #dbe3e9; border-radius: 10px; background: #f7fafc; }
+.learning-plan-setup .lps-link-editor label { margin-top: 0; font-size: .86rem; }
+.learning-plan-setup .lps-link-editor > div { display: flex; gap: 8px; flex-wrap: wrap; }
+.learning-plan-setup .lps-link-editor input { flex: 1 1 200px; width: auto; min-width: 0; }
+.learning-plan-setup .lps-link-editor button { font-size: .82rem; }
+.learning-plan-setup .lps-resources { list-style: none; margin: 14px 0; padding: 0; }
+.learning-plan-setup .lps-resources li { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #dbe3e9; border-radius: 10px; margin-top: 8px; background: #fafcfd; }
+.learning-plan-setup .lps-resources li > svg { flex-shrink: 0; color: #366681; }
+.learning-plan-setup .lps-resources li > div { flex: 1; min-width: 0; }
+.learning-plan-setup .lps-resources strong, .learning-plan-setup .lps-resources span { display: block; overflow-wrap: anywhere; font-size: .84rem; }
+.learning-plan-setup .lps-resources span { color: #655f69; font-size: .76rem; margin-top: 3px; }
+.learning-plan-setup .lps-resources button { flex-shrink: 0; min-height: 36px; width: 36px; padding: 0; background: #fff; }
+.learning-plan-setup .lps-privacy { font-size: .77rem; line-height: 1.55; color: #655f69; margin: 14px 0; }
+.learning-plan-setup .lps-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; border-top: 1px solid #e1e6eb; margin-top: 28px; padding-top: 22px; }
+.learning-plan-setup .lps-submit { background: #285d78; border-color: #285d78; color: #fff; min-height: 48px; padding: 11px 22px; }
+.learning-plan-setup .lps-submit:hover:not(:disabled) { background: #204b62; }
+.learning-plan-setup .lps-error { border: 1px solid #e6bbb7; background: #fff0ef; color: #8e2820; padding: 12px 14px; border-radius: 10px; font-size: .87rem; }
+.learning-plan-setup .lps-edit-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 9px; }
+.learning-plan-setup .lps-edit-footer span { color: #655f69; font-size: .76rem; flex: 1 1 180px; }
+.learning-plan-setup .lps-edit-footer button { font-size: .8rem; }
+.learning-plan-setup .lps-progress { background: #edf8f2; color: #255c43; border-radius: 10px; padding: 12px 14px; font-size: .85rem; }
+.learning-plan-setup .lps-spinner { animation: lps-spin 1s linear infinite; }
+@keyframes lps-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .learning-plan-setup .lps-spinner { animation: none; } .learning-plan-setup .lps-choice-content { transition: none; } }
+@media (max-width: 640px) { .learning-plan-setup .lps-level-options { grid-template-columns: 1fr; } .learning-plan-setup .lps-goal { padding: 16px; } .learning-plan-setup .lps-goal-title { font-size: 1.25rem; } .learning-plan-setup .lps-level .lps-choice-content { padding: 12px 15px; } .learning-plan-setup .lps-question { margin-top: 23px; } .learning-plan-setup .lps-footer > button { flex: 1 1 170px; } }

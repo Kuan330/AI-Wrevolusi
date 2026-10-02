@@ -12,6 +12,21 @@ export class ApiError extends Error {
   }
 }
 
+/** FastAPI may return a list of validation failures rather than one detail string. */
+export function apiErrorDetail(body: unknown, status: number): string {
+  if (body && typeof body === "object" && "detail" in body) {
+    const detail = body.detail;
+    if (typeof detail === "string" && detail.trim()) return detail;
+    if (Array.isArray(detail)) {
+      const messages = detail.filter((item): item is { msg: string } =>
+        Boolean(item) && typeof item === "object" && "msg" in item && typeof item.msg === "string",
+      ).map(item => item.msg.replace(/^Value error,\s*/i, "").slice(0, 500));
+      if (messages.length) return [...new Set(messages)].slice(0, 3).join(" ");
+    }
+  }
+  return `Request failed with status ${status}`;
+}
+
 const parseResponseBody = async (response: Response): Promise<unknown> => {
   if (response.status === 204) {
     return null;
@@ -66,13 +81,7 @@ const request = async <T>(
     }
     const body = await parseResponseBody(response);
     if (!response.ok) {
-      const detail =
-        typeof body === "object" &&
-        body !== null &&
-        "detail" in body &&
-        typeof body.detail === "string"
-          ? body.detail
-          : `Request failed with status ${response.status}`;
+      const detail = apiErrorDetail(body, response.status);
       throw new ApiError(detail, response.status);
     }
 

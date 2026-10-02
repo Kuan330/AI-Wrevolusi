@@ -203,6 +203,9 @@ def validate_new_goal_source(goal, data):
             raise ValueError('The goal must keep your saved personal skill and its work context.')
         for item in expected['tasks']:
             validate_current_task(item, data)
+    elif source_key.startswith('onboarding:'):
+        from app.services.learning_onboarding import validate_onboarding_source
+        validate_onboarding_source(goal, data)
     elif source_key.startswith('context:'):
         context = json.loads(data.get('aiwrevolusi.journey.v1', '{"contexts":{}}')).get('contexts', {}).get(source_key[8:])
         if not context:

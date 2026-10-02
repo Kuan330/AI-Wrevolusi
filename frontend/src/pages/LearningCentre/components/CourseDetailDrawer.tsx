@@ -1,4 +1,5 @@
 import { cleanDisplayText } from "@/lib/displayText";
+import { safeProviderUrl } from "@/features/course-workspace/courseWorkspace";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Bookmark, ExternalLink, Trash2 } from "lucide-react";
 import {
@@ -47,6 +48,7 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
         .map((item) => item.charAt(0).toUpperCase() + item.slice(1)),
     [course.outcomes],
   );
+  const providerUrl = safeProviderUrl(course.url);
   const sheetRef = useRef<HTMLDivElement>(null);
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const aboutIsLong = course.intro.length > 180;
@@ -87,15 +89,15 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
           </DrawerDescription>
         </DrawerHeader>
         <DrawerBody>
-          <a
+          {providerUrl ? <a
             className="learning-provider-link"
-            href={course.url}
+            href={providerUrl}
             target="_blank"
             rel="noopener noreferrer"
           >
             Open provider course
             <ExternalLink size={14} />
-          </a>
+          </a> : <p className="library-muted">A provider link is not available for this course.</p>}
           {linkedSkills && linkedSkills.length > 0 && <p className="library-linked-skills"><strong>Linked skills:</strong> {linkedSkills.map(cleanDisplayText).join(" · ")}</p>}
           {learningRecords && learningRecords.length > 1 && <section className="learning-course-records" aria-label="Learning records for linked skills">
             <h3>Learning records for linked skills</h3>
@@ -198,7 +200,7 @@ export default function CourseDetailDrawer(props: CourseDetailDrawerProps) {
             onClick={onSave}
           >
             {saved ? <Trash2 size={16} /> : <Bookmark size={16} />}
-            {busy ? "Saving…" : saved ? "Remove from My Learning" : "Add to My Learning"}
+            {busy ? "Saving…" : saved ? "Remove from My courses" : "Add to My courses"}
           </Button>
         </div>
       </DrawerContent>

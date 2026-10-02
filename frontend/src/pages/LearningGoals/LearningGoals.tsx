@@ -19,6 +19,12 @@ import PendingLearningInterests from "./PendingLearningInterests";
 import GoalSuggestion from "./GoalSuggestion";
 import SavedGoalHistory from "./SavedGoalHistory";
 import { plannedActivityAttempt, hasMaterialGoalWarnings } from "@/features/learning-goals/guidedLearning";
+import { loadLearningCatalogue } from "@/features/learning-planning/courseDirectory";
+import { changeSavedCourses } from "@/features/learning-planning/courseOperations";
+import type { Course } from "@/features/learning-planning/types";
+import { EXPERIENCE_LABELS, experienceLevelForPlan, formatDays, formatMinutes, generatePersonalPlan, GOAL_LABELS, readPersonalPlan, savePersonalPlan, selectPlanCourses, type PersonalLearningPlan, type LearningPlanInputs, type PlanActivity } from "@/features/learning-goals/personalLearningPlan";
+import type { LearningPlanResource } from "@/features/learning-goals/learningPlanSetup";
+import LearningPlanSetup from "./LearningPlanSetup";
 import type { GuidedGoalSuggestion } from "@/services/guidedLearningService";
 import "./learning-goals.css";
 
@@ -241,9 +247,11 @@ function GoalDetail({ goal, tasks, run, busy, needsReload }: { goal: LearningGoa
     }} />;
   const recoveryNeedsAttention = reviewRequired || Boolean(draftError) || needsReload;
   const RecoveryContainer = recoveryNeedsAttention ? "section" : "details";
+  const independentRequest = goal.sourceKey === `onboarding:${goal.id}`;
   const sourceParams = goal.sourceKey.startsWith("personal:") ? `personal=${encodeURIComponent(goal.sourceKey.slice(9))}` : goal.sourceKey.startsWith("specialist:") ? `specialist=${encodeURIComponent(goal.sourceKey.slice(11))}` : `context=${encodeURIComponent(goal.sourceKey.slice(8))}`;
-  const newGoalLink = <p><Link to={`${ROUTES.learningGoals}?${sourceParams}&new=1`}>Create a new goal from my current saved choice</Link></p>;
+  const newGoalLink = independentRequest ? <p><Link to={ROUTES.skills}>Choose another learning interest</Link></p> : <p><Link to={`${ROUTES.learningGoals}?${sourceParams}&new=1`}>Create a new goal from my current saved choice</Link></p>;
   return <>
+    <PersonalPlanManager goal={goal} run={run} busy={busy} needsReload={needsReload} />
     {(draftHasChanges(draft) || draftError || needsReload) && <RecoveryContainer className="lg-warning" aria-label="Unsaved draft recovery">
       {recoveryNeedsAttention ? <h2>{needsReload ? "Reload your saved account to continue" : "Unsaved changes need attention"}</h2> : <summary>Unsaved draft options</summary>}
       <p>Your draft is separate from saved learning evidence. It belongs to this account and goal in this tab.</p>
@@ -264,8 +272,8 @@ function GoalDetail({ goal, tasks, run, busy, needsReload }: { goal: LearningGoa
       </form>
       </details>
       <details className="lg-starting"><summary>Why I chose this skill and my starting record</summary>
-        <p><strong>Original goal:</strong> {goalDisplayLabel(origin.wording, origin.skill.label)}</p><p><strong>Skill source:</strong> {origin.skill.source === "personal" ? "Your own skill entry. No external source identity or version is claimed." : `${origin.skill.source.toUpperCase()} ${origin.skill.sourceVersion ? `version ${origin.skill.sourceVersion}` : "· source version not recorded"}`}</p>
-        <p className="lg-muted lg-break">Skill identity: {origin.skill.id}</p><p><strong>My original choice:</strong> {origin.decision ? decisionLabels[origin.decision] ?? origin.decision : "Not recorded"}</p>
+        <p><strong>Original goal:</strong> {goalDisplayLabel(origin.wording, origin.skill.label)}</p><p><strong>Skill source:</strong> {independentRequest ? "Your own learning request. No confirmed skill or work evidence is claimed." : origin.skill.source === "personal" ? "Your own skill entry. No external source identity or version is claimed." : `${origin.skill.source.toUpperCase()} ${origin.skill.sourceVersion ? `version ${origin.skill.sourceVersion}` : "· source version not recorded"}`}</p>
+        <p className="lg-muted lg-break">{independentRequest ? "Goal identity" : "Skill identity"}: {origin.skill.id}</p><p><strong>My original choice:</strong> {origin.decision ? decisionLabels[origin.decision] ?? origin.decision : "Not recorded"}</p>
         {origin.tasks.length ? <><h3>Tasks saved with this goal</h3><ul>{origin.tasks.map(t => <li key={t.id}>{cleanDisplayText(t.wording)}</li>)}</ul></> : <p>{origin.origin === "browse" ? "No work task was linked. Independent learning does not require one." : "No confirmed work task was linked at the start. This is a gap in the record, not a lack of ability."}</p>}
         {origin.career ? <p><strong>Career reason:</strong> {cleanDisplayText(origin.career.title)} ({origin.career.code})</p> : <p>{origin.origin === "browse" ? "No career reason was linked. This is optional for independent learning." : "No career reason was saved."}</p>}
         {origin.sourceOccupationUri && <p>An ESCO role was used to discover this skill. That role is not a confirmed career goal.</p>}
@@ -318,4 +326,85 @@ function AttemptForm({ value, historical, tasks, busy, saveBlocked, onChange, on
     {confirmDiscard && <div className="lg-warning"><p>Discard this unsaved attempt draft? Saved attempts stay unchanged.</p><button type="button" disabled={busy} onClick={() => { onCancel(); setConfirmDiscard(false); }}>Confirm discard attempt</button><button type="button" onClick={() => setConfirmDiscard(false)}>Keep draft</button></div>}
     <div className="lg-buttons"><button className="lg-primary" disabled={saveBlocked || (type === "workplace_practice" && (!task || !selectable.some(t => taskIdentity(t.task) === taskIdentity(task))))}>{busy ? "Saving…" : value.editing ? "Save correction" : "Save attempt"}</button>{(value.editing || description || notes) && <button type="button" disabled={busy} onClick={() => setConfirmDiscard(true)}>Discard attempt draft</button>}</div>
   </form>;
+}
+
+function PersonalPlanManager({ goal, run, busy, needsReload }: { goal: LearningGoal; run: Run; busy: boolean; needsReload: boolean }) {
+  const [saved] = useState(() => {
+    try { return { plan: readPersonalPlan(goal.id), error: "" }; }
+    catch (error) { return { plan: null, error: errorText(error) }; }
+  });
+  const [plan, setPlan] = useState<PersonalLearningPlan | null>(saved.plan);
+  const [editing, setEditing] = useState(!saved.plan);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [catalogueError, setCatalogueError] = useState("");
+  const [catalogueLoading, setCatalogueLoading] = useState(true);
+  const [selectedIds, setSelectedIds] = useState<string[]>(saved.plan?.courseIds ?? []);
+  const [retry, setRetry] = useState(0);
+  const [expanded, setExpanded] = useState(!saved.plan || saved.plan.status !== "active");
+  // Catalogue keys are WEF name slugs, not numeric WEF ids or ESCO URIs.
+  const skillId = goal.initial.skill.source === "wef"
+    ? goal.initial.skill.label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") : plan?.skillId ?? "";
+  useEffect(() => {
+    let cancelled = false;
+    const request = skillId ? loadLearningCatalogue(skillId, true) : Promise.resolve({ courses: [] as Course[] });
+    void request.then(result => {
+      if (!cancelled) { setCourses(result.courses); setCatalogueError(""); }
+    }).catch(() => {
+      if (!cancelled) setCatalogueError("The course catalogue is unavailable. You can still build a practice-only plan, or retry loading courses.");
+    }).finally(() => { if (!cancelled) setCatalogueLoading(false); });
+    return () => { cancelled = true; };
+  }, [skillId, retry]);
+  const blocked = busy || needsReload || Boolean(saved.error);
+  const generate = async (inputs: LearningPlanInputs, resources: LearningPlanResource[]) => {
+    if (blocked || catalogueLoading) return;
+    const next = generatePersonalPlan({ goalId: goal.id, goalTitle: goal.wording, skillId, skillLabel: plan?.skillLabel ?? goal.initial.skill.label, courses, inputs, resources });
+    const ok = await run(async () => { await savePersonalPlan(next); }, "Your personalised plan is saved and ready to review.");
+    if (ok) { setPlan(next); setSelectedIds(next.courseIds); setExpanded(true); setEditing(false); }
+    else throw new Error("The plan could not be saved. Your answers are still here; review the message above before trying again.");
+  };
+  const selectedPlan = plan ? selectPlanCourses(plan, selectedIds) : null;
+  const accept = async () => {
+    if (!selectedPlan || blocked) return;
+    let accepted: PersonalLearningPlan | undefined;
+    const ok = await run(async () => {
+      const result = await changeSavedCourses({ add: selectedPlan.courseIds, personalPlan: selectedPlan });
+      accepted = result.personalPlan;
+    }, selectedPlan.courseIds.length ? "Your plan is active. Your selected courses are saved in My courses." : "Your practice plan is active. Record your activities below as you work towards your goal.");
+    if (ok && accepted) { setPlan(accepted); setSelectedIds(accepted.courseIds); }
+  };
+  return <section className="lg-card lg-plan" aria-labelledby="personal-plan-heading">
+    <div className="lg-plan-heading"><div><p className="lg-eyebrow">Goals &amp; activities</p><h2 id="personal-plan-heading">{editing ? "A learning plan that fits you" : "Your learning blueprint"}</h2></div>{plan && !editing && <span className={`lg-plan-status lg-plan-status--${plan.status}`}>{plan.status === "active" ? "Active plan" : "Ready to review"}</span>}</div>
+    {saved.error && <p role="alert" className="lg-error">{saved.error}</p>}
+    {editing ? <LearningPlanSetup goalTitle={goal.wording} initialInputs={plan?.inputs} initialResources={plan?.resources} disabled={blocked} busy={busy} loading={catalogueLoading} error={catalogueError} onSubmit={generate} onCancel={plan ? () => setEditing(false) : undefined} /> : selectedPlan && plan && <>
+      <p className="lg-plan-outcome">Work towards <strong>{selectedPlan.inputs.goalText}</strong> through a short sequence of learning, practice and reflection.</p>
+      <div className="lg-plan-summary"><span><strong>{selectedPlan.courseIds.length}</strong> selected {selectedPlan.courseIds.length === 1 ? "course" : "courses"}</span><span><strong>{selectedPlan.activities.length}</strong> learning activities</span><span><strong>{formatMinutes(selectedPlan.totals.minutes)}</strong> planned time</span></div>
+      <p className="lg-plan-total">At {selectedPlan.inputs.minutesPerDay} min/day: about {formatDays(selectedPlan.estimatedDays)} · Starting level: {experienceLevelForPlan(selectedPlan.inputs.experience)}</p>
+      {selectedPlan.activities.some(item => item.estimated) && <p className="lg-muted">Some activity durations are planning estimates, not published course times. Your actual pace may differ.</p>}
+      <details className="lg-original-request"><summary>Your original request</summary><p className="lg-preserve">{plan.inputs.goalText}</p><dl><div><dt>Starting point</dt><dd>{EXPERIENCE_LABELS[plan.inputs.experience]}</dd></div><div><dt>Daily time</dt><dd>{plan.inputs.minutesPerDay} minutes</dd></div><div><dt>Motivation</dt><dd>{GOAL_LABELS[plan.inputs.goalKind]}</dd></div></dl></details>
+      {!!plan.resources?.length && <details className="lg-original-request"><summary>Your reference materials ({plan.resources.length})</summary><p className="lg-muted">Kept for your reference. These materials have not been analysed to generate course content.</p><ul>{plan.resources.map(resource => <li key={resource.id}>{resource.kind === "link" ? <a href={resource.url} target="_blank" rel="noopener noreferrer">{resource.name}</a> : <details><summary>{resource.name}</summary><pre className="lg-preserve">{resource.text}</pre></details>}</li>)}</ul></details>}
+      <p className="lg-muted">{plan.rationale}</p>
+      {goal.wording !== plan.goalTitle && <p className="lg-warning">Your saved goal wording has changed since this blueprint was built. Change your answers to build a plan for the updated goal.</p>}
+      <button type="button" className="lg-plan-toggle" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? "Hide learning sequence" : "Review learning sequence"}</button>
+      {expanded && <div className="lg-plan-sequence">
+        {plan.courseIds.length > 0 && <p className="lg-muted">{plan.status === "draft" ? "Select the recommended courses you want to add. You can also start with practice only." : "Suggested order — courses are not locked. Continue them at your own pace."}</p>}
+        {plan.courseIds.map((id, index) => {
+          const course = courses.find(item => item.id === id);
+          const activities = plan.activities.filter(item => item.courseId === id);
+          return <section key={id} className={`lg-plan-course${selectedIds.includes(id) ? " lg-plan-course--selected" : ""}`}>
+            <div className="lg-plan-course-heading"><span className="lg-plan-index">{index + 1}</span><div><p className="lg-eyebrow">Course {index + 1}</p><h3>{course?.title ?? activities[0]?.courseTitle ?? `Saved course ${index + 1}`}</h3><p className="lg-muted">{course ? `${course.provider} · ${course.level} · ` : ""}{activities.length} {activities.length === 1 ? "activity" : "activities"} · {formatMinutes(activities.reduce((sum, item) => sum + item.minutes, 0))}</p></div>{plan.status === "draft" && <label className="lg-plan-choice"><input type="checkbox" checked={selectedIds.includes(id)} disabled={blocked} onChange={event => setSelectedIds(ids => event.target.checked ? [...ids, id] : ids.filter(value => value !== id))} /><span>Add to my plan</span></label>}</div>
+            <details><summary>View course activities</summary><PlanActivityList activities={activities} /></details>
+            <Link to={`${ROUTES.learningCentre}?goal=${encodeURIComponent(goal.id)}&mode=browse&course=${encodeURIComponent(id)}`}>View course details</Link>
+          </section>;
+        })}
+        <h3>Put your learning into practice</h3><PlanActivityList activities={selectedPlan.activities.filter(item => item.kind !== "course")} />
+      </div>}
+      <div className="lg-buttons">{plan.status === "active" ? <><Link className="lg-primary" to={ROUTES.plan}>Go to My courses</Link><button type="button" disabled={blocked} onClick={() => setEditing(true)}>Change my answers</button></> : <><button type="button" className="lg-primary" disabled={blocked} onClick={() => void accept()}>{busy ? "Saving…" : "Accept plan and start"}</button><button type="button" disabled={blocked} onClick={() => setEditing(true)}>Change my answers</button></>}</div>
+      <p className="lg-muted">Build again after changing your answers to regenerate the blueprint. Earlier plans and learning evidence are kept; existing saved courses are not removed.</p>
+    </>}
+    {catalogueError && <div className="lg-buttons"><button type="button" disabled={blocked || catalogueLoading} onClick={() => { setCatalogueLoading(true); setRetry(value => value + 1); }}>Retry loading courses</button></div>}
+    <div className="lg-buttons"><Link to={`${ROUTES.learningCentre}?goal=${encodeURIComponent(goal.id)}&mode=browse`}>Browse more courses</Link></div>
+  </section>;
+}
+function PlanActivityList({ activities }: { activities: PlanActivity[] }) {
+  return <ol className="lg-plan-activities">{activities.map((activity, index) => <li key={activity.id}><span className="lg-plan-index">{index + 1}</span><div><strong>{activity.title}</strong><p>{activity.description}</p><small>{activity.kind === "course" ? "Study" : activity.kind === "practice" ? "Practice" : "Review"} · {formatMinutes(activity.minutes)}{activity.estimated ? " (estimate)" : ""}</small></div></li>)}</ol>;
 }

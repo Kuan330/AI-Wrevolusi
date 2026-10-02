@@ -15,7 +15,7 @@ import type { ProfileTask } from "@/features/work-profile/types";
 import type { WefSkill } from "@/types/reference";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
-import { skillKey } from "../learningSkills";
+import { catalogueSkillSlug as skillKey, coursesForCatalogueSkill } from "@/features/learning-planning/catalogueSkill";
 import "./skill-path.css";
 
 type Props = { tasks: ProfileTask[]; skills: WefSkill[]; assessments: ConfirmedTaskExposureAssessment[]; decisions: Record<string, string>; loading: boolean };
@@ -73,7 +73,7 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
   let savedError = "";
   try { savedIds = readLibrary().saved; }
   catch (error) { savedError = error instanceof Error ? error.message : "Your saved courses could not be read. Reload before making changes."; }
-  const groups = useMemo(() => groupProviderCourses(courses ?? []), [courses]);
+  const groupsBySkill = useMemo(() => new Map(recommendations.map(item => [item.skill.wef_skill_id, groupProviderCourses(coursesForCatalogueSkill(courses ?? [], skillKey(item.skill.core_skill)))])), [courses, recommendations]);
   const pendingIds = selectedIds.filter(id => !savedIds.includes(id));
   const hasHighAssistance = recommendations.some(item => item.highTaskCount > 0);
 
@@ -120,7 +120,7 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
       <div className="skill-path__cards">{recommendations.map((item, index) => {
         const id = item.skill.wef_skill_id;
         const open = openIds.includes(id);
-        const matches = groups.filter(group => group.course.skills.includes(skillKey(item.skill.core_skill)));
+        const matches = groupsBySkill.get(id) ?? [];
         const reviewLink = `${ROUTES.skills}?${new URLSearchParams({ view: "task", task: item.tasks[0].id, skill: String(id) })}`;
         return <article className={`skill-path__card tone-${index % 3}${open ? " is-open" : ""}`} id={`skill-area-${id}`} key={id} style={{ "--path-delay": `${index * 55}ms` } as CSSProperties}>
           <div className="skill-path__card-top"><span className="skill-path__icon"><BookOpen size={20} /></span></div>
@@ -131,7 +131,7 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
             const course = courseGroupRecord(group, savedIds);
             const saved = savedIds.includes(course.id);
             const checked = saved || selectedIds.includes(course.id);
-            return <div className={`skill-path__course${checked ? " is-selected" : ""}`} key={course.id}><label><input type="checkbox" checked={checked} disabled={saving || saved || Boolean(savedError)} onChange={event => { const next = event.target.checked; setSelectedIds(current => next ? [...new Set([...current, course.id])] : current.filter(value => value !== course.id)); setSaveError(""); }} /><span><strong>{cleanDisplayText(group.course.title)}</strong><small>{group.course.provider}{group.course.level !== "unknown" ? ` · ${group.course.level}` : ""}</small><small>{saved ? <><Check size={12} /> Already in your plan</> : group.course.durationMin ? <><Clock3 size={12} /> {group.course.durationMin} min</> : "Duration not listed"}</small></span></label><Link to={`${ROUTES.learningCentre}?${new URLSearchParams({ mode: "browse", course: course.id })}`} aria-label={`Course details for ${group.course.title}`}>Details <ArrowUpRight size={12} /></Link></div>;
+            return <div className={`skill-path__course${checked ? " is-selected" : ""}`} key={course.id}><label><input type="checkbox" checked={checked} disabled={saving || saved || Boolean(savedError)} onChange={event => { const next = event.target.checked; setSelectedIds(current => next ? [...new Set([...current, course.id])] : current.filter(value => value !== course.id)); setSaveError(""); }} /><span><strong>{cleanDisplayText(group.course.title)}</strong><small>{group.course.provider}{group.course.level !== "unknown" ? ` · ${group.course.level}` : ""}</small><small>{saved ? <><Check size={12} /> Already in your plan</> : group.course.durationMin ? <><Clock3 size={12} /> {group.course.durationMin} min</> : "Duration not listed"}</small></span></label><Link to={`${ROUTES.learningCentre}?${new URLSearchParams({ mode: "browse", course: course.id, skill: skillKey(item.skill.core_skill) })}`} aria-label={`Course details for ${group.course.title}`}>Details <ArrowUpRight size={12} /></Link></div>;
           })}{matches.length > 3 && <Link className="skill-path__all-courses" to={`${ROUTES.learningCentre}?${new URLSearchParams({ mode: "browse", skill: skillKey(item.skill.core_skill) })}`}>Browse all {matches.length} courses <ArrowRight size={14} /></Link>}</>}</div>}
         </article>;
       })}</div>

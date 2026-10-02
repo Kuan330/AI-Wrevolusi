@@ -13,7 +13,7 @@ export default function GoalSuggestion({ goal, incoming, disabled, onGoal, onAct
   const alive = useRef(true);
   const request = useRef<AbortController | null>(null);
   const latest = useRef(goal.revision);
-  latest.current = goal.revision;
+  useEffect(() => { latest.current = goal.revision; }, [goal.revision]);
   useEffect(() => { alive.current = true; return () => { alive.current = false; request.current?.abort(); }; }, []);
   async function another() {
     if (pending || disabled) return;
