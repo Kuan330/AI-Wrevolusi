@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 let stored, profile, owner, fail, duringCommit;
 const source=readFileSync(new URL('../src/features/journey/specialistSkills.ts',import.meta.url),'utf8')
- .replace(/^import .*;\n/gm,'')+'\nreturn {parseSpecialistState,readSpecialistState,saveSpecialistEntry,saveSpecialistFocus,specialistEntryKey,specialistEntryIsCurrent};';
+ .replace(/^import .*;\r?\n/gm,'')+'\nreturn {parseSpecialistState,readSpecialistState,saveSpecialistEntry,saveSpecialistFocus,specialistEntryKey,specialistEntryIsCurrent};';
 const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText.replace(/export /g,'');
 const api=new Function('accountStorage','commitWorkspaceItems','currentWorkspaceSession','readJourneyProfile',compiled)(
  {getItem:key=>stored.get(key)??null}, async values=>{const initial=owner;if(duringCommit)await duringCommit();if(fail)throw Error('save failed');if(owner!==initial)throw Error('account changed');for(const [k,v]of Object.entries(values))stored.set(k,v);},()=>owner,()=>profile);

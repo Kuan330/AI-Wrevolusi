@@ -1,0 +1,43 @@
+.learning-plan-onboarding { max-width: 820px; margin: 0 auto; padding: 28px 20px 56px; color: #302d35; line-height: 1.6; }
+.learning-plan-onboarding .lpo-header { margin-bottom: 25px; }
+.learning-plan-onboarding .lpo-eyebrow { display: inline-flex; align-items: center; gap: 7px; color: #366681; font-size: .8rem; font-weight: 650; }
+.learning-plan-onboarding h1 { font-size: clamp(1.65rem, 3vw, 2.2rem); font-weight: 650; letter-spacing: -.035em; line-height: 1.25; margin: 12px 0; }
+.learning-plan-onboarding .lpo-header p { color: #655f69; max-width: 590px; font-size: .94rem; }
+.learning-plan-onboarding .lpo-steps { display: flex; list-style: none; margin: 0 0 20px; padding: 0; gap: 25px; font-size: .85rem; color: #655f69; }
+.learning-plan-onboarding .lpo-steps li { display: flex; align-items: center; gap: 8px; }
+.learning-plan-onboarding .lpo-steps li > span { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #e6edf1; color: #655f69; font-weight: 650; }
+.learning-plan-onboarding .lpo-steps li[aria-current] { color: #285d78; font-weight: 650; }
+.learning-plan-onboarding .lpo-steps li[aria-current] > span { color: white; background: #285d78; }
+.learning-plan-onboarding .lpo-card { background: #fff; border: 1px solid #dbe3e9; border-radius: 18px; padding: 30px; box-shadow: 0 5px 20px #302d3504; }
+.learning-plan-onboarding h2 { font-size: 1.3rem; font-weight: 650; line-height: 1.4; margin: 0 0 8px; }
+.learning-plan-onboarding .lpo-description { color: #655f69; font-size: .92rem; margin-bottom: 25px; }
+.learning-plan-onboarding .lpo-icon { display: inline-flex; align-items: center; justify-content: center; width: 47px; height: 47px; border-radius: 13px; color: #366681; background: #eaf4fa; margin-bottom: 20px; }
+.learning-plan-onboarding label { display: block; font-weight: 600; margin: 16px 0 8px; font-size: .9rem; }
+.learning-plan-onboarding textarea, .learning-plan-onboarding input { display: block; width: 100%; background: #fff; border: 1px solid #abb9c4; border-radius: 10px; padding: 12px 14px; color: #302d35; font: inherit; }
+.learning-plan-onboarding textarea { resize: vertical; min-height: 92px; }
+.learning-plan-onboarding textarea::placeholder { color: #817d85; }
+.learning-plan-onboarding button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #fff; border: 1px solid #a5b7c4; color: #28536d; border-radius: 9px; min-height: 44px; padding: 9px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+.learning-plan-onboarding button:disabled { opacity: .55; cursor: not-allowed; }
+.learning-plan-onboarding :focus-visible { outline: 3px solid #5d96b5; outline-offset: 3px; }
+.learning-plan-onboarding .lpo-input-footer { display: flex; justify-content: flex-end; font-size: .76rem; color: #655f69; margin-top: 9px; }
+.learning-plan-onboarding .lpo-example-label { font-size: .81rem; color: #655f69; margin: 22px 0 10px; }
+.learning-plan-onboarding .lpo-examples { display: flex; flex-wrap: wrap; gap: 8px; }
+.learning-plan-onboarding .lpo-examples button { font-size: .77rem; font-weight: 500; min-height: 36px; border-color: #d0dce4; border-radius: 999px; background: #fafcfd; padding: 7px 12px; }
+.learning-plan-onboarding .lpo-examples button:hover { background: #eaf4fa; border-color: #8eafc2; }
+.learning-plan-onboarding .lpo-goal-footer { margin-top: 30px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.learning-plan-onboarding .lpo-goal-footer > span { font-size: .8rem; color: #655f69; }
+.learning-plan-onboarding .lpo-primary { background: #285d78; color: white; border-color: #285d78; min-width: 130px; }
+.learning-plan-onboarding .lpo-footnote { margin: 20px 4px 0; font-size: .8rem; color: #655f69; max-width: 670px; }
+.learning-plan-onboarding .lpo-error { padding: 12px 14px; background: #fff0ef; border: 1px solid #e6bbb7; color: #8e2820; border-radius: 10px; margin-top: 14px; font-size: .87rem; }
+.learning-plan-onboarding .lpo-catalogue-notice { padding: 12px 14px; background: #fffaec; border: 1px solid #e5d399; border-radius: 10px; margin-top: 14px; }
+.learning-plan-onboarding .lpo-catalogue-notice p { margin: 0 0 8px; font-size: .84rem; }
+.learning-plan-onboarding .lpo-catalogue-notice button { font-size: .8rem; }
+.learning-plan-onboarding .learning-plan-setup { max-width: none; }
+.learning-plan-onboarding .learning-plan-setup .lps-goal-title { font-size: 1.3rem; }
+.learning-plan-onboarding [hidden] { display: none !important; }
+@media (max-width: 640px) { .learning-plan-onboarding { padding: 18px 12px 40px; } .learning-plan-onboarding .lpo-card { padding: 20px 16px; } .learning-plan-onboarding .lpo-goal-footer > button { width: 100%; } .learning-plan-onboarding .lpo-steps { gap: 20px; } }
+.learning-plan-onboarding .lpo-skill-choice { padding: 16px 18px; margin: 20px 0; background: #f7fafc; border: 1px solid #d7e5ed; border-radius: 12px; }
+.learning-plan-onboarding .lpo-skill-choice h3 { font-size: .96rem; font-weight: 650; margin: 0; }
+.learning-plan-onboarding .lpo-skill-choice h3 span { color: #655f69; font-size: .82rem; font-weight: 400; margin-left: 6px; }
+.learning-plan-onboarding .lpo-skill-choice select { display: block; width: 100%; min-height: 44px; border: 1px solid #abb9c4; border-radius: 9px; padding: 10px; background: white; color: #302d35; font: inherit; font-size: .87rem; }
+.learning-plan-onboarding .lpo-skill-choice p { font-size: .8rem; line-height: 1.55; margin: 10px 0 0; color: #655f69; }

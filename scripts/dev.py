@@ -45,6 +45,18 @@ def require_command(name: str) -> None:
         raise RuntimeError(f"Required command is not installed: {name}")
 
 
+def command_path(name: str) -> str:
+    """Return a command string that subprocess can launch on this platform.
+
+    POSIX subprocess searches PATH itself, so the bare name is used and
+    behaviour is unchanged. Windows CreateProcess does not apply PATHEXT, so a
+    bare ``npm`` fails with FileNotFoundError; resolve the real npm.cmd shim.
+    """
+    if os.name == "nt":
+        return shutil.which(name) or name
+    return name
+
+
 def compatible_node(version: str, minimum: tuple[int, ...]) -> bool:
     try:
         installed = tuple(int(part) for part in version.removeprefix("v").split("."))
@@ -53,15 +65,39 @@ def compatible_node(version: str, minimum: tuple[int, ...]) -> bool:
     return len(installed) == 3 and installed[0] == minimum[0] and installed >= minimum
 
 
+def windows_node_candidates(version: str) -> list[Path]:
+    """Known Windows Node locations, including nvm-windows and local installs."""
+    candidates: list[Path] = []
+    for variable in ("NVM_SYMLINK", "NVM_HOME"):
+        base = os.environ.get(variable)
+        if base:
+            candidates.append(Path(base) / "node.exe")
+            candidates.append(Path(base) / f"v{version}" / "node.exe")
+    for variable in ("APPDATA", "LOCALAPPDATA"):
+        base = os.environ.get(variable)
+        if base:
+            candidates.append(Path(base) / "nvm" / f"v{version}" / "node.exe")
+    program_files = os.environ.get("ProgramFiles")
+    if program_files:
+        candidates.append(Path(program_files) / "nodejs" / "node.exe")
+    candidates.append(
+        Path.home() / ".local" / "nodejs" / f"node-v{version}-win-x64" / "node.exe"
+    )
+    return candidates
+
+
 def installed_node_candidates(version: str) -> list[Path]:
     """Known existing installations only. Never download a runtime."""
     major = version.split(".")[0]
-    return [
+    candidates = [
         Path.home() / ".nvm" / "versions" / "node" / f"v{version}" / "bin" / "node",
         Path(f"/opt/homebrew/opt/node@{major}/bin/node"),
         Path(f"/usr/local/opt/node@{major}/bin/node"),
         Path.home() / ".cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
     ]
+    if os.name == "nt":
+        candidates.extend(windows_node_candidates(version))
+    return candidates
 
 
 def select_frontend_runtime() -> None:
@@ -102,7 +138,7 @@ def require_frontend_toolchain() -> None:
         require_command(command)
         try:
             result = subprocess.run(
-                [command, "--version"], check=True, capture_output=True,
+                [command_path(command), "--version"], check=True, capture_output=True,
                 text=True, timeout=10,
             )
         except (OSError, subprocess.SubprocessError) as error:
@@ -128,12 +164,117 @@ def port_number(value: str) -> int:
     return port
 
 
+WINDOWS_CREATE_SUSPENDED = 0x00000004
+WINDOWS_CREATE_NEW_PROCESS_GROUP = 0x00000200
+
+
+class WindowsProcessJob:
+    """Own service processes and their descendants as one Windows job."""
+
+    def __init__(self) -> None:
+        import ctypes
+        from ctypes import wintypes
+
+        class IoCounters(ctypes.Structure):
+            _fields_ = [
+                ("ReadOperationCount", ctypes.c_ulonglong),
+                ("WriteOperationCount", ctypes.c_ulonglong),
+                ("OtherOperationCount", ctypes.c_ulonglong),
+                ("ReadTransferCount", ctypes.c_ulonglong),
+                ("WriteTransferCount", ctypes.c_ulonglong),
+                ("OtherTransferCount", ctypes.c_ulonglong),
+            ]
+
+        class BasicLimitInformation(ctypes.Structure):
+            _fields_ = [
+                ("PerProcessUserTimeLimit", ctypes.c_longlong),
+                ("PerJobUserTimeLimit", ctypes.c_longlong),
+                ("LimitFlags", wintypes.DWORD),
+                ("MinimumWorkingSetSize", ctypes.c_size_t),
+                ("MaximumWorkingSetSize", ctypes.c_size_t),
+                ("ActiveProcessLimit", wintypes.DWORD),
+                ("Affinity", ctypes.c_size_t),
+                ("PriorityClass", wintypes.DWORD),
+                ("SchedulingClass", wintypes.DWORD),
+            ]
+
+        class ExtendedLimitInformation(ctypes.Structure):
+            _fields_ = [
+                ("BasicLimitInformation", BasicLimitInformation),
+                ("IoInfo", IoCounters),
+                ("ProcessMemoryLimit", ctypes.c_size_t),
+                ("JobMemoryLimit", ctypes.c_size_t),
+                ("PeakProcessMemoryUsed", ctypes.c_size_t),
+                ("PeakJobMemoryUsed", ctypes.c_size_t),
+            ]
+
+        self._ctypes = ctypes
+        self._kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        self._ntdll = ctypes.WinDLL("ntdll", use_last_error=True)
+        self._kernel32.CreateJobObjectW.argtypes = [wintypes.LPVOID, wintypes.LPCWSTR]
+        self._kernel32.CreateJobObjectW.restype = wintypes.HANDLE
+        self._kernel32.SetInformationJobObject.argtypes = [
+            wintypes.HANDLE, ctypes.c_int, wintypes.LPVOID, wintypes.DWORD,
+        ]
+        self._kernel32.SetInformationJobObject.restype = wintypes.BOOL
+        self._kernel32.AssignProcessToJobObject.argtypes = [wintypes.HANDLE, wintypes.HANDLE]
+        self._kernel32.AssignProcessToJobObject.restype = wintypes.BOOL
+        self._kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+        self._kernel32.CloseHandle.restype = wintypes.BOOL
+        # Resume the suspended launcher only after it is in the job. This closes
+        # the race where uv/npm could spawn a child before job assignment.
+        self._ntdll.NtResumeProcess.argtypes = [wintypes.HANDLE]
+        self._ntdll.NtResumeProcess.restype = ctypes.c_long
+
+        self._handle = self._kernel32.CreateJobObjectW(None, None)
+        if not self._handle:
+            error = ctypes.WinError(ctypes.get_last_error())
+            raise RuntimeError(f"Could not create the Windows service cleanup job: {error}") from error
+        limits = ExtendedLimitInformation()
+        # Closing the owning Python process also closes this handle, which makes
+        # Windows terminate every service descendant even if the batch shell is
+        # interrupted before Python can run its cleanup block.
+        limits.BasicLimitInformation.LimitFlags = 0x00002000  # KILL_ON_JOB_CLOSE
+        if not self._kernel32.SetInformationJobObject(
+            self._handle, 9, ctypes.byref(limits), ctypes.sizeof(limits),
+        ):
+            error = ctypes.WinError(ctypes.get_last_error())
+            self.close()
+            raise RuntimeError(f"Could not configure the Windows service cleanup job: {error}") from error
+
+    def assign_and_resume(self, process: subprocess.Popen[bytes]) -> None:
+        process_handle = self._ctypes.c_void_p(int(process._handle))
+        if not self._kernel32.AssignProcessToJobObject(self._handle, process_handle):
+            error = self._ctypes.WinError(self._ctypes.get_last_error())
+            process.kill()
+            process.wait()
+            raise RuntimeError(
+                "Windows could not place a service in the cleanup job. "
+                f"The launcher will not start services that it cannot reliably stop: {error}"
+            ) from error
+        status = self._ntdll.NtResumeProcess(process_handle)
+        if status < 0:
+            self.close()
+            process.wait()
+            raise RuntimeError(
+                f"Could not resume a service in the Windows cleanup job "
+                f"(NTSTATUS 0x{status & 0xFFFFFFFF:08X})."
+            )
+
+    def close(self) -> None:
+        if self._handle:
+            handle, self._handle = self._handle, None
+            self._kernel32.CloseHandle(handle)
+
+
 def stop_process(process: subprocess.Popen[bytes]) -> None:
     if process.poll() is not None:
         return
     if os.name == "posix":
         os.killpg(process.pid, signal.SIGTERM)
     else:
+        # The Windows launcher normally stops the shared Job Object instead.
+        # Keep this direct-child fallback for callers outside main().
         process.terminate()
 
 
@@ -194,10 +335,14 @@ def main() -> int:
     frontend_environment["VITE_API_PROXY_TARGET"] = backend_origin
 
     common_options: dict[str, object] = {}
+    process_job: WindowsProcessJob | None = None
     if os.name == "posix":
         common_options["start_new_session"] = True
     elif os.name == "nt":
-        common_options["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+        process_job = WindowsProcessJob()
+        common_options["creationflags"] = (
+            WINDOWS_CREATE_NEW_PROCESS_GROUP | WINDOWS_CREATE_SUSPENDED
+        )
 
     print("Starting AI-Wrevolusi", flush=True)
     print(f"  App:      {frontend_origin}", flush=True)
@@ -207,38 +352,34 @@ def main() -> int:
 
     processes: list[subprocess.Popen[bytes]] = []
     try:
-        processes.append(subprocess.Popen(
-            [
-                "uv",
-                "run",
-                "--locked",
-                "uvicorn",
-                "app.main:app",
-                "--reload",
-                "--host",
-                HOST,
-                "--port",
-                str(backend_port),
-            ],
-            cwd=BACKEND_ROOT,
-            env=backend_environment,
-            **common_options,
-        ))
-        processes.append(subprocess.Popen(
-            [
-                "npm",
-                "run",
-                "dev",
-                "--",
-                "--host",
-                HOST,
-                "--port",
-                str(frontend_port),
-            ],
-            cwd=FRONTEND_ROOT,
-            env=frontend_environment,
-            **common_options,
-        ))
+        for command, cwd, environment in (
+            (
+                [
+                    command_path("uv"), "run", "--locked", "uvicorn",
+                    "app.main:app", "--reload", "--host", HOST,
+                    "--port", str(backend_port),
+                ],
+                BACKEND_ROOT,
+                backend_environment,
+            ),
+            (
+                [
+                    command_path("npm"), "run", "dev", "--", "--host", HOST,
+                    "--port", str(frontend_port),
+                ],
+                FRONTEND_ROOT,
+                frontend_environment,
+            ),
+        ):
+            process = subprocess.Popen(
+                command,
+                cwd=cwd,
+                env=environment,
+                **common_options,
+            )
+            if process_job is not None:
+                process_job.assign_and_resume(process)
+            processes.append(process)
         while True:
             for process in processes:
                 return_code = process.poll()
@@ -248,10 +389,17 @@ def main() -> int:
     except KeyboardInterrupt:
         return 0
     finally:
-        for process in processes:
-            stop_process(process)
-        for process in processes:
-            wait_for_exit(process)
+        try:
+            if process_job is not None:
+                # Closing a KILL_ON_JOB_CLOSE job terminates each wrapper and
+                # descendant, even if this launcher is exiting after Ctrl+C.
+                process_job.close()
+            else:
+                for process in processes:
+                    stop_process(process)
+        finally:
+            for process in processes:
+                wait_for_exit(process)
 
 
 if __name__ == "__main__":

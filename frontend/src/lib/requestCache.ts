@@ -1,3 +1,4 @@
+import { referenceCacheStorage } from "../infrastructure/storage/referenceCacheStorage.ts";
 type Entry<T> = { value: T; at: number };
 type Options = {
   maxAgeMs: number;
@@ -7,13 +8,13 @@ type Options = {
   storage?: () => Storage | undefined;
 };
 
-const browserStorage = () => (typeof localStorage === "undefined" ? undefined : localStorage);
+
 
 /**
  * Keeps successful responses so pages can render at once on a repeat visit.
  * Failures are never cached, so the next call retries.
  */
-export function createRequestCache<T>({ maxAgeMs, storageKey, now = Date.now, storage = browserStorage }: Options) {
+export function createRequestCache<T>({ maxAgeMs, storageKey, now = Date.now, storage = referenceCacheStorage }: Options) {
   const memory = new Map<string, Entry<T>>();
   const pending = new Map<string, Promise<T>>();
   let restored = !storageKey;

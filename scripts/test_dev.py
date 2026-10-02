@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import signal
 from contextlib import ExitStack
 from pathlib import Path
 import subprocess
@@ -16,6 +17,9 @@ import dev
 class LauncherTests(unittest.TestCase):
     def setUp(self):
         stack = self.enterContext(ExitStack())
+        # These lifecycle tests exercise the POSIX process-group branch; the
+        # dedicated WindowsLauncherLifecycleTests covers Windows Job Objects.
+        stack.enter_context(patch.object(dev.os, "name", "posix"))
         stack.enter_context(patch.object(dev, "parse_args", return_value=argparse.Namespace(
             backend_port=8000, frontend_port=5173,
         )))
@@ -62,7 +66,10 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(self.wait.call_args_list, [call(backend), call(frontend)])
 
         backend_call, frontend_call = self.spawn.call_args_list
-        self.assertEqual(backend_call.args[0][:4], ["uv", "run", "--locked", "uvicorn"])
+        self.assertEqual(
+            [Path(part).stem for part in backend_call.args[0][:4]],
+            ["uv", "run", "--locked", "uvicorn"],
+        )
         self.assertEqual(backend_call.kwargs["env"]["CORS_ORIGINS"], "http://127.0.0.1:5174")
         self.assertEqual(frontend_call.kwargs["env"]["VITE_API_BASE_URL"], "/api/v1")
         self.assertEqual(frontend_call.kwargs["env"]["VITE_API_PROXY_TARGET"], "http://127.0.0.1:8001")
@@ -78,12 +85,69 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(self.wait.call_args_list, [call(backend), call(frontend)])
 
 
+class StopProcessTests(unittest.TestCase):
+    @patch.object(dev.os, "name", "posix")
+    @patch.object(dev.os, "killpg", create=True)
+    def test_posix_stops_the_process_group(self, killpg):
+        process = Mock(pid=123)
+        process.poll.return_value = None
+
+        dev.stop_process(process)
+
+        killpg.assert_called_once_with(123, signal.SIGTERM)
+        process.terminate.assert_not_called()
+
+    @patch.object(dev.os, "name", "nt")
+    def test_windows_fallback_stops_the_direct_child(self):
+        process = Mock(pid=123)
+        process.poll.return_value = None
+
+        dev.stop_process(process)
+
+        process.terminate.assert_called_once_with()
+
+
+class WindowsLauncherLifecycleTests(unittest.TestCase):
+    @patch.object(dev.os, "name", "nt")
+    @patch.object(dev, "command_path", side_effect=lambda name: name)
+    @patch.object(dev, "WindowsProcessJob")
+    def test_windows_launcher_suspends_assigns_and_cleans_up_job(self, job_factory, _command_path):
+        backend, frontend = Mock(), Mock()
+        backend.poll.return_value = None
+        frontend.poll.return_value = 7
+        with patch.object(dev, "parse_args", return_value=argparse.Namespace(
+            backend_port=8000, frontend_port=5173,
+        )), patch.object(dev, "require_command"), \
+                patch.object(dev, "select_frontend_runtime"), \
+                patch.object(dev, "require_frontend_toolchain"), \
+                patch.object(dev.Path, "exists", return_value=True), \
+                patch.object(dev, "available_port", side_effect=[8001, 5174]), \
+                patch.object(dev.subprocess, "Popen", side_effect=[backend, frontend]) as spawn, \
+                patch.object(dev, "wait_for_exit") as wait, \
+                patch("builtins.print"):
+            self.assertEqual(dev.main(), 7)
+
+        job = job_factory.return_value
+        self.assertEqual(job.assign_and_resume.call_args_list, [call(backend), call(frontend)])
+        job.close.assert_called_once_with()
+        self.assertEqual(wait.call_args_list, [call(backend), call(frontend)])
+        for invocation in spawn.call_args_list:
+            self.assertEqual(
+                invocation.kwargs["creationflags"],
+                dev.WINDOWS_CREATE_NEW_PROCESS_GROUP | dev.WINDOWS_CREATE_SUSPENDED,
+            )
+
+
 class RuntimeSelectionTests(unittest.TestCase):
     def setUp(self):
         self.enterContext(patch.dict(dev.os.environ, {"PATH": "/global/bin"}))
         dev.os.environ.pop("AIW_NODE_BIN", None)
-        self.enterContext(patch.object(dev.shutil, "which", return_value="/global/bin/node"))
-        self.enterContext(patch.object(dev, "installed_node_candidates", return_value=[dev.Path("/local/node24/bin/node")]))
+        # Native strings so the launcher's str(Path(...)) comparisons round-trip
+        # on both POSIX and Windows.
+        self.global_node = str(Path("/global/bin/node"))
+        self.local_node = str(Path("/local/node24/bin/node"))
+        self.enterContext(patch.object(dev.shutil, "which", return_value=self.global_node))
+        self.enterContext(patch.object(dev, "installed_node_candidates", return_value=[dev.Path(self.local_node)]))
         self.enterContext(patch.object(dev.Path, "is_file", return_value=True))
         self.run = self.enterContext(patch.object(dev.subprocess, "run"))
         self.enterContext(patch("builtins.print"))
@@ -97,8 +161,11 @@ class RuntimeSelectionTests(unittest.TestCase):
     def test_node_26_falls_back_to_installed_node_24(self):
         self.run.side_effect = [Mock(stdout="v26.6.0\n"), Mock(stdout="v24.19.0\n")]
         dev.select_frontend_runtime()
-        self.assertEqual(dev.os.environ["PATH"], "/local/node24/bin:/global/bin")
-        self.assertEqual(self.run.call_args.args[0], ["/local/node24/bin/node", "--version"])
+        self.assertEqual(
+            dev.os.environ["PATH"],
+            str(Path(self.local_node).parent) + dev.os.pathsep + "/global/bin",
+        )
+        self.assertEqual(self.run.call_args.args[0], [self.local_node, "--version"])
 
     def test_incompatible_fallback_does_not_change_path(self):
         self.run.side_effect = [Mock(stdout="v26.6.0\n"), Mock(stdout="v24.18.0\n")]
@@ -111,11 +178,15 @@ class RuntimeSelectionTests(unittest.TestCase):
         self.assertEqual(dev.os.environ["PATH"], "/global/bin")
 
     def test_explicit_runtime_is_selected(self):
+        chosen = Path("/chosen/bin/node").expanduser().absolute()
         dev.os.environ["AIW_NODE_BIN"] = "/chosen/bin/node"
         self.run.return_value = Mock(stdout="v24.20.0\n")
         dev.select_frontend_runtime()
-        self.assertEqual(dev.os.environ["PATH"], "/chosen/bin:/global/bin")
-        self.assertEqual(self.run.call_args.args[0], ["/chosen/bin/node", "--version"])
+        self.assertEqual(
+            dev.os.environ["PATH"],
+            str(chosen.parent) + dev.os.pathsep + "/global/bin",
+        )
+        self.assertEqual(self.run.call_args.args[0], [str(chosen), "--version"])
 
     def test_invalid_override_fails_instead_of_silently_ignoring_it(self):
         dev.os.environ["AIW_NODE_BIN"] = "/chosen/bin/node"
@@ -133,7 +204,11 @@ class ToolchainTests(unittest.TestCase):
     def test_matching_versions_are_accepted(self):
         self.run.side_effect = [Mock(stdout="v24.19.0\n"), Mock(stdout="12.0.2\n")]
         dev.require_frontend_toolchain()
-        self.assertEqual([c.args[0] for c in self.run.call_args_list], [["node", "--version"], ["npm", "--version"]])
+        # command_path keeps bare names on POSIX and resolves npm.cmd on Windows.
+        self.assertEqual(
+            [(Path(c.args[0][0]).stem, c.args[0][1]) for c in self.run.call_args_list],
+            [("node", "--version"), ("npm", "--version")],
+        )
 
     def test_node_mismatch_fails_before_checking_npm(self):
         self.run.return_value = Mock(stdout="v26.6.0\n")
@@ -166,7 +241,41 @@ class ToolchainTests(unittest.TestCase):
             dev.require_frontend_toolchain()
 
 
+class CommandPathTests(unittest.TestCase):
+    def test_posix_keeps_bare_command(self):
+        with patch.object(dev.os, "name", "posix"):
+            self.assertEqual(dev.command_path("npm"), "npm")
+
+    def test_windows_resolves_the_npm_shim(self):
+        with patch.object(dev.os, "name", "nt"), \
+                patch.object(dev.shutil, "which", return_value=r"C:\node\npm.CMD"):
+            self.assertEqual(dev.command_path("npm"), r"C:\node\npm.CMD")
+
+    def test_windows_missing_command_falls_back_to_bare_name(self):
+        with patch.object(dev.os, "name", "nt"), \
+                patch.object(dev.shutil, "which", return_value=None):
+            self.assertEqual(dev.command_path("npm"), "npm")
+
+
+class WindowsNodeCandidateTests(unittest.TestCase):
+    def test_includes_local_nodejs_install(self):
+        self.assertIn(
+            Path.home() / ".local" / "nodejs" / "node-v24.19.0-win-x64" / "node.exe",
+            dev.windows_node_candidates("24.19.0"),
+        )
+
+    def test_uses_nvm_environment_variables(self):
+        with patch.dict(dev.os.environ, {"NVM_SYMLINK": r"C:\Program Files\nodejs"}):
+            candidates = dev.windows_node_candidates("24.19.0")
+        self.assertIn(Path(r"C:\Program Files\nodejs") / "node.exe", candidates)
+
+    def test_installed_candidates_include_windows_entries_only_on_windows(self):
+        names = {candidate.name for candidate in dev.installed_node_candidates("24.19.0")}
+        self.assertEqual("node.exe" in names, dev.os.name == "nt")
+
+
 class HostingToolchainTests(unittest.TestCase):
+    @unittest.skipUnless(os.name == "posix", "Vercel build commands run under sh")
     def test_frontend_service_uses_project_npm_for_install_and_build(self):
         package = json.loads((dev.FRONTEND_ROOT / "package.json").read_text())
         config = json.loads((dev.REPOSITORY_ROOT / "vercel.json").read_text())
