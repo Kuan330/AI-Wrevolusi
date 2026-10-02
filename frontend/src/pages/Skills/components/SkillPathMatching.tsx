@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowDown, ArrowRight, ArrowUpRight, BookOpen, Check, ChevronDown, Clock3, GitBranch, LoaderCircle, Sparkles } from "lucide-react";
+import { message } from "@/components/ui/message";
 import { ROUTES } from "@/constants/routes";
 import { recommendSkills } from "@/features/skills/recommendations";
 import { buildSkillPath, skillPathDescription, type SkillRecommendation } from "@/features/skills/skillPath";
@@ -85,14 +86,17 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
     });
   }
 
-  async function buildPlan() {
+  async function addToLearningPlan() {
     if (lock.current || !selectedIds.length || savedError) return;
     const owner = currentWorkspaceSession();
     lock.current = true; setSaving(true); setSaveError("");
     try {
       if (pendingIds.length) await changeSavedCourses({ add: pendingIds });
       await flushWorkspace();
-      if (mounted.current && owner === currentWorkspaceSession()) navigate(ROUTES.plan);
+      if (mounted.current && owner === currentWorkspaceSession()) {
+        navigate(ROUTES.plan);
+        message.success(`${selectedIds.length} ${selectedIds.length === 1 ? "course" : "courses"} added to your learning plan.`, 4500);
+      }
     } catch (error) {
       if (mounted.current && owner === currentWorkspaceSession()) setSaveError(error instanceof Error ? error.message : "Your courses could not be saved. Your choices are kept. Try again.");
     } finally { lock.current = false; if (mounted.current) setSaving(false); }
@@ -137,7 +141,7 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
       })}</div>
     </section>
 
-    <div className={`skill-path__planbar${pendingIds.length || saveError ? " has-selection" : ""}`}><div><span><BookOpen size={19} /><strong>{pendingIds.length ? `${pendingIds.length} ${pendingIds.length === 1 ? "course" : "courses"} selected for your next step` : "Ready to build your learning plan?"}</strong></span>{(saveError || pendingIds.length > 0) && <p>{saveError ? "Your choices are kept here. Retry to confirm they are saved to your account." : "Add these courses to your plan, then choose when to learn."}</p>}</div><button type="button" disabled={saving || Boolean(savedError) || (!pendingIds.length && !saveError)} onClick={() => { void buildPlan(); }}>{saving ? "Saving your courses…" : saveError ? "Retry saving courses" : "Build my plan"}<ArrowRight size={17} /></button>{(saveError || savedError) && <p role="alert">{saveError || savedError}</p>}</div>
+    <div className={`skill-path__planbar${pendingIds.length || saveError ? " has-selection" : ""}`}><div><span><BookOpen size={19} /><strong>{pendingIds.length ? `${pendingIds.length} ${pendingIds.length === 1 ? "course" : "courses"} selected for your next step` : "Choose your next courses"}</strong></span><p>{saveError ? "Your choices are kept here. Retry to confirm they are saved to your account." : pendingIds.length ? "Save your selections and continue in My courses." : "Select at least one course to add to your learning plan."}</p></div><button type="button" disabled={saving || Boolean(savedError) || (!pendingIds.length && !saveError)} onClick={() => { void addToLearningPlan(); }}>{saving ? "Saving your courses…" : saveError ? "Retry saving courses" : "Add to my learning plan"}<ArrowRight size={17} /></button>{(saveError || savedError) && <p role="alert">{saveError || savedError}</p>}</div>
     <p className="skill-path__footnote">Suggestions come from your task wording and the WEF skills framework. They do not measure your skill level.</p>
   </section>;
 }

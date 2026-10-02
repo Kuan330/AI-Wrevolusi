@@ -12,7 +12,7 @@ const buttonVariants = cva(
         default: "soft-btn-blue",
         destructive: "soft-btn-red",
         outline: "soft-btn-gray",
-        secondary: "soft-btn-brown",
+        secondary: "soft-btn-pink",
         ghost:
           "border border-transparent bg-transparent shadow-none hover:bg-[#eaf3fb] hover:text-[#35617c]",
         link: "rounded-md border-0 bg-transparent p-0 font-medium text-[#326889] shadow-none underline-offset-4 hover:underline hover:transform-none",
