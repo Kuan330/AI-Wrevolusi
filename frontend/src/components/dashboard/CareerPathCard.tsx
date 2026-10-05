@@ -30,7 +30,7 @@ export default function CareerPathCard({ path }: Props) {
     }
   };
   const matched = path.have.length + path.learning.length + path.suggested.length;
-  const sources = [path.have.length && `${path.have.length} from your work profile`, path.suggested.length && `${path.suggested.length} from your tasks`, path.learning.length && `${path.learning.length} from your learning`].filter(Boolean).join(" · ");
+  const sources = [path.have.length && `${path.have.length} from your work`, path.suggested.length && `${path.suggested.length} from your tasks`, path.learning.length && `${path.learning.length} from your learning`].filter(Boolean).join(", ");
   return <Card className="career-path-card" aria-label={`Progress towards ${path.title}`}>
     <header className="career-path-header">
       <div><p className="dashboard-eyebrow"><Compass size={15} /> YOUR NEXT CAREER DIRECTION</p><h2>Your path to {path.title}</h2></div>
@@ -39,15 +39,15 @@ export default function CareerPathCard({ path }: Props) {
     <div className="career-path-body">
       <section aria-label="Skills matched so far">
         <div className="career-path-meter"><Progress value={path.percent} aria-label={`${path.title} skills matched`} /><span>{path.percent}%</span></div>
-        <p className="career-path-summary">{matched} of {path.total} role skills matched{sources ? ` · ${sources}` : ""}</p>
-        <p className="career-path-note">Matched from your work, tasks and learning. It is not a skill level.</p>
+        <p className="career-path-summary">{matched} of {path.total} skills matched</p>
+        <p className="career-path-note">{sources ? `${sources}. ` : ""}This is not a skill level.</p>
       </section>
       <section aria-label="Gaps still to close">
         <p className="dashboard-eyebrow">{path.gaps.length ? `${path.gaps.length} ${path.gaps.length === 1 ? "GAP" : "GAPS"} TO CLOSE` : "NO GAPS LEFT"}</p>
         {path.gaps.length ? <ul className="career-path-gaps">{path.gaps.map(skill => <li key={skill.skill_id} className={skill.skill_id === path.nextGap?.skill_id ? "is-next" : undefined}>
           <span>{skill.name}</span>{skill.skill_id === path.nextGap?.skill_id && <em>Next up</em>}
-        </li>)}</ul> : <p>Every skill for this role has a match in your work or learning.</p>}
-        {path.nextGap && <button type="button" className="dashboard-text-link" disabled={starting} onClick={() => { void work(); }}>{starting ? "Opening learning resources…" : <>Work on {path.nextGap.name} <ArrowRight size={15} /></>}</button>}
+        </li>)}</ul> : <p>You have a match for every skill in this role.</p>}
+        {path.nextGap && <button type="button" className="dashboard-text-link" disabled={starting} onClick={() => { void work(); }}>{starting ? "Opening learning resources…" : <>Start learning {path.nextGap.name} <ArrowRight size={15} /></>}</button>}
         {error && <p role="alert" className="career-path-note">{error}</p>}
       </section>
     </div>

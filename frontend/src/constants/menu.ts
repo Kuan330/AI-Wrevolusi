@@ -2,7 +2,7 @@ import { ROUTES } from "./routes.ts";
 
 export const SIDEBAR_GROUPS = [
   { key: "overview", label: "Overview", collapsible: false, icon: "dashboard", items: [
-    { label: "Learning overview", path: ROUTES.dashboard, icon: "dashboard", exact: true },
+    { label: "Overview", path: ROUTES.dashboard, icon: "dashboard", exact: true },
   ] },
   { key: "work", label: "My work & AI", collapsible: true, icon: "work", items: [
     { label: "My work", path: ROUTES.workProfile, icon: "work", exact: true },
