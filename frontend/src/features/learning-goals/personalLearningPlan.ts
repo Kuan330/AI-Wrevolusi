@@ -106,7 +106,8 @@ export function generatePersonalPlan({ goalId, goalTitle, skillId, skillLabel, c
   if (inputs.goalText.trim().length > 1000) throw new Error("Keep your learning goal to 1,000 characters or fewer.");
   if (!inputs.goalText.trim()) throw new Error("Describe what you want to learn before building your plan.");
   const recommendation = recommendCourses(courses, inputs, skillId);
-  const selected = selectedCourseIds === undefined ? recommendation.courses : recommendation.courses.filter(course => selectedCourseIds.includes(course.id));
+  const selected = selectedCourseIds === undefined ? recommendation.courses : selectedCourseIds.map(id => courses.find(course => course.id === id)).filter((course): course is Course => Boolean(course));
+  if (selectedCourseIds?.some(id => !courses.some(course => course.id === id))) throw new Error("A selected course is unavailable. Return to Skill areas and choose your courses again.");
   const activities = buildActivities(inputs, selected);
   const courseMinutes = activities.filter(item => item.kind === "course").reduce((sum, item) => sum + item.minutes, 0);
   const practiceMinutes = activities.filter(item => item.kind !== "course").reduce((sum, item) => sum + item.minutes, 0);

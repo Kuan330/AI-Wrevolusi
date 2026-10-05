@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 
 export type TooltipProps = {
   title: ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   children: ReactElement;
   side?: "top" | "bottom" | "left" | "right";
   className?: string;
@@ -17,7 +19,7 @@ export function Tooltip(props: TooltipProps) {
 
   return (
     <BaseTooltip.Provider>
-      <BaseTooltip.Root>
+      <BaseTooltip.Root open={props.open} onOpenChange={props.onOpenChange}>
         <BaseTooltip.Trigger
           delay={160}
           closeDelay={80}

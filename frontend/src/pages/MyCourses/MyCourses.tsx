@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, BookOpen, CalendarDays, Check, ChevronRight, Clock, ExternalLink, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, History, Check, ChevronRight, Clock, ExternalLink, Search, Trash2 } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 import { cleanDisplayText } from "@/lib/displayText";
 import { Button } from "@/components/ui/button";
@@ -127,7 +127,7 @@ export default function MyCourses() {
   }
   const disabled = progressBusy || busy || pendingSync || opening || Boolean(readError);
   return <div className="my-courses">
-    <header className="courses-heading"><div><p className="courses-eyebrow">MY LEARNING PLAN</p><h1>{course ? "Your learning workspace" : "My courses"}</h1><p>{course ? "A clear next step, at your own pace." : "Keep your learning in one place. Pick up where you left off."}</p></div><div className="courses-heading-actions"><Link className="courses-secondary" to={`${ROUTES.plan}?view=schedule`}><CalendarDays size={16} /> Study calendar</Link><Link className="courses-primary" to={`${ROUTES.learningCentre}?mode=browse`}>Find courses <ArrowRight size={16} /></Link></div></header>
+    <header className="courses-heading"><div><p className="courses-eyebrow">MY LEARNING PLAN</p><h1>{course ? "Your learning workspace" : "My courses"}</h1><p>{course ? "A clear next step, at your own pace." : "Keep your learning in one place. Pick up where you left off."}</p></div><div className="courses-heading-actions"><Link className="courses-secondary" to={ROUTES.progress}><History size={16} /> View learning records</Link><Link className="courses-primary" to={`${ROUTES.learningCentre}?mode=browse`}>Find courses <ArrowRight size={16} /></Link></div></header>
     {(readError || notice || actionError) && <div className="courses-notice" role="alert">{readError || notice || actionError}</div>}
     {loadError && <div className="courses-notice" role="status">{loadError} <button onClick={() => setRevision(value => value + 1)} disabled={loading}>Retry loading</button></div>}
     {feedback && <p className="courses-feedback" role="status">{feedback}</p>}

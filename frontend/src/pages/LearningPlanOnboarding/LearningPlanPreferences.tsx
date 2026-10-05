@@ -1,6 +1,6 @@
 import { useId, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { ArrowRight, Check, FileText, Link2, LoaderCircle, Pencil, Plus, X } from "lucide-react";
+import { ArrowRight, Check, FileText, Link2, LoaderCircle, Plus, X } from "lucide-react";
 import type { LearningPlanInputs } from "@/features/learning-goals/personalLearningPlan";
 import {
   addPlanResource, MAX_PLAN_RESOURCES, normalizeResourceUrl, RESOURCE_ACCEPT,
@@ -19,7 +19,6 @@ export type LearningPlanPreferencesProps = {
   error?: string;
   onSubmit: (inputs: LearningPlanInputs, resources: LearningPlanResource[]) => void | Promise<void>;
   onCancel?: () => void;
-  onGoalTextChange: (text: string) => void;
 };
 
 const experiences = [
@@ -37,7 +36,7 @@ const timeOptions = [15, 30, 60] as const;
 const readableError = (error: unknown) => error instanceof Error ? error.message : "Something went wrong. Please try again.";
 
 /** Preferences step for first-time learning-plan setup within our own workspace. */
-export default function LearningPlanPreferences({ goalTitle, initialInputs, initialResources = [], disabled = false, busy = false, loading = false, error = "", onSubmit, onCancel, onGoalTextChange }: LearningPlanPreferencesProps) {
+export default function LearningPlanPreferences({ goalTitle, initialInputs, initialResources = [], disabled = false, busy = false, loading = false, error = "", onSubmit, onCancel }: LearningPlanPreferencesProps) {
   const id = useId();
   const [draft, setDraft] = useState<LearningPlanSetupDraft>(() => ({
     goalText: initialInputs?.goalText ?? goalTitle,
@@ -46,7 +45,6 @@ export default function LearningPlanPreferences({ goalTitle, initialInputs, init
     goalKind: initialInputs?.goalKind ?? "",
   }));
   const values = { ...draft, goalText: goalTitle };
-  const [editingGoal, setEditingGoal] = useState(!goalTitle.trim());
   const [resources, setResources] = useState<LearningPlanResource[]>(initialResources);
   const [showLink, setShowLink] = useState(false);
   const [link, setLink] = useState("");
@@ -57,7 +55,7 @@ export default function LearningPlanPreferences({ goalTitle, initialInputs, init
   const operation = useRef(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const blocked = disabled || busy || pending || readingFile;
-  const submitBlocked = blocked || loading || Boolean(validateSetupDraft(values)) || editingGoal;
+  const submitBlocked = blocked || loading || Boolean(validateSetupDraft(values));
   const hasExtraTime = draft.minutesPerDay === 45 || draft.minutesPerDay === 90;
 
   const attachFile = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -85,7 +83,7 @@ export default function LearningPlanPreferences({ goalTitle, initialInputs, init
   };
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (operation.current || disabled || busy || loading || editingGoal) return;
+    if (operation.current || disabled || busy || loading) return;
     const validation = validateSetupDraft(values);
     if (validation) { setSubmitError(validation); return; }
     operation.current = true;
@@ -97,15 +95,6 @@ export default function LearningPlanPreferences({ goalTitle, initialInputs, init
 
   return <form className="learning-plan-setup" onSubmit={submit} aria-label="Configure your learning plan" aria-busy={busy || pending || readingFile}>
     <fieldset className="lps-controls" disabled={blocked}>
-      <div className="lps-goal">
-        <span className="lps-kicker">Your learning goal</span>
-        {editingGoal ? <div className="lps-goal-editor">
-          <label htmlFor={`${id}-goal`}>What would you like to learn?</label>
-          <textarea id={`${id}-goal`} autoFocus rows={2} maxLength={300} value={goalTitle} onChange={event => onGoalTextChange(event.target.value)} aria-describedby={`${id}-goal-hint`} />
-          <div className="lps-edit-footer"><span id={`${id}-goal-hint`}>{goalTitle.length}/300 · Your goal will be saved when you build your plan.</span><button type="button" disabled={!goalTitle.trim()} onClick={() => setEditingGoal(false)}><Check size={15} aria-hidden="true" /> Keep this wording</button></div>
-        </div> : <><h3 className="lps-goal-title">“{goalTitle}”</h3><button className="lps-text-button" type="button" onClick={() => setEditingGoal(true)}><Pencil size={14} aria-hidden="true" /> Say it differently</button></>}
-      </div>
-      <p className="lps-intro">Two quick choices, and we’ll build a plan that fits you.</p>
       <fieldset className="lps-question"><legend>Where are you starting from?</legend><div className="lps-level-options">
         {experiences.map(option => <label className="lps-choice lps-level" key={option.value}>
           <input type="radio" name={`${id}-experience`} value={option.value} checked={draft.experience === option.value} onChange={() => setDraft({ ...draft, experience: option.value })} required />

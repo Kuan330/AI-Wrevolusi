@@ -1,6 +1,6 @@
 import { useId, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { ArrowRight, Check, FileText, Link2, LoaderCircle, Pencil, Plus, X } from "lucide-react";
+import { ArrowRight, Check, FileText, Link2, LoaderCircle, Plus, X } from "lucide-react";
 import type { LearningPlanInputs } from "@/features/learning-goals/personalLearningPlan";
 import {
   addPlanResource, MAX_PLAN_RESOURCES, normalizeResourceUrl, RESOURCE_ACCEPT,
@@ -44,7 +44,6 @@ export default function LearningPlanSetup({ goalTitle, initialInputs, initialRes
     minutesPerDay: initialInputs?.minutesPerDay ?? "",
     goalKind: initialInputs?.goalKind ?? "",
   }));
-  const [editingGoal, setEditingGoal] = useState(!draft.goalText.trim());
   const [resources, setResources] = useState<LearningPlanResource[]>(initialResources);
   const [showLink, setShowLink] = useState(false);
   const [link, setLink] = useState("");
@@ -55,7 +54,7 @@ export default function LearningPlanSetup({ goalTitle, initialInputs, initialRes
   const operation = useRef(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const blocked = disabled || busy || pending || readingFile;
-  const submitBlocked = blocked || loading || Boolean(validateSetupDraft(draft)) || editingGoal;
+  const submitBlocked = blocked || loading || Boolean(validateSetupDraft(draft));
   const hasExtraTime = draft.minutesPerDay === 45 || draft.minutesPerDay === 90;
 
   const attachFile = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -83,7 +82,7 @@ export default function LearningPlanSetup({ goalTitle, initialInputs, initialRes
   };
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (operation.current || disabled || busy || loading || editingGoal) return;
+    if (operation.current || disabled || busy || loading) return;
     const validation = validateSetupDraft(draft);
     if (validation) { setSubmitError(validation); return; }
     operation.current = true;
@@ -95,15 +94,6 @@ export default function LearningPlanSetup({ goalTitle, initialInputs, initialRes
 
   return <form className="learning-plan-setup" onSubmit={submit} aria-label="Configure your learning plan" aria-busy={busy || pending || readingFile}>
     <fieldset className="lps-controls" disabled={blocked}>
-      <div className="lps-goal">
-        <span className="lps-kicker">Your learning goal</span>
-        {editingGoal ? <div className="lps-goal-editor">
-          <label htmlFor={`${id}-goal`}>What would you like to learn?</label>
-          <textarea id={`${id}-goal`} autoFocus rows={2} maxLength={300} value={draft.goalText} onChange={event => setDraft({ ...draft, goalText: event.target.value })} aria-describedby={`${id}-goal-hint`} />
-          <div className="lps-edit-footer"><span id={`${id}-goal-hint`}>{draft.goalText.length}/300 · This changes your plan request, not your saved goal.</span><button type="button" disabled={!draft.goalText.trim()} onClick={() => setEditingGoal(false)}><Check size={15} aria-hidden="true" /> Keep this wording</button></div>
-        </div> : <><h3 className="lps-goal-title">“{draft.goalText}”</h3><button className="lps-text-button" type="button" onClick={() => setEditingGoal(true)}><Pencil size={14} aria-hidden="true" /> Say it differently</button></>}
-      </div>
-      <p className="lps-intro">Two quick choices, and we’ll build a plan that fits you.</p>
       <fieldset className="lps-question"><legend>Where are you starting from?</legend><div className="lps-level-options">
         {experiences.map(option => <label className="lps-choice lps-level" key={option.value}>
           <input type="radio" name={`${id}-experience`} value={option.value} checked={draft.experience === option.value} onChange={() => setDraft({ ...draft, experience: option.value })} required />

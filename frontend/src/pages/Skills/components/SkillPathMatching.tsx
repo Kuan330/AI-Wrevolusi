@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowDown, ArrowRight, ArrowUpRight, BookOpen, Check, ChevronDown, Clock3, GitBranch, LoaderCircle, Sparkles } from "lucide-react";
+import { message } from "@/components/ui/message";
 import { ROUTES } from "@/constants/routes";
 import { recommendSkills } from "@/features/skills/recommendations";
 import { buildSkillPath, skillPathDescription, type SkillRecommendation } from "@/features/skills/skillPath";
@@ -16,6 +17,7 @@ import type { WefSkill } from "@/types/reference";
 import type { ConfirmedTaskExposureAssessment } from "@/services/exposureService";
 import { cleanDisplayText, shortTaskLabel } from "@/lib/displayText";
 import { catalogueSkillSlug as skillKey, coursesForCatalogueSkill } from "@/features/learning-planning/catalogueSkill";
+import { readCareerPath, mergeCareerSkills } from "@/features/skills/careerPath";
 import "./skill-path.css";
 
 type Props = { tasks: ProfileTask[]; skills: WefSkill[]; assessments: ConfirmedTaskExposureAssessment[]; decisions: Record<string, string>; loading: boolean };
@@ -47,7 +49,11 @@ function PathSkeleton() {
 
 export default function SkillPathMatching({ tasks, skills, assessments, decisions, loading }: Props) {
   const navigate = useNavigate();
-  const recommendations = useMemo(() => recommendSkills(tasks, skills, assessments, decisions), [tasks, skills, assessments, decisions]);
+  let career = { ids: [] as number[], sources: {} as Record<string, string> };
+  let careerError = "";
+  try { career = readCareerPath(); } catch (error) { careerError = error instanceof Error ? error.message : "Could not read career skills."; }
+  const taskRecommendations = useMemo(() => recommendSkills(tasks, skills, assessments, decisions), [tasks, skills, assessments, decisions]);
+  const recommendations = mergeCareerSkills(taskRecommendations, skills, career.ids);
   const path = buildSkillPath(recommendations);
   const [openIds, setOpenIds] = useState<number[]>([]);
   // A repeat visit shows the last catalogue at once; the effect below refreshes it quietly.
@@ -60,6 +66,13 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
   const lock = useRef(false);
   const mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  useEffect(() => {
+    if (loading) return;
+    const id = new URLSearchParams(window.location.search).get("careerSkill");
+    if (!id || !/^\d+$/.test(id)) return;
+    const frame = requestAnimationFrame(() => document.getElementById(`skill-area-${id}`)?.scrollIntoView({ block: "center", behavior: "auto" }));
+    return () => cancelAnimationFrame(frame);
+  }, [loading, skills]);
   const hasOpenCard = openIds.length > 0;
   useEffect(() => {
     if (!hasOpenCard) return;
@@ -85,14 +98,19 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
     });
   }
 
-  async function buildPlan() {
+  async function addToLearningPlan() {
     if (lock.current || !selectedIds.length || savedError) return;
     const owner = currentWorkspaceSession();
     lock.current = true; setSaving(true); setSaveError("");
     try {
       if (pendingIds.length) await changeSavedCourses({ add: pendingIds });
       await flushWorkspace();
-      if (mounted.current && owner === currentWorkspaceSession()) navigate(ROUTES.plan);
+      if (mounted.current && owner === currentWorkspaceSession()) {
+        const params = new URLSearchParams({ setup: "courses" });
+        selectedIds.forEach(id => params.append("course", id));
+        navigate(`${ROUTES.learningGoals}?${params}`);
+        message.success(`${selectedIds.length} ${selectedIds.length === 1 ? "course" : "courses"} added to your learning plan.`, 4500);
+      }
     } catch (error) {
       if (mounted.current && owner === currentWorkspaceSession()) setSaveError(error instanceof Error ? error.message : "Your courses could not be saved. Your choices are kept. Try again.");
     } finally { lock.current = false; if (mounted.current) setSaving(false); }
@@ -102,7 +120,8 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
   if (!path.start) return <section className="skill-path__empty"><BookOpen size={28} /><h2>Your path starts with one task</h2><p>No supported skill areas were found in your current task wording. Review a task to search the catalogue or add a skill in your own words.</p><Link to={`${ROUTES.skills}?view=task`}>Review my tasks <ArrowRight size={16} /></Link></section>;
 
   return <section className="skill-path" aria-label="Your recommended skill path">
-    <div className="skill-path__intro"><p>{recommendations.length} skill {recommendations.length === 1 ? "area" : "areas"} from your confirmed tasks{hasHighAssistance ? ", AI-assisted tasks first" : ""}.</p><Link className="skill-path__plan-link" to={ROUTES.learningGoals}>My learning plan <ArrowUpRight size={16} /></Link></div>
+    {careerError && <p role="alert">{careerError}</p>}
+    <div className="skill-path__intro"><p>{recommendations.length} skill {recommendations.length === 1 ? "area" : "areas"} from your work and career interests{hasHighAssistance ? ", AI-assisted tasks first" : ""}.</p><Link className="skill-path__plan-link" to={ROUTES.learningGoals}>My learning plan <ArrowUpRight size={16} /></Link></div>
 
     <section className="skill-path__map" aria-labelledby="skill-path-heading">
       <header><div><h2 id="skill-path-heading">Your starting point</h2></div></header>
@@ -121,13 +140,13 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
         const id = item.skill.wef_skill_id;
         const open = openIds.includes(id);
         const matches = groupsBySkill.get(id) ?? [];
-        const reviewLink = `${ROUTES.skills}?${new URLSearchParams({ view: "task", task: item.tasks[0].id, skill: String(id) })}`;
+        const reviewLink = `${ROUTES.skills}?${new URLSearchParams({ view: "task", task: item.tasks[0]?.id ?? "", skill: String(id) })}`;
         return <article className={`skill-path__card tone-${index % 3}${open ? " is-open" : ""}`} id={`skill-area-${id}`} key={id} style={{ "--path-delay": `${index * 55}ms` } as CSSProperties}>
           <div className="skill-path__card-top"><span className="skill-path__icon"><BookOpen size={20} /></span></div>
-          <h3>{cleanDisplayText(item.skill.core_skill)}</h3><p>{skillPathDescription(id)}</p>
-          <details className="skill-path__evidence"><summary>Why this area? · {item.tasks.length} {item.tasks.length === 1 ? "task" : "tasks"}</summary><ul>{item.tasks.map(task => <li key={task.id}>{shortTaskLabel(task.wording, 180)}</li>)}</ul><p>Suggested from task wording. Check whether it fits your work.</p><Link className="skill-path__review" to={reviewLink} state={{ taskWording: item.tasks[0].wording }}>Review this skill connection <ArrowUpRight size={14} /></Link></details>
+          <h3>{cleanDisplayText(item.skill.core_skill)}</h3>{career.ids.includes(id) && <p className="skill-path__career-source">From career exploration{career.sources[id] ? ` · ${career.sources[id]}` : ""}</p>}<p>{skillPathDescription(id)}</p>
+          {item.tasks.length > 0 && <details className="skill-path__evidence"><summary>Why this area? · {item.tasks.length} {item.tasks.length === 1 ? "task" : "tasks"}</summary><ul>{item.tasks.map(task => <li key={task.id}>{shortTaskLabel(task.wording, 180)}</li>)}</ul><p>Suggested from task wording. Check whether it fits your work.</p><Link className="skill-path__review" to={reviewLink} state={{ taskWording: item.tasks[0]?.wording }}>Review this skill connection <ArrowUpRight size={14} /></Link></details>}
           <button className="skill-path__expand" type="button" id={`skill-area-toggle-${id}`} aria-expanded={open} aria-controls={`skill-area-courses-${id}`} onClick={() => setOpenIds(current => current.includes(id) ? current.filter(value => value !== id) : [...current, id])}>{open ? "Hide courses" : "Explore courses"}<ChevronDown size={16} /></button>
-          {open && <div className="skill-path__courses" id={`skill-area-courses-${id}`}>{courseError ? <div role="alert"><p>{courseError}</p><button type="button" onClick={() => setAttempt(value => value + 1)}>Try again</button></div> : !courses ? <div className="skill-path__course-loading" role="status"><span className="sr-only">Loading courses…</span>{[0, 1, 2].map(index => <span key={index} className="skill-path__bone is-course" aria-hidden="true" style={boneDelay(index)} />)}</div> : !matches.length ? <div className="skill-path__no-courses"><p>No verified courses are linked to this area yet. You can still create a learning goal from your task review.</p><Link to={reviewLink} state={{ taskWording: item.tasks[0].wording }}>Choose a learning goal <ArrowRight size={14} /></Link></div> : <>{matches.slice(0, 3).map(group => {
+          {open && <div className="skill-path__courses" id={`skill-area-courses-${id}`}>{courseError ? <div role="alert"><p>{courseError}</p><button type="button" onClick={() => setAttempt(value => value + 1)}>Try again</button></div> : !courses ? <div className="skill-path__course-loading" role="status"><span className="sr-only">Loading courses…</span>{[0, 1, 2].map(index => <span key={index} className="skill-path__bone is-course" aria-hidden="true" style={boneDelay(index)} />)}</div> : !matches.length ? <div className="skill-path__no-courses"><p>No verified courses are linked to this area yet. You can explore the course catalogue.</p><Link to={`${ROUTES.learningCentre}?${new URLSearchParams({ mode: "browse", skill: skillKey(item.skill.core_skill) })}`}>Find courses <ArrowRight size={14} /></Link></div> : <>{matches.slice(0, 3).map(group => {
             const course = courseGroupRecord(group, savedIds);
             const saved = savedIds.includes(course.id);
             const checked = saved || selectedIds.includes(course.id);
@@ -137,7 +156,7 @@ export default function SkillPathMatching({ tasks, skills, assessments, decision
       })}</div>
     </section>
 
-    <div className={`skill-path__planbar${pendingIds.length || saveError ? " has-selection" : ""}`}><div><span><BookOpen size={19} /><strong>{pendingIds.length ? `${pendingIds.length} ${pendingIds.length === 1 ? "course" : "courses"} selected for your next step` : "Ready to build your learning plan?"}</strong></span>{(saveError || pendingIds.length > 0) && <p>{saveError ? "Your choices are kept here. Retry to confirm they are saved to your account." : "Add these courses to your plan, then choose when to learn."}</p>}</div><button type="button" disabled={saving || Boolean(savedError) || (!pendingIds.length && !saveError)} onClick={() => { void buildPlan(); }}>{saving ? "Saving your courses…" : saveError ? "Retry saving courses" : "Build my plan"}<ArrowRight size={17} /></button>{(saveError || savedError) && <p role="alert">{saveError || savedError}</p>}</div>
-    <p className="skill-path__footnote">Suggestions come from your task wording and the WEF skills framework. They do not measure your skill level.</p>
+    <div className={`skill-path__planbar${pendingIds.length || saveError ? " has-selection" : ""}`}><div><span><BookOpen size={19} /><strong>{pendingIds.length ? `${pendingIds.length} ${pendingIds.length === 1 ? "course" : "courses"} selected for your next step` : "Choose your next courses"}</strong></span><p>{saveError ? "Your choices are kept here. Retry to confirm they are saved to your account." : pendingIds.length ? "Add these courses to your plan, then choose when to learn." : "Select at least one course to add to your learning plan."}</p></div><button type="button" disabled={saving || Boolean(savedError) || (!pendingIds.length && !saveError)} onClick={() => { void addToLearningPlan(); }}>{saving ? "Saving your courses…" : saveError ? "Retry saving courses" : "Build my plan"}<ArrowRight size={17} /></button>{(saveError || savedError) && <p role="alert">{saveError || savedError}</p>}</div>
+    <p className="skill-path__footnote">Areas combine task-based suggestions with your chosen career interests using the WEF skills framework. They do not measure your skill level.</p>
   </section>;
 }

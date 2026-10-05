@@ -124,6 +124,31 @@ test('entry wraps the existing page instead of changing Goals & activities or My
   assert.match(routes,/<LearningPlanOnboarding><LearningGoals \/><\/LearningPlanOnboarding>/);
   assert.match(routes,/<AccountGate kind="plan"><Plan \/><\/AccountGate>/);
   const page=readFileSync(new URL('../src/pages/LearningPlanOnboarding/LearningPlanOnboarding.tsx',import.meta.url),'utf8');
-  assert.match(page,/if \(complete\) return <>{children}<\/>/);
+  assert.match(page,/if \(complete && !courseSetup\) return <>{children}<\/>/);
   assert.match(page,/owner !== currentWorkspaceSession\(\)/);
+});
+
+test('course handoff keeps every explicit selection without reselecting a skill', () => {
+  const courses = Array.from({ length: 4 }, (_, index) => course({ id: `selected-${index}` }));
+  const result = records({ courses, selectedSkill: null, selectedCourseIds: courses.map(item => item.id) });
+  assert.deepEqual(result.plan.courseIds, courses.map(item => item.id));
+  assert.throws(() => records({ selectedCourseIds: ['missing'] }), /unavailable/);
+});
+test('course handoff opens preferences directly and omits redundant goal controls', () => {
+  const page = readFileSync(new URL('../src/pages/LearningPlanOnboarding/LearningPlanOnboarding.tsx', import.meta.url), 'utf8');
+  const preferences = readFileSync(new URL('../src/pages/LearningPlanOnboarding/LearningPlanPreferences.tsx', import.meta.url), 'utf8');
+  const matching = readFileSync(new URL('../src/pages/Skills/components/SkillPathMatching.tsx', import.meta.url), 'utf8');
+  assert.match(matching, /setup: "courses"/);
+  assert.match(matching, /params.append\("course", id\)/);
+  assert.doesNotMatch(page, /Find courses for a skill|Let’s make it fit your day|What would you like to learn/);
+  assert.doesNotMatch(preferences, /Your learning goal|Say it differently|Two quick choices/);
+  assert.match(preferences, /Where are you starting from/);
+});
+
+test('returning users can load selected courses without waiting for skill references', () => {
+  const page = readFileSync(new URL('../src/pages/LearningPlanOnboarding/LearningPlanOnboarding.tsx', import.meta.url), 'utf8');
+  assert.doesNotMatch(page, /if \(complete \|\| stateError \|\| referenceLoading\) return/);
+  assert.match(page, /courseSetup \|\| !selectedSkill/);
+  assert.match(page, /cached && params.getAll\("course"\).every\(id => cached.has\(id\)\)/);
+  assert.match(page, /selectedSkill: courseSetup \? null/);
 });

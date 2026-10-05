@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { possibilitiesService } from "@/services/possibilitiesService";
 import { accountStorage, currentWorkspaceSession } from "@/services/accountStorage";
-import { CHOSEN_DIRECTION_KEY, careerPathProgress, parseChosenDirection } from "@/features/dashboard/careerPath";
+import { CHOSEN_DIRECTION_KEY, careerPathProgress, parseChosenDirection } from "@/features/dashboard/careerProgress";
 
 type CareerPath = ReturnType<typeof careerPathProgress> & { occupationCode: string };
 

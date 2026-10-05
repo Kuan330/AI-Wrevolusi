@@ -68,3 +68,10 @@ export function possibilitiesViewState(input: { loading: boolean; error: string;
 export function shouldApplyPossibilitiesResult(requestId: number, latestRequestId: number, mounted: boolean): boolean {
   return mounted && requestId === latestRequestId;
 }
+
+/** Use the entire identified skill map; learning intentions are not matches. */
+export function skillMatch(skills: PossibilitySkill[]) {
+  const unique = [...new Map(skills.map(skill => [skill.skill_id, skill])).values()];
+  const matched = unique.filter(skill => ["have", "suggested", "learning"].includes(skill.state)).length;
+  return { matched, total: unique.length, percent: unique.length ? Math.round(matched * 100 / unique.length) : null };
+}

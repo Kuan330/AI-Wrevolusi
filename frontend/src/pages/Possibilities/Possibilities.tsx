@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Info } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
 import { possibilitiesService } from "@/services/possibilitiesService";
 import { accountStorage, currentWorkspaceSession, flushWorkspace } from "@/services/accountStorage";
@@ -13,12 +13,17 @@ import {
   toPossibilitiesData,
   type PossibilitiesData,
 } from "./possibilitiesModel";
-import { startLearning } from "@/features/journey/journey";
+import Tooltip from "@/components/ui/tooltip";
+import InfoHint from "@/components/common/InfoHint";
+import { addCareerPathSkill, readCareerPath } from "@/features/skills/careerPath";
+import { skillPathDescription } from "@/features/skills/skillPath";
+import { skillMatch } from "./possibilitiesModel";
 import { ROUTES } from "@/constants/routes";
 import "./exploration.css";
 
 const DIRECTION_KEY = "aiwrevolusi.possibilities.chosenDirection";
-const COMPANION_AVATAR = "/images/possibilities-companion.png";
+const MATCH_HINT = "Based on skills connected to your work, tasks and learning. This indicates skill overlap, not job suitability.";
+const GAP_HINT = "No connection has been found in your current records. This does not mean you do not have this skill.";
 const readJson = <T,>(key: string, fallback: T): T => {
   try {
     const value = accountStorage.getItem(key);
@@ -27,86 +32,6 @@ const readJson = <T,>(key: string, fallback: T): T => {
     return fallback;
   }
 };
-
-function JourneyCompanion({
-  currentTitle,
-  targetTitle,
-  matchingSkills,
-  suggestedSkillCount,
-  developingSkillCount,
-  onExplore,
-  canExplore,
-  continuing,
-}: {
-  currentTitle: string;
-  targetTitle: string | null;
-  matchingSkills: { skill_id: number; name: string }[];
-  suggestedSkillCount: number;
-  developingSkillCount: number;
-  onExplore: () => void;
-  canExplore: boolean;
-  continuing: boolean;
-}) {
-  const [detailsOpen, setDetailsOpen] = useState(false);
-
-  useEffect(() => {
-    setDetailsOpen(false);
-  }, [targetTitle]);
-
-  return (
-    <aside className="px-companion">
-      <p className="px-eyebrow">Journey Companion</p>
-      <div className="px-companion-avatar">
-        <img
-          src={COMPANION_AVATAR}
-          alt="AI career companion"
-          width={280}
-          height={320}
-          decoding="async"
-        />
-      </div>
-      {targetTitle ? (
-        <>
-          <p className="px-companion-path">
-            <span>{currentTitle}</span>
-            <ArrowRight size={14} aria-hidden />
-            <span>{targetTitle}</span>
-          </p>
-
-          <div className="px-companion-evidence">
-            <strong>{[
-              suggestedSkillCount > 0 ? `${suggestedSkillCount} task matches` : null,
-              developingSkillCount > 0 ? `${developingSkillCount} from courses or learning` : null,
-            ].filter(Boolean).join(" · ") || "Matching skills"}</strong>
-            <p className="px-chosen-hint">WEF skills · occupation task matches</p>
-            <button type="button" className="px-info-button"
-              aria-label={detailsOpen ? "Hide career details" : "Show career details"}
-              title={detailsOpen ? "Hide career details" : "Show career details"}
-              aria-expanded={detailsOpen} onClick={() => setDetailsOpen((open) => !open)}>
-              <Info size={17} aria-hidden />
-            </button>
-            {detailsOpen ? (
-              <div className="px-companion-story" id="px-companion-details">
-                <h3>What this path suggests</h3>
-                <h4>Skills identified for this direction</h4>
-                <ul>{matchingSkills.map(skill => <li key={skill.skill_id}>{skill.name}</li>)}</ul>
-              </div>
-            ) : null}
-          </div>
-
-          <button className="px-primary px-companion-cta" type="button" disabled={!canExplore || continuing} onClick={onExplore}>
-            {continuing ? "Opening learning resources…" : canExplore ? "Find learning for selected skill" : "Choose a skill to continue"}
-          </button>
-        </>
-      ) : (
-        <div className="px-companion-story">
-          <h3>Pick a direction to begin</h3>
-
-        </div>
-      )}
-    </aside>
-  );
-}
 
 export default function Possibilities() {
   const navigate = useNavigate();
@@ -162,7 +87,7 @@ export default function Possibilities() {
     const direction = data?.directions.find(item => item.occupation_code === code);
     if (!direction) return;
     try {
-      accountStorage.setItem(DIRECTION_KEY, JSON.stringify({ occupation_code: code, title: direction.title }));
+      accountStorage.setItem(DIRECTION_KEY, JSON.stringify({ occupation_code: code, title: direction.title, skillSources: readCareerPath().sources }));
       setSelectedCode(code);
       setSkillChoice(current => current?.careerCode === code ? current : null);
       setNavigationError("");
@@ -211,8 +136,10 @@ export default function Possibilities() {
   const selected = data.directions.find(item => item.occupation_code === selectedCode);
   const currentTitle = data.currentRole?.title ?? "Your current role";
   const identifiedProfileSkills = data.skills.filter(item => item.state === "have" || item.state === "suggested" || item.state === "learning");
-  const selectedMatchingSkills = (selected?.skills ?? []).filter(item => item.state === "have" || item.state === "suggested" || item.state === "learning");
-  const availableSkills = (selected?.skills ?? []).filter(item => item.state !== "have");
+  const availableSkills = (selected?.skills ?? []).filter(item => item.state !== "have").sort((a, b) => Number(["suggested", "learning"].includes(a.state)) - Number(["suggested", "learning"].includes(b.state)));
+  let careerIds: number[] = [];
+  let careerError = "";
+  try { careerIds = readCareerPath().ids; } catch (error) { careerError = error instanceof Error ? error.message : "Could not read saved skills."; }
   const selectedSkill = skillChoice?.careerCode === selected?.occupation_code
     ? availableSkills.find(item => item.skill_id === skillChoice?.skillId) : undefined;
   const goLearning = async (skillId = selectedSkill?.skill_id) => {
@@ -222,172 +149,70 @@ export default function Possibilities() {
     try {
       setContinuing(true);
       setNavigationError("");
-      const destination = await startLearning({
-        origin: "career",
-        skill: { id: skill.skill_id, slug: skill.skill_slug, name: skill.name },
-        career: { code: selected.occupation_code, title: selected.title },
-        goal: `Develop ${skill.name} for ${selected.title}`,
-      });
-      navigate(destination);
+      const owner = currentWorkspaceSession();
+      await addCareerPathSkill(skill.skill_id, selected.occupation_code, selected.title);
+      if (owner === currentWorkspaceSession()) navigate(`${ROUTES.skills}?careerSkill=${skill.skill_id}#skill-area-${skill.skill_id}`);
     } catch (error) {
-      setNavigationError(error instanceof Error ? error.message : "Could not open learning resources.");
+      setNavigationError(error instanceof Error ? error.message : "Could not save your skill. Please try again.");
       setContinuing(false);
     }
   };
 
-  return (
-    <div className="px-page">
-      <PageHeader
-        title="Career options"
-        description="Grow in your current role, or explore where your experience could take you next."
-      />
-      {data.careerSourceNote && <details className="px-info-disclosure px-source-note">
-        <summary aria-label="Show career source information" title="Career source information"><Info size={17} aria-hidden /></summary>
-        <p>{data.careerSourceNote}</p>
-      </details>}
-      <div className="px-body">
-        <div className="px-main-col">
-          <section className="px-current">
-            <div className="px-current-intro">
-              <p className="px-eyebrow">YOUR STARTING POINT</p>
-              <h2>{currentTitle}</h2>
+  const unmatched = availableSkills.filter(skill => !["have", "suggested", "learning"].includes(skill.state));
+  const matchedOptions = availableSkills.filter(skill => ["have", "suggested", "learning"].includes(skill.state));
+  const renderSkill = (skill: (typeof availableSkills)[number]) => {
+          if (!selected) return null;
+          const chosen = selectedSkill?.skill_id === skill.skill_id;
+          const saved = careerIds.includes(skill.skill_id);
+          const missing = !["have", "suggested", "learning"].includes(skill.state);
+          return <label key={skill.skill_id} className={`px-development-card ${chosen ? "is-selected" : ""} ${missing ? "is-missing" : ""}`}>
+            <input type="radio" name="career-learning-skill" value={skill.skill_id} checked={chosen} onChange={() => { setSkillChoice({ careerCode: selected.occupation_code, skillId: skill.skill_id }); setNavigationError(""); }} />
+            <span><strong>{skill.name}</strong><span className="px-skill-badges">{missing && <small className="px-gap-count">Not matched yet</small>}{saved && <small>In your Skill Path</small>}{!missing && <small>{skill.state === "learning" ? "From courses or learning" : "Suggested from tasks"}</small>}</span><p>{skillPathDescription(skill.skill_id)}</p></span>{chosen && <Check size={18} aria-hidden="true" />}
+          </label>;
+        };
 
-              <Link className="px-light" to={profilePath}>
-                Review work profile
-              </Link>
-            </div>
-            <div className="px-current-skills">
-              <div className="px-profile-skills-heading">
-                <h3>Skills in your profile</h3>
-                <details className="px-info-disclosure">
-                  <summary aria-label="Show skill source information" title="Skill source information"><Info size={16} aria-hidden /></summary>
-                  <p>Directions use WEF skills suggested by your confirmed tasks. No review is needed.</p>
-                </details>
-              </div>
-              <div className="px-chips">
-                {identifiedProfileSkills.map(skill => (
-                  <span className={`px-chip ${skill.state === "have" ? "have" : "missing"}`} key={skill.skill_id}>
-                    {skill.name}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section className="px-options">
-            <p className="px-eyebrow">EXPLORE OTHER DIRECTIONS</p>
-            <h2>Where could you go next?</h2>
-            {!data.directions.length && <div className="px-no-direction">
-              {data.status === "needs_skill_review" ? <><h3>No task skills found yet</h3><Link className="px-light" to={ROUTES.workProfile}>Update my tasks</Link></> : <><h3>No matching career options yet</h3><Link className="px-light" to={ROUTES.workProfile}>Update my tasks</Link></>}
-            </div>}
-            <div className="px-direction-grid">
-              {data.directions.slice(0, 3).map((direction, index) => {
-                const chosen = selected?.occupation_code === direction.occupation_code;
-                const matchingSkills = direction.skills.filter(skill => skill.state === "have" || skill.state === "suggested" || skill.state === "learning");
-                return (
-                  <article
-                    className={`px-direction-card px-accent-${index} ${chosen ? "is-chosen" : ""}`}
-                    key={direction.occupation_code}
-                  >
-                    {direction.area ? <p className="px-eyebrow">{direction.area}</p> : null}
-                    <h3>{direction.title}</h3>
-                    <div className="px-card-evidence">
-                      <strong>{matchingSkills.length} skill{matchingSkills.length === 1 ? "" : "s"} matched</strong>
-                      <span>{[
-                        direction.current_skill_overlap > 0 ? `${direction.current_skill_overlap} confirmed at work` : null,
-                        direction.suggested_skill_overlap > 0 ? `${direction.suggested_skill_overlap} from tasks` : null,
-                        direction.developing_skill_overlap > 0 ? `${direction.developing_skill_overlap} from courses or learning` : null,
-                      ].filter(Boolean).join(" · ")}</span>
-                      <p>{matchingSkills.map(skill => skill.name).join(" · ")}</p>
-                    </div>
-                    {direction.description && <details className="px-info-disclosure px-role-info">
-                      <summary aria-label={`Show ${direction.title} description`} title="Role description"><Info size={16} aria-hidden /></summary>
-                      <p>{direction.description}</p>
-                    </details>}
-                    <p className="px-card-source">WEF skills · occupation task matches</p>
-                    <button
-                      className={chosen ? "px-primary" : "px-outline"}
-                      type="button"
-                      onClick={() => choose(direction.occupation_code)}
-                    >
-                      {chosen ? "Chosen direction" : "Explore this direction"}
-                    </button>
-                  </article>
-                );
-              })}
-            </div>
-          </section>
-
-          {selected ? (
-            <section className="px-chosen" aria-labelledby="px-chosen-title">
-              <p className="px-eyebrow">03 · MY CHOSEN DIRECTION</p>
-              <h2 id="px-chosen-title">Your path to {selected.title}</h2>
-              {selected.description && <details className="px-info-disclosure px-role-info">
-                <summary aria-label={`Show ${selected.title} description`} title="Role description"><Info size={16} aria-hidden /></summary>
-                <p>{selected.description}</p>
-              </details>}
-              {selected.skills.length > 0 ? (
-                <div className="px-chosen-skills">
-                  <div className="px-skill-split">
-                    <div>
-                      <h3>Skills identified for you</h3>
-                      <ul className="px-requirement-list">{selectedMatchingSkills.map(skill => <li key={skill.skill_id}>
-                        <strong>{skill.name}</strong><span>{skill.state === "have" ? "From your work profile" : skill.state === "learning" ? "From courses or learning" : "From your tasks"}</span>
-                      </li>)}</ul>
-                    </div>
-                    <div>
-                      <h3>Skills for this role</h3>
-                      <ul className="px-requirement-list">{selected.skills.map(skill => <li key={skill.skill_id}>
-                        <strong>{skill.name}</strong><span>{skill.state === "have" ? "Fits my work" : skill.state === "learning" ? "From courses or learning" : skill.state === "suggested" ? "Suggested from your tasks" : "Not matched yet"}</span>
-                      </li>)}</ul>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-              <fieldset className="mt-5 space-y-3" disabled={continuing}>
-                <legend className="font-semibold">Choose a skill to develop</legend>
-                <details className="px-info-disclosure">
-                  <summary aria-label="Show role skill information" title="Role skill information"><Info size={16} aria-hidden /></summary>
-                  <p>Skills are matched from WEF labels and occupation task descriptions.</p>
-                </details>
-                {availableSkills.map(item => (
-                  <label key={item.skill_id} className="flex items-center gap-2">
-                    <input type="radio" name="career-learning-skill" value={item.skill_id}
-                      checked={selectedSkill?.skill_id === item.skill_id}
-                      onChange={() => {
-                        setSkillChoice({ careerCode: selected.occupation_code, skillId: item.skill_id });
-                        try { accountStorage.setItem(DIRECTION_KEY, JSON.stringify({ occupation_code: selected.occupation_code, title: selected.title, skill_id: item.skill_id })); setNavigationError(""); }
-                        catch (error) { setNavigationError(error instanceof Error ? error.message : "Could not save your skill choice."); }
-                      }} />
-                    {item.name}{item.state === "learning" ? " · already in development" : ""}
-                  </label>
-                ))}
-                {!availableSkills.length && <p role="status">No additional skills to explore.</p>}
-              </fieldset>
-              <details className="px-info-disclosure px-source-details">
-                <summary aria-label="Show career source and date" title="Career source and date"><Info size={16} aria-hidden /></summary>
-                <p>WEF skill labels matched against occupation task descriptions.</p>
-              </details>
-              {navigationError && <p role="alert" className="mt-3">{navigationError}</p>}
-              <button className="px-primary mt-4" type="button" disabled={!selectedSkill || continuing} onClick={() => { void goLearning(); }}>
-                {continuing ? "Opening learning resources…" : selectedSkill ? `Develop ${selectedSkill.name}` : "Choose a skill to continue"}
-              </button>
-            </section>
-          ) : null}
-        </div>
-
-        <JourneyCompanion
-          currentTitle={currentTitle}
-          targetTitle={selected?.title ?? null}
-          matchingSkills={selectedMatchingSkills}
-          suggestedSkillCount={selected?.suggested_skill_overlap ?? 0}
-          developingSkillCount={selected?.developing_skill_overlap ?? 0}
-          onExplore={() => { void goLearning(); }}
-          canExplore={Boolean(selectedSkill)}
-          continuing={continuing}
-        />
-      </div>
-
-    </div>
-  );
+  return <div className="px-page">
+    <PageHeader title="Career possibilities" description="Explore career matches, choose a skill to develop and take your next step in Skill Path." />
+    <div className="px-career-layout"><main className="px-career-main">
+    <section className="px-current">
+      <div><p className="px-eyebrow">YOUR STARTING POINT</p><h2>{currentTitle}</h2><Link className="px-light" to={profilePath}>Review work profile</Link></div>
+      <div><h3>Skills in your profile</h3><div className="px-chips">{identifiedProfileSkills.map(skill => <span className="px-chip have" key={skill.skill_id}>{skill.name}</span>)}</div></div>
+    </section>
+    <section className="px-options">
+      <p className="px-eyebrow">EXPLORE OTHER DIRECTIONS</p><h2>Where could you go next?</h2>
+      <p className="px-match-help">About skill matching <InfoHint label="About skill matching and sources" text={[MATCH_HINT, data.careerSourceNote].filter(Boolean).join(" ")} /></p>
+      {!data.directions.length && <div className="px-no-direction"><h3>No matching career options yet</h3><Link to={profilePath}>Update my tasks</Link></div>}
+      <div className="px-direction-grid">{data.directions.map((direction, index) => {
+        const match = skillMatch(direction.skills);
+        const chosen = selectedCode === direction.occupation_code;
+        return <article className={`px-direction-card px-accent-${index % 3} ${chosen ? "is-chosen" : ""}`} key={direction.occupation_code}>
+          <div className="px-career-top"><div>{index === 0 && <span className="px-best-match">Top suggested direction</span>}<Tooltip title={direction.title}><h3 tabIndex={0}>{direction.title}</h3></Tooltip>{direction.area && <p className="px-career-area">{direction.area}</p>}</div>
+            <div className="px-career-score"><svg viewBox="0 0 100 100" role="img" aria-label={match.percent === null ? "Match unavailable" : `${match.percent}% skill match`}><circle cx="50" cy="50" r="42" fill="none" stroke="#e8edf5" strokeWidth="9" />{match.percent !== null && <circle cx="50" cy="50" r="42" fill="none" stroke="#4f91ba" strokeWidth="9" strokeLinecap="round" strokeDasharray={`${match.percent * 2.639} 263.9`} transform="rotate(-90 50 50)" />}<text x="50" y="56" textAnchor="middle">{match.percent === null ? "—" : `${match.percent}%`}</text></svg></div>
+          </div>
+          <div className="px-description-row"><Tooltip title={direction.description || "Explore the skills connected to this career direction."}><p tabIndex={0} className="px-career-description">{direction.description || "Explore the skills connected to this career direction."}</p></Tooltip></div>
+          <Tooltip title={direction.skills.filter(skill => ["have", "suggested", "learning"].includes(skill.state)).map(skill => `${skill.name} (${skill.state === "have" ? "work profile" : skill.state === "learning" ? "courses or learning" : "task suggestion"})`).join("; ") || "No matched skills yet."}><p tabIndex={0} className="px-match-summary">{match.matched} of {match.total} skills matched</p></Tooltip>
+          <div className="px-career-skill-group"><h4>SKILLS TO BUILD</h4><div className="px-career-tags is-building">{direction.skills.filter(skill => !["have", "suggested", "learning"].includes(skill.state)).map(skill => <span key={skill.skill_id}>{skill.name}</span>)}{match.total === match.matched && <small>{match.total ? "All identified skills have a connection" : "Match unavailable"}</small>}</div></div>
+          <button className={chosen ? "px-primary" : "px-outline"} type="button" disabled={continuing} aria-pressed={chosen} onClick={() => choose(direction.occupation_code)}>{chosen ? "Chosen direction" : "Explore this direction"}<ArrowRight size={15} /></button>
+        </article>;
+      })}</div>
+    </section>
+    {selected && <section className="px-chosen" aria-labelledby="px-chosen-title">
+      <p className="px-eyebrow">YOUR NEXT STEP</p><h2 id="px-chosen-title">Choose your next skill</h2><p>Skills to explore for {selected.title}.</p>
+      <fieldset className="px-development" disabled={continuing || Boolean(careerError)}>
+        <legend>Skills to develop · {unmatched.length || matchedOptions.length} <InfoHint label="About not matched skills" text={GAP_HINT} /></legend>
+        <p>Choose one skill to add to your Skill Path.</p>
+        <div className="px-development-grid">{(unmatched.length ? unmatched : matchedOptions).map(renderSkill)}</div>
+        {unmatched.length > 0 && matchedOptions.length > 0 && <details className="px-other-skills" key={selected.occupation_code}><summary>Develop a matched skill instead · {matchedOptions.length}</summary><div className="px-development-grid">{matchedOptions.map(renderSkill)}</div></details>}
+        {!availableSkills.length && <p>No additional skills are available for this direction.</p>}
+      </fieldset>
+    </section>}
+    </main>
+    <aside className="px-companion" aria-label="Journey Companion">
+      <p className="px-eyebrow">JOURNEY COMPANION</p>
+      <div className="px-companion-avatar"><img src="/images/possibilities-companion.png" alt="Your virtual career companion" width={280} height={320} /></div>
+      <div className="px-companion-story"><h3>{selected ? "Your next chapter" : "Pick a direction to begin"}</h3><p>{selected ? `${currentTitle} → ${selected.title}` : "Explore a career direction, then choose a skill you would like to develop."}</p>{selectedSkill && <p>Selected skill: <strong>{selectedSkill.name}</strong></p>}</div>
+      {selected && <button className="px-primary px-companion-cta" disabled={!selectedSkill || continuing || Boolean(careerError)} onClick={() => { void goLearning(); }}>{continuing ? "Saving your skill…" : "Add to Skill Path"}<ArrowRight size={15} /></button>}
+    </aside></div>
+    {(navigationError || careerError) && <p role="alert">{navigationError || careerError}</p>}
+  </div>;
 }

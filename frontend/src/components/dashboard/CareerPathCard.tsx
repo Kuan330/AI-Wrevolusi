@@ -4,7 +4,7 @@ import { ArrowRight, Compass } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ROUTES } from "@/constants/routes";
-import type { careerPathProgress } from "@/features/dashboard/careerPath";
+import type { careerPathProgress } from "@/features/dashboard/careerProgress";
 import { startLearning } from "@/features/journey/journey";
 
 type Props = { path: ReturnType<typeof careerPathProgress> & { occupationCode: string } };
