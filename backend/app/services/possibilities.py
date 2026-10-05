@@ -199,6 +199,41 @@ def completed_course_wef_skill_ids(
     }
 
 
+def occupations_in_same_sub_major(
+    occupations: Iterable[Mapping],
+    current_occupation_code: str | None,
+    taxonomy: Mapping[str, Mapping],
+) -> list[Mapping]:
+    """Limit candidate occupations to the selected role's sub-major category."""
+    rows = list(occupations)
+    if not current_occupation_code:
+        return rows
+
+    def sub_major_code(code: str) -> str | None:
+        seen: set[str] = set()
+        row = taxonomy.get(code)
+        while row:
+            current_code = str(row.get('occupation_code') or '')
+            if current_code in seen:
+                return None
+            seen.add(current_code)
+            if row.get('level') == 'sub_major':
+                return current_code
+            parent = str(row.get('parent_code') or '')
+            row = taxonomy.get(parent)
+        return None
+
+    selected_sub_major = sub_major_code(str(current_occupation_code))
+    if selected_sub_major is None:
+        # If taxonomy data is missing or stale, avoid silently recommending
+        # occupations from unrelated categories.
+        return []
+    return [
+        row for row in rows
+        if sub_major_code(str(row.get('occupation_code') or '')) == selected_sub_major
+    ]
+
+
 def rank_esco_directions(occupations, relations, skills, current_skill_uris, developing_skill_uris, source):
     """Rank source-linked ESCO roles using current skills and learning interests."""
     by_occupation: dict[str, list[dict]] = {}
