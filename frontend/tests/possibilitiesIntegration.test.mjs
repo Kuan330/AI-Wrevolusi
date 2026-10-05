@@ -153,7 +153,8 @@ test('page loads live data, restores and persists approved workspace keys', () =
   assert.match(page, /possibilitiesService\.getPossibilities/);
   assert.match(page, /accountStorage\.getItem/);
   assert.match(page, /aiwrevolusi\.possibilities\.chosenDirection/);
-  assert.match(page, /acceptedCareerEvidence/);
+  assert.match(page, /readCareerPath\(\)/);
+  assert.match(page, /skillMatch\(direction\.skills\)/);
   assert.match(page, /loadSavedPossibilities\(\{/);
   assert.match(page, /flush: flushWorkspace/);
   assert.match(page, /get: possibilitiesService\.getPossibilities/);
@@ -162,8 +163,8 @@ test('page loads live data, restores and persists approved workspace keys', () =
   assert.ok((page.match(/to=\{profilePath\}/g) ?? []).length >= 1);
   assert.doesNotMatch(page, /to="\/profile"/);
   assert.match(page, /setError\(""\)/);
-  assert.match(page, /px-info-button/);
-  assert.match(page, /Show career details/);
+  assert.match(page, /<InfoHint/);
+  assert.match(page, /About skill matching and sources/);
   assert.doesNotMatch(page, /SKILL COVERAGE|coveragePct|coverage_pct|<small>%<\/small>/);
   assert.doesNotMatch(page, /sessionStorage/);
 });
