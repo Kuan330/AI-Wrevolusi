@@ -282,3 +282,12 @@
 @media(max-width:850px) { .career-path-body { grid-template-columns:1fr; } .career-path-card { padding:22px 20px; } }
 .career-path-body button.dashboard-text-link { background:none; border:0; padding:0; cursor:pointer; text-align:left; }
 .career-path-body button.dashboard-text-link:disabled { opacity:.6; cursor:default; }
+
+/* With a chosen career, the top of the overview is one row: path on the left, current course on the right. */
+.career-overview { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:24px; align-items:stretch; }
+.career-overview .career-path-body { grid-template-columns:1fr; }
+.career-overview .growth-plan-card.is-compact .growth-plan-grid { grid-template-columns:1fr; }
+.career-overview .growth-plan-card.is-compact { display:flex; flex-direction:column; }
+.career-overview .growth-plan-card.is-compact .growth-plan-grid { padding-top:22px; flex:1; }
+.career-overview .growth-plan-card.is-compact .growth-plan-header > span:last-child { display:none; }
+@media(max-width:1000px) { .career-overview { grid-template-columns:1fr; } }

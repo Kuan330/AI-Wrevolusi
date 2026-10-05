@@ -25,10 +25,10 @@ export default function Dashboard() {
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const latestGoal = data?.goals.slice().sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt))[0];
   const learningPath = summary?.nextCourse ? planCourseUrl(summary.nextCourse.id) : latestGoal ? `${ROUTES.learningGoals}?${new URLSearchParams({goal:latestGoal.id})}` : ROUTES.skills;
+  const continueCard = <ContinueLearningCard compact={Boolean(careerPath)} summary={summary} latestGoal={latestGoal} learningPath={learningPath} courseContext={summary?.nextCourse ? data.journey.contexts[data.journey.courseContexts[summary.nextCourse.id]] : undefined} />;
   return <div className="dashboard-page">
     <PageHeader title={`${greeting}${user ? `, ${user.username}` : ""}`} description="Your learning plan, your progress, your next step." actions={<Button asChild variant="outline"><Link to={ROUTES.skills}><Plus size={16} /> New learning goal</Link></Button>} />
-    {careerPath && <CareerPathCard path={careerPath} />}
-    <ContinueLearningCard summary={summary} latestGoal={latestGoal} learningPath={learningPath} courseContext={summary?.nextCourse ? data.journey.contexts[data.journey.courseContexts[summary.nextCourse.id]] : undefined} />
+    {careerPath ? <div className="career-overview"><CareerPathCard path={careerPath} />{continueCard}</div> : continueCard}
     {summary && <LearningActivityCard summary={summary} />}
 
 
