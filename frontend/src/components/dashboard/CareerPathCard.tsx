@@ -29,7 +29,8 @@ export default function CareerPathCard({ path }: Props) {
       setStarting(false);
     }
   };
-  const covered = path.have.length + path.learning.length;
+  const matched = path.have.length + path.learning.length + path.suggested.length;
+  const sources = [path.have.length && `${path.have.length} from your work profile`, path.suggested.length && `${path.suggested.length} from your tasks`, path.learning.length && `${path.learning.length} from your learning`].filter(Boolean).join(" · ");
   return <Card className="career-path-card" aria-label={`Progress towards ${path.title}`}>
     <header className="career-path-header">
       <div><p className="dashboard-eyebrow"><Compass size={15} /> YOUR NEXT CAREER DIRECTION</p><h2>Your path to {path.title}</h2></div>
@@ -38,8 +39,8 @@ export default function CareerPathCard({ path }: Props) {
     <div className="career-path-body">
       <section aria-label="Skills matched so far">
         <div className="career-path-meter"><Progress value={path.percent} aria-label={`${path.title} skills matched`} /><span>{path.percent}%</span></div>
-        <p className="career-path-summary">{covered} of {path.total} role skills matched from your work{path.learning.length ? `, including ${path.learning.length} from your learning` : ""}.</p>
-        <p className="career-path-note">This counts skills matched to your work and learning. It is not a skill level.</p>
+        <p className="career-path-summary">{matched} of {path.total} role skills matched{sources ? ` · ${sources}` : ""}</p>
+        <p className="career-path-note">Matched from your work, tasks and learning. It is not a skill level.</p>
       </section>
       <section aria-label="Gaps still to close">
         <p className="dashboard-eyebrow">{path.gaps.length ? `${path.gaps.length} ${path.gaps.length === 1 ? "GAP" : "GAPS"} TO CLOSE` : "NO GAPS LEFT"}</p>

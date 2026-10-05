@@ -12,17 +12,19 @@ test('chosen direction is read from the Possibilities choice and ignores malform
   assert.equal(parseChosenDirection(null), null);
 });
 
-test('progress counts skills already matched and lists the remaining gaps', () => {
+test('progress counts skills matched from work, learning or tasks and lists the remaining gaps', () => {
   const result = careerPathProgress(direction([skill(1, 'have'), skill(2, 'learning'), skill(3, 'suggested'), skill(4, 'missing')]));
-  assert.equal(result.percent, 50);
-  assert.deepEqual(result.gaps.map(item => item.skill_id), [3, 4]);
+  assert.equal(result.percent, 75);
+  assert.deepEqual(result.gaps.map(item => item.skill_id), [4]);
   assert.equal(result.learning.length, 1);
+  assert.equal(result.suggested.length, 1);
 });
 
 test('next gap prefers the skill the user chose, then a shortlisted one, then the first gap', () => {
   const skills = [skill(1, 'have'), skill(2, 'missing'), skill(3, 'shortlisted'), skill(4, 'missing')];
   assert.equal(careerPathProgress(direction(skills), 4).nextGap.skill_id, 4);
   assert.equal(careerPathProgress(direction(skills), 1).nextGap.skill_id, 3);
+  assert.equal(careerPathProgress(direction([skill(1, 'suggested'), skill(2, 'missing')]), 1).nextGap.skill_id, 2);
   assert.equal(careerPathProgress(direction([skill(1, 'have'), skill(2, 'missing')])).nextGap.skill_id, 2);
 });
 

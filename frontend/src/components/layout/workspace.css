@@ -291,3 +291,4 @@
 .career-overview .growth-plan-card.is-compact .growth-plan-grid { padding-top:22px; flex:1; }
 .career-overview .growth-plan-card.is-compact .growth-plan-header > span:last-child { display:none; }
 @media(max-width:1000px) { .career-overview { grid-template-columns:1fr; } }
+.career-path-header > .dashboard-text-link { white-space:nowrap; }
