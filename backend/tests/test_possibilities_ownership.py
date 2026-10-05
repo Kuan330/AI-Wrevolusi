@@ -46,6 +46,9 @@ def setup_client(monkeypatch, workspace, *, fail_workspace=False):
     monkeypatch.setattr(route, '_load_reference_data', AsyncMock(return_value=(
         {1: {'core_skill': 'Modern skill'}, 2: {'core_skill': 'Legacy skill'}},
         [{'occupation_code': '1111', 'title': 'Modern role'}, {'occupation_code': '2222', 'title': 'Legacy role'}],
+        {'1111': {'occupation_code': '1111', 'level': 'unit', 'parent_code': 'SUB'},
+         '2222': {'occupation_code': '2222', 'level': 'unit', 'parent_code': 'SUB'},
+         'SUB': {'occupation_code': 'SUB', 'level': 'sub_major', 'parent_code': None}},
     )))
     monkeypatch.setattr(route, 'occupation_required_skills', lambda *args, **kwargs: set())
     monkeypatch.setattr(skill_matching, 'match_skills', lambda text, *args, **kwargs: [
@@ -67,7 +70,8 @@ def test_modern_confirmation_ignores_conflicting_legacy_workspace_and_tables(mon
     assert response.status_code == 200
     payload = response.json()
     assert payload['current_role']['occupation_code'] == '1111'
-    assert {item['skill_id'] for item in payload['skills'] if item['state'] == 'have'} == {1}
+    # Modern evidence is matched from tasks; the conflicting legacy skill is not.
+    assert {item['skill_id'] for item in payload['skills'] if item['state'] == 'suggested'} == {1}
     assert not any('FROM tasks' in query or 'FROM occupations' in query for query in queries)
 
 
@@ -100,7 +104,7 @@ def test_absent_modern_profile_keeps_legacy_fallback(monkeypatch, workspace):
         response = client.get('/api/v1/possibilities')
     assert response.status_code == 200
     assert response.json()['current_role']['occupation_code'] == '2222'
-    assert {item['skill_id'] for item in response.json()['skills'] if item['state'] == 'have'} == {2}
+    assert {item['skill_id'] for item in response.json()['skills'] if item['state'] == 'suggested'} == {2}
     assert any('FROM tasks' in query for query in queries)
 
 

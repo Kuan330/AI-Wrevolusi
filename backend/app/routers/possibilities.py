@@ -167,6 +167,9 @@ async def get_possibilities(
         )
     except ValueError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from None
+    if not has_confirmed_tasks:
+        # Unconfirmed drafts are not evidence, even if an older skill review is still saved.
+        current_wef, suggested_wef = set(), set()
 
     try:
         from app.services.catalogue import load_catalogue_scope

@@ -45,7 +45,7 @@ def test_possibilities_route_survives_invalid_legacy_shortlist(monkeypatch):
     import app.routers.possibilities as route
 
     monkeypatch.setattr(route, '_load_reference_data', AsyncMock(return_value=(
-        {2: {'core_skill': 'Creative thinking'}}, [],
+        {2: {'core_skill': 'Creative thinking'}}, [], {},
     )))
     task_rows = Mock()
     task_rows.mappings.return_value.all.return_value = []

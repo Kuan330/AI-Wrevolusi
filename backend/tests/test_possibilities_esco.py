@@ -61,11 +61,23 @@ def test_ranking_uses_exact_links_and_only_roles_with_current_overlap():
     assert [skill['state'] for skill in ranked[0]['requirements']] == ['current', 'not_yet_evidenced']
 
 
-def test_ranking_returns_no_roles_without_current_reviewed_skill():
+def test_ranking_returns_no_roles_without_current_or_learning_skill():
+    ranked = rank_esco_directions(
+        [{'uri': OCCUPATION, 'isco_code': '3115', 'label': 'Mechanical technician', 'description': 'Role'}],
+        [{'occupation_uri': OCCUPATION, 'skill_uri': CURRENT_SKILL, 'relation': 'essential'}],
+        {CURRENT_SKILL: {'label': 'Interpret drawings'}}, set(), set(), None,
+    )
+    assert ranked == []
+
+
+def test_ranking_includes_roles_matched_only_by_learning_interest():
     ranked = rank_esco_directions(
         [{'uri': OCCUPATION, 'isco_code': '3115', 'label': 'Mechanical technician', 'description': 'Role'}],
         [{'occupation_uri': OCCUPATION, 'skill_uri': CURRENT_SKILL, 'relation': 'essential'}],
         {CURRENT_SKILL: {'label': 'Interpret drawings'}}, set(), {CURRENT_SKILL}, None,
     )
-    assert ranked == []
+    assert [role['occupation_uri'] for role in ranked] == [OCCUPATION]
+    assert ranked[0]['current_skill_overlap'] == 0
+    assert ranked[0]['developing_skill_overlap'] == 1
+    assert [skill['state'] for skill in ranked[0]['requirements']] == ['developing']
 

@@ -40,6 +40,13 @@ def reviewed_workspace(decisions, *, completed=True, with_analysis=True):
     }
 
 
+def same_sub_major(rows):
+    """Taxonomy placing every source role in one sub-major, so ranking is not filtered out."""
+    codes = [row['occupation_code'] for row in rows]
+    return {code: {'occupation_code': code, 'level': 'unit', 'parent_code': 'SUB'} for code in codes} | {
+        'SUB': {'occupation_code': 'SUB', 'level': 'sub_major', 'parent_code': None}}
+
+
 def career_client(monkeypatch, workspace):
     owner = uuid4()
     queries = []
@@ -62,7 +69,7 @@ def career_client(monkeypatch, workspace):
         result.scalar_one_or_none.return_value = workspace
         return result
 
-    monkeypatch.setattr(route, '_load_reference_data', AsyncMock(return_value=(skills, sources)))
+    monkeypatch.setattr(route, '_load_reference_data', AsyncMock(return_value=(skills, sources, same_sub_major(sources))))
     monkeypatch.setattr(route, 'occupation_required_skills', lambda *_args, **_kwargs: {1, 2, 3})
     monkeypatch.setattr(skill_matching, 'match_skills', lambda *_args, **_kwargs: [
         SimpleNamespace(wef_skill_id=skill_id) for skill_id in (1, 2, 3)
@@ -90,10 +97,9 @@ def test_endpoint_keeps_rejection_on_repeat_visits_without_removing_wanted_or_so
             payload = response.json()
             assert {item['skill_id'] for item in payload['skills'] if item['state'] == 'have'} == {1}
             assert payload['shortlisted_skill_ids'] == [2]
-            assert payload['status'] == 'needs_skill_review'
-            assert payload['directions'] == []
+            assert payload['status'] == 'ready'
             assert {item['skill_id']: item['state'] for item in payload['skills']} == {
-                1: 'have', 2: 'shortlisted', 3: 'missing',
+                1: 'have', 2: 'shortlisted', 3: 'suggested',
             }
     assert len(queries) == 2
     assert sources == original_sources
@@ -105,9 +111,11 @@ def test_endpoint_completed_review_with_no_acceptances_does_not_resurrect_inferr
     with client:
         response = client.get('/api/v1/possibilities')
     assert response.status_code == 200
-    assert response.json()['status'] == 'needs_skill_review'
-    assert response.json()['directions'] == []
+    assert response.json()['status'] == 'ready'
     assert all(item['state'] != 'have' for item in response.json()['skills'])
+    assert {item['skill_id']: item['state'] for item in response.json()['skills']} == {
+        1: 'suggested', 2: 'shortlisted', 3: 'suggested',
+    }
     assert response.json()['shortlisted_skill_ids'] == [2]
 
 
@@ -121,7 +129,9 @@ def test_endpoint_changed_work_preserves_rejection_while_awaiting_a_new_review(m
     with client:
         response = client.get('/api/v1/possibilities')
     assert response.status_code == 200
-    assert {item['skill_id'] for item in response.json()['skills'] if item['state'] == 'have'} == {1, 3}
+    # The old review no longer matches the changed work, so nothing is treated as a confirmed strength.
+    assert all(item['state'] != 'have' for item in response.json()['skills'])
+    assert {item['skill_id'] for item in response.json()['skills'] if item['state'] == 'suggested'} == {1, 2, 3}
 
 
 @pytest.mark.parametrize('raw', ['{bad', 'null', '{"version":1,"contexts":{},"courseContexts":{"course":"missing"}}'])
@@ -147,7 +157,7 @@ def test_endpoint_accepts_confirmed_tasks_without_an_ilo_assessment(monkeypatch)
     assert response.status_code == 200
     payload = response.json()
     assert payload['current_role']['occupation_code'] == '4110'
-    assert payload['status'] == 'needs_skill_review'
+    assert payload['status'] == 'ready'
     assert {item['skill_id'] for item in payload['skills'] if item['state'] == 'have'} == {1}
 
 
