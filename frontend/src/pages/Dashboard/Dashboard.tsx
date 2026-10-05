@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import PageHeader from "@/components/common/PageHeader";
 import ContinueLearningCard from "@/components/dashboard/ContinueLearningCard";
+import CareerPathCard from "@/components/dashboard/CareerPathCard";
 import LearningActivityCard from "@/components/dashboard/LearningActivityCard";
 import LearningTimeline from "@/components/dashboard/LearningTimeline";
 import { useAccount } from "@/components/account/useAccount";
 import { useLearningOverviewSnapshot } from "@/hooks/useWorkspaceSnapshot";
+import { useCareerPath } from "@/hooks/useCareerPath";
 import { ROUTES } from "@/constants/routes";
 import { learningSummary } from "@/features/dashboard/learningSummary";
 import { planCourseUrl } from "@/features/journey/journey";
@@ -15,6 +17,7 @@ import { planCourseUrl } from "@/features/journey/journey";
 export default function Dashboard() {
   const { user, reload } = useAccount();
   const { data, error } = useLearningOverviewSnapshot();
+  const careerPath = useCareerPath();
   if (error) return <Card className="dashboard-panel" role="alert"><h1 className="text-xl font-semibold">Your workspace needs attention</h1><p>{error}</p><div className="mt-4 flex flex-wrap gap-3"><Button onClick={reload}>Reload saved work</Button><Button asChild variant="outline"><Link to={ROUTES.progress}>View learning records</Link></Button></div></Card>;
   if (!data) return <p role="status">Loading your overview…</p>;
   const summary = learningSummary(data.plan, data.goals, data.journey.resume?.kind === "course" ? data.journey.resume.id : undefined);
@@ -24,6 +27,7 @@ export default function Dashboard() {
   const learningPath = summary?.nextCourse ? planCourseUrl(summary.nextCourse.id) : latestGoal ? `${ROUTES.learningGoals}?${new URLSearchParams({goal:latestGoal.id})}` : ROUTES.skills;
   return <div className="dashboard-page">
     <PageHeader title={`${greeting}${user ? `, ${user.username}` : ""}`} description="Your learning plan, your progress, your next step." actions={<Button asChild variant="outline"><Link to={ROUTES.skills}><Plus size={16} /> New learning goal</Link></Button>} />
+    {careerPath && <CareerPathCard path={careerPath} />}
     <ContinueLearningCard summary={summary} latestGoal={latestGoal} learningPath={learningPath} courseContext={summary?.nextCourse ? data.journey.contexts[data.journey.courseContexts[summary.nextCourse.id]] : undefined} />
     {summary && <LearningActivityCard summary={summary} />}
 
