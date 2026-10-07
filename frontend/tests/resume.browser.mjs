@@ -4,6 +4,7 @@
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { docxFixture, blankPdf } from './resume-fixtures.mjs';
+import { EXAMPLE_JOB_REQUIREMENTS } from '../src/features/resume/onboarding.ts';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 const { chromium } = createRequire(import.meta.url)(process.env.AIW_PLAYWRIGHT_MODULE || 'playwright');
@@ -14,9 +15,11 @@ const browser = await chromium.launch({ headless: true, channel: process.env.AIW
 const context = await browser.newContext({ viewport: { width: 1536, height: 1000 }, acceptDownloads: true });
 const page = await context.newPage(); page.setDefaultTimeout(15000);
 const errors = [], sync = []; page.on('pageerror', e => errors.push(e.message));
-let owner = 'qa-account-a', signedIn = true, count = 0, fail = false, lastPdf, latestInput;
+let owner = 'qa-account-empty', signedIn = true, count = 0, courseRequests = 0, aiConfigured = false, fail = false, lastPdf, latestInput;
+let releaseSkillLoad, generateGate = null;
+let skillGate = new Promise(resolve => { releaseSkillLoad = resolve; });
 const base = { 'aiwrevolusi.learningSkills.v1': JSON.stringify([{ id: 'analytical-thinking', name: 'Analytical thinking' }, { id: 'sql', name: 'SQL' }]) };
-let workspace = { ...base };
+let workspace = {};
 const json = (route, body, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) });
 await context.route('**/*', async route => {
   const req = route.request(), url = new URL(req.url());
@@ -30,16 +33,17 @@ await context.route('**/*', async route => {
   }
   if (path === '/auth/logout') { signedIn = false; return json(route, null); }
   if (path === '/auth/refresh') return json(route, { detail: 'Unauthenticated' }, 401);
-  if (path === '/reference/wef-skills') return json(route, [{ wef_skill_id: 1, core_skill: 'Analytical thinking' }]);
-  if (path === '/resume/capabilities') return json(route, { ai_configured: true, ai_provider_host: 'synthetic.provider.test', ai_model: 'fixture-only', rendercv_version: '2.8' });
+  if (path === '/reference/wef-skills') { if (skillGate) await skillGate; return json(route, [{ wef_skill_id: 1, core_skill: 'Analytical thinking' }]); }
+  if (path === '/resume/capabilities') return json(route, { ai_configured: aiConfigured, ai_provider_host: 'synthetic.provider.test', ai_model: 'fixture-only', rendercv_version: '2.8' });
   if (path === '/resume/generate') {
     const input = req.postDataJSON(); latestInput = input; count++; assert.ok(input.job_requirements.trim()); assert.ok(!input.contacts && !input.name);
     assert.ok(!JSON.stringify(input).includes('alex@example.com'));
+    if (generateGate) await generateGate;
     if (fail) { fail = false; return json(route, { detail: 'Synthetic retryable error' }, 503); }
     const s = input.skills[0];
     return json(route, { sections: [{ title: 'Skills', entries: [{ text: s.name + (count > 2 ? ' applied to analysis' : ''), skill_ids: [s.id], fact_ids: [] }] }], gaps: [{ id: 'security', label: 'Cybersecurity', keywords: ['security'], skill_slugs: ['networks-and-cybersecurity'] }] });
   }
-  if (path === '/resume/recommend-courses') return json(route, { courses: ['security-1', 'security-2'].map(course_id => ({ course_id, gap_ids: ['security'], reason: 'Addresses the specified cybersecurity gap.' })) });
+  if (path === '/resume/recommend-courses') { courseRequests++; return json(route, { courses: ['security-1', 'security-2'].map(course_id => ({ course_id, gap_ids: ['security'], reason: 'Addresses the specified cybersecurity gap.' })) }); }
   if (path === '/learning/courses') return json(route, { found: true, courses: ['security-1', 'security-2'].map((course_id, i) => ({ course_id, skill_id: 'networks-and-cybersecurity', title: `Security course ${i + 1}`, provider: 'Synthetic catalogue', level: 'Beginner', chapters: [{ order: 1, title: 'Security foundations', duration_min: 30 }], chapter_count: 1 })) });
   if (path === '/resume/render') { const response = await route.fetch({ url: `${renderer}/api/v1/resume/render` }); if (response.status() === 200) lastPdf = await response.body(); return route.fulfill({ response }); }
   return json(route, { detail: 'Deliberately unavailable in offline QA' }, 503);
@@ -52,9 +56,64 @@ try {
   await page.goto(`${origin}/career/possibilities/resume`); await ready();
   const job = page.getByLabel(/Target job requirements · required/);
   assert.equal(await page.getByRole('button', { name: 'Generate my resume' }).isDisabled(), true);
+  // First-use shortcut: keyboard activation, replacement consent and local persistence.
+  const example = page.getByRole('button', { name: 'Use an example', exact: true });
+  await example.focus(); await page.keyboard.press('Enter');
+  assert.equal(await job.inputValue(), EXAMPLE_JOB_REQUIREMENTS);
+  assert.equal(count, 0); assert.equal(courseRequests, 0);
+  assert.equal(await page.getByRole('button', { name: 'Generate my resume' }).isDisabled(), true, 'Pending skill loading is not zero skills');
+  releaseSkillLoad(); skillGate = null;
+  await job.fill('My own requirements'); await example.click();
+  const replacement = page.getByRole('dialog', { name: 'Replace your job requirements?' }); await replacement.waitFor();
+  await replacement.getByRole('button', { name: 'Cancel', exact: true }).click(); assert.equal(await job.inputValue(), 'My own requirements');
+  await example.click(); await replacement.getByRole('button', { name: 'Use example', exact: true }).click();
+  assert.equal(await job.inputValue(), EXAMPLE_JOB_REQUIREMENTS);
+  const editedExample = EXAMPLE_JOB_REQUIREMENTS + '\nUser-edited requirements.';
+  await job.fill(editedExample); await saved(); await page.reload(); await ready(); assert.equal(await job.inputValue(), editedExample);
+  assert.equal(await page.getByRole('button', { name: 'Privacy details' }).getAttribute('aria-expanded'), 'false');
+  await page.getByRole('button', { name: 'Privacy details' }).click(); await page.getByText(/zero retention is not guaranteed/).waitFor();
+  assert.doesNotMatch(await page.locator('body').textContent(), /synthetic.provider.test|fixture-only|available skills|20,000 characters/);
+  await page.getByRole('button', { name: 'Privacy details' }).click();
+  await page.getByText(/zero retention is not guaranteed/).waitFor({ state: 'hidden' });
+  await page.screenshot({ path: `${output}/first-use-desktop.png`, fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  const textareaBox = await job.boundingBox(), exampleBox = await example.boundingBox();
+  assert.ok(exampleBox.x + exampleBox.width <= textareaBox.x + textareaBox.width + 2);
+  assert.ok(exampleBox.x > textareaBox.x + textareaBox.width / 2);
+  await page.screenshot({ path: `${output}/first-use-mobile.png`, fullPage: true });
+  await page.setViewportSize({ width: 1536, height: 1000 });
+  // Even a manually supplied, unreviewed source still requires consent/removal.
+  await page.getByRole('button', { name: 'Or enter your resume details manually' }).click();
+  assert.equal(await page.getByRole('button', { name: 'Generate my resume' }).isDisabled(), true);
+  await page.getByRole('button', { name: 'Remove source' }).click();
+  await page.getByRole('button', { name: 'Generate my resume' }).click(); await pdfReady(); await saved();
+  assert.equal(count, 0, 'Empty drafts must not call AI'); assert.equal(courseRequests, 0, 'Empty drafts must not request courses');
+  const emptyYaml = (await exportFile('YAML')).toString(); assert.match(emptyYaml, /Skills: \[\]/); assert.doesNotMatch(emptyYaml, /name:|Experience:|Education:/);
+  assert.ok((await exportFile('PDF')).equals(lastPdf)); assert.equal(await example.count(), 0);
+  await page.getByText('No skills yet. Add your skills to this draft.', { exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Add entry', exact: true }).click(); await page.getByLabel(/^Bullet/).fill('User-entered analytical thinking');
+  await saved(); await page.reload(); await ready(); await pdfReady(); assert.match((await exportFile('YAML')).toString(), /User-entered analytical thinking/);
+  await page.getByRole('button', { name: 'Target & AI' }).click();
+  assert.equal(await page.getByRole('button', { name: 'Generate new suggestions' }).isDisabled(), true);
+  assert.match((await exportFile('YAML')).toString(), /User-entered analytical thinking/);
+  // Unreadable skill storage is an error, not an empty-skill fallback; retry remains available.
+  owner = 'qa-account-unreadable'; workspace = { ...base, 'aiwrevolusi.learningSkills.v1': '{broken-json' };
+  await page.reload(); await ready(); await job.fill('QA SKILL ERROR: analyse data.'); await saved();
+  await page.getByRole('alert').filter({ hasText: "We couldn't load your saved skills" }).waitFor();
+  assert.equal(await page.getByRole('button', { name: 'Generate my resume' }).isDisabled(), true);
+  await page.getByRole('button', { name: 'Retry skills' }).click();
+  assert.equal(await page.getByRole('button', { name: 'Generate my resume' }).isDisabled(), true);
+  workspace = {}; await page.reload(); await ready(); assert.equal(await job.inputValue(), 'QA SKILL ERROR: analyse data.');
+  await page.getByRole('button', { name: 'Generate my resume' }).click(); await pdfReady(); assert.equal(count, 0);
+  // The existing complete regression continues using an account with real saved skill candidates.
+  owner = 'qa-account-a'; workspace = { ...base }; aiConfigured = true; await page.reload(); await ready();
+  assert.equal(await job.inputValue(), '');
   await job.fill('QA TARGET PRIVATE: analyse data using SQL and cybersecurity.'); await saved();
   await page.reload(); await ready(); assert.match(await job.inputValue(), /QA TARGET PRIVATE/);
-  fail = true; await page.getByRole('button', { name: 'Generate my resume' }).click(); await page.getByRole('alert').filter({ hasText: 'Synthetic retryable' }).waitFor();
+  fail = true; let releaseGenerate; generateGate = new Promise(resolve => { releaseGenerate = resolve; });
+  await page.getByRole('button', { name: 'Generate my resume' }).click();
+  assert.equal(await example.isDisabled(), true); releaseGenerate(); generateGate = null;
+  await page.getByRole('alert').filter({ hasText: 'Synthetic retryable' }).waitFor();
   assert.match(await job.inputValue(), /QA TARGET PRIVATE/); await page.getByRole('button', { name: 'Generate my resume' }).click(); await pdfReady(); await saved();
   const yaml = (await exportFile('YAML')).toString(); assert.match(yaml, /Skills:/); assert.doesNotMatch(yaml, /name:|Experience:|Education:/);
   const pdf = await exportFile('PDF'); await writeFile(`${output}/synthetic.pdf`, pdf); assert.ok(pdf.equals(lastPdf), 'Preview/download bytes must match');
@@ -121,9 +180,9 @@ try {
   await page.getByLabel(/Resume evidence that AI will receive/).waitFor();
   assert.doesNotMatch(await page.getByLabel(/Resume evidence that AI will receive/).inputValue(), /Alex Example|alex@example|412 345/);
   await job.fill('QA TARGET PRIVATE: analysis and Python.'); await page.locator('.rb-source-review .rb-check').getByRole('checkbox').check();
-  await page.locator('.rb-skill-chips').getByText('Python', { exact: true }).waitFor(); await saved();
+  assert.match(await page.getByLabel('Skills explicitly listed in your original resume').inputValue(), /Python/); await saved();
   await page.getByRole('button', { name: 'Generate my resume' }).click(); await pdfReady();
   assert.ok(latestInput.skills.some(skill => skill.name === 'Python')); assert.doesNotMatch(JSON.stringify(latestInput), /Alex Example|alex@example.com|412 345/);
   assert.ok(sync.every(payload => !JSON.stringify(payload).includes('QA TARGET PRIVATE') && !Object.keys(payload.data).some(key => key.includes('resume')))); assert.deepEqual(errors, []);
-  console.log('PASS: first-use/retry/recovery, same PDF export, course partial/all, YAML recovery, section apply/undo, PDF import, desktop/mobile/keyboard, pagination/zoom, account isolation/logout/clear, no resume sync, invalid/encrypted/textless sources, DOCX/My Plan handoff and original-skill review.');
+  console.log('PASS: example fill/replace/cancel/restore, local zero-skill draft without AI/courses, skill-error protection, collapsed privacy, first-use/retry/recovery, same PDF export, course partial/all, YAML recovery, section apply/undo, PDF import, desktop/mobile/keyboard, pagination/zoom, account isolation/logout/clear, no resume sync, invalid/encrypted/textless sources, DOCX/My Plan handoff and original-skill review.');
 } catch (error) { console.error(errors, await page.locator("body").innerText()); await page.screenshot({ path: `${output}/failure.png`, fullPage: true }); throw error; } finally { await context.close(); await browser.close(); }

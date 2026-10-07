@@ -161,6 +161,15 @@ def test_all_builtin_themes_produce_real_pdf_without_a_name(theme):
     data = render_pdf({"cv": {"sections": {"Skills": [{"bullet": "Analytical thinking and digital literacy."}]}}, "design": {"theme": theme}})
     assert data.startswith(b"%PDF-") and len(data) > 5000
 
+@pytest.mark.parametrize("theme", THEMES)
+def test_empty_first_use_draft_produces_real_pdf_without_personal_facts(theme):
+    document = {"cv": {"sections": {"Skills": []}}, "design": {"theme": theme}}
+    data = render_pdf(document)
+    assert document["cv"] == {"sections": {"Skills": []}}
+    assert data.startswith(b"%PDF-") and len(data) > 1000
+    pages = re.search(rb"/Type\s*/Pages\s*/Count\s+(\d+)", data)
+    assert pages and int(pages.group(1)) >= 1
+
 def test_multi_page_render_and_private_api_headers(client):
     http, _, _ = client
     response = http.post("/api/v1/resume/render", json={"document": {"cv": {"sections": {"Skills": [{"bullet": "Analytical thinking. " * 20} for _ in range(30)]}}, "design": {"theme": "classic"}}})

@@ -5,6 +5,7 @@ import PageHeader from "@/components/common/PageHeader";
 import { useAccount } from "@/components/account/useAccount";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { FormField, Input, Textarea } from "@/components/ui/form-field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -20,6 +21,7 @@ import { resumeService, type ResumeCapabilities } from "@/features/resume/servic
 import { useResumeDraft } from "@/features/resume/useResumeDraft";
 import { mergeResumeSkills, resumeSkillSnapshot } from "@/features/resume/skills";
 import { applySections, documentYaml, entryText, moveSection, parseResumeYaml, THEMES } from "@/features/resume/document";
+import { EXAMPLE_JOB_REQUIREMENTS, emptyResumeDocument, resumeGenerationAction } from "@/features/resume/onboarding";
 import { importResume, RESUME_ACCEPT } from "@/features/resume/importResume";
 import { evidenceFromText, redactResume } from "@/features/resume/redaction";
 import { emptyContacts, type Generation, type ResumeDocument, type SkillCandidate } from "@/features/resume/types";
@@ -39,6 +41,8 @@ export default function ResumeBuilder() {
 function ResumeWorkspace({ owner }: { owner: string }) {
   const local = useResumeDraft(owner), { draft, change } = local;
   const [skills, setSkills] = useState<SkillCandidate[]>([]), [skillError, setSkillError] = useState("");
+  const [skillsLoading, setSkillsLoading] = useState(true), [skillRetry, setSkillRetry] = useState(0);
+  const [showExample, setShowExample] = useState(false);
   const [capabilities, setCapabilities] = useState<ResumeCapabilities | null>(null);
   const [error, setError] = useState(""), [generating, setGenerating] = useState(false), [importing, setImporting] = useState(false);
   const [clearing, setClearing] = useState(false);
@@ -78,18 +82,32 @@ function ResumeWorkspace({ owner }: { owner: string }) {
     mounted.current = true;
     const request = controller();
     void resumeService.capabilities(request.signal).then(result => { if (isCurrent()) setCapabilities(result); }).catch(() => undefined);
-    const readSkills = () => { void referenceService.wefSkills().then(reference => {
-      if (!isCurrent()) return;
-      try { setSkills(resumeSkillSnapshot(reference)); setSkillError(""); }
-      catch (cause) { setSkillError(message(cause)); }
-    }); };
     const readCourses = () => { if (isCurrent()) try { setSavedCourses(readLibrary().saved); } catch (cause) { setCourseNotice(message(cause)); } };
-    readSkills(); readCourses();
-    window.addEventListener("workspace-change", readSkills); window.addEventListener("workspace-change", readCourses);
-    return () => { mounted.current = false; abortRequests(); window.removeEventListener("workspace-change", readSkills); window.removeEventListener("workspace-change", readCourses); };
+    readCourses();
+    window.addEventListener("workspace-change", readCourses);
+    return () => { mounted.current = false; abortRequests(); window.removeEventListener("workspace-change", readCourses); };
     // Requests are scoped to this mounted account, not to individual form edits.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [owner]);
+  useEffect(() => {
+    let active = true, sequence = 0;
+    const readSkills = () => {
+      const token = ++sequence;
+      setSkillsLoading(true);
+      void referenceService.wefSkills().then(reference => {
+        if (active && isCurrent() && token === sequence) { setSkills(resumeSkillSnapshot(reference)); setSkillError(""); }
+      }).catch(() => {
+        if (active && isCurrent() && token === sequence) setSkillError("We couldn't load your saved skills. Retry before generating.");
+      }).finally(() => {
+        if (active && isCurrent() && token === sequence) setSkillsLoading(false);
+      });
+    };
+    readSkills();
+    window.addEventListener("workspace-change", readSkills);
+    return () => { active = false; window.removeEventListener("workspace-change", readSkills); };
+    // Guard each refresh so a stale result cannot enable the empty-draft path.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [owner, skillRetry]);
   useEffect(() => {
     if (!fingerprint) { setRendering(false); return; }
     const request = controller();
@@ -121,8 +139,15 @@ function ResumeWorkspace({ owner }: { owner: string }) {
     } catch { /* Optional, intentionally silent. */ }
     finally { controllers.current.delete(request); }
   };
+  const generationAction = resumeGenerationAction({
+    jobRequirements: draft.pendingJobRequirements, hasDocument: Boolean(draft.document),
+    skillCount: candidates.length, factCount: reviewedFacts.length, skillsLoading, skillError,
+    sourceReviewed: source ? source.reviewed : null, aiConfigured: capabilities?.ai_configured ?? null,
+    busy: generating || importing,
+  });
   const generate = async (targetConfirmed = false) => {
-    if (busy.current || !draft.pendingJobRequirements.trim()) return;
+    if (!isCurrent() || busy.current || !generationAction) return;
+    if (generationAction === "blank") { createEmpty(); return; }
     if (draft.document && draft.jobRequirements !== draft.pendingJobRequirements.trim() && !targetConfirmed) { setShowTarget(true); return; }
     if (candidates.length > 250 || candidates.some(skill => skill.name.length > 160 || skill.id.length > 160)) { setError("Use at most 250 skill names, each at most 160 characters."); return; }
     if (skillError) { setError(skillError); return; }
@@ -171,25 +196,30 @@ function ResumeWorkspace({ owner }: { owner: string }) {
     finally { if (isCurrent()) setSavingCourses(false); }
   };
   const createEmpty = () => {
-    if (!draft.pendingJobRequirements.trim() || busy.current) return;
-    const document: ResumeDocument = { cv: { sections: { Skills: [] } }, design: { theme: "engineeringresumes" } };
-    change(old => ({ ...old, document, yamlText: documentYaml(document), jobRequirements: old.pendingJobRequirements.trim() })); setShowJob(false);
+    if (!isCurrent() || draft.document || !draft.pendingJobRequirements.trim() || busy.current) return;
+    const document = emptyResumeDocument();
+    change(old => old.document ? old : ({ ...old, document, yamlText: documentYaml(document), jobRequirements: old.pendingJobRequirements.trim(), gaps: [], recommendations: [], proposal: null }));
+    setShowJob(false); setSelected("Skills"); setError("");
+  };
+  const fillExample = () => {
+    if (!isCurrent() || draft.document || generating || importing) return;
+    change(old => old.document ? old : ({ ...old, pendingJobRequirements: EXAMPLE_JOB_REQUIREMENTS }));
+    setShowExample(false);
   };
   if (local.loading || clearing) return <div className="rb-page" role="status">{clearing ? "Clearing your local resume…" : "Loading your local resume…"}</div>;
   return <div className="rb-page">
     <Link className="rb-back" to={ROUTES.possibilities}><ArrowLeft size={15} />Possibilities <span>/ Resume builder</span></Link>
-    <PageHeader title="Make your next move." description="A resume grounded in your skills. Tailored to the role you want." actions={<div className="rb-header-actions">{draft.document && <Button variant="outline" onClick={() => setShowJob(!showJob)}><Sparkles />Target & AI</Button>}<Button variant="ghost" size="icon" aria-label="Clear local resume data" onClick={() => setShowClear(true)}><Trash2 /></Button></div>} />
-    <div className="rb-status-line"><span><ShieldCheck size={14} />Local-first · no resume database</span><span role="status">{local.saveStatus || "Only this browser, on this device"}</span></div>
+    <PageHeader title="Make your next move." actions={<div className="rb-header-actions">{draft.document && <Button variant="outline" onClick={() => setShowJob(!showJob)}><Sparkles />Target & AI</Button>}<Button variant="ghost" size="icon" aria-label="Clear local resume data" onClick={() => setShowClear(true)}><Trash2 /></Button></div>} />
+    <div className="rb-status-line"><span><ShieldCheck size={14} />Local draft</span><span role="status">{local.saveStatus || "Only this browser, on this device"}</span></div>
     {local.storageError && <div className="rb-warning" role="alert">{local.storageError} Your draft can still be exported; local recovery is not guaranteed.</div>}
     {error && <div className="rb-error" role="alert">{error}</div>}
     {(!draft.document || !draft.jobRequirements.trim() || showJob) && <Card className="rb-job-card">
-      <div className="rb-job-heading"><div className="rb-step-mark"><Sparkles /></div><div><p className="rb-eyebrow">START WITH YOUR NEXT ROLE</p><h2>What is the job looking for?</h2><p>Paste the requirements from a job listing. We’ll connect them to your existing skills.</p></div></div>
+      <div className="rb-job-heading"><div className="rb-step-mark"><Sparkles /></div><div><p className="rb-eyebrow">START WITH YOUR NEXT ROLE</p><h2>What is the job looking for?</h2></div></div>
       <fieldset disabled={generating || importing}><FormField label="Target job requirements · required"><Textarea value={draft.pendingJobRequirements} onChange={event => change(old => ({ ...old, pendingJobRequirements: event.target.value }))} maxLength={20000} rows={7} placeholder="Paste the role’s responsibilities, required skills and qualifications here…" /></FormField>
-        <div className="rb-job-meta"><span>{draft.pendingJobRequirements.length.toLocaleString()} / 20,000 characters</span><span>{candidates.length} available skills</span></div>
-        {skillError ? <p className="rb-warning">{skillError} <Link to={ROUTES.skills}>Review skills</Link></p> : candidates.length > 0 ? <div className="rb-skill-chips" aria-label="Skills available for tailoring">{candidates.slice(0, 12).map(skill => <span key={skill.id}>{skill.name}</span>)}{candidates.length > 12 && <span>+{candidates.length - 12} more</span>}</div> : <p className="rb-hint">No saved skills yet. <Link to={ROUTES.skills}>Add or confirm your skills</Link>, or provide your own resume details.</p>}
-        <div className="rb-source-heading"><div><h3>Bring your existing resume <span>Optional</span></h3><p>Without one, AI generates only your Skills section. It never guesses your background.</p></div><Button variant="outline" onClick={() => fileInput.current?.click()} disabled={importing}><Upload />{source ? "Replace resume" : "Upload resume"}</Button></div>
+        {!draft.document && <div className="rb-example-action"><Button variant="link" size="sm" type="button" onClick={() => { if (draft.pendingJobRequirements.trim() && draft.pendingJobRequirements !== EXAMPLE_JOB_REQUIREMENTS) setShowExample(true); else fillExample(); }}>Use an example</Button></div>}
+        {skillError && <div className="rb-warning" role="alert">{skillError} <Button variant="link" size="sm" type="button" onClick={() => setSkillRetry(value => value + 1)}>Retry skills</Button></div>}
+        <div className="rb-source-heading"><div><h3>Bring your existing resume</h3><p>Optional · PDF/DOCX · Max 10 MB</p><p>Without a resume, only your skills are included.</p></div><Button variant="outline" onClick={() => fileInput.current?.click()} disabled={importing}><Upload />{source ? "Replace resume" : "Upload resume"}</Button></div>
         <input ref={fileInput} hidden type="file" accept={RESUME_ACCEPT} aria-label="Upload original resume PDF or DOCX" onChange={event => { const file = event.target.files?.[0]; event.target.value = ""; if (file) void attach(file); }} />
-        <p className="rb-hint">PDF or DOCX · up to 10 MB · parsed on this device · text PDFs only, no OCR.</p>
         {!source && <Button variant="link" size="sm" onClick={() => change(old => ({ ...old, source: { file: new Blob([]), name: "Manually supplied details", text: "", redactedText: "", contacts: emptyContacts(), reviewed: false } }))}>Or enter your resume details manually</Button>}
         {source && <div className="rb-source-review"><div className="rb-inline"><strong><FileText size={16} />{source.name}</strong><Button variant="ghost" size="sm" onClick={() => change(old => ({ ...old, source: null }))}>Remove source</Button></div>
           <p>Review these suggested personal fields. Correct mistakes and redact any remaining names, addresses or confidential details below. Automatic redaction is not infallible.</p>
@@ -199,21 +229,30 @@ function ResumeWorkspace({ owner }: { owner: string }) {
           <label className="rb-check"><Checkbox checked={source.reviewed} onCheckedChange={checked => change(old => old.source ? { ...old, source: { ...old.source, redactedText: redactResume(old.source.redactedText, old.source.contacts), reviewed: checked === true } } : old)} />I have reviewed this text and removed personal or confidential information I do not want sent to AI.</label>
         </div>}
       </fieldset>
-      <div className="rb-ai-disclosure"><ShieldCheck size={17} /><p>Generating sends your job requirements, skills and reviewed evidence to {capabilities ? <strong>{capabilities.ai_provider_host} · {capabilities.ai_model}</strong> : "our explicitly configured AI provider"}. Original files and personal-field mappings stay here. Provider retention policies still apply. Separately, previewing a template temporarily sends the complete resume, including personal fields you choose to include, to our PDF renderer.</p></div>
-      {capabilities && !capabilities.ai_configured && <p className="rb-warning">Resume AI is not configured. You can still open an empty template and edit it yourself.</p>}
-      <div className="rb-job-footer"><Button disabled={!draft.pendingJobRequirements.trim() || generating || importing || Boolean(skillError) || Boolean(source && !source.reviewed) || (!candidates.length && !reviewedFacts.length) || capabilities?.ai_configured === false} onClick={() => { void generate(); }}><Sparkles />{generating ? "Tailoring your resume…" : draft.document ? "Generate new suggestions" : "Generate my resume"}</Button>{!draft.document && <Button variant="ghost" disabled={!draft.pendingJobRequirements.trim() || generating || importing} onClick={createEmpty}>Open an empty template</Button>}{draft.document && <Button variant="ghost" disabled={generating || importing} onClick={() => setShowJob(false)}>Back to editing</Button>}</div>
+      <p className="rb-ai-summary">AI uses your job requirements, skills and any reviewed resume details.</p>
+      {capabilities?.ai_configured === false && generationAction !== "blank" && <p className="rb-warning">AI generation is unavailable. You can still open an empty template.</p>}
+      <div className="rb-job-footer"><Button disabled={!generationAction} onClick={() => { void generate(); }}><Sparkles />{generating ? "Tailoring your resume…" : draft.document ? "Generate new suggestions" : "Generate my resume"}</Button>{!draft.document && <Button variant="ghost" disabled={!draft.pendingJobRequirements.trim() || generating || importing} onClick={createEmpty}>Open an empty template</Button>}{draft.document && <Button variant="ghost" disabled={generating || importing} onClick={() => setShowJob(false)}>Back to editing</Button>}</div>
     </Card>}
     {draft.document && <>
+      {draft.document.cv.sections?.Skills?.length === 0 && <p className="rb-empty-skills" role="status">No skills yet. Add your skills to this draft.</p>}
       <div className="rb-toolbar"><Tabs value={mode} onValueChange={setMode}><TabsList aria-label="Resume editing mode"><TabsTrigger value="form">Form editor</TabsTrigger><TabsTrigger value="yaml">YAML</TabsTrigger></TabsList></Tabs><div><Button variant="ghost" size="sm" disabled={!draft.previous || unappliedYaml} onClick={() => { if (!draft.previous) return; const previous = draft.previous; run.current++; change(old => ({ ...old, document: previous.document, yamlText: previous.yamlText, jobRequirements: previous.jobRequirements, pendingJobRequirements: previous.jobRequirements, previous: null, gaps: [], recommendations: [] })); }}><Undo2 />Undo AI changes</Button><Button variant="outline" size="sm" onClick={() => download(new Blob([draft.yamlText], { type: "text/yaml;charset=utf-8" }), "resume.yaml")}><Download />YAML</Button><Button size="sm" disabled={!freshPdf} onClick={() => { if (pdf && freshPdf) download(pdf, "resume.pdf"); }}><Download />PDF</Button></div></div>
       <Tabs value={mobile} onValueChange={setMobile} className="rb-mobile-tabs"><TabsList aria-label="Mobile resume workspace"><TabsTrigger value="edit">Edit resume</TabsTrigger><TabsTrigger value="preview">PDF preview</TabsTrigger></TabsList></Tabs>
       <div className={`rb-workspace rb-mobile-${mobile}`}>
         <Card className="rb-tools"><fieldset disabled={unappliedYaml}><Tabs value={tool} onValueChange={setTool}><TabsList className="rb-tools-tabs" aria-label="Resume tools"><TabsTrigger value="sections">Sections</TabsTrigger><TabsTrigger value="design">Design</TabsTrigger></TabsList><TabsContent value="sections"><Button className="rb-nav-item" variant={selected === "@personal" ? "secondary" : "ghost"} onClick={() => { setSelected("@personal"); setMode("form"); }}>Personal information</Button>{sections.map((title, index) => <div className="rb-section-nav" key={title}><Button variant={selected === title ? "secondary" : "ghost"} className="rb-nav-item" onClick={() => { setSelected(title); setMode("form"); }}>{title}</Button><div><Button variant="ghost" size="icon" aria-label={`Move ${title} section up`} disabled={index === 0} onClick={() => editDocument(moveSection(draft.document!, title, -1))}><ArrowUp /></Button><Button variant="ghost" size="icon" aria-label={`Move ${title} section down`} disabled={index === sections.length - 1} onClick={() => editDocument(moveSection(draft.document!, title, 1))}><ArrowDown /></Button></div></div>)}<Button variant="outline" className="rb-add-section" onClick={() => setAddingSection(true)}><Plus />Add section</Button></TabsContent><TabsContent value="design"><DesignControls document={draft.document} themes={THEMES} change={editDocument} /></TabsContent></Tabs></fieldset><p className="rb-tools-note">Add only information that is true for you. Your resume is not a claim of verified proficiency.</p></Card>
         <Card className="rb-editor">{mode === "yaml" ? <><div className="rb-editor-caption">RenderCV 2.8 · safe YAML editing</div><YamlEditor value={draft.yamlText} onChange={value => { const parsed = parseResumeYaml(value); change(old => ({ ...old, yamlText: value, document: parsed.document ?? old.document })); }} /></> : <fieldset disabled={unappliedYaml}><ResumeForm key={selected} document={draft.document} selected={selected} change={editDocument} remove={setRemoveSection} /></fieldset>}{yaml.error && <p role="alert" className="rb-error rb-validation">{yaml.error} Last valid PDF is retained. Use YAML to correct unsupported fields; nothing is silently removed.</p>}</Card>
-        <Card className="rb-preview"><div className="rb-preview-heading"><strong>Live PDF</strong><span role="status">{rendering ? "Rendering…" : freshPdf ? "Up to date" : pdf ? "Last valid preview" : "RenderCV preview"}</span></div>{renderError && <div className="rb-error" role="alert">{renderError}<Button variant="link" size="sm" onClick={() => setRenderRetry(value => value + 1)}>Retry rendering</Button></div>}<PdfPreview blob={pdf} /><p className="rb-preview-notice">Previewing temporarily sends the complete document to our backend. Rendered files are deleted after each request; there is no server-side resume history.</p></Card>
+        <Card className="rb-preview"><div className="rb-preview-heading"><strong>Live PDF</strong><span role="status">{rendering ? "Rendering…" : freshPdf ? "Up to date" : pdf ? "Last valid preview" : "RenderCV preview"}</span></div>{renderError && <div className="rb-error" role="alert">{renderError}<Button variant="link" size="sm" onClick={() => setRenderRetry(value => value + 1)}>Retry rendering</Button></div>}<PdfPreview blob={pdf} /></Card>
       </div>
     </>}
     {courses.length > 0 && <Card className="rb-courses"><div className="rb-course-heading"><div><p className="rb-eyebrow">BUILD TOWARDS THIS ROLE</p><h2>A few courses to close the gaps</h2><p>Optional recommendations from our verified catalogue. They are not part of your resume.</p></div><label className="rb-check"><Checkbox checked={availableCourseIds.length > 0 && availableCourseIds.every(id => selectedCourses.includes(id))} disabled={!availableCourseIds.length || savingCourses} onCheckedChange={checked => setSelectedCourses(checked ? availableCourseIds : [])} />Select all</label></div><div className="rb-course-grid">{courses.map(({ course, recommendation }) => <label className="rb-course" key={course.id}><Checkbox checked={savedCourses.includes(course.id) || selectedCourses.includes(course.id)} disabled={savedCourses.includes(course.id) || savingCourses} onCheckedChange={checked => setSelectedCourses(old => checked ? [...new Set([...old, course.id])] : old.filter(id => id !== course.id))} /><div><span>{course.provider} · {course.level}</span><h3>{course.title}</h3><p>{recommendation.reason}</p>{savedCourses.includes(course.id) && <strong className="rb-added"><Check size={13} />Already in My courses</strong>}</div></label>)}</div><div className="rb-inline"><Button disabled={!selectedCourses.some(id => availableCourseIds.includes(id)) || savingCourses} onClick={() => { void addCourses(); }}>{savingCourses ? "Adding…" : "Add selected to My courses"}</Button><Link to={ROUTES.plan}>Open My courses →</Link></div>{courseNotice && <p role="status">{courseNotice}</p>}</Card>}
-    <p className="rb-device-note">Saved only in this browser on this device, separately for your account. Signing out keeps local drafts. Clearing site data, private browsing or browser storage eviction can remove them. Local storage is not device-level encryption; export a copy you want to keep.</p>
+    <div className="rb-privacy">
+      <p>Your draft stays in this browser. AI generation and PDF preview send data for processing.</p>
+      <Accordion type="single" collapsible><AccordionItem value="privacy" className="rb-privacy-item"><AccordionTrigger>Privacy details</AccordionTrigger><AccordionContent>
+        <p>Drafts are saved separately for your account in this browser and on this site, with no resume database or cross-device sync. Signing out keeps them. Clearing site data, ending private browsing or browser storage eviction can remove them. Account isolation is not device-level encryption; export a copy you want to keep.</p>
+        <p>Original PDF/DOCX files are parsed locally and are not uploaded. Readable text is required; scanned files need manual details, not OCR. AI generation sends your job requirements, skills and only reviewed, redacted evidence. Personal-field mappings stay local. Third-party provider retention policies still apply; zero retention is not guaranteed. An empty draft does not use AI.</p>
+        <p>PDF preview temporarily sends the complete document, including personal fields you add, to our backend renderer. Temporary files are deleted after rendering, including failures and timeouts; there is no server-side resume history.</p>
+      </AccordionContent></AccordionItem></Accordion>
+    </div>
+    <Dialog open={showExample} onOpenChange={setShowExample}><DialogContent><DialogHeader><DialogTitle>Replace your job requirements?</DialogTitle><DialogDescription>This replaces your current input with the Junior Data Analyst example. You can edit it before generating.</DialogDescription></DialogHeader><DialogFooter><Button variant="outline" onClick={() => setShowExample(false)}>Cancel</Button><Button disabled={generating || importing} onClick={fillExample}>Use example</Button></DialogFooter></DialogContent></Dialog>
     <Dialog open={Boolean(draft.proposal)} onOpenChange={open => { if (!open) change(old => ({ ...old, proposal: null })); }}><DialogContent className="rb-proposal-dialog"><DialogHeader><DialogTitle>Review AI suggestions</DialogTitle><DialogDescription>Your current resume is unchanged. Choose the chapters to apply. Personal information and unselected chapters are preserved.</DialogDescription></DialogHeader><div className="rb-proposals">{draft.proposal?.sections.map(section => <div key={section.title} className="rb-proposal"><label className="rb-check"><Checkbox checked={accepted.includes(section.title)} onCheckedChange={checked => setAccepted(old => checked ? [...old, section.title] : old.filter(title => title !== section.title))} /><strong>{section.title}</strong></label><div className="rb-compare"><div><small>CURRENT</small>{(draft.document?.cv.sections?.[section.title] ?? []).map((entry, i) => <p key={i}>{entryText(entry)}</p>)}</div><div><small>PROPOSED</small>{section.entries.map((entry, i) => <div key={i}><p>{entry.text}</p><details className="rb-citations"><summary>Evidence ({entry.skill_ids.length + entry.fact_ids.length})</summary><ul>{entry.skill_ids.map(id => <li key={id}>{candidates.find(skill => skill.id === id)?.name ?? id}</li>)}{entry.fact_ids.map(id => <li key={id}>{reviewedFacts.find(fact => fact.id === id)?.text ?? id}</li>)}</ul></details></div>)}</div></div></div>)}</div><DialogFooter><Button variant="outline" onClick={() => change(old => ({ ...old, proposal: null }))}>Keep current resume</Button><Button disabled={!accepted.length || unappliedYaml} onClick={applyProposal}>Apply selected chapters</Button></DialogFooter></DialogContent></Dialog>
     <Dialog open={showTarget} onOpenChange={setShowTarget}><DialogContent><DialogHeader><DialogTitle>Tailor for another role?</DialogTitle><DialogDescription>Only one current draft is kept. Export your existing resume first if you want a separate copy. Your current draft is not replaced until you apply the new suggestions.</DialogDescription></DialogHeader><DialogFooter><Button variant="outline" onClick={() => download(new Blob([draft.yamlText], { type: "text/yaml" }), "resume.yaml")}>Export YAML</Button><Button variant="outline" onClick={() => setShowTarget(false)}>Cancel</Button><Button onClick={() => { void generate(true); }}>Generate suggestions</Button></DialogFooter></DialogContent></Dialog>
     <Dialog open={showClear} onOpenChange={setShowClear}><DialogContent><DialogHeader><DialogTitle>Clear this account’s local resume?</DialogTitle><DialogDescription>This removes your job requirements, original file, personal-field mapping, draft and undo snapshot from this browser. It does not remove courses or account data.</DialogDescription></DialogHeader><DialogFooter><Button variant="outline" onClick={() => setShowClear(false)}>Cancel</Button><Button variant="destructive" onClick={() => { setClearing(true); abortRequests(); setGenerating(false); setImporting(false); void local.clear().then(() => { if (isCurrent()) { setPdf(null); setPdfKey(""); setShowClear(false); setShowJob(false); setError(""); setRenderError(""); setSelectedCourses([]); } }).catch(cause => { if (isCurrent()) { setError(message(cause)); setRenderRetry(value => value + 1); } }).finally(() => { if (isCurrent()) setClearing(false); }); }}>Clear local resume</Button></DialogFooter></DialogContent></Dialog>

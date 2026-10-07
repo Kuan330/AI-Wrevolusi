@@ -96,7 +96,7 @@ test("resume route is separate from Continue Journey, and skill action remains o
 test("draft restoration/clearing and stale PDF guards are explicit", () => {
   const page = file("../src/pages/ResumeBuilder/ResumeBuilder.tsx"), draft = file("../src/features/resume/useResumeDraft.ts");
   assert.match(page, /pdfKey === fingerprint/); assert.match(page, /request.signal.aborted/);
-  assert.match(page, /unappliedYaml/); assert.match(page, /Original files and personal-field mappings stay here/);
+  assert.match(page, /unappliedYaml/); assert.match(page, /Personal-field mappings stay local/);
   assert.match(draft, /currentWorkspaceSession/); assert.match(draft, /await queue.current/);
   assert.doesNotMatch(file("../src/services/accountStorage.ts"), /resume.local|resumeBuilder/);
 });
@@ -145,4 +145,46 @@ test("deduplication preserves C/C++/C# and bounds stable source IDs", () => {
 test("encrypted Office containers get an actionable message, not an OCR/password prompt", async () => {
   const bytes = Buffer.alloc(24); bytes.writeUInt32LE(0xe011cfd0); bytes.writeUInt32LE(0xe11ab1a1, 4);
   await assert.rejects(checkDocx(arrayBuffer(bytes)), /encrypted.*unencrypted DOCX/);
+});
+
+import { EXAMPLE_JOB_REQUIREMENTS, emptyResumeDocument, resumeGenerationAction } from "../src/features/resume/onboarding.ts";
+const firstUse = { jobRequirements: EXAMPLE_JOB_REQUIREMENTS, hasDocument: false, skillCount: 0, factCount: 0, skillsLoading: false, skillError: "", sourceReviewed: null, aiConfigured: false, busy: false };
+test("fixed classroom example contains requirements, not personal facts or skill seeding", () => {
+  assert.match(EXAMPLE_JOB_REQUIREMENTS, /^Junior Data Analyst\nResponsibilities and requirements:/);
+  assert.match(EXAMPLE_JOB_REQUIREMENTS, /Excel and SQL/); assert.match(EXAMPLE_JOB_REQUIREMENTS, /Python/);
+  assert.equal(EXAMPLE_JOB_REQUIREMENTS.split("\n").length, 7);
+  assert.ok(EXAMPLE_JOB_REQUIREMENTS.length < 20000);
+  assert.deepEqual(emptyResumeDocument().cv, { sections: { Skills: [] } });
+  assert.equal(parseResumeYaml(documentYaml(emptyResumeDocument())).error, "");
+});
+test("zero-skill first use creates a local blank draft even with AI unavailable", () => {
+  assert.equal(resumeGenerationAction(firstUse), "blank");
+  assert.equal(resumeGenerationAction({ ...firstUse, aiConfigured: true }), "blank");
+  assert.equal(resumeGenerationAction({ ...firstUse, aiConfigured: null }), "blank");
+});
+test("job requirements and successful skill loading remain mandatory", () => {
+  for (const change of [{ jobRequirements: "   " }, { skillsLoading: true }, { skillError: "unreadable skills" }, { busy: true }]) {
+    assert.equal(resumeGenerationAction({ ...firstUse, ...change }), null);
+  }
+});
+test("unreviewed source cannot bypass consent through empty-draft generation", () => {
+  assert.equal(resumeGenerationAction({ ...firstUse, sourceReviewed: false }), null);
+  assert.equal(resumeGenerationAction({ ...firstUse, sourceReviewed: true }), "blank");
+});
+test("existing drafts are never replaced by an empty generation fallback", () => {
+  assert.equal(resumeGenerationAction({ ...firstUse, hasDocument: true }), null);
+  assert.equal(resumeGenerationAction({ ...firstUse, hasDocument: true, skillCount: 1, aiConfigured: true }), "ai");
+});
+test("skills or reviewed evidence use AI and retain provider-availability protection", () => {
+  for (const source of [{ skillCount: 1 }, { factCount: 1, sourceReviewed: true }]) {
+    assert.equal(resumeGenerationAction({ ...firstUse, ...source, aiConfigured: true }), "ai");
+    assert.equal(resumeGenerationAction({ ...firstUse, ...source, aiConfigured: false }), null);
+  }
+});
+test("first-use controls hide provider details and preserve expandable privacy/confirmation", () => {
+  const page = file("../src/pages/ResumeBuilder/ResumeBuilder.tsx");
+  assert.doesNotMatch(page, /ai_provider_host|ai_model|available skills|20,000 characters|rb-skill-chips/);
+  assert.match(page, /Privacy details/); assert.match(page, /Third-party provider retention policies/);
+  assert.match(page, /Replace your job requirements\?/); assert.match(page, /!draft.document && <div className="rb-example-action"/);
+  assert.match(page, /Retry skills/); assert.match(page, /generationAction === "blank"/);
 });
