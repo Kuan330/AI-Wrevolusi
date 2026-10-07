@@ -89,11 +89,13 @@ def windows_node_candidates(version: str) -> list[Path]:
 def installed_node_candidates(version: str) -> list[Path]:
     """Known existing installations only. Never download a runtime."""
     major = version.split(".")[0]
+    node_executable = "node.exe" if os.name == "nt" else "node"
     candidates = [
         Path.home() / ".nvm" / "versions" / "node" / f"v{version}" / "bin" / "node",
         Path(f"/opt/homebrew/opt/node@{major}/bin/node"),
         Path(f"/usr/local/opt/node@{major}/bin/node"),
-        Path.home() / ".cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        Path.home() / ".cache" / "codex-runtimes" / "codex-primary-runtime"
+        / "dependencies" / "node" / "bin" / node_executable,
     ]
     if os.name == "nt":
         candidates.extend(windows_node_candidates(version))

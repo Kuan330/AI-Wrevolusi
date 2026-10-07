@@ -29,10 +29,10 @@ export function checkSourceBoundaries(file, source, options, sourceRoot) {
   const page = sourceName.match(/^pages\/([^/]+)\//)?.[1];
 
   function visit(node) {
-    const browserStorageName = ts.isIdentifier(node) && ["localStorage", "sessionStorage"].includes(node.text);
+    const browserStorageName = ts.isIdentifier(node) && ["localStorage", "sessionStorage", "indexedDB"].includes(node.text);
     const browserStorageLookup = ts.isElementAccessExpression(node) &&
       ts.isStringLiteralLike(node.argumentExpression) &&
-      ["localStorage", "sessionStorage"].includes(node.argumentExpression.text);
+      ["localStorage", "sessionStorage", "indexedDB"].includes(node.argumentExpression.text);
     if (!storageOwner && (browserStorageName || browserStorageLookup)) {
       report("browser storage must use an account repository or local-preference adapter");
     }

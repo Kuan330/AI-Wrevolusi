@@ -11,6 +11,7 @@ export const ROUTES = {
   progress: "/learning/history",
   progressReviews: "/learning/history/reviews",
   possibilities: "/career/possibilities",
+  resumeBuilder: "/career/possibilities/resume",
   continue: "/resume",
 } as const;
 

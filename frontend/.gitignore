@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+test-results.local.txt
+
+# Generated from the pinned PDF.js dependency by predev/prebuild.
+/public/vendor/pdfjs/

@@ -322,3 +322,5 @@
 .px-career-main .px-career-skill-group h4 { margin-bottom:8px; }
 .px-career-main .px-career-tags.is-building { max-height:none; overflow:visible; }
 .px-description-row .px-career-description { cursor:help; margin:0; }
+
+.px-matched-actions{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-top:18px}.px-matched-actions .px-other-skills{flex:1;margin-top:0}.px-matched-actions>button{flex-shrink:0}.px-matched-label{font-size:13px;color:#85788d;padding-top:10px}@media(max-width:700px){.px-matched-actions{flex-wrap:wrap}.px-matched-actions .px-other-skills{min-width:100%}.px-matched-actions>button{margin-left:auto}}

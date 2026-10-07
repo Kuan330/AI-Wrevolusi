@@ -12,6 +12,7 @@ dependencies = [
     "pydantic-settings",
     "python-jose[cryptography]",
     "python-multipart",
+    "rendercv[full]==2.8",
     "sqlalchemy[asyncio]",
 ]
 
@@ -39,4 +40,4 @@ build-backend = "setuptools.build_meta"
 include = ["app*"]
 
 [tool.setuptools.package-data]
-app = ["data/esco/*.json", "data/esco/*.json.gz"]
+app = ["data/esco/*.json", "data/esco/*.json.gz", "data/resume/preview/fontawesome/0.6.0/*"]

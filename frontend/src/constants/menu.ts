@@ -23,6 +23,7 @@ export function navigationPath(pathname: string): string {
   return pathname;
 }
 export function pageLabel(pathname: string): string {
+  if (pathname === ROUTES.resumeBuilder) return "Resume builder";
   if (pathname === ROUTES.learningCentre) return "Learning resources";
   if (pathname === ROUTES.plan) return "My courses";
   if (pathname === ROUTES.progressReviews) return "Progress reviews";

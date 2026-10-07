@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import AccountGate from "@/components/account/AccountGate";
 import { AccountProvider } from "@/components/account/AccountProvider";
@@ -13,6 +14,7 @@ import LearningGoals from "@/pages/LearningGoals/LearningGoals";
 import LearningPlanOnboarding from "@/pages/LearningPlanOnboarding/LearningPlanOnboarding";
 import LearningHistory from "@/pages/LearningHistory/LearningHistory";
 import Progress from "@/pages/Progress/Progress";
+const ResumeBuilder = lazy(() => import("@/pages/ResumeBuilder/ResumeBuilder"));
 import Possibilities from "@/pages/Possibilities/Possibilities";
 import Plan from "@/pages/Plan/Plan";
 import WorkProfile from "@/pages/WorkProfile/WorkProfile";
@@ -42,6 +44,7 @@ export default function AppRoutes() {
       <Route path={ROUTES.progress} element={<AccountGate kind="plan"><LearningHistory /></AccountGate>} />
       <Route path={ROUTES.progressReviews} element={<AccountGate kind="plan"><Progress /></AccountGate>} />
       <Route path={ROUTES.possibilities} element={<AccountGate kind="possibilities"><Possibilities /></AccountGate>} />
+      <Route path={ROUTES.resumeBuilder} element={<AccountGate kind="possibilities"><Suspense fallback={<p role="status" className="p-8">Loading resume editor…</p>}><ResumeBuilder /></Suspense></AccountGate>} />
       <Route path={ROUTES.continue} element={<AccountGate kind="plan"><ContinueJourney /></AccountGate>} />
       <Route path="*" element={<NotFound />} />
     </Route>

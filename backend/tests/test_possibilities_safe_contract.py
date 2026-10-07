@@ -282,3 +282,26 @@ def test_confirmed_uncoded_work_still_rejects_invalid_task_evidence():
     profile = {'tasksOccupationCode': None, 'tasksConfirmed': True, 'tasks': [{'wording': ''}], 'analysis': None}
     with pytest.raises(ValueError):
         confirmed_workspace_evidence({'aiwrevolusi.userProfile': json.dumps(profile)}, [])
+
+
+def test_confirmed_workspace_deduplicates_repeated_task_wording():
+    import json
+    from app.services.possibilities import confirmed_workspace_evidence
+
+    profile = {
+        'analysis': {
+            'occupationCode': '2512',
+            'tasks': [
+                {'wording': 'Analyse sales records'},
+                {'wording': 'Analyse sales records'},
+                {'wording': 'Lead a team'},
+            ],
+        },
+    }
+    workspace = {'aiwrevolusi.userProfile': json.dumps(profile)}
+    occupations = [{'occupation_code': '2512', 'title': 'Software developers'}]
+
+    assert confirmed_workspace_evidence(workspace, occupations) == (
+        ['Analyse sales records', 'Lead a team'],
+        {'occupation_code': '2512', 'title': 'Software developers'},
+    )

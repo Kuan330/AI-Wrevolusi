@@ -24,7 +24,7 @@ import {
   saveLearningSkills,
   skillKey,
   type LearningSkill,
-} from "@/pages/Skills/learningSkills";
+} from "@/features/skills/learningSkills";
 import { rateWefSkills } from "./lib/skillStars";
 import { buildSkillEvidence } from "../../features/skills/skillProfile.ts";
 import { useLearningSkills } from "@/pages/Skills/useLearningSkills";

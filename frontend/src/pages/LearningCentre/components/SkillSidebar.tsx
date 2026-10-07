@@ -4,7 +4,7 @@ import { ChevronRight, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InfoPopover } from "@/components/ui/info-popover";
-import { type LearningSkill } from "@/pages/Skills/learningSkills";
+import { type LearningSkill } from "@/features/skills/learningSkills";
 import { type SkillRating } from "../lib/skillStars";
 
 export type SkillSidebarProps = {

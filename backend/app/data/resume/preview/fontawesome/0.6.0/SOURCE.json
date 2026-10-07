@@ -1,0 +1,12 @@
+{
+  "source": "typst/packages/packages/preview/fontawesome/0.6.0",
+  "sha256": {
+    "LICENSE": "0320baf81952401aa54110ac90787587119ce6a26fc2235e506f3cc150399162",
+    "README.md": "843ef598f98e7125729e840998934711a647a3b4feaf6ecc209bbc9c0ba9b043",
+    "lib-gen-func.typ": "fafbe72def8d291bd79f6a48ebde87eb2197ba7c54d10dfca78cbaf8bf4e351d",
+    "lib-gen-map.typ": "f088eb6ae7b072ad567a8238373eece12da9163bebdcb10b226a3aa4c728b75a",
+    "lib-impl.typ": "d9d19a96f1c57fac4070c5caec9d14b6ece872f711874f803c2bb38085b2fd3a",
+    "lib.typ": "411354321c70c4c8630954745420e8ee12603e24c8519bf54d89cd5c9b0d2877",
+    "typst.toml": "59dd687a1f75ce0fd69cb0f2d6c2e701fdbeb971e04f6dfd0314e29177b5e502"
+  }
+}

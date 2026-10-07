@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
@@ -13,6 +13,7 @@ import {
   toPossibilitiesData,
   type PossibilitiesData,
 } from "./possibilitiesModel";
+import { Button } from "@/components/ui/button";
 import Tooltip from "@/components/ui/tooltip";
 import InfoHint from "@/components/common/InfoHint";
 import { addCareerPathSkill, readCareerPath } from "@/features/skills/careerPath";
@@ -35,6 +36,7 @@ const readJson = <T,>(key: string, fallback: T): T => {
 
 export default function Possibilities() {
   const navigate = useNavigate();
+  const alive = useRef(true);
   const profilePath = possibilitiesProfilePath(readTaskWorkspace());
   const [data, setData] = useState<PossibilitiesData | null>(null);
   const [selectedCode, setSelectedCode] = useState<string | null>(
@@ -50,6 +52,7 @@ export default function Possibilities() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    alive.current = true;
     const controller = new AbortController();
     const owner = currentWorkspaceSession();
     void loadSavedPossibilities({
@@ -79,7 +82,7 @@ export default function Possibilities() {
         setLoading(false);
       },
     });
-    return () => controller.abort();
+    return () => { alive.current = false; controller.abort(); };
   }, []);
 
   const choose = (code: string) => {
@@ -151,8 +154,9 @@ export default function Possibilities() {
       setNavigationError("");
       const owner = currentWorkspaceSession();
       await addCareerPathSkill(skill.skill_id, selected.occupation_code, selected.title);
-      if (owner === currentWorkspaceSession()) navigate(`${ROUTES.skills}?careerSkill=${skill.skill_id}#skill-area-${skill.skill_id}`);
+      if (alive.current && owner === currentWorkspaceSession()) navigate(`${ROUTES.skills}?careerSkill=${skill.skill_id}#skill-area-${skill.skill_id}`);
     } catch (error) {
+      if (!alive.current) return;
       setNavigationError(error instanceof Error ? error.message : "Could not save your skill. Please try again.");
       setContinuing(false);
     }
@@ -202,7 +206,7 @@ export default function Possibilities() {
         <legend>Skills to develop · {unmatched.length || matchedOptions.length} <InfoHint label="About not matched skills" text={GAP_HINT} /></legend>
         <p>Choose one skill to add to your Skill Path.</p>
         <div className="px-development-grid">{(unmatched.length ? unmatched : matchedOptions).map(renderSkill)}</div>
-        {unmatched.length > 0 && matchedOptions.length > 0 && <details className="px-other-skills" key={selected.occupation_code}><summary>Develop a matched skill instead · {matchedOptions.length}</summary><div className="px-development-grid">{matchedOptions.map(renderSkill)}</div></details>}
+        <div className="px-matched-actions">{unmatched.length > 0 && matchedOptions.length > 0 ? <details className="px-other-skills" key={selected.occupation_code}><summary>Develop a matched skill instead · {matchedOptions.length}</summary><div className="px-development-grid">{matchedOptions.map(renderSkill)}</div></details> : <span className="px-matched-label">Develop a matched skill instead · {matchedOptions.length}</span>}<Button disabled={!selectedSkill || continuing || Boolean(careerError)} onClick={() => { void goLearning(); }}>{continuing ? "Saving your skill…" : "Add to Skill Path"}<ArrowRight size={15} /></Button></div>
         {!availableSkills.length && <p>No additional skills are available for this direction.</p>}
       </fieldset>
     </section>}
@@ -211,7 +215,7 @@ export default function Possibilities() {
       <p className="px-eyebrow">JOURNEY COMPANION</p>
       <div className="px-companion-avatar"><img src="/images/possibilities-companion.png" alt="Your virtual career companion" width={280} height={320} /></div>
       <div className="px-companion-story"><h3>{selected ? "Your next chapter" : "Pick a direction to begin"}</h3><p>{selected ? `${currentTitle} → ${selected.title}` : "Explore a career direction, then choose a skill you would like to develop."}</p>{selectedSkill && <p>Selected skill: <strong>{selectedSkill.name}</strong></p>}</div>
-      {selected && <button className="px-primary px-companion-cta" disabled={!selectedSkill || continuing || Boolean(careerError)} onClick={() => { void goLearning(); }}>{continuing ? "Saving your skill…" : "Add to Skill Path"}<ArrowRight size={15} /></button>}
+      <Button className="px-primary px-companion-cta" onClick={() => { alive.current = false; navigate(ROUTES.resumeBuilder); }}>Generate resume<ArrowRight size={15} /></Button>
     </aside></div>
     {(navigationError || careerError) && <p role="alert">{navigationError || careerError}</p>}
   </div>;

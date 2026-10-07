@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/form-field";
 import { ROUTES } from "@/constants/routes";
-import { skillKey, type LearningSkill } from "@/pages/Skills/learningSkills";
+import { skillKey, type LearningSkill } from "@/features/skills/learningSkills";
 import { aiService, type SkillMatchItem } from "@/services/aiService";
 import { referenceService } from "@/services/referenceService";
 import type { WefSkill } from "@/types/reference";

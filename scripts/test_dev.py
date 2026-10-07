@@ -167,6 +167,17 @@ class RuntimeSelectionTests(unittest.TestCase):
         )
         self.assertEqual(self.run.call_args.args[0], [self.local_node, "--version"])
 
+    def test_node_22_falls_back_to_windows_node_executable(self):
+        bundled_node = Path("/bundled/node24/bin/node.exe")
+        with patch.object(dev, "installed_node_candidates", return_value=[bundled_node]):
+            self.run.side_effect = [Mock(stdout="v22.14.0\n"), Mock(stdout="v24.19.0\n")]
+            dev.select_frontend_runtime()
+        self.assertEqual(
+            dev.os.environ["PATH"],
+            str(bundled_node.parent) + dev.os.pathsep + "/global/bin",
+        )
+        self.assertEqual(self.run.call_args.args[0], [str(bundled_node), "--version"])
+
     def test_incompatible_fallback_does_not_change_path(self):
         self.run.side_effect = [Mock(stdout="v26.6.0\n"), Mock(stdout="v24.18.0\n")]
         dev.select_frontend_runtime()
@@ -258,6 +269,14 @@ class CommandPathTests(unittest.TestCase):
 
 
 class WindowsNodeCandidateTests(unittest.TestCase):
+    def test_bundled_runtime_uses_platform_executable_name(self):
+        executable = "node.exe" if dev.os.name == "nt" else "node"
+        bundled_node = (
+            Path.home() / ".cache" / "codex-runtimes" / "codex-primary-runtime"
+            / "dependencies" / "node" / "bin" / executable
+        )
+        self.assertIn(bundled_node, dev.installed_node_candidates("24.19.0"))
+
     def test_includes_local_nodejs_install(self):
         self.assertIn(
             Path.home() / ".local" / "nodejs" / "node-v24.19.0-win-x64" / "node.exe",

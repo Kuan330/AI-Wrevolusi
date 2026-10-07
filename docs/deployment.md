@@ -166,3 +166,7 @@ uv export --project backend --locked --only-group data --no-hashes \
 ```
 
 Deploy dependency changes to Preview before Production.
+
+## Resume renderer deployment gate
+
+The resume feature adds pinned RenderCV 2.8, Typst/fonts and an offline FontAwesome package. Read `docs/resume-builder.md` before deploying it. Local rendering tests do not establish Vercel compatibility: an authorised Preview must verify Linux binary wheels, fonts/package assets, subprocess/temp-directory behavior, size/time limits, authentication and actual multi-page PDF responses. No resume table or workspace sync migration is required. Frontend prebuild must run to package self-hosted PDF.js resources.

@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { referenceService } from "@/services/referenceService";
 import { recommendSkills } from "@/features/skills/recommendations";
 import { loadLearningCatalogue } from "@/features/learning-planning/courseDirectory";
-import { skillKey } from "@/pages/Skills/learningSkills";
+import { skillKey } from "@/features/skills/learningSkills";
 import { ROUTES } from "@/constants/routes";
 import type { ProfileTask } from "@/features/work-profile/types";
 import type { WefSkill } from "@/types/reference";

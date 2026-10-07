@@ -22,11 +22,14 @@ def analysis(text='modern evidence', code='1111'):
     return {'occupationCode': code, 'tasks': [{'wording': text}]}
 
 
-def setup_client(monkeypatch, workspace, *, fail_workspace=False):
+def setup_client(monkeypatch, workspace, *, fail_workspace=False, user_id=None, query_params=None):
     queries = []
+    user_id = user_id or uuid4()
     async def execute(statement, params):
         query = str(statement)
         queries.append(query)
+        if query_params is not None:
+            query_params.append((query, dict(params) if isinstance(params, dict) else params))
         result = Mock()
         if 'FROM app_accounts' in query:
             if fail_workspace:
@@ -55,7 +58,7 @@ def setup_client(monkeypatch, workspace, *, fail_workspace=False):
         SimpleNamespace(wef_skill_id=1 if text == 'modern evidence' else 2),
     ])
     application = create_app('/api')
-    application.dependency_overrides[get_current_user] = lambda: SimpleNamespace(id=uuid4(), occupation_id=uuid4())
+    application.dependency_overrides[get_current_user] = lambda: SimpleNamespace(id=user_id, occupation_id=uuid4())
     async def database():
         yield db
     application.dependency_overrides[get_db] = database
@@ -125,3 +128,25 @@ def test_invalid_workspace_container_requires_recovery(monkeypatch, workspace):
         response = client.get('/api/v1/possibilities')
     assert response.status_code == 409
     assert len(queries) == 1
+
+
+def test_workspace_and_legacy_task_queries_are_scoped_to_authenticated_user(monkeypatch):
+    user_id = uuid4()
+    query_params = []
+    client, _ = setup_client(monkeypatch, {}, user_id=user_id, query_params=query_params)
+    with client:
+        response = client.get('/api/v1/possibilities')
+
+    assert response.status_code == 200
+    assert next(params for query, params in query_params if 'FROM app_accounts' in query) == {'id': user_id}
+    assert next(params for query, params in query_params if 'FROM tasks' in query) == {'user_id': user_id}
+
+
+def test_unauthenticated_possibilities_request_does_not_query_database(monkeypatch):
+    client, queries = setup_client(monkeypatch, {})
+    client.app.dependency_overrides.pop(get_current_user)
+    with client:
+        response = client.get('/api/v1/possibilities')
+
+    assert response.status_code == 401
+    assert queries == []

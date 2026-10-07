@@ -40,7 +40,7 @@ globalThis.journeyRouteFixtures = {
   },
 };
 Object.defineProperty(globalThis.journeyRouteFixtures, 'requestedPath', { get: () => requestedPath });
-for (const name of ['ContinueJourney', 'SkillsReview', 'AIExposure', 'Home', 'LearningCentre', 'Possibilities', 'Plan', 'WorkProfile', 'Dashboard', 'LearningHistory', 'LearningGoals', 'Progress']) {
+for (const name of ['ContinueJourney', 'SkillsReview', 'AIExposure', 'Home', 'LearningCentre', 'Possibilities', 'Plan', 'WorkProfile', 'Dashboard', 'LearningHistory', 'LearningGoals', 'Progress', 'ResumeBuilder']) {
   globalThis.journeyRouteFixtures[name] = () => React.createElement('div', { 'data-page': name });
 }
 const routerModule = moduleUrl(`
@@ -58,6 +58,8 @@ const routesModule = moduleUrl(ts.transpileModule(
 const transpiled = ts.transpileModule(readFileSync(new URL('../src/routes/index.tsx', import.meta.url), 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.ESNext, jsx: ts.JsxEmit.ReactJSX },
 }).outputText.replaceAll('from "react/jsx-runtime"', `from ${JSON.stringify(packageUrl('react/jsx-runtime'))}`)
+  .replaceAll('from "react"', `from ${JSON.stringify(packageUrl('react'))}`)
+  .replace(/lazy\(\(\) => import\("(@\/[^"]+)"\)\)/g, (_match, path) => `globalThis.journeyRouteFixtures[${JSON.stringify(path.split('/').at(-1))}]`)
   .replaceAll('from "react-router-dom"', `from ${JSON.stringify(routerModule)}`)
   .replace(/from "(@\/[^"]+)"/g, (_match, path) => {
     if (path === '@/constants/routes') return `from ${JSON.stringify(routesModule)}`;
@@ -91,4 +93,16 @@ test('public introduction remains separate from the authenticated dashboard', ()
   assert.ok(!guest.includes('data-page="Dashboard"'));
   signedIn = true;
   assert.ok(renderToString(React.createElement(AppRoutes)).includes('data-page="Dashboard"'));
+});
+
+
+test('resume child is authenticated, independent of work tasks, and Continue Journey is unchanged', () => {
+  for (const [path, page] of [['/career/possibilities/resume', 'ResumeBuilder'], ['/resume', 'ContinueJourney']]) {
+    signedIn = false; guardVisits = 0; requestedPath = path;
+    assert.ok(renderToString(React.createElement(AppRoutes)).includes(`data-login-destination="${path}"`));
+    assert.equal(guardVisits, 0);
+    signedIn = true;
+    assert.ok(renderToString(React.createElement(AppRoutes)).includes(`data-page="${page}"`));
+    assert.equal(guardVisits, 0);
+  }
 });

@@ -122,3 +122,9 @@ were not verified. No migration or Vercel configuration was changed.
 A separate source-level response-contract risk was observed: `TaskRead` requires
 `profile_task_id`, but the Task ORM does not define it. That unrelated contract
 was left unchanged and needs its own endpoint review.
+
+## Local-first resume storage exception
+
+The authenticated Possibilities child `/career/possibilities/resume` deliberately does not use workspace/database persistence. `features/resume/repository` accesses only the independently account-keyed `infrastructure/storage/resumeStore` IndexedDB boundary. Resume files, evidence, contacts, requirements and YAML are absent from the account sync whitelist; My Plan PDF/DOCX attachments use that same boundary, not learning resources. Learning-list selectors are now owned by `features/skills`, with a compatibility page re-export.
+
+The architecture checker recognises `indexedDB` as storage access and permits it only in the storage owner. Full privacy/API, real RenderCV rendering, schema/vendor reproduction and hosted-release gates are in `docs/resume-builder.md`. Browser QA uses synthetic API interception and real local PDFs; it is not deployment verification.

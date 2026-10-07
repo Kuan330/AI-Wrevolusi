@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.db.session import init_models
@@ -17,6 +20,7 @@ from app.routers import (
     preparation,
     progress_reviews,
     reference,
+    resume,
     schedule,
     skill_directions,
     tasks,
@@ -60,6 +64,21 @@ def create_app(api_root: str = '/api') -> FastAPI:
     application.include_router(learning.router, prefix=api_prefix)
     application.include_router(progress_reviews.router, prefix=api_prefix)
     application.include_router(guided_learning.router, prefix=api_prefix)
+    application.include_router(resume.router, prefix=api_prefix)
+
+    @application.middleware("http")
+    async def private_resume_response(request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith(f"{api_prefix}/resume/"):
+            response.headers["Cache-Control"] = "no-store"
+        return response
+
+    @application.exception_handler(RequestValidationError)
+    async def private_validation(request, error):
+        if request.url.path.startswith(f"{api_prefix}/resume/"):
+            # FastAPI normally echoes rejected input (possibly contact details).
+            return JSONResponse(status_code=422, content={"detail": "Invalid resume request. Check field types, limits and evidence review."}, headers={"Cache-Control": "no-store"})
+        return await request_validation_exception_handler(request, error)
 
     @application.on_event('startup')
     async def startup_event() -> None:

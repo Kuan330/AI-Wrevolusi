@@ -32,3 +32,15 @@ frontend/dist/
 
 # Local browser verification snapshots
 /.playwright-mcp/
+/docs/prototypes/resume-builder.html
+# Local-only project notes and development launcher
+*.local.md
+/PROJECT_ARCHITECTURE.md
+/TECHNICAL_ARCHITECTURE_AND_SYSTEM_SPECIFICATION.md
+/start_project.local.bat
+
+# Resume implementation QA artifacts (synthetic documents and test logs)
+/.local/resume-qa/
+/backend/.pytest-resume-*/
+/backend/.resume-*-results.txt
+/frontend/.resume-check-results.txt

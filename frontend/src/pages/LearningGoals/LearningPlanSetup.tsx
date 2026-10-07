@@ -7,6 +7,10 @@ import {
   setupInputs, validateResourceFile, validateSetupDraft,
 } from "@/features/learning-goals/learningPlanSetup";
 import type { LearningPlanResource, LearningPlanSetupDraft } from "@/features/learning-goals/learningPlanSetup";
+import { useResumeAttachment } from "@/features/resume/useResumeAttachment";
+import { RESUME_ACCEPT, isResumeFile } from "@/features/resume/importResume";
+import { Link } from "react-router-dom";
+import { ROUTES } from "@/constants/routes";
 import "./learning-plan-setup.css";
 
 export type LearningPlanSetupProps = {
@@ -38,6 +42,7 @@ const readableError = (error: unknown) => error instanceof Error ? error.message
 /** Goal-scoped configuration within our workspace, not an external onboarding flow. */
 export default function LearningPlanSetup({ goalTitle, initialInputs, initialResources = [], disabled = false, busy = false, loading = false, error = "", onSubmit, onCancel }: LearningPlanSetupProps) {
   const id = useId();
+  const resumeAttachment = useResumeAttachment();
   const [draft, setDraft] = useState<LearningPlanSetupDraft>(() => ({
     goalText: initialInputs?.goalText ?? goalTitle,
     experience: initialInputs?.experience ?? "",
@@ -62,11 +67,12 @@ export default function LearningPlanSetup({ goalTitle, initialInputs, initialRes
     event.target.value = "";
     if (!file || operation.current || disabled || busy) return;
     setResourceError("");
-    const fileError = validateResourceFile(file);
+    const fileError = isResumeFile(file) ? "" : validateResourceFile(file);
     if (fileError) { setResourceError(fileError); return; }
     operation.current = true;
     setReadingFile(true);
     try {
+      if (await resumeAttachment.attach(file)) return;
       const text = await file.text();
       setResources(addPlanResource(resources, { id: crypto.randomUUID(), kind: "file", name: file.name, text, sizeBytes: file.size }));
     } catch (cause) { setResourceError(readableError(cause)); }
@@ -110,10 +116,11 @@ export default function LearningPlanSetup({ goalTitle, initialInputs, initialRes
       <section className="lps-question" aria-labelledby={`${id}-resources`}>
         <h4 id={`${id}-resources`}>Your resources <span className="lps-optional">Optional</span></h4>
         <p className="lps-hint">Attach your own reference material, or start with courses from our catalogue.</p>
-        <p className="lps-hint">TXT, MD or CSV · up to 1 MB and 20,000 characters per file · up to 5 resources. Files stay as text references; links are not automatically opened or analysed.</p>
-        <input ref={fileInput} type="file" className="lps-file-input" accept={RESOURCE_ACCEPT} onChange={event => { void attachFile(event); }} aria-label="Attach a text reference file" tabIndex={-1} />
-        <div className="lps-resource-actions"><button type="button" disabled={resources.length >= MAX_PLAN_RESOURCES} onClick={() => fileInput.current?.click()}><Plus size={16} aria-hidden="true" /> Attach file</button><button type="button" disabled={resources.length >= MAX_PLAN_RESOURCES} onClick={() => { setShowLink(value => !value); setResourceError(""); }} aria-expanded={showLink} aria-controls={`${id}-link-editor`}><Link2 size={16} aria-hidden="true" /> Paste link</button></div>
+        <p className="lps-hint">PDF/DOCX resumes · up to 10 MB, saved only on this device for Resume builder. TXT, MD or CSV learning references · up to 1 MB and 20,000 characters per file · up to 5 resources. Files stay as text references; links are not automatically opened or analysed.</p>
+        <input ref={fileInput} type="file" className="lps-file-input" accept={`${RESOURCE_ACCEPT},${RESUME_ACCEPT}`} onChange={event => { void attachFile(event); }} aria-label="Attach a text reference or a PDF/DOCX resume" tabIndex={-1} />
+        <div className="lps-resource-actions"><button type="button" disabled={readingFile} onClick={() => fileInput.current?.click()}><Plus size={16} aria-hidden="true" /> Attach file</button><button type="button" disabled={readingFile || resources.length >= MAX_PLAN_RESOURCES} onClick={() => { setShowLink(value => !value); setResourceError(""); }} aria-expanded={showLink} aria-controls={`${id}-link-editor`}><Link2 size={16} aria-hidden="true" /> Paste link</button></div>
         {showLink && <div className="lps-link-editor" id={`${id}-link-editor`}><label htmlFor={`${id}-url`}>Resource link</label><div><input id={`${id}-url`} type="url" maxLength={2048} autoFocus placeholder="https://…" value={link} onChange={event => setLink(event.target.value)} onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); attachLink(); } }} /><button type="button" disabled={!link.trim()} onClick={attachLink}>Add link</button><button type="button" onClick={() => { setShowLink(false); setLink(""); setResourceError(""); }}>Cancel</button></div></div>}
+        {resumeAttachment.notice && <p className="lps-hint" role="status">{resumeAttachment.notice} <Link to={ROUTES.resumeBuilder}>Open Resume builder →</Link> Job requirements are still required.</p>}
         {resourceError && <p className="lps-error" role="alert">{resourceError}</p>}
         {resources.length > 0 && <ul className="lps-resources" aria-label="Attached references">{resources.map(resource => <li key={resource.id}>{resource.kind === "file" ? <FileText size={18} aria-hidden="true" /> : <Link2 size={18} aria-hidden="true" />}<div><strong>{resource.name}</strong><span>{resource.kind === "link" ? resource.url : `${Math.ceil((resource.sizeBytes ?? 0) / 1024)} KB · Text reference`}</span></div><button type="button" aria-label={`Remove ${resource.name}`} onClick={() => { setResources(current => current.filter(item => item.id !== resource.id)); setResourceError(""); }}><X size={16} aria-hidden="true" /></button></li>)}</ul>}
         <p className="lps-privacy">Leave out passwords, personal details and confidential work information. References are saved with your plan when you build it.</p>
