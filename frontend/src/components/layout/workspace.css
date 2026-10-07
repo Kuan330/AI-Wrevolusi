@@ -292,3 +292,5 @@
 .career-overview .growth-plan-card.is-compact .growth-plan-header > span:last-child { display:none; }
 @media(max-width:1000px) { .career-overview { grid-template-columns:1fr; } }
 .career-path-header > .dashboard-text-link { white-space:nowrap; }
+
+.workspace-editor-focus{height:calc(100dvh - var(--workspace-top-offset,0px));min-height:0;overflow:hidden}.workspace-editor-focus>.workspace-sidebar{display:none}.workspace-editor-focus>.workspace-body{margin-left:0;height:100%;overflow:hidden}.workspace-editor-focus .workspace-topbar,.workspace-editor-focus .workspace-footer{display:none}.workspace-editor-focus .workspace-content{padding:0;max-width:none;height:100%;min-height:0;overflow:hidden}

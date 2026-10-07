@@ -1,80 +1,46 @@
-import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { ArrowDown, ArrowUp, ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormField, Input, NativeSelect, Textarea } from "@/components/ui/form-field";
 import { Checkbox } from "@/components/ui/checkbox";
-import { moveItem, type THEMES } from "@/features/resume/document";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { useMarkdownSelection } from "./MarkdownSelection";
+import { moveItem, moveSection } from "@/features/resume/document";
+import { ENTRY_TYPES, entryFields, entryType, fieldLabel, isMapping, renameSection, networkOptions } from "@/features/resume/editorModel";
 import type { ResumeDocument, ResumeEntry } from "@/features/resume/types";
-import { useState } from "react";
-
-const label = (key: string) => key.replaceAll("_", " ").replace(/\b\w/g, c => c.toUpperCase());
-/** Nested fields remain intact: arrays, social links, publications and design mappings round-trip. */
-function ValueField({ name, value, change }: { name: string; value: unknown; change: (value: unknown) => void }) {
-  if (typeof value === "boolean") return <label className="rb-check"><Checkbox checked={value} onCheckedChange={checked => change(checked === true)} />{label(name)}</label>;
-  if (Array.isArray(value) && value.every(item => typeof item === "string")) return <FormField label={label(name)} hint="One item per line"><Textarea value={value.join("\n")} onChange={event => change(event.target.value.split("\n"))} /></FormField>;
-  if (Array.isArray(value)) return <div className="rb-nested"><strong>{label(name)}</strong>{value.map((item, i) => <div key={i}><ValueField name={`${name} ${i + 1}`} value={item} change={next => change(value.map((old, j) => i === j ? next : old))} /><Button variant="ghost" size="sm" onClick={() => change(value.filter((_, j) => j !== i))}>Remove {label(name)} {i + 1}</Button></div>)}<Button variant="outline" size="sm" onClick={() => change([...value, typeof value[0] === "object" ? Object.fromEntries(Object.keys(value[0] as object).map(key => [key, ""])) : ""])}>Add {label(name)}</Button></div>;
-  if (value && typeof value === "object") return <div className="rb-nested"><strong>{label(name)}</strong>{Object.entries(value).map(([key, item]) => <ValueField key={key} name={key} value={item} change={next => change({ ...value, [key]: next })} />)}</div>;
-  if (typeof value === "number") return <FormField label={label(name)}><Input type="number" value={value} onChange={event => change(Number(event.target.value))} /></FormField>;
-  const long = ["bullet", "number", "reversed_number", "details", "summary", "text"].includes(name);
-  return <FormField label={label(name)}>{long ? <Textarea value={String(value ?? "")} onChange={event => change(event.target.value)} /> : <Input value={String(value ?? "")} onChange={event => change(event.target.value)} />}</FormField>;
+export type DocumentChange = (document: ResumeDocument, key?: string | null) => void;
+const markdownFields = new Set(["bullet", "number", "reversed_number", "text", "label", "details", "summary", "highlights", "authors", "title", "name", "journal", "company", "position", "institution", "area", "degree"]);
+export function ValueField({ name, value, change, path = name, markdown = markdownFields.has(name), options = [], seed = "", fixed = false }: {
+  name: string; value: unknown; change: (value: unknown, key?: string | null) => void; path?: string; markdown?: boolean; options?: string[]; seed?: unknown; fixed?: boolean;
+}) {
+  const select = useMarkdownSelection();
+  const onSelect = (event: React.SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>) => { const element = event.currentTarget; if (markdown) select({ element, text: element.value, start: element.selectionStart ?? 0, end: element.selectionEnd ?? 0, commit: next => change(next, null) }); };
+  const title = fieldLabel(name), attributes = { "aria-label": `${title} · ${path}`, "data-edit-key": path, "data-markdown": markdown || undefined };
+  if (Array.isArray(value)) return <div className={`rw-list${fixed ? " rw-fixed-list" : ""}`}><div className="rw-list-heading"><span>{title}</span>{!fixed && <Button variant="link" size="sm" aria-label={`Add ${title} item · ${path}`} onClick={() => change([...value, structuredClone(seed)], null)}><Plus />Add</Button>}</div>{value.map((item, index) => <div className="rw-list-item" key={index}><ValueField name={fixed ? String(index + 1) : name} value={item} path={`${path} item ${index + 1}`} markdown={markdown} change={(next, key) => change(value.map((old, i) => i === index ? next : old), key)} />{!fixed && <div className="rw-item-actions"><Button variant="ghost" size="icon" disabled={index === 0} aria-label={`Move ${title} item ${index + 1} up · ${path}`} onClick={() => change(moveItem(value, index, -1), null)}><ArrowUp /></Button><Button variant="ghost" size="icon" disabled={index === value.length - 1} aria-label={`Move ${title} item ${index + 1} down · ${path}`} onClick={() => change(moveItem(value, index, 1), null)}><ArrowDown /></Button><Button variant="ghost" size="icon" aria-label={`Remove ${title} item ${index + 1} · ${path}`} onClick={() => change(value.filter((_, i) => i !== index), null)}><Trash2 /></Button></div>}</div>)}</div>;
+  if (isMapping(value)) return <div className="rw-object">{Object.entries(value).map(([key, item]) => <ValueField key={key} name={key} value={item} path={`${path} ${key}`} change={(next, editKey) => change({ ...value, [key]: key === "url" && next === "" ? null : next }, editKey)} />)}</div>;
+  if (typeof value === "boolean") return <div className="rw-field-row"><span>{title}</span><Checkbox aria-label={`${title} · ${path}`} checked={value} onCheckedChange={next => change(next === true, null)} /></div>;
+  const long = ["bullet", "number", "reversed_number", "details", "summary", "text", "highlights", "authors"].includes(name);
+  return <div className="rw-field-row"><FormField label={title}>{(name === "network" ? networkOptions : options).length ? <NativeSelect {...attributes} value={String(value ?? "")} onChange={event => change(event.target.value, null)}>{!(name === "network" ? networkOptions : options).includes(String(value ?? "")) && <option value={String(value ?? "")}>{String(value ?? "Choose…")}</option>}{(name === "network" ? networkOptions : options).map(option => <option key={option} value={option}>{fieldLabel(option)}</option>)}</NativeSelect> : long ? <Textarea {...attributes} onSelect={onSelect} onKeyUp={onSelect} onMouseUp={onSelect} rows={1} value={String(value ?? "")} onChange={event => change(event.target.value, path)} /> : <Input {...attributes} onSelect={onSelect} onKeyUp={onSelect} onMouseUp={onSelect} type={typeof value === "number" ? "number" : "text"} value={String(value ?? "")} onChange={event => change(typeof value === "number" && event.target.value !== "" ? Number(event.target.value) : event.target.value, path)} />}</FormField></div>;
 }
-const ENTRY_TYPES: Record<string, ResumeEntry> = {
-  Bullet: { bullet: "" }, Text: "", "One line": { label: "", details: "" },
-  Experience: { company: "", position: "" }, Education: { institution: "", area: "" },
-  Project: { name: "" }, Publication: { title: "", authors: [] },
-  Numbered: { number: "" }, "Reversed numbered": { reversed_number: "" },
-};
-const fieldsFor = (entry: ResumeEntry) => {
-  if (typeof entry === "string") return [];
-  if ("company" in entry || "institution" in entry || "name" in entry) return ["date", "start_date", "end_date", "location", "summary", "highlights", ...("institution" in entry ? ["degree"] : [])];
-  if ("authors" in entry) return ["date", "doi", "url", "journal", "summary"];
-  return [];
-};
-function inferType(entry?: ResumeEntry) {
-  if (typeof entry === "string") return "Text";
-  if (!entry) return "Bullet";
-  return Object.entries(ENTRY_TYPES).find(([, sample]) => typeof sample === "object" && Object.keys(sample).every(key => key in entry))?.[0] ?? "Bullet";
+function EntryEditor({ entry, index, title, change }: { entry: ResumeEntry; index: number; title: string; change: (entry: ResumeEntry, key?: string | null) => void }) {
+  if (typeof entry === "string") return <ValueField name="text" value={entry} path={`${title} entry ${index + 1}`} change={(next, key) => change(String(next), key)} />;
+  return <>{entryFields(entry).map(key => <ValueField key={key} name={key} value={entry[key] ?? (["authors", "highlights"].includes(key) ? [] : "")} path={`${title} entry ${index + 1} ${key}`} change={(value, editKey) => change({ ...entry, [key]: value === "" && !Object.hasOwn(ENTRY_TYPES[entryType(entry)] as Record<string, unknown>, key) ? null : value }, editKey)} />)}</>;
 }
-export function ResumeForm({ document, selected, change, remove }: { document: ResumeDocument; selected: string; change: (document: ResumeDocument) => void; remove: (title: string) => void }) {
-  const sections = document.cv.sections ?? {};
-  const entries = sections[selected] ?? [];
+function SectionEntries({ entries, title, replace }: { entries: ResumeEntry[]; title: string; replace: (items: ResumeEntry[], key?: string | null) => void }) {
   const [newType, setNewType] = useState("Bullet");
-  const [newTitle, setNewTitle] = useState("");
-  const [formError, setFormError] = useState("");
-  const replace = (next: ResumeEntry[]) => change({ ...document, cv: { ...document.cv, sections: { ...sections, [selected]: next } } });
-  if (selected === "@personal") return <div className="rb-form"><h2>Personal information</h2><p>Only enter facts you want in your resume. These fields stay out of AI requests.</p>{["name", "headline", "email", "phone", "location", "website"].map(key => <ValueField key={key} name={key} value={document.cv[key] ?? ""} change={value => {
-    const cv = { ...document.cv }; if (!value) delete cv[key]; else cv[key] = value; change({ ...document, cv });
-  }} />)}{Object.entries(document.cv).filter(([key]) => !["name", "headline", "email", "phone", "location", "website", "sections", "photo"].includes(key)).map(([key, value]) => <ValueField key={key} name={key} value={value} change={next => change({ ...document, cv: { ...document.cv, [key]: next } })} />)}<Button variant="outline" onClick={() => change({ ...document, cv: { ...document.cv, social_networks: [...((document.cv.social_networks as unknown[]) ?? []), { network: "LinkedIn", username: "" }] } })}>Add social link</Button></div>;
-  if (!Object.hasOwn(sections, selected)) return <div className="rb-form"><h2>Select a chapter</h2><p>Add your own information, or choose a generated section.</p></div>;
-  return <div className="rb-form"><div className="rb-section-title"><h2>{selected}</h2><Button variant="ghost" size="icon" aria-label={`Delete ${selected} section`} onClick={() => remove(selected)}><Trash2 /></Button></div>
-    <div className="rb-inline"><Input aria-label="New section title" value={newTitle} placeholder="Rename this section" onChange={event => setNewTitle(event.target.value)} maxLength={100} /><Button variant="outline" size="sm" onClick={() => {
-      const title = newTitle.trim(); if (!title || title.startsWith("@") || Object.hasOwn(sections, title) || ["__proto__", "constructor", "prototype"].includes(title)) { setFormError("Choose a unique section title."); return; }
-      change({ ...document, cv: { ...document.cv, sections: Object.fromEntries(Object.entries(sections).map(([key, items]) => [key === selected ? title : key, items])) } }); setNewTitle(""); setFormError("");
-    }}>Rename</Button></div>
-    {formError && <p role="alert" className="rb-error">{formError}</p>}
-    {entries.map((entry, index) => <div className="rb-entry" key={index}><div className="rb-entry-tools"><span>Entry {index + 1}</span><div><Button variant="ghost" size="icon" aria-label={`Move entry ${index + 1} up`} disabled={index === 0} onClick={() => replace(moveItem(entries, index, -1))}><ArrowUp /></Button><Button variant="ghost" size="icon" aria-label={`Move entry ${index + 1} down`} disabled={index === entries.length - 1} onClick={() => replace(moveItem(entries, index, 1))}><ArrowDown /></Button><Button variant="ghost" size="icon" aria-label={`Remove entry ${index + 1}`} onClick={() => replace(entries.filter((_, i) => i !== index))}><Trash2 /></Button></div></div>
-      {typeof entry === "string" ? <ValueField name="text" value={entry} change={next => replace(entries.map((old, i) => i === index ? String(next) : old))} /> : <>
-        {Object.entries(entry).map(([key, value]) => <div className="rb-entry-field" key={key}><ValueField name={key} value={value} change={next => replace(entries.map((old, i) => i === index ? { ...entry, [key]: next } : old))} />{fieldsFor(entry).includes(key) && <Button variant="ghost" size="sm" onClick={() => { const next = { ...entry }; delete next[key]; replace(entries.map((old, i) => i === index ? next : old)); }}>Remove {label(key)}</Button>}</div>)}
-        {fieldsFor(entry).filter(key => !Object.hasOwn(entry, key)).length > 0 && <NativeSelect aria-label={`Add a field to entry ${index + 1}`} value="" onChange={event => { const key = event.target.value; if (key) replace(entries.map((old, i) => i === index ? { ...entry, [key]: key === "highlights" ? [] : "" } : old)); }}><option value="">Add an optional field…</option>{fieldsFor(entry).filter(key => !Object.hasOwn(entry, key)).map(key => <option key={key} value={key}>{label(key)}</option>)}</NativeSelect>}
-      </>}
-    </div>)}
-    <div className="rb-inline"><NativeSelect aria-label="Entry type" value={entries.length ? inferType(entries[0]) : newType} disabled={entries.length > 0} onChange={event => setNewType(event.target.value)}>{Object.keys(ENTRY_TYPES).map(type => <option key={type}>{type}</option>)}</NativeSelect><Button variant="outline" onClick={() => replace([...entries, structuredClone(ENTRY_TYPES[entries.length ? inferType(entries[0]) : newType])])}><Plus />Add entry</Button></div>
-  </div>;
+  const type = entries.length ? entryType(entries[0]) : newType;
+  return <div className="rw-entries">{entries.map((entry, index) => <div className="rw-entry" key={index} data-entry={index}><div className="rw-entry-heading"><span>{type} {index + 1}</span><div className="rw-item-actions"><Button variant="ghost" size="icon" disabled={!index} aria-label={`Move ${title} entry ${index + 1} up`} onClick={() => replace(moveItem(entries, index, -1), null)}><ArrowUp /></Button><Button variant="ghost" size="icon" disabled={index === entries.length - 1} aria-label={`Move ${title} entry ${index + 1} down`} onClick={() => replace(moveItem(entries, index, 1), null)}><ArrowDown /></Button><Button variant="ghost" size="icon" aria-label={`Remove ${title} entry ${index + 1}`} onClick={() => replace(entries.filter((_, i) => i !== index), null)}><Trash2 /></Button></div></div><EntryEditor entry={entry} index={index} title={title} change={(next, key) => replace(entries.map((old, i) => i === index ? next : old), key)} /></div>)}<div className="rw-entry-add"><NativeSelect aria-label={`Entry type · ${title}`} value={type} disabled={entries.length > 0} onChange={event => setNewType(event.target.value)}>{Object.keys(ENTRY_TYPES).map(name => <option key={name}>{name}</option>)}</NativeSelect><Button variant="link" size="sm" aria-label={`Add entry · ${title}`} onClick={() => replace([...entries, structuredClone(ENTRY_TYPES[type])], null)}><Plus />Add {type.toLowerCase()} entry</Button></div></div>;
 }
-function designValue(document: ResumeDocument, group: string, key: string, fallback: string) {
-  return String((document.design?.[group] as Record<string, unknown> | undefined)?.[key] ?? fallback);
+function PersonalField({ name, value, seed, change }: { name: string; value: unknown; seed: unknown; change: (value: unknown, key?: string | null) => void }) {
+  return <><ValueField name={name} path={`Personal ${name}`} markdown={false} value={value} seed={seed} change={change} />{["email", "phone", "website"].includes(name) && !Array.isArray(value) && <Button variant="link" size="sm" className="rw-add-contact" aria-label={`Add another ${name}`} onClick={() => change(value ? [value, ""] : [""], null)}><Plus />Add another {name}</Button>}</>;
 }
-export function DesignControls({ document, themes, change }: { document: ResumeDocument; themes: typeof THEMES; change: (next: ResumeDocument) => void }) {
-  const set = (group: string, key: string, value: unknown) => change({ ...document, design: { ...document.design, [group]: { ...(document.design?.[group] as object), [key]: value } } });
-  const typography = (key: string, value: unknown) => set("typography", key, value);
-  const fontSize = (document.design?.typography as Record<string, unknown> | undefined)?.font_size as Record<string, unknown> | undefined;
-  const font = (document.design?.typography as Record<string, unknown> | undefined)?.font_family;
-  return <div className="rb-design"><FormField label="Template"><NativeSelect value={String(document.design?.theme ?? "classic")} onChange={event => change({ ...document, design: { ...document.design, theme: event.target.value } })}>{themes.map(theme => <option value={theme} key={theme}>{theme === "engineeringresumes" ? "Engineering Resumes" : theme === "engineeringclassic" ? "Engineering Classic" : theme.charAt(0).toUpperCase() + theme.slice(1)}</option>)}</NativeSelect></FormField>
-    <FormField label="Font family"><NativeSelect value={typeof font === "string" ? font : String((font as Record<string, unknown> | undefined)?.body ?? "Source Sans 3")} onChange={event => typography("font_family", typeof font === "object" ? { ...font, body: event.target.value } : event.target.value)}>{["Source Sans 3", "Source Serif 4", "Roboto", "Lato", "Ubuntu", "Libertinus Serif"].map(name => <option key={name}>{name}</option>)}</NativeSelect></FormField>
-    <FormField label="Body font size"><Input value={String(fontSize?.body ?? "10pt")} onChange={event => typography("font_size", { ...fontSize, body: event.target.value })} /></FormField>
-    <FormField label="Line spacing"><Input value={designValue(document, "typography", "line_spacing", "0.6em")} onChange={event => typography("line_spacing", event.target.value)} /></FormField>
-    <FormField label="Accent colour"><Input type="color" value={designValue(document, "colors", "section_titles", "#287496")} onChange={event => set("colors", "section_titles", event.target.value)} /></FormField>
-    <FormField label="Paper size"><NativeSelect value={designValue(document, "page", "size", "a4")} onChange={event => set("page", "size", event.target.value)}><option value="a4">A4</option><option value="us-letter">US Letter</option></NativeSelect></FormField>
-    {["top_margin", "bottom_margin", "left_margin", "right_margin"].map(key => <FormField label={label(key)} key={key}><Input value={designValue(document, "page", key, "1.5cm")} onChange={event => set("page", key, event.target.value)} /></FormField>)}
-    <p className="rb-hint">Use YAML for all additional safe RenderCV styling options. Custom code, photos and external file paths are not supported.</p>
+export function ResumeForm({ document, change, remove, add, collapsed, toggle }: { document: ResumeDocument; change: DocumentChange; remove: (title: string) => void; add: () => void; collapsed: Set<string>; toggle: (title: string) => void }) {
+  const [renaming, setRenaming] = useState(""), [name, setName] = useState(""), [error, setError] = useState("");
+  const fields = ["name", "headline", "location", "email", "phone", "website", "social_networks", "custom_connections"];
+  const setPersonal = (key: string, value: unknown, editKey?: string | null) => change({ ...document, cv: { ...document.cv, [key]: value === "" ? null : value } }, editKey);
+  return <div className="rw-cv-form"><section className="rw-section rw-personal" data-title="Personal information"><div className="rw-section-heading"><Button variant="ghost" className="rw-section-toggle" aria-expanded={!collapsed.has("@personal")} onClick={() => toggle("@personal")}><ChevronDown />Personal information</Button></div>{!collapsed.has("@personal") && <div className="rw-section-body">{fields.map(key => <PersonalField key={key} name={key} value={document.cv[key] ?? (["social_networks", "custom_connections"].includes(key) ? [] : "")} seed={key === "social_networks" ? { network: "", username: "" } : key === "custom_connections" ? { fontawesome_icon: "", placeholder: "", url: null } : ""} change={(value, editKey) => setPersonal(key, value, editKey)} />)}{Object.keys(document.cv).some(key => ![...fields, "sections"].includes(key)) && <p className="rw-small">Additional fields are retained in YAML.</p>}</div>}</section>
+    {Object.entries(document.cv.sections ?? {}).map(([title, entries], index, all) => <section className="rw-section" key={title} data-title={title}><div className="rw-section-heading"><Button variant="ghost" className="rw-section-toggle" aria-expanded={!collapsed.has(title)} onClick={() => toggle(title)}><ChevronDown />{title}</Button><div className="rw-item-actions"><Button variant="ghost" size="icon" aria-label={`Rename ${title} section`} onClick={() => { setRenaming(title); setName(title); setError(""); }}><Pencil /></Button><Button variant="ghost" size="icon" aria-label={`Move ${title} section up`} disabled={index === 0} onClick={() => change(moveSection(document, title, -1), null)}><ArrowUp /></Button><Button variant="ghost" size="icon" aria-label={`Move ${title} section down`} disabled={index === all.length - 1} onClick={() => change(moveSection(document, title, 1), null)}><ArrowDown /></Button><Button variant="ghost" size="icon" aria-label={`Delete ${title} section`} onClick={() => remove(title)}><Trash2 /></Button></div></div>{!collapsed.has(title) && <div className="rw-section-body"><SectionEntries entries={entries} title={title} replace={(next, key) => change({ ...document, cv: { ...document.cv, sections: { ...document.cv.sections, [title]: next } } }, key)} /></div>}</section>)}
+    <Button variant="link" className="rw-add-section" onClick={add}><Plus />Add section</Button>
+    <Dialog open={Boolean(renaming)} onOpenChange={open => { if (!open) setRenaming(""); }}><DialogContent><DialogHeader><DialogTitle>Rename chapter</DialogTitle><DialogDescription>Keep a unique title. Entries and chapter order are preserved.</DialogDescription></DialogHeader><FormField label="New chapter title"><Input value={name} maxLength={100} onChange={event => setName(event.target.value)} /></FormField>{error && <p role="alert">{error}</p>}<DialogFooter><Button variant="outline" onClick={() => setRenaming("")}>Cancel</Button><Button onClick={() => { try { change(renameSection(document, renaming, name), null); setRenaming(""); } catch (cause) { setError(cause instanceof Error ? cause.message : "Choose another title."); } }}>Rename</Button></DialogFooter></DialogContent></Dialog>
   </div>;
 }

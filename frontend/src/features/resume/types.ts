@@ -1,6 +1,6 @@
 export type ResumeEntry = string | Record<string, unknown>;
 export type ResumeDocument = {
-  cv: Record<string, unknown> & { sections?: Record<string, ResumeEntry[]> };
+  cv: Record<string, unknown> & { sections?: Record<string, ResumeEntry[]> | null };
   design?: Record<string, unknown>;
   locale?: Record<string, unknown>;
   settings?: Record<string, unknown>;

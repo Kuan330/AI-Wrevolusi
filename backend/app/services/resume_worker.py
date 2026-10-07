@@ -38,6 +38,8 @@ def main():
             pdf_path=directory / "resume.pdf", dont_generate_png=True,
             dont_generate_html=True, dont_generate_markdown=True,
         )
+        from app.services.resume_render_safety import install_safe_template_adapters
+        install_safe_template_adapters(model.cv.name, model.settings.bold_keywords)
         # PyPI 2.8 bundles RenderCV but not FontAwesome. Supply its pinned MIT package.
         package_root = directory / "packages"
         rendercv_package = Path(pdf_png.__file__).parent / "rendercv_typst"

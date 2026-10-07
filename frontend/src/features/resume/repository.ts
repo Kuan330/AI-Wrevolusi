@@ -4,7 +4,7 @@ import { emptyDraft, type ResumeDraft, type ResumeSource } from "./types.ts";
 const mapping = (value: unknown): value is Record<string, unknown> => Boolean(value && typeof value === "object" && !Array.isArray(value));
 const strings = (value: unknown): value is string[] => Array.isArray(value) && value.every(item => typeof item === "string");
 const validDocument = (value: unknown) => mapping(value) && mapping(value.cv) &&
-  (value.cv.sections === undefined || (mapping(value.cv.sections) && Object.values(value.cv.sections).every(entries => Array.isArray(entries) && entries.every(entry => typeof entry === "string" || mapping(entry)))));
+  (value.cv.sections == null || (mapping(value.cv.sections) && Object.values(value.cv.sections).every(entries => Array.isArray(entries) && entries.every(entry => typeof entry === "string" || mapping(entry)))));
 const validGap = (value: unknown) => mapping(value) && typeof value.id === "string" && typeof value.label === "string" && strings(value.keywords) && strings(value.skill_slugs);
 const validGeneration = (value: unknown) => mapping(value) && typeof value.jobRequirements === "string" &&
   Array.isArray(value.gaps) && value.gaps.every(validGap) && Array.isArray(value.sections) && value.sections.every(section =>

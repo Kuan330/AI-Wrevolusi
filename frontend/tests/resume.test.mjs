@@ -188,3 +188,9 @@ test("first-use controls hide provider details and preserve expandable privacy/c
   assert.match(page, /Replace your job requirements\?/); assert.match(page, /!draft.document && <div className="rb-example-action"/);
   assert.match(page, /Retry skills/); assert.match(page, /generationAction === "blank"/);
 });
+test("nullable engine section mapping restores without treating a valid saved draft as corruption", () => {
+  const doc = { cv: { sections: null } };
+  assert.equal(parseResumeYaml(documentYaml(doc)).error, "");
+  const record = { ...emptyDraft('a'), revision: 1, document: doc, yamlText: documentYaml(doc) };
+  assert.equal(parseResumeRecord(record, 'a').document.cv.sections, null);
+});

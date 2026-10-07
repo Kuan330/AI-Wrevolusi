@@ -148,6 +148,7 @@ export function AccountProvider(props: { children: ReactNode }) {
           <Button
             {...({
               variant: "link",
+              className: "h-auto max-w-full whitespace-normal text-left",
               onClick: () => {
                 const key = `aiwrevolusi.account.${user.id}`;
                 const copy = localStorage.getItem(key);

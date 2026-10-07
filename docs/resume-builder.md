@@ -4,7 +4,7 @@
 
 The authenticated child route is `/career/possibilities/resume`; `/resume` still opens Continue Journey. Possibilities exposes Generate resume without a selected skill. The existing Add to Skill Path action is a separate button beside the matched-skill disclosure, retaining its previous save/navigation protection.
 
-The editor uses the project's common controls and layout. It supports RenderCV 2.8 form/YAML editing, ordered sections and entries, all nine built-in themes, safe design controls, actual PDF preview with zoom/pagination, PDF/YAML downloads, selective AI chapter replacement and one undo snapshot. The heavy editor is lazy-loaded. There is one current draft per account; changing target requirements warns the user to export and only replaces the target when a proposal is applied.
+The editor recreates the official visitor editor’s compact workbench using this project’s common controls and brand. It uses a top toolbar, continuous left-hand editing and a continuous actual-PDF preview on the right, with CV / Design / Locale / Settings tabs and a YAML switch. The official online frontend is not published; no bundled online code, iframe or official example-person data is used. It supports all nine entry types and built-in themes, nested list controls, safe model-derived Design/Locale/Settings fields, PDF/YAML downloads, selective AI chapter replacement, 50-step in-memory Undo/Redo and the persistent AI undo snapshot. The heavy editor is lazy-loaded. There is one current draft per account; changing target requirements warns the user to export and only replaces the target when a proposal is applied.
 
 The first-use requirements field offers a fixed **Use an example** classroom shortcut (Junior Data Analyst). It only fills editable job requirements, confirms before replacing different text, and never seeds skills or personal facts. With no skills or reviewed evidence, the primary action creates a local empty Skills draft without an AI/course request, even when AI is unavailable. Skill loading must succeed; unreviewed evidence still blocks generation. Existing drafts never use this fallback. The generate API's empty-source rejection is unchanged. Provider/model details are not displayed; essential privacy disclosures remain available in an expandable **Privacy details** section.
 
@@ -52,13 +52,26 @@ The published 2.8 wheel bundles RenderCV's Typst package but not its FontAwesome
 
 PDF.js CMaps, standard fonts and WASM are copied from the committed frontend dependency lock by `scripts/pdfjs-assets.mjs` during predev/prebuild. No CDN resources are used. Do not bypass those hooks when launching Vite manually unless the assets have already been generated.
 
-The shared schema is exported from the **installed pinned version**, not GitHub main:
+The shared schema and `rendercv-2.8.controls.json` control metadata are exported from the **installed pinned version**, not GitHub main:
 
 ```powershell
 backend/.venv/Scripts/python.exe scripts/export_resume_schema.py
 ```
 
+The isolated worker uses context-aware escaping for quoted template data (including PDF title, name and separators). Only the two engine-owned footer page-counter expressions remain executable Typst; user strings still pass the original safety validation and Markdown escaping. This preserves real page numbers rather than printing internal code.
+
 The exporter removes only invalid non-string title/description annotations emitted by 2.8; it does not remove validation constraints. Form/YAML share the same document. Invalid/unknown YAML stays as raw local text, disables destructive form/AI changes, and retains the last valid preview, including reconstruction from the local successful-render snapshot after reopening. Rendering is debounced and abort/version guarded; download uses the same bytes as the current valid preview, never a stale response.
+
+## Editing workbench details
+
+- A resume document activates route-local focus mode: the project sidebar, normal page header and footer are hidden. The toolbar’s workspace-menu button opens the existing navigation drawer. Returning to another route restores the original global sidebar preference without rewriting it. Account/sync alerts remain visible above the workspace; the editor fits the remaining viewport height, and the backup action wraps on narrow screens.
+- The panes start 50/50 with a pointer/keyboard separator (Left/Right; Home resets). The actual workspace width, not device identity, controls the Edit/Preview layout below 900px. Both panes scroll independently; long CVs never make the document body scroll sideways.
+- CV shows personal fields followed by every chapter in document order. Chapters collapse, rename, reorder and confirm before deletion. Entries and Highlights/Authors/Social networks/custom connections have individual list controls. Empty inputs never import fictitious facts.
+- Bold/Italic/safe-link formatting requires a selection in a Markdown-capable CV field. It is disabled in YAML, Design, Locale and Settings. Input grouping uses a 500ms window per field; structural actions have separate history steps. History is account-local memory, capped at 50; reopening starts a fresh memory history while the existing AI undo snapshot still survives.
+- Model metadata supplies each theme/language’s effective defaults. Viewing tabs does not add defaults to YAML. Only edited paths are written, with special handling for prior scalar typography overrides. Explicit overrides and unknown YAML are retained; there are no photo, remote resource, custom template or command/path controls. Locale changes fixed labels/date wording only, not user facts or generated-language rules.
+- RenderCV 2.8 defaults make text-based chapters unbreakable through `entries.allow_page_break`. For an unusually long Skills/Text chapter, explicitly enable Design → Entries → Allow Page Break; this preserves the pinned theme defaults rather than silently rewriting them. The long-document regression uses that real exported control.
+- The PDF preview keeps page placeholders for a continuous document and renders only visible/adjacent canvases with a pixel budget. It supports page jumping, fit width and zoom. Rendering cancels obsolete work and uses the same valid PDF bytes for downloading.
+- Target & AI opens the existing requirement/source-review workflow in a dialog. Courses opens a focus-trapped right-hand drawer only when actual recommendations exist. Resume options holds YAML export, persistent Undo AI changes, privacy details and confirmed local clearing. Existing storage/API formats are unchanged.
 
 ## Verification
 
@@ -83,7 +96,7 @@ npm run dev -- --port 5186
 
 In a third terminal inside frontend, `node tests/resume.browser.mjs`. If Playwright is supplied by a workspace runtime, set `AIW_PLAYWRIGHT_MODULE` to that installed package. The default headless browser channel is Chrome (`AIW_QA_BROWSER_CHANNEL` can change it). API interception uses synthetic accounts, catalogue and AI outputs and blocks external URLs. Only render requests reach the synthetic-auth local renderer. **Never deploy tests.resume_preview_server**. It is outside the installed `app` package.
 
-The browser workflow verifies mandatory target input, retry/restore, identical PDF download/preview bytes, course partial/all selection, YAML error recovery, selective chapter application/undo, PDF/DOCX import, invalid/oversized/textless sources, My Plan handoff without form submission, local source-skill review, desktop/mobile tabs, keyboard tab navigation, actual pagination/zoom, account isolation, logout retention and clearing. `AIW_QA_ENCRYPTED_PDF` optionally supplies a synthetic encrypted file for that negative case. Screenshots/synthetic artifacts are ignored under `.local/resume-qa`.
+The production-build browser workflow additionally verifies focus-mode/menu preference preservation, 50/50 splitter pointer/keyboard controls, no document mutation on tab viewing, Markdown/Undo/Redo, Design/Locale/Settings edits, lazy multi-page preview and desktop/tablet/mobile overflow. It also verifies mandatory target input, retry/restore, identical PDF download/preview bytes, course partial/all selection, YAML error recovery, selective chapter application/undo, PDF/DOCX import, invalid/oversized/textless sources, My Plan handoff without form submission, local source-skill review, desktop/mobile tabs, keyboard tab navigation, actual pagination/zoom, account isolation, logout retention and clearing. `AIW_QA_ENCRYPTED_PDF` optionally supplies a synthetic encrypted file for that negative case. Screenshots/synthetic artifacts are ignored under `.local/resume-qa`.
 
 ## Release gates still requiring hosted verification
 
