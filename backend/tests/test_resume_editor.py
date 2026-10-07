@@ -104,3 +104,116 @@ def test_empty_name_footer_keeps_italic_page_numbers_without_literal_markers(mon
     monkeypatch.setattr(service.subprocess, "run", inspect_worker)
     document = {"cv": {**contact, "sections": {"Skills": [{"bullet": "Own skill"}]}}, "design": {"theme": "classic"}}
     assert service.render_pdf(document).startswith(b"%PDF-")
+
+
+@pytest.mark.parametrize("contacts", [
+    {"email": "", "phone": "", "website": ""},
+    {"email": "  ", "phone": "\t", "website": "\n"},
+    {"email": [""], "phone": ["", " "], "website": ["\t"]},
+    {"email": ["", "first@example.com", "second@example.com", " "], "phone": ["", "+61 412 345 678"], "website": ["", "https://example.com"]},
+    {"email": [], "phone": [], "website": []},
+])
+def test_blank_optional_contacts_in_legacy_drafts_and_list_rows_render_real_pdf(contacts):
+    from app.services.resume_render import normalize_render_contacts
+    document = {"cv": {**contacts, "sections": {"Skills": [{"bullet": "Own skill"}]}}, "design": {"theme": "classic"}}
+    before = copy.deepcopy(document)
+    normalized = normalize_render_contacts(document)
+    assert document == before
+    assert normalize_render_contacts(normalized) == normalized
+    assert render_pdf(document).startswith(b"%PDF-")
+    assert document == before
+
+
+@pytest.mark.parametrize("contacts", [
+    {"email": "not an email", "phone": "0412345678", "website": "www.example.com"},
+    {"email": ["", "Contact me directly", "second address"], "phone": ["Office: 12345", "Local 0400 000 000"], "website": "Personal site coming soon"},
+    {"email": 'Own "quoted" contact', "phone": "12345 ext. 9", "website": "https://example.test/path/"},
+])
+def test_free_text_contacts_render_exact_literals_without_format_restrictions(monkeypatch, contacts):
+    import app.services.resume_render as service
+    from app.services.resume_render_safety import typst_string
+    original_run = service.subprocess.run
+
+    def inspect_worker(command, **kwargs):
+        process = original_run(command, **kwargs)
+        assert process.returncode == 0
+        text = (Path(command[-1]) / "resume.typ").read_text(encoding="utf-8")
+        for value in contacts.values():
+            for item in value if isinstance(value, list) else [value]:
+                if item:
+                    assert '#text("' + typst_string(item) + '")' in text
+        return process
+
+    monkeypatch.setattr(service.subprocess, "run", inspect_worker)
+    document = {"cv": {**contacts, "sections": {"Skills": []}}}
+    before = copy.deepcopy(document)
+    assert service.render_pdf(document).startswith(b"%PDF-")
+    assert document == before
+
+
+@pytest.mark.parametrize("literal", [
+    '#read("private.txt")',
+    '") #read("private.txt") #text("',
+    "$$read(private)$$",
+    "[label](file:///private)",
+    "![photo](https://example.test/photo.png)",
+    "**Keep stars** _and underscores_ `and backticks`",
+    "javascript:alert(1)",
+])
+def test_contact_code_markup_and_schemes_are_inert_text_not_commands_or_links(monkeypatch, literal):
+    import app.services.resume_render as service
+    from app.services.resume_render_safety import typst_string
+    original_run = service.subprocess.run
+
+    def inspect_worker(command, **kwargs):
+        process = original_run(command, **kwargs)
+        assert process.returncode == 0
+        text = (Path(command[-1]) / "resume.typ").read_text(encoding="utf-8")
+        assert '#text("' + typst_string(literal) + '")' in text
+        assert '#link("file:' not in text
+        assert '#link("javascript:' not in text
+        return process
+
+    monkeypatch.setattr(service.subprocess, "run", inspect_worker)
+    assert service.render_pdf({"cv": {"email": literal, "phone": literal, "website": literal, "sections": {"Skills": []}}}).startswith(b"%PDF-")
+    # The exemption is narrowly scoped to literal contacts. Editable Markdown
+    # chapters still reject executable/resource syntax.
+    if literal.startswith(("#read", "$$", "[label]", "![photo]")):
+        with pytest.raises(service.InvalidResume):
+            service.validate_render_document({"cv": {"sections": {"Skills": [{"bullet": literal}]}}})
+
+
+@pytest.mark.parametrize("value", [123, {"unexpected": "object"}, [None], ["Text", 123]])
+def test_free_text_contacts_still_require_a_renderable_text_shape(value):
+    from app.services.resume_render import InvalidResume
+    with pytest.raises(InvalidResume, match="must be text or a list of text values"):
+        render_pdf({"cv": {"email": value}})
+
+
+def test_free_text_header_contacts_keep_original_order_with_social_and_custom_connections(monkeypatch):
+    import app.services.resume_render as service
+    original_run = service.subprocess.run
+
+    def inspect_worker(command, **kwargs):
+        process = original_run(command, **kwargs)
+        assert process.returncode == 0
+        text = (Path(command[-1]) / "resume.typ").read_text(encoding="utf-8")
+        markers = ['#text("Own site label")', 'github.com/own-user', '#text("Own phone label")', 'Own custom label', '#text("Own email label")']
+        indices = [text.index(marker) for marker in markers]
+        assert indices == sorted(indices)
+        return process
+
+    monkeypatch.setattr(service.subprocess, "run", inspect_worker)
+    document = {"cv": {"website": "Own site label", "social_networks": [{"network": "GitHub", "username": "own-user"}], "phone": "Own phone label", "custom_connections": [{"fontawesome_icon": "link", "placeholder": "Own custom label", "url": None}], "email": "Own email label", "sections": {"Skills": []}}}
+    assert service.render_pdf(document).startswith(b"%PDF-")
+
+
+def test_contact_normalization_preserves_other_fields_and_invalid_array_types():
+    from app.services.resume_render import normalize_render_contacts
+    document = {"cv": {"name": "", "email": ["", None, 7], "unknown_fact": "Keep this fact"}, "settings": {"pdf_title": ""}}
+    normalized = normalize_render_contacts(document)
+    assert normalized["cv"]["email"] == [None, 7]
+    assert normalized["cv"]["unknown_fact"] == "Keep this fact"
+    assert normalized["cv"]["name"] == ""
+    assert normalized["settings"] == document["settings"]
+    assert "phone" not in normalized["cv"] and "website" not in normalized["cv"]

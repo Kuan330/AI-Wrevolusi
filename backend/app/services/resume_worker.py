@@ -32,6 +32,11 @@ def main():
     directory = Path(sys.argv[1]).resolve()
     try:
         document = validate_render_document(json.loads(sys.stdin.buffer.read().decode("utf-8")))
+        # Keep the user's exact contact text outside typed email/phone/URL
+        # validators. It is injected only as inert header text in this worker.
+        contact_order = list(document["cv"])
+        contacts = {key: value for key, value in document["cv"].items() if key in ("email", "phone", "website")}
+        document = {**document, "cv": {key: value for key, value in document["cv"].items() if key not in contacts}}
         _, model = build_rendercv_dictionary_and_model(
             json.dumps(document, ensure_ascii=False), input_file_path=directory / "input.yaml",
             output_folder=directory, typst_path=directory / "resume.typ",
@@ -39,7 +44,7 @@ def main():
             dont_generate_html=True, dont_generate_markdown=True,
         )
         from app.services.resume_render_safety import install_safe_template_adapters
-        install_safe_template_adapters(model.cv.name, model.settings.bold_keywords)
+        install_safe_template_adapters(model.cv.name, model.settings.bold_keywords, contacts=contacts, contact_order=contact_order)
         # PyPI 2.8 bundles RenderCV but not FontAwesome. Supply its pinned MIT package.
         package_root = directory / "packages"
         rendercv_package = Path(pdf_png.__file__).parent / "rendercv_typst"

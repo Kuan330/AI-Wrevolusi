@@ -38,7 +38,7 @@ export function controlFields(document: ResumeDocument, section: "design" | "loc
   const values = effectiveMerge(defaults, document[section]) as Mapping, fields: ControlField[] = [];
   const visit = (base: Mapping, effective: Mapping, node: SchemaNode, path: string[]) => {
     for (const [key, fallback] of Object.entries(base)) {
-      if (key === "theme" || key === "language" || key.startsWith("photo") || ["templates", "render_command"].includes(key)) continue;
+      if (key === "theme" || key === "language" || key.startsWith("photo") || ["templates", "render_command"].includes(key) || (path.join(".") === "header.connections" && key === "phone_number_format")) continue;
       const property = resolveSchema(node).properties?.[key] ?? {};
       const next = [...path, key];
       if (isMapping(fallback)) visit(fallback, effective[key] as Mapping, property, next);

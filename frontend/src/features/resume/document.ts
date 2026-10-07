@@ -13,6 +13,11 @@ export function parseResumeYaml(text: string): { document: ResumeDocument | null
     if (parsed.errors.length) throw new Error(parsed.errors[0].message);
     const value = parsed.toJS({ maxAliasCount: 20 }) as ResumeDocument;
     if (!value || typeof value !== "object" || !value.cv || typeof value.cv !== "object" || Array.isArray(value.cv)) throw new Error("The document needs a cv mapping.");
+    // Contact contents are free text; reject only incompatible YAML shapes.
+    for (const key of ["email", "phone", "website"]) {
+      const contact = value.cv[key];
+      if (contact != null && typeof contact !== "string" && !(Array.isArray(contact) && contact.every(item => typeof item === "string"))) throw new Error(`cv/${key} must be text or a list of text values.`);
+    }
     // Match the Python builder's implicit classic theme without altering YAML.
     const validationValue = value.design && typeof value.design === "object" && !Array.isArray(value.design) && value.design.theme === undefined
       ? { ...value, design: { ...value.design, theme: "classic" } } : value;
@@ -25,13 +30,13 @@ export function parseResumeYaml(text: string): { document: ResumeDocument | null
     if (value.settings && Object.keys(value.settings).some(key => !["current_date", "bold_keywords", "pdf_title"].includes(key))) throw new Error("Output paths and render commands are controlled by the server.");
     // Prevent prototype keys, recursive structures, and resource/code injection before rendering.
     let nodes = 0;
-    const inspect = (item: unknown, depth = 0) => {
+    const inspect = (item: unknown, depth = 0, literal = false) => {
       if (++nodes > 10000 || depth > 18) throw new Error("The document is too complex.");
-      if (typeof item === "string" && ((/#[A-Za-z_]/.test(item.replace(/https?:\/\/[^\s"<>]+/g, "")) && !/^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?(?:[0-9a-fA-F]{2})?$/.test(item)) || item.includes("$$"))) throw new Error("Raw Typst code is not supported.");
-      if (typeof item === "string" && (/\]\(\s*(?!https?:\/\/|mailto:|tel:)[^\s)]/i.test(item) || item.includes("!["))) throw new Error("Local file links and embedded resources are not supported.");
+      if (!literal && typeof item === "string" && ((/#[A-Za-z_]/.test(item.replace(/https?:\/\/[^\s"<>]+/g, "")) && !/^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?(?:[0-9a-fA-F]{2})?$/.test(item)) || item.includes("$$"))) throw new Error("Raw Typst code is not supported.");
+      if (!literal && typeof item === "string" && (/\]\(\s*(?!https?:\/\/|mailto:|tel:)[^\s)]/i.test(item) || item.includes("!["))) throw new Error("Local file links and embedded resources are not supported.");
       if (item && typeof item === "object") for (const [key, child] of Object.entries(item)) {
         if (["__proto__", "prototype", "constructor"].includes(key)) throw new Error("Invalid YAML field.");
-        inspect(child, depth + 1);
+        inspect(child, depth + 1, literal || (item === value.cv && ["email", "phone", "website"].includes(key)));
       }
     };
     inspect(value);
@@ -39,6 +44,22 @@ export function parseResumeYaml(text: string): { document: ResumeDocument | null
   } catch (cause) { return { document: null, error: cause instanceof Error ? cause.message : "Invalid YAML." }; }
 }
 export const documentYaml = (document: ResumeDocument) => stringify(document, { lineWidth: 0 });
+/** Empty optional contact inputs are editing placeholders, not invalid facts.
+ * Normalise only the render copy; preserve raw YAML, list slots and undo history.
+ * Non-empty text is never reformatted or replaced; structure checks stay separate.
+ */
+export function resumeRenderDocument(document: ResumeDocument): ResumeDocument {
+  const cv = { ...document.cv };
+  for (const key of ["email", "phone", "website"]) {
+    const value = cv[key];
+    if (typeof value === "string" && !value.trim()) cv[key] = null;
+    else if (Array.isArray(value)) {
+      const contacts = value.filter(item => !(typeof item === "string" && !item.trim()));
+      cv[key] = contacts.length ? contacts : null;
+    }
+  }
+  return { ...document, cv };
+}
 export function applySections(document: ResumeDocument | null, sections: GeneratedSection[], contacts?: Contacts): ResumeDocument {
   const next = structuredClone(document ?? { cv: {}, design: { theme: "engineeringresumes" } });
   next.cv.sections = { ...next.cv.sections };

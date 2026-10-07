@@ -13,10 +13,22 @@ export const SIDEBAR_GROUPS = [
     { label: "My learning plan", path: ROUTES.learningGoals, icon: "plan", exact: false },
     { label: "Learning records", path: ROUTES.progress, icon: "history", exact: false },
   ] },
-  { key: "career", label: "Career", collapsible: false, icon: "career", items: [
-    { label: "Possibilities", path: ROUTES.possibilities, icon: "career", exact: false },
+  { key: "career", label: "Possibilities", collapsible: true, icon: "career", items: [
+    { label: "Explore possibilities", path: ROUTES.possibilities, icon: "career", exact: true },
+    { label: "Resume builder", path: ROUTES.resumeBuilder, icon: "resume", exact: true },
   ] },
 ] as const;
+
+export const COLLAPSIBLE_MENU_KEYS: readonly string[] = SIDEBAR_GROUPS.filter(group => group.collapsible).map(group => group.key);
+
+export function filterSidebarGroups(query: string) {
+  const term = query.trim().toLowerCase();
+  return SIDEBAR_GROUPS.map(group => ({ ...group, items: group.items.filter(item => group.label.toLowerCase().includes(term) || item.label.toLowerCase().includes(term)) }));
+}
+
+export function isNavigationItemActive(path: string, item: { path: string; exact: boolean }): boolean {
+  return path === item.path || (!item.exact && path.startsWith(`${item.path}/`));
+}
 
 export function navigationPath(pathname: string): string {
   if (pathname === ROUTES.learningCentre) return ROUTES.learningGoals;
@@ -24,6 +36,7 @@ export function navigationPath(pathname: string): string {
 }
 export function pageLabel(pathname: string): string {
   if (pathname === ROUTES.resumeBuilder) return "Resume builder";
+  if (pathname === ROUTES.possibilities) return "Possibilities";
   if (pathname === ROUTES.learningCentre) return "Learning resources";
   if (pathname === ROUTES.plan) return "My courses";
   if (pathname === ROUTES.progressReviews) return "Progress reviews";

@@ -21,7 +21,7 @@ import type { Course } from "@/features/learning-planning/types";
 import { resumeService, type ResumeCapabilities } from "@/features/resume/service";
 import { useResumeDraft } from "@/features/resume/useResumeDraft";
 import { mergeResumeSkills, resumeSkillSnapshot } from "@/features/resume/skills";
-import { applySections, documentYaml, entryText, parseResumeYaml } from "@/features/resume/document";
+import { applySections, documentYaml, entryText, parseResumeYaml, resumeRenderDocument } from "@/features/resume/document";
 import { EXAMPLE_JOB_REQUIREMENTS, emptyResumeDocument, resumeGenerationAction } from "@/features/resume/onboarding";
 import { importResume, RESUME_ACCEPT } from "@/features/resume/importResume";
 import { evidenceFromText, redactResume } from "@/features/resume/redaction";
@@ -66,7 +66,7 @@ function ResumeWorkspace({ owner }: { owner: string }) {
   const unappliedYaml = Boolean(draft.document && yaml.error && draft.yamlText !== documentYaml(draft.document));
   const previewDocument = useMemo(() => {
     const candidate = yaml.document ?? draft.previewDocument ?? draft.document;
-    return candidate ? parseResumeYaml(documentYaml(candidate)).document : null;
+    return candidate ? parseResumeYaml(documentYaml(resumeRenderDocument(candidate))).document : null;
   }, [yaml.document, draft.previewDocument, draft.document]);
   const fingerprint = previewDocument ? JSON.stringify(previewDocument) : "";
   const freshPdf = Boolean(pdf && pdfKey === fingerprint && !yaml.error);

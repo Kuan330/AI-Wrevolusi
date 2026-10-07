@@ -2,7 +2,7 @@
 
 ## Scope and entry points
 
-The authenticated child route is `/career/possibilities/resume`; `/resume` still opens Continue Journey. Possibilities exposes Generate resume without a selected skill. The existing Add to Skill Path action is a separate button beside the matched-skill disclosure, retaining its previous save/navigation protection.
+The authenticated child route is `/career/possibilities/resume`; `/resume` still opens Continue Journey. The workspace sidebar presents **Possibilities** as a collapsible parent, matching Learning & growth, with **Explore possibilities** and **Resume builder** children. Search, collapsed-menu expansion, mobile drawers and the focused editor menu use the same hierarchy; only the current child receives the active-page marker. Possibilities exposes Generate resume without a selected skill. The existing Add to Skill Path action is a separate button beside the matched-skill disclosure, retaining its previous save/navigation protection.
 
 The editor recreates the official visitor editor’s compact workbench using this project’s common controls and brand. It uses a top toolbar, continuous left-hand editing and a continuous actual-PDF preview on the right, with CV / Design / Locale / Settings tabs and a YAML switch. The official online frontend is not published; no bundled online code, iframe or official example-person data is used. It supports all nine entry types and built-in themes, nested list controls, safe model-derived Design/Locale/Settings fields, PDF/YAML downloads, selective AI chapter replacement, 50-step in-memory Undo/Redo and the persistent AI undo snapshot. The heavy editor is lazy-loaded. There is one current draft per account; changing target requirements warns the user to export and only replaces the target when a proposal is applied.
 
@@ -72,6 +72,10 @@ The exporter removes only invalid non-string title/description annotations emitt
 - RenderCV 2.8 defaults make text-based chapters unbreakable through `entries.allow_page_break`. For an unusually long Skills/Text chapter, explicitly enable Design → Entries → Allow Page Break; this preserves the pinned theme defaults rather than silently rewriting them. The long-document regression uses that real exported control.
 - The PDF preview keeps page placeholders for a continuous document and renders only visible/adjacent canvases with a pixel budget. It supports page jumping, fit width and zoom. Rendering cancels obsolete work and uses the same valid PDF bytes for downloading.
 - Target & AI opens the existing requirement/source-review workflow in a dialog. Courses opens a focus-trapped right-hand drawer only when actual recommendations exist. Resume options holds YAML export, persistent Undo AI changes, privacy details and confirmed local clearing. Existing storage/API formats are unchanged.
+
+### Free-text contact fields
+
+Email, phone and website are optional free-text fields, not format-gated inputs. The editor and original YAML retain exactly what was entered, including local phone numbers and website labels without protocols. Blank scalar values and list rows are omitted from the render-only copy. The isolated worker keeps these values outside RenderCV's typed contact validators and renders them as escaped Typst string literals, preserving header order, existing social/custom connections and list order. Contact strings are not parsed as Markdown/code or turned into automatic hyperlinks; other content retains the existing safe-link/code restrictions. No country code, URL prefix or substitute contact is invented. The phone-number-format design control is hidden because literal phone text is no longer automatically reformatted. Only basic text/list structure and size limits apply, with no additional saved fields or API changes.
 
 ## Verification
 

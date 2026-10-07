@@ -15,7 +15,7 @@ const browser = await chromium.launch({ headless: true, channel: process.env.AIW
 const context = await browser.newContext({ viewport: { width: 1536, height: 1000 }, acceptDownloads: true });
 const page = await context.newPage(); page.setDefaultTimeout(15000);
 const errors = [], sync = []; page.on('pageerror', e => errors.push(e.message));
-let owner = 'qa-account-empty', signedIn = true, count = 0, courseRequests = 0, aiConfigured = false, fail = false, lastPdf, latestInput;
+let owner = 'qa-account-empty', signedIn = true, count = 0, courseRequests = 0, aiConfigured = false, fail = false, lastPdf, latestInput, lastRenderInput;
 let releaseSkillLoad, generateGate = null;
 let skillGate = new Promise(resolve => { releaseSkillLoad = resolve; });
 const base = { 'aiwrevolusi.learningSkills.v1': JSON.stringify([{ id: 'analytical-thinking', name: 'Analytical thinking' }, { id: 'sql', name: 'SQL' }]) };
@@ -45,12 +45,12 @@ await context.route('**/*', async route => {
   }
   if (path === '/resume/recommend-courses') { courseRequests++; return json(route, { courses: ['security-1', 'security-2'].map(course_id => ({ course_id, gap_ids: ['security'], reason: 'Addresses the specified cybersecurity gap.' })) }); }
   if (path === '/learning/courses') return json(route, { found: true, courses: ['security-1', 'security-2'].map((course_id, i) => ({ course_id, skill_id: 'networks-and-cybersecurity', title: `Security course ${i + 1}`, provider: 'Synthetic catalogue', level: 'Beginner', chapters: [{ order: 1, title: 'Security foundations', duration_min: 30 }], chapter_count: 1 })) });
-  if (path === '/resume/render') { const response = await route.fetch({ url: `${renderer}/api/v1/resume/render` }); if (response.status() === 200) lastPdf = await response.body(); return route.fulfill({ response }); }
+  if (path === '/resume/render') { lastRenderInput = req.postDataJSON().document; const response = await route.fetch({ url: `${renderer}/api/v1/resume/render` }); if (response.status() === 200) lastPdf = await response.body(); return route.fulfill({ response }); }
   return json(route, { detail: 'Deliberately unavailable in offline QA' }, 503);
 });
 const ready = () => page.waitForFunction(() => document.querySelector('.rw-workbench') || document.querySelector('.rb-job-card'));
 const saved = () => page.getByText('Saved on this device', { exact: true }).waitFor();
-const pdfReady = async () => { await page.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent.trim() === 'PDF' && !b.disabled)); if (await page.locator('.rw-preview-pane').isVisible()) await page.locator('.rw-pdf-page canvas').first().waitFor({ state: 'attached' }); };
+const pdfReady = async () => { await page.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent.trim() === 'PDF' && !b.disabled)); if (await page.locator('.rw-preview-pane').isVisible()) await page.locator('.rw-pdf-page canvas[data-render-state=ready]').first().waitFor({ state: 'attached' }); };
 const exportFile = async name => {
   let menu = false;
   if (name === 'YAML' && !await page.getByRole('button', { name: 'Download YAML', exact: true }).isVisible()) { await page.getByRole('button', { name: 'Resume options' }).click(); menu = true; }
@@ -62,6 +62,23 @@ const exportFile = async name => {
 };
 try {
   await page.goto(`${origin}/career/possibilities/resume`); await ready();
+  const desktopMenu = page.locator('aside.workspace-sidebar');
+  const possibilitiesMenu = desktopMenu.getByRole('button', { name: 'Possibilities', exact: true });
+  const resumeMenuLink = desktopMenu.getByRole('link', { name: 'Resume builder', exact: true });
+  const explorationMenuLink = desktopMenu.getByRole('link', { name: 'Explore possibilities', exact: true });
+  assert.equal(await possibilitiesMenu.getAttribute('aria-expanded'), 'true');
+  assert.equal(await resumeMenuLink.getAttribute('aria-current'), 'page');
+  assert.equal(await explorationMenuLink.getAttribute('aria-current'), null);
+  const menuSearch = desktopMenu.getByRole('textbox', { name: 'Search menu' });
+  await menuSearch.fill('resume'); await resumeMenuLink.waitFor({ state: 'visible' });
+  assert.equal(await explorationMenuLink.count(), 0); await menuSearch.fill('');
+  await possibilitiesMenu.focus(); await page.keyboard.press('Enter');
+  await desktopMenu.locator(`a[href="/career/possibilities/resume"]`).waitFor({ state: 'hidden' });
+  await page.keyboard.press('Enter'); await resumeMenuLink.waitFor({ state: 'visible' });
+  await desktopMenu.getByRole('button', { name: 'Collapse menu', exact: true }).click();
+  await desktopMenu.getByRole('button', { name: 'Expand Possibilities menu', exact: true }).click();
+  await resumeMenuLink.waitFor({ state: 'visible' });
+  await page.screenshot({ path: `${output}/possibilities-menu-desktop.png`, fullPage: true });
   const job = page.getByLabel(/Target job requirements · required/);
   assert.equal(await page.getByRole('button', { name: 'Generate my resume' }).isDisabled(), true);
   // First-use shortcut: keyboard activation, replacement consent and local persistence.
@@ -71,6 +88,14 @@ try {
   assert.equal(count, 0); assert.equal(courseRequests, 0);
   assert.equal(await page.getByRole('button', { name: 'Generate my resume' }).isDisabled(), true, 'Pending skill loading is not zero skills');
   releaseSkillLoad(); skillGate = null;
+  await saved(); await explorationMenuLink.click(); await page.waitForURL(`${origin}/career/possibilities`);
+  await desktopMenu.locator('a[href="/career/possibilities"][aria-current="page"]').waitFor({ state: 'visible' });
+  assert.equal(await explorationMenuLink.getAttribute('aria-current'), 'page');
+  assert.equal(await resumeMenuLink.getAttribute('aria-current'), null);
+  await resumeMenuLink.click(); await page.waitForURL(`${origin}/career/possibilities/resume`); await ready();
+  await desktopMenu.locator('a[href="/career/possibilities/resume"][aria-current="page"]').waitFor({ state: 'visible' });
+  assert.equal(await job.inputValue(), EXAMPLE_JOB_REQUIREMENTS);
+  assert.equal(await resumeMenuLink.getAttribute('aria-current'), 'page');
   await job.fill('My own requirements'); await example.click();
   const replacement = page.getByRole('dialog', { name: 'Replace your job requirements?' }); await replacement.waitFor();
   await replacement.getByRole('button', { name: 'Cancel', exact: true }).click(); assert.equal(await job.inputValue(), 'My own requirements');
@@ -85,6 +110,19 @@ try {
   await page.getByText(/zero retention is not guaranteed/).waitFor({ state: 'hidden' });
   await page.screenshot({ path: `${output}/first-use-desktop.png`, fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'Open menu', exact: true }).click();
+  const mobileMenu = page.getByRole('dialog', { name: 'Workspace menu', exact: true });
+  assert.equal(await mobileMenu.getByRole('button', { name: 'Possibilities', exact: true }).getAttribute('aria-expanded'), 'true');
+  assert.equal(await mobileMenu.getByRole('link', { name: 'Resume builder', exact: true }).getAttribute('aria-current'), 'page');
+  await mobileMenu.getByRole('textbox', { name: 'Search menu' }).fill('resume');
+  await mobileMenu.getByRole('link', { name: 'Resume builder', exact: true }).waitFor({ state: 'visible' });
+  await mobileMenu.getByRole('textbox', { name: 'Search menu' }).fill('');
+  const mobileResumeLink = mobileMenu.getByRole('link', { name: 'Resume builder', exact: true });
+  await mobileResumeLink.scrollIntoViewIfNeeded();
+  const mobileNavBox = await mobileMenu.locator('.workspace-navigation').boundingBox(), mobileResumeBox = await mobileResumeLink.boundingBox();
+  assert.ok(mobileResumeBox.y >= mobileNavBox.y - 1 && mobileResumeBox.y + mobileResumeBox.height <= mobileNavBox.y + mobileNavBox.height + 1, 'Resume child is reachable in the scrolling mobile menu');
+  await page.screenshot({ path: `${output}/possibilities-menu-mobile.png`, fullPage: true, animations: 'disabled' });
+  await page.keyboard.press('Escape');
   const textareaBox = await job.boundingBox(), exampleBox = await example.boundingBox();
   assert.ok(exampleBox.x + exampleBox.width <= textareaBox.x + textareaBox.width + 2);
   assert.ok(exampleBox.x > textareaBox.x + textareaBox.width / 2);
@@ -99,6 +137,47 @@ try {
   const emptyYaml = (await exportFile('YAML')).toString(); assert.match(emptyYaml, /Skills: \[\]/); assert.doesNotMatch(emptyYaml, /name:|Experience:|Education:/);
   assert.ok((await exportFile('PDF')).equals(lastPdf)); assert.equal(await example.count(), 0);
   await page.getByText('No skills yet. Add your skills to this draft.', { exact: true }).waitFor();
+  // Restore legacy blank strings without rewriting raw YAML or requiring contacts.
+  await page.getByRole('button', { name: 'YAML', exact: true }).click();
+  const contactYaml = page.locator('.cm-content');
+  await contactYaml.fill(JSON.stringify({ cv: { email: '', phone: '', website: '', sections: { Skills: [] } }, design: { theme: 'classic' } }));
+  await saved(); await pdfReady();
+  assert.deepEqual([lastRenderInput.cv.email, lastRenderInput.cv.phone, lastRenderInput.cv.website], [null, null, null]);
+  const legacyContacts = (await exportFile('YAML')).toString();
+  const restoredContacts = JSON.parse(legacyContacts).cv;
+  assert.deepEqual([restoredContacts.email, restoredContacts.phone, restoredContacts.website], ["", "", ""]);
+  await page.reload(); await ready(); await pdfReady(); assert.equal((await exportFile('YAML')).toString(), legacyContacts);
+  if (await contactYaml.isVisible()) await page.getByRole('button', { name: 'YAML', exact: true }).click();
+  for (const field of ['email', 'phone', 'website']) await page.getByRole('button', { name: `Add another ${field}`, exact: true }).click();
+  await saved(); await pdfReady();
+  const emailField = page.getByLabel('Email · Personal email item 1', { exact: true });
+  const phoneField = page.getByLabel('Phone · Personal phone item 1', { exact: true });
+  const websiteField = page.getByLabel('Website · Personal website item 1', { exact: true });
+  await emailField.fill('first@example.com'); await phoneField.fill('+61 412 345 678'); await websiteField.fill('https://example.test');
+  await saved(); await pdfReady();
+  assert.deepEqual(lastRenderInput.cv.email, ['first@example.com']);
+  assert.deepEqual(lastRenderInput.cv.phone, ['+61 412 345 678']);
+  assert.deepEqual(lastRenderInput.cv.website, ['https://example.test']);
+  const pdfBeforeEmptyRow = await exportFile('PDF');
+  await page.getByRole('button', { name: 'Add Email item · Personal email', exact: true }).click(); await saved(); await pdfReady();
+  assert.ok((await exportFile('PDF')).equals(pdfBeforeEmptyRow), 'An empty contact row leaves the valid preview/download unchanged');
+  assert.match((await exportFile('YAML')).toString(), /email:\n\s+- first@example.com\n\s+- ""/);
+  await emailField.fill('My email contact'); await phoneField.fill('0412345678 ext. 9'); await websiteField.fill('www.example.com/profile');
+  await saved(); await pdfReady();
+  assert.deepEqual(lastRenderInput.cv.email, ['My email contact']);
+  assert.deepEqual(lastRenderInput.cv.phone, ['0412345678 ext. 9']);
+  assert.deepEqual(lastRenderInput.cv.website, ['www.example.com/profile']);
+  assert.doesNotMatch(await page.locator('body').textContent(), /Email must|Phone must|Website must|Check RenderCV values at/);
+  await page.screenshot({ path: `${output}/free-text-contacts.png`, fullPage: true });
+  await page.reload(); await ready(); await pdfReady();
+  if (await contactYaml.isVisible()) await page.getByRole('button', { name: 'YAML', exact: true }).click();
+  assert.equal(await phoneField.inputValue(), '0412345678 ext. 9');
+  await websiteField.fill('#read("private.txt")'); await saved(); await pdfReady();
+  assert.deepEqual(lastRenderInput.cv.website, ['#read("private.txt")'], 'Contact syntax is rendered as inert text');
+  await websiteField.fill('www.example.com/profile'); await saved(); await pdfReady();
+  await phoneField.fill(''); await saved(); await pdfReady();
+  assert.equal(lastRenderInput.cv.phone, null, 'Clearing the optional field recovers PDF rendering');
+  assert.equal(count, 0); assert.equal(courseRequests, 0);
   await page.getByRole('button', { name: 'Add entry · Skills', exact: true }).click(); await page.getByLabel(/^Bullet/).fill('User-entered analytical thinking');
   await saved(); await page.reload(); await ready(); await pdfReady(); assert.match((await exportFile('YAML')).toString(), /User-entered analytical thinking/);
   await page.getByRole('button', { name: 'Target & AI' }).click();
@@ -130,7 +209,7 @@ try {
   assert.ok(await page.locator('.workspace-editor-focus').count(), 'Editor uses isolated focus mode');
   const navPreference = await page.evaluate(() => localStorage.getItem('aiwrevolusi.sidebar.collapsed'));
   await page.getByRole('button', { name: 'Open workspace menu' }).click();
-  await page.getByRole('dialog').waitFor(); await page.keyboard.press('Escape');
+  await page.getByRole('dialog').waitFor(); assert.equal(await page.getByRole('dialog').getByRole('link', { name: 'Resume builder', exact: true }).getAttribute('aria-current'), 'page'); await page.keyboard.press('Escape');
   assert.equal(await page.evaluate(() => localStorage.getItem('aiwrevolusi.sidebar.collapsed')), navPreference);
   const separator = page.getByRole('separator', { name: 'Resize editor and preview' });
   assert.equal(await separator.getAttribute('aria-valuenow'), '50'); await separator.focus(); await page.keyboard.press('ArrowLeft'); assert.equal(await separator.getAttribute('aria-valuenow'), '48'); await page.keyboard.press('Home');
@@ -155,7 +234,7 @@ try {
   await editor.fill('cv: {}\nunknown: preserve-this-value'); await saved();
   assert.match((await exportFile('YAML')).toString(), /preserve-this-value/); assert.equal(await page.getByRole('button', { name: 'PDF', exact: true }).isDisabled(), true);
   assert.equal(await page.getByRole('img', { name: /Resume PDF/ }).count(), 1);
-  await page.reload(); await ready(); if (await page.locator('.rw-preview-pane').isVisible()) await page.locator('.rw-pdf-page canvas').first().waitFor({ state: 'attached' });
+  await page.reload(); await ready(); if (await page.locator('.rw-preview-pane').isVisible()) await page.locator('.rw-pdf-page canvas[data-render-state=ready]').first().waitFor({ state: 'attached' });
   assert.equal(await page.getByRole('button', { name: 'PDF', exact: true }).isDisabled(), true);
   assert.match((await exportFile('YAML')).toString(), /preserve-this-value/);
   assert.equal(await page.getByRole('button', { name: 'Add section', exact: true }).isDisabled(), true);
@@ -248,5 +327,5 @@ try {
   await page.getByRole('button', { name: 'Generate my resume' }).click(); await pdfReady();
   assert.ok(latestInput.skills.some(skill => skill.name === 'Python')); assert.doesNotMatch(JSON.stringify(latestInput), /Alex Example|alex@example.com|412 345/);
   assert.ok(sync.every(payload => !JSON.stringify(payload).includes('QA TARGET PRIVATE') && !Object.keys(payload.data).some(key => key.includes('resume')))); assert.deepEqual(errors, []);
-  console.log('PASS: focused workbench/menu restoration, split pointer/keyboard, four tabs/explicit controls, selection formatting/safe links, undo/redo, all nine entry types and nested lists, rename/reorder/delete, tablet/phone overflow, lazy continuous PDF; example fill/replace/cancel/restore, local zero-skill draft without AI/courses, skill-error protection, collapsed privacy, first-use/retry/recovery, same PDF export, course partial/all, YAML recovery, section apply/undo, PDF import, desktop/mobile/keyboard, pagination/zoom, account isolation/logout/clear, no resume sync, invalid/encrypted/textless sources, DOCX/My Plan handoff and original-skill review.');
+  console.log('PASS: Possibilities child menu on desktop/mobile/focus mode, search, keyboard and correct child highlights; blank/legacy/list and free-text contacts with literal rendering and recovery; focused workbench/menu restoration, split pointer/keyboard, four tabs/explicit controls, selection formatting/safe links, undo/redo, all nine entry types and nested lists, rename/reorder/delete, tablet/phone overflow, lazy continuous PDF; example fill/replace/cancel/restore, local zero-skill draft without AI/courses, skill-error protection, collapsed privacy, first-use/retry/recovery, same PDF export, course partial/all, YAML recovery, section apply/undo, PDF import, desktop/mobile/keyboard, pagination/zoom, account isolation/logout/clear, no resume sync, invalid/encrypted/textless sources, DOCX/My Plan handoff and original-skill review.');
 } catch (error) { console.error(errors, await page.evaluate(() => ({ width: innerWidth, body: document.body.scrollWidth, root: document.documentElement.scrollWidth, overflow: [...document.querySelectorAll('body *')].map(el => ({ tag: el.tagName, cls: typeof el.className === 'string' ? el.className : '', text: (el.textContent || '').slice(0, 45), left: el.getBoundingClientRect().left, right: el.getBoundingClientRect().right })).filter(el => el.right > innerWidth + 1 && el.left >= 0).slice(0, 30) })), await page.locator("body").innerText()); await page.screenshot({ path: `${output}/failure.png`, fullPage: true }); throw error; } finally { await context.close(); await browser.close(); }

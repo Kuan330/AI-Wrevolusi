@@ -12,6 +12,8 @@ function PdfPage({ pdf, page, scale, width, height, active }: { pdf: PDFDocument
   useEffect(() => {
     const target = canvas.current;
     if (!active || !target) return;
+    target.dataset.renderState = "loading";
+    target.setAttribute("aria-busy", "true");
     let live = true, cancel: (() => void) | undefined;
     pending.current = pending.current.catch(() => undefined).then(() => pdf.getPage(page)).then(item => {
       if (!live) return;
@@ -21,9 +23,9 @@ function PdfPage({ pdf, page, scale, width, height, active }: { pdf: PDFDocument
       target.width = Math.ceil(viewport.width * density); target.height = Math.ceil(viewport.height * density);
       target.style.width = `${viewport.width}px`; target.style.height = `${viewport.height}px`;
       const task = item.render({ canvas: target, canvasContext: context, viewport, transform: [density, 0, 0, density, 0, 0] });
-      cancel = () => task.cancel(); return task.promise.then(() => { if (live) setError(""); });
+      cancel = () => task.cancel(); return task.promise.then(() => { if (live) { target.dataset.renderState = "ready"; target.setAttribute("aria-busy", "false"); setError(""); } });
     }).catch(cause => { if (live && cause.name !== "RenderingCancelledException") setError("This PDF page could not be displayed."); });
-    return () => { live = false; cancel?.(); target.width = 0; target.height = 0; };
+    return () => { live = false; cancel?.(); delete target.dataset.renderState; target.width = 0; target.height = 0; };
   }, [pdf, page, scale, active]);
   return <div className="rw-pdf-page" data-pdf-page={page} style={{ width, height }}>{error ? <p role="alert">{error}</p> : active ? <canvas ref={canvas} role="img" aria-label={`Resume PDF, page ${page} of ${pdf.numPages}. Download the PDF for accessible document text.`} /> : <span className="rw-page-placeholder">Page {page}</span>}</div>;
 }

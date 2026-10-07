@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { controlFields, controls, effectiveMerge, updateControl, ENTRY_TYPES, entryType, entryFields, renameSection, formatSelection, networkOptions } from "../src/features/resume/editorModel.ts";
 import { createEditorHistory } from "../src/features/resume/editorHistory.ts";
 import { emptyDraft } from "../src/features/resume/types.ts";
-import { parseResumeYaml, documentYaml, THEMES } from "../src/features/resume/document.ts";
+import { parseResumeYaml, documentYaml, THEMES, resumeRenderDocument } from "../src/features/resume/document.ts";
 const document = { cv: { sections: { Skills: [{ bullet: "User fact" }], Projects: [{ name: "User project" }] } }, design: { theme: "classic" } };
 for (const theme of THEMES) test(`pinned ${theme}: all safe default leaf controls validate and don't mutate the document`, () => {
   const doc = { ...document, design: { theme } }, before = structuredClone(doc);
@@ -86,4 +86,61 @@ test("invalid YAML history restores the last successfully rendered document, not
   history.sync({ ...draft('b'), previewDocument: draft('b').document });
   assert.deepEqual(history.undo().previewDocument, a.document);
   assert.deepEqual(history.redo().previewDocument, draft('b').document);
+});
+
+
+test("blank scalar contacts in restored drafts are omitted only from the render copy", () => {
+  const draft = { ...document, cv: { ...document.cv, email: "", phone: "  ", website: "\n\t", location: "Retain this field" } };
+  const original = documentYaml(draft);
+  const render = resumeRenderDocument(draft);
+  assert.deepEqual([render.cv.email, render.cv.phone, render.cv.website], [null, null, null]);
+  assert.equal(render.cv.location, "Retain this field");
+  assert.equal(documentYaml(draft), original);
+  assert.equal(parseResumeYaml(documentYaml(render)).error, "");
+  assert.deepEqual(resumeRenderDocument(render), render);
+});
+
+test("empty contact list rows do not invalidate preview or reorder actual contacts", () => {
+  const draft = { ...document, cv: { ...document.cv, email: ["", "first@example.com", "  ", "second@example.com"], phone: ["", "+61 412 345 678"], website: ["", "\t"] } };
+  const before = structuredClone(draft);
+  const render = resumeRenderDocument(draft);
+  assert.deepEqual(render.cv.email, ["first@example.com", "second@example.com"]);
+  assert.deepEqual(render.cv.phone, ["+61 412 345 678"]);
+  assert.equal(render.cv.website, null);
+  assert.deepEqual(draft, before);
+  assert.equal(parseResumeYaml(documentYaml(render)).error, "");
+});
+
+test("contact normalisation never rewrites non-empty text or changes other fields", () => {
+  const draft = { ...document, cv: { ...document.cv, name: "", extra_fact: "Retained unknown fact", email: "not an email", phone: ["", "0412345678", null, 7], website: "www.example.com" }, settings: { pdf_title: "" } };
+  const render = resumeRenderDocument(draft);
+  assert.equal(render.cv.email, "not an email");
+  assert.deepEqual(render.cv.phone, ["0412345678", null, 7]);
+  assert.equal(render.cv.website, "www.example.com");
+  assert.equal(render.cv.name, "");
+  assert.equal(render.cv.extra_fact, "Retained unknown fact");
+  assert.deepEqual(render.settings, draft.settings);
+  const untouched = resumeRenderDocument(document);
+  assert.equal(Object.hasOwn(untouched.cv, "email"), false);
+  assert.equal(Object.hasOwn(untouched.cv, "phone"), false);
+  assert.equal(Object.hasOwn(untouched.cv, "website"), false);
+});
+
+
+test("email, local phones, plain websites and punctuation are free text in form/YAML", () => {
+  const draft = { ...document, cv: { ...document.cv, email: "My email contact", phone: ["0412345678", "Office #123"], website: ['www.example.com', '#read("private.txt")', '[label](file:///private)', '**Literal stars**'] } };
+  const yaml = documentYaml(draft);
+  const parsed = parseResumeYaml(yaml);
+  assert.equal(parsed.error, "");
+  assert.deepEqual(parsed.document, draft);
+  assert.equal(documentYaml(draft), yaml);
+  assert.notEqual(parseResumeYaml(documentYaml({ cv: { sections: { Skills: [{ bullet: '#read("private.txt")' }] } } })).error, "");
+  for (const value of [123, { invalid: "object" }, [null], ["Text", 123]]) assert.match(parseResumeYaml(documentYaml({ cv: { email: value } })).error, /must be text or a list of text values/);
+});
+
+test("phone-number reformatting is not exposed for literal user-entered phone text", () => {
+  const draft = { ...document, design: { theme: "classic", header: { connections: { phone_number_format: "international" } } } };
+  const before = documentYaml(draft);
+  assert.equal(controlFields(draft, "design").some(field => field.path.join(".") === "header.connections.phone_number_format"), false);
+  assert.equal(documentYaml(draft), before);
 });

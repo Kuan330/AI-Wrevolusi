@@ -11,7 +11,7 @@ def typst_string(value):
     return text.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t")
 
 
-def install_safe_template_adapters(plain_name, bold_keywords=()):
+def install_safe_template_adapters(plain_name, bold_keywords=(), *, contacts=None, contact_order=None):
     from rendercv.renderer.templater import connections, model_processor, templater
     from rendercv.renderer.templater.string_processor import apply_string_processors
 
@@ -39,9 +39,40 @@ def install_safe_template_adapters(plain_name, bold_keywords=()):
     templater.get_jinja2_environment = environment
 
     original_connections = connections.parse_connections
+    original_contact_markdown = connections.markdown_to_typst
+
+    class LiteralContact(str):
+        """Internal marker: header text must never be interpreted as markup."""
+
+    def contact_markup(value):
+        if isinstance(value, LiteralContact):
+            return '#text("' + typst_string(value) + '")'
+        return original_contact_markdown(value)
+
+    connections.markdown_to_typst = contact_markup
 
     def parsed_connections(model):
-        items = original_connections(model)
+        if contacts is None:
+            items = original_connections(model)
+        else:
+            items = []
+            original_order = model.cv._key_order
+            try:
+                # Preserve the user's header order, including interleaved
+                # social/custom connections. Native values retain their engine
+                # logic; only the three free-text fields use literal bodies.
+                for key in contact_order or original_order:
+                    if key in contacts:
+                        value = contacts[key]
+                        values = value if isinstance(value, list) else [value]
+                        for text in values:
+                            if isinstance(text, str) and text.strip():
+                                items.append(connections.Connection(fontawesome_icon=connections.fontawesome_icons[key], url=None, body=LiteralContact(text)))
+                    elif key in original_order:
+                        model.cv._key_order = [key]
+                        items.extend(original_connections(model))
+            finally:
+                model.cv._key_order = original_order
         for item in items:
             item.fontawesome_icon = typst_string(item.fontawesome_icon)
             if item.url is not None:

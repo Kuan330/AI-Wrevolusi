@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { BookOpen, BriefcaseBusiness, ChartNoAxesCombined, Compass, History, PanelLeftClose, PanelLeftOpen, Search, Sparkles, Sprout } from "lucide-react";
+import { BookOpen, BriefcaseBusiness, ChartNoAxesCombined, Compass, FileText, History, PanelLeftClose, PanelLeftOpen, Search, Sparkles, Sprout } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Sidebar, SidebarItem } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/common/Logo";
 import AccountMenu from "@/components/account/AccountMenu";
 import { useAccount } from "@/components/account/useAccount";
-import { SIDEBAR_GROUPS, navigationPath } from "@/constants/menu";
+import { SIDEBAR_GROUPS, COLLAPSIBLE_MENU_KEYS, filterSidebarGroups, isNavigationItemActive, navigationPath } from "@/constants/menu";
 
-const icons = { dashboard: ChartNoAxesCombined, work: BriefcaseBusiness, ai: Sparkles, skills: Sprout, plan: BookOpen, history: History, career: Compass };
+const icons = { dashboard: ChartNoAxesCombined, work: BriefcaseBusiness, ai: Sparkles, skills: Sprout, plan: BookOpen, history: History, career: Compass, resume: FileText };
 export default function AppSidebar({ collapsed, onToggle, mobileOpen, onMobileOpenChange }: {
   collapsed: boolean; onToggle: () => void; mobileOpen: boolean; onMobileOpenChange: (open: boolean) => void;
 }) {
@@ -17,10 +17,10 @@ export default function AppSidebar({ collapsed, onToggle, mobileOpen, onMobileOp
   const { user } = useAccount();
   const [query, setQuery] = useState("");
   const path = navigationPath(pathname);
-  const groups = SIDEBAR_GROUPS.map(group => ({ ...group, items: group.items.filter(item => group.label.toLowerCase().includes(query.trim().toLowerCase()) || item.label.toLowerCase().includes(query.trim().toLowerCase())) }));
-  const [menuState,setMenuState] = useState({ path, expanded: ["work", "learning"] });
-  const activeGroup = SIDEBAR_GROUPS.find(group => group.items.some(item => path === item.path || (!item.exact && path.startsWith(`${item.path}/`))));
-  const expanded = query.trim() ? ["work","learning"] : menuState.path === path ? menuState.expanded : [...new Set([...menuState.expanded,...(activeGroup?.collapsible ? [activeGroup.key] : [])])];
+  const groups = filterSidebarGroups(query);
+  const [menuState,setMenuState] = useState({ path, expanded: [...COLLAPSIBLE_MENU_KEYS] });
+  const activeGroup = SIDEBAR_GROUPS.find(group => group.items.some(item => isNavigationItemActive(path, item)));
+  const expanded = query.trim() ? [...COLLAPSIBLE_MENU_KEYS] : menuState.path === path ? menuState.expanded : [...new Set([...menuState.expanded,...(activeGroup?.collapsible ? [activeGroup.key] : [])])];
   const iconOnly = collapsed && !mobileOpen;
 
   return <Sidebar collapsed={collapsed} mobileOpen={mobileOpen} onMobileOpenChange={onMobileOpenChange}>
@@ -32,7 +32,7 @@ export default function AppSidebar({ collapsed, onToggle, mobileOpen, onMobileOp
         if (!group.items.length) return null;
         const items = group.items.map(item => {
           const Icon = icons[item.icon];
-          const active = path === item.path || (!item.exact && path.startsWith(`${item.path}/`));
+          const active = isNavigationItemActive(path, item);
           return <SidebarItem key={item.path} to={item.path} label={item.label} icon={<Icon size={19} />} collapsed={iconOnly} active={active} onNavigate={() => { onMobileOpenChange(false); setQuery(""); }} />;
         });
         if (!group.collapsible) return <div key={group.key} className="workspace-root-items">{items}</div>;
