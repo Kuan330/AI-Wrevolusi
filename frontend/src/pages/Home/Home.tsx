@@ -13,6 +13,7 @@ import {
   StepsSection,
 } from "./components";
 import ScrollReveal from "@/components/ui/scroll-reveal";
+import ResumeInterviewSection from "./components/ResumeInterviewSection";
 
 import "./home.css";
 
@@ -31,6 +32,7 @@ const Home = () => {
       <LearningPlanSection />
       <ProgressSection />
       <PossibilitiesSection />
+      <ResumeInterviewSection />
       <FaqSection />
       <ScrollReveal className="home-reveal" threshold={0.12}>
         <CtaSection />

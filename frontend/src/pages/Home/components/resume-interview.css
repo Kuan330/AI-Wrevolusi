@@ -1,0 +1,75 @@
+.landing-page .home-career-ready { padding: 72px 0 80px; }
+.landing-page .home-career-ready-heading { margin-bottom: 32px; }
+.landing-page .home-career-ready-heading h2 { margin: 14px 0 12px; font-size: clamp(36px, 3.1vw, 47px); line-height: 1.12; letter-spacing: -.8px; font-weight: 600; }
+.landing-page .home-career-ready-heading > p { color: var(--c-text-secondary); font-size: 16px; line-height: 1.7; }
+.landing-page .home-career-ready-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.landing-page .home-career-ready-reveal { min-width: 0; display: flex; }
+.landing-page .home-career-ready-card { width: 100%; overflow: hidden; display: flex; flex-direction: column; border: 1px solid rgba(199,219,235,.65); border-radius: 24px; background: var(--glass-strong); box-shadow: 0 12px 32px rgba(61,43,54,.035); transition: transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease; }
+.landing-page .home-career-ready-preview { position: relative; height: 400px; flex: none; padding: 52px 30px 28px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid rgba(199,219,235,.35); }
+.landing-page .home-career-ready-resume { background: linear-gradient(135deg, #e4eff8, #f1f4fa); }
+.landing-page .home-career-ready-interview { background: linear-gradient(135deg, #f2edf7, #faecef); }
+.landing-page .home-career-ready-example { position: absolute; top: 19px; left: 24px; color: #6d7386; font-size: 11px; letter-spacing: .025em; }
+.landing-page .home-career-ready-paper { width: min(100%, 290px); background: white; padding: 24px 27px; border: 1px solid #e1e7ee; box-shadow: 0 10px 24px #354b6410; color: #354457; }
+.landing-page .home-career-ready-paper-heading { text-align: center; padding-bottom: 13px; }
+.landing-page .home-career-ready-paper-heading strong { display: block; font-family: Georgia, serif; font-size: 23px; font-weight: 500; }
+.landing-page .home-career-ready-paper-heading span { display: block; font-size: 10px; margin-top: 4px; color: #68768a; }
+.landing-page .home-career-ready-paper-section { margin-top: 10px; }
+.landing-page .home-career-ready-paper-section h4 { font-size: 10px; font-weight: 650; border-bottom: 1px solid #dce5ed; padding-bottom: 4px; margin-bottom: 5px; }
+.landing-page .home-career-ready-paper-section p { font-size: 9px; line-height: 1.6; color: #5e6c7d; margin: 0; }
+.landing-page .home-career-ready-paper-section > strong { font-size: 9px; }
+.landing-page .home-career-ready-lines { display: grid; gap: 5px; margin-top: 7px; }
+.landing-page .home-career-ready-lines i { height: 3px; background: #edf0f5; border-radius: 2px; }
+.landing-page .home-career-ready-lines i:last-child { width: 70%; }
+.landing-page .home-career-ready-paper-note { display: flex; align-items: center; gap: 6px; margin-top: 13px; font-size: 11px; color: #52758c; }
+.landing-page .home-career-ready-conversation { width: 100%; max-width: 370px; display: grid; gap: 14px; }
+.landing-page .home-career-ready-conversation span { display: block; font-size: 10px; font-weight: 650; margin-bottom: 6px; color: #75677e; }
+.landing-page .home-career-ready-conversation p { margin: 0; font-size: 13px; line-height: 1.65; }
+.landing-page .home-career-ready-question { background: white; padding: 17px 19px; border: 1px solid #eee6ee; border-radius: 16px 16px 16px 4px; margin-right: 27px; }
+.landing-page .home-career-ready-answer { background: #e5edf8; padding: 17px 19px; border: 1px solid #dce6f2; border-radius: 16px 16px 4px 16px; margin-left: 27px; color: #48566c; }
+.landing-page .home-career-ready-feedback { display: flex; align-items: flex-start; gap: 10px; padding: 13px 15px; background: #ffffff80; border-radius: 12px; color: #5f6378; }
+.landing-page .home-career-ready-feedback > svg { flex-shrink: 0; margin-top: 2px; color: #648ba3; }
+.landing-page .home-career-ready-feedback p { font-size: 12px; }
+.landing-page .home-career-ready-copy { padding: 26px 28px 28px; flex: 1; display: flex; flex-direction: column; }
+.landing-page .home-career-ready-copy h3 { display: flex; align-items: center; gap: 9px; font-size: 19px; line-height: 1.45; font-weight: 600; letter-spacing: -.02em; }
+.landing-page .home-career-ready-copy h3 svg { flex-shrink: 0; color: var(--c-deep-blue); }
+.landing-page .home-career-ready-copy > p { margin: 12px 0 23px; font-size: 14px; line-height: 1.8; color: var(--c-text-secondary); }
+.landing-page .home-career-ready-copy > a, .landing-page .home-career-ready-soon { margin-top: auto; min-height: 32px; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+.landing-page .home-career-ready-copy > a { color: #427d9f; align-self: flex-start; text-decoration: none; }
+.landing-page .home-career-ready-copy > a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.landing-page .home-career-ready-copy > a:focus-visible { outline: 2px solid #427d9f; outline-offset: 5px; border-radius: 3px; }
+.landing-page .home-career-ready-soon { color: var(--c-text-muted); flex-wrap: wrap; }
+.landing-page .home-career-ready-soon span { font-size: 10px; font-weight: 500; background: #f1edf4; border-radius: 99px; padding: 4px 9px; }
+.landing-page .home-career-ready-copy > a svg { transition: transform 220ms ease; }
+.landing-page .home-career-ready-copy > a:hover svg { transform: translateX(4px); }
+@media (hover: hover) and (pointer: fine) {
+  .landing-page .home-career-ready-card:hover { transform: translateY(-4px); border-color: #b7d3e5; box-shadow: 0 18px 36px rgba(61,43,54,.08); }
+}
+/* Each preview plays once when its card enters the viewport. */
+.landing-page .home-career-ready-reveal.is-visible .home-career-ready-paper { animation: career-paper-in 850ms cubic-bezier(.2,.7,.2,1) both; }
+.landing-page .home-career-ready-reveal.is-visible .home-career-ready-paper-section { animation: career-content-in 600ms ease both; }
+.landing-page .home-career-ready-reveal.is-visible .home-career-ready-paper-section:nth-child(2) { animation-delay: 220ms; }
+.landing-page .home-career-ready-reveal.is-visible .home-career-ready-paper-section:nth-child(3) { animation-delay: 420ms; }
+.landing-page .home-career-ready-reveal.is-visible .home-career-ready-paper-section:nth-child(4) { animation-delay: 620ms; }
+.landing-page .home-career-ready-reveal.is-visible .home-career-ready-paper-note { animation: career-content-in 600ms 850ms ease both; }
+.landing-page .home-career-ready-reveal.is-visible .home-career-ready-question { animation: career-content-in 650ms 250ms ease both; }
+.landing-page .home-career-ready-reveal.is-visible .home-career-ready-answer { animation: career-content-in 650ms 850ms ease both; }
+.landing-page .home-career-ready-reveal.is-visible .home-career-ready-feedback { animation: career-content-in 650ms 1450ms ease both; }
+@keyframes career-paper-in {
+  from { opacity: 0; transform: translateY(16px) rotate(-2deg); }
+  to { opacity: 1; transform: translateY(0) rotate(0); }
+}
+@keyframes career-content-in {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 760px) {
+  .landing-page .home-career-ready { padding: 48px 0; }
+  .landing-page .home-career-ready-grid { grid-template-columns: 1fr; gap: 20px; }
+  .landing-page .home-career-ready-preview { padding-inline: 22px; height: auto; min-height: 380px; }
+  .landing-page .home-career-ready-copy { padding: 23px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-page .home-career-ready .scroll-reveal { opacity: 1; transform: none; filter: none; transition: none; }
+  .landing-page .home-career-ready .home-career-ready-reveal * { animation: none !important; transition: none !important; }
+  .landing-page .home-career-ready-card:hover, .landing-page .home-career-ready-copy > a:hover svg { transform: none; }
+}

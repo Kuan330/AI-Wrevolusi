@@ -92,7 +92,7 @@ const PossibilitiesSection = () => {
         <ScrollReveal className="home-reveal" threshold={0.12}>
           <div className="home-paths-heading">
             <div>
-              <div className="home-eyebrow">06 / Possibilities</div>
+              <div className="home-eyebrow">Possibilities</div>
               <h2 id="home-paths-title">More doors than<br />you might think.</h2>
             </div>
             <div className="home-paths-intro">

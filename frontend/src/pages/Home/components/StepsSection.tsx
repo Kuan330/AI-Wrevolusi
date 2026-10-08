@@ -14,7 +14,7 @@ const StepsSection = () => {
       <div className="container home-profile-grid">
         <ScrollReveal className="home-reveal" threshold={0.12}>
           <div className="home-profile-copy">
-            <div className="home-eyebrow">01 / Your starting point</div>
+            <div className="home-eyebrow">Your starting point</div>
             <h2 id="home-profile-title">Your work, in your words.</h2>
             <p className="home-profile-lead">
               Describe your role, then review, edit or add tasks. Only what you confirm becomes your work profile — the starting point for your AI analysis and learning.

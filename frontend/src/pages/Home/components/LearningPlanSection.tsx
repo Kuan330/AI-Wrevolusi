@@ -20,7 +20,7 @@ const LearningPlanSection = () => {
       <div className="container home-plan-grid">
         <ScrollReveal className="home-reveal" threshold={0.12}>
           <div className="home-plan-copy">
-            <div className="home-eyebrow">04 / Your learning plan</div>
+            <div className="home-eyebrow">Your learning plan</div>
             <h2 id="home-plan-title">A plan made for you.</h2>
             <p className="home-plan-lead">Built from the courses you pick and the time you actually have.</p>
             <ol className="home-plan-steps">
