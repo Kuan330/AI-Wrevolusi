@@ -31,3 +31,7 @@ users, work_profiles, or other business tables.
 Rebuild lookup tables from CSV (does not truncate business tables):
 
      uv run --project backend --group database python db/seed_reference.py --replace
+
+Epic 9 interview question bank (data/reference/interview/) is loaded by the
+same commands and is checked by db/test_import.py. See the README.txt in that
+folder for the table list and a sample query.

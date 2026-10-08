@@ -26,6 +26,7 @@ import psycopg
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 REF = ROOT / "data" / "reference"
+INTERVIEW = REF / "interview"
 SCHEMA_SQL = HERE / "schema.sql"
 ENV_FILE = ROOT / ".env"
 
@@ -65,6 +66,39 @@ WEF_COLS = [
     "source",
     "source_year",
     "source_figures",
+]
+
+
+INTERVIEW_SOURCE_COLS = ["source_id", "publisher", "title", "evidence_period", "source_type", "url"]
+INTERVIEW_QUESTION_COLS = [
+    "question_id",
+    "scope",
+    "occupation_code",
+    "family_code",
+    "applies_to",
+    "primary_intent",
+    "question",
+    "source_ids",
+]
+INTERVIEW_MAPPING_COLS = ["occupation_code", "question_id", "scope", "display_order"]
+INTERVIEW_COVERAGE_COLS = [
+    "occupation_code",
+    "quality_tier",
+    "family_code",
+    "family_title",
+    "exact_count",
+    "family_count",
+    "targeted_count",
+    "mapped_question_count",
+    "coverage_status",
+    "review_note",
+]
+# Child tables first, so DELETE respects the foreign keys.
+INTERVIEW_TABLES = [
+    "ref_interview_occupation_questions",
+    "ref_interview_coverage",
+    "ref_interview_questions",
+    "ref_interview_sources",
 ]
 
 
@@ -124,6 +158,8 @@ def apply_schema(conn: psycopg.Connection) -> None:
 
 
 def blank_to_none(value):
+    if isinstance(value, list):
+        return value
     if value is None or (isinstance(value, float) and pd.isna(value)):
         return None
     if isinstance(value, str) and value.strip() == "":
@@ -230,6 +266,64 @@ def load_wef_skills() -> pd.DataFrame:
     return df.sort_values("wef_skill_id").reset_index(drop=True)
 
 
+def read_interview_csv(name: str, columns: list[str]) -> pd.DataFrame:
+    path = INTERVIEW / name
+    df = pd.read_csv(path, dtype=str)
+    df = df.rename(columns={"URL": "url"})
+    missing = [c for c in columns if c not in df.columns]
+    if missing:
+        raise ValueError(f"{path.name} missing columns: {missing}")
+    return df[columns]
+
+
+def load_interview_bank() -> dict[str, pd.DataFrame]:
+    """Read and check the Epic 9 question bank. Raises ValueError on any broken link."""
+    sources = read_interview_csv("ref_interview_sources.csv", INTERVIEW_SOURCE_COLS)
+    questions = read_interview_csv("ref_interview_questions.csv", INTERVIEW_QUESTION_COLS)
+    mapping = read_interview_csv("ref_interview_occupation_questions.csv", INTERVIEW_MAPPING_COLS)
+    coverage = read_interview_csv("ref_interview_coverage.csv", INTERVIEW_COVERAGE_COLS)
+
+    questions["source_ids"] = questions["source_ids"].fillna("").str.split(";")
+    mapping["display_order"] = pd.to_numeric(mapping["display_order"]).astype(int)
+    for col in ("exact_count", "family_count", "targeted_count", "mapped_question_count"):
+        coverage[col] = pd.to_numeric(coverage[col]).astype(int)
+
+    problems: list[str] = []
+    for name, df, key in (
+        ("sources", sources, ["source_id"]),
+        ("questions", questions, ["question_id"]),
+        ("mapping", mapping, ["occupation_code", "question_id"]),
+        ("coverage", coverage, ["occupation_code"]),
+    ):
+        if df.duplicated(key).any():
+            problems.append(f"{name}: duplicate {key}")
+    if questions["question"].duplicated().any():
+        problems.append("questions: duplicate question text")
+    if mapping.duplicated(["occupation_code", "display_order"]).any():
+        problems.append("mapping: duplicate display_order within an occupation")
+    known_sources = set(sources["source_id"])
+    if any(not ids or not set(ids) <= known_sources for ids in questions["source_ids"]):
+        problems.append("questions: empty or unknown source_ids")
+    if not set(mapping["question_id"]) <= set(questions["question_id"]):
+        problems.append("mapping: unknown question_id")
+    if set(mapping["occupation_code"]) != set(coverage["occupation_code"]):
+        problems.append("mapping and coverage cover different occupations")
+    counts = mapping.groupby("occupation_code").size()
+    declared = coverage.set_index("occupation_code")["mapped_question_count"]
+    if (declared != counts.reindex(declared.index)).any():
+        problems.append("coverage: mapped_question_count differs from mapping rows")
+    if counts.min() < 5:
+        problems.append("an occupation has fewer than five questions")
+    if problems:
+        raise ValueError("interview question bank is inconsistent: " + "; ".join(problems))
+    return {
+        "ref_interview_sources": sources,
+        "ref_interview_questions": questions,
+        "ref_interview_occupation_questions": mapping,
+        "ref_interview_coverage": coverage,
+    }
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Seed reference tables into Postgres / Neon.")
     parser.add_argument("--init", action="store_true", help="Apply db/schema.sql before seeding.")
@@ -246,10 +340,15 @@ def main() -> None:
     occupations = load_occupations()
     ilo_tasks = load_ilo_tasks()
     wef_skills = load_wef_skills()
+    interview = load_interview_bank()
 
     with psycopg.connect(database_url()) as conn:
         if args.init:
             apply_schema(conn)
+        if args.replace:
+            # Interview tables point at ref_occupations, so empty them before it.
+            for table in INTERVIEW_TABLES:
+                conn.execute(f"DELETE FROM {table}")
         i, u, k = upsert_table(
             conn, "ref_occupations", occupations, ["occupation_code"], OCCUPATION_COLS, args.replace
         )
@@ -262,6 +361,20 @@ def main() -> None:
             conn, "ref_wef_skills", wef_skills, ["wef_skill_id"], WEF_COLS, args.replace
         )
         report("ref_wef_skills", i, u, k, len(wef_skills) + (k if not args.replace else 0))
+        # Parents first: sources and questions before the tables that point at them.
+        for table, keys, columns in (
+            ("ref_interview_sources", ["source_id"], INTERVIEW_SOURCE_COLS),
+            ("ref_interview_questions", ["question_id"], INTERVIEW_QUESTION_COLS),
+            ("ref_interview_coverage", ["occupation_code"], INTERVIEW_COVERAGE_COLS),
+            (
+                "ref_interview_occupation_questions",
+                ["occupation_code", "question_id"],
+                INTERVIEW_MAPPING_COLS,
+            ),
+        ):
+            df = interview[table]
+            i, u, k = upsert_table(conn, table, df, keys, columns, args.replace)
+            report(table, i, u, k, len(df) + (k if not args.replace else 0))
         conn.commit()
 
 
