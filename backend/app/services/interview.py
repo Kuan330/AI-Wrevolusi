@@ -282,4 +282,4 @@ def _run(provider, operation, payload, response_model, prompt, validate, *, budg
             raise
         except Exception as error:
             code = "ai_schema_invalid" if isinstance(error, ValidationError) else "ai_provider_error" if isinstance(error, AIProviderError) else "internal_error"
-            raise GenerationFailure("The AI could not prepare a supported result. Your answers are unchanged. Try again.", code=code, attempts=attempt) from None
+            raise GenerationFailure("The AI could not prepare a supported result.", code=code, attempts=attempt) from None

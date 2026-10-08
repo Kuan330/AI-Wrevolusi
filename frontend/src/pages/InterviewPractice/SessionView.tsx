@@ -77,8 +77,8 @@ export default function SessionView({ owner, session, onChange, onExit }: Props)
     } catch (cause) {
       if (!alive.current || controller.signal.aborted) return;
       const message = cause instanceof Error ? cause.message : "Feedback could not be prepared. Your answer is saved.";
-      setError(message);
-      try { commit(setAttemptError(latest.current, questionId, attemptId, message)); } catch { /* removed */ }
+      // The saved answer shows this message beside its retry button.
+      try { commit(setAttemptError(latest.current, questionId, attemptId, message)); } catch { setError(message); }
     } finally { if (alive.current && request.current === controller) { request.current = null; setBusy(""); } }
   };
   const submit = (mode: "text" | "voice") => {
