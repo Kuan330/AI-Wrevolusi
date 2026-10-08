@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight, BriefcaseBusiness, Check, CheckCheck, ChevronDown, ClipboardList, LoaderCircle, Pencil, Plus, Search, ShieldCheck, Trash2, X } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { referenceService } from "@/services/referenceService";
 import { currentWorkspaceSession } from "@/services/accountStorage";
 import { confirmWorkDraft, readWorkDraft, startWorkDraft, updateWorkDraft, workDraftNeedsMatchReview } from "@/features/work-profile/workProfileDraft";
@@ -25,6 +26,7 @@ export default function WorkSceneEditor({ confirmed, cancelling, onSaved, onCanc
   const [loading, setLoading] = useState(false);
   const [failedOccupation, setFailedOccupation] = useState<ReferenceOccupation | null>(null);
   const [saving, setSaving] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("");
   const [editor, setEditor] = useState<{ task: ProfileTask | null; values: TaskEditorValues } | null>(null);
@@ -175,7 +177,13 @@ export default function WorkSceneEditor({ confirmed, cancelling, onSaved, onCanc
       </section>
     </fieldset>
     {(error || readError) && <p role="alert" className="work-scene-error">{error || readError}</p>}
-    <footer className="work-scene-save"><div><CheckCheck size={22} /><div><h3>Does this reflect your real work?</h3><p>{ready ? `${tasks.length} task${tasks.length === 1 ? "" : "s"} ready for your review. Save when the list feels right.` : "Choose a role and review its tasks before saving."}</p></div></div><div className="work-scene-save-actions"><Button variant="ghost" disabled={locked} onClick={onCancel}>{confirmed ? "Cancel changes" : "Clear draft"}</Button><Button className="work-scene-confirm" disabled={!ready || !tasks.length || locked} onClick={() => { void save(); }}>{saving ? <LoaderCircle className="animate-spin" /> : null}{saving ? "Saving your work…" : "Save and explore AI impact"}{!saving && <ArrowRight />}</Button></div></footer>
+    <footer className="work-scene-save"><div><CheckCheck size={22} /><div><h3>Does this reflect your real work?</h3><p>{ready ? `${tasks.length} task${tasks.length === 1 ? "" : "s"} ready for your review. Save when the list feels right.` : "Choose a role and review its tasks before saving."}</p></div></div><div className="work-scene-save-actions"><Button variant="ghost" disabled={locked} onClick={() => setConfirmCancel(true)}>{confirmed ? "Cancel changes" : "Clear draft"}</Button><Button className="work-scene-confirm" disabled={!ready || !tasks.length || locked} onClick={() => { void save(); }}>{saving ? <LoaderCircle className="animate-spin" /> : null}{saving ? "Saving your work…" : "Save and explore AI impact"}{!saving && <ArrowRight />}</Button></div></footer>
+    <Dialog open={confirmCancel} onOpenChange={setConfirmCancel}><DialogContent>
+      <DialogHeader><DialogTitle>{confirmed ? "Discard your changes?" : "Clear this draft?"}</DialogTitle>
+        <DialogDescription>{confirmed ? "Your edits to this list will be removed. Your saved work profile stays as it was." : "The role and tasks you chose here will be removed. You can start again at any time."}</DialogDescription></DialogHeader>
+      <DialogFooter><Button variant="outline" onClick={() => setConfirmCancel(false)}>Keep editing</Button>
+        <Button variant="destructive" onClick={() => { setConfirmCancel(false); onCancel(); }}>{confirmed ? "Discard changes" : "Clear draft"}</Button></DialogFooter>
+    </DialogContent></Dialog>
     {editor && <TaskEditorDialog open mode={editor.task ? "edit" : "add"} initialValues={editor.values} occupationCode={ready ? occupation?.occupation_code : undefined} existingTasks={tasks} editingTaskId={editor.task?.id} onClose={() => setEditor(null)} onSave={saveTask} />}
   </div>;
 }

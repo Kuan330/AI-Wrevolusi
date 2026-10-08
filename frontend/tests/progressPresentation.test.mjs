@@ -67,3 +67,13 @@ test('a newly linked completed course leads the summary without claiming skill m
  const g=goal({current:evidence({completed_learning:[{id:'c1',title:'Course',completed_at:null,source_label:'Reported complete'}]})});
  assert.equal(progressHeadline([g]),'You recorded 1 new course completion');
 });
+
+import { saveBlockedReason } from '../src/pages/Progress/progressPresentation.ts';
+test('the save button always has a plain reason beside it while it is blocked', () => {
+  const ok = { can_save: true, goals: [{ status: 'ready' }], required_reset_goal_ids: [] };
+  assert.equal(saveBlockedReason(ok, false), '');
+  assert.match(saveBlockedReason({ ...ok, can_save: false, goals: [{ status: 'source_needs_review' }] }, false), /source check/);
+  assert.match(saveBlockedReason({ ...ok, can_save: false }, false), /nothing new to save/i);
+  assert.match(saveBlockedReason({ ...ok, required_reset_goal_ids: ['g1'] }, false), /Tick the box/);
+  assert.equal(saveBlockedReason({ ...ok, required_reset_goal_ids: ['g1'] }, true), '');
+});

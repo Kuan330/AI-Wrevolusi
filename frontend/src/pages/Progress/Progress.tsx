@@ -7,7 +7,7 @@ import { ApiError } from "@/services/api";
 import { ROUTES } from "@/constants/routes";
 import { progressReviewService, type ProgressPreview, type ProgressReview, type ReviewList, type ProgressSummary, type ProgressGoal, type ProgressEvidence } from "@/services/progressReviewService";
 import { cleanDisplayText, goalDisplayLabel, taskDisplayText } from "@/lib/displayText";
-import { activityGroups, attemptChanges, comparisonRows, evidenceTimeline, progressErrorText, progressHeadline, type ProgressOperation } from "./progressPresentation";
+import { activityGroups, attemptChanges, comparisonRows, evidenceTimeline, progressErrorText, progressHeadline, saveBlockedReason, type ProgressOperation } from "./progressPresentation";
 import "./progress.css";
 
 const date = (value: string) => new Intl.DateTimeFormat("en-MY", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
@@ -117,6 +117,7 @@ function ProgressWorkspace() {
       {preview.required_reset_goal_ids.length > 0 && <div className="progress-warning"><p>{goalsLabel(preview.required_reset_goal_ids.length)} {preview.required_reset_goal_ids.length === 1 ? "needs" : "need"} a new starting point. Earlier reviews stay in history.</p><label><input type="checkbox" checked={approvedReset} disabled={saving} onChange={e => setApprovedReset(e.target.checked)} /> Use current records as the new starting point for these goals</label></div>}
       {preview.goals.some(g => g.status === "source_needs_review") && <p className="progress-warning">Goals with changed work or skill connections stay visible but are excluded from this comparison. You can review the remaining goals. <Link to={ROUTES.skills}>Review my skills</Link></p>}
       <button className="progress-primary" disabled={saving || preparing || conflict || !preview.can_save || (preview.required_reset_goal_ids.length > 0 && !approvedReset)} onClick={() => void save()}>{saving ? "Saving…" : preview.previous_review_id ? "Save this review" : "Save my starting point"}</button>
+      {!saving && !preparing && saveBlockedReason(preview, approvedReset) && <p className="progress-footnote" role="status">{saveBlockedReason(preview, approvedReset)}</p>}
     </section>}
     {preparing && <p role="status">Preparing a review from your saved records…</p>}
     {content && <><GoalComparisons key={preview ? `preview:${preview.reviewed_at}` : selected?.id} goals={content.goals} /></>}
