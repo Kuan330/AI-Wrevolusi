@@ -16,6 +16,7 @@ export const SIDEBAR_GROUPS = [
   { key: "career", label: "Possibilities", collapsible: true, icon: "career", items: [
     { label: "Explore possibilities", path: ROUTES.possibilities, icon: "career", exact: true },
     { label: "Resume builder", path: ROUTES.resumeBuilder, icon: "resume", exact: true },
+    { label: "Interview practice", path: ROUTES.interview, icon: "interview", exact: true },
   ] },
 ] as const;
 
@@ -36,6 +37,7 @@ export function navigationPath(pathname: string): string {
 }
 export function pageLabel(pathname: string): string {
   if (pathname === ROUTES.resumeBuilder) return "Resume builder";
+  if (pathname === ROUTES.interview) return "Interview practice";
   if (pathname === ROUTES.possibilities) return "Possibilities";
   if (pathname === ROUTES.learningCentre) return "Learning resources";
   if (pathname === ROUTES.plan) return "My courses";

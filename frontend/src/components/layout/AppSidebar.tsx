@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { BookOpen, BriefcaseBusiness, ChartNoAxesCombined, Compass, FileText, History, PanelLeftClose, PanelLeftOpen, Search, Sparkles, Sprout } from "lucide-react";
+import { BookOpen, BriefcaseBusiness, ChartNoAxesCombined, Compass, FileText, History, Mic, PanelLeftClose, PanelLeftOpen, Search, Sparkles, Sprout } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Sidebar, SidebarItem } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import AccountMenu from "@/components/account/AccountMenu";
 import { useAccount } from "@/components/account/useAccount";
 import { SIDEBAR_GROUPS, COLLAPSIBLE_MENU_KEYS, filterSidebarGroups, isNavigationItemActive, navigationPath } from "@/constants/menu";
 
-const icons = { dashboard: ChartNoAxesCombined, work: BriefcaseBusiness, ai: Sparkles, skills: Sprout, plan: BookOpen, history: History, career: Compass, resume: FileText };
+const icons = { dashboard: ChartNoAxesCombined, work: BriefcaseBusiness, ai: Sparkles, skills: Sprout, plan: BookOpen, history: History, career: Compass, resume: FileText, interview: Mic };
 export default function AppSidebar({ collapsed, onToggle, mobileOpen, onMobileOpenChange }: {
   collapsed: boolean; onToggle: () => void; mobileOpen: boolean; onMobileOpenChange: (open: boolean) => void;
 }) {
