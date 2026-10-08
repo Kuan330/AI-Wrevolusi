@@ -9,9 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.concurrency import run_in_threadpool
 from app.db.session import get_db
 from app.services.auth import get_current_user
-from app.schemas.resume import GenerateRequest, GenerateResponse, RecommendRequest, RecommendResponse, RenderRequest
+from app.schemas.resume import GenerateRequest, GenerateResponse, RecommendRequest, RecommendResponse, RenderRequest, AssistRequest, AssistResponse
 from app.services.resume import resume_provider, generate_resume, recommend_courses, provider_description
 from app.services.resume_errors import ResumeProblem, error_body
+from app.services.model_overrides import ModelOverrideError
+from app.services.resume_assistant import assist_resume
 from app.services.resume_render import render_pdf, InvalidResume, RenderBusy, RenderFailed
 
 logger = logging.getLogger(__name__)
@@ -38,6 +40,7 @@ def get_resume_provider():
     # No default_ai_gateway: its fallback chain is inappropriate for resumes.
     try:
         return resume_provider()
+    except ModelOverrideError: raise
     except Exception:
         raise HTTPException(503, "Resume AI is not configured. Your local draft is unchanged.") from None
 
@@ -55,9 +58,24 @@ async def generate(payload: GenerateRequest, provider=Depends(get_resume_provide
         body = error_body(error)
         body["detail"] += " Your local input is unchanged. Try again or edit manually." if error.code in {"duplicate_sections", "duplicate_gaps", "missing_evidence", "invalid_reference", "unsupported_fact", "unsupported_claim", "unverified_name", "unsafe_content"} else ""
         return JSONResponse(status_code=503, content=body, headers={"Cache-Control": "no-store"})
+    except ModelOverrideError: raise
     except Exception:
         logger.warning("resume_generate_failed code=internal_error attempts=0 status=503 duration_ms=%.1f", (time.monotonic() - started) * 1000)
         return JSONResponse(status_code=503, content={"detail": "AI could not generate a supported draft. Your local input is unchanged. Try again or edit manually.", "code": "internal_error", "fields": []}, headers={"Cache-Control": "no-store"})
+
+@router.post("/assist", response_model=AssistResponse)
+async def assist(payload: AssistRequest, provider=Depends(get_resume_provider)):
+    started = time.monotonic()
+    try:
+        return await run_in_threadpool(assist_resume, payload, provider)
+    except ResumeProblem as error:
+        status = 422 if isinstance(error, InvalidResume) else 503
+        logger.warning("resume_assist_failed code=%s attempts=%s status=%s duration_ms=%.1f", error.code, error.attempts, status, (time.monotonic() - started) * 1000)
+        return JSONResponse(status_code=status, content=error_body(error), headers={"Cache-Control": "no-store"})
+    except ModelOverrideError: raise
+    except Exception:
+        logger.warning("resume_assist_failed code=internal_error attempts=0 status=503 duration_ms=%.1f", (time.monotonic() - started) * 1000)
+        return JSONResponse(status_code=503, content={"detail": "The assistant could not prepare changes. Your draft is unchanged.", "code": "internal_error", "fields": []}, headers={"Cache-Control": "no-store"})
 
 @router.post("/recommend-courses", response_model=RecommendResponse)
 async def recommendations(payload: RecommendRequest, db: AsyncSession = Depends(get_db)):
@@ -70,6 +88,10 @@ async def recommendations(payload: RecommendRequest, db: AsyncSession = Depends(
             "FROM catalogue_courses c JOIN ref_wef_skills s ON s.wef_skill_id=c.skill_id"
         ))).mappings().all()
         return await run_in_threadpool(recommend_courses, payload.gaps, rows, resume_provider())
+    except ModelOverrideError:
+        # The optional client can ignore failures, but configuration errors must
+        # not masquerade as a successful empty recommendation response.
+        raise
     except Exception as error:
         logger.warning("resume_courses_unavailable category=%s", type(error).__name__)
         return RecommendResponse()

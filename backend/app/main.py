@@ -37,6 +37,8 @@ def create_app(api_root: str = '/api') -> FastAPI:
     )
 
     # Last added middleware is outermost: timing wraps CORS + route work.
+    from app.services.model_overrides import ModelOverrideMiddleware, ModelOverrideError
+    application.add_middleware(ModelOverrideMiddleware)
     application.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -45,6 +47,10 @@ def create_app(api_root: str = '/api') -> FastAPI:
         allow_headers=['*'],
     )
     application.add_middleware(RequestTimingMiddleware)
+
+    @application.exception_handler(ModelOverrideError)
+    async def model_override_error(request, error):
+        return JSONResponse(status_code=503, content={"detail": str(error), "code": error.code, "fields": []}, headers={"Cache-Control": "no-store"})
 
     api_root = api_root.rstrip('/')
     api_prefix = f'{api_root}/{settings.api_version}'

@@ -22,3 +22,75 @@
 /* Courses use the shared focus-trapped Dialog as a right-hand drawer. */
 .rw-courses-dialog{left:auto;right:0;top:0;transform:none;width:min(460px,100vw);max-width:none!important;height:100dvh;max-height:none;border-radius:18px 0 0 18px;align-content:start;padding:26px 20px;overflow:auto}.rw-courses-dialog .rb-course-heading{justify-content:flex-end;margin-bottom:12px}.rw-add-contact{font-size:11px;height:24px;margin:0 0 2px auto;display:flex;color:#477393;padding:3px 0}
 .rw-fixed-list>.rw-list-item>.rw-field-row>label{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px}.rw-fixed-list>.rw-list-item>.rw-field-row>label>span:first-child{display:block}
+
+/* Assistant stays inside the editor column; PDF remains an independent pane. */
+.rw-edit-pane{display:flex;flex-direction:column;min-height:0}
+.rw-edit-scroll{flex:1;min-height:0}
+.rw-assistant{flex:none;border-top:1px solid hsl(var(--border,207 30% 84%));background:hsl(var(--card,0 0% 100%));padding:8px 12px 12px;box-shadow:0 -6px 18px #57405a08}
+.rw-assistant-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rw-assistant-heading>span{font-size:11px;color:hsl(var(--muted-foreground,327 10% 40%))}
+.rw-assistant-body{max-height:min(42vh,360px);overflow-y:auto;overscroll-behavior:contain;padding:6px 2px 10px}
+.rw-assistant-shortcuts{display:flex;gap:5px;flex-wrap:wrap;padding:4px 0 10px}
+.rw-assistant-shortcuts button{height:auto;white-space:normal;text-align:left;font-size:11px;padding:5px 8px;max-width:100%}
+.rw-assistant-message{font-size:12px;line-height:1.5;padding:9px 11px;border-radius:10px;background:#f6f3f7;margin:5px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.rw-assistant-message strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.rw-message-user{background:#edf4f8}
+.rw-assistant-composer{display:flex;align-items:flex-end;gap:8px;margin-top:5px}
+.rw-assistant-composer textarea{min-height:60px;resize:vertical;font-size:13px;max-height:120px}
+.rw-assistant-composer>button{flex:none;border-radius:50%;width:34px;height:34px;margin-bottom:3px}
+.rw-assistant-note,.rw-assistant-working,.rw-assistant-error{font-size:12px;line-height:1.4;margin:4px 2px}
+.rw-assistant-note{color:hsl(var(--muted-foreground,327 10% 40%))}
+.rw-assistant-error{color:#a3394c}
+.rw-assistant-proposal{border:1px solid #ded6e3;border-radius:10px;padding:10px;margin-top:8px}
+.rw-assistant-proposal h3{font-size:13px;font-weight:650;margin:0 0 7px}
+.rw-assistant-change{display:block;border-top:1px solid #eae5ed;padding:8px 0;font-size:12px}
+.rw-assistant-change .rb-check{align-items:flex-start}
+.rw-assistant-change>span strong{display:block;font-size:11px;margin-top:2px;color:#476f86}
+.rw-assistant-change details summary{cursor:pointer;font-size:11px;color:#6e5774;margin:6px 0}
+.rw-assistant-diff{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rw-assistant-diff>div{min-width:0;border-radius:6px;background:#f7f5f8;padding:7px}
+.rw-assistant-diff strong{font-size:10px}
+.rw-assistant-diff pre{font-family:inherit;font-size:11px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;max-height:150px;overflow:auto;margin:5px 0}
+.rw-assistant-proposal-actions{display:flex;gap:5px;padding-top:8px}
+.rw-assistant-review{width:calc(100vw - 2rem);max-width:700px;max-height:90dvh;overflow:auto}
+.rw-assistant-review textarea[readonly]{font:11px/1.5 ui-monospace,monospace;background:#f7f5f8}
+
+.rw-courses-trigger{gap:6px}
+.rw-courses-count{border-radius:999px;background:#765680;color:#fff;padding:0 5px;min-width:19px;height:19px;font-size:10px;justify-content:center;line-height:1}
+.rw-courses-dialog{width:calc(100vw - 2rem);max-width:680px!important;max-height:85dvh;display:flex!important;flex-direction:column;gap:0!important;padding:24px!important;overflow:hidden!important;border-radius:18px;background:hsl(var(--card,0 0% 100%))!important}
+.rw-courses-title{display:flex;align-items:center;gap:12px;padding-right:16px;margin-bottom:17px}
+.rw-courses-title [data-slot=dialog-title]{font-size:19px}
+.rw-courses-icon{display:flex;align-items:center;justify-content:center;flex:none;width:42px;height:42px;border-radius:12px;background:#eee7f2;color:#705679}
+.rw-courses-title p{font-size:13px;line-height:1.5;margin-top:5px}
+.rw-courses-selection{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid #e9e2ed;font-size:12px;font-weight:600;gap:8px}
+.rw-courses-selection small{font-size:11px;font-weight:400;color:#827489}
+.rw-courses-list{overflow-y:auto;min-height:0;overscroll-behavior:contain;display:grid;gap:9px;padding:2px 3px 14px 0}
+.rw-course-item{display:flex;align-items:flex-start;gap:12px;padding:15px;border:1px solid #e6dfe9;border-radius:12px;cursor:pointer;transition:background .15s,border-color .15s}
+.rw-course-item>button{flex:none;margin-top:3px}
+.rw-course-item:hover{border-color:#b6a5c0;background:#fcfafd}
+.rw-course-selected{border-color:#9b83aa;background:#f7f3fa}
+.rw-course-added{background:#f6faf8;cursor:default;border-color:#dce9e1}
+.rw-course-copy{min-width:0;flex:1}
+.rw-course-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px;color:#83738a;font-size:10px}
+.rw-course-meta>div{font-size:9px;line-height:1.2;font-weight:500;padding:2px 6px}
+.rw-course-meta .rw-added-badge{margin-left:auto;gap:3px;background:#e6f1eb;color:#39795e}
+.rw-course-copy h3{font-size:14px;line-height:1.45;font-weight:600;margin:7px 0 5px;color:#4b3b50;overflow-wrap:anywhere}
+.rw-course-copy p{font-size:12px;line-height:1.55;margin:0;color:#7e6d85;overflow-wrap:anywhere}
+.rw-courses-footer{border-top:1px solid #e9e2ed;padding-top:15px;flex:none}
+.rw-courses-footer>div{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.rw-courses-footer>p{font-size:12px;margin:0 0 9px;color:#627469}
+.rw-courses-footer button{font-size:12px}
+.rw-courses-dialog .rb-check{font-size:12px;white-space:nowrap}
+
+@media(max-width:600px){.rw-assistant-heading>span{display:none}
+.rw-assistant-diff{grid-template-columns:1fr}
+.rw-assistant-body{max-height:32dvh}
+.rw-courses-dialog{padding:18px!important;width:calc(100vw - 20px);max-height:90dvh}
+.rw-courses-title{gap:9px}
+.rw-courses-title h2{font-size:17px}
+.rw-courses-selection small{display:none}
+.rw-course-item{padding:12px;gap:9px}
+.rw-courses-footer>div{flex-direction:column;align-items:stretch}
+.rw-courses-footer button{width:100%}
+.rw-course-meta .rw-added-badge{margin-left:0}
+}

@@ -11,7 +11,7 @@ GENERATION_MESSAGES = {
     "unverified_name": "AI returned a name or term that could not be verified.",
     "unsafe_content": "AI returned unsupported contact, code or resource content.",
 }
-REQUEST_KEYS = frozenset("body document job_requirements skills evidence evidence_reviewed id name text sections entries gaps title skill_ids fact_ids keywords skill_slugs label course_id gap_ids reason courses repair_feedback code fields field".split())
+REQUEST_KEYS = frozenset("body document job_requirements skills evidence evidence_reviewed id name text sections entries gaps title skill_ids fact_ids keywords skill_slugs label course_id gap_ids reason courses repair_feedback code fields field instruction context_reviewed history content role section_index source_ids path value design cv".split())
 
 @lru_cache(maxsize=1)
 def render_keys():

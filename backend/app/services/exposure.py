@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.services.model_overrides import ModelOverrideError
 from app.constants.exposure_types import ExposureType
 from app.schemas.ai_matching import TaskMatchCandidate
 from app.schemas.exposure import (
@@ -310,6 +311,7 @@ def _resolve_llm_task_match_judgement(
             confirmed_task.task_text,
             candidates,
         )
+    except ModelOverrideError: raise
     except Exception:  # noqa: BLE001 - the judge is optional by design
         return None
     if judge_result is None or not judge_result.candidate_id:

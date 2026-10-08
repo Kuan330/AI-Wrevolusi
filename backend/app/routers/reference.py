@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select, text
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.services.model_overrides import ModelOverrideError, current_models
 from app.services.specialist_catalogue import catalogue_for_occupation, search_catalogue
 from app.services.classification_alignment import require_ilo_title_agreement
 from app.services.occupation_text import occupation_description_sql
@@ -104,17 +105,22 @@ def _timed_keyword_normaliser(query: str, gateway: AIGateway) -> list[str]:
 
     from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
 
+    strict = bool(getattr(getattr(gateway, "provider", None), "strict_override", False))
+    if strict:
+        gateway.provider.timeout_s = min(gateway.provider.timeout_s, settings.occupation_search_normaliser_timeout_s)
     with ThreadPoolExecutor(max_workers=1) as pool:
         future = pool.submit(normalise_search_query, query, gateway)
         try:
             return list(future.result(timeout=settings.occupation_search_normaliser_timeout_s))
         except FuturesTimeout:
+            if strict: raise ModelOverrideError("ai_budget_exhausted") from None
             logger.warning(
                 'occupation_search_normaliser_timeout query=%r budget_s=%.1f',
                 query,
                 settings.occupation_search_normaliser_timeout_s,
             )
             return []
+        except ModelOverrideError: raise
         except Exception:  # noqa: BLE001 - optional layer by design
             logger.exception('occupation_search_normaliser_failed query=%r', query)
             return []
@@ -157,7 +163,7 @@ async def list_reference_occupations(
     if q and q.strip():
         needle = q.strip()
         cache_key = (area, needle.casefold())
-        cached = _cached_search_result(cache_key)
+        cached = None if current_models() else _cached_search_result(cache_key)
         if cached is not None:
             return cached
 
@@ -188,7 +194,7 @@ async def list_reference_occupations(
             needle,
             keyword_normaliser=lambda query: _timed_keyword_normaliser(query, gateway),
         )
-        _store_search_result(cache_key, rows)
+        if not current_models(): _store_search_result(cache_key, rows)
         return rows
     elif parent:
         result = await db.execute(

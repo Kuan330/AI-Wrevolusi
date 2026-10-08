@@ -66,3 +66,46 @@ class RecommendResponse(StrictModel):
 
 class RenderRequest(StrictModel):
     document: dict
+
+
+class AssistMessage(StrictModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=3000)
+
+class AssistRequest(StrictModel):
+    instruction: str = Field(min_length=1, max_length=5000)
+    document: dict
+    skills: list[SkillCandidate] = Field(default_factory=list, max_length=250)
+    context_reviewed: bool = False
+    history: list[AssistMessage] = Field(default_factory=list, max_length=10)
+
+    @model_validator(mode="after")
+    def private_context(self):
+        import json
+        if not self.context_reviewed: raise ValueError("Review the assistant context first.")
+        if set(self.document) - {"cv", "design"} or not isinstance(self.document.get("cv"), dict) or set(self.document["cv"]) - {"sections"}:
+            raise ValueError("Only redacted sections and safe design settings may be sent.")
+        text = json.dumps(self.model_dump(), ensure_ascii=False)
+        if len(text) > 100000 or sum(len(m.content) for m in self.history) > 15000:
+            raise ValueError("Assistant context exceeds the size limit.")
+        if re.search(r"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|\+[1-9][0-9 ().-]{7,}[0-9]", text):
+            raise ValueError("Remove contact details before sending assistant context.")
+        if len({s.id for s in self.skills}) != len(self.skills): raise ValueError("Source IDs must be unique.")
+        return self
+
+class AssistEntry(StrictModel):
+    entry: str | dict
+    source_ids: list[Annotated[str, Field(min_length=1, max_length=180)]] = Field(min_length=1, max_length=30)
+
+class AssistSection(StrictModel):
+    section_index: int = Field(ge=0, le=100)
+    entries: list[AssistEntry] = Field(max_length=80)
+
+class AssistDesign(StrictModel):
+    path: list[Annotated[str, Field(pattern=r"^[a-z_]{1,64}$")]] = Field(min_length=1, max_length=6)
+    value: str | bool | int | float | None
+
+class AssistResponse(StrictModel):
+    message: str = Field(min_length=1, max_length=500)
+    sections: list[AssistSection] = Field(default_factory=list, max_length=50)
+    design: list[AssistDesign] = Field(default_factory=list, max_length=80)

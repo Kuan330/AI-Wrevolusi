@@ -2716,3 +2716,5 @@
     stroke-dashoffset: 0;
   }
 }
+
+.home-developer-trigger{border:0;background:transparent;color:inherit;font:inherit;padding:0;cursor:default}.home-developer-trigger:focus-visible{outline:2px solid hsl(var(--primary,203 44% 52%));outline-offset:4px;border-radius:4px}.developer-model-dialog{width:calc(100vw - 2rem);max-width:640px;max-height:90dvh;overflow-y:auto}

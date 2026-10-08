@@ -83,6 +83,8 @@ class AIGateway:
         request_cache_enabled: bool = True,
     ) -> GatewayResult[ModelT]:
         started = self._clock()
+        if getattr(self.provider, "strict_override", False):
+            request_cache_enabled = False
         key = cache_key or self._cache_key(operation, payload)
         if request_cache_enabled and key in self.cache:
             cached = self._validate(self.cache[key], response_model)
@@ -112,6 +114,10 @@ class AIGateway:
                         self.cache[key] = value.model_dump(mode='json')
                     return GatewayResult(value, self._metadata(started, attempts=attempt))
                 except Exception as exc:
+                    if getattr(self.provider, "strict_override", False):
+                        from app.services.model_overrides import ModelOverrideError
+                        if isinstance(exc, ModelOverrideError): raise
+                        raise ModelOverrideError("ai_output_invalid") from None
                     last_error = type(exc).__name__
 
             if prefer_local_on_provider_failure:
@@ -306,10 +312,11 @@ class AIGateway:
 class AIProviderError(RuntimeError):
     """Raised when the configured HTTP provider cannot return usable JSON."""
 
-    def __init__(self, message: str, *, status_code: int | None = None) -> None:
+    def __init__(self, message: str, *, status_code: int | None = None, kind: str = "output") -> None:
         """Keep the upstream status (when known) for the fallback decision."""
         super().__init__(message)
         self.status_code = status_code
+        self.kind = kind
 
 
 # Transient upstream failures worth one more attempt: throttling, timeouts
@@ -537,7 +544,7 @@ class OpenAICompatibleProvider:
                     request_options['timeout'] = httpx.Timeout(float(request_timeout_s))
                 response = self._client.post(self._endpoint, **request_options)
             except httpx.HTTPError as error:  # timeouts and transport failures
-                last_error = error
+                last_error = AIProviderError('Provider transport failed.', kind='transport')
                 _LOGGER.warning(
                     'AI provider attempt %s/%s failed: %s',
                     attempt + 1,
@@ -548,7 +555,7 @@ class OpenAICompatibleProvider:
 
             if response.status_code in _RETRYABLE_PROVIDER_STATUS_CODES:
                 last_error = AIProviderError(
-                    f'provider returned retryable status {response.status_code}'
+                    f'provider returned retryable status {response.status_code}', status_code=response.status_code, kind='http'
                 )
                 _LOGGER.warning(
                     'AI provider attempt %s/%s failed with status %s',
@@ -558,9 +565,16 @@ class OpenAICompatibleProvider:
                 )
                 continue
             if response.status_code >= 400:
+                kind = 'http'
+                if response.status_code in {400, 404, 422}:
+                    try:
+                        error_data = response.json().get('error', {})
+                        if isinstance(error_data, dict) and isinstance(error_data.get('code'), str) and error_data.get('code') in {'model_not_found', 'model_not_available', 'unsupported_model', 'invalid_model', 'model_unavailable', 'model_not_supported'}:
+                            kind = 'model_unavailable'
+                    except (ValueError, AttributeError): pass
                 raise AIProviderError(
                     f'provider rejected the request with status {response.status_code}',
-                    status_code=response.status_code,
+                    status_code=response.status_code, kind=kind,
                 )
 
             try:
@@ -590,7 +604,8 @@ class OpenAICompatibleProvider:
             return parsed
 
         raise AIProviderError(
-            f'provider request failed after {retry_limit + 1} attempt(s): {last_error}'
+            f'provider request failed after {retry_limit + 1} attempt(s)',
+            status_code=getattr(last_error, 'status_code', None), kind=getattr(last_error, 'kind', 'output')
         )
 
     def _build_request_body(
@@ -713,7 +728,7 @@ class OpenAICompatibleProvider:
             while self._request_times and now - self._request_times[0] >= 60.0:
                 self._request_times.popleft()
             if len(self._request_times) >= self._rpm_limit:
-                raise AIProviderError('local rate limit reached; request was not sent')
+                raise AIProviderError('local rate limit reached; request was not sent', kind='local_limit')
             self._request_times.append(now)
 
     def _cache_key(self, operation: str, payload: Any) -> str:
@@ -872,6 +887,9 @@ def default_ai_gateway() -> AIGateway:
     Without an ``AI_API_KEY`` this stays credential-free and every endpoint
     keeps its deterministic behaviour.
     """
+    from app.services.model_overrides import current_models, priority_provider
+    if current_models():
+        return AIGateway(provider=priority_provider(), max_attempts=1)
     global _default_gateway
     if _default_gateway is None:
         _default_gateway = AIGateway(

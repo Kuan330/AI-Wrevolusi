@@ -5,6 +5,7 @@ import uuid
 import httpx
 
 from app.core.config import settings
+from app.services.model_overrides import current_models, skill_override
 from app.schemas.skill_direction import (
     LearningTheme,
     SkillDirectionAnalysisRequest,
@@ -70,7 +71,7 @@ def _response_text(payload: dict) -> str:
 async def generate_learning_themes(
     request: SkillDirectionAnalysisRequest,
 ) -> SkillDirectionAnalysisResponse:
-    if not settings.skill_llm_api_key:
+    if not settings.skill_llm_api_key and not current_models():
         raise SkillDirectionConfigurationError(
             'Skill learning analysis is not configured yet. Set SKILL_LLM_API_KEY on the backend.'
         )
@@ -118,22 +119,25 @@ async def generate_learning_themes(
 
     endpoint = f"{settings.skill_llm_base_url.rstrip('/')}/chat/completions"
     generated: dict | None = None
-    try:
-        async with httpx.AsyncClient(timeout=settings.skill_request_timeout_s) as client:
-            for attempt in range(settings.skill_max_retries + 1):
-                response = await client.post(endpoint, headers=headers, json=body)
-                if response.status_code < 400:
-                    generated = json.loads(_response_text(response.json()))
-                    break
-                if response.status_code not in {408, 409, 429} and response.status_code < 500:
-                    response.raise_for_status()
-                if attempt >= settings.skill_max_retries:
-                    response.raise_for_status()
-                await asyncio.sleep(0.5 * (2**attempt))
-    except (httpx.HTTPError, json.JSONDecodeError, KeyError, TypeError) as exc:
-        raise SkillDirectionGenerationError(
-            'Learning themes could not be generated. Please try again.'
-        ) from exc
+    if current_models():
+        generated = await skill_override(body['messages'][0]['content'], json.loads(body['messages'][1]['content']), settings.skill_request_timeout_s)
+    else:
+        try:
+            async with httpx.AsyncClient(timeout=settings.skill_request_timeout_s) as client:
+                for attempt in range(settings.skill_max_retries + 1):
+                    response = await client.post(endpoint, headers=headers, json=body)
+                    if response.status_code < 400:
+                        generated = json.loads(_response_text(response.json()))
+                        break
+                    if response.status_code not in {408, 409, 429} and response.status_code < 500:
+                        response.raise_for_status()
+                    if attempt >= settings.skill_max_retries:
+                        response.raise_for_status()
+                    await asyncio.sleep(0.5 * (2**attempt))
+        except (httpx.HTTPError, json.JSONDecodeError, KeyError, TypeError) as exc:
+            raise SkillDirectionGenerationError(
+                'Learning themes could not be generated. Please try again.'
+            ) from exc
 
     if generated is None:
         raise SkillDirectionGenerationError('The model did not return learning themes.')

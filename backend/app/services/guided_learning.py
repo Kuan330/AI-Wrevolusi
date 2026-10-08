@@ -15,6 +15,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.config import settings
+from app.services.model_overrides import current_models, skill_override
 from app.models.specialist import SpecialistConcept
 from app.schemas.guided_learning import ExtractedActivities, PreparedIdea, SelectedConcepts
 from app.services.learning_goals import LEARNING_GOALS_KEY, validate_learning_goals, validate_new_goal_source
@@ -35,6 +36,8 @@ class GuidedProviderUnavailable(Exception):
 
 async def model_json(instructions: str, payload: dict) -> dict:
     """Use the existing configured provider, with no retries or credential fallback."""
+    if current_models():
+        return await skill_override(f'{PROMPT_VERSION}. {instructions}', payload, min(settings.skill_request_timeout_s, PROVIDER_TIMEOUT_SECONDS))
     if not settings.skill_llm_api_key:
         raise GuidedProviderUnavailable('Guided suggestions are not available. You can still search skills or write your own goal.')
     headers = {'Authorization': f'Bearer {settings.skill_llm_api_key}', 'Content-Type': 'application/json'}

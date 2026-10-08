@@ -1,3 +1,4 @@
+import { isAIRequest, modelPreferenceSnapshot, subscribeModelPreferences } from "../infrastructure/storage/modelPreferences.ts";
 const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL ?? "/api/v1";
 
 export class ApiError extends Error {
@@ -62,6 +63,9 @@ const request = async <T>(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const externalSignal = init?.signal ?? null;
+  const aiRequest = isAIRequest(path), modelVersion = modelPreferenceSnapshot();
+  let modelsChanged = false;
+  const unsubscribeModels = aiRequest ? subscribeModelPreferences(() => { modelsChanged = true; controller.abort(); }) : () => {};
   const relayExternalAbort = () => controller.abort();
   if (externalSignal) {
     if (externalSignal.aborted) {
@@ -75,12 +79,13 @@ const request = async <T>(
 
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
+      ...init,
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
+        ...(aiRequest && modelVersion ? { "X-AIW-Models": modelVersion } : {}),
         ...(init?.headers ?? {}),
       },
-      ...init,
       signal: controller.signal,
     });
 
@@ -89,6 +94,7 @@ const request = async <T>(
       return request<T>(path, init, timeoutMs, false);
     }
     const body = await parseResponseBody(response);
+    if (aiRequest && (modelsChanged || modelVersion !== modelPreferenceSnapshot())) { modelsChanged = true; throw new ApiError("AI models changed. Try again with the new settings.", 409, { code: "ai_models_changed" }); }
     if (!response.ok) {
       const detail = apiErrorDetail(body, response.status);
       throw new ApiError(detail, response.status, body);
@@ -96,12 +102,14 @@ const request = async <T>(
 
     return body as T;
   } catch (error) {
+    if (modelsChanged) throw new ApiError("AI models changed. Try again with the new settings.", 409, { code: "ai_models_changed" });
     if (error instanceof Error && error.name === "AbortError") {
       throw new ApiError("Request timed out", 408);
     }
     throw error;
   } finally {
     clearTimeout(timer);
+    unsubscribeModels();
     externalSignal?.removeEventListener("abort", relayExternalAbort);
   }
 };

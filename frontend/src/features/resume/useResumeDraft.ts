@@ -5,6 +5,7 @@ import { emptyDraft, type ResumeDraft } from "./types.ts";
 export function useResumeDraft(owner: string) {
   const [draft, setDraft] = useState(() => emptyDraft(owner));
   const [loading, setLoading] = useState(true);
+  const [editVersion, setEditVersion] = useState(0);
   const [storageError, setStorageError] = useState("");
   const [saveStatus, setSaveStatus] = useState("");
   const [unreadable, setUnreadable] = useState(false);
@@ -31,6 +32,7 @@ export function useResumeDraft(owner: string) {
     const next = update(current.current);
     current.current = next; setDraft(next);
     const sequence = ++edits.current;
+    setEditVersion(sequence);
     if (writeBlocked.current) { setSaveStatus("Not saved locally"); return; }
     setSaveStatus("Saving locally…");
     // Start an IDB transaction on every edit; no unload handler/debounce data loss.
@@ -60,5 +62,5 @@ export function useResumeDraft(owner: string) {
       if (active.current) { setDraft(next); setStorageError(""); setSaveStatus(""); setUnreadable(false); }
     } finally { clearing.current = false; }
   };
-  return { draft, change, clear, loading, storageError, saveStatus, unreadable, flush: () => queue.current };
+  return { draft, change, clear, editVersion, loading, storageError, saveStatus, unreadable, flush: () => queue.current };
 }

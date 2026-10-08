@@ -1,3 +1,4 @@
+import type { AssistantMessage, AssistantProposal } from "./assistant.ts";
 import { api, ApiError, apiErrorDetail } from "../../services/api.ts";
 import type { Generation, ResumeDocument, ResumeEvidence, SkillCandidate, SkillGap, RecommendedCourse } from "./types.ts";
 export type ResumeCapabilities = { ai_configured: boolean; ai_provider_host: string; ai_model: string; rendercv_version: string };
@@ -5,6 +6,8 @@ export const resumeService = {
   capabilities: (signal: AbortSignal) => api.get<ResumeCapabilities>("/resume/capabilities", signal),
   generate: (job: string, skills: SkillCandidate[], evidence: ResumeEvidence[], reviewed: boolean, signal: AbortSignal) =>
     api.post<Generation>("/resume/generate", { job_requirements: job.trim(), skills, evidence, evidence_reviewed: reviewed }, 55000, signal),
+  assist: (instruction: string, document: ResumeDocument, skills: SkillCandidate[], history: AssistantMessage[], signal: AbortSignal) =>
+    api.post<AssistantProposal>("/resume/assist", { instruction, document, skills, history, context_reviewed: true }, 55000, signal),
   courses: (gaps: SkillGap[], signal: AbortSignal) => api.post<{ courses: RecommendedCourse[] }>("/resume/recommend-courses", { gaps }, 40000, signal),
   async render(document: ResumeDocument, signal: AbortSignal): Promise<Blob> {
     const controller = new AbortController();

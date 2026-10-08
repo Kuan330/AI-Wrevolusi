@@ -23,6 +23,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
+from app.services.model_overrides import ModelOverrideError
 from app.schemas.occupation_search import OccupationSearchKeywords
 from app.services.ai_matching import (
     normalize_task_text_for_matching,
@@ -238,6 +239,7 @@ def normalise_search_query(query: str, gateway: Any) -> list[str]:
             fallback=lambda: OccupationSearchKeywords(keywords=[]),
         )
         value = getattr(result, 'value', None)
+    except ModelOverrideError: raise
     except Exception:  # noqa: BLE001 - optional layer by design
         return []
 

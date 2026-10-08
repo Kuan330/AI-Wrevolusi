@@ -12,6 +12,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Protocol
 
+from app.services.model_overrides import ModelOverrideError
 from app.schemas.ai_matching import TaskMatchCandidate, TaskMatchResponse
 from app.services.ai_gateway import AIGateway
 from app.services.ai_matching import (
@@ -70,6 +71,7 @@ class LLMTaskMatchJudge:
                 payload=payload,
                 response_model=TaskMatchResponse,
             )
+        except ModelOverrideError: raise
         except Exception:  # noqa: BLE001 - the optional layer must never break a request
             return None
 

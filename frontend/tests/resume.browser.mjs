@@ -180,7 +180,7 @@ try {
   assert.equal(count, 0); assert.equal(courseRequests, 0);
   await page.getByRole('button', { name: 'Add entry · Skills', exact: true }).click(); await page.getByLabel(/^Bullet/).fill('User-entered analytical thinking');
   await saved(); await page.reload(); await ready(); await pdfReady(); assert.match((await exportFile('YAML')).toString(), /User-entered analytical thinking/);
-  await page.getByRole('button', { name: 'Target & AI' }).click();
+  await page.getByRole('button', { name: 'Target role' }).click();
   assert.equal(await page.getByRole('button', { name: 'Generate new suggestions' }).isDisabled(), true);
   await page.getByRole('button', { name: 'Back to editing' }).click();
   assert.match((await exportFile('YAML')).toString(), /User-entered analytical thinking/);
@@ -264,10 +264,10 @@ try {
   await page.getByRole('tab', { name: 'Settings', exact: true }).click(); await page.getByLabel('Pdf Title · pdf_title').fill('Own CV title'); await saved(); assert.match((await exportFile('YAML')).toString(), /Own CV title/); await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await page.getByRole('tab', { name: 'CV', exact: true }).click(); await pdfReady();
 
-  await page.getByRole('button', { name: 'Courses', exact: true }).click(); const courses = page.locator('.rb-courses'); await courses.waitFor();
-  await courses.locator('.rb-course').first().getByRole('checkbox').check(); await courses.getByRole('button', { name: /Add selected/ }).click();
-  await courses.getByText('Added to My courses.', { exact: false }).waitFor(); assert.equal(await courses.locator('.rb-added').count(), 1);
-  await courses.getByRole('checkbox', { name: /Select all/ }).check(); await courses.getByRole('button', { name: /Add selected/ }).click(); await page.waitForFunction(() => document.querySelectorAll('.rb-added').length === 2); await page.getByRole('dialog', { name: 'Courses for your next role' }).getByRole('button', { name: 'Close', exact: true }).click();
+  await page.getByRole('button', { name: /^Courses, \d+ recommendations$/ }).click(); const courses = page.locator('.rw-courses-dialog'); await courses.waitFor();
+  await courses.locator('.rw-course-item').first().getByRole('checkbox').check(); await courses.getByRole('button', { name: /Add selected/ }).click();
+  await courses.getByText('Added to My courses.', { exact: false }).waitFor(); assert.equal(await courses.locator('.rw-added-badge').count(), 1);
+  await courses.getByRole('checkbox', { name: /Select all/ }).check(); await courses.getByRole('button', { name: /Add selected/ }).click(); await page.waitForFunction(() => document.querySelectorAll('.rw-added-badge').length === 2); await page.getByRole('dialog', { name: 'Courses for your next role' }).getByRole('button', { name: 'Close', exact: true }).click();
   await page.getByRole('button', { name: 'YAML', exact: true }).click(); const editor = page.locator('.cm-content');
   await editor.fill('cv: {}\nunknown: preserve-this-value'); await saved();
   assert.match((await exportFile('YAML')).toString(), /preserve-this-value/); assert.equal(await page.getByRole('button', { name: 'PDF', exact: true }).isDisabled(), true);
@@ -280,10 +280,10 @@ try {
   await editor.fill(yaml); await page.getByRole('button', { name: 'YAML', exact: true }).click(); await pdfReady();
   await page.getByRole('button', { name: /Add section/ }).click(); await page.getByLabel('Chapter title').fill('Projects'); await page.getByRole('dialog').getByRole('button', { name: 'Add chapter', exact: true }).click();
   await page.getByRole('button', { name: 'Add entry · Projects', exact: true }).click(); await page.getByLabel('Bullet · Projects entry 1 bullet', { exact: true }).fill('User-entered factual project.'); await saved();
-  await page.getByRole('button', { name: 'Target & AI' }).click(); await page.getByRole('button', { name: 'Generate new suggestions' }).click();
+  await page.getByRole('button', { name: 'Target role' }).click(); await page.getByRole('button', { name: 'Generate new suggestions' }).click();
   const dialog = page.getByRole('dialog', { name: 'Review AI suggestions' }); await dialog.waitFor(); await dialog.getByRole('checkbox').check(); await dialog.getByRole('button', { name: 'Apply selected chapters' }).click(); await saved();
   assert.match((await exportFile('YAML')).toString(), /User-entered factual project/); await page.getByRole('button', { name: 'Resume options' }).click(); await page.getByRole('button', { name: 'Undo AI changes' }).click(); await page.getByRole('dialog', { name: 'Resume options' }).getByRole('button', { name: 'Close', exact: true }).click(); await saved(); assert.match((await exportFile('YAML')).toString(), /User-entered factual project/);
-  if (!await page.locator('.rb-job-card').count() || !await page.locator('.rb-job-card').isVisible()) await page.getByRole('button', { name: 'Target & AI' }).click(); await page.locator('input[type=file]').setInputFiles({ name: 'original.pdf', mimeType: 'application/pdf', buffer: pdf });
+  if (!await page.locator('.rb-job-card').count() || !await page.locator('.rb-job-card').isVisible()) await page.getByRole('button', { name: 'Target role' }).click(); await page.locator('input[type=file]').setInputFiles({ name: 'original.pdf', mimeType: 'application/pdf', buffer: pdf });
   await page.getByLabel(/Resume evidence that AI will receive/).waitFor(); assert.ok((await page.getByLabel(/Resume evidence that AI will receive/).inputValue()).length > 3);
   assert.equal(await page.getByRole('button', { name: 'Generate new suggestions' }).isDisabled(), true); await page.getByRole('button', { name: 'Remove source' }).click(); await page.getByRole('button', { name: 'Back to editing' }).click();
   await page.setViewportSize({ width: 390, height: 844 }); await page.getByRole('tab', { name: 'Preview', exact: true }).click(); await page.getByRole('img', { name: /Resume PDF/ }).first().waitFor(); assert.equal(await page.locator('.rw-edit-pane').isVisible(), false);

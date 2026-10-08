@@ -1,7 +1,7 @@
 import { ApiError } from "../../services/api.ts";
 import schema from "./rendercv-2.8.schema.json" with { type: "json" };
 import type { ResumeDocument } from "./types.ts";
-const keys = new Set("document job_requirements skills evidence evidence_reviewed id text entries gaps skill_ids fact_ids keywords skill_slugs course_id gap_ids reason courses field".split(" "));
+const keys = new Set("document job_requirements skills evidence evidence_reviewed id text entries gaps skill_ids fact_ids keywords skill_slugs course_id gap_ids reason courses field instruction context_reviewed history role content section_index source_ids path value design".split(" "));
 function collect(value: unknown) {
   if (!value || typeof value !== "object") return;
   if (!Array.isArray(value) && "properties" in value && value.properties && typeof value.properties === "object") for (const key of Object.keys(value.properties)) keys.add(key);

@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Bold, ChevronsDownUp, ChevronsUpDown, Download, Italic, Link2, Menu, MoreHorizontal, Redo2, Sparkles, Undo2, BookOpen } from "lucide-react";
@@ -21,7 +22,7 @@ type Props = {
   undo: () => void; redo: () => void; canUndo: boolean; canRedo: boolean;
   saveStatus: string; notices: React.ReactNode; pdf: Blob | null; freshPdf: boolean; rendering: boolean;
   renderError: string; retryRender: () => void; downloadPdf: () => void; downloadYaml: () => void;
-  target: () => void; courses?: () => void; more: () => void;
+  target: () => void; courses?: () => void; courseCount: number; more: () => void; assistant: React.ReactNode;
 };
 export default function ResumeWorkbench(props: Props) {
   const workspace = useWorkspacePresentation();
@@ -65,7 +66,7 @@ export default function ResumeWorkbench(props: Props) {
         <Button variant="ghost" size="icon" aria-label="Bold selection" disabled={!canFormat} onMouseDown={event => event.preventDefault()} onClick={() => applyFormat("bold")}><Bold /></Button><Button variant="ghost" size="icon" aria-label="Italic selection" disabled={!canFormat} onMouseDown={event => event.preventDefault()} onClick={() => applyFormat("italic")}><Italic /></Button><Button variant="ghost" size="icon" aria-label="Insert link" disabled={!canFormat} onMouseDown={event => event.preventDefault()} onClick={() => { linkSelection.current = selection; setUrl(""); setLinkError(""); setLinkOpen(true); }}><Link2 /></Button>
         <Button variant={yamlMode ? "secondary" : "ghost"} size="sm" aria-pressed={yamlMode} onClick={() => { setYamlMode(value => !value); setSelection(null); }}>YAML</Button>
       </div>
-      <div className="rw-toolbar-actions"><span className="rw-save" role="status">{props.saveStatus || "Local draft"}</span><Button variant="ghost" size="sm" onClick={props.target}><Sparkles /><span>Target & AI</span></Button>{props.courses && <Button variant="ghost" size="sm" onClick={props.courses}><BookOpen />Courses</Button>}<Button variant="outline" size="sm" disabled={!props.freshPdf} onClick={props.downloadPdf}><Download />PDF</Button><Button variant="ghost" size="icon" aria-label="Resume options" onClick={props.more}><MoreHorizontal /></Button><AccountMenu iconOnly /></div>
+      <div className="rw-toolbar-actions"><span className="rw-save" role="status">{props.saveStatus || "Local draft"}</span><Button variant="ghost" size="sm" onClick={props.target}><Sparkles /><span>Target role</span></Button>{props.courses && <Button variant="ghost" size="sm" className="rw-courses-trigger" aria-label={`Courses, ${props.courseCount} recommendations`} onClick={props.courses}><BookOpen />Courses<Badge className="rw-courses-count" aria-hidden="true">{props.courseCount}</Badge></Button>}<Button variant="outline" size="sm" disabled={!props.freshPdf} onClick={props.downloadPdf}><Download />PDF</Button><Button variant="ghost" size="icon" aria-label="Resume options" onClick={props.more}><MoreHorizontal /></Button><AccountMenu iconOnly /></div>
     </header>
     {props.notices && <div className="rw-notices">{props.notices}</div>}
     <div className="rw-pane-toolbar">
@@ -76,7 +77,7 @@ export default function ResumeWorkbench(props: Props) {
     <div className="rw-split" ref={split} style={{ "--editor-width": `${effectiveRatio}%` } as React.CSSProperties}>
       <section className="rw-edit-pane" aria-label="Resume editing"><div className="rw-edit-scroll">
         {yamlMode ? <><YamlEditor value={props.yamlText} onChange={props.editYaml} />{props.yamlError && <div className="rb-error rw-yaml-error" role="alert">{props.yamlError}</div>}</> : <><fieldset disabled={props.unappliedYaml}>{props.yamlError && !props.unappliedYaml && <div className="rb-error" role="alert">{props.yamlError}</div>}{props.unappliedYaml && <div className="rb-warning" role="alert">Fix the pending YAML before editing the form. Your text and last valid PDF are retained.</div>}<MarkdownContext.Provider value={next => setSelection(next ? { ...next, document: props.document } : null)}>{tab === "cv" ? <ResumeForm document={props.document} change={props.editDocument} add={props.addSection} remove={props.removeSection} collapsed={collapsed} toggle={title => setCollapsed(old => { const next = new Set(old); if (next.has(title)) next.delete(title); else next.add(title); return next; })} /> : <ResumeControls document={props.document} section={tab as "design" | "settings"} change={props.editDocument} />}</MarkdownContext.Provider></fieldset></>}
-      </div></section>
+      </div>{props.assistant}</section>
       <div ref={divider} role="separator" tabIndex={narrow ? -1 : 0} aria-label="Resize editor and preview" aria-orientation="vertical" aria-valuemin={Math.ceil(360 / workspaceWidth * 100)} aria-valuemax={Math.floor(100 - 327 / workspaceWidth * 100)} aria-valuenow={Math.round(effectiveRatio)} className="rw-separator" onKeyDown={event => { if (["ArrowLeft", "ArrowRight", "Home"].includes(event.key)) { event.preventDefault(); adjust(event.key === "Home" ? 50 : effectiveRatio + (event.key === "ArrowLeft" ? -2 : 2)); } }} onPointerDown={event => { if (event.button === 0) event.currentTarget.setPointerCapture(event.pointerId); }} onPointerMove={event => { if (!event.currentTarget.hasPointerCapture(event.pointerId)) return; const bounds = split.current?.getBoundingClientRect(); if (bounds) adjust((event.clientX - bounds.left) / bounds.width * 100); }} onPointerUp={event => { if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }} />
       <section className="rw-preview-pane" aria-label="Resume PDF preview"><div className="rw-preview-status"><span role="status">{props.rendering ? "Rendering…" : props.freshPdf ? "Up to date" : props.pdf ? "Last valid preview" : "RenderCV preview"}</span><Button variant="link" size="sm" onClick={props.downloadYaml}>Download YAML</Button></div>{props.renderError && <div className="rb-error" role="alert">{props.renderError}<Button variant="link" size="sm" onClick={props.retryRender}>Retry rendering</Button></div>}<PdfPreview blob={props.pdf} controlsTarget={pdfControls} /></section>
     </div>
