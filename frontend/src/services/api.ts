@@ -3,12 +3,21 @@ const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL ?? "/api/v1";
 export class ApiError extends Error {
   readonly status: number;
   readonly detail: string;
+  readonly code?: string;
+  readonly fields: (string | number)[][];
 
-  constructor(message: string, status: number) {
+  constructor(message: string, status: number, metadata?: unknown) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.detail = message;
+    const body = metadata && typeof metadata === "object" ? metadata as Record<string, unknown> : {};
+    if (typeof body.code === "string" && /^[a-z][a-z0-9_]{0,63}$/.test(body.code)) this.code = body.code;
+    this.fields = Array.isArray(body.fields) ? body.fields.slice(0, 5).filter((path): path is (string | number)[] =>
+      Array.isArray(path) && path.length <= 18 && path.every(part =>
+        typeof part === "number" ? Number.isInteger(part) && part >= 0 && part <= 10000 :
+          typeof part === "string" && /^[a-z_]{1,64}$/.test(part)),
+    ).map(path => [...path]) : [];
   }
 }
 
@@ -82,7 +91,7 @@ const request = async <T>(
     const body = await parseResponseBody(response);
     if (!response.ok) {
       const detail = apiErrorDetail(body, response.status);
-      throw new ApiError(detail, response.status);
+      throw new ApiError(detail, response.status, body);
     }
 
     return body as T;

@@ -14,7 +14,7 @@ const output = fileURLToPath(new URL('../../.local/resume-qa', import.meta.url))
 const browser = await chromium.launch({ headless: true, channel: process.env.AIW_QA_BROWSER_CHANNEL || "chrome" });
 const context = await browser.newContext({ viewport: { width: 1536, height: 1000 }, acceptDownloads: true });
 const page = await context.newPage(); page.setDefaultTimeout(15000);
-const errors = [], sync = []; page.on('pageerror', e => errors.push(e.message));
+const errors = [], sync = [], renderFailures = []; let renderRequests = 0; page.on('pageerror', e => errors.push(e.message));
 let owner = 'qa-account-empty', signedIn = true, count = 0, courseRequests = 0, aiConfigured = false, fail = false, lastPdf, latestInput, lastRenderInput;
 let releaseSkillLoad, generateGate = null;
 let skillGate = new Promise(resolve => { releaseSkillLoad = resolve; });
@@ -39,13 +39,13 @@ await context.route('**/*', async route => {
     const input = req.postDataJSON(); latestInput = input; count++; assert.ok(input.job_requirements.trim()); assert.ok(!input.contacts && !input.name);
     assert.ok(!JSON.stringify(input).includes('alex@example.com'));
     if (generateGate) await generateGate;
-    if (fail) { fail = false; return json(route, { detail: 'Synthetic retryable error' }, 503); }
+    if (fail) { fail = false; return json(route, { detail: 'Synthetic retryable error', code: 'unverified_name', fields: [['sections', 0, 'entries', 0, 'text']] }, 503); }
     const s = input.skills[0];
     return json(route, { sections: [{ title: 'Skills', entries: [{ text: s.name + (count > 2 ? ' applied to analysis' : ''), skill_ids: [s.id], fact_ids: [] }] }], gaps: [{ id: 'security', label: 'Cybersecurity', keywords: ['security'], skill_slugs: ['networks-and-cybersecurity'] }] });
   }
   if (path === '/resume/recommend-courses') { courseRequests++; return json(route, { courses: ['security-1', 'security-2'].map(course_id => ({ course_id, gap_ids: ['security'], reason: 'Addresses the specified cybersecurity gap.' })) }); }
   if (path === '/learning/courses') return json(route, { found: true, courses: ['security-1', 'security-2'].map((course_id, i) => ({ course_id, skill_id: 'networks-and-cybersecurity', title: `Security course ${i + 1}`, provider: 'Synthetic catalogue', level: 'Beginner', chapters: [{ order: 1, title: 'Security foundations', duration_min: 30 }], chapter_count: 1 })) });
-  if (path === '/resume/render') { lastRenderInput = req.postDataJSON().document; const response = await route.fetch({ url: `${renderer}/api/v1/resume/render` }); if (response.status() === 200) lastPdf = await response.body(); return route.fulfill({ response }); }
+  if (path === '/resume/render') { renderRequests++; lastRenderInput = req.postDataJSON().document; const response = await route.fetch({ url: `${renderer}/api/v1/resume/render` }); if (response.status() === 200) lastPdf = await response.body(); else if (response.status() === 422) renderFailures.push(await response.json()); return route.fulfill({ response }); }
   return json(route, { detail: 'Deliberately unavailable in offline QA' }, 503);
 });
 const ready = () => page.waitForFunction(() => document.querySelector('.rw-workbench') || document.querySelector('.rb-job-card'));
@@ -202,6 +202,8 @@ try {
   await page.getByRole('button', { name: 'Generate my resume' }).click();
   assert.equal(await example.isDisabled(), true); releaseGenerate(); generateGate = null;
   await page.getByRole('alert').filter({ hasText: 'Synthetic retryable' }).waitFor();
+  assert.match(await page.getByRole('alert').filter({ hasText: 'Synthetic retryable' }).innerText(), /Generated section 1 → Entries → Entry 1 → Text/);
+  assert.equal(courseRequests, 0, 'Failed generation cannot start course recommendations');
   assert.match(await job.inputValue(), /QA TARGET PRIVATE/); await page.getByRole('button', { name: 'Generate my resume' }).click(); await pdfReady(); await saved();
   const yaml = (await exportFile('YAML')).toString(); assert.match(yaml, /Skills:/); assert.doesNotMatch(yaml, /name:|Experience:|Education:/);
   const pdf = await exportFile('PDF'); await writeFile(`${output}/synthetic.pdf`, pdf); assert.ok(pdf.equals(lastPdf), 'Preview/download bytes must match');
@@ -214,7 +216,27 @@ try {
   const separator = page.getByRole('separator', { name: 'Resize editor and preview' });
   assert.equal(await separator.getAttribute('aria-valuenow'), '50'); await separator.focus(); await page.keyboard.press('ArrowLeft'); assert.equal(await separator.getAttribute('aria-valuenow'), '48'); await page.keyboard.press('Home');
   const bounds = await separator.boundingBox(); await page.mouse.move(bounds.x + 3, bounds.y + 100); await page.mouse.down(); await page.mouse.move(bounds.x + 100, bounds.y + 100); await page.mouse.up(); assert.ok(Number(await separator.getAttribute('aria-valuenow')) > 50); await separator.focus(); await page.keyboard.press('Home');
-  for (const tab of ['Design', 'Locale', 'Settings', 'CV']) { await page.getByRole('tab', { name: tab, exact: true }).click(); assert.equal((await exportFile('YAML')).toString(), yaml, 'Opening tabs must not materialize defaults'); }
+  assert.deepEqual(await page.getByRole('tablist', { name: 'Resume tools' }).getByRole('tab').allTextContents(), ['CV', 'Design', 'Settings']);
+  assert.equal(await page.getByRole('tab', { name: 'Locale', exact: true }).count(), 0);
+  // A calendar-invalid date passes the JSON shape but the real engine rejects it.
+  const invalidCalendar = { ...lastRenderInput, cv: { ...lastRenderInput.cv, sections: { ...lastRenderInput.cv.sections, 'Local-only work': [{ company: 'PrivateSyntheticCompany', position: 'PrivateSyntheticRole', start_date: '2026-02-31' }] } } };
+  const validPdfBeforeError = Buffer.from(lastPdf);
+  await page.getByRole('button', { name: 'YAML', exact: true }).click();
+  await page.locator('.cm-content').fill(JSON.stringify(invalidCalendar)); await saved();
+  await page.getByRole('alert').filter({ hasText: /Local-only work → Entry 1 → Start Date/ }).waitFor();
+  const diagnostic = renderFailures.at(-1);
+  assert.equal(diagnostic.code, 'render_values_invalid');
+  assert.ok(diagnostic.fields.some(path => JSON.stringify(path) === JSON.stringify(['cv', 'sections', 1, 0, 'start_date'])));
+  assert.doesNotMatch(JSON.stringify(diagnostic), /Local-only work|PrivateSyntheticCompany|PrivateSyntheticRole|2026-02-31/);
+  assert.ok(lastPdf.equals(validPdfBeforeError), '422 must retain the last valid PDF');
+  assert.equal(await page.getByRole('button', { name: 'PDF', exact: true }).isDisabled(), true);
+  assert.match((await exportFile('YAML')).toString(), /2026-02-31/);
+  const failedRequestCount = renderRequests; await page.waitForTimeout(1200);
+  assert.equal(renderRequests, failedRequestCount, 'Unchanged failed input must not auto-retry');
+  await page.locator('.cm-content').fill(yaml); await saved(); await pdfReady();
+  assert.ok((await exportFile('PDF')).equals(lastPdf), 'Recovered preview and export must use the same PDF');
+  await page.getByRole('button', { name: 'YAML', exact: true }).click();
+  for (const tab of ['Design', 'Settings', 'CV']) { await page.getByRole('tab', { name: tab, exact: true }).click(); assert.equal((await exportFile('YAML')).toString(), yaml, 'Opening tabs must not materialize defaults'); }
   await page.getByRole('button', { name: 'Collapse all sections' }).click(); assert.equal(await page.getByLabel('Bullet · Skills entry 1 bullet').count(), 0); await page.getByRole('button', { name: 'Expand all sections' }).click();
   const skillField = page.getByLabel('Bullet · Skills entry 1 bullet'); await skillField.focus(); await skillField.press("ControlOrMeta+A");
   assert.equal(await page.getByRole('button', { name: 'Bold selection' }).isDisabled(), false); await page.getByRole('button', { name: 'Bold selection' }).click(); await saved(); assert.match((await exportFile('YAML')).toString(), /\*\*/);
@@ -222,7 +244,23 @@ try {
   await skillField.focus(); await skillField.press('ControlOrMeta+A'); await page.getByRole('button', { name: 'Italic selection' }).click(); await saved(); assert.match((await exportFile('YAML')).toString(), /\*Analytical thinking\*/); await page.keyboard.press('ControlOrMeta+Z');
   await skillField.focus(); await skillField.press('ControlOrMeta+A'); await page.getByRole('button', { name: 'Insert link' }).click(); await page.getByLabel('Link URL').fill('javascript:alert(1)'); await page.getByRole('button', { name: 'Insert link', exact: true }).last().click(); await page.getByRole('alert').filter({ hasText: /https, http, mailto or tel/ }).waitFor(); await page.getByLabel('Link URL').fill('https://example.test/own'); await page.getByRole('dialog', { name: 'Insert link' }).getByRole('button', { name: 'Insert link', exact: true }).click(); await saved(); assert.match((await exportFile('YAML')).toString(), /example.test\/own/); await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await page.getByRole('tab', { name: 'Design', exact: true }).click(); await page.getByLabel('Top Margin · page.top_margin', { exact: true }).fill(''); assert.equal(await page.getByLabel('Top Margin · page.top_margin', { exact: true }).getAttribute('type'), 'number'); await page.getByLabel('Top Margin · page.top_margin', { exact: true }).fill('0.9'); await saved(); assert.match((await exportFile('YAML')).toString(), /top_margin: 0.9in/); await page.getByRole('button', { name: 'Undo', exact: true }).click();
-  await page.getByRole('tab', { name: 'Locale', exact: true }).click(); await page.getByLabel('Locale language').selectOption('french'); await saved(); assert.match((await exportFile('YAML')).toString(), /language: french/); await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  // Locale is advanced YAML-only; previously saved values still restore and render.
+  const localeYaml = yaml + "\nlocale:\n  language: french\n  present: En cours\n";
+  await page.getByRole('button', { name: 'YAML', exact: true }).click();
+  await page.locator('.cm-content').fill(localeYaml); await saved(); await pdfReady();
+  await page.getByRole('button', { name: 'YAML', exact: true }).click();
+  await page.reload(); await ready(); await pdfReady();
+  assert.equal((await exportFile('YAML')).toString(), localeYaml, 'Saved locale must survive reopening');
+  assert.equal(lastRenderInput.locale.language, 'french'); assert.equal(lastRenderInput.locale.present, 'En cours');
+  assert.equal(await page.getByRole('tab', { name: 'Locale', exact: true }).count(), 0);
+  for (const tab of ['CV', 'Design', 'Settings']) { await page.getByRole('tab', { name: tab, exact: true }).click(); assert.equal((await exportFile('YAML')).toString(), localeYaml, 'Form tabs must preserve locale overrides'); }
+  await page.getByLabel('Pdf Title · pdf_title').fill('Locale compatibility title'); await saved();
+  assert.match((await exportFile('YAML')).toString(), /language: french/);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  assert.equal((await exportFile('YAML')).toString(), localeYaml);
+  await page.getByRole('button', { name: 'YAML', exact: true }).click();
+  await page.locator('.cm-content').fill(yaml); await saved();
+  await page.getByRole('button', { name: 'YAML', exact: true }).click();
   await page.getByRole('tab', { name: 'Settings', exact: true }).click(); await page.getByLabel('Pdf Title · pdf_title').fill('Own CV title'); await saved(); assert.match((await exportFile('YAML')).toString(), /Own CV title/); await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await page.getByRole('tab', { name: 'CV', exact: true }).click(); await pdfReady();
 
@@ -327,5 +365,5 @@ try {
   await page.getByRole('button', { name: 'Generate my resume' }).click(); await pdfReady();
   assert.ok(latestInput.skills.some(skill => skill.name === 'Python')); assert.doesNotMatch(JSON.stringify(latestInput), /Alex Example|alex@example.com|412 345/);
   assert.ok(sync.every(payload => !JSON.stringify(payload).includes('QA TARGET PRIVATE') && !Object.keys(payload.data).some(key => key.includes('resume')))); assert.deepEqual(errors, []);
-  console.log('PASS: Possibilities child menu on desktop/mobile/focus mode, search, keyboard and correct child highlights; blank/legacy/list and free-text contacts with literal rendering and recovery; focused workbench/menu restoration, split pointer/keyboard, four tabs/explicit controls, selection formatting/safe links, undo/redo, all nine entry types and nested lists, rename/reorder/delete, tablet/phone overflow, lazy continuous PDF; example fill/replace/cancel/restore, local zero-skill draft without AI/courses, skill-error protection, collapsed privacy, first-use/retry/recovery, same PDF export, course partial/all, YAML recovery, section apply/undo, PDF import, desktop/mobile/keyboard, pagination/zoom, account isolation/logout/clear, no resume sync, invalid/encrypted/textless sources, DOCX/My Plan handoff and original-skill review.');
+  console.log('PASS: Possibilities child menu on desktop/mobile/focus mode, search, keyboard and correct child highlights; blank/legacy/list and free-text contacts with literal rendering and recovery; focused workbench/menu restoration, split pointer/keyboard, three tabs/explicit controls, structured private field errors with last-valid PDF recovery and no automatic render retries, and YAML-only locale restore/render compatibility, selection formatting/safe links, undo/redo, all nine entry types and nested lists, rename/reorder/delete, tablet/phone overflow, lazy continuous PDF; example fill/replace/cancel/restore, local zero-skill draft without AI/courses, skill-error protection, collapsed privacy, first-use/retry/recovery, same PDF export, course partial/all, YAML recovery, section apply/undo, PDF import, desktop/mobile/keyboard, pagination/zoom, account isolation/logout/clear, no resume sync, invalid/encrypted/textless sources, DOCX/My Plan handoff and original-skill review.');
 } catch (error) { console.error(errors, await page.evaluate(() => ({ width: innerWidth, body: document.body.scrollWidth, root: document.documentElement.scrollWidth, overflow: [...document.querySelectorAll('body *')].map(el => ({ tag: el.tagName, cls: typeof el.className === 'string' ? el.className : '', text: (el.textContent || '').slice(0, 45), left: el.getBoundingClientRect().left, right: el.getBoundingClientRect().right })).filter(el => el.right > innerWidth + 1 && el.left >= 0).slice(0, 30) })), await page.locator("body").innerText()); await page.screenshot({ path: `${output}/failure.png`, fullPage: true }); throw error; } finally { await context.close(); await browser.close(); }

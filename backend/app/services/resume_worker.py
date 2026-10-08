@@ -57,15 +57,9 @@ def main():
         pdf_png.get_package_path = lambda: package_root
         generate_pdf(model, generate_typst(model))
     except RenderCVUserValidationError as error:
-        fields = []
-        for issue in error.validation_errors[:5]:
-            location = getattr(issue, "schema_location", None)
-            if location:
-                parts = list(location)
-                if len(parts) > 2 and parts[:2] == ["cv", "sections"]:
-                    parts[2] = "[chapter]"
-                fields.append("/".join(str(part) for part in parts)[:200])
-        print(json.dumps({"fields": fields}))
+        from app.services.resume_errors import render_fields
+        locations = [issue.schema_location for issue in error.validation_errors[:20] if getattr(issue, "schema_location", None)]
+        print(json.dumps({"fields": render_fields(locations, document)}))
         return 2
     except Exception:
         # Do not print/log exception strings: they may contain personal data.

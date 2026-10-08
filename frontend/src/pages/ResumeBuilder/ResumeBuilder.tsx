@@ -1,3 +1,4 @@
+import { resumeErrorMessage } from "@/features/resume/errors";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Check, FileText, ShieldCheck, Sparkles, Trash2, Undo2, Upload } from "lucide-react";
@@ -119,7 +120,7 @@ function ResumeWorkspace({ owner }: { owner: string }) {
     const timer = setTimeout(() => {
       void resumeService.render(JSON.parse(fingerprint), request.signal).then(blob => {
         if (isCurrent() && !request.signal.aborted) { setPdf(blob); setPdfKey(fingerprint); setRenderError(""); change(old => { const next = { ...old, previewDocument: JSON.parse(fingerprint) }; history.current.sync(next); return next; }); }
-      }).catch(cause => { if (isCurrent() && !request.signal.aborted) setRenderError(message(cause)); })
+      }).catch(cause => { if (isCurrent() && !request.signal.aborted) setRenderError(resumeErrorMessage(cause, JSON.parse(fingerprint))); })
         .finally(() => { controllers.current.delete(request); if (isCurrent() && !request.signal.aborted) setRendering(false); });
     }, 700);
     return () => { clearTimeout(timer); request.abort(); controllers.current.delete(request); };
@@ -170,7 +171,7 @@ function ResumeWorkspace({ owner }: { owner: string }) {
         change(old => ({ ...old, document, yamlText: documentYaml(document), jobRequirements: job, pendingJobRequirements: job, gaps: result.gaps, recommendations: [], proposal: null }));
         setShowJob(false); void getRecommendations(result, job, token);
       }
-    } catch (cause) { if (isCurrent() && !request.signal.aborted) setError(message(cause)); }
+    } catch (cause) { if (isCurrent() && !request.signal.aborted) setError(resumeErrorMessage(cause)); }
     finally { controllers.current.delete(request); if (isCurrent() && token === run.current) { busy.current = false; setGenerating(false); } }
   };
   const applyProposal = () => {

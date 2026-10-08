@@ -1,5 +1,7 @@
 """Authenticated transient endpoints; no database writes or resume payload logs."""
 import logging
+import time
+from starlette.responses import JSONResponse
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.routing import APIRoute
 from sqlalchemy import text
@@ -9,6 +11,7 @@ from app.db.session import get_db
 from app.services.auth import get_current_user
 from app.schemas.resume import GenerateRequest, GenerateResponse, RecommendRequest, RecommendResponse, RenderRequest
 from app.services.resume import resume_provider, generate_resume, recommend_courses, provider_description
+from app.services.resume_errors import ResumeProblem, error_body
 from app.services.resume_render import render_pdf, InvalidResume, RenderBusy, RenderFailed
 
 logger = logging.getLogger(__name__)
@@ -44,11 +47,17 @@ def capabilities():
 
 @router.post("/generate", response_model=GenerateResponse)
 async def generate(payload: GenerateRequest, provider=Depends(get_resume_provider)):
+    started = time.monotonic()
     try:
         return await run_in_threadpool(generate_resume, payload, provider)
-    except Exception as error:
-        logger.warning("resume_generate_failed category=%s", type(error).__name__)
-        raise HTTPException(503, "AI could not produce a supported, evidence-based draft. Your local input is unchanged. Try again or edit manually.") from None
+    except ResumeProblem as error:
+        logger.warning("resume_generate_failed code=%s attempts=%s status=503 duration_ms=%.1f", error.code, error.attempts, (time.monotonic() - started) * 1000)
+        body = error_body(error)
+        body["detail"] += " Your local input is unchanged. Try again or edit manually." if error.code in {"duplicate_sections", "duplicate_gaps", "missing_evidence", "invalid_reference", "unsupported_fact", "unsupported_claim", "unverified_name", "unsafe_content"} else ""
+        return JSONResponse(status_code=503, content=body, headers={"Cache-Control": "no-store"})
+    except Exception:
+        logger.warning("resume_generate_failed code=internal_error attempts=0 status=503 duration_ms=%.1f", (time.monotonic() - started) * 1000)
+        return JSONResponse(status_code=503, content={"detail": "AI could not generate a supported draft. Your local input is unchanged. Try again or edit manually.", "code": "internal_error", "fields": []}, headers={"Cache-Control": "no-store"})
 
 @router.post("/recommend-courses", response_model=RecommendResponse)
 async def recommendations(payload: RecommendRequest, db: AsyncSession = Depends(get_db)):
@@ -67,12 +76,21 @@ async def recommendations(payload: RecommendRequest, db: AsyncSession = Depends(
 
 @router.post("/render")
 async def render(payload: RenderRequest):
+    started = time.monotonic()
     try:
         data = await run_in_threadpool(render_pdf, payload.document)
     except InvalidResume as error:
-        raise HTTPException(422, str(error)) from None
+        logger.warning("resume_render_rejected code=%s attempts=1 status=422 duration_ms=%.1f", error.code, (time.monotonic() - started) * 1000)
+        return JSONResponse(status_code=422, content=error_body(error), headers={"Cache-Control": "no-store"})
     except RenderBusy:
-        raise HTTPException(429, "The renderer is busy. Try again shortly.") from None
+        logger.warning("resume_render_failed code=render_busy attempts=1 status=429 duration_ms=%.1f", (time.monotonic() - started) * 1000)
+        return JSONResponse(status_code=429, content={"detail": "The renderer is busy. Try again shortly.", "code": "render_busy", "fields": []}, headers={"Cache-Control": "no-store"})
     except RenderFailed as error:
-        raise HTTPException(503, str(error)) from None
+        code = "render_timeout" if error.code == "render_timeout" else "render_failed"
+        detail = "Resume rendering timed out. Your local draft is unchanged." if code == "render_timeout" else "The PDF could not be rendered. Your local draft is unchanged."
+        logger.warning("resume_render_failed code=%s attempts=1 status=503 duration_ms=%.1f", code, (time.monotonic() - started) * 1000)
+        return JSONResponse(status_code=503, content={"detail": detail, "code": code, "fields": []}, headers={"Cache-Control": "no-store"})
+    except Exception:
+        logger.warning("resume_render_failed code=internal_error attempts=1 status=500 duration_ms=%.1f", (time.monotonic() - started) * 1000)
+        return JSONResponse(status_code=500, content={"detail": "The PDF could not be rendered. Your local draft is unchanged.", "code": "internal_error", "fields": []}, headers={"Cache-Control": "no-store"})
     return Response(data, media_type="application/pdf", headers={"Cache-Control": "no-store", "Content-Disposition": 'inline; filename="resume.pdf"'})

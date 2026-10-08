@@ -17,7 +17,10 @@ export const resumeService = {
         method: "POST", credentials: "include", cache: "no-store", signal: controller.signal,
         headers: { "Content-Type": "application/json" }, body: JSON.stringify({ document }),
       });
-      if (!response.ok) throw new ApiError(apiErrorDetail(await response.json().catch(() => null), response.status), response.status);
+      if (!response.ok) {
+        const body: unknown = await response.json().catch(() => null);
+        throw new ApiError(apiErrorDetail(body, response.status), response.status, body);
+      }
       if (!response.headers.get("content-type")?.includes("application/pdf")) throw new Error("The renderer did not return a PDF.");
       return await response.blob();
     } finally { clearTimeout(timer); signal.removeEventListener("abort", relay); }

@@ -76,8 +76,9 @@ def create_app(api_root: str = '/api') -> FastAPI:
     @application.exception_handler(RequestValidationError)
     async def private_validation(request, error):
         if request.url.path.startswith(f"{api_prefix}/resume/"):
+            from app.services.resume_errors import safe_fields
             # FastAPI normally echoes rejected input (possibly contact details).
-            return JSONResponse(status_code=422, content={"detail": "Invalid resume request. Check field types, limits and evidence review."}, headers={"Cache-Control": "no-store"})
+            return JSONResponse(status_code=422, content={"detail": "Invalid resume request. Check field types, limits and evidence review.", "code": "invalid_request", "fields": safe_fields([issue.get("loc", ()) for issue in error.errors()])}, headers={"Cache-Control": "no-store"})
         return await request_validation_exception_handler(request, error)
 
     @application.on_event('startup')

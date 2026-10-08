@@ -144,3 +144,27 @@ test("phone-number reformatting is not exposed for literal user-entered phone te
   assert.equal(controlFields(draft, "design").some(field => field.path.join(".") === "header.connections.phone_number_format"), false);
   assert.equal(documentYaml(draft), before);
 });
+
+
+test("hidden locale keeps English defaults without adding fields to new drafts", () => {
+  const before = documentYaml(document);
+  assert.equal(controlFields(document, "locale").find(field => field.path[0] === "present").value, "present");
+  const edited = updateControl(document, "settings", ["pdf_title"], "Own title");
+  assert.equal(Object.hasOwn(edited, "locale"), false);
+  assert.equal(Object.hasOwn(resumeRenderDocument(edited), "locale"), false);
+  assert.equal(documentYaml(document), before);
+});
+
+test("existing locale survives form edits, YAML round-trips and render preparation", () => {
+  const locale = { language: "french", present: "En cours", last_updated: "Mis à jour en", month_abbreviations: ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."] };
+  const draft = { ...document, locale };
+  const before = structuredClone(draft);
+  let edited = updateControl(draft, "design", ["page", "top_margin"], "1in");
+  edited = updateControl(edited, "settings", ["pdf_title"], "Own title");
+  edited = renameSection(edited, "Skills", "Competencies");
+  const parsed = parseResumeYaml(documentYaml(edited));
+  assert.equal(parsed.error, "");
+  assert.deepEqual(parsed.document.locale, locale);
+  assert.deepEqual(resumeRenderDocument(parsed.document).locale, locale);
+  assert.deepEqual(draft, before);
+});
