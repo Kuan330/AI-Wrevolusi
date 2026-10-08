@@ -12,6 +12,6 @@ type FeedbackBody = {
 export const interviewService = {
   bank: (occupationCode: string, signal: AbortSignal) =>
     api.get<QuestionBank>(`/interview/question-bank?occupation_code=${encodeURIComponent(occupationCode)}&limit=12`, signal),
-  plan: (body: PlanBody, signal: AbortSignal) => api.post<PlanResult>("/interview/plan", body, 50000, signal),
-  feedback: (body: FeedbackBody, signal: AbortSignal) => api.post<Feedback>("/interview/feedback", body, 55000, signal),
+  plan: (body: PlanBody, signal: AbortSignal) => api.post<PlanResult>("/interview/plan", body, 60000, signal),
+  feedback: (body: FeedbackBody, signal: AbortSignal) => api.post<Feedback>("/interview/feedback", body, 60000, signal),
 };

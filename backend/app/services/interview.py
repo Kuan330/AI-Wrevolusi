@@ -189,7 +189,7 @@ def plan_questions(request: PlanRequest, provider) -> PlanResponse:
     return _run(
         provider, "interview.plan.v1", request.model_dump(), PlanModelResponse,
         PLAN_PROMPT.replace("{count}", str(request.count)),
-        lambda raw: validate_plan(PlanModelResponse.model_validate(raw), request), budget_s=40,
+        lambda raw: validate_plan(PlanModelResponse.model_validate(raw), request), budget_s=50,
     )
 
 
@@ -247,7 +247,7 @@ def normalise_feedback(result: FeedbackResponse, request: FeedbackRequest) -> Fe
 def feedback_for_answer(request: FeedbackRequest, provider) -> FeedbackResponse:
     return _run(
         provider, "interview.feedback.v1", request.model_dump(), FeedbackResponse, FEEDBACK_PROMPT,
-        lambda raw: normalise_feedback(FeedbackResponse.model_validate(raw), request), budget_s=40,
+        lambda raw: normalise_feedback(FeedbackResponse.model_validate(raw), request), budget_s=50,
     )
 
 
