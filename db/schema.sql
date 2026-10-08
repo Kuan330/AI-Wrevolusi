@@ -67,6 +67,51 @@ CREATE TABLE IF NOT EXISTS ref_wef_skills (
     source_figures TEXT
 );
 
+-- Epic 9 interview question bank (reference data only, no personal data).
+-- Fast lookup: ref_interview_occupation_questions ordered by display_order.
+
+CREATE TABLE IF NOT EXISTS ref_interview_sources (
+    source_id TEXT PRIMARY KEY,
+    publisher TEXT,
+    title TEXT,
+    evidence_period TEXT,
+    source_type TEXT,
+    url TEXT
+);
+
+CREATE TABLE IF NOT EXISTS ref_interview_questions (
+    question_id TEXT PRIMARY KEY,
+    scope TEXT NOT NULL CHECK (scope IN ('Exact', 'Family', 'Common')),
+    occupation_code TEXT REFERENCES ref_occupations (occupation_code),
+    family_code TEXT,
+    applies_to TEXT,
+    primary_intent TEXT NOT NULL,
+    question TEXT NOT NULL UNIQUE,
+    source_ids TEXT[] NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ref_interview_occupation_questions (
+    occupation_code TEXT NOT NULL REFERENCES ref_occupations (occupation_code),
+    question_id TEXT NOT NULL REFERENCES ref_interview_questions (question_id),
+    scope TEXT NOT NULL CHECK (scope IN ('Exact', 'Family', 'Common')),
+    display_order INTEGER NOT NULL,
+    PRIMARY KEY (occupation_code, question_id),
+    UNIQUE (occupation_code, display_order)
+);
+
+CREATE TABLE IF NOT EXISTS ref_interview_coverage (
+    occupation_code TEXT PRIMARY KEY REFERENCES ref_occupations (occupation_code),
+    quality_tier TEXT NOT NULL,
+    family_code TEXT,
+    family_title TEXT,
+    exact_count INTEGER NOT NULL,
+    family_count INTEGER NOT NULL,
+    targeted_count INTEGER NOT NULL,
+    mapped_question_count INTEGER NOT NULL,
+    coverage_status TEXT NOT NULL,
+    review_note TEXT
+);
+
 -- ---------------------------------------------------------------------------
 -- Business (app writes these; seed script does not)
 -- ---------------------------------------------------------------------------

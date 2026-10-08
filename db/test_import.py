@@ -24,10 +24,15 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from seed_reference import (  # noqa: E402
     ILO_COLS,
+    INTERVIEW_COVERAGE_COLS,
+    INTERVIEW_MAPPING_COLS,
+    INTERVIEW_QUESTION_COLS,
+    INTERVIEW_SOURCE_COLS,
     OCCUPATION_COLS,
     WEF_COLS,
     database_url,
     load_ilo_tasks,
+    load_interview_bank,
     load_occupations,
     load_wef_skills,
 )
@@ -191,6 +196,7 @@ def main() -> None:
     occupations = load_occupations()
     ilo_tasks = load_ilo_tasks()
     wef_skills = load_wef_skills()
+    interview = load_interview_bank()
     errors: list[str] = []
 
     with psycopg.connect(database_url()) as conn:
@@ -224,6 +230,22 @@ def main() -> None:
                 args.strict,
             )
         )
+        for table, keys, columns in (
+            ("ref_interview_sources", ["source_id"], INTERVIEW_SOURCE_COLS),
+            ("ref_interview_questions", ["question_id"], INTERVIEW_QUESTION_COLS),
+            ("ref_interview_coverage", ["occupation_code"], INTERVIEW_COVERAGE_COLS),
+            (
+                "ref_interview_occupation_questions",
+                ["occupation_code", "question_id"],
+                INTERVIEW_MAPPING_COLS,
+            ),
+        ):
+            errors.extend(
+                compare_table(
+                    table, interview[table], fetch_table(conn, table, columns),
+                    keys, columns, args.strict,
+                )
+            )
         for table in BUSINESS_TABLES:
             n = count_rows(conn, table)
             status = "ok empty" if n == 0 else f"FAIL {n} rows (seed must not write this table)"
