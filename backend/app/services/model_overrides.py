@@ -76,6 +76,16 @@ class PriorityProvider:
         self.locked = False
         self.deadline = None
     def lock_model(self): self.locked = True
+    async def complete_json_async(self, **kwargs):
+        # Resume v2 is exactly one request: use the user's first priority, never
+        # spend another full generation budget on a different model.
+        timeout_s = float(kwargs.get("request_timeout_s") or self.timeout_s)
+        provider = model_provider(self.models[0], timeout_s, self.max_tokens)
+        try:
+            return await provider.complete_json_async(**{**kwargs, "request_timeout_s": timeout_s})
+        finally:
+            provider.close()
+
     def complete_json(self, **kwargs):
         from app.services.ai_gateway import AIProviderError
         if self.deadline is None: self.deadline = time.monotonic() + self.timeout_s

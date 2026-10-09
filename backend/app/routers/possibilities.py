@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.models.user import User
 from app.services.auth import get_current_user
-from app.services.occupation_text import occupation_description_sql
 from app.services.possibilities import (
     MODERN_PROFILE_KEY,
     PROFILE_RECOVERY_MESSAGE,
@@ -18,19 +17,14 @@ from app.services.possibilities import (
     recommend_occupations,
     wef_career_evidence,
 )
-from app.schemas.possibilities import PossibilitiesResponse
+from app.schemas.possibilities import OccupationRequirements, PossibilitiesResponse
+from app.services.possibilities_reference import load_reference_data, build_direction_payload, build_occupation_requirements
 from app.services.workspace import SHORTLIST_KEY, read_workspace_shortlist
 from app.services.journey import apply_skill_review
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix='/possibilities', tags=['Possibilities'])
 DISCLAIMER = 'Exploratory skill connections only; not job readiness or hiring probability.'
-
-# Reference data is stable per process — avoid re-joining ~2.5k ILO tasks every request.
-_skills_cache: dict[int, dict] | None = None
-_occupation_rows_cache: list[dict] | None = None
-_occupation_taxonomy_cache: dict[str, dict] | None = None
-
 
 def _json_value(workspace: dict, key: str, default):
     try:
@@ -40,59 +34,27 @@ def _json_value(workspace: dict, key: str, default):
         return default
 
 
-def build_direction_payload(row: dict, skills: dict) -> dict:
-    from app.services.possibilities import slugify_skill_name
-
-    return {
-        'occupation_code': row['occupation_code'],
-        'title': row['title'],
-        'area': row.get('industry'),
-        'description': row.get('description') or '',
-        'coverage_pct': row.get('coverage_pct'),
-        'skills': [
-            {
-                'skill_id': skill_id,
-                'skill_slug': slugify_skill_name(str(skills[skill_id]['core_skill'])),
-                'name': skills[skill_id]['core_skill'],
-                'state': row.get('skill_states', {}).get(skill_id, 'missing'),
-            }
-            for skill_id in row.get('required_skill_ids', [])
-        ],
-    }
+async def _load_reference_data(db: AsyncSession):
+    # Keep the existing router test hook; both routes share the same process cache.
+    return await load_reference_data(db)
 
 
-async def _load_reference_data(db: AsyncSession) -> tuple[dict[int, dict], list[dict], dict[str, dict]]:
-    global _skills_cache, _occupation_rows_cache, _occupation_taxonomy_cache
-    if (_skills_cache is not None and _occupation_rows_cache is not None
-            and _occupation_taxonomy_cache is not None):
-        return _skills_cache, _occupation_rows_cache, _occupation_taxonomy_cache
-
-    skill_rows = (await db.execute(text(
-        'SELECT wef_skill_id, core_skill, wef_skill_group FROM ref_wef_skills ORDER BY wef_skill_id'
-    ))).mappings().all()
-    skills = {int(row['wef_skill_id']): dict(row) for row in skill_rows}
-
-    taxonomy_rows = (await db.execute(text(
-        'SELECT occupation_code, level, parent_code FROM ref_occupations'
-    ))).mappings().all()
-    occupation_taxonomy = {
-        str(row['occupation_code']): dict(row) for row in taxonomy_rows
-    }
-
-    # Unit occupations only — major/minor tree nodes have no ILO tasks and inflate matching.
-    occupation_rows = (await db.execute(text(
-        f"SELECT o.occupation_code, o.level, o.parent_code, o.title, {occupation_description_sql('o.description')}, NULL AS industry, "
-        "COALESCE(array_agg(i.task_text ORDER BY i.task_id) FILTER (WHERE i.task_text IS NOT NULL), '{}') AS tasks "
-        "FROM ref_occupations o LEFT JOIN ref_ilo_tasks i ON i.isco_08=o.occupation_code "
-        "WHERE o.level = 'unit' "
-        "GROUP BY o.occupation_code,o.level,o.parent_code,o.title,o.description ORDER BY o.occupation_code"
-    ))).mappings().all()
-    occupations = [dict(row) for row in occupation_rows]
-
-    _skills_cache = skills
-    _occupation_rows_cache = occupations
-    _occupation_taxonomy_cache = occupation_taxonomy
-    return skills, occupations, occupation_taxonomy
+@router.get('/{occupation_code}/requirements', response_model=OccupationRequirements)
+async def get_occupation_requirements(
+    occupation_code: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> OccupationRequirements:
+    """Use the same uncapped database-backed skill map as the direction cards."""
+    try:
+        skills, occupations, _ = await _load_reference_data(db)
+    except Exception:
+        logger.exception('Failed to load occupation requirements reference data')
+        raise HTTPException(status_code=503, detail='Role requirements are unavailable. Please retry.') from None
+    role = build_occupation_requirements(occupation_code, skills, occupations, matcher=occupation_required_skills)
+    if role is None:
+        raise HTTPException(status_code=404, detail='This target role is no longer available. Choose another career direction.')
+    return role
 
 
 @router.get('', response_model=PossibilitiesResponse)

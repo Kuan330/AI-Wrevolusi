@@ -1,5 +1,7 @@
 import { detectContacts, redactResume } from "./redaction.ts";
-import { explicitResumeSkills } from "./sourceSkills.ts";
+import { sourceProjects } from "./projects.ts";
+import { evidenceFromText } from "./redaction.ts";
+import { explicitResumeSkills, SKILLS_PARSER_VERSION } from "./sourceSkills.ts";
 import type { ResumeSource } from "./types.ts";
 export const RESUME_ACCEPT = ".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 export const MAX_RESUME_BYTES = 10 * 1024 * 1024;
@@ -26,5 +28,5 @@ export async function importResume(file: File, signal?: AbortSignal): Promise<Re
     worker.postMessage({ buffer, kind: /\.pdf$/i.test(file.name) ? "pdf" : "docx" }, [buffer]);
   });
   const contacts = detectContacts(text);
-  return { file, name: file.name, text, contacts, skills: explicitResumeSkills(redactResume(text, contacts)), redactedText: redactResume(text, contacts), reviewed: false };
+  return { file, name: file.name, text, contacts, skillsParserVersion: SKILLS_PARSER_VERSION, skillsOrigin: "extracted", skills: explicitResumeSkills(redactResume(text, contacts)), redactedText: redactResume(text, contacts), projects: sourceProjects(evidenceFromText(redactResume(text, contacts))), reviewed: false };
 }

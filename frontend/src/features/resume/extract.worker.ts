@@ -21,7 +21,15 @@ self.onmessage = async (event: MessageEvent<{ buffer: ArrayBuffer; kind: "pdf" |
         if (pdf.numPages > 20) throw new Error("Resume PDFs must have at most 20 pages.");
         for (let page = 1; page <= pdf.numPages; page++) {
           const content = await (await pdf.getPage(page)).getTextContent();
-          text += content.items.map(item => "str" in item ? item.str + (item.hasEOL ? "\n" : " ") : "").join("") + "\n";
+          let y: number | null = null;
+          for (const item of content.items) {
+            if (!("str" in item)) continue;
+            const nextY = item.transform[5];
+            if (y !== null && Math.abs(nextY - y) > 2 && !text.endsWith("\n")) text += "\n";
+            text += item.str + (item.hasEOL ? "\n" : " ");
+            y = nextY;
+          }
+          text += "\n";
           if (text.length > 60000) throw new Error("Resume text must be at most 60,000 characters.");
         }
       } finally { await task.destroy(); worker.destroy(); port.terminate(); }

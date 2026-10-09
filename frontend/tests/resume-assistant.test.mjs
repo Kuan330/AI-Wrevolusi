@@ -45,3 +45,10 @@ test("applying proposal is one history step and keeps a persistent previous snap
  history.record(before,after);assert.equal(history.undo().document.design.theme,"classic");assert.equal(history.redo().document.design.theme,"moderncv");
  assert.equal(history.canRedo,false);
 });
+
+test("assistant review context changes when selected learning skills are added or removed", () => {
+  const initial = assistantReviewKey(document, [{id:"sql",name:"SQL"}], "");
+  const changed = assistantReviewKey(document, [{id:"sql",name:"SQL"},{id:"learning",name:"Creative thinking"}], "");
+  assert.notEqual(initial,changed);
+  assert.equal(initial,assistantReviewKey(document,[{id:"sql",name:"SQL"}],""));
+});

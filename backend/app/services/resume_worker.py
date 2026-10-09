@@ -43,13 +43,14 @@ def main():
             pdf_path=directory / "resume.pdf", dont_generate_png=True,
             dont_generate_html=True, dont_generate_markdown=True,
         )
-        from app.services.resume_render_safety import install_safe_template_adapters
+        from app.services.resume_render_safety import install_safe_template_adapters, install_text_section_pagination
         install_safe_template_adapters(model.cv.name, model.settings.bold_keywords, contacts=contacts, contact_order=contact_order)
         # PyPI 2.8 bundles RenderCV but not FontAwesome. Supply its pinned MIT package.
         package_root = directory / "packages"
         rendercv_package = Path(pdf_png.__file__).parent / "rendercv_typst"
         package_version = tomllib.loads((rendercv_package / "typst.toml").read_text(encoding="utf-8"))["package"]["version"]
         shutil.copytree(rendercv_package, package_root / "preview" / "rendercv" / package_version)
+        install_text_section_pagination(package_root / "preview" / "rendercv" / package_version)
         bundled = Path(__file__).resolve().parents[1] / "data" / "resume" / "preview" / "fontawesome" / "0.6.0"
         shutil.copytree(bundled, package_root / "preview" / "fontawesome" / "0.6.0")
         # Keep ALL compiler packages inside the parent-owned directory. Even

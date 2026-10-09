@@ -17,3 +17,8 @@ export type PossibilitiesResponse = {
   chosen_direction_code: string | null; chosen_direction_uri: string | null; chosen_direction_coverage_pct: number | null; shortlisted_skill_ids: number[];
   reviewed_esco_skills: ReviewedCareerSkill[]; career_source_note: string | null;
 };
+
+export type OccupationRequirements = {
+  occupation_code: string; title: string;
+  skills: { skill_id: number; skill_slug: string; name: string }[];
+};

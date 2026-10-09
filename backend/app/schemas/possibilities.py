@@ -31,6 +31,18 @@ class PossibilitySkill(PossibilitiesSchema):
         return value
 
 
+class OccupationRequirementSkill(PossibilitiesSchema):
+    skill_id: int = Field(gt=0)
+    skill_slug: str = Field(min_length=1, max_length=120, pattern=r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
+    name: str = Field(min_length=1, max_length=120)
+
+
+class OccupationRequirements(PossibilitiesSchema):
+    occupation_code: str = Field(min_length=1, max_length=100)
+    title: str = Field(min_length=1, max_length=300)
+    skills: list[OccupationRequirementSkill] = Field(default_factory=list, max_length=60)
+
+
 class CareerSkill(PossibilitiesSchema):
     uri: str = Field(min_length=1, max_length=200)
     label: str = Field(min_length=1, max_length=300)
@@ -97,6 +109,8 @@ class PossibilityShortlistRequest(PossibilitiesSchema):
 
 __all__ = [
     'CurrentRole',
+    'OccupationRequirements',
+    'OccupationRequirementSkill',
     'PossibilitiesResponse',
     'PossibilityDirection',
     'PossibilityPreferenceRequest',

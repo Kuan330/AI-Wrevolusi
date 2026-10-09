@@ -608,6 +608,30 @@ class OpenAICompatibleProvider:
             status_code=getattr(last_error, 'status_code', None), kind=getattr(last_error, 'kind', 'output')
         )
 
+    async def complete_json_async(
+        self, *, operation, payload, response_model, system_prompt=None,
+        request_timeout_s=30, request_max_tokens=None,
+    ):
+        """One cancellable request, no retry/cache; the caller owns the wall deadline."""
+        body = self._build_request_body(operation, payload, response_model, system_prompt)
+        if request_max_tokens is not None:
+            key = 'max_output_tokens' if self.api_mode == _RESPONSES_MODE else 'max_tokens'
+            body[key] = min(6500, max(1, int(request_max_tokens)))
+        self._consume_rate_limit_slot()
+        try:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(float(request_timeout_s))) as client:
+                response = await client.post(self._endpoint, headers=self._headers, json=body)
+        except httpx.TimeoutException:
+            raise AIProviderError('Provider deadline exceeded.', kind='timeout') from None
+        except httpx.HTTPError:
+            raise AIProviderError('Provider transport failed.', kind='transport') from None
+        if response.status_code >= 400:
+            raise AIProviderError('Provider rejected the request.', status_code=response.status_code, kind='http')
+        parsed = self._parse_payload(response)
+        if AIGateway.validate(parsed, response_model) is None:
+            raise AIProviderError('Provider output did not satisfy the response schema.', kind='output')
+        return parsed
+
     def _build_request_body(
         self,
         operation: str,

@@ -23,7 +23,7 @@ await context.route("**/*",async route=>{
  if(path==="/account/workspace"){if(req.method()==="PATCH"){const body=req.postDataJSON();sync.push(body);workspace=body.data;return json(route,{owner_id:owner,data:workspace,revision:body.revision+1})}return json(route,{owner_id:owner,data:workspace,revision:0})}
  if(path==="/auth/logout"){signedIn=false;return json(route,null)}
  if(path==="/auth/refresh")return json(route,{detail:"Unauthenticated"},401);
- if(path==="/reference/wef-skills")return json(route,[{wef_skill_id:1,core_skill:"SQL"}]);
+ if(path==="/reference/wef-skills")return json(route,[{wef_skill_id:1,core_skill:"SQL"},{wef_skill_id:2,core_skill:"Analytical thinking"}]);
  if(path==="/resume/capabilities")return json(route,{ai_configured:true,ai_provider_host:"do-not-display.test",ai_model:"private-fixture",rendercv_version:"2.8"});
  if(path==="/learning/courses")return json(route,{found:true,courses:[1,2,3].map(i=>({course_id:`course-${i}`,skill_id:"analytical-thinking",title:`Practical data analysis ${i}`,provider:"Verified catalogue",level:i===2?"Intermediate":"Beginner",chapters:[{order:1,title:"Practice",duration_min:30}],chapter_count:1}))});
  if(path==="/resume/assist"){

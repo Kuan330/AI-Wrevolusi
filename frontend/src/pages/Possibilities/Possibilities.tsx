@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
+import { readCareerDirection, saveCareerDirection } from "@/services/careerDirection";
 import { possibilitiesService } from "@/services/possibilitiesService";
-import { accountStorage, currentWorkspaceSession, flushWorkspace } from "@/services/accountStorage";
+import { currentWorkspaceSession, flushWorkspace } from "@/services/accountStorage";
 import {
   readTaskWorkspace,
 } from "@/features/work-profile/userProfile";
@@ -22,17 +23,9 @@ import { skillMatch } from "./possibilitiesModel";
 import { ROUTES } from "@/constants/routes";
 import "./exploration.css";
 
-const DIRECTION_KEY = "aiwrevolusi.possibilities.chosenDirection";
 const MATCH_HINT = "Based on skills connected to your work, tasks and learning. This indicates skill overlap, not job suitability.";
 const GAP_HINT = "No connection has been found in your current records. This does not mean you do not have this skill.";
-const readJson = <T,>(key: string, fallback: T): T => {
-  try {
-    const value = accountStorage.getItem(key);
-    return value ? (JSON.parse(value) as T) : fallback;
-  } catch {
-    return fallback;
-  }
-};
+const savedDirection = () => { try { return readCareerDirection(); } catch { return null; } };
 
 export default function Possibilities() {
   const navigate = useNavigate();
@@ -40,10 +33,10 @@ export default function Possibilities() {
   const profilePath = possibilitiesProfilePath(readTaskWorkspace());
   const [data, setData] = useState<PossibilitiesData | null>(null);
   const [selectedCode, setSelectedCode] = useState<string | null>(
-    () => readJson<{ occupation_code?: string } | null>(DIRECTION_KEY, null)?.occupation_code ?? null,
+    () => savedDirection()?.occupation_code ?? null,
   );
   const [skillChoice, setSkillChoice] = useState<{ careerCode: string; skillId: number } | null>(() => {
-    const saved = readJson<{ occupation_code?: string; skill_id?: number } | null>(DIRECTION_KEY, null);
+    const saved = savedDirection();
     return saved?.occupation_code && saved.skill_id ? { careerCode: saved.occupation_code, skillId: saved.skill_id } : null;
   });
   const [navigationError, setNavigationError] = useState("");
@@ -90,7 +83,7 @@ export default function Possibilities() {
     const direction = data?.directions.find(item => item.occupation_code === code);
     if (!direction) return;
     try {
-      accountStorage.setItem(DIRECTION_KEY, JSON.stringify({ occupation_code: code, title: direction.title, skillSources: readCareerPath().sources }));
+      saveCareerDirection({ occupation_code: code, title: direction.title, skillSources: readCareerPath().sources });
       setSelectedCode(code);
       setSkillChoice(current => current?.careerCode === code ? current : null);
       setNavigationError("");
@@ -162,6 +155,20 @@ export default function Possibilities() {
     }
   };
 
+  const goResume = async () => {
+    if (!selected || continuing) return;
+    const owner = currentWorkspaceSession();
+    setContinuing(true); setNavigationError("");
+    try {
+      const previous = readCareerDirection();
+      saveCareerDirection({ ...previous, occupation_code: selected.occupation_code, title: selected.title, skillSources: readCareerPath().sources });
+      await flushWorkspace();
+      if (alive.current && owner === currentWorkspaceSession()) navigate(ROUTES.resumeBuilder);
+    } catch (cause) {
+      if (alive.current && owner === currentWorkspaceSession()) setNavigationError(cause instanceof Error ? cause.message : "Could not save your target role. Please try again.");
+    } finally { if (alive.current && owner === currentWorkspaceSession()) setContinuing(false); }
+  };
+
   const unmatched = availableSkills.filter(skill => !["have", "suggested", "learning"].includes(skill.state));
   const matchedOptions = availableSkills.filter(skill => ["have", "suggested", "learning"].includes(skill.state));
   const renderSkill = (skill: (typeof availableSkills)[number]) => {
@@ -215,7 +222,8 @@ export default function Possibilities() {
       <p className="px-eyebrow">JOURNEY COMPANION</p>
       <div className="px-companion-avatar"><img src="/images/possibilities-companion.png" alt="Your virtual career companion" width={280} height={320} /></div>
       <div className="px-companion-story"><h3>{selected ? "Your next chapter" : "Pick a direction to begin"}</h3><p>{selected ? `${currentTitle} → ${selected.title}` : "Explore a career direction, then choose a skill you would like to develop."}</p>{selectedSkill && <p>Selected skill: <strong>{selectedSkill.name}</strong></p>}</div>
-      <Button className="px-primary px-companion-cta" onClick={() => { alive.current = false; navigate(ROUTES.resumeBuilder); }}>Generate resume<ArrowRight size={15} /></Button>
+      <Button className="px-primary px-companion-cta" disabled={!selected || continuing} aria-describedby={!selected ? "px-resume-hint" : undefined} onClick={() => { void goResume(); }}>{continuing ? "Saving your selection…" : "Generate resume"}<ArrowRight size={15} /></Button>
+      {!selected && <p id="px-resume-hint">Select a career direction to continue</p>}
     </aside></div>
     {(navigationError || careerError) && <p role="alert">{navigationError || careerError}</p>}
   </div>;

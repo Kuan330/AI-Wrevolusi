@@ -151,8 +151,10 @@ test('live response maps backend scores and skills without recomputing them', ()
 test('page loads live data, restores and persists approved workspace keys', () => {
   const page = readFileSync(new URL('../src/pages/Possibilities/Possibilities.tsx', import.meta.url), 'utf8');
   assert.match(page, /possibilitiesService\.getPossibilities/);
-  assert.match(page, /accountStorage\.getItem/);
-  assert.match(page, /aiwrevolusi\.possibilities\.chosenDirection/);
+  assert.match(page, /readCareerDirection/);
+  assert.match(page, /saveCareerDirection/);
+  assert.match(page, /disabled=\{!selected \|\| continuing\}/);
+  assert.match(page, /Select a career direction to continue/);
   assert.match(page, /readCareerPath\(\)/);
   assert.match(page, /skillMatch\(direction\.skills\)/);
   assert.match(page, /loadSavedPossibilities\(\{/);

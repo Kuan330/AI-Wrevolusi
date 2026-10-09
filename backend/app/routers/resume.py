@@ -1,4 +1,5 @@
 """Authenticated transient endpoints; no database writes or resume payload logs."""
+import asyncio
 import logging
 import time
 from starlette.responses import JSONResponse
@@ -44,20 +45,51 @@ def get_resume_provider():
     except Exception:
         raise HTTPException(503, "Resume AI is not configured. Your local draft is unchanged.") from None
 
+def get_resume_role_loader(db: AsyncSession = Depends(get_db)):
+    from app.services.resume_relevance import load_role
+    async def load(code):
+        return await load_role(db, code)
+    return load
+
 @router.get("/capabilities")
 def capabilities():
     return provider_description()
 
 @router.post("/generate", response_model=GenerateResponse)
-async def generate(payload: GenerateRequest, provider=Depends(get_resume_provider)):
+async def generate(payload: GenerateRequest, request: Request, provider=Depends(get_resume_provider), role_loader=Depends(get_resume_role_loader)):
     started = time.monotonic()
     try:
-        return await run_in_threadpool(generate_resume, payload, provider)
+        if payload.source_sections is None:
+            return await run_in_threadpool(generate_resume, payload, provider)
+        from app.services.resume_generation import generate_reviewed_resume
+        async def disconnected():
+            # The bounded body has already been consumed by PrivateRoute.
+            # Await the ASGI disconnect directly: is_disconnected() uses a
+            # cancelled AnyIO scope which can swallow Task.cancel() and leave
+            # the response waiting forever during cleanup.
+            while True:
+                if (await request.receive())["type"] == "http.disconnect": return
+        async def generate_with_role():
+            role = await role_loader(payload.occupation_code) if payload.occupation_code is not None else None
+            return await generate_reviewed_resume(payload, provider, role)
+        generation = asyncio.create_task(generate_with_role())
+        disconnect = asyncio.create_task(disconnected())
+        try:
+            done, _ = await asyncio.wait({generation, disconnect}, return_when=asyncio.FIRST_COMPLETED)
+            if disconnect in done and not generation.done():
+                logger.info("resume_polish_cancelled code=client_disconnected")
+                return Response(status_code=499)
+            return await generation
+        finally:
+            for task in (generation, disconnect):
+                if not task.done(): task.cancel()
+            await asyncio.gather(generation, disconnect, return_exceptions=True)
     except ResumeProblem as error:
         logger.warning("resume_generate_failed code=%s attempts=%s status=503 duration_ms=%.1f", error.code, error.attempts, (time.monotonic() - started) * 1000)
         body = error_body(error)
         body["detail"] += " Your local input is unchanged. Try again or edit manually." if error.code in {"duplicate_sections", "duplicate_gaps", "missing_evidence", "invalid_reference", "unsupported_fact", "unsupported_claim", "unverified_name", "unsafe_content"} else ""
-        return JSONResponse(status_code=503, content=body, headers={"Cache-Control": "no-store"})
+        status = 404 if error.code == "target_role_not_found" else 409 if error.code == "target_role_changed" else 422 if error.code in {"role_has_no_skills", "no_related_input"} else 503
+        return JSONResponse(status_code=status, content=body, headers={"Cache-Control": "no-store"})
     except ModelOverrideError: raise
     except Exception:
         logger.warning("resume_generate_failed code=internal_error attempts=0 status=503 duration_ms=%.1f", (time.monotonic() - started) * 1000)

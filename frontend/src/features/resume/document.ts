@@ -1,7 +1,7 @@
 import { LineCounter, parseDocument, stringify } from "yaml";
 import Ajv2020 from "ajv/dist/2020.js";
 import schema from "./rendercv-2.8.schema.json" with { type: "json" };
-import type { Contacts, GeneratedSection, ResumeDocument, ResumeEntry } from "./types.ts";
+import type { Contacts, GeneratedSection, ResumeDocument, ResumeEntry, SkillFilterVersion } from "./types.ts";
 export const THEMES = ["classic", "ember", "engineeringclassic", "engineeringresumes", "harvard", "ink", "moderncv", "opal", "sb2nov"] as const;
 const ajv = new Ajv2020({ strict: false, validateFormats: false, allErrors: true });
 const validate = ajv.compile(schema);
@@ -60,10 +60,16 @@ export function resumeRenderDocument(document: ResumeDocument): ResumeDocument {
   }
   return { ...document, cv };
 }
-export function applySections(document: ResumeDocument | null, sections: GeneratedSection[], contacts?: Contacts): ResumeDocument {
+export function applySections(document: ResumeDocument | null, sections: GeneratedSection[], contacts?: Contacts, filterVersion?: SkillFilterVersion | null): ResumeDocument {
   const next = structuredClone(document ?? { cv: {}, design: { theme: "engineeringresumes" } });
   next.cv.sections = { ...next.cv.sections };
-  for (const section of sections) next.cv.sections[section.title] = section.entries.map(entry => ({ bullet: entry.text }));
+  for (const section of sections) {
+    if (filterVersion === "role_relevance_v1" && section.title === "Skills" && section.entries.length === 0) {
+      delete next.cv.sections.Skills;
+      continue;
+    }
+    next.cv.sections[section.title] = section.entries.map(entry => entry.project ? { name: entry.project.name, ...(entry.project.date ? { date: entry.project.date } : {}), highlights: [...entry.project.highlights] } : entry.verbatim || (entry.project_id && section.title === "Projects") ? entry.text : ({ bullet: entry.text }));
+  }
   if (!document && contacts) for (const [key, value] of Object.entries(contacts)) if (value.trim()) next.cv[key] = value.trim();
   return next;
 }

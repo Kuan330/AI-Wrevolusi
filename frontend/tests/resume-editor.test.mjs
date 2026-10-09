@@ -78,7 +78,7 @@ test("history is capped at50 and is account-local; AI target/gaps/courses/previo
   assert.equal(history.canUndo, false); assert.equal(createEditorHistory().canRedo, false);
   history.clear(); const before = draft("old"), after = { ...draft("new", "Target B"), gaps: [{ id: "gap" }], recommendations: [], previous: { document: before.document, yamlText: "old", jobRequirements: "Target A" } };
   history.record(before, after); history.sync({ ...after, recommendations: [{ course_id: "course" }] });
-  assert.equal(history.undo().jobRequirements, "Target A"); const redo = history.redo(); assert.equal(redo.pendingJobRequirements, "Target B"); assert.equal(redo.recommendations[0].course_id, "course"); assert.equal(redo.previous.yamlText, "old");
+  assert.equal(history.undo().jobRequirements, "Target A"); const redo = history.redo(); assert.equal(redo.pendingJobRequirements, undefined, "Undo never restores the selected pending target"); assert.equal(redo.recommendations[0].course_id, "course"); assert.equal(redo.previous.yamlText, "old");
 });
 test("invalid YAML history restores the last successfully rendered document, not a newer unrelated preview", () => {
   const history = createEditorHistory(), a = { ...draft('a'), previewDocument: draft('a').document }, invalid = { ...draft('a'), yamlText: 'broken: [', previewDocument: draft('a').document };
