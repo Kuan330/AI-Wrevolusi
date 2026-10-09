@@ -14,8 +14,15 @@ export type RecommendedCourse = { course_id: string; gap_ids: string[]; reason: 
 export type Contacts = { name: string; email: string; phone: string; location: string; website: string };
 export type ResumeSource = { file: Blob; name: string; text: string; redactedText: string; contacts: Contacts; skills?: string[]; skillsText?: string; reviewed: boolean };
 export type ResumeSnapshot = { document: ResumeDocument; yamlText: string; jobRequirements: string };
+/** The user confirmed this version of the resume content. `fingerprint` ties the mark to that content. */
+export type ReviewedMark = { at: string; fingerprint: string };
+/** A point from interview practice, offered on one resume entry. It changes nothing until accepted. */
+export type InterviewSuggestion = {
+  id: string; sessionId: string; createdAt: string; section: string; entryIndex: number; entryLabel: string; text: string; question: string;
+};
 export type ResumeDraft = {
   version: 1; owner: string; revision: number; updatedAt: string;
+  reviewed?: ReviewedMark | null; interviewSuggestions?: InterviewSuggestion[];
   jobRequirements: string; pendingJobRequirements: string;
   document: ResumeDocument | null; previewDocument?: ResumeDocument | null; yamlText: string;
   source: ResumeSource | null; previous: ResumeSnapshot | null;

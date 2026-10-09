@@ -15,6 +15,7 @@ import LearningPlanOnboarding from "@/pages/LearningPlanOnboarding/LearningPlanO
 import LearningHistory from "@/pages/LearningHistory/LearningHistory";
 import Progress from "@/pages/Progress/Progress";
 const ResumeBuilder = lazy(() => import("@/pages/ResumeBuilder/ResumeBuilder"));
+const InterviewPractice = lazy(() => import("@/pages/InterviewPractice/InterviewPractice"));
 import Possibilities from "@/pages/Possibilities/Possibilities";
 import Plan from "@/pages/Plan/Plan";
 import WorkProfile from "@/pages/WorkProfile/WorkProfile";
@@ -45,6 +46,7 @@ export default function AppRoutes() {
       <Route path={ROUTES.progressReviews} element={<AccountGate kind="plan"><Progress /></AccountGate>} />
       <Route path={ROUTES.possibilities} element={<AccountGate kind="possibilities"><Possibilities /></AccountGate>} />
       <Route path={ROUTES.resumeBuilder} element={<AccountGate kind="possibilities"><Suspense fallback={<p role="status" className="p-8">Loading resume editor…</p>}><ResumeBuilder /></Suspense></AccountGate>} />
+      <Route path={ROUTES.interview} element={<AccountGate kind="possibilities"><Suspense fallback={<p role="status" className="p-8">Loading interview practice…</p>}><InterviewPractice /></Suspense></AccountGate>} />
       <Route path={ROUTES.continue} element={<AccountGate kind="plan"><ContinueJourney /></AccountGate>} />
       <Route path="*" element={<NotFound />} />
     </Route>

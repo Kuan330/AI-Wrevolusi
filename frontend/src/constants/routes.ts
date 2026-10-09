@@ -12,6 +12,7 @@ export const ROUTES = {
   progressReviews: "/learning/history/reviews",
   possibilities: "/career/possibilities",
   resumeBuilder: "/career/possibilities/resume",
+  interview: "/career/possibilities/interview",
   continue: "/resume",
 } as const;
 

@@ -94,3 +94,9 @@
 .rw-courses-footer button{width:100%}
 .rw-course-meta .rw-added-badge{margin-left:0}
 }
+
+/* Review mark and suggestions from interview practice. */
+.rw-review{display:grid;gap:6px;padding:6px 14px;border-bottom:1px solid #ece5f0;background:#fbf8fd;font-size:12px}
+.rw-review-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.rw-review-line a{color:#326889;font-weight:600;margin-left:auto}.rw-review-ok{color:#2d7a4f}
+.rw-review-suggestion{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:8px 10px;border:1px solid #e1d8e8;border-radius:10px;background:#fff}
+.rw-review-suggestion p{margin:2px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}.rw-review-warn{color:#8a3a2e}.rw-review-actions{display:flex;gap:6px;flex-wrap:wrap}

@@ -10,6 +10,7 @@ const validGeneration = (value: unknown) => mapping(value) && typeof value.jobRe
   Array.isArray(value.gaps) && value.gaps.every(validGap) && Array.isArray(value.sections) && value.sections.every(section =>
     mapping(section) && typeof section.title === "string" && Array.isArray(section.entries) && section.entries.every(entry =>
       mapping(entry) && typeof entry.text === "string" && strings(entry.skill_ids) && strings(entry.fact_ids)));
+const validSuggestion = (value: unknown) => mapping(value) && ["id", "sessionId", "createdAt", "section", "entryLabel", "text", "question"].every(key => typeof value[key] === "string") && Number.isSafeInteger(value.entryIndex) && Number(value.entryIndex) >= 0;
 export function parseResumeRecord(raw: unknown, owner: string): ResumeDraft {
   if (raw === null || raw === undefined) return emptyDraft(owner);
   const record = raw as ResumeDraft;
@@ -19,6 +20,8 @@ export function parseResumeRecord(raw: unknown, owner: string): ResumeDraft {
       (record.source !== null && (!record.source || !(record.source.file instanceof Blob) || typeof record.source.name !== "string" || typeof record.source.text !== "string" || typeof record.source.redactedText !== "string" || typeof record.source.reviewed !== "boolean" ||
         !mapping(record.source.contacts) || !["name", "email", "phone", "location", "website"].every(key => typeof record.source!.contacts[key as keyof typeof record.source.contacts] === "string") ||
         (record.source.skills !== undefined && !strings(record.source.skills)) || (record.source.skillsText !== undefined && typeof record.source.skillsText !== "string"))) ||
+      (record.reviewed != null && !(mapping(record.reviewed) && typeof record.reviewed.at === "string" && typeof record.reviewed.fingerprint === "string")) ||
+      (record.interviewSuggestions != null && !(Array.isArray(record.interviewSuggestions) && record.interviewSuggestions.every(validSuggestion))) ||
       (record.document !== null && !validDocument(record.document)) ||
       (record.previewDocument != null && !validDocument(record.previewDocument)) ||
       (record.proposal !== null && !validGeneration(record.proposal)) ||

@@ -150,11 +150,12 @@ def sql_statements(script: str) -> list[str]:
     return parts
 
 
-def apply_schema(conn: psycopg.Connection) -> None:
+def apply_schema(conn: psycopg.Connection, only: str | None = None) -> None:
     script = SCHEMA_SQL.read_text(encoding="utf-8")
     for stmt in sql_statements(script):
-        conn.execute(stmt)
-    print(f"applied schema -> {SCHEMA_SQL}")
+        if only is None or only in stmt:
+            conn.execute(stmt)
+    print(f"applied schema -> {SCHEMA_SQL}" + (f" (only statements with {only!r})" if only else ""))
 
 
 def blank_to_none(value):
@@ -324,9 +325,37 @@ def load_interview_bank() -> dict[str, pd.DataFrame]:
     }
 
 
+def load_interview_tables(
+    conn: psycopg.Connection, interview: dict[str, pd.DataFrame], replace: bool
+) -> None:
+    if replace:
+        # Child tables first, so the foreign keys allow the delete.
+        for table in INTERVIEW_TABLES:
+            conn.execute(f"DELETE FROM {table}")
+    # Parents first: sources and questions before the tables that point at them.
+    for table, keys, columns in (
+        ("ref_interview_sources", ["source_id"], INTERVIEW_SOURCE_COLS),
+        ("ref_interview_questions", ["question_id"], INTERVIEW_QUESTION_COLS),
+        ("ref_interview_coverage", ["occupation_code"], INTERVIEW_COVERAGE_COLS),
+        (
+            "ref_interview_occupation_questions",
+            ["occupation_code", "question_id"],
+            INTERVIEW_MAPPING_COLS,
+        ),
+    ):
+        df = interview[table]
+        i, u, k = upsert_table(conn, table, df, keys, columns, replace)
+        report(table, i, u, k, len(df) + (k if not replace else 0))
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Seed reference tables into Postgres / Neon.")
     parser.add_argument("--init", action="store_true", help="Apply db/schema.sql before seeding.")
+    parser.add_argument(
+        "--interview-only",
+        action="store_true",
+        help="Create and load only the ref_interview_* tables. Leaves every other table alone.",
+    )
     parser.add_argument(
         "--replace",
         action="store_true",
@@ -337,18 +366,22 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    interview = load_interview_bank()
+    if args.interview_only:
+        with psycopg.connect(database_url()) as conn:
+            if args.init:
+                apply_schema(conn, only="ref_interview_")
+            load_interview_tables(conn, interview, args.replace)
+            conn.commit()
+        return
+
     occupations = load_occupations()
     ilo_tasks = load_ilo_tasks()
     wef_skills = load_wef_skills()
-    interview = load_interview_bank()
 
     with psycopg.connect(database_url()) as conn:
         if args.init:
             apply_schema(conn)
-        if args.replace:
-            # Interview tables point at ref_occupations, so empty them before it.
-            for table in INTERVIEW_TABLES:
-                conn.execute(f"DELETE FROM {table}")
         i, u, k = upsert_table(
             conn, "ref_occupations", occupations, ["occupation_code"], OCCUPATION_COLS, args.replace
         )
@@ -361,20 +394,7 @@ def main() -> None:
             conn, "ref_wef_skills", wef_skills, ["wef_skill_id"], WEF_COLS, args.replace
         )
         report("ref_wef_skills", i, u, k, len(wef_skills) + (k if not args.replace else 0))
-        # Parents first: sources and questions before the tables that point at them.
-        for table, keys, columns in (
-            ("ref_interview_sources", ["source_id"], INTERVIEW_SOURCE_COLS),
-            ("ref_interview_questions", ["question_id"], INTERVIEW_QUESTION_COLS),
-            ("ref_interview_coverage", ["occupation_code"], INTERVIEW_COVERAGE_COLS),
-            (
-                "ref_interview_occupation_questions",
-                ["occupation_code", "question_id"],
-                INTERVIEW_MAPPING_COLS,
-            ),
-        ):
-            df = interview[table]
-            i, u, k = upsert_table(conn, table, df, keys, columns, args.replace)
-            report(table, i, u, k, len(df) + (k if not args.replace else 0))
+        load_interview_tables(conn, interview, args.replace)
         conn.commit()
 
 

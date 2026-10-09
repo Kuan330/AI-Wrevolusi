@@ -14,6 +14,17 @@ export function progressErrorText(error: unknown, operation: ProgressOperation):
     ? `${message} ${cleanDisplayText(error.detail)}` : message;
 }
 
+/** Plain reason shown beside the Save button while it cannot be used. Empty when nothing blocks saving. */
+export function saveBlockedReason(preview: { can_save: boolean; goals: { status: string }[]; required_reset_goal_ids: string[] }, approvedReset: boolean): string {
+  if (!preview.can_save) {
+    return preview.goals.some(goal => goal.status === "source_needs_review")
+      ? "You cannot save yet. Your goal needs a source check. Review your skills, then come back."
+      : "There is nothing new to save yet. Add or record some learning, then check again.";
+  }
+  if (preview.required_reset_goal_ids.length > 0 && !approvedReset) return "Tick the box above to use your current records as the new starting point.";
+  return "";
+}
+
 export const activityGroups = [
   ["study", "Study"],
   ["course_practice", "Course or sample practice"],

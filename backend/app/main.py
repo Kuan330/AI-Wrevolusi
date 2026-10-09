@@ -14,6 +14,7 @@ from app.routers import (
     capabilities,
     exposure,
     guided_learning,
+    interview,
     learning,
     occupations,
     possibilities,
@@ -71,6 +72,7 @@ def create_app(api_root: str = '/api') -> FastAPI:
     application.include_router(progress_reviews.router, prefix=api_prefix)
     application.include_router(guided_learning.router, prefix=api_prefix)
     application.include_router(resume.router, prefix=api_prefix)
+    application.include_router(interview.router, prefix=api_prefix)
 
     @application.middleware("http")
     async def private_resume_response(request, call_next):

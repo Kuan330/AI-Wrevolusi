@@ -1,5 +1,8 @@
 import ResumeAssistant from "./ResumeAssistant";
 import ResumeCoursesDialog from "./ResumeCoursesDialog";
+import ResumeReview from "./ResumeReview";
+import { applyInterviewSuggestion, dismissInterviewSuggestion } from "@/features/resume/interviewSuggestions";
+import { reviewedMark } from "@/features/resume/review";
 import { resumeErrorMessage } from "@/features/resume/errors";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -28,7 +31,7 @@ import { applySections, documentYaml, entryText, parseResumeYaml, resumeRenderDo
 import { EXAMPLE_JOB_REQUIREMENTS, emptyResumeDocument, resumeGenerationAction } from "@/features/resume/onboarding";
 import { importResume, RESUME_ACCEPT } from "@/features/resume/importResume";
 import { evidenceFromText, redactResume } from "@/features/resume/redaction";
-import { emptyContacts, type Generation, type ResumeDocument, type ResumeDraft, type SkillCandidate } from "@/features/resume/types";
+import { emptyContacts, type Generation, type InterviewSuggestion, type ResumeDocument, type ResumeDraft, type SkillCandidate } from "@/features/resume/types";
 import ResumeWorkbench from "./ResumeWorkbench";
 import "./resume-builder.css";
 const message = (cause: unknown) => cause instanceof Error ? cause.message : "Something went wrong. Your local draft is unchanged.";
@@ -244,7 +247,18 @@ function ResumeWorkspace({ owner }: { owner: string }) {
       </AccordionContent></AccordionItem></Accordion>
     </div>;
   if (local.loading || clearing) return <div className="rb-page" role="status">{clearing ? "Clearing your local resume…" : "Loading your local resume…"}</div>;
-  const notices = <>{local.storageError && <div className="rb-warning" role="alert">{local.storageError} Your draft can still be exported; local recovery is not guaranteed.</div>}{error && <div className="rb-error" role="alert">{error}</div>}{draft.document?.cv.sections?.Skills?.length === 0 && <p className="rw-empty-skills" role="status">No skills yet. Add your skills to this draft.</p>}</>;
+  const reviewLocked = unappliedYaml || Boolean(yaml.error);
+  const acceptSuggestion = (suggestion: InterviewSuggestion) => {
+    if (!isCurrent() || reviewLocked) return;
+    try {
+      editDraft(old => {
+        if (!old.document) return old;
+        const next = applyInterviewSuggestion(old.document, suggestion);
+        return dismissInterviewSuggestion({ ...old, previous: { document: old.document, yamlText: old.yamlText, jobRequirements: old.jobRequirements }, document: next, yamlText: documentYaml(next) }, suggestion.id);
+      });
+    } catch (cause) { setError(message(cause)); }
+  };
+  const notices = <>{draft.document && <ResumeReview draft={draft} locked={reviewLocked} onReview={() => change(old => ({ ...old, reviewed: reviewedMark(old) }))} onAccept={acceptSuggestion} onDismiss={id => change(old => dismissInterviewSuggestion(old, id))} />}{local.storageError && <div className="rb-warning" role="alert">{local.storageError} Your draft can still be exported; local recovery is not guaranteed.</div>}{error && <div className="rb-error" role="alert">{error}</div>}{draft.document?.cv.sections?.Skills?.length === 0 && <p className="rw-empty-skills" role="status">No skills yet. Add your skills to this draft.</p>}</>;
   return <>{draft.document ? <ResumeWorkbench document={draft.document} yamlText={draft.yamlText} yamlError={yaml.error} unappliedYaml={unappliedYaml} editDocument={editDocument} editYaml={editYaml} addSection={() => setAddingSection(true)} removeSection={setRemoveSection} undo={() => travelHistory("undo")} redo={() => travelHistory("redo")} canUndo={history.current.canUndo} canRedo={history.current.canRedo} saveStatus={local.saveStatus} notices={notices} pdf={pdf} freshPdf={freshPdf} rendering={rendering} renderError={renderError} retryRender={() => setRenderRetry(value => value + 1)} downloadPdf={() => { if (pdf && freshPdf) download(pdf, "resume.pdf"); }} downloadYaml={() => download(new Blob([draft.yamlText], { type: "text/yaml;charset=utf-8" }), "resume.yaml")} target={() => setShowJob(true)} courses={courses.length ? () => setShowCourses(true) : undefined} courseCount={courses.length} assistant={<ResumeAssistant key={owner} owner={owner} document={draft.document} documentVersion={local.editVersion} skills={candidates} jobRequirements={draft.jobRequirements} disabledReason={unappliedYaml || yaml.error ? "Fix the pending YAML before asking AI to edit." : generating || importing ? "Finish the current generation or import first." : skillError ? "Retry loading your saved skills before using AI." : skillsLoading ? "Loading your saved skills…" : capabilities?.ai_configured === false ? "AI is unavailable. You can still edit manually." : ""} apply={next => { if (!isCurrent() || unappliedYaml || yaml.error) return; editDraft(old => ({ ...old, previous: { document: old.document!, yamlText: old.yamlText, jobRequirements: old.jobRequirements }, document: next, yamlText: documentYaml(next), proposal: null })); }} />} more={() => setShowOptions(true)} /> : <div className="rb-page">
     <Link className="rb-back" to={ROUTES.possibilities}><ArrowLeft size={15} />Possibilities <span>/ Resume builder</span></Link>
     <PageHeader title="Make your next move." actions={<Button variant="ghost" size="icon" aria-label="Clear local resume data" onClick={() => setShowClear(true)}><Trash2 /></Button>} />

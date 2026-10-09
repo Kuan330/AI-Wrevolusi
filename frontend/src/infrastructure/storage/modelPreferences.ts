@@ -40,7 +40,7 @@ export function restoreDefaultModels(): void {
 }
 export function isAIRequest(path: string): boolean {
   return /^\/(ai|guided-learning|skill-directions)(\/|$)/.test(path) ||
-    /^\/resume\/(generate|assist|recommend-courses)(\?|$)/.test(path) ||
+    /^\/resume\/(generate|assist|recommend-courses)(\?|$)/.test(path) || /^\/interview\/(plan|feedback)(\?|$)/.test(path) ||
     /^\/exposure\//.test(path) || /^\/learning\/(summary|daily-brief)(\?|$)/.test(path) ||
     /^\/reference\/occupations(\?|$)/.test(path);
 }

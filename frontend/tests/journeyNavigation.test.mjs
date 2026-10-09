@@ -25,7 +25,7 @@ test('legacy bookmarks redirect without creating duplicate destinations or redir
 });
 
 test('sidebar has two-level work, learning and Possibilities groups, with only overview as a direct link', () => {
-  assert.deepEqual(SIDEBAR_GROUPS.filter(group=>group.collapsible).map(group=>[group.key,group.items.length]),[['work',2],['learning',3],['career',2]]);
+  assert.deepEqual(SIDEBAR_GROUPS.filter(group=>group.collapsible).map(group=>[group.key,group.items.length]),[['work',2],['learning',3],['career',3]]);
   assert.deepEqual(SIDEBAR_GROUPS.filter(group=>!group.collapsible).map(group=>group.items[0].path),[ROUTES.dashboard]);
 });
 
@@ -34,16 +34,17 @@ test('resume builder is a child of Possibilities alongside the original explorat
   const career = SIDEBAR_GROUPS.find(group => group.key === 'career');
   assert.equal(career.label, 'Possibilities');
   assert.equal(career.collapsible, true);
-  assert.deepEqual(career.items.map(item => item.path), [ROUTES.possibilities, ROUTES.resumeBuilder]);
-  assert.deepEqual(career.items.map(item => item.label), ['Explore possibilities', 'Resume builder']);
+  assert.deepEqual(career.items.map(item => item.path), [ROUTES.possibilities, ROUTES.resumeBuilder, ROUTES.interview]);
+  assert.deepEqual(career.items.map(item => item.label), ['Explore possibilities', 'Resume builder', 'Interview practice']);
   assert.ok(COLLAPSIBLE_MENU_KEYS.includes('career'));
   assert.equal(pageLabel(ROUTES.possibilities), 'Possibilities');
   assert.equal(pageLabel(ROUTES.resumeBuilder), 'Resume builder');
+  assert.equal(pageLabel(ROUTES.interview), 'Interview practice');
 });
 
 test('only the actual Possibilities child is highlighted; learning nested-page matching is retained', () => {
   const career = SIDEBAR_GROUPS.find(group => group.key === 'career');
-  for (const path of [ROUTES.possibilities, ROUTES.resumeBuilder]) assert.deepEqual(career.items.filter(item => isNavigationItemActive(navigationPath(path), item)).map(item => item.path), [path]);
+  for (const path of [ROUTES.possibilities, ROUTES.resumeBuilder, ROUTES.interview]) assert.deepEqual(career.items.filter(item => isNavigationItemActive(navigationPath(path), item)).map(item => item.path), [path]);
   const plan = SIDEBAR_GROUPS.find(group => group.key === 'learning').items.find(item => item.path === ROUTES.learningGoals);
   assert.equal(isNavigationItemActive(navigationPath(ROUTES.plan), plan), true);
   assert.equal(isNavigationItemActive(navigationPath(ROUTES.learningCentre), plan), true);
@@ -55,6 +56,6 @@ test('menu search finds the resume child and expands all registered groups witho
   assert.equal(matches[0].key, 'career');
   assert.deepEqual(matches[0].items.map(item => item.path), [ROUTES.resumeBuilder]);
   assert.deepEqual(COLLAPSIBLE_MENU_KEYS, SIDEBAR_GROUPS.filter(group => group.collapsible).map(group => group.key));
-  assert.equal(filterSidebarGroups('Possibilities').find(group => group.key === 'career').items.length, 2);
+  assert.equal(filterSidebarGroups('Possibilities').find(group => group.key === 'career').items.length, 3);
   assert.deepEqual(filterSidebarGroups(''), SIDEBAR_GROUPS);
 });

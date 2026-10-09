@@ -68,6 +68,8 @@ CREATE TABLE IF NOT EXISTS ref_wef_skills (
 );
 
 -- Epic 9 interview question bank (reference data only, no personal data).
+-- Keyed by MASCO unit code, with no foreign key to ref_occupations (that table
+-- can hold a different code list). Join on occupation_code when both exist.
 -- Fast lookup: ref_interview_occupation_questions ordered by display_order.
 
 CREATE TABLE IF NOT EXISTS ref_interview_sources (
@@ -82,7 +84,7 @@ CREATE TABLE IF NOT EXISTS ref_interview_sources (
 CREATE TABLE IF NOT EXISTS ref_interview_questions (
     question_id TEXT PRIMARY KEY,
     scope TEXT NOT NULL CHECK (scope IN ('Exact', 'Family', 'Common')),
-    occupation_code TEXT REFERENCES ref_occupations (occupation_code),
+    occupation_code TEXT,
     family_code TEXT,
     applies_to TEXT,
     primary_intent TEXT NOT NULL,
@@ -91,7 +93,7 @@ CREATE TABLE IF NOT EXISTS ref_interview_questions (
 );
 
 CREATE TABLE IF NOT EXISTS ref_interview_occupation_questions (
-    occupation_code TEXT NOT NULL REFERENCES ref_occupations (occupation_code),
+    occupation_code TEXT NOT NULL,
     question_id TEXT NOT NULL REFERENCES ref_interview_questions (question_id),
     scope TEXT NOT NULL CHECK (scope IN ('Exact', 'Family', 'Common')),
     display_order INTEGER NOT NULL,
@@ -100,7 +102,7 @@ CREATE TABLE IF NOT EXISTS ref_interview_occupation_questions (
 );
 
 CREATE TABLE IF NOT EXISTS ref_interview_coverage (
-    occupation_code TEXT PRIMARY KEY REFERENCES ref_occupations (occupation_code),
+    occupation_code TEXT PRIMARY KEY,
     quality_tier TEXT NOT NULL,
     family_code TEXT,
     family_title TEXT,
