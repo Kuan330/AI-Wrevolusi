@@ -1,9 +1,9 @@
 import { api } from "../../services/api.ts";
-import type { Feedback, PlanResult, QuestionBank } from "./types.ts";
+import type { ChangeTopic, Feedback, PlanResult, QuestionBank } from "./types.ts";
 
 type PlanBody = {
   role_title: string; items: { id: string; kind: string; label: string; text: string }[];
-  bank: { id: string; question: string }[]; topics: { id: string; text: string }[]; count: number; items_reviewed: boolean;
+  bank: { id: string; question: string }[]; topics: ChangeTopic[]; count: number; items_reviewed: boolean;
 };
 type FeedbackBody = {
   question: { text: string; kind: string; item_label: string | null }; answer: string; role_title: string; attempt: number;

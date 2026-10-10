@@ -216,6 +216,7 @@ export default function Possibilities() {
       <div className="px-companion-avatar"><img src="/images/possibilities-companion.png" alt="Your virtual career companion" width={280} height={320} /></div>
       <div className="px-companion-story"><h3>{selected ? "Your next chapter" : "Pick a direction to begin"}</h3><p>{selected ? `${currentTitle} → ${selected.title}` : "Explore a career direction, then choose a skill you would like to develop."}</p>{selectedSkill && <p>Selected skill: <strong>{selectedSkill.name}</strong></p>}</div>
       <Button className="px-primary px-companion-cta" onClick={() => { alive.current = false; navigate(ROUTES.resumeBuilder); }}>Generate resume<ArrowRight size={15} /></Button>
+      {selected && <Button asChild variant="outline"><Link to={ROUTES.interview}>Practise for an interview<ArrowRight size={15} /></Link></Button>}
     </aside></div>
     {(navigationError || careerError) && <p role="alert">{navigationError || careerError}</p>}
   </div>;

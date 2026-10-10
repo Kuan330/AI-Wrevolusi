@@ -15,7 +15,7 @@ function Practice({ owner }: { owner: string }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const active = store.sessions.find(session => session.id === activeId) ?? null;
   return <div className="ip-page">
-    <PageHeader title="Practise for your interview" description={active ? undefined : "Short practice based on your own resume and target role. Your answers stay on this device."} actions={store.saveStatus ? <span className="ip-save" role="status">{store.saveStatus}</span> : undefined} />
+    <PageHeader title="Practise for your interview" description={active ? undefined : "Practise for your future occupation or use your reviewed resume. Your answers stay on this device."} actions={store.saveStatus ? <span className="ip-save" role="status">{store.saveStatus}</span> : undefined} />
     {store.error && <div className="ip-note" role="alert">{store.error}</div>}
     {store.loading ? <p role="status">Loading your saved practice…</p> : active
       ? <SessionView key={active.id} owner={owner} session={active} onChange={session => { void store.save(session); }} onExit={() => setActiveId(null)} />

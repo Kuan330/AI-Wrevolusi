@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 import { buildRequirementItems, buildResumeItems, prepareInterviewContext, roleTitleFromRequirements, sectionKind } from '../src/features/interview/resumeItems.ts';
 import {
-  addAttempt, answerFollowUp, compareAttempts, createSession, followUpCount, nextOpenQuestion, questionDone, sessionProgress,
+  addAttempt, answerFollowUp, compareAttempts, createSession, feedbackRoleTitle, followUpCount, nextOpenQuestion, questionDone, sessionProgress,
   setAttemptError, setAttemptFeedback, setDraft, skipQuestion, upsertSession, MAX_SESSIONS,
 } from '../src/features/interview/session.ts';
 import { parseInterviewRecord } from '../src/features/interview/repository.ts';
@@ -14,6 +14,8 @@ import { entryLabel, reviewState, reviewedMark, resumeFingerprint } from '../src
 import { parseResumeRecord } from '../src/features/resume/repository.ts';
 import { emptyDraft } from '../src/features/resume/types.ts';
 import { ROUTES } from '../src/constants/routes.ts';
+import { createInterviewStore } from '../src/infrastructure/storage/interviewStore.ts';
+import { IDBFactory } from 'fake-indexeddb';
 
 const DOCUMENT = {
   cv: {
@@ -165,6 +167,64 @@ test('saved practice is read strictly and never silently replaced', () => {
   assert.throws(() => parseInterviewRecord(good, 'someone-else'), /could not be read/);
   assert.throws(() => parseInterviewRecord({ ...good, sessions: [{ ...good.sessions[0], questions: [{ id: 1 }] }] }, owner), /could not be read/);
   assert.throws(() => parseInterviewRecord({ ...good, sessions: 'x' }, owner), /could not be read/);
+});
+
+test('feedback uses the redacted role snapshot and omits unsafe legacy titles', () => {
+  const s = session();
+  s.role.title = 'Private Aurora Analytics Junior Data Analyst';
+  s.role.sentTitle = '[PRIVATE_1] Junior Data Analyst';
+  assert.equal(feedbackRoleTitle(s), '[PRIVATE_1] Junior Data Analyst');
+  delete s.role.sentTitle;
+  assert.equal(feedbackRoleTitle(s), '', 'legacy saved titles must not restore hidden words in requests');
+  s.role.sentTitle = 'x'.repeat(250);
+  assert.equal(feedbackRoleTitle(s).length, 200);
+});
+
+test('occupation practice snapshots survive storage and malformed optional fields are refused', () => {
+  const s = session();
+  s.mode = 'career'; s.resumeVersion = null;
+  s.role = { title: 'Future analyst', requirements: 'Explain reports', sentTitle: 'Future analyst', occupationCode: 'TEST-01' };
+  const record = { version: 1, owner: 'u', revision: 1, sessions: [s] };
+  const restored = parseInterviewRecord(JSON.parse(JSON.stringify(record)), 'u').sessions[0];
+  assert.equal(restored.mode, 'career');
+  assert.equal(restored.role.occupationCode, 'TEST-01');
+  assert.equal(restored.resumeVersion, null);
+  for (const field of ['sentTitle', 'occupationCode']) {
+    const malformed = structuredClone(record); malformed.sessions[0].role[field] = 4;
+    assert.throws(() => parseInterviewRecord(malformed, 'u'), /could not be read/);
+  }
+});
+
+test('immediate draft snapshots preserve fast edits on different questions in queued storage', async () => {
+  const store = createInterviewStore(new IDBFactory());
+  let s = session(), revision = 0, queue = Promise.resolve();
+  const [first, second] = s.questions.map(question => question.id);
+  const save = next => { queue = queue.then(() => store.update('u', () => ({ version: 1, owner: 'u', revision: ++revision, sessions: [next] }))); };
+  s = setDraft(s, first, 'first question draft'); save(s);
+  s = setDraft(s, second, 'second question draft'); save(s);
+  s = setDraft(s, first, 'first question final draft'); save(s);
+  await queue;
+  const restored = parseInterviewRecord(await store.read('u'), 'u').sessions[0];
+  assert.equal(restored.questions[0].draft, 'first question final draft');
+  assert.equal(restored.questions[1].draft, 'second question draft');
+  assert.equal(revision, 3);
+});
+
+test('all attempts remain reviewable and a reply updates only its chosen historical attempt', () => {
+  let s = session();
+  const questionId = s.questions[0].id, ids = [];
+  for (const answer of ['first full answer', 'failed full answer', 'latest full answer']) {
+    let attemptId; ({ session: s, attemptId } = addAttempt(s, questionId, { answer, mode: 'text' })); ids.push(attemptId);
+    s = answer.startsWith('failed') ? setAttemptError(s, questionId, attemptId, 'Try again') : setAttemptFeedback(s, questionId, attemptId, feedback({ follow_up: 'What did you do?' }));
+  }
+  const record = { version: 1, owner: 'u', revision: 1, sessions: [s] };
+  s = parseInterviewRecord(JSON.parse(JSON.stringify(record)), 'u').sessions[0];
+  assert.deepEqual(s.questions[0].attempts.map(attempt => attempt.answer), ['first full answer', 'failed full answer', 'latest full answer']);
+  const first = s.questions[0].attempts[0];
+  s = answerFollowUp(s, questionId, ids[0], first.followUps[0].id, { answer: 'Historical reply' });
+  assert.equal(s.questions[0].attempts[0].followUps[0].answer, 'Historical reply');
+  assert.equal(s.questions[0].attempts[1].error, 'Try again');
+  assert.equal(s.questions[0].attempts[2].followUps[0].answer, null);
 });
 
 test('voice support is detected without recording anything, with plain messages when it fails', () => {

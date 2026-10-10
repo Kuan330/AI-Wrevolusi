@@ -6,6 +6,7 @@ export type ImprovementKind = "expression" | "missing_example" | "possible_skill
 
 /** One thing in the reviewed resume (or the target role) that a question can be about. */
 export type InterviewItem = { id: string; kind: ItemKind; label: string; text: string; ref?: { section: string; index: number } };
+export type ChangeTopic = { id: string; text: string; item_id: string; impact_score: number; reference_id: string; source_name: string; source_year: number };
 
 export type Feedback = {
   summary: string;

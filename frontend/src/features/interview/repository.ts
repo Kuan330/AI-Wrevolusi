@@ -9,7 +9,8 @@ const validAttempt = (value: unknown) => mapping(value) && text(value.id) && tex
 const validQuestion = (value: unknown) => mapping(value) && text(value.id) && text(value.text) && text(value.sentText) && text(value.kind) && typeof value.skipped === "boolean" &&
   Array.isArray(value.attempts) && value.attempts.every(validAttempt);
 const validSession = (value: unknown) => mapping(value) && value.version === 1 && text(value.id) && text(value.createdAt) && text(value.updatedAt) &&
-  (value.mode === "resume" || value.mode === "general") && mapping(value.role) && text(value.role.title) && text(value.role.requirements) &&
+  (value.mode === "resume" || value.mode === "general" || value.mode === "career") && mapping(value.role) && text(value.role.title) && text(value.role.requirements) &&
+  (value.role.sentTitle === undefined || text(value.role.sentTitle)) && (value.role.occupationCode === undefined || text(value.role.occupationCode)) &&
   Array.isArray(value.items) && Array.isArray(value.questions) && value.questions.every(validQuestion);
 
 export function parseInterviewRecord(raw: unknown, owner: string): InterviewRecord {

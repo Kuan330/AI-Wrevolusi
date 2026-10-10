@@ -27,6 +27,10 @@ export default function FeedbackPanel({ question, attempt, previous, skillName, 
   const compare = previous ? compareAttempts(previous, attempt) : null;
   const gap = feedback.skill_gap;
   return <div className="ip-feedback" aria-label="Feedback on your answer">
+    <section className="ip-answers" aria-label={previous ? "Compare your answers" : "Your submitted answer"}>
+      {previous && <div><h4>Previous answer</h4><blockquote>{previous.answer}</blockquote></div>}
+      <div><h4>{previous ? "Current answer" : "Your answer"}</h4><blockquote>{attempt.answer}</blockquote></div>
+    </section>
     <h3>Feedback</h3>
     <p className="ip-summary">{feedback.summary}</p>
     <ul className="ip-checks">{feedback.checks.map(check => <li key={check.id} className={`ip-check ip-${check.status}`}>

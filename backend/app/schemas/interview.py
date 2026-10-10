@@ -42,6 +42,11 @@ class PlanItem(StrictModel):
 class ChangeTopic(StrictModel):
     id: str = Field(min_length=1, max_length=80)
     text: str = Field(min_length=1, max_length=500)
+    item_id: str | None = Field(default=None, min_length=1, max_length=80)
+    impact_score: float | None = Field(default=None, ge=0, le=1)
+    reference_id: str | None = Field(default=None, min_length=1, max_length=200)
+    source_name: str | None = Field(default=None, min_length=1, max_length=200)
+    source_year: int | None = Field(default=None, ge=1900, le=2100)
 
 
 class PlanRequest(StrictModel):
@@ -61,8 +66,6 @@ class PlanRequest(StrictModel):
         everything = " ".join([self.role_title, *[f"{i.label} {i.text}" for i in self.items], *[t.text for t in self.topics]])
         if CONTACT.search(everything):
             raise ValueError("Remove contact details before sending resume items.")
-        if not self.items and not self.bank:
-            raise ValueError("Provide resume items or question-bank questions.")
         return self
 
 

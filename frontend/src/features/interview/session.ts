@@ -7,9 +7,11 @@ export type SessionQuestion = { id: string; text: string; sentText: string; kind
 /** The reviewed resume this session used. Later edits in the resume do not change it. */
 export type ResumeVersion = { reviewedAt: string; itemCount: number };
 export type InterviewSession = {
-  version: 1; id: string; createdAt: string; updatedAt: string; mode: "resume" | "general"; source: "ai" | "template";
-  role: { title: string; requirements: string }; resumeVersion: ResumeVersion | null; items: InterviewItem[]; questions: SessionQuestion[];
+  version: 1; id: string; createdAt: string; updatedAt: string; mode: "resume" | "general" | "career"; source: "ai" | "template";
+  role: { title: string; requirements: string; sentTitle?: string; occupationCode?: string }; resumeVersion: ResumeVersion | null; items: InterviewItem[]; questions: SessionQuestion[];
 };
+/** Older sessions have no redacted role snapshot, so omit it instead of sending restored private words. */
+export const feedbackRoleTitle = (session: InterviewSession) => (session.role.sentTitle ?? "").slice(0, 200);
 export const MAX_FOLLOW_UPS = 2;
 export const MAX_SESSIONS = 20;
 const newId = () => globalThis.crypto.randomUUID();

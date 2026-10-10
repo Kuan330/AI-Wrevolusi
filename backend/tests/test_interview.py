@@ -30,7 +30,7 @@ ITEMS = [
     {"id": "req-1", "kind": "requirement", "label": "SQL queries", "text": ""},
 ]
 BANK = [{"id": "E9-Q-0001", "question": "How would you handle two urgent requests at once?"}]
-PLAN = {"role_title": "Junior Data Analyst", "items": ITEMS, "bank": BANK, "topics": [{"id": "task-1", "text": "Prepare weekly sales reports"}], "items_reviewed": True}
+PLAN = {"role_title": "Junior Data Analyst", "items": ITEMS, "bank": BANK, "topics": [{"id": "task-1", "text": "Prepare weekly sales reports", "item_id": "work-1", "impact_score": 0.7, "reference_id": "ref-task-1", "source_name": "Research example", "source_year": 2025}], "items_reviewed": True}
 
 
 def question(**changes):
@@ -75,8 +75,7 @@ def test_plan_needs_reviewed_items_and_no_contact_details():
         plan_request(items_reviewed=False)
     with pytest.raises(ValidationError):
         plan_request(items=[{**ITEMS[0], "text": "Email me at someone@example.test"}])
-    with pytest.raises(ValidationError):
-        plan_request(items=[], bank=[])
+    assert len(template_plan(plan_request(role_title="", items=[], bank=[], topics=[])).questions) == 4
 
 
 def test_good_plan_links_each_question_to_an_item():
@@ -154,7 +153,7 @@ def test_template_plan_prefers_work_then_project_and_marks_requirements_as_pract
 def test_template_plan_pads_from_bank_and_skips_unfair_bank_questions():
     request = plan_request(items=[ITEMS[0]], bank=[{"id": "x", "question": "Are you married?"}, *BANK], topics=[], count=3)
     texts = [q.text for q in template_plan(request).questions]
-    assert len(texts) == 2 and "married" not in " ".join(texts)
+    assert len(texts) == 3 and "married" not in " ".join(texts)
 
 
 # --- feedback -------------------------------------------------------------------------
@@ -349,3 +348,143 @@ def test_interview_routes_need_sign_in():
     with TestClient(create_app("/api")) as http:
         assert http.get("/api/v1/interview/question-bank", params={"occupation_code": "2512"}).status_code == 401
         assert http.post("/api/v1/interview/plan", json=PLAN).status_code == 401
+
+
+# --- regressions from the local Epic 9 acceptance checks -------------------------------
+
+@pytest.mark.parametrize("count", [3, 4, 5])
+@pytest.mark.parametrize("items", [[], ITEMS[:1]])
+def test_fallback_always_returns_requested_count_without_a_bank(count, items):
+    request = plan_request(role_title="Future Data Analyst", items=items, bank=[], topics=[], count=count)
+    result = template_plan(request)
+    assert len(result.questions) == count
+    assert len({q.text for q in result.questions}) == count
+    assert all("Data Analyst" in q.text for q in result.questions if q.kind == "general")
+
+
+@pytest.mark.parametrize("text", [
+    "What religion do you practise?", "Are you a Muslim?", "What is your faith?",
+    "Do you have children?", "When will you get married?", "What is your age?",
+])
+def test_personal_questions_cannot_bypass_the_guard(text):
+    with pytest.raises(InterviewRejected):
+        validate_plan(PlanModelResponse.model_validate(bad_first_question(text)), plan_request())
+
+
+@pytest.mark.parametrize("tool", ["ChatGPT", "ai", "Copilot"])
+def test_no_tool_experience_cannot_leak_into_any_feedback(tool):
+    answer = f"I have not used {tool} at work. I check the totals by hand, and I would learn from my supervisor before using it."
+    raw = feedback(
+        summary=f"You lack {tool} experience.",
+        checks=[{"id": "answered_question", "status": "yes", "quote": "I check the totals by hand"},
+                {"id": "ai_check", "status": "no", "note": f"You lack {tool} experience."}],
+        improvements=[{"kind": "possible_skill_gap", "text": f"You lack {tool} experience."}],
+        skill_gap={"skill_id": 3, "reason": f"Missing {tool} experience"},
+    )
+    result = normalise_feedback(raw, feedback_request(answer=answer))
+    assert f"You lack {tool} experience." not in result.model_dump_json()
+    assert not result.improvements and result.skill_gap is None
+    assert next(c for c in result.checks if c.id == "ai_check").status == "not_applicable"
+
+
+@pytest.mark.parametrize("invented", [
+    "How did you manage your team of 30 staff?",
+    "How did you reduce costs by 40% at Acme?",
+    "What did your supervisor say about the launch?",
+])
+def test_follow_up_quotes_the_answer_and_does_not_invent_facts(invented):
+    result = normalise_feedback(feedback(follow_up=invented), feedback_request())
+    assert result.follow_up != invented
+    assert '\"I prepared the weekly sales report myself\"' in result.follow_up
+    assert "30" not in result.follow_up and "Acme" not in result.follow_up
+
+
+def test_ai_change_cannot_use_legacy_unlinked_topics():
+    with pytest.raises(InterviewRejected):
+        validate_plan(PlanModelResponse.model_validate(good_plan()), plan_request(topics=[{"id": "task-1", "text": "Prepare weekly sales reports"}]))
+
+
+@pytest.mark.parametrize("missing", ["item_id", "impact_score", "reference_id", "source_name", "source_year"])
+def test_ai_change_requires_every_evidence_field(missing):
+    topic = {key: value for key, value in PLAN["topics"][0].items() if key != missing}
+    with pytest.raises(InterviewRejected):
+        validate_plan(PlanModelResponse.model_validate(good_plan()), plan_request(topics=[topic]))
+    assert not any(q.kind == "ai_change" for q in template_plan(plan_request(items=ITEMS[:1], topics=[topic])).questions)
+
+
+def test_ai_change_must_link_to_the_same_work_item_and_accept_zero_impact():
+    items = [*ITEMS, {**ITEMS[0], "id": "work-2"}]
+    topic = {**PLAN["topics"][0], "item_id": "work-2"}
+    with pytest.raises(InterviewRejected):
+        validate_plan(PlanModelResponse.model_validate(good_plan()), plan_request(items=items, topics=[topic]))
+    result = template_plan(plan_request(items=ITEMS[:1], topics=[{**PLAN["topics"][0], "impact_score": 0}]))
+    ai_question = next(q for q in result.questions if q.kind == "ai_change")
+    assert ai_question.item_id == "work-1" and ai_question.topic_id == "task-1"
+    assert len(validate_plan(PlanModelResponse(questions=result.questions), plan_request(items=ITEMS[:1])).questions) == 4
+
+
+@pytest.mark.parametrize("changes", [{"impact_score": 1.1}, {"impact_score": -0.1}, {"source_year": 0}, {"source_name": ""}])
+def test_ai_change_evidence_fields_are_bounded(changes):
+    with pytest.raises(ValidationError):
+        plan_request(topics=[{**PLAN["topics"][0], **changes}])
+
+
+def test_future_role_and_empty_general_practice_work_without_resume_bank_or_ai():
+    with client(configured=False) as http:
+        for role in ("Data Analyst", ""):
+            result = http.post("/api/v1/interview/plan", json={"role_title": role, "count": 5})
+            assert result.status_code == 200
+            assert len(result.json()["questions"]) == 5
+            assert all(q["kind"] == "general" and q["item_id"] is None for q in result.json()["questions"])
+
+
+def test_future_role_practice_can_use_ai_without_resume_or_bank():
+    body = {"role_title": "Data Analyst", "count": 3}
+    output = {"questions": [{"text": f"How would you learn task {n} for a Data Analyst role?", "kind": "general"} for n in range(3)]}
+    with client(Provider([output])) as http:
+        result = http.post("/api/v1/interview/plan", json=body)
+        assert result.status_code == 200 and result.json()["source"] == "ai"
+        assert len(result.json()["questions"]) == 3
+
+
+def test_fallback_bank_filters_personal_and_duplicate_questions():
+    bank = [{"id": "religion", "question": "What religion do you practise?"}, BANK[0], {**BANK[0], "id": "duplicate"}]
+    result = template_plan(PlanRequest(bank=bank, count=5))
+    assert len(result.questions) == len({q.text for q in result.questions}) == 5
+    assert result.questions[0].bank_id == BANK[0]["id"]
+    assert "religion" not in " ".join(q.text for q in result.questions)
+
+
+def test_replacing_a_tool_gap_keeps_the_only_supported_quote():
+    answer = "I have not used ChatGPT"
+    raw = feedback(checks=[], improvements=[{"kind": "possible_skill_gap", "text": "You lack ChatGPT experience.", "quote": answer}])
+    result = normalise_feedback(raw, feedback_request(answer=answer))
+    assert result.improvements == []
+    assert result.checks[0].quote == answer and answer in result.follow_up
+
+
+def test_supported_follow_up_quote_uses_actual_answer_case_and_spacing():
+    raw = feedback(checks=[{"id": "own_actions", "status": "yes", "quote": "i prepared the weekly sales report myself"}], improvements=[])
+    result = normalise_feedback(raw, feedback_request())
+    assert '"I prepared the weekly sales report myself"' in result.follow_up
+
+
+@pytest.mark.parametrize("answer", [
+    "I have never tried ChatGPT. I would learn it and check the output before using it.",
+    "I have no experience with AI tools. I would compare the output with reliable sources.",
+    "I don't use Copilot. I would check what it suggests before relying on it.",
+])
+def test_different_no_tool_experience_phrases_receive_safe_feedback(answer):
+    raw = feedback(summary="You need more ChatGPT experience.",
+                   checks=[{"id": "ai_check", "status": "no", "quote": answer[:20], "note": "Gain ai experience."}],
+                   improvements=[])
+    result = normalise_feedback(raw, feedback_request(answer=answer))
+    assert result.summary.startswith("Not having used")
+    assert next(c for c in result.checks if c.id == "ai_check").status == "not_applicable"
+
+
+def test_unrelated_unused_equipment_does_not_hide_actual_ai_checks():
+    answer = "I have not used cameras. I use AI to prepare reports and check its output against the till records before sending them."
+    raw = feedback(checks=[{"id": "ai_check", "status": "yes", "quote": "check its output", "note": "You explained your AI output checks."}], improvements=[])
+    result = normalise_feedback(raw, feedback_request(answer=answer))
+    assert next(c for c in result.checks if c.id == "ai_check").status == "yes"

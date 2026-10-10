@@ -32,4 +32,6 @@
 .ip-retry blockquote{margin:6px 0;padding:8px 12px;border-left:3px solid #d9cfe0;background:#faf7fb;font-size:14px;white-space:pre-wrap}
 .ip-evidence{background:#f8f5fa;border-radius:12px;padding:10px 14px;font-size:14px}.ip-evidence p{margin:2px 0 8px;overflow-wrap:anywhere}
 .ip-feedback-actions{border-top:1px solid #efe9f2;padding-top:12px}
+.ip-history{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;font-size:14px}.ip-history select{max-width:100%;padding:6px 8px;border:1px solid #d9cfe0;border-radius:8px;background:#fff;color:#2f2430}
+.ip-answers{display:grid;gap:12px}.ip-answers blockquote{margin:6px 0;padding:10px 12px;background:#f8f5fa;border-left:3px solid #d9cfe0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
 @media(max-width:760px){.ip-page{padding:16px 12px 36px}.ip-topbar{grid-template-columns:1fr}.ip-facts div{grid-template-columns:1fr;gap:2px}.ip-check{grid-template-columns:64px 1fr}.ip-card,.ip-question,.ip-done{padding:16px}}
