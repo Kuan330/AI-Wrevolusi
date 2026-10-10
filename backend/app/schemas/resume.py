@@ -152,12 +152,13 @@ class AssistRequest(StrictModel):
     document: dict
     skills: list[SkillCandidate] = Field(default_factory=list, max_length=250)
     context_reviewed: bool = False
+    context_mode: Literal["auto_redacted"] | None = None
     history: list[AssistMessage] = Field(default_factory=list, max_length=10)
 
     @model_validator(mode="after")
     def private_context(self):
         import json
-        if not self.context_reviewed: raise ValueError("Review the assistant context first.")
+        if not self.context_reviewed and self.context_mode != "auto_redacted": raise ValueError("Use automatically redacted context or review the assistant context first.")
         if set(self.document) - {"cv", "design"} or not isinstance(self.document.get("cv"), dict) or set(self.document["cv"]) - {"sections"}:
             raise ValueError("Only redacted sections and safe design settings may be sent.")
         text = json.dumps(self.model_dump(), ensure_ascii=False)

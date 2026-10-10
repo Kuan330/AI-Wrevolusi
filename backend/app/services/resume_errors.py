@@ -12,7 +12,7 @@ GENERATION_MESSAGES = {
     "output_limit": "The generated section exceeds the supported size. Shorten the reviewed source before retrying.",
     "unsafe_content": "AI returned unsupported contact, code or resource content.",
 }
-REQUEST_KEYS = frozenset("body occupation_code skill_filter_version candidate_id requirement_skill_id skill_decisions document job_requirements skills evidence evidence_reviewed id name text sections entries gaps title skill_ids fact_ids keywords skill_slugs label course_id gap_ids reason courses repair_feedback code fields field instruction context_reviewed history content role section_index source_ids path value design cv source_projects source_sections heading_fact_id polishable_fact_ids project_id project mode date highlights highlight_fact_ids outcome notices verbatim patches fact_id".split())
+REQUEST_KEYS = frozenset("message updates entry_id delete add_skills order body occupation_code skill_filter_version candidate_id requirement_skill_id skill_decisions document job_requirements skills evidence evidence_reviewed id name text sections entries gaps title skill_ids fact_ids keywords skill_slugs label course_id gap_ids reason courses repair_feedback code fields field instruction context_reviewed context_mode history content role section_index source_ids path value design cv source_projects source_sections heading_fact_id polishable_fact_ids project_id project mode date highlights highlight_fact_ids outcome notices verbatim patches fact_id".split())
 
 @lru_cache(maxsize=1)
 def render_keys():

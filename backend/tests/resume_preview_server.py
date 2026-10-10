@@ -12,6 +12,13 @@ from app.services.auth import get_current_user
 from app.routers.resume import get_resume_provider, get_resume_role_loader
 
 app = FastAPI()
+app.state.assist_counts = {}
+
+@app.get("/qa/assist-counts")
+def assist_counts():
+    # Synthetic-only counts: never record instructions, source text or identities.
+    return app.state.assist_counts
+
 app.include_router(router, prefix='/api/v1')
 app.dependency_overrides[get_current_user] = lambda: SimpleNamespace(id='synthetic-browser-account')
 
@@ -23,6 +30,35 @@ class SyntheticResumeProvider:
 
     async def complete_json_async(self, **kwargs):
         from app.services.ai_gateway import AIProviderError
+        if kwargs["operation"] == "resume.assist.entries.v2":
+            import asyncio
+            counts = app.state.assist_counts.setdefault(self.scenario, {"calls": 0, "cancelled": 0})
+            counts["calls"] += 1
+            if self.scenario == "assist_timeout": raise AIProviderError("Synthetic timeout", kind="timeout")
+            if self.scenario == "assist_transport": raise AIProviderError("Synthetic connection", kind="transport")
+            if self.scenario == "assist_credentials": raise AIProviderError("Synthetic credentials", kind="http", status_code=401)
+            if self.scenario == "assist_cancel":
+                try: await asyncio.sleep(10)
+                except asyncio.CancelledError:
+                    counts["cancelled"] += 1
+                    raise
+            if self.scenario == "assist_invalid": return {"unexpected": "Synthetic invalid output"}
+            payload = kwargs["payload"]
+            updates = []
+            for section in payload["sections"]:
+                if section["title"] != "Skills": continue
+                row = section["entries"][0]
+                entry = row["entry"]
+                if self.scenario == "assist_repair" and "repair_feedback" not in payload:
+                    entry = {"bullet": "Expert SQL"}
+                else:
+                    text = entry if isinstance(entry, str) else entry["bullet"]
+                    # Synthetic-only polish with exactly the same factual words.
+                    text = "SQL" if text == "Knowledge of SQL" else "Knowledge of SQL"
+                    entry = text if isinstance(entry, str) else {"bullet": text}
+                updates.append({"section_index": section["section_index"], "updates": [{"entry_id": row["id"], "entry": entry, "source_ids": [row["id"]]}]})
+                break
+            return {"message": "Refined the existing skill wording.", "sections": updates, "design": []}
         if self.scenario == "unavailable": raise AIProviderError("Synthetic offline provider", status_code=503, kind="http")
         if self.scenario == "invalid": return {"unexpected": "Synthetic invalid output"}
         if self.scenario in {"slow", "progress"}:

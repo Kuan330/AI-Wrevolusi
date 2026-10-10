@@ -7,7 +7,12 @@ export const resumeService = {
   generate: (job: string, skills: SkillCandidate[], evidence: ResumeEvidence[], reviewed: boolean, signal: AbortSignal, projects: SourceProject[] = [], sections?: SourceSection[], occupationCode?: string) =>
     api.post<Generation>("/resume/generate", { ...(occupationCode ? { occupation_code: occupationCode } : {}), job_requirements: job.trim(), skills, evidence, evidence_reviewed: reviewed, source_projects: projects, ...(sections ? { source_sections: sections } : {}) }, sections ? 70000 : 55000, signal),
   assist: (instruction: string, document: ResumeDocument, skills: SkillCandidate[], history: AssistantMessage[], signal: AbortSignal) =>
-    api.post<AssistantProposal>("/resume/assist", { instruction, document, skills, history, context_reviewed: true }, 55000, signal),
+    api.post<AssistantProposal>("/resume/assist", { instruction, document, skills, history, context_mode: "auto_redacted" }, 100000, signal).catch((error: unknown) => {
+      if (error instanceof ApiError && error.status === 408 && !signal.aborted) {
+        throw new ApiError("AI editing timed out. Your resume is unchanged. Try again.", 504, { code: "ai_timeout" });
+      }
+      throw error;
+    }),
   courses: (gaps: SkillGap[], signal: AbortSignal) => api.post<{ courses: RecommendedCourse[] }>("/resume/recommend-courses", { gaps }, 40000, signal),
   async render(document: ResumeDocument, signal: AbortSignal): Promise<Blob> {
     const controller = new AbortController();

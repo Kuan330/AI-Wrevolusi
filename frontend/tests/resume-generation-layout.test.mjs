@@ -17,10 +17,10 @@ for (const count of [1, 80, 81, 250]) {
     assert.deepEqual(parsed.document.cv.sections.Skills, next.cv.sections.Skills);
   });
 }
-test("modern generation gets 70 seconds; legacy, assistant and rendering budgets stay unchanged", () => {
+test("modern generation gets 70 seconds; legacy and rendering stay unchanged; assistant gets 100 seconds", () => {
   const source = file("../src/features/resume/service.ts");
   assert.match(source, /sections \? 70000 : 55000/);
-  assert.match(source, /context_reviewed: true }, 55000, signal/);
+  assert.match(source, /context_mode: "auto_redacted" }, 100000, signal/);
   assert.match(source, /setTimeout\(relay, 35000\)/);
 });
 test("generation progress is indeterminate, accessible and has reduced-motion styling", () => {

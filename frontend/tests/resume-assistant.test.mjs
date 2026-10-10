@@ -52,3 +52,44 @@ test("assistant review context changes when selected learning skills are added o
   assert.notEqual(initial,changed);
   assert.equal(initial,assistantReviewKey(document,[{id:"sql",name:"SQL"}],""));
 });
+
+
+test("all validated section and design changes apply atomically, preserving unrelated content", () => {
+ const context=prepareAssistantContext(document,[],"Refine");
+ const result={message:"Changed",sections:[{section_index:0,entries:[{entry:{bullet:"SQL"},source_ids:["section-0-entry-0"]}]}],design:[{path:["theme"],value:"moderncv"}]};
+ const before=structuredClone(document);
+ const next=applyAssistantProposal(document,result,["section-0","design-0"],context.mapping);
+ assert.equal(next.design.theme,"moderncv");assert.equal(next.cv.sections.Skills[0].bullet,"SQL");assert.deepEqual(next.cv.sections.Projects,before.cv.sections.Projects);
+ assert.deepEqual(document,before);
+ const bad={...result,design:[{path:["templates","normal_entry"],value:"code"}]};
+ assert.throws(()=>applyAssistantProposal(document,bad,["section-0","design-0"],context.mapping),/unsupported/);assert.deepEqual(document,before);
+ assert.throws(()=>applyAssistantProposal(document,{...result,sections:[{section_index:0,entries:[{entry:{bullet:"[PRIVATE_999]"},source_ids:["section-0-entry-0"]}]}]},["section-0","design-0"],context.mapping),/unknown private/);
+});
+test("an unchanged all-sections response does not create a history step", () => {
+ const before={...emptyDraft("a"),document,yamlText:documentYaml(document)};
+ const result={sections:[],design:[]};const next=applyAssistantProposal(document,result,[],{});
+ assert.deepEqual(next,document);
+ const history=createEditorHistory();history.record(before,{...before,document:next});assert.equal(history.canUndo,false);
+});
+test("current private terms redact previous conversation and role context too", () => {
+ const context=prepareAssistantContext(document,[],"Refine CustomerSecret", "CustomerSecret");
+ for(const content of ["Alex Doe said CustomerSecret", "Target CustomerSecret: secondary@example.test"]) {
+  const sent=context.redact(content);assert.ok(!sent.includes("Alex Doe")&&!sent.includes("CustomerSecret")&&!sent.includes("secondary@example.test"));
+ }
+});
+
+
+test("assistant wire uses automatic preparation rather than asserting manual review", async () => {
+ const {resumeService}=await import("../src/features/resume/service.ts");const {api}=await import("../src/services/api.ts");
+ const original=api.post,calls=[];api.post=async(...args)=>{calls.push(args);return {message:"No edit",sections:[],design:[]};};
+ try {const controller=new AbortController();await resumeService.assist("Refine",{cv:{sections:{}}},[],[],controller.signal);assert.equal(calls[0][1].context_mode,"auto_redacted");assert.equal(calls[0][1].context_reviewed,undefined);assert.equal(calls[0][2],100000);assert.equal(calls[0][3],controller.signal);} finally {api.post=original;}
+});
+
+
+test("assistant captures selected target changes without substituting the applied interview target", async () => {
+ const {readFileSync}=await import("node:fs");
+ const assistant=readFileSync(new URL("../src/pages/ResumeBuilder/ResumeAssistant.tsx",import.meta.url),"utf8");
+ const parent=readFileSync(new URL("../src/pages/ResumeBuilder/ResumeBuilder.tsx",import.meta.url),"utf8");
+ assert.match(assistant,/props\.jobRequirements, props\.targetKey/);
+ assert.match(parent,/skills=\{candidates\} targetKey=\{targetKey\} jobRequirements=\{draft\.jobRequirements\}/);
+});
