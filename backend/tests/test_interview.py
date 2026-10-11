@@ -606,3 +606,21 @@ def test_two_provider_failures_stop_after_one_retry():
     with pytest.raises(Exception, match="slow or busy"):
         feedback_for_answer(feedback_request(), provider)
     assert len(provider.calls) == 2
+
+
+def test_long_quotes_and_rewrites_do_not_fail_the_whole_reply():
+    long_quote = "I prepared the weekly sales report myself " * 12
+    raw = feedback(
+        scores=[score(quote=long_quote, reason="You named a real check. " * 30, next_step="Say how often it found a mistake. " * 20), score(competency="ownership", level=3)],
+        follow_up_quote=long_quote, structure=[{"part": "action", "status": "yes", "quote": long_quote}], stronger_answer="I checked the totals. " * 100,
+    )
+    result = normalise_feedback(raw, feedback_request(answer=LONG_ANSWER))
+    assert result.stronger_answer is None
+    assert [s.competency for s in result.scores] == ["ownership"] or all(len(s.reason) <= 300 and len(s.next_step) <= 200 for s in result.scores)
+    assert result.structure[0].quote is None
+
+
+def test_long_reason_text_is_trimmed_to_the_display_limit():
+    raw = feedback(scores=[score(reason="You named a real check on the totals. " * 20, next_step="Say how often it found a mistake. " * 20)])
+    result = normalise_feedback(raw, feedback_request(answer=LONG_ANSWER))
+    assert len(result.scores[0].reason) <= 300 and len(result.scores[0].next_step) <= 200 and result.scores[0].reason.endswith("…")

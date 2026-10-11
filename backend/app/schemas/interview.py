@@ -148,15 +148,15 @@ class CompetencyScore(StrictModel):
     """What one answer showed about one skill. 1 not shown yet, 2 started, 3 clear, 4 strong."""
     competency: CompetencyId
     level: int = Field(ge=1, le=4)
-    quote: str | None = Field(default=None, max_length=300)
-    reason: str = Field(min_length=1, max_length=300)
-    next_step: str = Field(default="", max_length=200)
+    quote: str | None = Field(default=None, max_length=4000)
+    reason: str = Field(min_length=1, max_length=1000)
+    next_step: str = Field(default="", max_length=1000)
 
 
 class StructureCheck(StrictModel):
     part: StructurePart
     status: CheckStatus
-    quote: str | None = Field(default=None, max_length=300)
+    quote: str | None = Field(default=None, max_length=4000)
 
 
 class FeedbackResponse(StrictModel):
@@ -164,9 +164,9 @@ class FeedbackResponse(StrictModel):
     checks: list[Check] = Field(max_length=5)
     improvements: list[Improvement] = Field(default_factory=list, max_length=5)
     follow_up: str | None = Field(default=None, max_length=300)
-    follow_up_quote: str | None = Field(default=None, max_length=300)
+    follow_up_quote: str | None = Field(default=None, max_length=4000)
     follow_up_focus: FollowUpFocus | None = None
     skill_gap: SkillGapPick | None = None
     scores: list[CompetencyScore] = Field(default_factory=list, max_length=4)
     structure: list[StructureCheck] = Field(default_factory=list, max_length=4)
-    stronger_answer: str | None = Field(default=None, max_length=900)
+    stronger_answer: str | None = Field(default=None, max_length=6000)

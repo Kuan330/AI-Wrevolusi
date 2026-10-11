@@ -262,9 +262,18 @@ GENERIC_FOLLOW_UP = "Can you explain your own action or how you would approach i
 SENTENCE_START = re.compile(r"(?:^|[.!?]\s+)")
 
 
+MAX_STRONGER = 1200
+
+
+def trimmed(value: str, limit: int) -> str:
+    """Shorten a long model sentence at a word boundary instead of failing the whole reply."""
+    value = value.strip()
+    return value if len(value) <= limit else value[: limit - 1].rsplit(" ", 1)[0].rstrip(" ,;:") + "…"
+
+
 def safe_stronger_answer(value: str | None, request: FeedbackRequest) -> str | None:
     """Keep a rewrite only when it adds no number or name that is not already in the answer or question. Otherwise drop it."""
-    if not value or len(value.split()) < 8:
+    if not value or len(value.split()) < 8 or len(value) > MAX_STRONGER:
         return None
     if JUDGES_PERSON.search(value) or PREDICTS_HIRING.search(value) or UNFAIR.search(value) or ASSUMES_AI.search(value):
         return None
@@ -296,7 +305,8 @@ def clean_scores(scores, request: FeedbackRequest, quote, said_not_used: bool, a
         if score.level >= 2 and evidence is None:
             continue
         seen.add(score.competency)
-        kept.append(score.model_copy(update={"quote": evidence, "level": min(score.level, cap)}))
+        kept.append(score.model_copy(update={"quote": evidence, "level": min(score.level, cap),
+                                             "reason": trimmed(score.reason, 300), "next_step": trimmed(score.next_step, 200)}))
     return kept
 
 
