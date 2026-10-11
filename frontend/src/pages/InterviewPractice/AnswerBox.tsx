@@ -2,21 +2,23 @@ import { useEffect, useRef, useState } from "react";
 import { Mic, Square, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormField, Textarea } from "@/components/ui/form-field";
-import { speechSupported, startSpeech, type SpeechSession } from "@/features/interview/speech";
+import { speechSupported, startSpeech, voiceBlockedBy, type SpeechSession } from "@/features/interview/speech";
 
 type Props = { value: string; onChange: (value: string) => void; onSubmit: (mode: "text" | "voice") => void; busy: boolean };
 export default function AnswerBox({ value, onChange, onSubmit, busy }: Props) {
   const [mode, setMode] = useState<"text" | "voice">("text");
   const [recording, setRecording] = useState(false), [note, setNote] = useState(""), [spoken, setSpoken] = useState(false);
+  // A voice problem is shown beside the Type and Speak choice, where the user just acted, not under the answer box.
+  const [voiceNote, setVoiceNote] = useState(""), [blocked, setBlocked] = useState(false);
   const session = useRef<SpeechSession | null>(null), base = useRef("");
-  const canSpeak = speechSupported();
+  const canSpeak = speechSupported() && !blocked;
   // Recording always ends when the user leaves this screen.
   useEffect(() => () => session.current?.cancel(), []);
   const begin = () => {
-    setNote(""); base.current = value.trim();
+    setNote(""); setVoiceNote(""); base.current = value.trim();
     const started = startSpeech({
       onText: text => { onChange([base.current, text].filter(Boolean).join(" ")); setSpoken(true); },
-      onError: setNote,
+      onError: (message, code) => { setVoiceNote(message); if (voiceBlockedBy(code)) { setBlocked(true); setMode("text"); } },
       onEnd: () => { session.current = null; setRecording(false); },
     });
     if (started) { session.current = started; setRecording(true); }
@@ -30,8 +32,9 @@ export default function AnswerBox({ value, onChange, onSubmit, busy }: Props) {
     <div className="ip-mode" role="group" aria-label="How do you want to answer?">
       <Button type="button" size="sm" variant={mode === "text" ? "secondary" : "ghost"} aria-pressed={mode === "text"} disabled={recording} onClick={() => setMode("text")}>Type</Button>
       <Button type="button" size="sm" variant={mode === "voice" ? "secondary" : "ghost"} aria-pressed={mode === "voice"} disabled={recording || !canSpeak} onClick={() => setMode("voice")}>Speak</Button>
-      {!canSpeak && <span className="ip-hint">Voice is not available in this browser. You can type your answer.</span>}
+      {!canSpeak && <span className="ip-hint">{blocked ? "Voice typing is not working in this browser right now." : "Voice is not available in this browser. You can type your answer."}</span>}
     </div>
+    {voiceNote && <p className="ip-note" role="alert">{voiceNote}</p>}
     {mode === "voice" && <div className="ip-voice">
       <p className="ip-hint">When you speak, your browser turns your voice into text. We do not record or keep your audio, but your browser may send it to its own speech service. You can check and change the text before you submit.</p>
       <div className="ip-voice-actions">

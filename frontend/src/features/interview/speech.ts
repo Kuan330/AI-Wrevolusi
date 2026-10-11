@@ -15,13 +15,15 @@ const REASONS: Record<string, string> = {
   "service-not-allowed": "Your browser does not allow speech recognition here. You can type your answer instead.",
   "no-speech": "We did not hear anything. Try again or type your answer.",
   "audio-capture": "No microphone was found. You can type your answer instead.",
-  network: "Speech recognition needs a connection. You can type your answer instead.",
+  network: "Voice typing could not reach its speech service. Check your connection, or try Chrome or Edge. Some browsers, such as Brave, block it. You can type your answer instead.",
 };
+/** These errors will not go away on a retry in the same browser, so voice is switched off for this visit. */
+export const voiceBlockedBy = (code: string) => code === "network" || code === "service-not-allowed";
 export const speechErrorMessage = (code: string) => REASONS[code] ?? "Voice input stopped. You can try again or type your answer.";
 
 export type SpeechSession = { stop: () => void; cancel: () => void };
 /** Start listening. `stop` keeps what was heard; `cancel` throws it away. Either way recording ends and nothing is stored. */
-export function startSpeech(handlers: { onText: (text: string) => void; onError: (message: string) => void; onEnd: () => void }, lang = "en-MY"): SpeechSession | null {
+export function startSpeech(handlers: { onText: (text: string) => void; onError: (message: string, code: string) => void; onEnd: () => void }, lang = "en-MY"): SpeechSession | null {
   const scope = globalThis as unknown as Record<string, RecognitionConstructor | undefined>;
   const Ctor = scope.SpeechRecognition ?? scope.webkitSpeechRecognition;
   if (!Ctor) return null;
@@ -38,8 +40,8 @@ export function startSpeech(handlers: { onText: (text: string) => void; onError:
     }
     handlers.onText(`${final}${interim}`.replace(/\s+/g, " ").trim());
   };
-  recognition.onerror = event => { if (!cancelled && event.error !== "aborted") handlers.onError(speechErrorMessage(event.error)); };
+  recognition.onerror = event => { if (!cancelled && event.error !== "aborted") handlers.onError(speechErrorMessage(event.error), event.error); };
   recognition.onend = finish;
-  try { recognition.start(); } catch { handlers.onError(speechErrorMessage("")); finish(); return null; }
+  try { recognition.start(); } catch { handlers.onError(speechErrorMessage(""), ""); finish(); return null; }
   return { stop: () => recognition.stop(), cancel: () => { cancelled = true; try { recognition.abort(); } catch { /* already stopped */ } finish(); } };
 }

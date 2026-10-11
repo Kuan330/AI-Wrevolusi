@@ -7,7 +7,7 @@ import {
   setAttemptError, setAttemptFeedback, setDraft, skipQuestion, upsertSession, MAX_SESSIONS,
 } from '../src/features/interview/session.ts';
 import { parseInterviewRecord } from '../src/features/interview/repository.ts';
-import { speechErrorMessage, speechSupported } from '../src/features/interview/speech.ts';
+import { speechErrorMessage, speechSupported, voiceBlockedBy } from '../src/features/interview/speech.ts';
 import { skillSlug } from '../src/features/interview/handoff.ts';
 import { addInterviewSuggestion, applyInterviewSuggestion, dismissInterviewSuggestion, suggestionTarget } from '../src/features/resume/interviewSuggestions.ts';
 import { entryLabel, reviewState, reviewedMark, resumeFingerprint } from '../src/features/resume/review.ts';
@@ -232,6 +232,8 @@ test('voice support is detected without recording anything, with plain messages 
   assert.equal(speechSupported({ webkitSpeechRecognition: function () {} }), true);
   assert.match(speechErrorMessage('not-allowed'), /type your answer/);
   assert.match(speechErrorMessage('something-new'), /type your answer/);
+  assert.match(speechErrorMessage('network'), /Chrome or Edge/);
+  assert.deepEqual(['network', 'service-not-allowed', 'not-allowed', 'no-speech', ''].map(voiceBlockedBy), [true, true, false, false, false]);
 });
 
 test('skill slugs match the backend rule', () => {
