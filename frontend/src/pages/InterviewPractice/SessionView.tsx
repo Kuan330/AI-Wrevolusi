@@ -141,14 +141,14 @@ export default function SessionView({ owner, session, allSessions, onChange, onE
       <h2 ref={heading} tabIndex={-1}>{question.text}</h2>
       <p className="ip-hint">This is a practice question. It is not the employer’s question.</p>
       {question.attempts.length > 1 && <label className="ip-history">Review an answer
-        <NativeSelect value={attempt?.id ?? ""} onChange={event => { setSelected(old => ({ ...old, [question.id]: event.target.value })); setAgain(old => ({ ...old, [question.id]: false })); setResumeOpen(false); setLearnOpen(false); }}>
+        <NativeSelect value={attempt?.id ?? ""} onChange={event => { setNotice(""); setSelected(old => ({ ...old, [question.id]: event.target.value })); setAgain(old => ({ ...old, [question.id]: false })); setResumeOpen(false); setLearnOpen(false); }}>
           {question.attempts.map((entry, position) => <option key={entry.id} value={entry.id}>Attempt {position + 1}{entry.feedback ? " · feedback ready" : entry.error ? " · feedback failed" : " · awaiting feedback"}</option>)}
         </NativeSelect>
       </label>}
       {question.skipped ? <div className="ip-actions"><p>You skipped this question.</p><Button variant="outline" onClick={() => commit(reopenQuestion(latest.current, question.id))}>Answer it anyway</Button></div>
         : attempt && attempt.feedback && !editing ? <FeedbackPanel key={attempt.id} question={question} attempt={attempt} previous={previous} canSendToResume={Boolean(item?.ref)}
             onTryAgain={editAnswer} onUseStronger={useStronger}
-            onNext={nextIndex >= 0 && nextIndex !== index ? () => go(nextIndex) : null} onFinish={progress.complete ? () => setFinished(true) : null} onSendToResume={() => setResumeOpen(true)} onStrengthen={() => setLearnOpen(true)}
+            onNext={nextIndex >= 0 && nextIndex !== index ? () => go(nextIndex) : null} onFinish={progress.complete ? () => setFinished(true) : null} fresh={notice !== ""} onSendToResume={() => setResumeOpen(true)} onStrengthen={() => setLearnOpen(true)}
             onFollowUp={(id, reply) => commit(answerFollowUp(latest.current, question.id, attempt.id, id, reply))} />
         : attempt && !attempt.feedback && !editing ? <div className="ip-retry">{attempt.error && <p className="ip-note" role="alert">{attempt.error}</p>}
             <p className="ip-hint">Your answer is saved:</p><blockquote>{attempt.answer}</blockquote>

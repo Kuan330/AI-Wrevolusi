@@ -87,8 +87,15 @@
 @media(max-width:760px){
   .ip-hint,.ip-tip{font-size:14px}
   .ip-step{width:44px;height:44px}
-  .ip-page .ip-actions button,.ip-page .ip-mode button,.ip-page .ip-voice-actions button{min-height:44px}
+  .ip-page button:not([role=checkbox]){min-height:44px;font-size:14px}
+  .ip-your-answer summary,.ip-more summary{min-height:44px}
   .ip-feedback-actions{position:sticky;bottom:0;background:#fffdfd;padding:10px 0 calc(10px + env(safe-area-inset-bottom));z-index:2;box-shadow:0 -6px 12px -8px #57405a33}
   .ip-feedback-actions button{flex:1 1 auto}
   .ip-score-head .ip-bar{margin-left:0}
 }
+
+.ip-feedback h3:focus{outline:none}
+.ip-more[aria-label] .ip-score-list{margin-top:8px}
+.ip-lead.is-first{display:flex;flex-direction:column}.ip-lead.is-first .ip-todo{order:-1;border-top:0;padding-top:0;margin-bottom:2px}.ip-lead.is-first .ip-well{border-top:1px solid #cfe5d8;padding-top:12px}
+.ip-hint svg{flex:none;vertical-align:-2px;margin-right:4px}
+.ip-begin .ip-actions .ip-hint{display:flex;align-items:flex-start}

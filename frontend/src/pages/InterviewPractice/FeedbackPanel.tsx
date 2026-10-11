@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, BookOpen, CircleCheck, FilePenLine, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/form-field";
@@ -23,9 +23,14 @@ type Props = {
   question: SessionQuestion; attempt: Attempt; previous: Attempt | null;
   canSendToResume: boolean; onTryAgain: () => void; onUseStronger: (text: string) => void; onNext: (() => void) | null; onFinish: (() => void) | null;
   onSendToResume: () => void; onStrengthen: () => void;
+  /** True when this feedback has only just arrived, so focus should move to it. */
+  fresh?: boolean;
   onFollowUp: (followUpId: string, reply: { answer?: string; skipped?: boolean; correction?: string }) => void;
 };
-export default function FeedbackPanel({ question, attempt, previous, canSendToResume, onTryAgain, onUseStronger, onNext, onFinish, onSendToResume, onStrengthen, onFollowUp }: Props) {
+export default function FeedbackPanel({ question, attempt, previous, canSendToResume, onTryAgain, onUseStronger, onNext, onFinish, onSendToResume, onStrengthen, onFollowUp, fresh }: Props) {
+  const title = useRef<HTMLHeadingElement | null>(null);
+  // The answer box is gone once feedback arrives, so put focus on the feedback instead of losing it.
+  useEffect(() => { if (fresh) title.current?.focus(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const feedback = attempt.feedback;
   const [replies, setReplies] = useState<Record<string, string>>({}), [fixing, setFixing] = useState<string | null>(null);
   if (!feedback) return null;
@@ -35,17 +40,19 @@ export default function FeedbackPanel({ question, attempt, previous, canSendToRe
   const scoreChanges = previous ? compareScores(previous.feedback?.scores, scores) : [];
   const shortAnswer = attempt.answer.trim().split(/\s+/).length < 20;
   // Lead with what went well, then one thing to do. Everything else is one tap away.
-  const praise = [
-    ...scores.filter(score => score.level >= 3).map(score => ({ key: score.competency, label: competencyLabel(score.competency), quote: score.quote })),
-    ...feedback.checks.filter(check => check.status === "yes").map(check => ({ key: check.id, label: CHECKS[check.id], quote: check.quote })),
-  ];
-  // Two points about the same words read as repeats, so keep the first one for each quote.
-  const wentWell = praise.filter((item, index) => !item.quote || praise.findIndex(other => other.quote === item.quote) === index).slice(0, 3);
+  // The quotes sit in the skills list below, so repeating them here would read twice.
+  const wentWell = [
+    ...scores.filter(score => score.level >= 3).map(score => ({ key: score.competency, label: competencyLabel(score.competency), text: score.reason })),
+    ...feedback.checks.filter(check => check.status === "yes" && check.id !== "answered_question").map(check => ({ key: check.id, label: CHECKS[check.id], text: "" })),
+  ].slice(0, 3);
+  const answered = feedback.checks.find(check => check.id === "answered_question");
+  // A short answer is already explained by the hint below, so only longer answers get the "answer the question" step.
+  const offTopic = answered !== undefined && (answered.status === "no" || (answered.status === "partly" && !shortAnswer));
   const weakest = [...scores].filter(score => score.level < 4 && score.next_step).sort((a, b) => a.level - b.level)[0];
-  const doNext = weakest ? { label: competencyLabel(weakest.competency), text: weakest.next_step }
+  const doNext = offTopic ? { label: "Answer the question that was asked", text: answered!.note || "Start with a direct answer to the question, then add your example." } : weakest ? { label: competencyLabel(weakest.competency), text: weakest.next_step }
     : (feedback.improvements.find(item => item.kind !== "possible_skill_gap") ? { label: "", text: feedback.improvements.find(item => item.kind !== "possible_skill_gap")!.text } : null);
   return <div className="ip-feedback" aria-label="Feedback on your answer">
-    <h3>Feedback</h3>
+    <h3 tabIndex={-1} ref={title}>Feedback</h3>
     <details className="ip-your-answer" open={Boolean(previous)}>
       <summary>{previous ? "Compare your answers" : "Your answer"}</summary>
       <div className="ip-answers">
@@ -54,20 +61,20 @@ export default function FeedbackPanel({ question, attempt, previous, canSendToRe
       </div>
     </details>
     <p className="ip-summary">{feedback.summary}</p>
-    {(wentWell.length > 0 || doNext) && <section className="ip-lead" aria-label="What went well and what to do next">
-      {wentWell.length > 0 && <div><h4><CircleCheck size={15} aria-hidden="true" /> What went well</h4>
-        <ul>{wentWell.map(item => <li key={item.key}><strong>{item.label}</strong>{item.quote && <q className="ip-quote">{item.quote}</q>}</li>)}</ul></div>}
-      {doNext && <div><h4>Do this next</h4><p>{doNext.label && <strong>{doNext.label}. </strong>}{doNext.text}</p></div>}
+    {(wentWell.length > 0 || doNext) && <section className={`ip-lead${offTopic ? " is-first" : ""}`} aria-label="What went well and what to do next">
+      {wentWell.length > 0 && <div className="ip-well"><h4><CircleCheck size={15} aria-hidden="true" /> What went well</h4>
+        <ul>{wentWell.map(item => <li key={item.key}><strong>{item.label}</strong>{item.text && <span>: {item.text}</span>}</li>)}</ul></div>}
+      {doNext && <div className="ip-todo"><h4>Do this next</h4><p>{doNext.label && <strong>{doNext.label}. </strong>}{doNext.text}</p></div>}
     </section>}
     {shortAnswer && <p className="ip-hint" role="note">Your answer is short, so scores stay low until there is more to judge. Try three to five sentences: what the situation was, what you did, and what changed.</p>}
-    {scores.length > 0 && <section className="ip-group" aria-label="Skills this answer showed">
-      <h4>Skills this answer showed</h4>
+    {scores.length > 0 && <details className="ip-more" aria-label="Skills this answer showed">
+      <summary>Skills this answer showed ({scores.length})</summary>
       <p className="ip-hint">This describes this answer only. It is practice, not a test of you.</p>
       <ul className="ip-score-list">{scores.map(score => <li key={score.competency}>
         <div className="ip-score-head"><strong>{competencyLabel(score.competency)}</strong><span className={`ip-level ip-level-${score.level}`}>{LEVEL_LABEL[score.level]}</span><LevelBar level={score.level} /></div>
         {score.quote && <q className="ip-quote">{score.quote}</q>}<p>{score.reason}</p>
       </li>)}</ul>
-    </section>}
+    </details>}
     {attempt.followUps.map(followUp => <section key={followUp.id} className="ip-followup" aria-label="Follow-up question">
       <h4>One more question</h4><p>{followUp.text}</p>
       {followUp.skipped ? <p className="ip-hint">You skipped this one.</p> : followUp.answer ? <><p className="ip-hint">Your reply</p><p>{followUp.answer}</p></> : <>

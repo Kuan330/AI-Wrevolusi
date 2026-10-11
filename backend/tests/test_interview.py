@@ -11,6 +11,7 @@ from app.db.session import get_db
 from app.main import create_app
 from app.routers.interview import _optional_provider
 from app.routers.resume import get_resume_provider
+from app.services.ai_gateway import AIProviderError
 from app.schemas.interview import FeedbackRequest, FeedbackResponse, PlanModelResponse, PlanRequest
 from app.services.auth import get_current_user
 from app.services.interview import (
@@ -575,3 +576,33 @@ def test_feedback_payload_names_the_focus_skill_from_the_question_intent():
     feedback_for_answer(request, provider)
     assert provider.calls[0]["payload"]["focus_competency"] == "communication"
     assert "role_knowledge" in provider.calls[0]["system_prompt"]
+
+
+def test_an_answer_that_misses_the_question_cannot_score_above_started_or_clear():
+    base = {"improvements": []}
+    no = feedback(scores=[score(level=4)], checks=[{"id": "answered_question", "status": "no", "quote": "checked the totals"}], **base)
+    partly = feedback(scores=[score(level=4)], checks=[{"id": "answered_question", "status": "partly", "quote": "checked the totals"}], **base)
+    request = feedback_request(answer=LONG_ANSWER)
+    assert normalise_feedback(no, request).scores[0].level == 2
+    assert normalise_feedback(partly, request).scores[0].level == 3
+
+
+def test_follow_up_quote_has_no_doubled_punctuation():
+    raw = feedback(follow_up_quote="I prepared the weekly sales report myself.", follow_up_focus="reason", follow_up="Can you explain why?")
+    answer = "I prepared the weekly sales report myself. I checked the totals against the till records and fixed two mistakes before sending it."
+    follow_up = normalise_feedback(raw, feedback_request(answer=answer)).follow_up
+    assert follow_up.startswith('You said "I prepared the weekly sales report myself". ')
+
+
+def test_one_stalled_provider_call_is_retried_once():
+    provider = Provider([AIProviderError("timed out", kind="timeout"), feedback().model_dump()])
+    assert feedback_for_answer(feedback_request(), provider).summary.startswith("You described")
+    assert len(provider.calls) == 2 and "repair_feedback" not in provider.calls[1]["payload"]
+    assert all(call["request_timeout_s"] <= 30 for call in provider.calls)
+
+
+def test_two_provider_failures_stop_after_one_retry():
+    provider = Provider([AIProviderError("timed out", kind="timeout")])
+    with pytest.raises(Exception, match="slow or busy"):
+        feedback_for_answer(feedback_request(), provider)
+    assert len(provider.calls) == 2
