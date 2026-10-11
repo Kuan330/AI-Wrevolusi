@@ -16,6 +16,7 @@ export type Course = {
   intro: string;
   outcomes: string[];
   prereq: string;
+  catalogueChaptersComplete?: boolean;
   chapters: { title: string; min: number | null }[] | null;
   advice: string;
 };

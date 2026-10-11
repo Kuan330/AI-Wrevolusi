@@ -73,7 +73,29 @@ class SyntheticResumeProvider:
             decisions.append({"candidate_id": candidate["candidate_id"], "requirement_skill_id": anchor})
         if self.scenario == "relevance_invalid" and decisions:
             decisions[0]["requirement_skill_id"] = 999999
-        return {"skill_decisions": decisions, "patches": [{"fact_id": f["id"], "text": f["text"].lstrip("•●▪*- ")} for f in kwargs["payload"].get("facts", [])], "gaps": []}
+        output = {"skill_decisions": decisions, "patches": [{"fact_id": f["id"], "text": f["text"].lstrip("•●▪*- ")} for f in kwargs["payload"].get("facts", [])], "gaps": []}
+        if kwargs["operation"] == "resume.career.v1":
+            payload = kwargs["payload"]
+            source = payload.get("facts", [])
+            output.update(summary=[{"fact_id": source[0]["id"], "text": source[0]["text"].lstrip("• ")}] if source else [],
+                project_order=[p["id"] for p in payload.get("source_projects", [])], evidence_links=[])
+            if self.scenario == "career_evidence":
+                code = payload["target_role"]["occupation_code"]
+                allowed = {"2421": {"Analytical thinking", "SQL", "Excel", "Communication", "Reading, writing and mathematics"},
+                    "2512": {"Programming", "SQL", "Analytical thinking"},
+                    "4111": {"Microsoft Office", "Excel", "Reading, writing and mathematics", "Communication"}}[code]
+                for candidate, decision in zip(payload["skill_candidates"], decisions):
+                    decision["requirement_skill_id"] = payload["target_role"]["required_skills"][0]["skill_id"] if candidate["name"] in allowed else None
+                if code == "4111": output["project_order"].reverse()
+                summary_marker = {"2421": "Cleaned 2,400", "2512": "Used SQL joins", "4111": "Reviewed 180"}[code]
+                summary_fact = next((f for f in source if summary_marker in f["text"]), None)
+                if summary_fact:
+                    output["summary"] = [{"fact_id": summary_fact["id"], "text": summary_fact["text"].lstrip("• ")}]
+                for candidate in payload["all_candidates"]:
+                    if candidate["name"] in {"SQL", "Excel"} and candidate["name"] in allowed:
+                        fact = next((f for f in source if candidate["name"] in f["text"]), None)
+                        if fact: output["evidence_links"].append({"candidate_id": candidate["candidate_id"], "fact_id": fact["id"], "quote": fact["text"]})
+        return output
 
     def complete_json(self, **kwargs):
         payload = kwargs["payload"]

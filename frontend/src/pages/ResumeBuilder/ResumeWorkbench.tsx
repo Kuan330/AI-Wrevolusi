@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Bold, ChevronsDownUp, ChevronsUpDown, Download, Italic, Link2, Menu, MoreHorizontal, Redo2, Sparkles, Undo2, BookOpen } from "lucide-react";
 import AccountMenu from "@/components/account/AccountMenu";
@@ -14,12 +14,15 @@ import type { ResumeDocument } from "@/features/resume/types";
 import { MarkdownContext, type MarkdownSelection } from "./MarkdownSelection";
 import { ResumeForm, type DocumentChange } from "./ResumeForm";
 import ResumeControls from "./ResumeControls";
-import YamlEditor from "./YamlEditor";
 import PdfPreview from "./PdfPreview";
+const loadYamlEditor = () => import("./YamlEditor");
+const YamlEditor = lazy(loadYamlEditor);
+const preloadYamlEditor = () => { void loadYamlEditor().catch(() => undefined); };
 type Props = {
   document: ResumeDocument; yamlText: string; yamlError: string | null; unappliedYaml: boolean;
   editDocument: DocumentChange; editYaml: (value: string) => void; addSection: () => void; removeSection: (title: string) => void;
   undo: () => void; redo: () => void; canUndo: boolean; canRedo: boolean;
+  alignment?: React.ReactNode;
   saveStatus: string; notices: React.ReactNode; pdf: Blob | null; freshPdf: boolean; rendering: boolean;
   renderError: string; retryRender: () => void; downloadPdf: () => void; downloadYaml: () => void;
   target: () => void; courses?: () => void; courseCount: number; more: () => void; assistant: React.ReactNode;
@@ -32,6 +35,15 @@ export default function ResumeWorkbench(props: Props) {
   const [pdfControls, setPdfControls] = useState<HTMLDivElement | null>(null);
   const [selection, setSelection] = useState<(MarkdownSelection & { document: ResumeDocument }) | null>(null), [linkOpen, setLinkOpen] = useState(false), [url, setUrl] = useState(""), [linkError, setLinkError] = useState("");
   const linkSelection = useRef<MarkdownSelection | null>(null);
+  const latestDocument = useRef(props.document);
+  useLayoutEffect(() => { latestDocument.current = props.document; }, [props.document]);
+  const rememberSelection = useCallback((next: MarkdownSelection | null) => {
+    setSelection(old => {
+      if (!next || next.start === next.end) return null;
+      if (old && old.document === latestDocument.current && old.element === next.element && old.text === next.text && old.start === next.start && old.end === next.end) return old;
+      return { ...next, document: latestDocument.current };
+    });
+  }, []);
   useEffect(() => {
     const element = root.current; if (!element) return;
     const observer = new ResizeObserver(entries => setWorkspaceWidth(entries[0].contentRect.width));
@@ -64,7 +76,7 @@ export default function ResumeWorkbench(props: Props) {
         <Button variant="ghost" size="icon" aria-label={allCollapsed ? "Expand all sections" : "Collapse all sections"} disabled={yamlMode || tab !== "cv"} onClick={() => setCollapsed(allCollapsed ? new Set() : new Set(allTitles))}>{allCollapsed ? <ChevronsUpDown /> : <ChevronsDownUp />}</Button>
         <span className="rw-tool-divider" />
         <Button variant="ghost" size="icon" aria-label="Bold selection" disabled={!canFormat} onMouseDown={event => event.preventDefault()} onClick={() => applyFormat("bold")}><Bold /></Button><Button variant="ghost" size="icon" aria-label="Italic selection" disabled={!canFormat} onMouseDown={event => event.preventDefault()} onClick={() => applyFormat("italic")}><Italic /></Button><Button variant="ghost" size="icon" aria-label="Insert link" disabled={!canFormat} onMouseDown={event => event.preventDefault()} onClick={() => { linkSelection.current = selection; setUrl(""); setLinkError(""); setLinkOpen(true); }}><Link2 /></Button>
-        <Button variant={yamlMode ? "secondary" : "ghost"} size="sm" aria-pressed={yamlMode} onClick={() => { setYamlMode(value => !value); setSelection(null); }}>YAML</Button>
+        <Button variant={yamlMode ? "secondary" : "ghost"} size="sm" aria-pressed={yamlMode} onPointerEnter={preloadYamlEditor} onFocus={preloadYamlEditor} onClick={() => { setYamlMode(value => !value); setSelection(null); }}>YAML</Button>
       </div>
       <div className="rw-toolbar-actions"><span className="rw-save" role="status">{props.saveStatus || "Local draft"}</span><Button variant="ghost" size="sm" onClick={props.target}><Sparkles /><span>Target role</span></Button>{props.courses && <Button variant="ghost" size="sm" className="rw-courses-trigger" aria-label={`Courses, ${props.courseCount} recommendations`} onClick={props.courses}><BookOpen />Courses<Badge className="rw-courses-count" aria-hidden="true">{props.courseCount}</Badge></Button>}<Button variant="outline" size="sm" disabled={!props.freshPdf} onClick={props.downloadPdf}><Download />PDF</Button><Button variant="ghost" size="icon" aria-label="Resume options" onClick={props.more}><MoreHorizontal /></Button><AccountMenu iconOnly /></div>
     </header>
@@ -76,7 +88,8 @@ export default function ResumeWorkbench(props: Props) {
     </div>
     <div className="rw-split" ref={split} style={{ "--editor-width": `${effectiveRatio}%` } as React.CSSProperties}>
       <section className="rw-edit-pane" aria-label="Resume editing"><div className="rw-edit-scroll">
-        {yamlMode ? <><YamlEditor value={props.yamlText} onChange={props.editYaml} />{props.yamlError && <div className="rb-error rw-yaml-error" role="alert">{props.yamlError}</div>}</> : <><fieldset disabled={props.unappliedYaml}>{props.yamlError && !props.unappliedYaml && <div className="rb-error" role="alert">{props.yamlError}</div>}{props.unappliedYaml && <div className="rb-warning" role="alert">Fix the pending YAML before editing the form. Your text and last valid PDF are retained.</div>}<MarkdownContext.Provider value={next => setSelection(next ? { ...next, document: props.document } : null)}>{tab === "cv" ? <ResumeForm document={props.document} change={props.editDocument} add={props.addSection} remove={props.removeSection} collapsed={collapsed} toggle={title => setCollapsed(old => { const next = new Set(old); if (next.has(title)) next.delete(title); else next.add(title); return next; })} /> : <ResumeControls document={props.document} section={tab as "design" | "settings"} change={props.editDocument} />}</MarkdownContext.Provider></fieldset></>}
+        {props.alignment}
+        {yamlMode ? <><Suspense fallback={<div className="rb-yaml" role="status">Loading YAML editor…</div>}><YamlEditor value={props.yamlText} onChange={props.editYaml} /></Suspense>{props.yamlError && <div className="rb-error rw-yaml-error" role="alert">{props.yamlError}</div>}</> : <><fieldset disabled={props.unappliedYaml}>{props.yamlError && !props.unappliedYaml && <div className="rb-error" role="alert">{props.yamlError}</div>}{props.unappliedYaml && <div className="rb-warning" role="alert">Fix the pending YAML before editing the form. Your text and last valid PDF are retained.</div>}<MarkdownContext.Provider value={rememberSelection}>{tab === "cv" ? <ResumeForm document={props.document} change={props.editDocument} add={props.addSection} remove={props.removeSection} collapsed={collapsed} toggle={title => setCollapsed(old => { const next = new Set(old); if (next.has(title)) next.delete(title); else next.add(title); return next; })} /> : <ResumeControls document={props.document} section={tab as "design" | "settings"} change={props.editDocument} />}</MarkdownContext.Provider></fieldset></>}
       </div>{props.assistant}</section>
       <div ref={divider} role="separator" tabIndex={narrow ? -1 : 0} aria-label="Resize editor and preview" aria-orientation="vertical" aria-valuemin={Math.ceil(360 / workspaceWidth * 100)} aria-valuemax={Math.floor(100 - 327 / workspaceWidth * 100)} aria-valuenow={Math.round(effectiveRatio)} className="rw-separator" onKeyDown={event => { if (["ArrowLeft", "ArrowRight", "Home"].includes(event.key)) { event.preventDefault(); adjust(event.key === "Home" ? 50 : effectiveRatio + (event.key === "ArrowLeft" ? -2 : 2)); } }} onPointerDown={event => { if (event.button === 0) event.currentTarget.setPointerCapture(event.pointerId); }} onPointerMove={event => { if (!event.currentTarget.hasPointerCapture(event.pointerId)) return; const bounds = split.current?.getBoundingClientRect(); if (bounds) adjust((event.clientX - bounds.left) / bounds.width * 100); }} onPointerUp={event => { if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }} />
       <section className="rw-preview-pane" aria-label="Resume PDF preview"><div className="rw-preview-status"><span role="status">{props.rendering ? "Rendering…" : props.freshPdf ? "Up to date" : props.pdf ? "Last valid preview" : "RenderCV preview"}</span><Button variant="link" size="sm" onClick={props.downloadYaml}>Download YAML</Button></div>{props.renderError && <div className="rb-error" role="alert">{props.renderError}<Button variant="link" size="sm" onClick={props.retryRender}>Retry rendering</Button></div>}<PdfPreview blob={props.pdf} controlsTarget={pdfControls} /></section>

@@ -1,3 +1,4 @@
+import { applyReviewedResume } from "./resume-browser-review.mjs";
 /** Synthetic-only browser QA: insurance pollution, fallback, cancel, old drafts and PDF. */
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
@@ -43,7 +44,7 @@ try{
   const skillField=page.getByLabel(/Skills explicitly listed/);await skillField.waitFor();
   const extracted=await skillField.inputValue();assert.ok(extracted.includes('Salesforce')&&extracted.includes('Life, medical, motor, property, and travel insurance'));assert.ok(!/Jaya|Berhad|92%|Professional Experience/.test(extracted));
   await page.getByText('I have reviewed this text and removed',{exact:false}).click();
-  const started=Date.now();await page.getByRole('button',{name:'Generate my resume',exact:true}).click();await page.locator('.rw-workbench').waitFor();await saved();
+  const started=Date.now();await page.getByRole('button',{name:'Generate my resume',exact:true}).click();await applyReviewedResume(page);await page.locator('.rw-workbench').waitFor();await saved();
   const first=await readDraft();assert.equal(first.generationOutcome,'tailored');assert.ok(Date.now()-started<10000);
   const names=generated[0].skills.map(s=>s.name);assert.ok(names.includes('AI and big data')&&names.includes('Reading, writing and mathematics'));assert.ok(!names.includes('Everyday English 1')&&!names.includes('Analytical thinking')&&!names.includes('Petaling Jaya'));assert.ok(!names.some(s=>s.includes('92%')));
   assert.ok(JSON.stringify(first.document.cv.sections.Experience).includes('92%'));assert.equal(first.document.cv.sections.Projects[0].name,'Retail Sales Analysis');assert.equal(first.document.cv.sections.Projects[0].date,'Apr 2026');assert.ok(first.document.cv.sections['Licenses & Certifications'].includes('Original license wording'));

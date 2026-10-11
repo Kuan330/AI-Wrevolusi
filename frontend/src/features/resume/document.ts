@@ -5,13 +5,12 @@ import type { Contacts, GeneratedSection, ResumeDocument, ResumeEntry, SkillFilt
 export const THEMES = ["classic", "ember", "engineeringclassic", "engineeringresumes", "harvard", "ink", "moderncv", "opal", "sb2nov"] as const;
 const ajv = new Ajv2020({ strict: false, validateFormats: false, allErrors: true });
 const validate = ajv.compile(schema);
-export function parseResumeYaml(text: string): { document: ResumeDocument | null; error: string } {
+type ResumeValidation = { document: ResumeDocument | null; error: string };
+const invalidDocument = (cause: unknown): ResumeValidation => ({ document: null, error: cause instanceof Error ? cause.message : "Invalid YAML." });
+/** One shared schema/resource guard for form objects and parsed YAML. */
+function validateResumeValue(value: ResumeDocument, sourceLength: number): ResumeValidation {
   try {
-    if (text.length > 150000) throw new Error("YAML exceeds the supported text limit.");
-    const lineCounter = new LineCounter();
-    const parsed = parseDocument(text, { lineCounter, uniqueKeys: true });
-    if (parsed.errors.length) throw new Error(parsed.errors[0].message);
-    const value = parsed.toJS({ maxAliasCount: 20 }) as ResumeDocument;
+    if (sourceLength > 150000) throw new Error("YAML exceeds the supported text limit.");
     if (!value || typeof value !== "object" || !value.cv || typeof value.cv !== "object" || Array.isArray(value.cv)) throw new Error("The document needs a cv mapping.");
     // Contact contents are free text; reject only incompatible YAML shapes.
     for (const key of ["email", "phone", "website"]) {
@@ -41,7 +40,23 @@ export function parseResumeYaml(text: string): { document: ResumeDocument | null
     };
     inspect(value);
     return { document: value, error: "" };
-  } catch (cause) { return { document: null, error: cause instanceof Error ? cause.message : "Invalid YAML." }; }
+  } catch (cause) { return invalidDocument(cause); }
+}
+export function parseResumeYaml(text: string): ResumeValidation {
+  try {
+    if (text.length > 150000) throw new Error("YAML exceeds the supported text limit.");
+    const lineCounter = new LineCounter();
+    const parsed = parseDocument(text, { lineCounter, uniqueKeys: true });
+    if (parsed.errors.length) throw new Error(parsed.errors[0].message);
+    return validateResumeValue(parsed.toJS({ maxAliasCount: 20 }) as ResumeDocument, text.length);
+  } catch (cause) { return invalidDocument(cause); }
+}
+/** Form values already have structure. Preserve alias limits for emitted shared references. */
+export function validateResumeDocument(value: ResumeDocument, serializedYaml?: string): ResumeValidation {
+  try {
+    const text = serializedYaml ?? stringify(value, { lineWidth: 0 });
+    return /(?:^|\s)[&*]a\d+(?=\s|$)/m.test(text) ? parseResumeYaml(text) : validateResumeValue(value, text.length);
+  } catch (cause) { return invalidDocument(cause); }
 }
 export const documentYaml = (document: ResumeDocument) => stringify(document, { lineWidth: 0 });
 /** Empty optional contact inputs are editing placeholders, not invalid facts.

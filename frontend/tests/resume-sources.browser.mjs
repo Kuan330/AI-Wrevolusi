@@ -1,3 +1,4 @@
+import { applyReviewedResume } from "./resume-browser-review.mjs";
 /** End-to-end local QA: synthetic accounts, real generation validation/assembly and PDF renderer. */
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
@@ -56,7 +57,7 @@ try {
   assert.ok((await page.getByLabel(/Skills explicitly listed/).inputValue()).includes("SQL"));
   await page.screenshot({path:output+"/reviewed-source.png",fullPage:true});
   await page.getByRole("button",{name:"Generate my resume",exact:true}).click();
-  await page.locator(".rw-workbench").waitFor(); await saved();
+  await applyReviewedResume(page); await page.locator(".rw-workbench").waitFor(); await saved();
   const first=await readDraft();
   const names=generated[0].skills.map(s=>s.name);
   for(const name of ["Excel","SQL","Data cleaning","Data validation","Analytical thinking","Attention to detail","Communication","Teamwork","Creative thinking","Leadership and social influence","Programming","Write reports"]) assert.ok(names.includes(name),name);

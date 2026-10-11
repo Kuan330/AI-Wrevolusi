@@ -1,0 +1,385 @@
+{
+  "version": "career_evidence_v1",
+  "synthetic_only": true,
+  "real_model_evaluation_authorized": false,
+  "reference_snapshots": [
+    {
+      "occupation_code": "2421",
+      "title": "MANAGEMENT AND ORGANISATION ANALYSTS",
+      "skills": [
+        {
+          "skill_id": 1,
+          "skill_slug": "analytical-thinking",
+          "name": "Analytical thinking"
+        },
+        {
+          "skill_id": 10,
+          "skill_slug": "service-orientation-and-customer-service",
+          "name": "Service orientation and customer service"
+        },
+        {
+          "skill_id": 21,
+          "skill_slug": "reading-writing-and-mathematics",
+          "name": "Reading, writing and mathematics"
+        },
+        {
+          "skill_id": 24,
+          "skill_slug": "manual-dexterity-endurance-and-precision",
+          "name": "Manual dexterity, endurance and precision"
+        }
+      ],
+      "tasks": [
+        "Assisting and encouraging the development of objectives, strategies and plans aimed at achieving customer satisfaction and the efficient use of organizations‚Äô resources;",
+        "Analysing and evaluating current systems and structures;",
+        "Discussing current systems with staff and observing systems at all levels of organization;",
+        "Directing clients towards more efficient organization and developing solutions to organizational problems;",
+        "Undertaking and reviewing work studies by analysing existing and proposed methods and procedures such as administrative and clerical procedures;",
+        "Recording and analysing organizations‚Äô workflow charts, records, reports, manuals and job descriptions;",
+        "Preparing and recommending proposals to revise methods and procedures, alter work flows, redefine job functions and resolve organizational problems;",
+        "Assisting in implementing approved recommendations, issuing revised instructions and procedure manuals, and drafting other documentation;",
+        "Reviewing operating procedures and advising of departures from procedures and standards."
+      ]
+    },
+    {
+      "occupation_code": "2512",
+      "title": "SOFTWARE DEVELOPERS",
+      "skills": [
+        {
+          "skill_id": 1,
+          "skill_slug": "analytical-thinking",
+          "name": "Analytical thinking"
+        },
+        {
+          "skill_id": 6,
+          "skill_slug": "technological-literacy",
+          "name": "Technological literacy"
+        },
+        {
+          "skill_id": 10,
+          "skill_slug": "service-orientation-and-customer-service",
+          "name": "Service orientation and customer service"
+        },
+        {
+          "skill_id": 18,
+          "skill_slug": "design-and-user-experience",
+          "name": "Design and user experience"
+        },
+        {
+          "skill_id": 21,
+          "skill_slug": "reading-writing-and-mathematics",
+          "name": "Reading, writing and mathematics"
+        },
+        {
+          "skill_id": 23,
+          "skill_slug": "programming",
+          "name": "Programming"
+        }
+      ],
+      "tasks": [
+        "Researching, analysing and evaluating requirements for software applications and operating systems;",
+        "Researching, designing, and developing computer software systems;",
+        "Consulting with engineering staff to evaluate interfaces between hardware and software;",
+        "Developing and directing software testing and validation procedures;",
+        "Modifying existing software to correct errors, to adapt it to new hardware or to upgrade interfaces and improve performance;",
+        "Directing software programming and development of documentation;",
+        "Assessing, developing, upgrading and documenting maintenance procedures for operating systems, communications environments and applications software;",
+        "Consulting with customers concerning maintenance of software system."
+      ]
+    },
+    {
+      "occupation_code": "4111",
+      "title": "GENERAL OFFICE CLERKS",
+      "skills": [],
+      "tasks": []
+    }
+  ],
+  "known_reference_gaps": {
+    "4111": "Bundled MASCO occupation exists, but no checked ILO task/skill mapping exists. Do not substitute ISCO 4110 or claim a real-model comparison for this code."
+  },
+  "contrast_roles": [
+    {
+      "occupation_code": "2421",
+      "title": "Management and Organisation Analysts",
+      "synthetic_requirements": [
+        {
+          "skill_id": 1,
+          "name": "Analytical thinking",
+          "skill_slug": "analytical-thinking"
+        }
+      ],
+      "acceptable_semantic_candidates": [
+        "SQL",
+        "Excel",
+        "Communication"
+      ],
+      "emphasis": "Reviewed analysis and reporting examples; target is an objective."
+    },
+    {
+      "occupation_code": "2512",
+      "title": "Software Developers",
+      "synthetic_requirements": [
+        {
+          "skill_id": 23,
+          "name": "Programming",
+          "skill_slug": "programming"
+        },
+        {
+          "skill_id": 1,
+          "name": "Analytical thinking",
+          "skill_slug": "analytical-thinking"
+        }
+      ],
+      "acceptable_semantic_candidates": [
+        "SQL"
+      ],
+      "emphasis": "Reviewed SQL/data work; do not rename projects or invent development employment."
+    },
+    {
+      "occupation_code": "4111",
+      "title": "General Office Clerks",
+      "synthetic_requirements": [
+        {
+          "skill_id": 21,
+          "name": "Reading, writing and mathematics",
+          "skill_slug": "reading-writing-and-mathematics"
+        }
+      ],
+      "acceptable_semantic_candidates": [
+        "Excel",
+        "Microsoft Office",
+        "Communication"
+      ],
+      "emphasis": "Reviewed record checking/reporting. This is an explicit mock reference, not the missing live database mapping."
+    }
+  ],
+  "cases": [
+    {
+      "id": "insurance_two_projects",
+      "cv_lines": [
+        "Skills",
+        "SQL, Excel, Microsoft Office, Communication",
+        "Analytical thinking",
+        "Professional Experience",
+        "ABC Insurance Berhad, Kuala Lumpur",
+        "Insurance Sales Representative Jan 2021 – Present",
+        "• Managed 250+ clients, achieving a 92% policy renewal rate.",
+        "XYZ Financial Services, Petaling Jaya",
+        "• Maintained a 95% customer satisfaction score.",
+        "Projects",
+        "Retail Sales Analysis | Apr 2026",
+        "• Cleaned 2,400 records in Excel and removed 36 duplicates.",
+        "• Used SQL joins and aggregations to compare monthly sales.",
+        "Student Survey Review | Nov 2025",
+        "• Reviewed 180 anonymous responses."
+      ],
+      "learning": [],
+      "expected_projects": [
+        {
+          "name": "Retail Sales Analysis",
+          "date": "Apr 2026",
+          "protected_numbers": [
+            "2,400",
+            "36"
+          ]
+        },
+        {
+          "name": "Student Survey Review",
+          "date": "Nov 2025",
+          "protected_numbers": [
+            "180"
+          ]
+        }
+      ],
+      "protected_facts": [
+        "ABC Insurance Berhad",
+        "XYZ Financial Services",
+        "Kuala Lumpur",
+        "Petaling Jaya",
+        "Jan 2021",
+        "250+",
+        "92%",
+        "95%"
+      ],
+      "forbidden_skills": [
+        "ABC Insurance Berhad",
+        "XYZ Financial Services",
+        "Petaling Jaya",
+        "achieving a 92% policy renewal rate"
+      ]
+    },
+    {
+      "id": "completed_course_and_practice",
+      "cv_lines": [
+        "Skills",
+        "SQL, Excel, Microsoft Office, Communication",
+        "Analytical thinking",
+        "Professional Experience",
+        "ABC Insurance Berhad, Kuala Lumpur",
+        "Insurance Sales Representative Jan 2021 – Present",
+        "• Managed 250+ clients, achieving a 92% policy renewal rate.",
+        "XYZ Financial Services, Petaling Jaya",
+        "• Maintained a 95% customer satisfaction score.",
+        "Projects",
+        "Retail Sales Analysis | Apr 2026",
+        "• Cleaned 2,400 records in Excel and removed 36 duplicates.",
+        "• Used SQL joins and aggregations to compare monthly sales.",
+        "Student Survey Review | Nov 2025",
+        "• Reviewed 180 anonymous responses."
+      ],
+      "learning": [
+        {
+          "record_id": "course:synthetic",
+          "catalogue_chapter_count": 2,
+          "catalogue_orders": [
+            1,
+            2
+          ],
+          "synchronised_values": [
+            10,
+            10
+          ],
+          "selected": true,
+          "reviewed": true,
+          "completion_date": null,
+          "expected_section": "Professional Development"
+        },
+        {
+          "record_id": "practice:synthetic",
+          "kind": "course_practice",
+          "date": "2026-09-20",
+          "description": "Used SQL joins on a synthetic dataset.",
+          "selected": true,
+          "reviewed": true,
+          "expected_section": "Learning practice"
+        }
+      ],
+      "forbidden_claims": [
+        "externally certified",
+        "proficient",
+        "completed on an inferred date"
+      ]
+    },
+    {
+      "id": "unfinished_and_unsynchronised",
+      "cv_lines": [
+        "Skills",
+        "SQL, Excel, Microsoft Office, Communication",
+        "Analytical thinking",
+        "Professional Experience",
+        "ABC Insurance Berhad, Kuala Lumpur",
+        "Insurance Sales Representative Jan 2021 – Present",
+        "• Managed 250+ clients, achieving a 92% policy renewal rate.",
+        "XYZ Financial Services, Petaling Jaya",
+        "• Maintained a 95% customer satisfaction score.",
+        "Projects",
+        "Retail Sales Analysis | Apr 2026",
+        "• Cleaned 2,400 records in Excel and removed 36 duplicates.",
+        "• Used SQL joins and aggregations to compare monthly sales.",
+        "Student Survey Review | Nov 2025",
+        "• Reviewed 180 anonymous responses."
+      ],
+      "learning": [
+        {
+          "record_id": "course:unfinished",
+          "catalogue_chapter_count": 2,
+          "catalogue_orders": [
+            1,
+            2
+          ],
+          "synchronised_values": [
+            10,
+            9
+          ],
+          "local_pending_values": [
+            10,
+            10
+          ],
+          "expected_completion_record": false
+        },
+        {
+          "record_id": "course:incomplete_catalogue",
+          "catalogue_chapter_count": 2,
+          "catalogue_orders": [
+            1
+          ],
+          "synchronised_values": [
+            10
+          ],
+          "expected_completion_record": false
+        }
+      ],
+      "forbidden_claims": [
+        "completed course",
+        "earned certificate"
+      ]
+    },
+    {
+      "id": "multisource_duplicate",
+      "cv_lines": [
+        "Skills",
+        "SQL, Excel, Microsoft Office, Communication",
+        "Analytical thinking",
+        "Professional Experience",
+        "ABC Insurance Berhad, Kuala Lumpur",
+        "Insurance Sales Representative Jan 2021 – Present",
+        "• Managed 250+ clients, achieving a 92% policy renewal rate.",
+        "XYZ Financial Services, Petaling Jaya",
+        "• Maintained a 95% customer satisfaction score.",
+        "Projects",
+        "Retail Sales Analysis | Apr 2026",
+        "• Cleaned 2,400 records in Excel and removed 36 duplicates.",
+        "• Used SQL joins and aggregations to compare monthly sales.",
+        "Student Survey Review | Nov 2025",
+        "• Reviewed 180 anonymous responses."
+      ],
+      "skill_origins": {
+        "SQL": [
+          "reviewed_resume",
+          "platform_confirmed",
+          "learning_intention",
+          "reviewed_learning"
+        ]
+      },
+      "expected_skill_count_for_SQL": 1,
+      "expected_origins_for_SQL": 4
+    },
+    {
+      "id": "ambiguous_projects",
+      "cv_lines": [
+        "Skills",
+        "SQL",
+        "Projects",
+        "Reviewed a student survey and prepared a report.",
+        "Another paragraph without a reliable project boundary."
+      ],
+      "expected_mode": "verbatim",
+      "expected_order": "unchanged",
+      "forbidden_claims": [
+        "new project name",
+        "inferred project date"
+      ]
+    }
+  ],
+  "human_rubric": {
+    "scale": "0 = unsupported/incorrect, 1 = partly useful/unclear, 2 = clear and supported",
+    "criteria": [
+      "Highlights relevant reviewed background",
+      "Associations meaningfully support specific role references",
+      "Citations actually support the selected emphasis",
+      "Different careers receive appropriate distinct emphasis"
+    ],
+    "record": [
+      "case_id",
+      "occupation_code",
+      "reference_available",
+      "model_and_version",
+      "human_reviewer",
+      "criterion_scores",
+      "false_associations",
+      "omissions",
+      "fact_violations",
+      "notes"
+    ],
+    "gate": "Any changed/invented identity, employer, title, date, number, project ownership, new user skill, or learning-intent-to-completion claim fails factual acceptance regardless of relevance scores."
+  }
+}

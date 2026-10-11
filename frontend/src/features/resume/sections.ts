@@ -1,5 +1,7 @@
 import type { ResumeEvidence, SourceSection } from "./types.ts";
 const headings: [RegExp, string][] = [
+  [/^professional development$/i, "Professional Development"],
+  [/^learning practice$/i, "Learning practice"],
   [/^(?:(?:technical|professional|core|key|soft|personal|specialist)\s+)?skills?$/i, "Skills"],
   [/^(?:(?:professional|work|employment|relevant|career)\s+)?experience$|^(?:employment|work history|employment history)$/i, "Experience"],
   [/^(?:(?:academic|personal|selected|professional)\s+)?projects?$/i, "Projects"],

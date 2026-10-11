@@ -168,3 +168,19 @@ test("existing locale survives form edits, YAML round-trips and render preparati
   assert.deepEqual(resumeRenderDocument(parsed.document).locale, locale);
   assert.deepEqual(draft, before);
 });
+
+test("history owns its snapshots even if callers mutate input documents after recording", () => {
+  const before = draft("before"), after = draft("after");
+  const history = createEditorHistory(); history.record(before, after);
+  before.document.cv.sections.Skills[0].bullet = "external before mutation";
+  after.document.cv.sections.Skills[0].bullet = "external after mutation";
+  assert.equal(history.undo().document.cv.sections.Skills[0].bullet, "before");
+  assert.equal(history.redo().document.cv.sections.Skills[0].bullet, "after");
+});
+test("equivalent snapshots remain no-ops while YAML-only changes remain undoable", () => {
+  const original = draft("same"); const history = createEditorHistory();
+  history.record(original, structuredClone(original)); assert.equal(history.canUndo, false);
+  const formatted = { ...original, yamlText: original.yamlText + "\n" };
+  history.record(original, formatted, "yaml"); assert.equal(history.undo().yamlText, original.yamlText);
+  assert.equal(history.redo().yamlText, formatted.yamlText);
+});

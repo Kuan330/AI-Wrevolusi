@@ -7,7 +7,7 @@ import { readCareerPath } from "../skills/careerPath.ts";
 import { isSkillReviewCurrent, readJourneyState, personalSkillIsCurrent, readJourneyProfile } from "../journey/journey.ts";
 import { readSpecialistState, specialistEntryIsCurrent } from "../journey/specialistSkills.ts";
 import type { WefSkill } from "../../types/reference.ts";
-import type { SkillCandidate } from "./types.ts";
+import type { SkillCandidate, SkillOrigin, SkillSources } from "./types.ts";
 export function mergeResumeSkills(groups: SkillCandidate[][]): SkillCandidate[] {
   const result = new Map<string, SkillCandidate>();
   for (const group of groups) for (const skill of group) {
@@ -47,16 +47,41 @@ export function canonicalResumeSkill(id: string | number, name: string, referenc
   if (requireWef) throw new Error("A saved learning skill could not be resolved to its standard name. Retry or review the selection; no skill has been dropped.");
   return [{ id: String(id), name }];
 }
-export function resumeSkillSnapshot(reference: WefSkill[], directory: Map<string, Course> = new Map()): SkillCandidate[] {
+export type ResumeSkillInput = { skill: SkillCandidate; origin: SkillOrigin };
+export function mergeSkillInputs(inputs: ResumeSkillInput[]) {
+  const skills = mergeResumeSkills([inputs.map(input => input.skill)]);
+  const sources: SkillSources[] = skills.map(skill => ({ skill_id: skill.id, origins: [] }));
+  for (const input of inputs) {
+    const id = mergeResumeSkills([[input.skill]])[0]?.id;
+    const row = sources.find(source => source.skill_id === id);
+    if (row && !row.origins.some(origin => JSON.stringify(origin) === JSON.stringify(input.origin))) row.origins.push(input.origin);
+  }
+  if (sources.some(row => row.origins.length > 20 || row.origins.some(origin => origin.label.length > 300 || origin.fact_ids.length > 20))) throw new Error("Skill source details exceed the supported limit. Review your selections; no source has been silently dropped.");
+  return { skills, sources };
+}
+export function resumeSkillInputs(reference: WefSkill[], directory: Map<string, Course> = new Map()): ResumeSkillInput[] {
+  const inputs: ResumeSkillInput[] = [];
+  const add = (skills: SkillCandidate[], kind: SkillOrigin["kind"], label: string) => inputs.push(...skills.map(skill => ({ skill, origin: { kind, label, fact_ids: [] } })));
   const journey = readJourneyState();
-  const confirmed = isSkillReviewCurrent() ? reference.filter(s => journey.review?.decisions[String(s.wef_skill_id)] === "accepted").map(s => ({ id: String(s.wef_skill_id), name: s.core_skill })) : [];
-  const learning = (readLearningSkills() ?? []).flatMap(s => canonicalResumeSkill(s.id, s.name, reference, directory, s.source === "wef" || s.source === "other-role"));
-  const path = readCareerPath().ids.flatMap(id => { const skill = reference.find(s => s.wef_skill_id === id); return skill ? [{ id: String(id), name: skill.core_skill }] : []; });
-  const contexts = Object.values(journey.contexts).flatMap(c => canonicalResumeSkill(c.skill.id, c.skill.name, reference, directory, true));
-  const personal = (journey.personalSkills ?? []).filter(s => personalSkillIsCurrent(s) && (s.decision === "use" || s.wantsLearning)).map(s => ({ id: s.id, name: s.name }));
+  add(isSkillReviewCurrent() ? reference.filter(s => journey.review?.decisions[String(s.wef_skill_id)] === "accepted").map(s => ({ id: String(s.wef_skill_id), name: s.core_skill })) : [], "platform_confirmed", "Confirmed platform skills");
+  for (const skill of readLearningSkills() ?? []) add(canonicalResumeSkill(skill.id, skill.name, reference, directory, skill.source === "wef" || skill.source === "other-role"), "learning_intention", "Selected learning skill");
+  add(readCareerPath().ids.flatMap(id => { const skill = reference.find(s => s.wef_skill_id === id); return skill ? [{ id: String(id), name: skill.core_skill }] : []; }), "learning_intention", "Selected career learning direction");
+  for (const context of Object.values(journey.contexts)) add(canonicalResumeSkill(context.skill.id, context.skill.name, reference, directory, true), "learning_intention", "Learning context");
+  for (const skill of journey.personalSkills ?? []) {
+    if (!personalSkillIsCurrent(skill)) continue;
+    if (skill.decision === "use") add([{ id: skill.id, name: skill.name }], "platform_confirmed", "Confirmed personal skill");
+    if (skill.wantsLearning) add([{ id: skill.id, name: skill.name }], "learning_intention", "Personal learning choice");
+  }
   const profile = readJourneyProfile();
-  const specialist = readSpecialistState().entries.filter(s => specialistEntryIsCurrent(s, profile.tasks, profile.tasksOccupationCode ?? null) && (s.decision === "use" || s.wantsLearning)).map(s => ({ id: s.skillUri, name: s.skillLabel }));
-  const goals = readLearningGoals().flatMap(goal => canonicalResumeSkill(goal.initial.skill.id, goal.initial.skill.label, reference, directory, goal.initial.skill.source === "wef"));
-  const courses = selectedCourseSkills(reference, directory, selectedResumeCourseIds());
-  return mergeResumeSkills([confirmed, learning, path, contexts, personal, specialist, goals, courses]);
+  for (const skill of readSpecialistState().entries) {
+    if (!specialistEntryIsCurrent(skill, profile.tasks, profile.tasksOccupationCode ?? null)) continue;
+    if (skill.decision === "use") add([{ id: skill.skillUri, name: skill.skillLabel }], "platform_confirmed", "Confirmed specialist skill");
+    if (skill.wantsLearning) add([{ id: skill.skillUri, name: skill.skillLabel }], "learning_intention", "Specialist learning choice");
+  }
+  for (const goal of readLearningGoals()) add(canonicalResumeSkill(goal.initial.skill.id, goal.initial.skill.label, reference, directory, goal.initial.skill.source === "wef"), "learning_intention", "Selected learning goal");
+  for (const id of selectedResumeCourseIds()) add(selectedCourseSkills(reference, directory, [id]), "learning_intention", "Selected course: " + directory.get(id)!.title);
+  return inputs;
+}
+export function resumeSkillSnapshot(reference: WefSkill[], directory: Map<string, Course> = new Map()): SkillCandidate[] {
+  return mergeSkillInputs(resumeSkillInputs(reference, directory)).skills;
 }

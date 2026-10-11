@@ -5,6 +5,8 @@ export function appliedSkillFilter(generation: Generation, fingerprint: string |
 }
 /** Manual/assistant edits remain possible, but must not claim the old filter proof. */
 export function invalidateEditedSkills(before: ResumeDraft, after: ResumeDraft): ResumeDraft {
-  return JSON.stringify(before.document?.cv.sections?.Skills) === JSON.stringify(after.document?.cv.sections?.Skills)
+  const beforeSections = before.document?.cv.sections, afterSections = after.document?.cv.sections;
+  if (after.careerAlignment && !after.careerAlignment.needsReview && beforeSections !== afterSections && JSON.stringify(beforeSections) !== JSON.stringify(afterSections)) after = { ...after, careerAlignment: { ...after.careerAlignment, needsReview: true } };
+  return beforeSections?.Skills === afterSections?.Skills || JSON.stringify(beforeSections?.Skills) === JSON.stringify(afterSections?.Skills)
     ? after : { ...after, skillFilterVersion: undefined, skillFilterInputFingerprint: undefined };
 }

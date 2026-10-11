@@ -82,6 +82,7 @@ function mapCourse(item: ApiCourse): Course {
       .filter(Boolean),
     prereq: item.prereq ?? "",
     chapters,
+    catalogueChaptersComplete: item.chapter_count > 0 && item.chapters.length === item.chapter_count && new Set(item.chapters.map(chapter => chapter.order)).size === item.chapter_count && item.chapters.every((chapter, index) => chapter.order === index + 1),
     advice: item.advice ?? "",
   };
 }

@@ -169,6 +169,6 @@ export function postLearningDailyBrief(
 }
 
 /** Authoritative saved chapter values for the signed-in learner. */
-export function getLearningProgress() {
-  return api.get<{ chapters: LearningChapterProgress[] }>("/learning/progress");
+export function getLearningProgress(signal?: AbortSignal) {
+  return api.get<{ chapters: LearningChapterProgress[] }>("/learning/progress", signal);
 }
