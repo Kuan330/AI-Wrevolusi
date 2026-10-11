@@ -16,12 +16,13 @@ import type { WefSkill } from "@/types/reference";
 import AnswerBox from "./AnswerBox";
 import FeedbackPanel from "./FeedbackPanel";
 import { SendToResumeDialog, StrengthenDialog } from "./HandoffDialogs";
+import ProfilePanel from "./ProfilePanel";
 
 const dateText = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
 const TAGS = { resume_item: "From your resume", requirement_practice: "Role requirement. Practice only", ai_change: "AI at work", general: "General practice" } as const;
 
-type Props = { owner: string; session: InterviewSession; onChange: (session: InterviewSession) => void; onExit: () => void };
-export default function SessionView({ owner, session, onChange, onExit }: Props) {
+type Props = { owner: string; session: InterviewSession; allSessions: InterviewSession[]; onChange: (session: InterviewSession) => void; onExit: () => void };
+export default function SessionView({ owner, session, allSessions, onChange, onExit }: Props) {
   const navigate = useNavigate();
   const latest = useRef(session);
   useEffect(() => { latest.current = session; });
@@ -65,7 +66,7 @@ export default function SessionView({ owner, session, onChange, onExit }: Props)
     setBusy(attemptId); setError("");
     try {
       const result = await interviewService.feedback({
-        question: { text: current.sentText, kind: current.kind, item_label: null }, answer: target.answer, role_title: feedbackRoleTitle(latest.current),
+        question: { text: current.sentText, kind: current.kind, item_label: null, intent: current.intent ?? null }, answer: target.answer, role_title: feedbackRoleTitle(latest.current),
         attempt: current.attempts.findIndex(entry => entry.id === attemptId) + 1, follow_ups_asked: Math.min(followUpCount(current), 2),
         skills: skills.map(skill => ({ id: skill.wef_skill_id, name: skill.core_skill })),
       }, controller.signal);
@@ -96,6 +97,12 @@ export default function SessionView({ owner, session, onChange, onExit }: Props)
     setAgain(old => ({ ...old, [question.id]: true }));
   };
 
+  const useStronger = (text: string) => {
+    if (!question) return;
+    changeDraft(text);
+    setAgain(old => ({ ...old, [question.id]: true }));
+  };
+
   const career = session.role.occupationCode ? { code: session.role.occupationCode, title: session.role.title } : null;
   const strengthen = async () => {
     const gap = attempt?.feedback?.skill_gap;
@@ -118,6 +125,7 @@ export default function SessionView({ owner, session, onChange, onExit }: Props)
     {progress.complete && <Card className="ip-done" role="status"><h2>You finished this practice.</h2>
       <p>Look back at any answer, or start a new set. This is practice only. It does not predict how an interview will go.</p>
       <Button onClick={onExit}>Back to practice home</Button></Card>}
+    {progress.complete && <ProfilePanel sessions={allSessions} />}
     {question && <Card className="ip-question">
       <p className="ip-tag">{session.mode === "career" && question.kind === "general" ? "Future occupation practice" : TAGS[question.kind]}{question.itemLabel ? ` · ${question.itemLabel}` : ""}</p>
       <h2>{question.text}</h2>
@@ -129,7 +137,7 @@ export default function SessionView({ owner, session, onChange, onExit }: Props)
       </label>}
       {question.skipped ? <div className="ip-actions"><p>You skipped this question.</p><Button variant="outline" onClick={() => commit(reopenQuestion(latest.current, question.id))}>Answer it anyway</Button></div>
         : attempt && attempt.feedback && !editing ? <FeedbackPanel key={attempt.id} question={question} attempt={attempt} previous={previous} skillName={skillName} canSendToResume={Boolean(item?.ref)}
-            onTryAgain={editAnswer}
+            onTryAgain={editAnswer} onUseStronger={useStronger}
             onNext={nextIndex >= 0 && nextIndex !== index ? () => go(nextIndex) : null} onSendToResume={() => setResumeOpen(true)} onStrengthen={() => setLearnOpen(true)}
             onFollowUp={(id, reply) => commit(answerFollowUp(latest.current, question.id, attempt.id, id, reply))} />
         : attempt && !attempt.feedback && !editing ? <div className="ip-retry">{attempt.error && <p className="ip-note" role="alert">{attempt.error}</p>}

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { CheckCircle2, FileText, Mic, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import ProfilePanel from "./ProfilePanel";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FormField, FormSelect, Textarea } from "@/components/ui/form-field";
@@ -56,10 +57,11 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
         ? await interviewService.plan(planBody(prepared, bank?.questions ?? [], topics, accepted), controller.signal)
         : await interviewService.plan({ role_title: mode === "career" ? future!.title : "", items: [], topics: [], count: 4, items_reviewed: false, bank: (bank?.questions ?? []).slice(0, 12).map(q => ({ id: q.id, question: q.question })) }, controller.signal);
       if (controller.signal.aborted) return;
+      const bankIntents = Object.fromEntries((bank?.questions ?? []).map(question => [question.id, question.intent]));
       const session = mode === "resume" && prepared && draft && state.at
         ? createSession({ mode, role: { title: prepared.roleTitle, sentTitle: prepared.sentRoleTitle, requirements: draft.jobRequirements,
-          ...(career?.title.toLowerCase() === prepared.roleTitle.toLowerCase() ? { occupationCode: career.code } : {}) }, resumeVersion: { reviewedAt: state.at, itemCount: prepared.display.length }, items: prepared.display, plan, restore: prepared.restore })
-        : createSession({ mode, role: mode === "career" ? { title: future!.title, sentTitle: future!.title, occupationCode: future!.code, requirements: "" } : { title: "General practice", sentTitle: "", requirements: "" }, resumeVersion: null, items: [], plan });
+          ...(career?.title.toLowerCase() === prepared.roleTitle.toLowerCase() ? { occupationCode: career.code } : {}) }, resumeVersion: { reviewedAt: state.at, itemCount: prepared.display.length }, items: prepared.display, plan, restore: prepared.restore, bankIntents })
+        : createSession({ mode, role: mode === "career" ? { title: future!.title, sentTitle: future!.title, occupationCode: future!.code, requirements: "" } : { title: "General practice", sentTitle: "", requirements: "" }, resumeVersion: null, items: [], plan, bankIntents });
       onStart(session);
     } catch (cause) { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : "Could not prepare your questions. Try again."); }
     finally { if (request.current === controller) { request.current = null; setBusy(""); } }
@@ -104,6 +106,7 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
         <p className="ip-hint"><Mic size={13} /> You can answer by typing or speaking. You can skip any question and stop whenever you like.</p>
       </>}
     </Card>
+    <ProfilePanel sessions={sessions} />
     <Card className="ip-card">
       <h2>Your saved practice</h2>
       {sessions.length === 0 ? <p className="ip-hint">Nothing yet. Your answers and feedback stay on this device only.</p> :

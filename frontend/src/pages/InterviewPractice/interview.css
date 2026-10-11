@@ -34,4 +34,14 @@
 .ip-feedback-actions{border-top:1px solid #efe9f2;padding-top:12px}
 .ip-history{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;font-size:14px}.ip-history select{max-width:100%;padding:6px 8px;border:1px solid #d9cfe0;border-radius:8px;background:#fff;color:#2f2430}
 .ip-answers{display:grid;gap:12px}.ip-answers blockquote{margin:6px 0;padding:10px 12px;background:#f8f5fa;border-left:3px solid #d9cfe0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+.ip-scores,.ip-stronger{background:#f8f5fa;border-radius:12px;padding:12px 14px}
+.ip-score-list,.ip-profile-list{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:12px}.ip-score-list p,.ip-profile-list p{margin:2px 0;font-size:13px;color:#5b4f63}
+.ip-score-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14px}
+.ip-level{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:#f3f1f4;color:#5b4f63}.ip-level-1{background:#fbe6e0;color:#8a3a2e}.ip-level-2{background:#fdf0d8;color:#8a5a0a}.ip-level-3{background:#e1f3e8;color:#1f6b42}.ip-level-4{background:#d3ecde;color:#175533}
+.ip-meter{width:100%;height:8px;margin:4px 0}
+.ip-next{color:#326889!important}
+.ip-stronger blockquote{margin:6px 0;padding:10px 12px;background:#fff;border-left:3px solid #9fd0b4;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+.ip-structure{list-style:none;padding-left:0!important}.ip-structure li{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ip-profile h3{font-size:15px;margin:8px 0 4px}.ip-profile .ip-group{margin-top:14px}
+.ip-chips{list-style:none;margin:6px 0 0;padding:0;display:flex;gap:8px;flex-wrap:wrap}.ip-chips li{font-size:12px;padding:4px 10px;border:1px solid #d9cfe0;border-radius:999px;color:#5b4f63}
 @media(max-width:760px){.ip-page{padding:16px 12px 36px}.ip-topbar{grid-template-columns:1fr}.ip-facts div{grid-template-columns:1fr;gap:2px}.ip-check{grid-template-columns:64px 1fr}.ip-card,.ip-question,.ip-done{padding:16px}}

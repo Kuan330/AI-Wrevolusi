@@ -2,14 +2,17 @@ import { useState } from "react";
 import { ArrowRight, BookOpen, FilePenLine, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/form-field";
+import { LEVEL_LABEL, competencyLabel } from "@/features/interview/competencies";
+import { compareScores } from "@/features/interview/profile";
 import { compareAttempts, followUpCount, MAX_FOLLOW_UPS, type Attempt, type SessionQuestion } from "@/features/interview/session";
-import type { CheckId, CheckStatus, ImprovementKind } from "@/features/interview/types";
+import type { CheckId, CheckStatus, ImprovementKind, StructurePart } from "@/features/interview/types";
 
 const CHECKS: Record<CheckId, string> = {
   answered_question: "Answered the question", own_actions: "Described what you did yourself", concrete_example: "Gave a real example",
   judgement: "Explained where your judgement matters", ai_check: "Said how you check AI output",
 };
 const STATUS: Record<CheckStatus, string> = { yes: "Yes", partly: "Partly", no: "Not yet", not_applicable: "Not needed" };
+const PARTS: Record<StructurePart, string> = { situation: "Situation", task: "Task", action: "Your action", result: "Result" };
 const GROUPS: Record<ImprovementKind, { title: string; note?: string }> = {
   expression: { title: "How you said it" },
   missing_example: { title: "Details you could add" },
@@ -17,15 +20,18 @@ const GROUPS: Record<ImprovementKind, { title: string; note?: string }> = {
 };
 type Props = {
   question: SessionQuestion; attempt: Attempt; previous: Attempt | null; skillName: (id: number) => string;
-  canSendToResume: boolean; onTryAgain: () => void; onNext: (() => void) | null; onSendToResume: () => void; onStrengthen: () => void;
+  canSendToResume: boolean; onTryAgain: () => void; onUseStronger: (text: string) => void; onNext: (() => void) | null; onSendToResume: () => void; onStrengthen: () => void;
   onFollowUp: (followUpId: string, reply: { answer?: string; skipped?: boolean; correction?: string }) => void;
 };
-export default function FeedbackPanel({ question, attempt, previous, skillName, canSendToResume, onTryAgain, onNext, onSendToResume, onStrengthen, onFollowUp }: Props) {
+export default function FeedbackPanel({ question, attempt, previous, skillName, canSendToResume, onTryAgain, onUseStronger, onNext, onSendToResume, onStrengthen, onFollowUp }: Props) {
   const feedback = attempt.feedback;
   const [replies, setReplies] = useState<Record<string, string>>({}), [fixing, setFixing] = useState<string | null>(null);
   if (!feedback) return null;
   const compare = previous ? compareAttempts(previous, attempt) : null;
   const gap = feedback.skill_gap;
+  const scores = feedback.scores ?? [], structure = (feedback.structure ?? []).filter(part => part.status !== "not_applicable");
+  const scoreChanges = previous ? compareScores(previous.feedback?.scores, scores) : [];
+  const shortAnswer = attempt.answer.trim().split(/\s+/).length < 20;
   return <div className="ip-feedback" aria-label="Feedback on your answer">
     <section className="ip-answers" aria-label={previous ? "Compare your answers" : "Your submitted answer"}>
       {previous && <div><h4>Previous answer</h4><blockquote>{previous.answer}</blockquote></div>}
@@ -37,11 +43,30 @@ export default function FeedbackPanel({ question, attempt, previous, skillName, 
       <span className="ip-check-status">{STATUS[check.status]}</span>
       <div><strong>{CHECKS[check.id]}</strong>{check.quote && <q className="ip-quote">{check.quote}</q>}{check.note && <p>{check.note}</p>}</div>
     </li>)}</ul>
+    {scores.length > 0 && <section className="ip-group ip-scores" aria-label="Skills this answer showed">
+      <h4>Skills this answer showed</h4>
+      <p className="ip-hint">This describes this answer only. It is practice, not a test of you, and not a prediction of an interview.</p>
+      <ul className="ip-score-list">{scores.map(score => <li key={score.competency}>
+        <div className="ip-score-head"><strong>{competencyLabel(score.competency)}</strong><span className={`ip-level ip-level-${score.level}`}>{LEVEL_LABEL[score.level]}</span></div>
+        <meter className="ip-meter" min={1} max={4} value={score.level} aria-label={`${competencyLabel(score.competency)}: ${LEVEL_LABEL[score.level]}`} />
+        {score.quote && <q className="ip-quote">{score.quote}</q>}<p>{score.reason}</p>
+        {score.next_step && score.level < 4 && <p className="ip-next"><strong>Next level:</strong> {score.next_step}</p>}
+      </li>)}</ul>
+    </section>}
+    {structure.length > 0 && <section className="ip-group" aria-label="Answer structure"><h4>Answer structure</h4>
+      <ul className="ip-structure">{structure.map(part => <li key={part.part}><span className={`ip-check-status ip-${part.status}`}>{STATUS[part.status]}</span> {PARTS[part.part]}{part.quote && <q className="ip-quote">{part.quote}</q>}</li>)}</ul></section>}
+    {shortAnswer && <p className="ip-hint" role="note">Your answer is short, so scores stay low until there is more to judge. Try three to five sentences: what the situation was, what you did, and what changed.</p>}
     {(["expression", "missing_example", "possible_skill_gap"] as const).map(kind => {
       const items = feedback.improvements.filter(item => item.kind === kind);
       return items.length ? <section key={kind} className="ip-group"><h4>{GROUPS[kind].title}</h4>{GROUPS[kind].note && <p className="ip-hint">{GROUPS[kind].note}</p>}
         <ul>{items.map((item, index) => <li key={index}>{item.text}{item.quote && <q className="ip-quote">{item.quote}</q>}{item.uncertain && <span className="ip-uncertain"> Not certain. There was too little to tell.</span>}</li>)}</ul></section> : null;
     })}
+    {feedback.stronger_answer && <section className="ip-group ip-stronger" aria-label="A stronger version">
+      <h4>A stronger version, using only your own facts</h4>
+      <blockquote>{feedback.stronger_answer}</blockquote>
+      <p className="ip-hint">Fill in the [brackets] from real experience. Do not add anything that is not true. This is an example of structure, not an answer to copy.</p>
+      <Button size="sm" variant="outline" onClick={() => onUseStronger(feedback.stronger_answer!)}>Use as my next draft</Button>
+    </section>}
     {attempt.followUps.map(followUp => <section key={followUp.id} className="ip-followup" aria-label="Follow-up question">
       <h4>One more question</h4><p>{followUp.text}</p>
       {followUp.skipped ? <p className="ip-hint">You skipped this one.</p> : followUp.answer ? <><p className="ip-hint">Your reply</p><p>{followUp.answer}</p></> : <>
@@ -55,6 +80,8 @@ export default function FeedbackPanel({ question, attempt, previous, skillName, 
       </>}
       {followUp.correction && fixing !== followUp.id && <p className="ip-hint">Your correction: {followUp.correction}</p>}
     </section>)}
+    {scoreChanges.length > 0 && <section className="ip-group ip-compare" aria-label="Skill changes since your last answer"><h4>Skills since your last answer</h4>
+      <ul>{scoreChanges.map(change => <li key={change.competency}>{competencyLabel(change.competency)}: {LEVEL_LABEL[change.before]} → {LEVEL_LABEL[change.after]} {change.after > change.before ? "(better)" : change.after < change.before ? "(less clear this time)" : "(same)"}</li>)}</ul></section>}
     {compare && compare.changes.length > 0 && <section className="ip-group ip-compare" aria-label="Compared with your last answer">
       <h4>Compared with your last answer</h4>
       <ul>{compare.changes.map(change => <li key={change.id}>{CHECKS[change.id]}: {STATUS[change.before]} → {STATUS[change.after]} {change.result === "better" ? "(better)" : change.result === "worse" ? "(less clear this time)" : "(same)"}</li>)}</ul>

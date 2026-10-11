@@ -488,3 +488,90 @@ def test_unrelated_unused_equipment_does_not_hide_actual_ai_checks():
     raw = feedback(checks=[{"id": "ai_check", "status": "yes", "quote": "check its output", "note": "You explained your AI output checks."}], improvements=[])
     result = normalise_feedback(raw, feedback_request(answer=answer))
     assert next(c for c in result.checks if c.id == "ai_check").status == "yes"
+
+
+# --- rubric scores, stronger answer and real follow-ups -------------------------------
+
+LONG_ANSWER = (
+    "I prepared the weekly sales report myself. I checked the totals against the till records and fixed two mistakes before sending it. "
+    "After that I added a short note for my manager about why the totals changed, so she could answer questions from the shop floor."
+)
+
+
+def score(**changes):
+    return {"competency": "quality_care", "level": 3, "quote": "checked the totals against the till records",
+            "reason": "You named a real check.", "next_step": "Say how often the check found a mistake.", **changes}
+
+
+def test_scores_need_her_own_words_from_level_two_up():
+    raw = feedback(scores=[score(), score(competency="results", quote="words I never said"), score(competency="teamwork", level=1, quote=None)])
+    result = normalise_feedback(raw, feedback_request(answer=LONG_ANSWER))
+    assert [s.competency for s in result.scores] == ["quality_care", "teamwork"]
+    assert result.scores[0].quote == "checked the totals against the till records"
+
+
+@pytest.mark.parametrize("answer,top", [("I checked the totals against the till records and fixed two mistakes.", 2),
+                                         (ANSWER, 3), (LONG_ANSWER, 4)])
+def test_a_short_answer_can_never_score_as_strong(answer, top):
+    raw = feedback(scores=[score(level=4)], checks=[{"id": "answered_question", "status": "yes", "quote": "checked the totals"}], improvements=[])
+    result = normalise_feedback(raw, feedback_request(answer=answer))
+    assert result.scores[0].level == top
+
+
+def test_duplicate_scores_and_ai_scores_on_non_ai_questions_are_dropped():
+    raw = feedback(scores=[score(), score(level=2), score(competency="ai_change", quote="prepared the weekly sales report myself")])
+    result = normalise_feedback(raw, feedback_request(answer=LONG_ANSWER))
+    assert [(s.competency, s.level) for s in result.scores] == [("quality_care", 3)]
+
+
+def test_ai_score_is_kept_for_ai_questions_but_not_when_she_has_not_used_the_tool():
+    question = {"text": "How is this task changing with AI?", "kind": "ai_change", "item_label": None}
+    answer = "I would check any AI output against the till records before I sent a report to my manager, and ask a colleague to review it."
+    base = {"checks": [{"id": "answered_question", "status": "yes", "quote": "check any AI output"}], "improvements": []}
+    raw = feedback(scores=[score(competency="ai_change", quote="check any AI output against the till records")], **base)
+    assert normalise_feedback(raw, feedback_request(question=question, answer=answer)).scores[0].competency == "ai_change"
+    unused = "I have not used any AI tool at work. I check the totals by hand and I would learn the tool from my supervisor if the team started using one."
+    raw = feedback(scores=[score(competency="ai_change", quote="I check the totals by hand")],
+                   checks=[{"id": "answered_question", "status": "yes", "quote": "I check the totals by hand"}], improvements=[])
+    assert normalise_feedback(raw, feedback_request(question=question, answer=unused)).scores == []
+
+
+def test_score_wording_cannot_judge_the_person():
+    with pytest.raises(InterviewRejected):
+        normalise_feedback(feedback(scores=[score(reason="You seem like a shy person with a weak personality.")]), feedback_request(answer=LONG_ANSWER))
+
+
+def test_stronger_answer_keeps_only_facts_from_the_answer():
+    ok = "I prepared the weekly sales report myself and checked the totals against the till records. I fixed two mistakes, then sent it. [Add what changed afterwards.]"
+    assert normalise_feedback(feedback(stronger_answer=ok), feedback_request()).stronger_answer == ok
+    for invented in [
+        "I prepared the weekly sales report myself and cut errors by 40% before sending it to the team every week.",
+        "I prepared the weekly sales report myself for Acme and checked the totals against the till records each time.",
+        "I prepared the weekly sales report myself. Your accent made this hard to follow, so speak slower next time.",
+    ]:
+        assert normalise_feedback(feedback(stronger_answer=invented), feedback_request()).stronger_answer is None
+
+
+def test_a_good_follow_up_keeps_the_ai_question_after_the_quote_is_verified():
+    raw = feedback(follow_up="What did you change after finding the two mistakes?", follow_up_quote="fixed two mistakes before sending it", follow_up_focus="action")
+    result = normalise_feedback(raw, feedback_request())
+    assert result.follow_up == 'You said "fixed two mistakes before sending it". What did you change after finding the two mistakes?'
+
+
+@pytest.mark.parametrize("raw_changes,expected", [
+    ({"follow_up_quote": "words I never said"}, "Can you explain your own action"),
+    ({"follow_up_quote": "fixed two mistakes before sending it", "follow_up": "What did your supervisor say about the launch?", "follow_up_focus": "result"}, "What happened as a result"),
+    ({"follow_up_quote": "fixed two mistakes before sending it", "follow_up": "Tell me more. What happened?"}, "Can you explain your own action"),
+    ({"follow_up_quote": "fixed two mistakes before sending it", "follow_up": "How did you reduce them by 40%?", "follow_up_focus": "check"}, "How would you check that this worked?"),
+])
+def test_follow_up_falls_back_to_a_safe_question_when_it_adds_facts(raw_changes, expected):
+    result = normalise_feedback(feedback(**raw_changes), feedback_request())
+    assert expected in result.follow_up and "supervisor" not in result.follow_up and "40" not in result.follow_up
+
+
+def test_feedback_payload_names_the_focus_skill_from_the_question_intent():
+    provider = Provider([feedback().model_dump()])
+    request = feedback_request(question={"text": "How would you explain a delay to a customer?", "kind": "general", "intent": "customer_communication"})
+    feedback_for_answer(request, provider)
+    assert provider.calls[0]["payload"]["focus_competency"] == "communication"
+    assert "role_knowledge" in provider.calls[0]["system_prompt"]

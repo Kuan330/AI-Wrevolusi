@@ -6,7 +6,7 @@ type PlanBody = {
   bank: { id: string; question: string }[]; topics: ChangeTopic[]; count: number; items_reviewed: boolean;
 };
 type FeedbackBody = {
-  question: { text: string; kind: string; item_label: string | null }; answer: string; role_title: string; attempt: number;
+  question: { text: string; kind: string; item_label: string | null; intent: string | null }; answer: string; role_title: string; attempt: number;
   follow_ups_asked: number; skills: { id: number; name: string }[];
 };
 export const interviewService = {

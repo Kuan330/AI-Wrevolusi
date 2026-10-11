@@ -91,12 +91,16 @@ class PlanResponse(StrictModel):
 CheckId = Literal["answered_question", "own_actions", "concrete_example", "judgement", "ai_check"]
 CheckStatus = Literal["yes", "partly", "no", "not_applicable"]
 ImprovementKind = Literal["expression", "missing_example", "possible_skill_gap"]
+CompetencyId = Literal["role_knowledge", "problem_solving", "communication", "quality_care", "teamwork", "learning", "ownership", "results", "ai_change"]
+StructurePart = Literal["situation", "task", "action", "result"]
+FollowUpFocus = Literal["action", "reason", "result", "obstacle", "check"]
 
 
 class QuestionContext(StrictModel):
     text: str = Field(min_length=1, max_length=500)
     kind: QuestionKind = "general"
     item_label: str | None = Field(default=None, max_length=200)
+    intent: str | None = Field(default=None, max_length=60, pattern=r"^[a-z_]+$")
 
 
 class SkillOption(StrictModel):
@@ -140,9 +144,29 @@ class SkillGapPick(StrictModel):
     reason: Annotated[str, Field(min_length=1, max_length=300)]
 
 
+class CompetencyScore(StrictModel):
+    """What one answer showed about one skill. 1 not shown yet, 2 started, 3 clear, 4 strong."""
+    competency: CompetencyId
+    level: int = Field(ge=1, le=4)
+    quote: str | None = Field(default=None, max_length=300)
+    reason: str = Field(min_length=1, max_length=300)
+    next_step: str = Field(default="", max_length=200)
+
+
+class StructureCheck(StrictModel):
+    part: StructurePart
+    status: CheckStatus
+    quote: str | None = Field(default=None, max_length=300)
+
+
 class FeedbackResponse(StrictModel):
     summary: str = Field(min_length=1, max_length=400)
     checks: list[Check] = Field(max_length=5)
     improvements: list[Improvement] = Field(default_factory=list, max_length=5)
     follow_up: str | None = Field(default=None, max_length=300)
+    follow_up_quote: str | None = Field(default=None, max_length=300)
+    follow_up_focus: FollowUpFocus | None = None
     skill_gap: SkillGapPick | None = None
+    scores: list[CompetencyScore] = Field(default_factory=list, max_length=4)
+    structure: list[StructureCheck] = Field(default_factory=list, max_length=4)
+    stronger_answer: str | None = Field(default=None, max_length=900)

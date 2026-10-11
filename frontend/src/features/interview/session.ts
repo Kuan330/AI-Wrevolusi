@@ -3,7 +3,9 @@ import type { Feedback, InterviewItem, PlanResult, QuestionKind } from "./types.
 export type FollowUp = { id: string; text: string; answer: string | null; skipped: boolean; correction: string };
 export type Attempt = { id: string; answer: string; mode: "text" | "voice"; submittedAt: string; feedback: Feedback | null; error: string; followUps: FollowUp[] };
 /** `text` is what the user reads. `sentText` is the redacted wording AI wrote, used when asking for feedback. */
-export type SessionQuestion = { id: string; text: string; sentText: string; kind: QuestionKind; itemId: string | null; itemLabel: string | null; skipped: boolean; attempts: Attempt[]; draft?: string };
+export type SessionQuestion = { id: string; text: string; sentText: string; kind: QuestionKind; itemId: string | null; itemLabel: string | null; skipped: boolean; attempts: Attempt[]; draft?: string;
+  /** What the question bank says this question tests, for example `customer_communication`. Older sessions have none. */
+  intent?: string | null };
 /** The reviewed resume this session used. Later edits in the resume do not change it. */
 export type ResumeVersion = { reviewedAt: string; itemCount: number };
 export type InterviewSession = {
@@ -19,12 +21,13 @@ const stamp = (now?: Date) => (now ?? new Date()).toISOString();
 
 export function createSession(input: {
   mode: InterviewSession["mode"]; role: InterviewSession["role"]; resumeVersion: ResumeVersion | null; items: InterviewItem[];
-  plan: PlanResult; restore?: (value: string) => string; now?: Date;
+  plan: PlanResult; restore?: (value: string) => string; now?: Date; bankIntents?: Record<string, string | null>;
 }): InterviewSession {
   const restore = input.restore ?? (value => value), byId = new Map(input.items.map(item => [item.id, item]));
   const questions = input.plan.questions.map(question => ({
     id: newId(), text: restore(question.text), sentText: question.text, kind: question.kind, itemId: question.item_id && byId.has(question.item_id) ? question.item_id : null,
     itemLabel: question.item_id ? byId.get(question.item_id)?.label ?? null : null, skipped: false, attempts: [] as Attempt[],
+    intent: question.bank_id ? input.bankIntents?.[question.bank_id] ?? null : null,
   }));
   if (!questions.length) throw new Error("No practice questions are available yet. Try again.");
   const at = stamp(input.now);
