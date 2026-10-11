@@ -42,10 +42,11 @@ export default function AnswerBox({ value, onChange, onSubmit, busy }: Props) {
         </> : <Button type="button" size="sm" onClick={begin} disabled={busy}><Mic size={14} />{spoken ? "Record again" : "Start recording"}</Button>}
       </div>
     </div>}
+    <p className="ip-tip">Tip: write three to five sentences. Say what happened, what you did, and what changed. Speaking is fine too.</p>
     <FormField label={mode === "voice" ? "Your transcript. Check it and fix any mistakes." : "Your answer"}>
       <Textarea rows={7} maxLength={4000} value={value} disabled={busy} readOnly={recording} aria-label="Your answer" placeholder="Type what you would say in the interview…" onChange={event => { onChange(event.target.value); setNote(""); }} />
     </FormField>
     {note && <p className="ip-note" role="alert">{note}</p>}
-    <div className="ip-actions"><Button type="button" disabled={busy || recording} onClick={submit}>{busy ? "Getting feedback…" : "Submit answer"}</Button><span className="ip-hint">Nothing is sent for feedback until you submit.</span></div>
+    <div className="ip-actions"><Button type="button" disabled={busy || recording} onClick={submit}>{busy ? "Getting feedback…" : "Submit answer"}</Button><span className="ip-hint">{value.trim() ? `${value.trim().split(/\s+/).length} words. ` : ""}Nothing is sent for feedback until you submit.</span></div>
   </div>;
 }

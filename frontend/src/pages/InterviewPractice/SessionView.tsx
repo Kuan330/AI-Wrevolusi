@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, SkipForward } from "lucide-react";
+import { ArrowLeft, Check, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -16,6 +16,7 @@ import type { WefSkill } from "@/types/reference";
 import AnswerBox from "./AnswerBox";
 import FeedbackPanel from "./FeedbackPanel";
 import { SendToResumeDialog, StrengthenDialog } from "./HandoffDialogs";
+import FinishView from "./FinishView";
 import ProfilePanel from "./ProfilePanel";
 
 const dateText = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
@@ -32,8 +33,15 @@ export default function SessionView({ owner, session, allSessions, onChange, onE
   const [busy, setBusy] = useState(""), [error, setError] = useState("");
   const [again, setAgain] = useState<Record<string, boolean>>({}), [selected, setSelected] = useState<Record<string, string>>({});
   const [resumeOpen, setResumeOpen] = useState(false), [learnOpen, setLearnOpen] = useState(false);
+  const [finished, setFinished] = useState(() => sessionProgress(session).complete), [notice, setNotice] = useState("");
+  const heading = useRef<HTMLHeadingElement | null>(null), firstRender = useRef(true);
   const request = useRef<AbortController | null>(null), alive = useRef(true);
   useEffect(() => { alive.current = true; return () => { alive.current = false; request.current?.abort(); }; }, []);
+  // After moving to another question, put focus on its heading so keyboard and screen reader users start there.
+  useEffect(() => {
+    if (firstRender.current) { firstRender.current = false; return; }
+    heading.current?.focus();
+  }, [index]);
   useEffect(() => {
     const controller = new AbortController();
     referenceService.wefSkills().then(list => { if (!controller.signal.aborted) setSkills(list); }).catch(() => undefined);
@@ -72,6 +80,7 @@ export default function SessionView({ owner, session, allSessions, onChange, onE
       }, controller.signal);
       if (!alive.current || controller.signal.aborted) return;
       commit(setAttemptFeedback(latest.current, questionId, attemptId, result));
+      setNotice("Your feedback is ready.");
     } catch (cause) {
       if (!alive.current || controller.signal.aborted) return;
       const message = cause instanceof Error ? cause.message : "Feedback could not be prepared. Your answer is saved.";
@@ -89,7 +98,7 @@ export default function SessionView({ owner, session, allSessions, onChange, onE
       void askFeedback(question.id, attemptId);
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Add your answer first."); }
   };
-  const go = (next: number) => { setIndex(next); setError(""); setResumeOpen(false); setLearnOpen(false); };
+  const go = (next: number) => { setIndex(next); setError(""); setNotice(""); setResumeOpen(false); setLearnOpen(false); };
   const nextIndex = nextOpenQuestion(session, index);
   const editAnswer = () => {
     if (!question || !attempt) return;
@@ -120,33 +129,39 @@ export default function SessionView({ owner, session, allSessions, onChange, onE
     </div>
     <nav className="ip-steps" aria-label="Questions">{session.questions.map((entry, position) => <button key={entry.id} type="button" aria-current={position === index ? "step" : undefined}
       className={`ip-step ${questionDone(entry) ? (entry.skipped ? "is-skipped" : "is-done") : ""}`} onClick={() => go(position)}>
-      <span className="sr-only">Question </span>{position + 1}{entry.skipped ? <span className="sr-only"> skipped</span> : questionDone(entry) ? <span className="sr-only"> answered</span> : null}</button>)}</nav>
+      <span className="sr-only">Question </span>{position + 1}{questionDone(entry) && !entry.skipped && <Check size={11} aria-hidden="true" />}{entry.skipped ? <span className="sr-only"> skipped</span> : questionDone(entry) ? <span className="sr-only"> answered</span> : null}</button>)}</nav>
     {error && <div className="ip-note" role="alert">{error}</div>}
-    {progress.complete && <Card className="ip-done" role="status"><h2>You finished this practice.</h2>
-      <p>Look back at any answer, or start a new set. This is practice only. It does not predict how an interview will go.</p>
-      <Button onClick={onExit}>Back to practice home</Button></Card>}
-    {progress.complete && <ProfilePanel sessions={allSessions} />}
-    {question && <Card className="ip-question">
+    <p className="sr-only" role="status">{notice}</p>
+    {progress.complete && finished && <>
+      <FinishView session={session} onExit={onExit} onReview={() => setFinished(false)} />
+      <ProfilePanel sessions={allSessions} />
+    </>}
+    {question && !(progress.complete && finished) && <Card className="ip-question">
       <p className="ip-tag">{session.mode === "career" && question.kind === "general" ? "Future occupation practice" : TAGS[question.kind]}{question.itemLabel ? ` · ${question.itemLabel}` : ""}</p>
-      <h2>{question.text}</h2>
+      <h2 ref={heading} tabIndex={-1}>{question.text}</h2>
       <p className="ip-hint">This is a practice question. It is not the employer’s question.</p>
-      {question.attempts.length > 0 && <label className="ip-history">Review an answer
+      {question.attempts.length > 1 && <label className="ip-history">Review an answer
         <NativeSelect value={attempt?.id ?? ""} onChange={event => { setSelected(old => ({ ...old, [question.id]: event.target.value })); setAgain(old => ({ ...old, [question.id]: false })); setResumeOpen(false); setLearnOpen(false); }}>
           {question.attempts.map((entry, position) => <option key={entry.id} value={entry.id}>Attempt {position + 1}{entry.feedback ? " · feedback ready" : entry.error ? " · feedback failed" : " · awaiting feedback"}</option>)}
         </NativeSelect>
       </label>}
       {question.skipped ? <div className="ip-actions"><p>You skipped this question.</p><Button variant="outline" onClick={() => commit(reopenQuestion(latest.current, question.id))}>Answer it anyway</Button></div>
-        : attempt && attempt.feedback && !editing ? <FeedbackPanel key={attempt.id} question={question} attempt={attempt} previous={previous} skillName={skillName} canSendToResume={Boolean(item?.ref)}
+        : attempt && attempt.feedback && !editing ? <FeedbackPanel key={attempt.id} question={question} attempt={attempt} previous={previous} canSendToResume={Boolean(item?.ref)}
             onTryAgain={editAnswer} onUseStronger={useStronger}
-            onNext={nextIndex >= 0 && nextIndex !== index ? () => go(nextIndex) : null} onSendToResume={() => setResumeOpen(true)} onStrengthen={() => setLearnOpen(true)}
+            onNext={nextIndex >= 0 && nextIndex !== index ? () => go(nextIndex) : null} onFinish={progress.complete ? () => setFinished(true) : null} onSendToResume={() => setResumeOpen(true)} onStrengthen={() => setLearnOpen(true)}
             onFollowUp={(id, reply) => commit(answerFollowUp(latest.current, question.id, attempt.id, id, reply))} />
         : attempt && !attempt.feedback && !editing ? <div className="ip-retry">{attempt.error && <p className="ip-note" role="alert">{attempt.error}</p>}
             <p className="ip-hint">Your answer is saved:</p><blockquote>{attempt.answer}</blockquote>
-            {busy === attempt.id ? <p role="status">Getting feedback…</p> : <div className="ip-actions"><Button disabled={Boolean(busy)} onClick={() => { void askFeedback(question.id, attempt.id); }}>Try feedback again</Button>
+            {busy === attempt.id ? <div className="ip-waiting" role="status"><p>Reading your answer. This can take up to a minute.</p>
+              <Button variant="ghost" size="sm" onClick={() => request.current?.abort()}>Stop waiting</Button></div> : <div className="ip-actions"><Button disabled={Boolean(busy)} onClick={() => { void askFeedback(question.id, attempt.id); }}>Try feedback again</Button>
               <Button variant="outline" disabled={Boolean(busy)} onClick={editAnswer}>Edit my answer</Button></div>}</div>
         : <>{attempt && editing && attempt.feedback && <p className="ip-hint">Improve your last answer, then submit it again to compare.</p>}
             <AnswerBox key={question.id} value={draft} onChange={changeDraft} onSubmit={submit} busy={Boolean(busy)} /></>}
-      {!question.skipped && !(attempt?.feedback && !editing) && <div className="ip-actions"><Button variant="ghost" size="sm" onClick={() => { commit(skipQuestion(latest.current, question.id)); if (nextIndex >= 0 && nextIndex !== index) go(nextIndex); }}><SkipForward size={14} />Skip this question</Button></div>}
+      {!question.skipped && !(attempt?.feedback && !editing) && <div className="ip-actions"><Button variant="ghost" size="sm" onClick={() => {
+          const next = skipQuestion(latest.current, question.id);
+          commit(next);
+          if (sessionProgress(next).complete) setFinished(true); else if (nextIndex >= 0 && nextIndex !== index) go(nextIndex);
+        }}><SkipForward size={14} />Skip this question</Button></div>}
     </Card>}
     {item?.ref && attempt && <SendToResumeDialog open={resumeOpen} onOpenChange={setResumeOpen} entryLabel={item.label} initialText={attempt.answer}
       send={text => sendAnswerToResume(owner, { sessionId: session.id, questionId: question!.id, attemptId: attempt.id, question: question!.text, item, text })} />}

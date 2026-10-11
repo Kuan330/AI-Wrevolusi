@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle2, FileText, Mic, TriangleAlert } from "lucide-react";
+import { CheckCircle2, Mic, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ProfilePanel from "./ProfilePanel";
@@ -23,6 +23,7 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
   const [extra, setExtra] = useState(""), [accepted, setAccepted] = useState(false), [busy, setBusy] = useState<"" | InterviewSession["mode"]>(""), [error, setError] = useState("");
   const [taskLinks, setTaskLinks] = useState<Record<string, string>>({}), [workspaceVersion, setWorkspaceVersion] = useState(0);
   const [deleting, setDeleting] = useState<InterviewSession | null>(null);
+  const [choice, setChoice] = useState<InterviewSession["mode"]>(() => futureInterviewOccupation() ? "career" : "general");
   const request = useRef<AbortController | null>(null);
   useEffect(() => {
     let live = true;
@@ -67,29 +68,38 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
     finally { if (request.current === controller) { request.current = null; setBusy(""); } }
   };
 
-  return <div className="ip-start">
-    {error && <p className="ip-note" role="alert">{error}</p>}
-    <Card className="ip-card">
-      <h2>Your future occupation</h2>
-      {future ? <>
-        <p><strong>{future.title}</strong></p>
-        <p className="ip-hint">Practise questions for this occupation. No resume is needed, and choosing this role does not mean you already have its skills.</p>
-        <div className="ip-actions"><Button disabled={Boolean(busy)} onClick={() => { void start("career"); }}>{busy === "career" ? "Preparing questions…" : "Practise for this occupation"}</Button>
-          <Button asChild variant="outline"><Link to={ROUTES.possibilities}>Change future occupation</Link></Button></div>
-      </> : <><p className="ip-hint">Choose a future occupation in Possibilities to practise for that role without making a resume.</p>
-        <Button asChild variant="outline"><Link to={ROUTES.possibilities}>Choose a future occupation</Link></Button></>}
-      <div className="ip-actions"><Button variant="ghost" disabled={Boolean(busy)} onClick={() => { void start("general"); }}>{busy === "general" ? "Preparing questions…" : "Practise general questions"}</Button></div>
-    </Card>
-    <Card className="ip-card">
-      <h2><FileText size={18} />Practice from your resume · optional</h2>
-      {loading ? <p role="status">Loading your resume…</p> : loadError ? <p className="ip-note" role="alert">{loadError}</p> : <>
+  const canStart = choice === "career" ? Boolean(future) : choice === "resume" ? ready && accepted : true;
+  const CHOICES = [
+    { id: "career" as const, title: "My future occupation", text: future ? future.title : "Choose one in Possibilities first", disabled: !future },
+    { id: "general" as const, title: "General questions", text: "Common questions. No setup.", disabled: false },
+    { id: "resume" as const, title: "My resume", text: "Optional. Questions from your own experience.", disabled: false },
+  ];
+  const resumeNotice = state.status === "reviewed" && !hasResumeRole ? "Add a target role in the Resume builder to practise from this resume."
+    : state.status === "needs-review" ? "Review your resume again to practise from its latest version."
+    : "A reviewed resume lets you practise questions about your own experience.";
+
+  return <div className={`ip-start${sessions.length ? " has-sessions" : ""}`}>
+    <Card className="ip-card ip-begin">
+      <h2>Start practice</h2>
+      {error && <p className="ip-note" role="alert">{error}</p>}
+      <div className="ip-choice" role="radiogroup" aria-label="What do you want to practise?">
+        {CHOICES.map(item => <label key={item.id} className={`ip-choice-item${choice === item.id ? " is-on" : ""}${item.disabled ? " is-off" : ""}`}>
+          <input type="radio" name="ip-choice" value={item.id} checked={choice === item.id} disabled={item.disabled || Boolean(busy)} onChange={() => setChoice(item.id)} />
+          <span><strong>{item.title}</strong><small>{item.text}</small></span>
+        </label>)}
+      </div>
+      {choice === "career" && (future
+        ? <p className="ip-hint">Choosing this role does not mean you already have its skills. <Link className="ip-link" to={ROUTES.possibilities}>Change future occupation</Link></p>
+        : <p className="ip-hint"><Link className="ip-link" to={ROUTES.possibilities}>Choose a future occupation</Link> to practise for that role.</p>)}
+      {choice === "general" && <p className="ip-hint">You will get 3 to 5 common interview questions that are not tied to a role.</p>}
+      {choice === "resume" && (loading ? <p role="status">Loading your resume…</p> : loadError ? <p className="ip-note" role="alert">{loadError}</p> : <div className="ip-resume">
         <dl className="ip-facts">
           <div><dt>Target role</dt><dd>{prepared?.roleTitle && draft?.jobRequirements.trim() ? prepared.roleTitle : "Not set yet"}</dd></div>
           <div><dt>Resume version</dt><dd>{state.status === "reviewed" ? <><CheckCircle2 size={15} className="ip-ok" /> Reviewed on {dateText(state.at!)}, {prepared?.display.length ?? 0} items</>
             : state.status === "needs-review" ? <><TriangleAlert size={15} className="ip-warn" /> Changed since you last reviewed it</> : "No resume yet"}</dd></div>
         </dl>
-        {(state.status !== "reviewed" || !hasResumeRole) && <div className="ip-callout" role="status"><p>{state.status === "reviewed" && !hasResumeRole ? "Add a target role in the Resume builder to practise from this resume. Future occupation practice above is still available." : state.status === "needs-review" ? "Review your resume again to practise from its latest version. You can still practise for your future occupation above." : "A reviewed resume lets you practise questions about your own experience. You can practise for your future occupation above without one."}</p>
-          <Button asChild><Link to={ROUTES.resumeBuilder}>Open Resume builder</Link></Button></div>}
+        {(state.status !== "reviewed" || !hasResumeRole) && <div className="ip-callout" role="status"><p>{resumeNotice}</p>
+          <Button asChild variant="outline"><Link to={ROUTES.resumeBuilder}>Open Resume builder</Link></Button></div>}
         {ready && prepared && <>
           <details className="ip-details"><summary>What AI will receive</summary>
             <p className="ip-hint">Your name and contact details stay on this device. Check this list and remove anything private from your resume or add it below.</p>
@@ -100,14 +110,14 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
             <Textarea readOnly rows={9} aria-label="What AI will receive" value={JSON.stringify({ role: prepared.sentRoleTitle, items: prepared.sent, work_tasks: topics }, null, 2)} />
             <p className="ip-hint">Hiding words automatically can miss things. Your answers are only sent when you submit them.</p></details>
           <label className="ip-accept"><Checkbox checked={accepted} onCheckedChange={value => setAccepted(value === true)} />I checked this and want to send it to AI.</label>
-          <p className="ip-hint">You will get 3 to 5 practice questions based on your resume and role. If AI is not available you still get simple questions.</p>
         </>}
-        <div className="ip-actions"><Button disabled={!ready || !accepted || Boolean(busy)} onClick={() => { void start("resume"); }}>{busy === "resume" ? "Preparing questions…" : "Start practice"}</Button></div>
-        <p className="ip-hint"><Mic size={13} /> You can answer by typing or speaking. You can skip any question and stop whenever you like.</p>
-      </>}
+      </div>)}
+      <div className="ip-actions"><Button disabled={!canStart || Boolean(busy)} onClick={() => { void start(choice); }}>{busy ? "Preparing questions…" : "Start practice"}</Button>
+        <span className="ip-hint"><Mic size={13} aria-hidden="true" /> Type or speak. Skip any question. Stop whenever you like.</span></div>
+      {choice === "resume" && !loading && !canStart && ready && <p className="ip-hint">Tick the box above to send your checked resume items to AI.</p>}
     </Card>
-    <ProfilePanel sessions={sessions} />
-    <Card className="ip-card">
+    {sessions.length > 0 && <ProfilePanel sessions={sessions} />}
+    <Card className="ip-card ip-saved-card">
       <h2>Your saved practice</h2>
       {sessions.length === 0 ? <p className="ip-hint">Nothing yet. Your answers and feedback stay on this device only.</p> :
         <ul className="ip-saved">{sessions.map(session => { const p = sessionProgress(session); return <li key={session.id}>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
+import LevelBar from "./LevelBar";
 import { LEVEL_LABEL } from "@/features/interview/competencies";
 import { buildProfile, weakestEvidence, type Confidence, type SkillRow } from "@/features/interview/profile";
 import type { InterviewSession } from "@/features/interview/session";
@@ -11,8 +12,7 @@ const TREND = { up: "Improving over your practice", down: "Less clear in recent 
 
 function SkillHead({ row }: { row: SkillRow }) {
   return <>
-    <div className="ip-score-head"><strong>{row.label}</strong><span className={`ip-level ip-level-${row.level}`}>{LEVEL_LABEL[row.level!]}</span></div>
-    <meter className="ip-meter" min={1} max={4} value={row.mean!} aria-label={`${row.label}: ${LEVEL_LABEL[row.level!]}`} />
+    <div className="ip-score-head"><strong>{row.label}</strong><span className={`ip-level ip-level-${row.level}`}>{LEVEL_LABEL[row.level!]}</span><LevelBar level={row.mean!} /></div>
     <p className="ip-hint">{CONFIDENCE[row.confidence]}{row.trend ? ` · ${TREND[row.trend]}` : ""}</p>
   </>;
 }
@@ -31,15 +31,15 @@ export default function ProfilePanel({ sessions }: { sessions: InterviewSession[
   return <Card className="ip-card ip-profile" aria-label="Your skills overview">
     <h2>Your skills overview</h2>
     {!scored ? <p className="ip-hint">Answer a few practice questions and your overview will appear here. It shows which skills your answers have shown so far, and what to work on next.</p> : <>
-      <p className="ip-hint">Based on {profile.answers} practice {profile.answers === 1 ? "answer" : "answers"} saved on this device. It shows what your answers have shown so far. It is not a test and does not predict an interview. One answer is only a first look.</p>
+      <p className="ip-hint">Based on {profile.answers} practice {profile.answers === 1 ? "answer" : "answers"} saved on this device. It is practice, not a test. One answer is only a first look.</p>
+      {profile.strengths.length > 0 && <section className="ip-group" aria-label="What your answers showed well"><h3>What your answers showed well</h3>
+        <ul className="ip-profile-list">{profile.strengths.map(row => <li key={row.id}><SkillHead row={row} /></li>)}</ul></section>}
       {profile.improve.length > 0 && <section className="ip-group" aria-label="What to improve next"><h3>What you can improve next</h3>
         <ul className="ip-profile-list">{profile.improve.map(row => <li key={row.id}>
           <SkillHead row={row} />
           {weakestEvidence(row, 1).map(item => <div key={`${item.questionId}-${item.at}`} className="ip-evidence">
             {item.quote && <q className="ip-quote">{item.quote}</q>}<p>{item.reason}</p>{item.next_step && <p className="ip-next"><strong>Next level:</strong> {item.next_step}</p>}</div>)}
         </li>)}</ul></section>}
-      {profile.strengths.length > 0 && <section className="ip-group" aria-label="What your answers showed well"><h3>What your answers showed well</h3>
-        <ul className="ip-profile-list">{profile.strengths.map(row => <li key={row.id}><SkillHead row={row} /></li>)}</ul></section>}
       {profile.notYet.length > 0 && <section className="ip-group" aria-label="Not practised yet"><h3>Not practised yet</h3>
         <p className="ip-hint">Nothing to show for these skills because no answer has covered them.</p>
         <ul className="ip-chips">{profile.notYet.map(row => <li key={row.id} title={row.hint}>{row.label}</li>)}</ul></section>}
