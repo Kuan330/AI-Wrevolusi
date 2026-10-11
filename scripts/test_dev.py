@@ -158,6 +158,14 @@ class RuntimeSelectionTests(unittest.TestCase):
         self.assertEqual(dev.os.environ["PATH"], "/global/bin")
         self.run.assert_called_once()
 
+    def test_windows_uppercase_executable_extension_is_accepted(self):
+        current = str(Path("/global/bin/node.EXE"))
+        with patch.object(dev.shutil, "which", return_value=current):
+            self.run.return_value = Mock(stdout="v24.19.0\n")
+            dev.select_frontend_runtime()
+        self.assertEqual(dev.os.environ["PATH"], "/global/bin")
+        self.run.assert_called_once()
+
     def test_node_26_falls_back_to_installed_node_24(self):
         self.run.side_effect = [Mock(stdout="v26.6.0\n"), Mock(stdout="v24.19.0\n")]
         dev.select_frontend_runtime()
@@ -249,6 +257,18 @@ class ToolchainTests(unittest.TestCase):
     def test_broken_version_command_reports_actionable_error(self):
         self.run.side_effect = dev.subprocess.TimeoutExpired("node", 10)
         with self.assertRaisesRegex(RuntimeError, "Could not check node version"):
+            dev.require_frontend_toolchain()
+
+    def test_version_probe_allows_slow_windows_cold_start(self):
+        self.run.side_effect = [Mock(stdout="v24.19.0\n"), Mock(stdout="12.0.2\n")]
+        dev.require_frontend_toolchain()
+        self.assertTrue(all(c.kwargs["timeout"] == 60 for c in self.run.call_args_list))
+
+    def test_failed_version_probe_preserves_stderr(self):
+        self.run.side_effect = subprocess.CalledProcessError(
+            1, "npm", stderr="Cannot find module npm-cli.js"
+        )
+        with self.assertRaisesRegex(RuntimeError, "Cannot find module npm-cli.js"):
             dev.require_frontend_toolchain()
 
 

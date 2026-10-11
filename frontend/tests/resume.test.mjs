@@ -83,14 +83,16 @@ test("My Plan upload branches before reading/adding synced learning resources", 
   for (const path of ["../src/pages/LearningGoals/LearningPlanSetup.tsx", "../src/pages/LearningPlanOnboarding/LearningPlanPreferences.tsx"]) {
     const source = file(path);
     assert.ok(source.indexOf("await resumeAttachment.attach(file)") < source.indexOf("await file.text()"));
-    assert.match(source, /RESOURCE_ACCEPT.*RESUME_ACCEPT/); assert.match(source, /Job requirements are still required/);
+    assert.match(source, /RESOURCE_ACCEPT.*RESUME_ACCEPT/); assert.match(source, /Choose a target role in Explore possibilities before generating/);
   }
   assert.doesNotMatch(file("../src/features/resume/repository.ts"), /commitWorkspaceItems|saveWorkspaceItems|accountStorage/);
 });
 test("resume route is separate from Continue Journey, and skill action remains outside the details summary", () => {
   const routes = file("../src/constants/routes.ts"), page = file("../src/pages/Possibilities/Possibilities.tsx");
   assert.match(routes, /resumeBuilder: "\/career\/possibilities\/resume"/); assert.match(routes, /continue: "\/resume"/);
-  assert.match(page, /navigate\(ROUTES.resumeBuilder\); \}\}>Generate resume/);
+  assert.match(page, /navigate\(ROUTES.resumeBuilder\)/);
+  assert.match(page, /disabled=\{!selected \|\| continuing\}/);
+  assert.match(page, /await flushWorkspace\(\)/);
   assert.ok(page.indexOf("</details> :") < page.indexOf('"Add to Skill Path"'));
 });
 test("draft restoration/clearing and stale PDF guards are explicit", () => {
@@ -147,20 +149,21 @@ test("encrypted Office containers get an actionable message, not an OCR/password
   await assert.rejects(checkDocx(arrayBuffer(bytes)), /encrypted.*unencrypted DOCX/);
 });
 
-import { EXAMPLE_JOB_REQUIREMENTS, emptyResumeDocument, resumeGenerationAction } from "../src/features/resume/onboarding.ts";
-const firstUse = { jobRequirements: EXAMPLE_JOB_REQUIREMENTS, hasDocument: false, skillCount: 0, factCount: 0, skillsLoading: false, skillError: "", sourceReviewed: null, aiConfigured: false, busy: false };
-test("fixed classroom example contains requirements, not personal facts or skill seeding", () => {
-  assert.match(EXAMPLE_JOB_REQUIREMENTS, /^Junior Data Analyst\nResponsibilities and requirements:/);
-  assert.match(EXAMPLE_JOB_REQUIREMENTS, /Excel and SQL/); assert.match(EXAMPLE_JOB_REQUIREMENTS, /Python/);
-  assert.equal(EXAMPLE_JOB_REQUIREMENTS.split("\n").length, 7);
-  assert.ok(EXAMPLE_JOB_REQUIREMENTS.length < 20000);
+import { emptyResumeDocument, resumeGenerationAction } from "../src/features/resume/onboarding.ts";
+import { targetRequirements } from "../src/features/resume/targetRole.ts";
+const TARGET_JOB_REQUIREMENTS = targetRequirements({ occupation_code: "2421", title: "Management and Organization Analysts", skills: [{ skill_id: 1, skill_slug: "analytical-thinking", name: "Analytical thinking" }] });
+const firstUse = { jobRequirements: TARGET_JOB_REQUIREMENTS, hasDocument: false, skillCount: 0, factCount: 0, skillsLoading: false, skillError: "", sourceReviewed: null, aiConfigured: false, busy: false };
+test("selected role requirements are separate from personal facts or skill seeding", () => {
+  assert.match(TARGET_JOB_REQUIREMENTS, /^Management and Organization Analysts\nRequired skills:/);
+  assert.match(TARGET_JOB_REQUIREMENTS, /Analytical thinking/);
+  assert.ok(TARGET_JOB_REQUIREMENTS.length < 20000);
   assert.deepEqual(emptyResumeDocument().cv, { sections: { Skills: [] } });
   assert.equal(parseResumeYaml(documentYaml(emptyResumeDocument())).error, "");
 });
-test("zero-skill first use creates a local blank draft even with AI unavailable", () => {
-  assert.equal(resumeGenerationAction(firstUse), "blank");
-  assert.equal(resumeGenerationAction({ ...firstUse, aiConfigured: true }), "blank");
-  assert.equal(resumeGenerationAction({ ...firstUse, aiConfigured: null }), "blank");
+test("no skills or reviewed facts disables generation regardless of AI availability", () => {
+  assert.equal(resumeGenerationAction(firstUse), null);
+  assert.equal(resumeGenerationAction({ ...firstUse, aiConfigured: true }), null);
+  assert.equal(resumeGenerationAction({ ...firstUse, aiConfigured: null }), null);
 });
 test("job requirements and successful skill loading remain mandatory", () => {
   for (const change of [{ jobRequirements: "   " }, { skillsLoading: true }, { skillError: "unreadable skills" }, { busy: true }]) {
@@ -169,7 +172,7 @@ test("job requirements and successful skill loading remain mandatory", () => {
 });
 test("unreviewed source cannot bypass consent through empty-draft generation", () => {
   assert.equal(resumeGenerationAction({ ...firstUse, sourceReviewed: false }), null);
-  assert.equal(resumeGenerationAction({ ...firstUse, sourceReviewed: true }), "blank");
+  assert.equal(resumeGenerationAction({ ...firstUse, sourceReviewed: true }), null);
 });
 test("existing drafts are never replaced by an empty generation fallback", () => {
   assert.equal(resumeGenerationAction({ ...firstUse, hasDocument: true }), null);
@@ -185,8 +188,9 @@ test("first-use controls hide provider details and preserve expandable privacy/c
   const page = file("../src/pages/ResumeBuilder/ResumeBuilder.tsx");
   assert.doesNotMatch(page, /ai_provider_host|ai_model|available skills|20,000 characters|rb-skill-chips/);
   assert.match(page, /Privacy details/); assert.match(page, /Third-party provider retention policies/);
-  assert.match(page, /Replace your job requirements\?/); assert.match(page, /!draft.document && <div className="rb-example-action"/);
-  assert.match(page, /Retry skills/); assert.match(page, /generationAction === "blank"/);
+  assert.doesNotMatch(page, /Replace your job requirements|rb-example-action|Use an example|Target job requirements · required/);
+  assert.match(page, /Selected target role/); assert.match(page, /Change target role/);
+  assert.match(page, /Retry skills/); assert.match(page, /Add reviewed resume details or selected user skills before generating/);
 });
 test("nullable engine section mapping restores without treating a valid saved draft as corruption", () => {
   const doc = { cv: { sections: null } };

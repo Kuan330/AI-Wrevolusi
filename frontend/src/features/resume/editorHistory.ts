@@ -1,6 +1,6 @@
 import type { ResumeDraft } from "./types.ts";
-export type EditorSnapshot = Pick<ResumeDraft, "document" | "yamlText" | "jobRequirements" | "pendingJobRequirements" | "gaps" | "recommendations" | "previous" | "previewDocument">;
-export const editorSnapshot = (draft: ResumeDraft): EditorSnapshot => structuredClone({ document: draft.document, yamlText: draft.yamlText, jobRequirements: draft.jobRequirements, pendingJobRequirements: draft.pendingJobRequirements, gaps: draft.gaps, recommendations: draft.recommendations, previous: draft.previous, previewDocument: draft.previewDocument });
+export type EditorSnapshot = Pick<ResumeDraft, "document" | "yamlText" | "jobRequirements" | "gaps" | "recommendations" | "previous" | "previewDocument" | "generationInputFingerprint" | "generationOutcome" | "generationNotices" | "skillFilterVersion" | "skillFilterInputFingerprint">;
+export const editorSnapshot = (draft: ResumeDraft): EditorSnapshot => structuredClone({ skillFilterVersion: draft.skillFilterVersion, skillFilterInputFingerprint: draft.skillFilterInputFingerprint, generationOutcome: draft.generationOutcome, generationNotices: draft.generationNotices, generationInputFingerprint: draft.generationInputFingerprint, document: draft.document, yamlText: draft.yamlText, jobRequirements: draft.jobRequirements, gaps: draft.gaps, recommendations: draft.recommendations, previous: draft.previous, previewDocument: draft.previewDocument });
 export function createEditorHistory() {
   const past: EditorSnapshot[] = [], future: EditorSnapshot[] = [];
   let current: EditorSnapshot | null = null, group: string | null = null, at = 0;

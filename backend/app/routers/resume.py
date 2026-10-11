@@ -1,4 +1,5 @@
 """Authenticated transient endpoints; no database writes or resume payload logs."""
+import asyncio
 import logging
 import time
 from starlette.responses import JSONResponse
@@ -13,7 +14,7 @@ from app.schemas.resume import GenerateRequest, GenerateResponse, RecommendReque
 from app.services.resume import resume_provider, generate_resume, recommend_courses, provider_description
 from app.services.resume_errors import ResumeProblem, error_body
 from app.services.model_overrides import ModelOverrideError
-from app.services.resume_assistant import assist_resume
+from app.services.resume_assistant import assist_resume_async, assistant_provider_failure
 from app.services.resume_render import render_pdf, InvalidResume, RenderBusy, RenderFailed
 
 logger = logging.getLogger(__name__)
@@ -36,46 +37,101 @@ class PrivateRoute(APIRoute):
 
 router = APIRouter(prefix="/resume", tags=["Resume"], route_class=PrivateRoute, dependencies=[Depends(get_current_user)])
 
-def get_resume_provider():
+def get_resume_provider(request: Request = None):
     # No default_ai_gateway: its fallback chain is inappropriate for resumes.
     try:
         return resume_provider()
     except ModelOverrideError: raise
     except Exception:
+        if request is not None and request.url.path.endswith("/resume/assist"):
+            from app.core.config import settings
+            raise ModelOverrideError("ai_configuration_invalid" if (settings.ai_api_key or "").strip() else "ai_not_configured") from None
         raise HTTPException(503, "Resume AI is not configured. Your local draft is unchanged.") from None
+
+def get_resume_role_loader(db: AsyncSession = Depends(get_db)):
+    from app.services.resume_relevance import load_role
+    async def load(code):
+        return await load_role(db, code)
+    return load
 
 @router.get("/capabilities")
 def capabilities():
     return provider_description()
 
 @router.post("/generate", response_model=GenerateResponse)
-async def generate(payload: GenerateRequest, provider=Depends(get_resume_provider)):
+async def generate(payload: GenerateRequest, request: Request, provider=Depends(get_resume_provider), role_loader=Depends(get_resume_role_loader)):
     started = time.monotonic()
     try:
-        return await run_in_threadpool(generate_resume, payload, provider)
+        if payload.source_sections is None:
+            return await run_in_threadpool(generate_resume, payload, provider)
+        from app.services.resume_generation import generate_reviewed_resume
+        async def disconnected():
+            # The bounded body has already been consumed by PrivateRoute.
+            # Await the ASGI disconnect directly: is_disconnected() uses a
+            # cancelled AnyIO scope which can swallow Task.cancel() and leave
+            # the response waiting forever during cleanup.
+            while True:
+                if (await request.receive())["type"] == "http.disconnect": return
+        async def generate_with_role():
+            role = await role_loader(payload.occupation_code) if payload.occupation_code is not None else None
+            return await generate_reviewed_resume(payload, provider, role)
+        generation = asyncio.create_task(generate_with_role())
+        disconnect = asyncio.create_task(disconnected())
+        try:
+            done, _ = await asyncio.wait({generation, disconnect}, return_when=asyncio.FIRST_COMPLETED)
+            if disconnect in done and not generation.done():
+                logger.info("resume_polish_cancelled code=client_disconnected")
+                return Response(status_code=499)
+            return await generation
+        finally:
+            for task in (generation, disconnect):
+                if not task.done(): task.cancel()
+            await asyncio.gather(generation, disconnect, return_exceptions=True)
     except ResumeProblem as error:
         logger.warning("resume_generate_failed code=%s attempts=%s status=503 duration_ms=%.1f", error.code, error.attempts, (time.monotonic() - started) * 1000)
         body = error_body(error)
         body["detail"] += " Your local input is unchanged. Try again or edit manually." if error.code in {"duplicate_sections", "duplicate_gaps", "missing_evidence", "invalid_reference", "unsupported_fact", "unsupported_claim", "unverified_name", "unsafe_content"} else ""
-        return JSONResponse(status_code=503, content=body, headers={"Cache-Control": "no-store"})
+        status = 404 if error.code == "target_role_not_found" else 409 if error.code == "target_role_changed" else 422 if error.code in {"role_has_no_skills", "no_related_input"} else 503
+        return JSONResponse(status_code=status, content=body, headers={"Cache-Control": "no-store"})
     except ModelOverrideError: raise
     except Exception:
         logger.warning("resume_generate_failed code=internal_error attempts=0 status=503 duration_ms=%.1f", (time.monotonic() - started) * 1000)
         return JSONResponse(status_code=503, content={"detail": "AI could not generate a supported draft. Your local input is unchanged. Try again or edit manually.", "code": "internal_error", "fields": []}, headers={"Cache-Control": "no-store"})
 
 @router.post("/assist", response_model=AssistResponse)
-async def assist(payload: AssistRequest, provider=Depends(get_resume_provider)):
+async def assist(payload: AssistRequest, request: Request, provider=Depends(get_resume_provider)):
     started = time.monotonic()
     try:
-        return await run_in_threadpool(assist_resume, payload, provider)
+        async def disconnected():
+            # PrivateRoute already consumed the body; directly await disconnect.
+            # Avoid is_disconnected()'s AnyIO cancel scope swallowing Task.cancel.
+            while True:
+                if (await request.receive())["type"] == "http.disconnect": return
+        editing = asyncio.create_task(assist_resume_async(payload, provider))
+        disconnect = asyncio.create_task(disconnected())
+        try:
+            done, _ = await asyncio.wait({editing, disconnect}, return_when=asyncio.FIRST_COMPLETED)
+            if disconnect in done:
+                logger.info("resume_assist_disconnected code=client_disconnected")
+                return Response(status_code=499)
+            return await editing
+        finally:
+            for task in (editing, disconnect):
+                if not task.done(): task.cancel()
+            await asyncio.gather(editing, disconnect, return_exceptions=True)
     except ResumeProblem as error:
-        status = 422 if isinstance(error, InvalidResume) else 503
+        status = 422 if isinstance(error, InvalidResume) else 504 if error.code == "ai_timeout" else 422 if error.code in {"ai_output_invalid", "invalid_reference", "unsupported_fact", "unsupported_claim", "unverified_name", "missing_evidence", "unsafe_content", "output_limit", "duplicate_sections"} else 503
         logger.warning("resume_assist_failed code=%s attempts=%s status=%s duration_ms=%.1f", error.code, error.attempts, status, (time.monotonic() - started) * 1000)
-        return JSONResponse(status_code=status, content=error_body(error), headers={"Cache-Control": "no-store"})
-    except ModelOverrideError: raise
+        body = error_body(error)
+        if status == 422 and not isinstance(error, InvalidResume) and error.code != "ai_output_invalid":
+            body["detail"] = "AI editing returned changes that failed safety checks. Your resume is unchanged. Try a more specific instruction."
+        return JSONResponse(status_code=status, content=body, headers={"Cache-Control": "no-store"})
+    except ModelOverrideError as error:
+        failure = assistant_provider_failure(error)
+        return JSONResponse(status_code=503, content=error_body(failure), headers={"Cache-Control": "no-store"})
     except Exception:
-        logger.warning("resume_assist_failed code=internal_error attempts=0 status=503 duration_ms=%.1f", (time.monotonic() - started) * 1000)
-        return JSONResponse(status_code=503, content={"detail": "The assistant could not prepare changes. Your draft is unchanged.", "code": "internal_error", "fields": []}, headers={"Cache-Control": "no-store"})
+        logger.warning("resume_assist_failed code=internal_error attempts=0 status=500 duration_ms=%.1f", (time.monotonic() - started) * 1000)
+        return JSONResponse(status_code=500, content={"detail": "An internal editing error occurred. Your resume is unchanged. Try again.", "code": "internal_error", "fields": []}, headers={"Cache-Control": "no-store"})
 
 @router.post("/recommend-courses", response_model=RecommendResponse)
 async def recommendations(payload: RecommendRequest, db: AsyncSession = Depends(get_db)):

@@ -111,12 +111,12 @@ def select_frontend_runtime() -> None:
     candidates = ([Path(override).expanduser().absolute()] if override else
                   ([Path(current)] if current else []) + installed_node_candidates(version))
     for binary in candidates:
-        if binary.name not in {"node", "node.exe"} or not binary.is_file():
+        if binary.name.lower() not in {"node", "node.exe"} or not binary.is_file():
             continue
         try:
             result = subprocess.run(
                 [str(binary), "--version"], check=True, capture_output=True,
-                text=True, timeout=10,
+                text=True, timeout=60,
             )
         except (OSError, subprocess.SubprocessError):
             continue
@@ -141,10 +141,16 @@ def require_frontend_toolchain() -> None:
         try:
             result = subprocess.run(
                 [command_path(command), "--version"], check=True, capture_output=True,
-                text=True, timeout=10,
+                text=True, timeout=60,
             )
         except (OSError, subprocess.SubprocessError) as error:
-            raise RuntimeError(f"Could not check {command} version. Check your PATH and retry.") from error
+            detail = str(error)
+            if isinstance(error, subprocess.CalledProcessError):
+                detail = (error.stderr or error.stdout or detail).strip()
+            raise RuntimeError(
+                f"Could not check {command} version using {command_path(command)}: "
+                f"{detail}. Check your PATH and retry."
+            ) from error
         actual = result.stdout.strip().removeprefix("v")
         if kind == "runtime":
             minimum = tuple(int(part) for part in (FRONTEND_ROOT / ".nvmrc").read_text().strip().split("."))

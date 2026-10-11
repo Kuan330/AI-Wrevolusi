@@ -114,3 +114,21 @@ def install_safe_template_adapters(plain_name, bold_keywords=(), *, contacts=Non
         return original_footer(template, **{**kwargs, "name": plain_name, "string_processors": [process]})
 
     model_processor.render_footer_template = footer
+
+
+
+def install_text_section_pagination(package_directory):
+    """The pinned engine groups consecutive bullets into one content-area block.
+
+    That block must follow section pagination, not regular-entry pagination;
+    otherwise a long Skills list silently overflows a single physical page.
+    Change only the trusted package copy owned by the isolated render worker.
+    Structured projects still follow the user's regular-entry break setting.
+    """
+    library = package_directory / "lib.typ"
+    text = library.read_text(encoding="utf-8")
+    old = "breakable: entries-allow-page-break,\n    below: sections-space-between-text-based-entries"
+    new = 'breakable: config.at("sections-allow-page-break"),\n    below: sections-space-between-text-based-entries'
+    if text.count(old) != 1:
+        raise RuntimeError("Pinned text-section pagination adapter needs review.")
+    library.write_text(text.replace(old, new, 1), encoding="utf-8")

@@ -19,6 +19,16 @@ GOOD = {"message":"Shortened the description.", "sections":[{"section_index":0,"
 class Provider:
     def __init__(self, outputs): self.outputs, self.calls = outputs, []
     def complete_json(self, **kwargs): self.calls.append(kwargs); return deepcopy(self.outputs[min(len(self.calls)-1,len(self.outputs)-1)])
+    async def complete_json_async(self, **kwargs):
+        raw = self.complete_json(**kwargs)
+        patches = []
+        for section in raw.get("sections", []):
+            rows = kwargs["payload"]["sections"][section["section_index"]]["entries"]
+            patches.append({"section_index": section["section_index"], "updates": [
+                {"entry_id": rows[i]["id"], "entry": entry["entry"], "source_ids": [rows[i]["id"]]}
+                for i, entry in enumerate(section["entries"])]})
+        return {"message": raw["message"], "sections": patches, "design": raw.get("design", [])}
+
 
 def test_good_result_once_and_no_content_cache():
     provider=Provider([GOOD]); result=assist_resume(AssistRequest.model_validate(REQ),provider)
@@ -122,3 +132,40 @@ def test_proposed_complexity_is_bounded_before_grounding():
     result=AssistResponse(message="Change",sections=[{"section_index":0,"entries":[{"entry":{"bullet":"x"*10001},"source_ids":["section-0-entry-0"]}]}])
     with pytest.raises(GenerationRejected) as caught:validate_assistance(result,AssistRequest.model_validate(REQ))
     assert caught.value.code=="unsafe_content"
+
+
+def test_auto_redacted_mode_does_not_claim_manual_review_and_preserves_fact_checks():
+    request = AssistRequest(instruction=REQ["instruction"], document=deepcopy(DOC), context_mode="auto_redacted")
+    assert request.context_reviewed is False
+    provider = Provider([GOOD])
+    result = assist_resume(request, provider)
+    assert result.sections[0].entries[0].entry == {"bullet": "SQL"}
+    assert len(provider.calls) == 1
+    bad = AssistResponse.model_validate({**GOOD, "sections": [{"section_index": 0, "entries": [{"entry": {"bullet": "Expert SQL"}, "source_ids": ["section-0-entry-0"]}]}]})
+    with pytest.raises(GenerationRejected): validate_assistance(bad, request)
+
+
+@pytest.mark.parametrize("change", [
+    {"document": {"cv": {"name": "private"}}},
+    {"document": {"cv": {"sections": {}}, "settings": {"pdf_title": "private"}}},
+    {"instruction": "contact private@example.test"},
+    {"history": [{"role": "user", "content": "private@example.test"}]},
+    {"skills": [{"id": "s", "name": "SQL"}, {"id": "s", "name": "SQL"}]},
+    {"context_mode": "unredacted"},
+])
+def test_auto_mode_does_not_bypass_privacy_or_source_validation(change):
+    with pytest.raises(ValidationError):
+        AssistRequest.model_validate({"instruction": "Refine", "document": deepcopy(DOC), "context_mode": "auto_redacted", **change})
+
+
+@pytest.mark.parametrize("mode", [{"context_reviewed": True}, {"context_mode": "auto_redacted"}])
+def test_old_and_new_assistant_route_modes_are_compatible_and_private(mode, caplog):
+    app = create_app(); provider = Provider([GOOD])
+    app.dependency_overrides[get_current_user] = lambda: SimpleNamespace(id="synthetic")
+    app.dependency_overrides[get_resume_provider] = lambda: provider
+    with TestClient(app) as client:
+        response = client.post("/api/v1/resume/assist", json={"instruction": "Refine", "document": DOC, **mode})
+        assert response.status_code == 200 and response.headers["cache-control"] == "no-store"
+        invalid = client.post("/api/v1/resume/assist", json={"instruction": "Refine", "document": {"cv": {"email": "private@example.test", "name": "DO-NOT-ECHO"}}, **mode})
+        assert invalid.status_code == 422 and "private@example.test" not in invalid.text and "DO-NOT-ECHO" not in invalid.text
+    assert len(provider.calls) == 1 and "DO-NOT-ECHO" not in caplog.text

@@ -1,5 +1,7 @@
 """Stateless edits grounded in reviewed current content, never chat as evidence."""
 from copy import deepcopy
+import asyncio
+import json
 import logging
 import re
 import time
@@ -10,6 +12,7 @@ from app.services.resume_errors import GenerationRejected, GenerationFailure
 from app.services.resume_render import validate_render_document, InvalidResume
 from app.services.ai_gateway import AIProviderError
 from app.services.model_overrides import ModelOverrideError
+from app.services.resume_assistant_limits import ASSIST_TOTAL_BUDGET_S, ASSIST_CORRECTION_MIN_REMAINING_S
 
 logger = logging.getLogger(__name__)
 FACT_FIELDS = frozenset("company position institution area degree date start_date end_date location authors doi url name".split())
@@ -136,11 +139,11 @@ def validate_assistance(result, request):
 def assist_resume(request, provider):
     validate_context(request)
     started = time.monotonic()
-    deadline = started + 45
+    deadline = started + ASSIST_TOTAL_BUDGET_S
     rejected = None
     for attempt in (1, 2):
         remaining = deadline - time.monotonic()
-        if attempt == 2 and remaining < 5: raise rejected
+        if attempt == 2 and remaining < ASSIST_CORRECTION_MIN_REMAINING_S: raise rejected
         payload = request.model_dump()
         payload["design_paths"] = design_paths(request.document)
         if rejected: payload["repair_feedback"] = {"code": rejected.code, "fields": rejected.fields}
@@ -161,3 +164,81 @@ def assist_resume(request, provider):
         except Exception as error:
             code = "ai_schema_invalid" if isinstance(error, ValidationError) else "ai_provider_error" if isinstance(error, AIProviderError) else "internal_error"
             raise GenerationFailure("The assistant could not prepare supported changes. Your draft is unchanged.", code=code, attempts=attempt) from None
+
+
+ASSIST_TIMEOUT_MESSAGE = "AI editing timed out. Your resume is unchanged. Try again."
+
+def assistant_provider_failure(error, attempt=0):
+    """Fixed diagnostics only: never expose upstream response bodies or input."""
+    status = getattr(error, "status_code", None)
+    kind = getattr(error, "kind", None)
+    code = getattr(error, "code", None)
+    if kind == "timeout" or status in {408, 504} or code == "ai_budget_exhausted":
+        return GenerationFailure(ASSIST_TIMEOUT_MESSAGE, code="ai_timeout", attempts=attempt)
+    if status in {401, 403} or code == "ai_credentials_invalid":
+        code, message = "ai_credentials_invalid", "AI credentials were rejected. Check the AI configuration. Your resume is unchanged."
+    elif code in {"ai_not_configured", "ai_configuration_invalid", "ai_models_invalid"}:
+        message = "AI editing is not configured correctly. Check the AI settings. Your resume is unchanged."
+    elif status == 429 or kind == "local_limit":
+        code, message = "ai_rate_limited", "AI editing is temporarily rate limited. Your resume is unchanged. Try again later."
+    elif (kind == "http" and status is not None and status >= 500) or code == "ai_models_unavailable" or kind == "model_unavailable":
+        code, message = "ai_provider_unavailable", "The AI editing provider is temporarily unavailable. Your resume is unchanged. Try again later."
+    elif kind == "http" and status is not None and 400 <= status < 500:
+        code, message = "ai_request_rejected", "The AI provider rejected the editing request. Check the AI settings. Your resume is unchanged."
+    else:
+        code, message = "ai_connection_failed", "Could not connect to the AI editing provider. Your resume is unchanged. Try again."
+    return GenerationFailure(message, code=code, attempts=attempt)
+
+async def assist_resume_async(request, provider):
+    """Cancellable compact edits; initial attempt and one repair share ONE deadline."""
+    from app.services.resume_assistant_patches import CompactAssistResponse, PROMPT as PATCH_PROMPT, compact_context, assemble_assistance
+    from app.services.resume_errors import safe_fields
+    started = time.monotonic()
+    deadline = started + ASSIST_TOTAL_BUDGET_S
+    attempt = 0
+    try:
+        async with asyncio.timeout(ASSIST_TOTAL_BUDGET_S):
+            validate_context(request)
+            original_payload, originals, skills = compact_context(request, design_paths(request.document))
+            rejected = None
+            for attempt in (1, 2):
+                remaining = deadline - time.monotonic()
+                if remaining <= 0: raise TimeoutError()
+                if attempt == 2 and remaining < ASSIST_CORRECTION_MIN_REMAINING_S: raise rejected
+                payload = deepcopy(original_payload)
+                if rejected: payload["repair_feedback"] = {"code": rejected.code, "fields": rejected.fields}
+                stage = time.monotonic()
+                try:
+                    raw = await provider.complete_json_async(operation="resume.assist.entries.v2", payload=payload,
+                        response_model=CompactAssistResponse,
+                        system_prompt=PATCH_PROMPT + (" This is the single correction. Use the original input and fixed feedback only, not any previous proposal." if rejected else ""),
+                        request_timeout_s=remaining)
+                    upstream_ms = (time.monotonic()-stage)*1000
+                    assembly_started = time.monotonic()
+                    # Synchronous assembly must also be inside the wall budget.
+                    if time.monotonic() >= deadline: raise TimeoutError()
+                    output = CompactAssistResponse.model_validate(raw)
+                    result = assemble_assistance(output, request, originals, skills)
+                    if time.monotonic() >= deadline: raise TimeoutError()
+                    logger.info("resume_assist_completed code=ok attempts=%s entries=%s skills=%s input_bytes=%s patch_bytes=%s response_bytes=%s upstream_ms=%.1f validation_ms=%.1f duration_ms=%.1f",
+                        attempt, len(originals), len(skills), len(json.dumps(payload).encode()), len(json.dumps(raw).encode()), len(result.model_dump_json().encode()),
+                        upstream_ms, (time.monotonic()-assembly_started)*1000, (time.monotonic()-started)*1000)
+                    return result
+                except ValidationError as error:
+                    rejected = GenerationFailure("AI editing returned invalid output. Your resume is unchanged. Try again.",
+                        code="ai_output_invalid", fields=safe_fields([e["loc"] for e in error.errors()]), attempts=attempt)
+                except GenerationRejected as error:
+                    rejected = error
+                    rejected.attempts = attempt
+                except AIProviderError as error:
+                    if error.kind != "output": raise assistant_provider_failure(error, attempt) from None
+                    rejected = GenerationFailure("AI editing returned invalid output. Your resume is unchanged. Try again.", code="ai_output_invalid", attempts=attempt)
+                except ModelOverrideError as error:
+                    raise assistant_provider_failure(error, attempt) from None
+                if attempt == 2: raise rejected
+                logger.warning("resume_assist_correction code=%s attempts=%s duration_ms=%.1f", rejected.code, attempt, (time.monotonic()-started)*1000)
+    except TimeoutError:
+        raise GenerationFailure(ASSIST_TIMEOUT_MESSAGE, code="ai_timeout", attempts=attempt) from None
+    except asyncio.CancelledError:
+        logger.info("resume_assist_cancelled code=cancelled attempts=%s duration_ms=%.1f", attempt, (time.monotonic()-started)*1000)
+        raise

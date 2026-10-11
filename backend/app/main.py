@@ -51,6 +51,11 @@ def create_app(api_root: str = '/api') -> FastAPI:
 
     @application.exception_handler(ModelOverrideError)
     async def model_override_error(request, error):
+        if request.url.path.endswith("/resume/assist"):
+            from app.services.resume_assistant import assistant_provider_failure
+            from app.services.resume_errors import error_body
+            failure = assistant_provider_failure(error)
+            return JSONResponse(status_code=504 if failure.code == "ai_timeout" else 503, content=error_body(failure), headers={"Cache-Control": "no-store"})
         return JSONResponse(status_code=503, content={"detail": str(error), "code": error.code, "fields": []}, headers={"Cache-Control": "no-store"})
 
     api_root = api_root.rstrip('/')
