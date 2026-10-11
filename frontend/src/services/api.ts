@@ -89,14 +89,16 @@ const request = async <T>(
       signal: controller.signal,
     });
 
-    if (response.status === 401 && path === "/account/workspace" && retrySession) {
-      await request("/auth/refresh", { method: "POST" }, timeoutMs, false);
+    // The access cookie lasts 30 minutes. If it has gone but the sign-in is still valid, renew it once and repeat the request.
+    // A 401 means the request was refused before it did anything, so repeating a POST is safe.
+    if (response.status === 401 && retrySession && canRenewSession(path) && await renewSession(timeoutMs)) {
       return request<T>(path, init, timeoutMs, false);
     }
     const body = await parseResponseBody(response);
     if (aiRequest && (modelsChanged || modelVersion !== modelPreferenceSnapshot())) { modelsChanged = true; throw new ApiError("AI models changed. Try again with the new settings.", 409, { code: "ai_models_changed" }); }
     if (!response.ok) {
-      const detail = apiErrorDetail(body, response.status);
+      // A refused request after a failed renewal means the sign-in has ended. Say so in plain words.
+      const detail = response.status === 401 && canRenewSession(path) ? "Your sign-in has ended. Please sign in again." : apiErrorDetail(body, response.status);
       throw new ApiError(detail, response.status, body);
     }
 
@@ -112,6 +114,15 @@ const request = async <T>(
     unsubscribeModels();
     externalSignal?.removeEventListener("abort", relayExternalAbort);
   }
+};
+
+/** Sign-in and account lookups handle their own expiry. */
+const canRenewSession = (path: string) => !/^\/(auth\/|account\/(login|register|me)(\?|$))/.test(path);
+let renewing: Promise<boolean> | null = null;
+/** One renewal at a time, so several expired requests do not fight over the refresh token. */
+const renewSession = (timeoutMs: number): Promise<boolean> => {
+  renewing ??= request("/auth/refresh", { method: "POST" }, timeoutMs, false).then(() => true, () => false).finally(() => { renewing = null; });
+  return renewing;
 };
 
 export const api = {
