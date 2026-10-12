@@ -101,7 +101,7 @@ const ProgressSection = () => {
 
         <ScrollReveal className="home-reveal" threshold={0.12} delay={120}>
           <div className="home-progress-copy">
-            <div className="home-eyebrow">05 / Track your progress</div>
+            <div className="home-eyebrow">Track your progress</div>
             <h2 id="home-progress-title">Every step you take, counted.</h2>
             <p className="home-progress-lead">
               Log the chapters you finish. Your progress adds up by skill, so you always know where you are and what comes next.

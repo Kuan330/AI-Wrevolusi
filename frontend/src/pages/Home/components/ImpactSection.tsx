@@ -170,7 +170,7 @@ const ImpactSection = () => {
         <ScrollReveal className="home-reveal" threshold={0.12}>
           <div className="home-impact-heading">
             <div className="home-impact-head-copy">
-              <div className="home-eyebrow">02 / AI impact analysis</div>
+              <div className="home-eyebrow">AI impact analysis</div>
               <h2 id="home-impact-title">
                 Which parts of your work
                 <br />
@@ -338,7 +338,7 @@ const ImpactSection = () => {
           <section className="home-work-skills" aria-labelledby="home-work-skills-title">
             <div className="home-work-skills-heading">
               <div>
-                <div className="home-eyebrow">03 / skills for your work</div>
+                <div className="home-eyebrow">skills for your work</div>
                 <h2 id="home-work-skills-title">Skills that can support your work</h2>
               </div>
               <p>These example skills show how practical learning can help with tasks where AI may play a larger role.</p>
