@@ -1,0 +1,23 @@
+{
+  "project_id": "divine-forest-19262447",
+  "branch_id": "br-rapid-wildflower-az8k9530",
+  "branch_name": "iteration-3-backup-20261012",
+  "parent_branch_id": "br-dark-cake-azomjcab",
+  "parent_branch_name": "development",
+  "database": "neondb",
+  "kind": "manual_data_and_schema_snapshot",
+  "created_at": "2026-10-12T12:55:20Z",
+  "auto_delete": "Never",
+  "history_retention_hours_observed": 6,
+  "verified_at": "2026-10-12T12:57:07.275613+00:00",
+  "verification": {
+    "client_tls": true,
+    "tables": 62,
+    "rows": 173962,
+    "validated_foreign_keys": 69,
+    "migration": "0007_progress_reviews"
+  },
+  "production_routing_changed": false,
+  "scheduled_backup": false,
+  "pitr_rehearsal_completed": false
+}
