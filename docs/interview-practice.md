@@ -51,7 +51,7 @@ All routes need sign-in and return `Cache-Control: no-store` (the bank lookup us
 | POST `/api/v1/interview/plan` | 3 to 5 questions from the redacted items. Falls back to template questions when AI is off or its output is rejected. |
 | POST `/api/v1/interview/feedback` | Feedback, skill scores, stronger version and follow-up for one answer. Needs AI. The request may carry the question's `intent`. |
 
-Both AI routes reuse the Epic 8 provider settings (no fallback chain, no cache, one correction attempt). Output checks reject personal-topic questions, assumed AI use, judgements about the person, hiring predictions, quotes that are not in the answer, skills outside the supplied list, skill scores with no verified quote, and rewrites or follow-ups that add facts. A reply that says the user has not used a tool is never counted as a weakness.
+Both AI routes reuse the Epic 8 provider settings (no fallback chain, no cache, one correction attempt). The provider stalls on some calls (about one in three in testing, worse at times). If a call has not answered after 14 seconds, or fails outright, a second identical call starts and the first success wins, within a 50 second budget. This only helps when stalls are independent; it cannot fix a provider that is slow for everyone. Output checks reject personal-topic questions, assumed AI use, judgements about the person, hiring predictions, quotes that are not in the answer, skills outside the supplied list, skill scores with no verified quote, and rewrites or follow-ups that add facts. A reply that says the user has not used a tool is never counted as a weakness.
 
 ## Question bank
 
