@@ -72,7 +72,7 @@ export function activateWorkspace(id: string | null, next?: Workspace) {
 export function clearWorkspaceOnLogout() {
   for (const key of Object.keys(localStorage)) {
     if (workspaceKeys.includes(key) || key.startsWith("aiwrevolusi.account.") ||
-        key === "aiwrevolusi.selectedOccupation" || key === "aiwrevolusi.demo.credential") {
+        key.startsWith("aiwrevolusi.possibilities.cache.") || key === "aiwrevolusi.selectedOccupation" || key === "aiwrevolusi.demo.credential") {
       localStorage.removeItem(key);
     }
   }
@@ -270,3 +270,5 @@ export async function commitWorkspaceItems(items: Record<string, string | null>)
     notify();
   }
 }
+
+export const currentWorkspaceOwner = () => userId;

@@ -41,12 +41,19 @@ def validate_render_document(document):
         raise InvalidResume("Render commands, external overlays and output paths are not supported.", code="render_unsafe", fields=[["settings"]])
     if document["cv"].get("photo") is not None:
         raise InvalidResume("Photos and external resources are not supported in this version.", code="render_unsafe", fields=[["cv", "photo"]])
-    # These header fields are free text. Only their structural shape is
-    # checked; the isolated worker renders them as escaped string literals.
+    # Validate contact formats before passing user text to the renderer.
     for key in _CONTACT_FIELDS:
         value = document["cv"].get(key)
         if value is not None and not isinstance(value, str) and not (isinstance(value, list) and all(isinstance(item, str) for item in value)):
             raise InvalidResume(f"cv/{key} must be text or a list of text values.", fields=[["cv", key]])
+        for item in value if isinstance(value, list) else [value]:
+            if not isinstance(item, str) or not item.strip():
+                continue
+            item = item.strip()
+            if key == "email" and not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", item):
+                raise InvalidResume("Enter a valid email address.", fields=[["cv", key]])
+            if key == "phone" and (not re.fullmatch(r"\+?[0-9 ()-]+", item) or not 7 <= len(re.sub(r"\D", "", item)) <= 15):
+                raise InvalidResume("Enter a phone number with 7–15 digits; a leading +, spaces, parentheses and hyphens are allowed.", fields=[["cv", key]])
     nodes = 0
     characters = 0
     def walk(value, depth=0, literal=False, path=()):

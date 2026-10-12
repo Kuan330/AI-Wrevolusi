@@ -1,0 +1,13 @@
+/* Final theme layer: action controls and portal surfaces share the brand palette. */
+:root { --button-primary:linear-gradient(105deg,#d8eafa,#f2dce9); --button-primary-hover:linear-gradient(105deg,#c3def2,#eecadd); }
+:root:root body :is(.soft-btn,.soft-btn-blue,.soft-btn-pink,.soft-btn-brown,.soft-btn-gray,.soft-btn-gradient,.soft-btn-green,.courses-primary,.courses-secondary,.px-primary,.px-outline,.lg-primary,.lpo-primary,.lps-submit,.pl-primary,.progress-primary,.btn-primary,.btn-warm,.home-progress-button,.profile-primary-btn,.profile-blue-btn,.profile-dialog-btn,.skill-path__planbar>button) {
+ background:linear-gradient(105deg,#dceefb,#f6e1ed) !important; color:#355c78 !important; border-color:#c1d9e9 !important;
+}
+:root:root body :is(.soft-btn,.soft-btn-blue,.soft-btn-pink,.soft-btn-brown,.soft-btn-gray,.soft-btn-gradient,.soft-btn-green,.courses-primary,.courses-secondary,.px-primary,.px-outline,.lg-primary,.lpo-primary,.lps-submit,.pl-primary,.progress-primary,.btn-primary,.btn-warm,.home-progress-button,.profile-primary-btn,.profile-blue-btn,.profile-dialog-btn,.skill-path__planbar>button):hover:not(:disabled) {
+ background:linear-gradient(105deg,#d2e8f8,#f2dce9) !important; color:#284b65 !important; transform:none !important; filter:none !important; box-shadow:0 3px 10px #477da314 !important;
+}
+:root:root body [role=dialog], :root:root body [role=alertdialog] { background:linear-gradient(115deg,#f0f8ff,#fff3f9) !important; border-color:#d2dfed; }
+:root:root body [role=menu], :root:root body [role=listbox], :root:root body .app-message { background:linear-gradient(115deg,#f0f8ff,#fff3f9); border-color:#d2dfed; }
+.app-message__content { flex:1; }
+.app-message__dismiss { flex-shrink:0; background:transparent; padding:4px; border-radius:6px; }
+.app-message__dismiss:focus-visible { outline:2px solid #4f91ba; }

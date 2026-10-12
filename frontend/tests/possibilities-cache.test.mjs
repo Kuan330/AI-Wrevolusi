@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { activateWorkspace } from '../src/services/accountStorage.ts';
+import { possibilitiesService } from '../src/services/possibilitiesService.ts';
+const memory = new Map();
+globalThis.localStorage = { getItem: key => memory.get(key) ?? null, setItem: (key,value) => memory.set(key,value), removeItem: key => memory.delete(key) };
+globalThis.window = new EventTarget();
+test('career cache reuses results only for the same owner and unchanged input', async () => {
+  let calls = 0;
+  globalThis.fetch = async () => { calls++; return Response.json({ contract_version: '2', status: 'ready', directions: [] }); };
+  activateWorkspace('one', { data: {}, revision: 0 });
+  await possibilitiesService.getPossibilities(); await possibilitiesService.getPossibilities();
+  assert.equal(calls, 1);
+  activateWorkspace('one', { data: { 'aiwrevolusi.userProfile': '{"tasksOccupationCode":"2"}' }, revision: 1 });
+  await possibilitiesService.getPossibilities(); assert.equal(calls, 2);
+  activateWorkspace('two', { data: {}, revision: 0 });
+  await possibilitiesService.getPossibilities(); assert.equal(calls, 3);
+  const controller = new AbortController(); controller.abort();
+  await assert.rejects(possibilitiesService.getPossibilities(controller.signal));
+  assert.equal(calls, 3);
+});

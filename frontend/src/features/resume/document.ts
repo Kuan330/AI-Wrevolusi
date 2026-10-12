@@ -1,3 +1,4 @@
+import { contactError } from "./contactValidation.ts";
 import { LineCounter, parseDocument, stringify } from "yaml";
 import Ajv2020 from "ajv/dist/2020.js";
 import schema from "./rendercv-2.8.schema.json" with { type: "json" };
@@ -12,10 +13,11 @@ function validateResumeValue(value: ResumeDocument, sourceLength: number): Resum
   try {
     if (sourceLength > 150000) throw new Error("YAML exceeds the supported text limit.");
     if (!value || typeof value !== "object" || !value.cv || typeof value.cv !== "object" || Array.isArray(value.cv)) throw new Error("The document needs a cv mapping.");
-    // Contact contents are free text; reject only incompatible YAML shapes.
+    // Validate contact formats consistently for both form and YAML input.
     for (const key of ["email", "phone", "website"]) {
       const contact = value.cv[key];
       if (contact != null && typeof contact !== "string" && !(Array.isArray(contact) && contact.every(item => typeof item === "string"))) throw new Error(`cv/${key} must be text or a list of text values.`);
+      for (const item of Array.isArray(contact) ? contact : [contact]) { if (typeof item === "string") { const error = contactError(key, item); if (error) throw new Error(`cv/${key}: ${error}`); } }
     }
     // Match the Python builder's implicit classic theme without altering YAML.
     const validationValue = value.design && typeof value.design === "object" && !Array.isArray(value.design) && value.design.theme === undefined

@@ -1,3 +1,4 @@
+import { message } from "@/components/ui/message";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
@@ -46,6 +47,7 @@ export default function Possibilities() {
 
   useEffect(() => {
     alive.current = true;
+    if (!readTaskWorkspace()) { setLoading(false); return () => { alive.current = false; }; }
     const controller = new AbortController();
     const owner = currentWorkspaceSession();
     void loadSavedPossibilities({
@@ -99,6 +101,7 @@ export default function Possibilities() {
       </div>
     );
   }
+  if (!readTaskWorkspace()) return <div className="px-page"><PageHeader title="Career possibilities" description="Choose your occupation to explore relevant career directions." /><Link className="px-primary" to={ROUTES.workProfile}>Choose my occupation <ArrowRight size={16} /></Link></div>;
   if (error || !data) {
     return (
       <div className="px-page">
@@ -146,7 +149,7 @@ export default function Possibilities() {
       setContinuing(true);
       setNavigationError("");
       const owner = currentWorkspaceSession();
-      await addCareerPathSkill(skill.skill_id, selected.occupation_code, selected.title);
+      await message.action(() => addCareerPathSkill(skill.skill_id, selected.occupation_code, selected.title), "Skill added to your Skill Path.");
       if (alive.current && owner === currentWorkspaceSession()) navigate(`${ROUTES.skills}?careerSkill=${skill.skill_id}#skill-area-${skill.skill_id}`);
     } catch (error) {
       if (!alive.current) return;

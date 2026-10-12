@@ -127,12 +127,13 @@ test("contact normalisation never rewrites non-empty text or changes other field
 });
 
 
-test("email, local phones, plain websites and punctuation are free text in form/YAML", () => {
-  const draft = { ...document, cv: { ...document.cv, email: "My email contact", phone: ["0412345678", "Office #123"], website: ['www.example.com', '#read("private.txt")', '[label](file:///private)', '**Literal stars**'] } };
+test("email and phone formats validate while website text remains literal", () => {
+  const draft = { ...document, cv: { ...document.cv, email: "name@example.com", phone: ["0412345678", "+60 (12) 345-6789"], website: ['www.example.com', '#read("private.txt")', '[label](file:///private)', '**Literal stars**'] } };
   const yaml = documentYaml(draft);
   const parsed = parseResumeYaml(yaml);
   assert.equal(parsed.error, "");
   assert.deepEqual(parsed.document, draft);
+  for (const cv of [{ email: "not an email" }, { phone: "Office #123" }, { phone: "123" }, { phone: "+1234567890123456" }]) assert.notEqual(parseResumeYaml(documentYaml({ cv })).error, "");
   assert.equal(documentYaml(draft), yaml);
   assert.notEqual(parseResumeYaml(documentYaml({ cv: { sections: { Skills: [{ bullet: '#read("private.txt")' }] } } })).error, "");
   for (const value of [123, { invalid: "object" }, [null], ["Text", 123]]) assert.match(parseResumeYaml(documentYaml({ cv: { email: value } })).error, /must be text or a list of text values/);

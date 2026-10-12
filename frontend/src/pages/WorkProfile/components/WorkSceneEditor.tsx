@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, BriefcaseBusiness, Check, CheckCheck, ChevronDown, ClipboardList, LoaderCircle, Pencil, Plus, Search, ShieldCheck, Trash2, X } from "lucide-react";
+import { message } from "@/components/ui/message";
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -105,9 +106,22 @@ export default function WorkSceneEditor({ confirmed, cancelling, onSaved, onCanc
     const task = editor?.task;
     replaceTasks(task ? tasks.map(item => item.id === task.id ? { ...item, ...values, score2025: values.wording !== (item.originalWording ?? item.wording) ? null : item.score2025 } : item) : [...tasks, toProfileTask(values.wording, "user", values)]);
   }
-  function removeTask(task: ProfileTask) {
-    try { replaceTasks(tasks.filter(item => item.id !== task.id)); setRemoved({ task, index: tasks.findIndex(item => item.id === task.id) }); }
-    catch (issue) { setError(issue instanceof Error ? issue.message : "Could not remove this task."); }
+  async function removeTask(task: ProfileTask) {
+    const owner = currentWorkspaceSession();
+    if (!await message.confirm("Remove this task from your work draft? You can undo this before saving.")) return;
+    if (!mounted.current || owner !== currentWorkspaceSession()) return;
+    try {
+      const current = readWorkDraft();
+      if (!current || current.occupation?.unit.occupation_code !== occupation?.occupation_code) return;
+      const index = current.tasks.findIndex(item => item.id === task.id);
+      if (index < 0) return;
+      replaceTasks(current.tasks.filter(item => item.id !== task.id));
+      setRemoved({ task: current.tasks[index], index });
+      message.success("Task removed from your draft.");
+    } catch (issue) {
+      const text = issue instanceof Error ? issue.message : "Could not remove this task.";
+      setError(text); message.error(text);
+    }
   }
   function undo() {
     if (!removed) return;

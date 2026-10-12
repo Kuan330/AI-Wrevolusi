@@ -127,8 +127,10 @@
   .home-progress-button
 ):hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--button-primary-hover) !important;
-  border-color: var(--button-primary-hover) !important;
-  color: #fff !important;
+  border-color: #b5cee1 !important;
+  color: #284b65 !important;
+  transform: none !important;
+  box-shadow: 0 3px 10px #477da314 !important;
   filter: none;
 }
 :root body :is(

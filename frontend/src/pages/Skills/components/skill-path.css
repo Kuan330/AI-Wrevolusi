@@ -58,16 +58,16 @@
 .skill-path__course small { display:flex; align-items:center; gap:5px; flex-wrap:wrap; font-size:10px; line-height:1.5; color:#536b81; }
 .skill-path__course>a { display:flex; width:fit-content; gap:5px; align-items:center; color:#376b91; font-size:10px; padding-top:9px; padding-left:27px; min-height:32px; }
 .skill-path__all-courses,.skill-path__no-courses a,.skill-path__courses button { display:inline-flex; align-items:center; gap:6px; color:var(--path-blue); font-size:12px; min-height:40px; text-decoration:underline; text-underline-offset:3px; }
-.skill-path__planbar { position:relative; bottom:16px; z-index:10; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px 24px; background:#2d425b; color:#fff; border:1px solid #324b65; border-radius:18px; padding:21px 24px; box-shadow:0 12px 30px #203c561c; }
+.skill-path__planbar { position:relative; bottom:16px; z-index:10; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px 24px; background:linear-gradient(110deg,#e3f0fc,#f7e5ef); color:#304e68; border:1px solid #cedfeb; border-radius:18px; padding:21px 24px; box-shadow:0 12px 30px #203c561c; }
 .skill-path__planbar.has-selection { position:sticky; }
 .skill-path__planbar>div { flex:1; min-width:200px; }
 .skill-path__planbar span { display:flex; align-items:center; gap:10px; }
 .skill-path__planbar strong { font-size:14px; font-weight:600; }
-.skill-path__planbar p { color:#dde7f1; font-size:12px; line-height:1.7; margin-top:7px; }
+.skill-path__planbar p { color:#586f85; font-size:12px; line-height:1.7; margin-top:7px; }
 .skill-path__planbar>button { display:flex; align-items:center; gap:12px; flex-shrink:0; min-height:44px; background:#fff; color:#2c4b66; border-radius:10px; padding:12px 17px; font-size:12px; font-weight:650; transition:background .18s,transform .18s; }
 .skill-path__planbar>button:hover:not(:disabled) { background:#eaf3fb; transform:translateY(-1px); }
 .skill-path__planbar>button:disabled { opacity:.6; cursor:not-allowed; }
-.skill-path__planbar>[role=alert] { width:100%; color:#fff2d2; }
+.skill-path__planbar>[role=alert] { width:100%; color:#8b426b; }
 .skill-path__footnote { color:#5d6f82; font-size:11px; line-height:1.7; max-width:90ch; }
 .skill-path__empty { display:grid; justify-items:start; gap:14px; padding:28px; border-radius:20px; border:1px solid #dce6ef; background:#fff; color:var(--path-ink); }
 .skill-path__empty p { font-size:14px; color:var(--path-muted); line-height:1.8; max-width:65ch; }
@@ -92,7 +92,7 @@
 @media(max-width:1150px) { .skill-path__cards { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:700px) { .skill-path { gap:24px; } .skill-path__intro { align-items:flex-start; flex-direction:column; gap:10px; } .skill-path__map { padding:22px 18px; border-radius:19px; } .skill-path__map>header,.skill-path__areas>header { align-items:flex-start; gap:12px; } .skill-path__areas>header { flex-direction:column; } .skill-path__graph.has-connections { grid-template-columns:1fr; gap:16px; } .skill-path__connections { display:none; } .skill-path__branches { padding-left:20px; position:relative; } .skill-path__branches::before { content:""; position:absolute; left:6px; top:0; bottom:18px; width:2px; background:#a8c2da; } .skill-path__branches .skill-path__node::before { content:""; position:absolute; top:30px; left:-14px; width:13px; height:2px; background:#a8c2da; } .skill-path__node { padding:19px; } .skill-path__cards { grid-template-columns:1fr; } .skill-path .skill-path__card h3,.skill-path__card>p { min-height:0; } .skill-path__planbar { bottom:10px; padding:18px; gap:14px; } .skill-path__planbar>button { width:100%; justify-content:center; } }
 @media(prefers-reduced-motion:reduce) { .skill-path * { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
-.skill-path__career-source { padding:8px 12px; border-radius:10px; background:#f8eaf3; color:#8b426b !important; font-size:12px !important; }
+.skill-path__career-source { min-width:0; max-width:calc(100% - 56px); padding:7px 12px; border-radius:999px; background:linear-gradient(110deg,#e8f2fc,#f8eaf3); border:1px solid #e7dce9; color:#8b426b; font-size:12px; line-height:18px; }
 .skill-path__card:target { animation:career-highlight 3s ease-out; scroll-margin-top:90px; }
 @keyframes career-highlight { from { box-shadow:0 0 0 3px #77a9cc; background:#edf6fd; } to { box-shadow:none; } }
 @media(prefers-reduced-motion:reduce) { .skill-path__card:target { animation:none; outline:2px solid #77a9cc; } }

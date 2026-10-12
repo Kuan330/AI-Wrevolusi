@@ -29,7 +29,7 @@ export function AuthDialog(props: {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [importGuest, setImportGuest] = useState(true);
+  const [importGuest, setImportGuest] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const dialogProps1 = {
@@ -118,7 +118,7 @@ export function AuthDialog(props: {
             }
             setBusy(true);
             try {
-              await authenticate(mode, username.trim(), password, importGuest);
+              await authenticate(mode, username.trim(), password, mode === "login" && importGuest);
               onClose();
               const intended = safeJourneyDestination(destination) ??
                 safeJourneyDestination(location.pathname + location.search + location.hash);
@@ -154,16 +154,7 @@ export function AuthDialog(props: {
                   } satisfies Partial<ComponentProps<typeof Input>>)}
                 />
               </FormField>
-              <label className="flex items-start gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={importGuest}
-                  onChange={(e) => setImportGuest(e.target.checked)}
-                  disabled={busy}
-                />{" "}
-                Save my current work profile and learning choices to this
-                account.
-              </label>
+              <p className="text-sm text-muted-foreground">Your new account starts empty. Choose your occupation in My work to get personalised skills and career directions.</p>
             </>
           )}
           {mode === "login" && (

@@ -1,3 +1,4 @@
+import { contactError } from "@/features/resume/contactValidation";
 import { createResumePreviewCache } from "@/features/resume/previewCache";
 import CareerAlignment from "./CareerAlignment";
 import ResumeLearningRecords from "./ResumeLearningRecords";
@@ -72,6 +73,8 @@ function ResumeWorkspace({ owner }: { owner: string }) {
   const targetKey = targetReady ? `${target.role!.occupation_code}:${targetText}` : "";
   const targetVersion = useRef(targetKey); targetVersion.current = targetKey;
   const generationRequest = useRef<AbortController | null>(null);
+  const [checkingAI, setCheckingAI] = useState(false);
+  const [aiCheckNotice, setAiCheckNotice] = useState("");
   const [capabilities, setCapabilities] = useState<ResumeCapabilities | null>(null);
   const [error, setError] = useState(""), [generating, setGenerating] = useState(false), [importing, setImporting] = useState(false);
   const [roleNeedsRefresh, setRoleNeedsRefresh] = useState(false);
@@ -121,6 +124,8 @@ function ResumeWorkspace({ owner }: { owner: string }) {
   const freshPdf = Boolean(pdf && pdfKey === fingerprint && !yaml.error);
   const sections = Object.keys(draft.document?.cv.sections ?? {});
   const source = draft.source;
+  const contactErrors = source ? Object.fromEntries(Object.entries(source.contacts).map(([key, value]) => [key, contactError(key, value)])) : {};
+  const hasContactErrors = Object.values(contactErrors).some(Boolean);
   const sourceSkillReview = useMemo(() => source ? reviewedSourceSkills({ ...source, redactedText: redactResume(source.redactedText, source.contacts) }) : { names: [], rejected: [], text: "" }, [source]);
   const sourceInput = useMemo(() => {
     if (sourceSkillReview.rejected.length) return { evidence: [], projects: [], sections: [], error: "Some skill entries are work history, locations or achievements. Correct the Skills field before confirming your source." };
@@ -277,12 +282,25 @@ function ResumeWorkspace({ owner }: { owner: string }) {
     try { return targetReady && readCareerDirection()?.occupation_code === target.role?.occupation_code; }
     catch { return false; }
   };
-  const generationAction = candidates.length <= 250 && !candidates.some(skill => skill.name.length > 160 || skill.id.length > 160) && targetReady && draft.pendingJobRequirements === targetText ? resumeGenerationAction({
+  const generationAction = !hasContactErrors && candidates.length <= 250 && !candidates.some(skill => skill.name.length > 160 || skill.id.length > 160) && targetReady && draft.pendingJobRequirements === targetText ? resumeGenerationAction({
     jobRequirements: draft.pendingJobRequirements, hasDocument: Boolean(draft.document),
     skillCount: candidates.length, factCount: reviewedFacts.length, skillsLoading, skillError: skillError || inputError,
     sourceReviewed: source ? source.reviewed : null, aiConfigured: capabilities?.ai_configured ?? null,
     busy: generating || importing,
   }) : null;
+  const recheckAI = async () => {
+    if (checkingAI) return;
+    setCheckingAI(true); setAiCheckNotice("");
+    const request = controller();
+    try {
+      const result = await resumeService.capabilities(request.signal);
+      if (isCurrent()) {
+        setCapabilities(result);
+        setAiCheckNotice(result.ai_configured ? "AI configuration is available. You can now generate after completing the required fields." : "Still not configured. Ask the administrator to configure the resume AI service and restart the backend.");
+      }
+    } catch (cause) { if (isCurrent()) setAiCheckNotice(message(cause)); }
+    finally { if (isCurrent()) setCheckingAI(false); }
+  };
   const generate = async (targetConfirmed = false) => {
     if (!isCurrent() || !targetIsCurrent() || busy.current || !generationAction) return;
     if (draft.document && draft.jobRequirements !== draft.pendingJobRequirements.trim() && !targetConfirmed) { setShowTarget(true); return; }
@@ -358,21 +376,21 @@ function ResumeWorkspace({ owner }: { owner: string }) {
         {!source && <Button variant="link" size="sm" onClick={() => change(old => ({ ...old, source: { file: new Blob([]), name: "Manually supplied details", text: "", redactedText: "", contacts: emptyContacts(), reviewed: false } }))}>Or enter your resume details manually</Button>}
         {source && <div className="rb-source-review"><div className="rb-inline"><strong><FileText size={16} />{source.name}</strong><Button variant="ghost" size="sm" onClick={() => change(old => ({ ...old, source: null }))}>Remove source</Button></div>
           <p>Review these suggested personal fields. Correct mistakes and redact any remaining names, addresses or confidential details below. Automatic redaction is not infallible.</p>
-          <div className="rb-contact-grid">{Object.entries(source.contacts).map(([key, value]) => <FormField key={key} label={`${key.charAt(0).toUpperCase() + key.slice(1)} · local only`}><Input value={value} onChange={event => change(old => { if (!old.source) return old; const contacts = { ...old.source.contacts, [key]: event.target.value }; return { ...old, source: { ...old.source, contacts, redactedText: redactResume(old.source.redactedText, contacts), reviewed: false } }; })} /></FormField>)}</div>
+          <div className="rb-contact-grid">{Object.entries(source.contacts).map(([key, value]) => <FormField key={key} label={`${key.charAt(0).toUpperCase() + key.slice(1)} · local only`}><Input type={key === "email" ? "email" : key === "phone" ? "tel" : "text"} inputMode={key === "email" ? "email" : key === "phone" ? "tel" : "text"} aria-invalid={Boolean(contactErrors[key])} aria-describedby={contactErrors[key] ? `source-${key}-error` : undefined} value={value} onChange={event => change(old => { if (!old.source) return old; const contacts = { ...old.source.contacts, [key]: event.target.value }; return { ...old, source: { ...old.source, contacts, redactedText: redactResume(old.source.redactedText, contacts), reviewed: false } }; })} />{contactErrors[key] && <p id={`source-${key}-error`} role="alert" className="rb-error">{contactErrors[key]}</p>}</FormField>)}</div>
           <FormField label="Skills explicitly listed in your original resume" hint="Review these local suggestions. Use one skill per line; include only skills actually in your source. Confirmed names join your existing skill list."><Textarea rows={2} maxLength={13000} value={sourceSkillReview.text} onChange={event => change(old => old.source ? { ...old, source: { ...old.source, skillsText: event.target.value, skillsOrigin: "manual", skillsParserVersion: SKILLS_PARSER_VERSION, reviewed: false } } : old)} /></FormField>
           <FormField label="Resume evidence that AI will receive" hint="Keep only factual background you want to share. Personal fields above are not sent to AI."><Textarea rows={8} maxLength={60000} value={source.redactedText} onChange={event => change(old => old.source ? { ...old, source: { ...old.source, redactedText: event.target.value, reviewed: false } } : old)} /></FormField>
           {sourceInput.error && <p className="rb-warning" role="alert">{sourceInput.error}</p>}
           {sourceInput.projects.length > 0 && <div className="rb-source-projects" aria-label="Projects from your reviewed source"><h4>Projects from your source</h4>{sourceInput.projects.map(project => <div key={project.id}>
             {project.mode === "structured" ? <><strong>{project.name}</strong>{project.date && <p>{project.date}</p>}<ul>{project.highlight_fact_ids.map(id => <li key={id}>{sourceInput.evidence.find(f => f.id === id)?.text.replace(/^[•●▪*-]\s+/, "")}</li>)}</ul></> : <><p>Project boundaries are unclear. These paragraphs will be kept unchanged, without AI rewriting.</p>{project.fact_ids.map(id => <p key={id}>{sourceInput.evidence.find(f => f.id === id)?.text}</p>)}</>}
           </div>)}</div>}
-          <label className="rb-check"><Checkbox disabled={Boolean(sourceInput.error)} checked={source.reviewed} onCheckedChange={checked => change(old => old.source ? { ...old, source: { ...old.source, redactedText: redactResume(old.source.redactedText, old.source.contacts), projects: sourceInput.projects, skills: sourceSkillReview.names, ...(old.source.skillsText !== undefined ? { skillsText: sourceSkillReview.names.join("\n") } : {}), skillsParserVersion: SKILLS_PARSER_VERSION, reviewed: checked === true } } : old)} />I have reviewed this text and removed personal or confidential information I do not want sent to AI.</label>
+          <label className="rb-check"><Checkbox disabled={Boolean(sourceInput.error) || hasContactErrors} checked={source.reviewed} onCheckedChange={checked => change(old => old.source ? { ...old, source: { ...old.source, redactedText: redactResume(old.source.redactedText, old.source.contacts), projects: sourceInput.projects, skills: sourceSkillReview.names, ...(old.source.skillsText !== undefined ? { skillsText: sourceSkillReview.names.join("\n") } : {}), skillsParserVersion: SKILLS_PARSER_VERSION, reviewed: checked === true } } : old)} />I have reviewed this text and removed personal or confidential information I do not want sent to AI.</label>
         </div>}
       </fieldset>
       <fieldset disabled={generating || importing}><ResumeLearningRecords records={learningRecords} selections={draft.learningSelections ?? []} loading={learningLoading} error={learningError} retry={() => setSkillRetry(value => value + 1)} change={learningSelections => change(old => ({ ...old, learningSelections }))} /></fieldset>
       {careerInput.error && <p className="rb-warning" role="alert">{careerInput.error}</p>}
       <p className="rb-ai-summary">AI uses your job requirements, skills and any reviewed resume details.</p>
       {!skillsLoading && !skillError && !inputError && !candidates.length && !reviewedFacts.length && <p className="rb-warning" role="status">Add reviewed resume details or selected user skills before generating. Target role requirements are not evidence of your abilities.</p>}
-      {capabilities?.ai_configured === false && <p className="rb-warning">AI generation is unavailable. You can still open an empty template.</p>}
+      {capabilities?.ai_configured === false && <div className="rb-warning"><p>Resume AI has not been configured on the server. No generation request has been sent. Ask the administrator to enable it, or open an empty template to continue manually.</p><Button variant="outline" size="sm" disabled={checkingAI} onClick={() => { void recheckAI(); }}>{checkingAI ? "Checking…" : "Check again"}</Button></div>}{aiCheckNotice && <p role="status">{aiCheckNotice}</p>}
       {generationStatus && <p role="status">{generationStatus}</p>}
       {generating && <ResumeGenerationProgress seconds={generationSeconds} />}
       <div className="rb-job-footer">{generating && <Button variant="outline" onClick={() => { cancelGeneration(); setGenerationStatus("Generation cancelled. Your existing resume is unchanged."); }}>Cancel generation</Button>}<Button disabled={!generationAction} onClick={() => { void generate(); }}><Sparkles />{generating ? "Polishing your resume…" : draft.document ? "Generate new suggestions" : "Generate my resume"}</Button>{!draft.document && <Button variant="ghost" disabled={!targetReady || draft.pendingJobRequirements !== targetText || generating || importing} onClick={createEmpty}>Open an empty template</Button>}{draft.document && <Button variant="ghost" disabled={generating || importing} onClick={() => setShowJob(false)}>Back to editing</Button>}</div>
