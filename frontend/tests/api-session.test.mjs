@@ -13,7 +13,7 @@ function stub(handler) {
 test('an expired access cookie is renewed once and the request is repeated', async () => {
   let served = 0;
   const calls = stub(path => {
-    if (path === '/auth/refresh') return json(200, { access_token: 'a', refresh_token: 'b' });
+    if (path === '/auth/refresh') return new Response(null, { status: 204 });
     return ++served === 1 ? json(401, { detail: 'Missing auth cookie.' }) : json(200, { ok: true });
   });
   assert.deepEqual(await api.post('/interview/feedback', { answer: 'x' }), { ok: true });

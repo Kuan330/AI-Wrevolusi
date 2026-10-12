@@ -1,12 +1,6 @@
 import { ApiError, api } from "@/services/api";
 import type { AuthUser, LoginPayload, RegisterPayload } from "@/types/auth";
 
-interface TokenResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-}
-
 interface DemoCredential {
   email: string;
   password: string;
@@ -36,10 +30,10 @@ const getDemoCredential = (): DemoCredential => {
 
 export const authService = {
   me: () => api.get<AuthUser>("/users/me"),
-  login: (payload: LoginPayload) => api.post<TokenResponse, LoginPayload>("/auth/login", payload),
+  login: (payload: LoginPayload) => api.post<null, LoginPayload>("/auth/login", payload),
   register: (payload: RegisterPayload) =>
     api.post<AuthUser, RegisterPayload>("/auth/register", payload),
-  refresh: () => api.post<TokenResponse>("/auth/refresh"),
+  refresh: () => api.post<null>("/auth/refresh"),
   logout: () => api.post<null>("/auth/logout"),
   ensureDemoSession: async (): Promise<AuthUser> => {
     try {

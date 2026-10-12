@@ -36,26 +36,35 @@ def create_token(
     return jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 
 
-def create_access_token(subject: str) -> str:
+def create_access_token(subject: str, session_id: str) -> str:
     return create_token(
         subject=subject,
         token_type='access',
         expires_delta=timedelta(minutes=settings.access_token_expire_minutes),
+        extra_claims={'sid': session_id},
     )
 
 
-def create_refresh_token(subject: str, jti: str) -> str:
+def create_refresh_token(subject: str, jti: str, session_id: str) -> str:
     return create_token(
         subject=subject,
         token_type='refresh',
         expires_delta=timedelta(days=settings.refresh_token_expire_days),
-        extra_claims={'jti': jti},
+        extra_claims={'jti': jti, 'sid': session_id},
     )
 
 
 def decode_token(token: str) -> dict[str, Any] | None:
     try:
         return jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
+    except JWTError:
+        return None
+
+
+def decode_logout_token(token: str) -> dict[str, Any] | None:
+    # An expired signed cookie can still identify the session to revoke.
+    try:
+        return jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm], options={'verify_exp': False})
     except JWTError:
         return None
 

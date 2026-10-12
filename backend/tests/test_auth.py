@@ -14,14 +14,16 @@ def test_password_hash_roundtrip() -> None:
 
 
 def test_jwt_generation_and_decode() -> None:
-    access_token = create_access_token('123')
+    access_token = create_access_token('123', 'session-id')
     payload = decode_token(access_token)
     assert payload is not None
     assert payload['sub'] == '123'
     assert payload['type'] == 'access'
+    assert payload['sid'] == 'session-id'
 
-    refresh_token = create_refresh_token('123', 'token-jti')
+    refresh_token = create_refresh_token('123', 'token-jti', 'session-id')
     refresh_payload = decode_token(refresh_token)
     assert refresh_payload is not None
     assert refresh_payload['type'] == 'refresh'
     assert refresh_payload['jti'] == 'token-jti'
+    assert refresh_payload['sid'] == 'session-id'

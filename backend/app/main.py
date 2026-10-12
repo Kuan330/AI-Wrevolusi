@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.exception_handlers import request_validation_exception_handler
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 
 from app.core.config import settings
 from app.db.session import init_models
@@ -79,20 +79,33 @@ def create_app(api_root: str = '/api') -> FastAPI:
     application.include_router(resume.router, prefix=api_prefix)
     application.include_router(interview.router, prefix=api_prefix)
 
+    private_prefixes = tuple(f"{api_prefix}/{area}" for area in ("resume", "interview", "auth", "account", "users"))
+
+    def private_api(path):
+        return any(path == prefix or path.startswith(f"{prefix}/") for prefix in private_prefixes)
+
     @application.middleware("http")
-    async def private_resume_response(request, call_next):
+    async def private_response(request, call_next):
         response = await call_next(request)
-        if request.url.path.startswith(f"{api_prefix}/resume/"):
+        if private_api(request.url.path):
             response.headers["Cache-Control"] = "no-store"
         return response
 
     @application.exception_handler(RequestValidationError)
     async def private_validation(request, error):
-        if request.url.path.startswith(f"{api_prefix}/resume/"):
+        if private_api(request.url.path):
             from app.services.resume_errors import safe_fields
             # FastAPI normally echoes rejected input (possibly contact details).
-            return JSONResponse(status_code=422, content={"detail": "Invalid resume request. Check field types, limits and evidence review.", "code": "invalid_request", "fields": safe_fields([issue.get("loc", ()) for issue in error.errors()])}, headers={"Cache-Control": "no-store"})
+            detail = "Invalid resume request. Check field types, limits and evidence review." if request.url.path.startswith(f"{api_prefix}/resume/") else "Invalid request. Check field types, limits and any required review."
+            return JSONResponse(status_code=422, content={"detail": detail, "code": "invalid_request", "fields": safe_fields([issue.get("loc", ()) for issue in error.errors()])}, headers={"Cache-Control": "no-store"})
         return await request_validation_exception_handler(request, error)
+
+    @application.exception_handler(Exception)
+    async def private_unexpected_error(request, error):
+        # Unhandled errors are rendered outside the response middleware.
+        if private_api(request.url.path):
+            return JSONResponse(status_code=500, content={"detail": "The request could not be completed. Please try again.", "code": "internal_error", "fields": []}, headers={"Cache-Control": "no-store"})
+        return PlainTextResponse("Internal Server Error", status_code=500)
 
     @application.on_event('startup')
     async def startup_event() -> None:
