@@ -133,7 +133,7 @@ export default function SessionView({ owner, session, allSessions, onChange, onE
     {error && <div className="ip-note" role="alert">{error}</div>}
     <p className="sr-only" role="status">{notice}</p>
     {progress.complete && finished && <>
-      <FinishView session={session} onExit={onExit} onReview={() => setFinished(false)} />
+      <FinishView owner={owner} session={session} onExit={onExit} onReview={() => setFinished(false)} />
       <ProfilePanel sessions={allSessions} />
     </>}
     {question && !(progress.complete && finished) && <Card className="ip-question">
