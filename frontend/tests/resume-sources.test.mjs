@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
 import { sourceProjects, reviewedResumeInput } from "../src/features/resume/projects.ts";
-import { selectedCourseSkills, mergeResumeSkills } from "../src/features/resume/skills.ts";
+import { selectedCourseSkills, mergeResumeSkills, resumeSkillSnapshot } from "../src/features/resume/skills.ts";
+import { createOnboardingRecords } from "../src/features/learning-onboarding/learningOnboarding.ts";
+import { activateWorkspace } from "../src/services/accountStorage.ts";
 import { evidenceFromText, redactResume } from "../src/features/resume/redaction.ts";
 import { applySections, parseResumeYaml, documentYaml } from "../src/features/resume/document.ts";
 import { parseResumeRecord } from "../src/features/resume/repository.ts";
@@ -55,6 +57,26 @@ test("editing reviewed text recomputes project references and redaction precedes
   assert.equal(changed.projects[0].date, "May 2026"); assert.notDeepEqual(changed.projects[0].fact_ids, parsed.projects[0].fact_ids);
 });
 const reference = [{ wef_skill_id: 1, core_skill: "Analytical thinking" }, { wef_skill_id: 2, core_skill: "Creative thinking" }];
+test("a saved learning plan contributes its selected skill without courses or completed study", () => {
+  const memory = new Map();
+  globalThis.localStorage = { getItem: key => memory.get(key) ?? null, setItem: (key, value) => memory.set(key, value), removeItem: key => memory.delete(key) };
+  globalThis.window = new EventTarget();
+  const { goal, plan } = createOnboardingRecords({
+    inputs: { goalText: "Learn to present findings", experience: "new", minutesPerDay: 15, goalKind: "skill" },
+    resources: [], courses: [], selectedCourseIds: [], selectedSkill: 2, referenceSkills: reference,
+  });
+  const snapshot = status => {
+    activateWorkspace("resume-learning-plan-test", { data: {
+      "aiwrevolusi.learningGoals.v1": JSON.stringify({ version: 1, goals: [goal] }),
+      "aiwrevolusi.learningPlanDraft.v1": JSON.stringify({ version: 1, plans: [{ ...plan, status, acceptedAt: status === "active" ? plan.createdAt : null }] }),
+    }, revision: 0 });
+    return resumeSkillSnapshot(reference);
+  };
+  try {
+    for (const status of ["draft", "active"]) assert.ok(snapshot(status).some(skill => skill.name === "Creative thinking"));
+    assert.ok(!snapshot("archived").some(skill => skill.name === "Creative thinking"));
+  } finally { activateWorkspace(null); }
+});
 test("saved and planned courses resolve canonical skill names, not course titles", () => {
   const directory = new Map([["saved", { title: "Expert Certificate", skills: ["analytical-thinking"] }], ["planned", { title: "Masterclass", skills: ["creative-thinking", "analytical-thinking"] }]]);
   const skills = selectedCourseSkills(reference, directory, ["saved", "planned", "saved"]);
@@ -72,6 +94,7 @@ test("all learning intent sources join confirmed skills, never untouched suggest
   code = code.replace(/^import .*;\r?$/gm, "");
   const dependencies = `const resolveCatalogueSkill=(id,ref)=>{const s=ref.find(s=>String(s.wef_skill_id)===String(id)||s.core_skill===id);return s?{id:s.wef_skill_id,name:s.core_skill}:null};
 const readLearningGoals = () => [{ initial: { skill: {id:"g",label:"Goal skill"}}}];
+const readPersonalPlans = () => [];
 const readLibrary = () => ({saved:[],pending:[]});
 const readLearningSkills = () => [{id:"l",name:"Learning skill"}];
 const readCareerPath = () => ({ids:[2]});

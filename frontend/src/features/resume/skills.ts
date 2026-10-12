@@ -1,4 +1,5 @@
 import { readLearningGoals } from "../learning-goals/learningGoals.ts";
+import { readPersonalPlans } from "../learning-goals/personalLearningPlan.ts";
 import { readLibrary } from "../learning-planning/libraryStorage.ts";
 import { resolveCatalogueSkill } from "../learning-planning/catalogueSkill.ts";
 import type { Course } from "../learning-planning/types.ts";
@@ -57,6 +58,7 @@ export function resumeSkillSnapshot(reference: WefSkill[], directory: Map<string
   const profile = readJourneyProfile();
   const specialist = readSpecialistState().entries.filter(s => specialistEntryIsCurrent(s, profile.tasks, profile.tasksOccupationCode ?? null) && (s.decision === "use" || s.wantsLearning)).map(s => ({ id: s.skillUri, name: s.skillLabel }));
   const goals = readLearningGoals().flatMap(goal => canonicalResumeSkill(goal.initial.skill.id, goal.initial.skill.label, reference, directory, goal.initial.skill.source === "wef"));
+  const plans = readPersonalPlans().filter(plan => plan.status !== "archived" && plan.skillId).flatMap(plan => canonicalResumeSkill(plan.skillId, plan.skillLabel, reference, directory, true));
   const courses = selectedCourseSkills(reference, directory, selectedResumeCourseIds());
-  return mergeResumeSkills([confirmed, learning, path, contexts, personal, specialist, goals, courses]);
+  return mergeResumeSkills([confirmed, learning, path, contexts, personal, specialist, goals, plans, courses]);
 }
