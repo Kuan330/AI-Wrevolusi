@@ -1,5 +1,6 @@
 """RenderCV in a short-lived process: compiler caches cannot retain a user's CV."""
 import json
+import os
 import re
 import subprocess
 import sys
@@ -108,6 +109,8 @@ def render_pdf(document, *, timeout=25):
                     input=json.dumps(document, ensure_ascii=False).encode("utf-8"),
                     stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=timeout,
                     cwd=Path(__file__).resolve().parents[2],
+                    # Vercel adds runtime dependencies to the parent's import path.
+                    env={**os.environ, "PYTHONPATH": os.pathsep.join(sys.path)},
                     creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
                 )
             except subprocess.TimeoutExpired:

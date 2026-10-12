@@ -2,6 +2,8 @@
 import json
 import re
 import subprocess
+import sys
+import venv
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -248,4 +250,15 @@ def test_renderer_preserves_original_unicode_names_across_windows_process_bounda
         return process
     monkeypatch.setattr(service.subprocess, "run", inspect_worker)
     pdf = service.render_pdf({"cv": {"name": "张示例", "sections": {"Skills": [{"bullet": "Analytical thinking"}]}}, "design": {"theme": "classic"}})
+    assert pdf.startswith(b"%PDF-")
+
+
+def test_renderer_worker_uses_parent_runtime_dependencies(monkeypatch, tmp_path):
+    import app.services.resume_render as service
+    environment = tmp_path / "worker-python"
+    venv.EnvBuilder(with_pip=False).create(environment)
+    executable = environment / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
+    monkeypatch.setattr(service.sys, "executable", str(executable))
+    monkeypatch.setenv("PYTHONPATH", str(tmp_path / "unrelated-path"))
+    pdf = service.render_pdf({"cv": {"sections": {"Skills": [{"bullet": "Analytical thinking"}]}}, "design": {"theme": "classic"}})
     assert pdf.startswith(b"%PDF-")
