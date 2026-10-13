@@ -6,8 +6,8 @@ export type Attempt = { id: string; answer: string; mode: "text" | "voice"; subm
 export type SessionQuestion = { id: string; text: string; sentText: string; kind: QuestionKind; itemId: string | null; itemLabel: string | null; skipped: boolean; attempts: Attempt[]; draft?: string;
   /** What the question bank says this question tests, for example `customer_communication`. Older sessions have none. */
   intent?: string | null };
-/** The reviewed resume this session used. Later edits in the resume do not change it. */
-export type ResumeVersion = { reviewedAt: string; itemCount: number };
+/** The saved resume this session used. Older sessions have a review date. */
+export type ResumeVersion = { itemCount: number } & ({ savedAt: string } | { reviewedAt: string });
 export type InterviewSession = {
   version: 1; id: string; createdAt: string; updatedAt: string; mode: "resume" | "general" | "career"; source: "ai" | "template";
   role: { title: string; requirements: string; sentTitle?: string; occupationCode?: string }; resumeVersion: ResumeVersion | null; items: InterviewItem[]; questions: SessionQuestion[];

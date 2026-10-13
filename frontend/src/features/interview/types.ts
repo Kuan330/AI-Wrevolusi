@@ -4,7 +4,7 @@ export type CheckId = "answered_question" | "own_actions" | "concrete_example" |
 export type CheckStatus = "yes" | "partly" | "no" | "not_applicable";
 export type ImprovementKind = "expression" | "missing_example" | "possible_skill_gap";
 
-/** One thing in the reviewed resume (or the target role) that a question can be about. */
+/** One thing in the saved resume (or the target role) that a question can be about. */
 export type InterviewItem = { id: string; kind: ItemKind; label: string; text: string; ref?: { section: string; index: number } };
 export type ChangeTopic = { id: string; text: string; item_id: string; impact_score: number; reference_id: string; source_name: string; source_year: number };
 

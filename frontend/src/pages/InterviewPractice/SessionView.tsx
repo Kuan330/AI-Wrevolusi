@@ -123,7 +123,7 @@ export default function SessionView({ owner, session, allSessions, onChange, onE
     <div className="ip-topbar">
       <Button variant="ghost" size="sm" onClick={onExit}><ArrowLeft size={15} />All practice</Button>
       <div className="ip-context"><strong>{session.role.title}</strong>
-        <span>{session.mode === "resume" && session.resumeVersion ? `Based on your resume reviewed on ${dateText(session.resumeVersion.reviewedAt)}` : session.mode === "career" ? "Based on your selected future occupation. No resume needed" : "General practice. Not based on your resume"}</span></div>
+        <span>{session.mode === "resume" && session.resumeVersion ? ("savedAt" in session.resumeVersion ? `Based on your resume saved on ${dateText(session.resumeVersion.savedAt)}` : `Based on your resume reviewed on ${dateText(session.resumeVersion.reviewedAt)}`) : session.mode === "career" ? "Based on your selected future occupation. No resume needed" : "General practice. Not based on your resume"}</span></div>
       <div className="ip-progress"><Progress value={progress.total ? Math.round((progress.answered + progress.skipped) * 100 / progress.total) : 0} aria-label="Practice progress" />
         <span>{progress.answered} answered{progress.skipped ? `, ${progress.skipped} skipped` : ""} of {progress.total}</span></div>
     </div>

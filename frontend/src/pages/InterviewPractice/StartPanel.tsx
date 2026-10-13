@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle2, Mic, TriangleAlert } from "lucide-react";
+import { CheckCircle2, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ProfilePanel from "./ProfilePanel";
@@ -13,7 +13,6 @@ import { interviewService } from "@/features/interview/service";
 import { createSession, sessionProgress, type InterviewSession } from "@/features/interview/session";
 import { availableChangeTasks, changeTopics, futureInterviewOccupation, interviewCareer, planBody } from "@/features/interview/start";
 import { loadResumeDraft } from "@/features/resume/repository";
-import { reviewState } from "@/features/resume/review";
 import type { ResumeDraft } from "@/features/resume/types";
 
 const dateText = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
@@ -36,14 +35,14 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
     return () => window.removeEventListener("workspace-change", update);
   }, []);
 
-  const state = draft ? reviewState(draft) : { status: "missing" as const };
   const prepared = useMemo(() => draft?.document ? prepareInterviewContext(draft.document, draft.jobRequirements, extra) : null, [draft, extra]);
   const changeTasks = useMemo(() => availableChangeTasks(), [workspaceVersion]);
   const topics = useMemo(() => prepared ? changeTopics(prepared, taskLinks) : [], [prepared, taskLinks, workspaceVersion]);
   const career = interviewCareer();
   const future = futureInterviewOccupation();
   const hasResumeRole = Boolean(draft?.jobRequirements.trim());
-  const ready = state.status === "reviewed" && hasResumeRole && Boolean(prepared?.display.length);
+  const hasResumeItems = Boolean(prepared?.display.some(item => item.kind !== "requirement"));
+  const ready = !loading && !loadError && hasResumeRole && hasResumeItems;
 
   const start = async (mode: InterviewSession["mode"]) => {
     if (busy) return;
@@ -52,16 +51,17 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
     request.current = controller;
     try {
       if (mode === "career" && !future) throw new Error("Choose a future occupation in Possibilities first.");
+      if (mode === "resume" && (!ready || !prepared || !draft)) throw new Error("Save your resume sections and target role in Resume Builder first.");
+      if (mode === "resume" && !accepted) throw new Error("Confirm that you want to send these resume items to AI first.");
       const bank = await interviewService.bank(mode === "career" ? future!.code : mode === "resume" ? career?.code ?? "0000" : "0000", controller.signal).catch(() => null);
-      if (mode === "resume" && (!prepared || !draft || state.status !== "reviewed" || !hasResumeRole)) throw new Error("Set your target role and review your resume first.");
       const plan = mode === "resume" && prepared
         ? await interviewService.plan(planBody(prepared, bank?.questions ?? [], topics, accepted), controller.signal)
         : await interviewService.plan({ role_title: mode === "career" ? future!.title : "", items: [], topics: [], count: 4, items_reviewed: false, bank: (bank?.questions ?? []).slice(0, 12).map(q => ({ id: q.id, question: q.question })) }, controller.signal);
       if (controller.signal.aborted) return;
       const bankIntents = Object.fromEntries((bank?.questions ?? []).map(question => [question.id, question.intent]));
-      const session = mode === "resume" && prepared && draft && state.at
+      const session = mode === "resume" && prepared && draft
         ? createSession({ mode, role: { title: prepared.roleTitle, sentTitle: prepared.sentRoleTitle, requirements: draft.jobRequirements,
-          ...(career?.title.toLowerCase() === prepared.roleTitle.toLowerCase() ? { occupationCode: career.code } : {}) }, resumeVersion: { reviewedAt: state.at, itemCount: prepared.display.length }, items: prepared.display, plan, restore: prepared.restore, bankIntents })
+          ...(career?.title.toLowerCase() === prepared.roleTitle.toLowerCase() ? { occupationCode: career.code } : {}) }, resumeVersion: { savedAt: draft.updatedAt, itemCount: prepared.display.length }, items: prepared.display, plan, restore: prepared.restore, bankIntents })
         : createSession({ mode, role: mode === "career" ? { title: future!.title, sentTitle: future!.title, occupationCode: future!.code, requirements: "" } : { title: "General practice", sentTitle: "", requirements: "" }, resumeVersion: null, items: [], plan, bankIntents });
       onStart(session);
     } catch (cause) { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : "Could not prepare your questions. Try again."); }
@@ -72,11 +72,11 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
   const CHOICES = [
     { id: "career" as const, title: "My future occupation", text: future ? future.title : "Choose one in Possibilities first", disabled: !future },
     { id: "general" as const, title: "General questions", text: "Common questions. No setup.", disabled: false },
-    { id: "resume" as const, title: "My resume", text: "Optional. Questions from your own experience.", disabled: false },
+    { id: "resume" as const, title: "My resume", text: "Questions from your saved Resume Builder sections.", disabled: false },
   ];
-  const resumeNotice = state.status === "reviewed" && !hasResumeRole ? "Add a target role in the Resume builder to practise from this resume."
-    : state.status === "needs-review" ? "Review your resume again to practise from its latest version."
-    : "A reviewed resume lets you practise questions about your own experience.";
+  const resumeNotice = !draft?.document ? "Save a resume in Resume Builder to practise from your own experience."
+    : !hasResumeRole ? "Add a target role in Resume Builder to practise from this resume."
+    : "Add experience, projects, skills or a summary in Resume Builder to practise from this resume.";
 
   return <div className={`ip-start${sessions.length ? " has-sessions" : ""}`}>
     <Card className="ip-card ip-begin">
@@ -95,10 +95,9 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
       {choice === "resume" && (loading ? <p role="status">Loading your resume…</p> : loadError ? <p className="ip-note" role="alert">{loadError}</p> : <div className="ip-resume">
         <dl className="ip-facts">
           <div><dt>Target role</dt><dd>{prepared?.roleTitle && draft?.jobRequirements.trim() ? prepared.roleTitle : "Not set yet"}</dd></div>
-          <div><dt>Resume version</dt><dd>{state.status === "reviewed" ? <><CheckCircle2 size={15} className="ip-ok" /> Reviewed on {dateText(state.at!)}, {prepared?.display.length ?? 0} items</>
-            : state.status === "needs-review" ? <><TriangleAlert size={15} className="ip-warn" /> Changed since you last reviewed it</> : "No resume yet"}</dd></div>
+          <div><dt>Resume version</dt><dd>{draft?.document ? <><CheckCircle2 size={15} className="ip-ok" /> Saved on {dateText(draft.updatedAt)}, {prepared?.display.length ?? 0} items</> : "No resume yet"}</dd></div>
         </dl>
-        {(state.status !== "reviewed" || !hasResumeRole) && <div className="ip-callout" role="status"><p>{resumeNotice}</p>
+        {!ready && <div className="ip-callout" role="status"><p>{resumeNotice}</p>
           <Button asChild variant="outline"><Link to={ROUTES.resumeBuilder}>Open Resume builder</Link></Button></div>}
         {ready && prepared && <>
           <details className="ip-details"><summary>What AI will receive</summary>

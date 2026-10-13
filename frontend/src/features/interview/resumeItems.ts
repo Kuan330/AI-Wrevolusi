@@ -13,7 +13,7 @@ const SECTION_KINDS: [RegExp, ItemKind][] = [
 const MAX_ITEMS = 30, MAX_SKILLS = 8, MAX_REQUIREMENTS = 8;
 export const sectionKind = (title: string): ItemKind | null => SECTION_KINDS.find(([pattern]) => pattern.test(title))?.[1] ?? null;
 
-/** Work, project, skill and summary entries of the reviewed resume. Education and other chapters are not asked about. */
+/** Work, project, skill and summary entries of the saved resume. Education and other chapters are not asked about. */
 export function buildResumeItems(document: ResumeDocument): InterviewItem[] {
   const items: InterviewItem[] = [];
   let skills = 0;

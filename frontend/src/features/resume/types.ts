@@ -28,7 +28,7 @@ export type RecommendedCourse = { course_id: string; gap_ids: string[]; reason: 
 export type Contacts = { name: string; email: string; phone: string; location: string; website: string };
 export type ResumeSource = { file: Blob; name: string; text: string; redactedText: string; contacts: Contacts; skills?: string[]; skillsText?: string; skillsParserVersion?: number; skillsOrigin?: "extracted" | "manual"; projects?: SourceProject[]; reviewed: boolean };
 export type ResumeSnapshot = { careerAlignment?: AppliedCareerAlignment; skillFilterVersion?: SkillFilterVersion; skillFilterInputFingerprint?: string; generationOutcome?: Generation["outcome"]; generationNotices?: string[]; generationInputFingerprint?: string; document: ResumeDocument; yamlText: string; jobRequirements: string };
-/** The user confirmed this version of the resume content. `fingerprint` ties the mark to that content. */
+/** Legacy review mark, kept so existing local drafts still open. */
 export type ReviewedMark = { at: string; fingerprint: string };
 /** A point from interview practice, offered on one resume entry. It changes nothing until accepted. */
 export type InterviewSuggestion = {

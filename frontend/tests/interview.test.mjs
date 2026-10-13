@@ -10,7 +10,7 @@ import { parseInterviewRecord } from '../src/features/interview/repository.ts';
 import { speechErrorMessage, speechSupported, voiceBlockedBy } from '../src/features/interview/speech.ts';
 import { skillSlug } from '../src/features/interview/handoff.ts';
 import { addInterviewSuggestion, applyInterviewSuggestion, dismissInterviewSuggestion, suggestionTarget } from '../src/features/resume/interviewSuggestions.ts';
-import { entryLabel, reviewState, reviewedMark, resumeFingerprint } from '../src/features/resume/review.ts';
+import { entryLabel } from '../src/features/resume/review.ts';
 import { parseResumeRecord } from '../src/features/resume/repository.ts';
 import { emptyDraft } from '../src/features/resume/types.ts';
 import { ROUTES } from '../src/constants/routes.ts';
@@ -80,6 +80,20 @@ test('a session keeps what the user reads and the redacted wording separately', 
   assert.equal(made.questions[0].sentText, 'Ask about [PRIVATE_1].');
   assert.equal(made.questions[0].itemLabel, 'Analyst, Acme Retail');
   assert.throws(() => createSession({ mode: 'general', role: { title: 'R', requirements: '' }, resumeVersion: null, items: [], plan: { source: 'template', questions: [] } }), /No practice questions/);
+});
+
+test('saved resume sessions keep their snapshot and reopen alongside older reviewed sessions', () => {
+  const items = buildResumeItems(structuredClone(DOCUMENT));
+  const made = createSession({ mode: 'resume', role: { title: 'Analyst', requirements: REQUIREMENTS },
+    resumeVersion: { savedAt: '2026-10-13T12:00:00.000Z', itemCount: items.length }, items,
+    plan: plan([['What did you do?', items[1].id]]) });
+  const changed = structuredClone(DOCUMENT);
+  changed.cv.sections.Experience[0].highlights = ['A later edit.'];
+  assert.notDeepEqual(buildResumeItems(changed), made.items);
+  const restored = parseInterviewRecord({ version: 1, owner: 'u', revision: 1, sessions: [made, session()] }, 'u');
+  assert.equal(restored.sessions[0].resumeVersion.savedAt, '2026-10-13T12:00:00.000Z');
+  assert.equal(restored.sessions[0].questions[0].itemId, items[1].id);
+  assert.equal(restored.sessions[1].resumeVersion.reviewedAt, '2026-10-07T00:00:00.000Z');
 });
 
 test('empty answers are refused, skipped questions can be reopened and progress counts honestly', () => {
@@ -240,19 +254,7 @@ test('skill slugs match the backend rule', () => {
   assert.equal(skillSlug('Service orientation and customer service'), 'service-orientation-and-customer-service');
   assert.equal(skillSlug('  AI & Big Data!  '), 'ai-big-data');
 });
-
-test('the resume is marked reviewed for a version, and any change needs a new review', () => {
-  const draft = { ...emptyDraft('u'), document: structuredClone(DOCUMENT), jobRequirements: REQUIREMENTS };
-  assert.equal(reviewState(emptyDraft('u')).status, 'missing');
-  assert.equal(reviewState(draft).status, 'needs-review');
-  const reviewed = { ...draft, reviewed: reviewedMark(draft, new Date('2026-10-07T01:00:00Z')) };
-  assert.deepEqual(reviewState(reviewed), { status: 'reviewed', at: '2026-10-07T01:00:00.000Z' });
-  const personal = structuredClone(reviewed); personal.document.cv.email = 'new@example.test';
-  assert.equal(reviewState(personal).status, 'reviewed', 'contact details are not part of the reviewed content');
-  const edited = structuredClone(reviewed); edited.document.cv.sections.Skills.push('Python');
-  assert.equal(reviewState(edited).status, 'needs-review');
-  assert.equal(reviewState({ ...reviewed, jobRequirements: 'Another role' }).status, 'needs-review');
-  assert.equal(resumeFingerprint(draft), resumeFingerprint(structuredClone(draft)));
+test('resume entry labels include the role and stay bounded', () => {
   assert.equal(entryLabel({ company: 'Acme', position: 'Analyst' }), 'Analyst, Acme');
   assert.equal(entryLabel({ bullet: 'x'.repeat(200) }).length, 80);
 });
