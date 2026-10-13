@@ -1,13 +1,25 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ROUTES } from "@/constants/routes";
 import { LEVEL_LABEL } from "@/features/interview/competencies";
 import { buildProfile } from "@/features/interview/profile";
 import { sessionProgress, type InterviewSession } from "@/features/interview/session";
+import { loadResumeDraft } from "@/features/resume/repository";
 import LevelBar from "./LevelBar";
 
-type Props = { session: InterviewSession; onReview: () => void; onExit: () => void };
+type Props = { owner: string; session: InterviewSession; onReview: () => void; onExit: () => void };
 /** The end of a set: what this set showed well first, then one thing to do. The all-time overview sits below it. */
-export default function FinishView({ session, onReview, onExit }: Props) {
+export default function FinishView({ owner, session, onReview, onExit }: Props) {
+  // Points sent from this practice wait in the Resume builder until the user accepts or dismisses them.
+  const [waiting, setWaiting] = useState(0);
+  useEffect(() => {
+    if (session.mode !== "resume") return;
+    let live = true;
+    loadResumeDraft(owner).then(draft => { if (live) setWaiting((draft.interviewSuggestions ?? []).filter(item => item.sessionId === session.id).length); }).catch(() => undefined);
+    return () => { live = false; };
+  }, [owner, session.id, session.mode]);
   const profile = buildProfile([session]), progress = sessionProgress(session);
   const best = profile.strengths.slice(0, 3);
   const next = profile.improve[0];
@@ -20,6 +32,10 @@ export default function FinishView({ session, onReview, onExit }: Props) {
     {next && <div className="ip-finish-block"><h3>One thing to work on</h3>
       <p><strong>{next.label}.</strong> {step ?? next.hint}</p></div>}
     {!best.length && !next && progress.answered > 0 && <p className="ip-hint">This practice did not show enough to rate a skill. Longer answers give more to work with.</p>}
+    {session.mode === "resume" && <div className="ip-finish-block"><h3>Your resume</h3>
+      <p>{waiting > 0 ? `${waiting} ${waiting === 1 ? "point" : "points"} from your answers ${waiting === 1 ? "is" : "are"} waiting in the Resume builder. Add or dismiss ${waiting === 1 ? "it" : "them"} there.`
+        : "To use what you practised, open an answer and choose “Send a point to my resume”. You add it in the Resume builder."}</p>
+      <Button asChild variant="outline"><Link to={ROUTES.resumeBuilder}>Open Resume builder</Link></Button></div>}
     <div className="ip-actions"><Button onClick={onExit}>Back to practice home</Button><Button variant="outline" onClick={onReview}>Review my answers</Button></div>
   </Card>;
 }

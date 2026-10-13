@@ -1,4 +1,6 @@
 """Epic 9 interview practice with synthetic data: no database writes, credentials or live AI."""
+import time
+from threading import Event
 from copy import deepcopy
 from types import SimpleNamespace
 from unittest.mock import Mock
@@ -12,6 +14,7 @@ from app.main import create_app
 from app.routers.interview import _optional_provider
 from app.routers.resume import get_resume_provider
 from app.services.ai_gateway import AIProviderError
+from app.services.model_overrides import ModelOverrideError
 from app.schemas.interview import FeedbackRequest, FeedbackResponse, PlanModelResponse, PlanRequest
 from app.services.auth import get_current_user
 from app.services.interview import (
@@ -598,7 +601,7 @@ def test_one_stalled_provider_call_is_retried_once():
     provider = Provider([AIProviderError("timed out", kind="timeout"), feedback().model_dump()])
     assert feedback_for_answer(feedback_request(), provider).summary.startswith("You described")
     assert len(provider.calls) == 2 and "repair_feedback" not in provider.calls[1]["payload"]
-    assert all(call["request_timeout_s"] <= 30 for call in provider.calls)
+    assert all(call["request_timeout_s"] <= 50 for call in provider.calls)
 
 
 def test_two_provider_failures_stop_after_one_retry():
@@ -624,3 +627,84 @@ def test_long_reason_text_is_trimmed_to_the_display_limit():
     raw = feedback(scores=[score(reason="You named a real check on the totals. " * 20, next_step="Say how often it found a mistake. " * 20)])
     result = normalise_feedback(raw, feedback_request(answer=LONG_ANSWER))
     assert len(result.scores[0].reason) <= 300 and len(result.scores[0].next_step) <= 200 and result.scores[0].reason.endswith("…")
+
+
+class SlowFirst:
+    """The first call stalls; later calls answer at once."""
+    def __init__(self, output, stall):
+        self.output, self.stall, self.calls, self.lock = output, stall, [], __import__("threading").Lock()
+
+    def complete_json(self, **kwargs):
+        with self.lock:
+            self.calls.append(kwargs)
+            number = len(self.calls)
+        if number == 1:
+            time.sleep(self.stall)
+        return deepcopy(self.output)
+
+
+def test_a_stalled_call_is_raced_by_a_second_call_and_the_first_success_wins(monkeypatch):
+    monkeypatch.setattr("app.services.interview.HEDGE_AFTER_S", 0.2)
+    provider = SlowFirst(feedback().model_dump(), stall=3)
+    started = time.monotonic()
+    result = feedback_for_answer(feedback_request(), provider)
+    assert result.summary.startswith("You described") and len(provider.calls) == 2
+    assert time.monotonic() - started < 1.5
+
+
+def test_a_fast_call_never_starts_a_second_call(monkeypatch):
+    monkeypatch.setattr("app.services.interview.HEDGE_AFTER_S", 0.5)
+    provider = SlowFirst(feedback().model_dump(), stall=0)
+    feedback_for_answer(feedback_request(), provider)
+    assert len(provider.calls) == 1
+
+
+@pytest.mark.parametrize("code", ["ai_models_unavailable", "ai_budget_exhausted"])
+def test_retryable_override_failure_waits_for_a_pending_success(monkeypatch, code):
+    monkeypatch.setattr("app.services.interview.HEDGE_AFTER_S", 0.01)
+
+    class PendingReply(SlowFirst):
+        def __init__(self):
+            super().__init__(feedback().model_dump(), stall=0)
+            self.hedge_started = Event()
+
+        def complete_json(self, **kwargs):
+            with self.lock:
+                self.calls.append(kwargs)
+                number = len(self.calls)
+            if number == 1:
+                assert self.hedge_started.wait(1)
+                raise ModelOverrideError(code)
+            self.hedge_started.set()
+            time.sleep(0.05)
+            return deepcopy(self.output)
+
+    provider = PendingReply()
+    assert feedback_for_answer(feedback_request(), provider).summary.startswith("You described")
+    assert len(provider.calls) == 2
+
+
+@pytest.mark.parametrize("code", ["ai_models_unavailable", "ai_budget_exhausted"])
+def test_fast_retryable_override_failure_is_retried_once(code):
+    provider = Provider([ModelOverrideError(code), feedback().model_dump()])
+    assert feedback_for_answer(feedback_request(), provider).summary.startswith("You described")
+    assert len(provider.calls) == 2
+
+
+@pytest.mark.parametrize("code", ["ai_credentials_invalid", "ai_configuration_invalid", "ai_rate_limited", "ai_request_rejected"])
+def test_terminal_override_failure_preserves_error_without_extra_requests(code):
+    error = ModelOverrideError(code)
+    provider = Provider([error, feedback().model_dump()])
+    with pytest.raises(ModelOverrideError) as raised:
+        feedback_for_answer(feedback_request(), provider)
+    assert raised.value is error
+    assert len(provider.calls) == 1
+
+
+def test_two_retryable_override_failures_preserve_the_last_error():
+    error = ModelOverrideError("ai_budget_exhausted")
+    provider = Provider([ModelOverrideError("ai_models_unavailable"), error])
+    with pytest.raises(ModelOverrideError) as raised:
+        feedback_for_answer(feedback_request(), provider)
+    assert raised.value is error
+    assert len(provider.calls) == 2

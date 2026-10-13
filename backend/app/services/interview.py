@@ -6,6 +6,7 @@ never cached or logged. The question bank is reference data only.
 import logging
 import re
 import time
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 
 from pydantic import ValidationError
 from sqlalchemy import text
@@ -400,13 +401,50 @@ FAILURE_TEXT = {
     "ai_schema_invalid": "The AI sent a reply that could not be used.",
     "internal_error": "Something went wrong while preparing this.",
 }
-# A normal call takes about 7 seconds. A stalled call is cut at 30 seconds so one retry still fits in the budget.
-ATTEMPT_TIMEOUT_S = 30
-RETRY_MIN_S = 10
+# A normal call takes about 8 seconds, but about one call in three stalls. If the first call has not answered after
+# HEDGE_AFTER_S, a second identical call starts and the first one to succeed wins. A call that fails outright is repeated at once.
+HEDGE_AFTER_S = 14
+RETRY_MIN_S = 8
+
+
+def _call_hedged(provider, request_kwargs, deadline, operation, started):
+    """Return the first successful provider reply, starting at most one extra call. Raises the last provider error."""
+    pool = ThreadPoolExecutor(max_workers=2)
+    futures, extra, last_error = set(), False, None
+
+    def launch():
+        timeout = max(0.001, deadline - time.monotonic())
+        futures.add(pool.submit(lambda: provider.complete_json(**request_kwargs, request_timeout_s=timeout)))
+
+    try:
+        launch()
+        while futures:
+            wait_for = deadline - time.monotonic() if extra else min(HEDGE_AFTER_S, max(0.0, deadline - time.monotonic()))
+            done, _ = wait(futures, timeout=max(0.0, wait_for), return_when=FIRST_COMPLETED)
+            if not done:
+                if not extra and deadline - time.monotonic() >= RETRY_MIN_S:
+                    extra = True; launch()
+                    logger.warning("interview_hedge op=%s after_ms=%.1f", operation, (time.monotonic() - started) * 1000)
+                    continue
+                break
+            for future in done:
+                futures.discard(future)
+                try:
+                    return future.result()
+                except (AIProviderError, ModelOverrideError) as error:
+                    if isinstance(error, ModelOverrideError) and error.code not in {"ai_models_unavailable", "ai_budget_exhausted"}:
+                        raise
+                    last_error = error
+                    if not extra and deadline - time.monotonic() >= RETRY_MIN_S:
+                        extra = True; launch()
+                        logger.warning("interview_retry op=%s after_ms=%.1f", operation, (time.monotonic() - started) * 1000)
+        raise last_error or AIProviderError("The AI did not answer in time.", kind="timeout")
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
 
 
 def _run(provider, operation, payload, response_model, prompt, validate, *, budget_s):
-    """One try plus one correction, or one retry after a provider failure. No cache, no retries inside the provider."""
+    """One try plus one correction. A stalled or failed provider call gets one hedge or retry. No cache, no retries inside the provider."""
     started = time.monotonic()
     deadline = started + budget_s
     rejected = None
@@ -418,11 +456,11 @@ def _run(provider, operation, payload, response_model, prompt, validate, *, budg
         if rejected:
             body["repair_feedback"] = {"code": rejected.code}
         try:
-            raw = provider.complete_json(
+            raw = _call_hedged(provider, dict(
                 operation=operation, payload=body, response_model=response_model,
                 system_prompt=prompt + (" This is the single correction: fix only the problem named in repair_feedback." if rejected else ""),
-                request_timeout_s=max(0.001, min(remaining, ATTEMPT_TIMEOUT_S)), request_max_retries=0, request_cache_enabled=False,
-            )
+                request_max_retries=0, request_cache_enabled=False,
+            ), deadline, operation, started)
             return validate(raw)
         except InterviewRejected as error:
             error.attempts = attempt
@@ -433,8 +471,5 @@ def _run(provider, operation, payload, response_model, prompt, validate, *, budg
         except (ModelOverrideError, GenerationFailure):
             raise
         except Exception as error:
-            if isinstance(error, AIProviderError) and attempt == 1 and deadline - time.monotonic() >= RETRY_MIN_S:
-                logger.warning("interview_provider_retry op=%s duration_ms=%.1f", operation, (time.monotonic() - started) * 1000)
-                continue
             code = "ai_schema_invalid" if isinstance(error, ValidationError) else "ai_provider_error" if isinstance(error, AIProviderError) else "internal_error"
             raise GenerationFailure(FAILURE_TEXT.get(code, FAILURE_TEXT["internal_error"]), code=code, attempts=attempt) from None
