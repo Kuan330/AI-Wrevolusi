@@ -2,6 +2,7 @@
 from typing import Annotated, Literal
 import re
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from app.schemas.resume_career import SourceMetadata, RoleAlignment, CareerQuote
 
 class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
@@ -34,6 +35,7 @@ class SourceSection(StrictModel):
     polishable_fact_ids: list[str] = Field(default_factory=list, max_length=500)
 
 class GenerateRequest(StrictModel):
+    source_metadata: SourceMetadata | None = None
     occupation_code: str | None = Field(default=None, min_length=1, max_length=100)
     job_requirements: str = Field(min_length=1, max_length=20000)
     skills: list[SkillCandidate] = Field(default_factory=list, max_length=250)
@@ -74,6 +76,30 @@ class GenerateRequest(StrictModel):
         if self.source_sections is not None:
             from app.schemas.resume_sources import validate_source_sections
             validate_source_sections(self)
+        if self.source_metadata is not None:
+            if self.occupation_code is None or self.source_sections is None:
+                raise ValueError("Career provenance requires a selected role and reviewed sections.")
+            skills, facts = {s.id for s in self.skills}, {f.id for f in self.evidence}
+            origins = self.source_metadata.skill_sources
+            if len({s.skill_id for s in origins}) != len(origins) or {s.skill_id for s in origins} != skills:
+                raise ValueError("Provenance must cover each candidate exactly once.")
+            if any(fid not in facts for s in origins for o in s.origins for fid in o.fact_ids):
+                raise ValueError("Skill provenance must reference reviewed facts.")
+            learning = self.source_metadata.learning_facts
+            if len({f.fact_id for f in learning}) != len(learning):
+                raise ValueError("Learning references must be unique.")
+            section_by_fact = {fid: s.title for s in self.source_sections for fid in s.fact_ids}
+            for fact in learning:
+                expected = "Professional Development" if fact.kind == "course_completion" else "Learning practice"
+                if section_by_fact.get(fact.fact_id) != expected:
+                    raise ValueError("Learning records must retain their reviewed section and nature.")
+            learning_ids = {row.fact_id for row in learning}
+            for row in origins:
+                for origin in row.origins:
+                    if origin.kind == "reviewed_learning" and (not origin.fact_ids or not set(origin.fact_ids) <= learning_ids):
+                        raise ValueError("Reviewed learning skill origins require selected learning facts.")
+                    if origin.kind == "reviewed_resume" and any(section_by_fact.get(fid) != "Skills" for fid in origin.fact_ids):
+                        raise ValueError("Reviewed resume skill origins must reference the source Skills block.")
         if not self.skills and not self.evidence:
             raise ValueError("Add skills or provide reviewed resume evidence first.")
         return self
@@ -106,12 +132,14 @@ class SkillGap(StrictModel):
     skill_slugs: list[Annotated[str, Field(max_length=120)]] = Field(default_factory=list, max_length=10)
 
 class GenerateResponse(StrictModel):
+    tailoring_version: Literal["career_evidence_v1"] | None = None
+    role_alignment: RoleAlignment | None = None
     skill_filter_version: Literal["role_relevance_v1"] | None = None
     sections: list[SkillsSection | ResumeSection] = Field(max_length=30)
     gaps: list[SkillGap] = Field(default_factory=list, max_length=20)
 
     outcome: Literal["tailored", "source_preserved"] | None = None
-    notices: list[Literal["ai_timeout", "ai_unavailable", "ai_output_invalid", "unsupported_polish", "unpolished_evidence", "no_polishable_evidence", "skill_relevance_incomplete", "no_related_skills"]] = Field(default_factory=list, max_length=6)
+    notices: list[Literal["ai_timeout", "ai_unavailable", "ai_output_invalid", "unsupported_polish", "unpolished_evidence", "no_polishable_evidence", "skill_relevance_incomplete", "no_related_skills", "career_summary_unavailable", "project_order_unverified", "alignment_incomplete"]] = Field(default_factory=list, max_length=12)
 
 class Polish(StrictModel):
     fact_id: str = Field(min_length=1, max_length=80)
@@ -127,6 +155,11 @@ class SkillRelevanceDecision(StrictModel):
 
 class ResumeRolePolishResponse(ResumePolishResponse):
     skill_decisions: list[SkillRelevanceDecision] = Field(max_length=250)
+
+class ResumeCareerPolishResponse(ResumeRolePolishResponse):
+    summary: list[Polish] = Field(default_factory=list, max_length=2)
+    project_order: list[Annotated[str, Field(min_length=1, max_length=80)]] = Field(default_factory=list, max_length=80)
+    evidence_links: list[CareerQuote] = Field(default_factory=list, max_length=250)
 
 class RecommendRequest(StrictModel):
     gaps: list[SkillGap] = Field(max_length=20)

@@ -122,3 +122,16 @@
 @keyframes rb-generation-flow{from{transform:translateX(-110%)}to{transform:translateX(275%)}}
 @media(max-width:760px){.rb-generation-progress{padding:14px;margin:16px 0}}
 @media(prefers-reduced-motion:reduce){.rb-generation-indicator{animation:none;transform:translateX(80%)}}
+
+.rb-career-alignment, .rb-learning-records { border: 1px solid #e3e7f4; border-radius: 16px; background: #f9faff; padding: 0 18px; margin: 16px 0; }
+.rb-career-alignment { max-width: 1120px; margin: 16px auto; width: calc(100% - 32px); }
+.rb-alignment-reference, .rb-learning-record { padding: 14px 0; border-top: 1px solid #e3e7f4; }
+.rb-alignment-reference h4 { font-weight: 650; color: #24355d; margin-bottom: 8px; }
+.rb-alignment-reference small { color: #526587; }
+.rb-alignment-reference p, .rb-learning-records p { color: #52617b; font-size: 13px; line-height: 1.6; margin: 8px 0; }
+.rb-alignment-reference ul { padding-left: 18px; list-style: disc; color: #52617b; font-size: 13px; }
+.rb-alignment-reference blockquote { border-left: 3px solid #c4b5fd; padding: 8px 12px; margin: 10px 0; background: #fff; border-radius: 0 8px 8px 0; }
+.rb-learning-record .rb-check { margin: 10px 0; }
+@media (max-width: 600px) { .rb-career-alignment { width: calc(100% - 20px); padding: 0 12px; } .rb-alignment-reference strong { display: block; } }
+.rw-edit-scroll .rb-career-alignment { width: 100%; max-width: none; margin: 12px 0; }
+.rb-career-alignment [role=region] { overflow-wrap: anywhere; }

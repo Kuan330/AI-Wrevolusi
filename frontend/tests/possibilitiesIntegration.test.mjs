@@ -134,7 +134,7 @@ test('typed service uses only the proposed endpoints and shared api wrapper', ()
     new URL('../src/services/possibilitiesService.ts', import.meta.url),
     'utf8',
   );
-  assert.match(service, /from "@\/services\/api"/);
+  assert.match(service, /from "(?:@\/services\/api|\.\/api(?:\.ts)?)"/);
   assert.match(service, /api\.get<PossibilitiesResponse>\("\/possibilities"/);
   assert.match(service, /api\.get<PossibilitiesResponse>\("\/possibilities"/);
   assert.doesNotMatch(service, /api\.put/);

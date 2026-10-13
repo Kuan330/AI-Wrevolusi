@@ -32,6 +32,7 @@ def test_requirements_equal_card_skills_without_ownership_states(client):
     payload = response.json()
     assert payload['occupation_code'] == '2421'
     assert payload['title'] == ROLE['title']
+    assert payload['tasks'] == ROLE['tasks']
     expected = route.build_direction_payload({**ROLE, 'required_skill_ids': [1, 2]}, SKILLS)
     assert payload['skills'] == [{key: skill[key] for key in ('skill_id', 'skill_slug', 'name')} for skill in expected['skills']]
     assert all('state' not in skill for skill in payload['skills'])

@@ -90,12 +90,8 @@ export function AccountProvider(props: { children: ReactNode }) {
     );
     await load(account);
     setError("");
-    if (importGuest) {
-      if (mode === "register") {
-        Object.entries(guest).forEach(([key, value]) =>
-          accountStorage.setItem(key, value),
-        );
-      } else if (guest["aiwrevolusi.learningCentre"]) {
+    if (importGuest && mode === "login") {
+      if (guest["aiwrevolusi.learningCentre"]) {
         const key = "aiwrevolusi.learningCentre";
         const current = JSON.parse(accountStorage.getItem(key) ?? "[]");
         const incoming = JSON.parse(guest[key]);

@@ -41,6 +41,7 @@ class OccupationRequirements(PossibilitiesSchema):
     occupation_code: str = Field(min_length=1, max_length=100)
     title: str = Field(min_length=1, max_length=300)
     skills: list[OccupationRequirementSkill] = Field(default_factory=list, max_length=60)
+    tasks: list[str] = Field(default_factory=list, max_length=100)
 
 
 class CareerSkill(PossibilitiesSchema):

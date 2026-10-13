@@ -50,6 +50,12 @@ const parseResponseBody = async (response: Response): Promise<unknown> => {
   return response.text();
 };
 
+function operationNotice(path: string, method: string | undefined, error?: unknown) {
+  const savedPost = method === "POST" && ["/learning/progress", "/learning/checkin", "/progress-reviews"].includes(path);
+  if (typeof window === "undefined" || (!savedPost && !["PUT", "PATCH", "DELETE"].includes(method ?? ""))) return;
+  window.dispatchEvent(new CustomEvent("api-operation-result", { detail: { type: error ? "error" : "success", content: error ? (error instanceof Error ? error.message : "Could not complete the operation. Please try again.") : method === "DELETE" ? "Deleted successfully." : "Changes saved successfully." } }));
+}
+
 const request = async <T>(
   path: string,
   init?: RequestInit,
@@ -102,8 +108,10 @@ const request = async <T>(
       throw new ApiError(detail, response.status, body);
     }
 
+    if (response.status !== 202) operationNotice(path, init?.method);
     return body as T;
   } catch (error) {
+    if (!externalSignal?.aborted) operationNotice(path, init?.method, error);
     if (modelsChanged) throw new ApiError("AI models changed. Try again with the new settings.", 409, { code: "ai_models_changed" });
     if (error instanceof Error && error.name === "AbortError") {
       throw new ApiError("Request timed out", 408);

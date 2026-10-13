@@ -125,9 +125,9 @@ def test_blank_optional_contacts_in_legacy_drafts_and_list_rows_render_real_pdf(
 
 
 @pytest.mark.parametrize("contacts", [
-    {"email": "not an email", "phone": "0412345678", "website": "www.example.com"},
-    {"email": ["", "Contact me directly", "second address"], "phone": ["Office: 12345", "Local 0400 000 000"], "website": "Personal site coming soon"},
-    {"email": 'Own "quoted" contact', "phone": "12345 ext. 9", "website": "https://example.test/path/"},
+    {"email": "first@example.com", "phone": "0412345678", "website": "www.example.com"},
+    {"email": ["", "first@example.com", "second@example.com"], "phone": ["+61 412 345 678", "0400 000 000"], "website": "Personal site coming soon"},
+    {"email": "own@example.com", "phone": "+60 12 345 6789", "website": "https://example.test/path/"},
 ])
 def test_free_text_contacts_render_exact_literals_without_format_restrictions(monkeypatch, contacts):
     import app.services.resume_render as service
@@ -175,7 +175,7 @@ def test_contact_code_markup_and_schemes_are_inert_text_not_commands_or_links(mo
         return process
 
     monkeypatch.setattr(service.subprocess, "run", inspect_worker)
-    assert service.render_pdf({"cv": {"email": literal, "phone": literal, "website": literal, "sections": {"Skills": []}}}).startswith(b"%PDF-")
+    assert service.render_pdf({"cv": {"email": "own@example.com", "phone": "0412345678", "website": literal, "sections": {"Skills": []}}}).startswith(b"%PDF-")
     # The exemption is narrowly scoped to literal contacts. Editable Markdown
     # chapters still reject executable/resource syntax.
     if literal.startswith(("#read", "$$", "[label]", "![photo]")):
@@ -198,13 +198,13 @@ def test_free_text_header_contacts_keep_original_order_with_social_and_custom_co
         process = original_run(command, **kwargs)
         assert process.returncode == 0
         text = (Path(command[-1]) / "resume.typ").read_text(encoding="utf-8")
-        markers = ['#text("Own site label")', 'github.com/own-user', '#text("Own phone label")', 'Own custom label', '#text("Own email label")']
+        markers = ['#text("Own site label")', 'github.com/own-user', '#text("0412345678")', 'Own custom label', '#text("own@example.com")']
         indices = [text.index(marker) for marker in markers]
         assert indices == sorted(indices)
         return process
 
     monkeypatch.setattr(service.subprocess, "run", inspect_worker)
-    document = {"cv": {"website": "Own site label", "social_networks": [{"network": "GitHub", "username": "own-user"}], "phone": "Own phone label", "custom_connections": [{"fontawesome_icon": "link", "placeholder": "Own custom label", "url": None}], "email": "Own email label", "sections": {"Skills": []}}}
+    document = {"cv": {"website": "Own site label", "social_networks": [{"network": "GitHub", "username": "own-user"}], "phone": "0412345678", "custom_connections": [{"fontawesome_icon": "link", "placeholder": "Own custom label", "url": None}], "email": "own@example.com", "sections": {"Skills": []}}}
     assert service.render_pdf(document).startswith(b"%PDF-")
 
 
@@ -217,3 +217,10 @@ def test_contact_normalization_preserves_other_fields_and_invalid_array_types():
     assert normalized["cv"]["name"] == ""
     assert normalized["settings"] == document["settings"]
     assert "phone" not in normalized["cv"] and "website" not in normalized["cv"]
+
+
+@pytest.mark.parametrize("contact", [{"email": "not an email"}, {"phone": "Office 123"}, {"phone": "123"}, {"phone": "+1234567890123456"}])
+def test_invalid_contact_format_rejected_before_render(contact):
+    from app.services.resume_render import validate_render_document, InvalidResume
+    with pytest.raises(InvalidResume):
+        validate_render_document({"cv": {**contact, "sections": {}}})

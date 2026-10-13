@@ -9,6 +9,8 @@ def section_heading(value):
         (r"(?:(?:professional|work|employment|relevant|career)\s+)?experience|employment|work history|employment history", "Experience"),
         (r"(?:(?:academic|personal|selected|professional)\s+)?projects?", "Projects"),
         (r"education(?:\s+(?:and|&)\s+qualifications)?|academic background", "Education"),
+        (r"professional development", "Professional Development"),
+        (r"learning practice", "Learning practice"),
         (r"(?:(?:professional|career|personal)\s+)?summary|profile|objective|about me", "Summary"),
     ]:
         if re.fullmatch(pattern, value, re.I): return title

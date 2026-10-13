@@ -6,6 +6,7 @@ export function validTargetRole(value: unknown): value is OccupationRequirements
   const role = value as OccupationRequirements;
   return typeof role.occupation_code === "string" && Boolean(role.occupation_code.trim()) && role.occupation_code.length <= 100 &&
     typeof role.title === "string" && Boolean(role.title.trim()) && role.title.length <= 300 &&
+    (role.tasks === undefined || (Array.isArray(role.tasks) && role.tasks.length <= 100 && role.tasks.every(task => typeof task === "string"))) &&
     Array.isArray(role.skills) && role.skills.length <= 60 && role.skills.every(skill => skill &&
       Number.isSafeInteger(skill.skill_id) && skill.skill_id > 0 && typeof skill.skill_slug === "string" && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(skill.skill_slug) && skill.skill_slug.length <= 120 &&
       typeof skill.name === "string" && Boolean(skill.name.trim()) && skill.name.length <= 120) &&

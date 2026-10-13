@@ -74,7 +74,8 @@ def build_occupation_requirements(code, skills, occupations, *, matcher=occupati
     required = matcher(occupation.get('tasks') or [], skills, occupation=occupation)
     payload = build_direction_payload({**occupation, 'required_skill_ids': sorted(required)}, skills)
     return OccupationRequirements(occupation_code=code, title=payload['title'],
-        skills=[{key: skill[key] for key in ('skill_id', 'skill_slug', 'name')} for skill in payload['skills']])
+        skills=[{key: skill[key] for key in ('skill_id', 'skill_slug', 'name')} for skill in payload['skills']],
+        tasks=list(occupation.get('tasks') or []))
 
 
 def requirements_text(role):

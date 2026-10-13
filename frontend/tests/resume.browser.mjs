@@ -1,3 +1,4 @@
+import { applyReviewedResume } from "./resume-browser-review.mjs";
 /** Isolated QA: synthetic accounts/AI/courses; only PDFs use a local real engine.
  * Requires Vite on 5186, tests.resume_preview_server on 8016 and Playwright.
  */
@@ -46,7 +47,7 @@ await context.route('**/*', async route => {
     if (generateGate) await generateGate;
     if (fail) { fail = false; return json(route, { detail: 'Synthetic retryable error', code: 'unverified_name', fields: [['sections', 0, 'entries', 0, 'text']] }, 503); }
     const s = input.skills[0];
-    return json(route, { skill_filter_version: "role_relevance_v1", sections: [{ title: 'Skills', entries: [{ text: s.name + (count > 2 ? ' applied to analysis' : ''), skill_ids: [s.id], fact_ids: [] }] }], gaps: [{ id: 'security', label: 'Cybersecurity', keywords: ['security'], skill_slugs: ['networks-and-cybersecurity'] }] });
+    return json(route, { tailoring_version: "career_evidence_v1", skill_filter_version: "role_relevance_v1", sections: [{ title: 'Skills', entries: [{ text: s.name + (count > 2 ? ' applied to analysis' : ''), skill_ids: [s.id], fact_ids: [] }] }], gaps: [{ id: 'security', label: 'Cybersecurity', keywords: ['security'], skill_slugs: ['networks-and-cybersecurity'] }] });
   }
   if (path === '/resume/recommend-courses') { courseRequests++; return json(route, { courses: ['security-1', 'security-2'].map(course_id => ({ course_id, gap_ids: ['security'], reason: 'Addresses the specified cybersecurity gap.' })) }); }
   if (path === '/learning/courses') return json(route, { found: true, courses: ['security-1', 'security-2'].map((course_id, i) => ({ course_id, skill_id: 'networks-and-cybersecurity', title: `Security course ${i + 1}`, provider: 'Synthetic catalogue', level: 'Beginner', chapters: [{ order: 1, title: 'Security foundations', duration_min: 30 }], chapter_count: 1 })) });
@@ -211,7 +212,7 @@ try {
   await page.getByRole('alert').filter({ hasText: 'Synthetic retryable' }).waitFor();
   assert.match(await page.getByRole('alert').filter({ hasText: 'Synthetic retryable' }).innerText(), /Generated section 1 → Entries → Entry 1 → Text/);
   assert.equal(courseRequests, 0, 'Failed generation cannot start course recommendations');
-  assert.match(await currentRequirements(), /QA TARGET PRIVATE/); await page.getByRole('button', { name: 'Generate my resume' }).click(); await pdfReady(); await saved();
+  assert.match(await currentRequirements(), /QA TARGET PRIVATE/); await page.getByRole('button', { name: 'Generate my resume' }).click(); await applyReviewedResume(page); await pdfReady(); await saved();
   const yaml = (await exportFile('YAML')).toString(); assert.match(yaml, /Skills:/); assert.doesNotMatch(yaml, /name:|Experience:|Education:/);
   const pdf = await exportFile('PDF'); await writeFile(`${output}/synthetic.pdf`, pdf); assert.ok(pdf.equals(lastPdf), 'Preview/download bytes must match');
   await page.screenshot({ path: `${output}/desktop.png`, fullPage: true });
@@ -369,7 +370,7 @@ try {
   assert.doesNotMatch(await page.getByLabel(/Resume evidence that AI will receive/).inputValue(), /Alex Example|alex@example|412 345/);
   await selectTarget('QA TARGET PRIVATE: analysis and Python.'); await page.locator('.rb-source-review .rb-check').getByRole('checkbox').check();
   assert.match(await page.getByLabel('Skills explicitly listed in your original resume').inputValue(), /Python/); await saved();
-  await page.getByRole('button', { name: 'Generate my resume' }).click(); await pdfReady();
+  await page.getByRole('button', { name: 'Generate my resume' }).click(); await applyReviewedResume(page); await pdfReady();
   assert.ok(latestInput.skills.some(skill => skill.name === 'Python')); assert.doesNotMatch(JSON.stringify(latestInput), /Alex Example|alex@example.com|412 345/);
   assert.ok(sync.every(payload => !JSON.stringify(payload).includes('QA TARGET PRIVATE') && !Object.keys(payload.data).some(key => key.includes('resume')))); assert.deepEqual(errors, []);
   console.log('PASS: Possibilities child menu on desktop/mobile/focus mode, search, keyboard and correct child highlights; blank/legacy/list and free-text contacts with literal rendering and recovery; focused workbench/menu restoration, split pointer/keyboard, three tabs/explicit controls, structured private field errors with last-valid PDF recovery and no automatic render retries, and YAML-only locale restore/render compatibility, selection formatting/safe links, undo/redo, all nine entry types and nested lists, rename/reorder/delete, tablet/phone overflow, lazy continuous PDF; read-only selected role/reload, no-evidence generation blocked; explicit empty template without AI/courses, skill-error protection, collapsed privacy, first-use/retry/recovery, same PDF export, course partial/all, YAML recovery, section apply/undo, PDF import, desktop/mobile/keyboard, pagination/zoom, account isolation/logout/clear, no resume sync, invalid/encrypted/textless sources, DOCX/My Plan handoff and original-skill review.');

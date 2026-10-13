@@ -1,4 +1,5 @@
 import { api } from "./api.ts";
+import { currentWorkspaceOwner, invalidatePossibilitiesCache } from "./accountStorage.ts";
 
 /** Skill input for brief/summary — only `skill_id` is used by the server. */
 export type SkillShape = {
@@ -114,9 +115,13 @@ export function postLearningProgress(
   localDate: string,
   chapters: LearningChapterProgress[],
 ) {
+  const owner = currentWorkspaceOwner();
   return api.post<ProgressUpdateResponse>("/learning/progress", {
     local_date: localDate,
     chapters,
+  }).then(response => {
+    invalidatePossibilitiesCache(owner);
+    return response;
   });
 }
 
@@ -169,6 +174,6 @@ export function postLearningDailyBrief(
 }
 
 /** Authoritative saved chapter values for the signed-in learner. */
-export function getLearningProgress() {
-  return api.get<{ chapters: LearningChapterProgress[] }>("/learning/progress");
+export function getLearningProgress(signal?: AbortSignal) {
+  return api.get<{ chapters: LearningChapterProgress[] }>("/learning/progress", signal);
 }

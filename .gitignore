@@ -41,6 +41,7 @@ frontend/dist/
 
 # Resume implementation QA artifacts (synthetic documents and test logs)
 /.local/resume-qa/
+/.local/epic8-*
 /backend/.pytest-resume-*/
 /backend/.resume-*-results.txt
 /frontend/.resume-check-results.txt

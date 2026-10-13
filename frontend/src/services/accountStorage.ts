@@ -21,6 +21,7 @@ export const workspaceKeys = [
 ];
 let userId: string | null = null;
 let workspaceSession = 0;
+let possibilitiesCacheRevision = 0;
 let workspace: Workspace = { data: {}, revision: 0 };
 let saving: Promise<void> | null = null;
 let savingSession: number | null = null;
@@ -72,7 +73,7 @@ export function activateWorkspace(id: string | null, next?: Workspace) {
 export function clearWorkspaceOnLogout() {
   for (const key of Object.keys(localStorage)) {
     if (workspaceKeys.includes(key) || key.startsWith("aiwrevolusi.account.") ||
-        key === "aiwrevolusi.selectedOccupation" || key === "aiwrevolusi.demo.credential") {
+        key.startsWith("aiwrevolusi.possibilities.cache.") || key === "aiwrevolusi.selectedOccupation" || key === "aiwrevolusi.demo.credential") {
       localStorage.removeItem(key);
     }
   }
@@ -162,6 +163,24 @@ export const accountStorage = {
   },
 };
 export const hasAccountWorkspace = () => Boolean(userId);
+/** Derived career results stay in the account's browser cache, outside workspace sync. */
+export function readPossibilitiesCache(): string | null {
+  if (!userId) return null;
+  try { return localStorage.getItem(`aiwrevolusi.possibilities.cache.v1.${userId}`); }
+  catch { return null; }
+}
+export function writePossibilitiesCache(value: string): void {
+  if (!userId) return;
+  try { localStorage.setItem(`aiwrevolusi.possibilities.cache.v1.${userId}`, value); }
+  catch { /* A full or blocked cache must not hide valid career results. */ }
+}
+export const currentPossibilitiesCacheRevision = () => possibilitiesCacheRevision;
+export function invalidatePossibilitiesCache(owner: string | null): void {
+  possibilitiesCacheRevision += 1;
+  if (!owner) return;
+  try { localStorage.removeItem(`aiwrevolusi.possibilities.cache.v1.${owner}`); }
+  catch { /* Cache revision also prevents reuse when storage is blocked. */ }
+}
 /** Detect an account change while an operation waits for catalogue data. */
 export const currentWorkspaceSession = () => workspaceSession;
 
@@ -270,3 +289,5 @@ export async function commitWorkspaceItems(items: Record<string, string | null>)
     notify();
   }
 }
+
+export const currentWorkspaceOwner = () => userId;

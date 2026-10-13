@@ -1,3 +1,4 @@
+import { applyReviewedResume } from "./resume-browser-review.mjs";
 /** Offline browser acceptance: synthetic accounts/reference data/AI; no live user data. */
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
@@ -64,7 +65,7 @@ await context.route("**/*", async route => {
   if (path === "/resume/generate") {
     const input = request.postDataJSON(); generated.push(input);
     if (generationGate) await generationGate;
-    return json(route, { skill_filter_version: "role_relevance_v1", sections: [{ title: "Skills", entries: [{ text: "Understanding SQL", skill_ids: input.skills.map(skill => skill.id), fact_ids: [] }] }], gaps: [] });
+    return json(route, { tailoring_version: "career_evidence_v1", skill_filter_version: "role_relevance_v1", sections: [{ title: "Skills", entries: [{ text: "Understanding SQL", skill_ids: input.skills.map(skill => skill.id), fact_ids: [] }] }], gaps: [] });
   }
   return json(route, { detail: "Offline QA endpoint unavailable" }, 503);
 });
@@ -107,7 +108,7 @@ try {
   await page.screenshot({ path: `${output}/selected-role-desktop.png`, fullPage: true });
   await page.reload(); await ready(); await roleShown(roleA); await saved();
   await page.getByRole("button", { name: "Generate my resume", exact: true }).click();
-  await page.locator(".rw-workbench").waitFor(); await saved();
+  await applyReviewedResume(page); await page.locator(".rw-workbench").waitFor(); await saved();
   assert.equal(generated[0].job_requirements, requirements(roleA));
   assert.deepEqual(generated[0].skills.map(skill => skill.name), ["SQL"], "Role requirements do not seed user skills");
   const original = await readDraft(); assert.equal(original.jobRequirements, requirements(roleA));

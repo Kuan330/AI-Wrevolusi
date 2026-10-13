@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
 import { sourceProjects, reviewedResumeInput } from "../src/features/resume/projects.ts";
-import { selectedCourseSkills, mergeResumeSkills, resumeSkillSnapshot } from "../src/features/resume/skills.ts";
+import { selectedCourseSkills, mergeResumeSkills, resumeSkillSnapshot, resumeSkillInputs, mergeSkillInputs } from "../src/features/resume/skills.ts";
 import { createOnboardingRecords } from "../src/features/learning-onboarding/learningOnboarding.ts";
 import { activateWorkspace } from "../src/services/accountStorage.ts";
 import { evidenceFromText, redactResume } from "../src/features/resume/redaction.ts";
@@ -73,7 +73,13 @@ test("a saved learning plan contributes its selected skill without courses or co
     return resumeSkillSnapshot(reference);
   };
   try {
-    for (const status of ["draft", "active"]) assert.ok(snapshot(status).some(skill => skill.name === "Creative thinking"));
+    for (const status of ["draft", "active"]) {
+      const skill = snapshot(status).find(skill => skill.name === "Creative thinking");
+      assert.ok(skill);
+      const source = mergeSkillInputs(resumeSkillInputs(reference)).sources.find(source => source.skill_id === skill.id);
+      assert.deepEqual(source.origins.map(origin => origin.kind), ["learning_intention"]);
+      assert.ok(source.origins.every(origin => origin.fact_ids.length === 0));
+    }
     assert.ok(!snapshot("archived").some(skill => skill.name === "Creative thinking"));
   } finally { activateWorkspace(null); }
 });

@@ -1,3 +1,4 @@
+import { applyReviewedResume } from "./resume-browser-review.mjs";
 /** Synthetic-only acceptance of role-filtered Skills through the real local generator. */
 import assert from "node:assert/strict";
 import {createRequire} from "node:module";
@@ -62,7 +63,7 @@ try{
  const source=docxFixture(sample.split("\n"));
  await page.getByLabel('Upload original resume PDF or DOCX').setInputFiles({name:'synthetic-role.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:source});
  await page.getByText('I have reviewed this text and removed',{exact:false}).click();
- await page.getByRole('button',{name:'Generate my resume',exact:true}).click();await page.locator('.rw-workbench').waitFor();await saved();
+ await page.getByRole('button',{name:'Generate my resume',exact:true}).click();await applyReviewedResume(page);await page.locator('.rw-workbench').waitFor();await saved();
  const first=await read(),names=first.document.cv.sections.Skills.map(e=>e.bullet),candidates=requests[0].skills.map(s=>s.name);
  assert.equal(requests[0].occupation_code,'2421');
  for(const skill of ['Excel','SQL','Life insurance','Analytical thinking','Programming','AI and big data','Reading, writing and mathematics'])assert.ok(candidates.includes(skill),skill);
@@ -78,12 +79,12 @@ try{
  await target();referenceChanged=true;await start();await page.getByText('The target role requirements changed.',{exact:false}).first().waitFor();
  assert.deepEqual((await read()).document,first.document);assert.equal((await read()).proposal,null);
  referenceChanged=false;await page.getByRole('button',{name:'Retry role requirements',exact:true}).click();await page.getByRole('heading',{name:management.title,exact:true}).waitFor();
- // Only standard matches survive failure for a newly selected role; applied interview target remains old.
+ // Only standard matches survive failure; reviewed CV skills sort before learning intentions, and the applied interview target remains old.
  await page.getByRole('button',{name:'Back to editing',exact:true}).click();await changeRole(software);await target();scenario='unavailable';await start();await proposal.waitFor();
  let current=await read();assert.equal(current.proposal.outcome,'source_preserved');
- assert.deepEqual(current.proposal.sections.find(s=>s.title==='Skills').entries.map(e=>e.text),['Programming','SQL']);
+ assert.deepEqual(current.proposal.sections.find(s=>s.title==='Skills').entries.map(e=>e.text),['SQL','Programming']);
  await proposal.getByText('Skill relevance checking was incomplete.',{exact:false}).waitFor();
- await chooseChapter('Skills');await apply();current=await read();assert.deepEqual(current.document.cv.sections.Skills.map(e=>e.bullet),['Programming','SQL']);assert.equal(current.jobRequirements,first.jobRequirements);
+ await chooseChapter('Skills');await apply();current=await read();assert.deepEqual(current.document.cv.sections.Skills.map(e=>e.bullet),['SQL','Programming']);assert.equal(current.jobRequirements,first.jobRequirements);
  await page.getByRole('button',{name:'Undo',exact:true}).click();await saved();assert.deepEqual((await read()).document,first.document);assert.equal((await read()).targetRole.occupation_code,'2512');
  // Applying another chapter cannot falsely mark old Skills as filtered for the new inputs.
  await target();scenario='role_relevance';await start();await proposal.waitFor();await chooseChapter('Experience');await apply();

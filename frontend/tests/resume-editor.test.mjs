@@ -127,12 +127,13 @@ test("contact normalisation never rewrites non-empty text or changes other field
 });
 
 
-test("email, local phones, plain websites and punctuation are free text in form/YAML", () => {
-  const draft = { ...document, cv: { ...document.cv, email: "My email contact", phone: ["0412345678", "Office #123"], website: ['www.example.com', '#read("private.txt")', '[label](file:///private)', '**Literal stars**'] } };
+test("email and phone formats validate while website text remains literal", () => {
+  const draft = { ...document, cv: { ...document.cv, email: "name@example.com", phone: ["0412345678", "+60 (12) 345-6789"], website: ['www.example.com', '#read("private.txt")', '[label](file:///private)', '**Literal stars**'] } };
   const yaml = documentYaml(draft);
   const parsed = parseResumeYaml(yaml);
   assert.equal(parsed.error, "");
   assert.deepEqual(parsed.document, draft);
+  for (const cv of [{ email: "not an email" }, { phone: "Office #123" }, { phone: "123" }, { phone: "+1234567890123456" }]) assert.notEqual(parseResumeYaml(documentYaml({ cv })).error, "");
   assert.equal(documentYaml(draft), yaml);
   assert.notEqual(parseResumeYaml(documentYaml({ cv: { sections: { Skills: [{ bullet: '#read("private.txt")' }] } } })).error, "");
   for (const value of [123, { invalid: "object" }, [null], ["Text", 123]]) assert.match(parseResumeYaml(documentYaml({ cv: { email: value } })).error, /must be text or a list of text values/);
@@ -167,4 +168,20 @@ test("existing locale survives form edits, YAML round-trips and render preparati
   assert.deepEqual(parsed.document.locale, locale);
   assert.deepEqual(resumeRenderDocument(parsed.document).locale, locale);
   assert.deepEqual(draft, before);
+});
+
+test("history owns its snapshots even if callers mutate input documents after recording", () => {
+  const before = draft("before"), after = draft("after");
+  const history = createEditorHistory(); history.record(before, after);
+  before.document.cv.sections.Skills[0].bullet = "external before mutation";
+  after.document.cv.sections.Skills[0].bullet = "external after mutation";
+  assert.equal(history.undo().document.cv.sections.Skills[0].bullet, "before");
+  assert.equal(history.redo().document.cv.sections.Skills[0].bullet, "after");
+});
+test("equivalent snapshots remain no-ops while YAML-only changes remain undoable", () => {
+  const original = draft("same"); const history = createEditorHistory();
+  history.record(original, structuredClone(original)); assert.equal(history.canUndo, false);
+  const formatted = { ...original, yamlText: original.yamlText + "\n" };
+  history.record(original, formatted, "yaml"); assert.equal(history.undo().yamlText, original.yamlText);
+  assert.equal(history.redo().yamlText, formatted.yamlText);
 });

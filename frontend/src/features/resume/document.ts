@@ -1,3 +1,4 @@
+import { contactError } from "./contactValidation.ts";
 import { LineCounter, parseDocument, stringify } from "yaml";
 import Ajv2020 from "ajv/dist/2020.js";
 import schema from "./rendercv-2.8.schema.json" with { type: "json" };
@@ -5,18 +6,18 @@ import type { Contacts, GeneratedSection, ResumeDocument, ResumeEntry, SkillFilt
 export const THEMES = ["classic", "ember", "engineeringclassic", "engineeringresumes", "harvard", "ink", "moderncv", "opal", "sb2nov"] as const;
 const ajv = new Ajv2020({ strict: false, validateFormats: false, allErrors: true });
 const validate = ajv.compile(schema);
-export function parseResumeYaml(text: string): { document: ResumeDocument | null; error: string } {
+type ResumeValidation = { document: ResumeDocument | null; error: string };
+const invalidDocument = (cause: unknown): ResumeValidation => ({ document: null, error: cause instanceof Error ? cause.message : "Invalid YAML." });
+/** One shared schema/resource guard for form objects and parsed YAML. */
+function validateResumeValue(value: ResumeDocument, sourceLength: number): ResumeValidation {
   try {
-    if (text.length > 150000) throw new Error("YAML exceeds the supported text limit.");
-    const lineCounter = new LineCounter();
-    const parsed = parseDocument(text, { lineCounter, uniqueKeys: true });
-    if (parsed.errors.length) throw new Error(parsed.errors[0].message);
-    const value = parsed.toJS({ maxAliasCount: 20 }) as ResumeDocument;
+    if (sourceLength > 150000) throw new Error("YAML exceeds the supported text limit.");
     if (!value || typeof value !== "object" || !value.cv || typeof value.cv !== "object" || Array.isArray(value.cv)) throw new Error("The document needs a cv mapping.");
-    // Contact contents are free text; reject only incompatible YAML shapes.
+    // Validate contact formats consistently for both form and YAML input.
     for (const key of ["email", "phone", "website"]) {
       const contact = value.cv[key];
       if (contact != null && typeof contact !== "string" && !(Array.isArray(contact) && contact.every(item => typeof item === "string"))) throw new Error(`cv/${key} must be text or a list of text values.`);
+      for (const item of Array.isArray(contact) ? contact : [contact]) { if (typeof item === "string") { const error = contactError(key, item); if (error) throw new Error(`cv/${key}: ${error}`); } }
     }
     // Match the Python builder's implicit classic theme without altering YAML.
     const validationValue = value.design && typeof value.design === "object" && !Array.isArray(value.design) && value.design.theme === undefined
@@ -41,7 +42,23 @@ export function parseResumeYaml(text: string): { document: ResumeDocument | null
     };
     inspect(value);
     return { document: value, error: "" };
-  } catch (cause) { return { document: null, error: cause instanceof Error ? cause.message : "Invalid YAML." }; }
+  } catch (cause) { return invalidDocument(cause); }
+}
+export function parseResumeYaml(text: string): ResumeValidation {
+  try {
+    if (text.length > 150000) throw new Error("YAML exceeds the supported text limit.");
+    const lineCounter = new LineCounter();
+    const parsed = parseDocument(text, { lineCounter, uniqueKeys: true });
+    if (parsed.errors.length) throw new Error(parsed.errors[0].message);
+    return validateResumeValue(parsed.toJS({ maxAliasCount: 20 }) as ResumeDocument, text.length);
+  } catch (cause) { return invalidDocument(cause); }
+}
+/** Form values already have structure. Preserve alias limits for emitted shared references. */
+export function validateResumeDocument(value: ResumeDocument, serializedYaml?: string): ResumeValidation {
+  try {
+    const text = serializedYaml ?? stringify(value, { lineWidth: 0 });
+    return /(?:^|\s)[&*]a\d+(?=\s|$)/m.test(text) ? parseResumeYaml(text) : validateResumeValue(value, text.length);
+  } catch (cause) { return invalidDocument(cause); }
 }
 export const documentYaml = (document: ResumeDocument) => stringify(document, { lineWidth: 0 });
 /** Empty optional contact inputs are editing placeholders, not invalid facts.
