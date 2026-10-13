@@ -45,3 +45,4 @@ frontend/dist/
 /backend/.pytest-resume-*/
 /backend/.resume-*-results.txt
 /frontend/.resume-check-results.txt
+/.local/interview-transcription/

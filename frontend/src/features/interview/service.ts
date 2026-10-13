@@ -10,6 +10,8 @@ type FeedbackBody = {
   follow_ups_asked: number; skills: { id: number; name: string }[];
 };
 export const interviewService = {
+  transcriptionCapabilities: (signal: AbortSignal) => api.get<{ configured: boolean }>("/interview/transcription-capabilities", signal),
+  transcribe: (audio: Blob, signal: AbortSignal) => api.postBlob<{ text: string }>("/interview/transcribe", audio, 55000, signal).then(result => result.text),
   bank: (occupationCode: string, signal: AbortSignal) =>
     api.get<QuestionBank>(`/interview/question-bank?occupation_code=${encodeURIComponent(occupationCode)}&limit=12`, signal),
   plan: (body: PlanBody, signal: AbortSignal) => api.post<PlanResult>("/interview/plan", body, 60000, signal),

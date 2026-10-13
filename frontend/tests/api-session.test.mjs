@@ -44,3 +44,18 @@ test('sign-in and account lookups never trigger a renewal', async () => {
     assert.deepEqual(calls, [`POST ${path}`]);
   }
 });
+
+test('audio uploads retain their bytes and MIME type through session renewal', async () => {
+  const audio = new Blob(['audio bytes'], { type: 'audio/webm;codecs=opus' }), uploads = [];
+  globalThis.fetch = async (url, init) => {
+    if (String(url).endsWith('/auth/refresh')) return json(200, {});
+    uploads.push(init);
+    return uploads.length === 1 ? json(401, { detail: 'Expired.' }) : json(200, { text: 'Transcript.' });
+  };
+  assert.deepEqual(await api.postBlob('/interview/transcribe', audio, 2000, new AbortController().signal), { text: 'Transcript.' });
+  assert.equal(uploads.length, 2);
+  for (const upload of uploads) {
+    assert.equal(upload.body, audio); assert.equal(upload.headers['Content-Type'], audio.type);
+    assert.equal(upload.credentials, 'include'); assert.equal(upload.cache, 'no-store');
+  }
+});

@@ -29,6 +29,57 @@ test('English is requested and live text is reported apart from finished text', 
   assert.deepEqual(log.text.at(-1), ['i checked the totals', 'i checked']);
 });
 
+test('unchanged interim words survive an update that starts after index zero', () => {
+  const made = install(), { log, h } = handlers();
+  startSpeech(h);
+  said(made[0], [['i checked', false], ['the total', false]]);
+  made[0].onresult({ resultIndex: 1, results: [Object.assign([{ transcript: 'i checked' }], { isFinal: false }), Object.assign([{ transcript: 'the totals' }], { isFinal: false })] });
+  assert.deepEqual(log.text.at(-1), ['i checked the totals', '']);
+});
+
+test('the current result list replaces interim text and never duplicates final phrases', () => {
+  const made = install(), { log, h } = handlers();
+  startSpeech(h);
+  said(made[0], [['first phrase', true], ['old guess', false]]);
+  said(made[0], [['first phrase', true], ['better guess', false]]);
+  assert.deepEqual(log.text.at(-1), ['first phrase better guess', 'first phrase']);
+  made[0].onresult({ resultIndex: 1, results: [Object.assign([{ transcript: 'first phrase' }], { isFinal: true })] });
+  assert.deepEqual(log.text.at(-1), ['first phrase', 'first phrase']);
+});
+
+test('stop retains visible interim words when the browser ends without a final result', () => {
+  const made = install(), { log, h } = handlers();
+  const session = startSpeech(h);
+  said(made[0], [['i checked the totals', false]]);
+  session.stop(); made[0].onend();
+  assert.deepEqual(log.text.at(-1), ['i checked the totals', 'i checked the totals']);
+  assert.equal(log.ended, 1);
+});
+
+test('a restart preserves pending words and ignores late events from the old recognizer', () => {
+  const made = install(), { log, h } = handlers();
+  startSpeech(h);
+  said(made[0], [['first part', false]]); made[0].onend();
+  said(made[1], [['second part', true]]);
+  assert.deepEqual(log.text.at(-1), ['first part second part', 'first part second part']);
+  const count = log.text.length;
+  said(made[0], [['stale result', true]]);
+  assert.equal(log.text.length, count);
+});
+
+test('listening status follows native start and pauses while the recognizer restarts', () => {
+  const made = install(), { log, h } = handlers();
+  log.listening = [];
+  startSpeech({ ...h, onListening: value => log.listening.push(value) });
+  assert.deepEqual(log.listening, []);
+  made[0].onstart();
+  assert.deepEqual(log.listening, [true]);
+  made[0].onend();
+  assert.deepEqual(log.listening, [true, false]);
+  made[1].onstart();
+  assert.deepEqual(log.listening, [true, false, true]);
+});
+
 test('a session the browser ends early is restarted, up to a limit, and keeps the words heard', () => {
   const made = install(), { log, h } = handlers();
   startSpeech(h);

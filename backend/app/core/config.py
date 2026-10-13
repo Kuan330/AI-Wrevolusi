@@ -87,6 +87,11 @@ class Settings(BaseSettings):
     ai_rpm_limit: int = Field(default=60, gt=0, le=6000)
     ai_cache_size: int = Field(default=128, ge=0, le=4096)
 
+    # Speech has separate credentials; personal audio never uses text fallbacks.
+    speech_api_key: str = ''
+    speech_base_url: str = ''
+    speech_model: str = ''
+
     @field_validator('cors_origins', mode='before')
     @classmethod
     def parse_cors_origins(cls, value: str | list[str]) -> list[str]:

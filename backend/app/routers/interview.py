@@ -1,8 +1,10 @@
 """Epic 9 interview practice. Reference lookups and transient AI calls; no personal data is stored."""
+import asyncio
 import logging
+import threading
 import time
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from fastapi.routing import APIRoute
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.concurrency import run_in_threadpool
@@ -15,9 +17,13 @@ from app.services.auth import get_current_user
 from app.services.interview import bank_for_occupation, feedback_for_answer, plan_questions, template_plan
 from app.services.model_overrides import ModelOverrideError
 from app.services.resume_errors import ResumeProblem, error_body
+from app.services.interview_transcription import MAX_AUDIO_BYTES, transcribe_audio, transcription_configured, validate_audio
 
 logger = logging.getLogger(__name__)
 NO_STORE = {"Cache-Control": "no-store"}
+# shortcut: one flight per account in this process; use shared limits across scaled instances.
+_TRANSCRIBING = set()
+_TRANSCRIPTION_LOCK = threading.Lock()
 
 
 class PrivateRoute(APIRoute):
@@ -28,9 +34,10 @@ class PrivateRoute(APIRoute):
 
         async def handler(request: Request):
             if request.method == "POST":
+                limit = MAX_AUDIO_BYTES if self.path.endswith("/interview/transcribe") else 200_000
                 body = bytearray()
                 async for chunk in request.stream():
-                    if len(body) + len(chunk) > 200_000:
+                    if len(body) + len(chunk) > limit:
                         raise HTTPException(413, "Interview request exceeds the size limit.")
                     body.extend(chunk)
                 request._body = bytes(body)
@@ -40,6 +47,42 @@ class PrivateRoute(APIRoute):
 
 
 router = APIRouter(prefix="/interview", tags=["Interview"], route_class=PrivateRoute, dependencies=[Depends(get_current_user)])
+
+
+@router.get("/transcription-capabilities")
+def transcription_capabilities():
+    return JSONResponse({"configured": transcription_configured()}, headers=NO_STORE)
+
+
+@router.post("/transcribe")
+async def transcribe(request: Request, user=Depends(get_current_user)):
+    audio = await request.body()
+    extension, media_type = validate_audio(audio, request.headers.get("content-type", ""))
+    with _TRANSCRIPTION_LOCK:
+        if user.id in _TRANSCRIBING:
+            raise HTTPException(429, "Your recording is already being transcribed. Wait for it to finish.")
+        _TRANSCRIBING.add(user.id)
+    try:
+        async def disconnected():
+            # PrivateRoute consumed the body; directly await ASGI disconnect.
+            while True:
+                if (await request.receive())["type"] == "http.disconnect":
+                    return
+        transcription = asyncio.create_task(transcribe_audio(audio, extension, media_type))
+        disconnect = asyncio.create_task(disconnected())
+        try:
+            done, _ = await asyncio.wait({transcription, disconnect}, return_when=asyncio.FIRST_COMPLETED)
+            if disconnect in done:
+                return Response(status_code=499, headers=NO_STORE)
+            return JSONResponse({"text": await transcription}, headers=NO_STORE)
+        finally:
+            for task in (transcription, disconnect):
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(transcription, disconnect, return_exceptions=True)
+    finally:
+        with _TRANSCRIPTION_LOCK:
+            _TRANSCRIBING.discard(user.id)
 
 
 def _optional_provider():

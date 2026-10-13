@@ -151,6 +151,8 @@ export const api = {
       },
       timeoutMs,
     ),
+  postBlob: <T>(path: string, audio: Blob, timeoutMs: number, signal: AbortSignal) =>
+    request<T>(path, { method: "POST", body: audio, headers: { "Content-Type": audio.type }, signal, cache: "no-store" }, timeoutMs),
   put: <T, TBody = unknown>(path: string, payload?: TBody) =>
     request<T>(path, {
       method: "PUT",
