@@ -5,6 +5,7 @@ from app.services.resume_errors import GenerationFailure
 from app.services.possibilities_reference import load_reference_data, build_occupation_requirements
 
 FILTER_VERSION = "role_relevance_v1"
+TASK_FILTER_VERSION = "role_relevance_v2"
 
 
 def skill_key(name):
@@ -41,8 +42,9 @@ def candidates_for_role(request, role):
     return direct, pending, covered
 
 
-def select_related(direct, pending, covered, role, decisions):
+def select_related(direct, pending, covered, role, decisions, *, allow_tasks=False):
     allowed = {skill.skill_id for skill in role.skills}
+    tasks = {task.id for task in role.task_references} if allow_tasks else set()
     grouped, incomplete = {}, False
     for decision in decisions or []:
         if decision.candidate_id not in pending:
@@ -56,12 +58,17 @@ def select_related(direct, pending, covered, role, decisions):
         if len(entries) != 1:
             incomplete = True
             continue
-        anchor = entries[0].requirement_skill_id
-        if anchor is None:
+        anchor, task = entries[0].requirement_skill_id, entries[0].task_id
+        if task is not None:
+            if task not in tasks or anchor is not None:
+                incomplete = True
+                continue
+            selected.append(candidate)
+        elif anchor is None:
             continue  # Explicitly unrelated, not an omitted decision.
-        if anchor not in allowed:
+        elif anchor not in allowed:
             incomplete = True
-            continue
-        selected.append(candidate)
-        covered.add(anchor)
+        else:
+            selected.append(candidate)
+            covered.add(anchor)
     return selected, covered, incomplete

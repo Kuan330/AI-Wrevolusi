@@ -20,6 +20,8 @@ export type PossibilitiesResponse = {
 
 export type OccupationRequirements = {
   tasks?: string[];
+  task_references?: { id: string; text: string }[];
+  reference_fingerprint?: string;
   occupation_code: string; title: string;
   skills: { skill_id: number; skill_slug: string; name: string }[];
 };

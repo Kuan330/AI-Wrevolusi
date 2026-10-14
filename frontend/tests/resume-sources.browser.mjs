@@ -1,3 +1,4 @@
+import { snapshotRole } from './resume-reference-fixtures.mjs';
 import { applyReviewedResume } from "./resume-browser-review.mjs";
 /** End-to-end local QA: synthetic accounts, real generation validation/assembly and PDF renderer. */
 import assert from "node:assert/strict";
@@ -26,7 +27,7 @@ const browser = await chromium.launch({headless:true,channel:process.env.AIW_QA_
 const context = await browser.newContext({viewport:{width:1440,height:1100},acceptDownloads:true});
 const page = await context.newPage(); page.setDefaultTimeout(25000);
 const errors = [], generated = []; page.on("pageerror", e => errors.push(e.message));
-const json = (route, body, status = 200) => route.fulfill({status,contentType:"application/json",body:JSON.stringify(body)});
+const json = (route, body, status = 200) => route.fulfill({status,contentType:"application/json",body:JSON.stringify(snapshotRole(body))});
 await context.route("**/*", async route => {
   const req = route.request(), url = new URL(req.url());
   if (url.origin !== origin && !["blob:","data:"].includes(url.protocol)) return route.abort();

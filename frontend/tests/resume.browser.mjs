@@ -1,3 +1,4 @@
+import { snapshotRole } from './resume-reference-fixtures.mjs';
 import { applyReviewedResume } from "./resume-browser-review.mjs";
 /** Isolated QA: synthetic accounts/AI/courses; only PDFs use a local real engine.
  * Requires Vite on 5186, tests.resume_preview_server on 8016 and Playwright.
@@ -24,7 +25,7 @@ const directionKey = 'aiwrevolusi.possibilities.chosenDirection';
 const initialTarget = { occupation_code: '2421', title: 'Management and Organization Analysts', skills: [{ skill_id: 1, skill_slug: 'analytical-thinking', name: 'Analytical thinking' }, { skill_id: 2, skill_slug: 'leadership', name: 'Leadership' }] };
 const targetFixtures = new Map([[initialTarget.occupation_code, initialTarget]]); let targetSequence = 0;
 let workspace = { [directionKey]: JSON.stringify({ occupation_code: initialTarget.occupation_code }) };
-const json = (route, body, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) });
+const json = (route, body, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(snapshotRole(body)) });
 await context.route('**/*', async route => {
   const req = route.request(), url = new URL(req.url());
   if (url.origin !== origin && !['blob:', 'data:'].includes(url.protocol)) return route.abort();
@@ -47,7 +48,7 @@ await context.route('**/*', async route => {
     if (generateGate) await generateGate;
     if (fail) { fail = false; return json(route, { detail: 'Synthetic retryable error', code: 'unverified_name', fields: [['sections', 0, 'entries', 0, 'text']] }, 503); }
     const s = input.skills[0];
-    return json(route, { tailoring_version: "career_evidence_v1", skill_filter_version: "role_relevance_v1", sections: [{ title: 'Skills', entries: [{ text: s.name + (count > 2 ? ' applied to analysis' : ''), skill_ids: [s.id], fact_ids: [] }] }], gaps: [{ id: 'security', label: 'Cybersecurity', keywords: ['security'], skill_slugs: ['networks-and-cybersecurity'] }] });
+    return json(route, { tailoring_version: "career_evidence_v2", skill_filter_version: "role_relevance_v2", sections: [{ title: 'Skills', entries: [{ text: s.name + (count > 2 ? ' applied to analysis' : ''), skill_ids: [s.id], fact_ids: [] }] }], gaps: [{ id: 'security', label: 'Cybersecurity', keywords: ['security'], skill_slugs: ['networks-and-cybersecurity'] }] });
   }
   if (path === '/resume/recommend-courses') { courseRequests++; return json(route, { courses: ['security-1', 'security-2'].map(course_id => ({ course_id, gap_ids: ['security'], reason: 'Addresses the specified cybersecurity gap.' })) }); }
   if (path === '/learning/courses') return json(route, { found: true, courses: ['security-1', 'security-2'].map((course_id, i) => ({ course_id, skill_id: 'networks-and-cybersecurity', title: `Security course ${i + 1}`, provider: 'Synthetic catalogue', level: 'Beginner', chapters: [{ order: 1, title: 'Security foundations', duration_min: 30 }], chapter_count: 1 })) });

@@ -1,3 +1,4 @@
+import { snapshotRole } from './resume-reference-fixtures.mjs';
 import { applyReviewedResume } from "./resume-browser-review.mjs";
 /** Synthetic-only acceptance of role-filtered Skills through the real local generator. */
 import assert from "node:assert/strict";
@@ -27,7 +28,7 @@ const browser=await chromium.launch({headless:true,channel:process.env.AIW_QA_BR
 const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
 const page=await context.newPage();page.setDefaultTimeout(25000);
 const errors=[],requests=[],renders=[];page.on("pageerror",error=>errors.push(error.message));
-const json=(route,body,status=200)=>route.fulfill({status,contentType:"application/json",body:JSON.stringify(body)});
+const json=(route,body,status=200)=>route.fulfill({status,contentType:"application/json",body:JSON.stringify(snapshotRole(body))});
 await context.route("**/*",async route=>{
  const request=route.request(),url=new URL(request.url());if(url.origin!==origin&&!['blob:','data:'].includes(url.protocol))return route.abort();
  if(!url.pathname.startsWith('/api/'))return route.continue();const path=url.pathname.replace('/api/v1','');
@@ -69,7 +70,7 @@ try{
  for(const skill of ['Excel','SQL','Life insurance','Analytical thinking','Programming','AI and big data','Reading, writing and mathematics'])assert.ok(candidates.includes(skill),skill);
  assert.ok(!candidates.includes('Leadership')&&!candidates.includes('Synthetic reading course'));
  assert.deepEqual(new Set(names),new Set(candidates.filter(name=>name!=='Life insurance')));
- assert.equal(first.skillFilterVersion,'role_relevance_v1');assert.equal(first.skillFilterInputFingerprint,first.generationInputFingerprint);
+ assert.equal(first.skillFilterVersion,'role_relevance_v2');assert.equal(first.skillFilterInputFingerprint,first.generationInputFingerprint);
  assert.ok(first.source.redactedText.includes('Life insurance'));assert.equal(first.source.file.size,source.length);
  assert.deepEqual(first.document.cv.sections.Projects[0],{name:'Retail Sales Analysis',date:'Apr 2026',highlights:['Cleaned 2,400 records.','Removed 36 duplicates.']});
  for(const storageKey of Object.keys(base).filter(k=>k!==key))assert.equal(workspace[storageKey],base[storageKey]);

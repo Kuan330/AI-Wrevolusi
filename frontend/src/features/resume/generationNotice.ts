@@ -9,7 +9,7 @@ export function generationNotice(outcome: Generation["outcome"], notices: string
     notices.includes("alignment_incomplete") ? "Some career associations could not be verified and were omitted from the explanation." : "",
   ].filter(Boolean).join(" ");
   const reason = notices.includes("ai_timeout") ? "AI polishing timed out." : notices.includes("ai_unavailable") ? "AI polishing was unavailable." : "AI polishing could not be fully verified.";
-  if (filterVersion === "role_relevance_v1" || notices.includes("skill_relevance_incomplete") || empty) {
+  if ((filterVersion === "role_relevance_v1" || filterVersion === "role_relevance_v2") || notices.includes("skill_relevance_incomplete") || empty) {
     const skills = notices.includes("skill_relevance_incomplete") ? "Skill relevance checking was incomplete. Candidates not confirmed as related were excluded from the generated suggestions; retry to assess them." : "Only role-related user skills are included in the generated suggestions.";
     return `${reason} ${skills} ${empty} ${careerDetails} Unverified text changes were replaced with reviewed original wording. This version is not marked as tailored to the new role.`;
   }

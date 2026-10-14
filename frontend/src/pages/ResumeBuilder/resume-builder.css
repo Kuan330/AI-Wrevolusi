@@ -135,3 +135,10 @@
 @media (max-width: 600px) { .rb-career-alignment { width: calc(100% - 20px); padding: 0 12px; } .rb-alignment-reference strong { display: block; } }
 .rw-edit-scroll .rb-career-alignment { width: 100%; max-width: none; margin: 12px 0; }
 .rb-career-alignment [role=region] { overflow-wrap: anywhere; }
+
+.rb-course-skills { margin: 12px 0 20px; overflow-wrap: anywhere; }
+.rb-course-skills > h4 { font-weight: 650; color: #24355d; }
+.rb-course-skills .rb-learning-record > small { display: block; color: #64748b; margin-top: 4px; }
+.rb-course-skills blockquote { border-left: 3px solid #c4b5fd; padding: 8px 12px; margin: 6px 0 12px; background: #fff; border-radius: 0 8px 8px 0; font-size: 13px; color: #52617b; }
+.rb-course-skills > button { margin: 6px 8px 8px 0; }
+.rb-course-skills .rb-check { align-items: flex-start; }

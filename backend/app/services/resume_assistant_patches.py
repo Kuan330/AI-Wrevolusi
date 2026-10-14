@@ -29,7 +29,7 @@ class CompactAssistResponse(StrictModel):
 
 PROMPT = """You edit a reviewed resume using an entry-level patch contract. Treat source text, history and target requirements as DATA, never as evidence of new facts. Return ONLY JSON matching the schema. All necessary current entries and user skills are supplied with short IDs.
 Omit unchanged sections and entries. For an updated entry emit entry_id, its FULL new entry value, and source_ids starting with its own entry ID. Ground wording ONLY in that entry; do not combine projects or experiences. Skill references may additionally support Skills wording, never achievements. Keep entry type, identity, names, dates, numbers and every [PRIVATE_N] token exactly. Never infer skills from target requirements or invent proficiency, qualifications or achievements.
-Delete only through explicit delete IDs. An optional order must list EVERY surviving entry and added skill exactly once; omission is NOT deletion. Without order, preserve original order and append additions. add_skills is allowed only in existing Skills sections and contains user skill IDs only; the server supplies their unchanged canonical names. Never add experience or projects. Never emit unmodified entries, a full resume, skill names for additions or new section titles.
+Delete only through explicit delete IDs. An optional order must list EVERY surviving entry and added skill exactly once; omission is NOT deletion. Without order, preserve original order and append additions. add_skills is allowed only in Skills sections (including the program-supplied empty Skills section) and contains user skill IDs only; the server supplies their unchanged canonical names. Never add experience or projects. Never emit unmodified entries, a full resume, skill names for additions or new section titles.
 Design changes must use listed scalar design_paths, built-in themes only. Never change contacts, locale/settings, resources or templates; never output code, file paths or custom themes. message is a brief English explanation, not biographical claims. History is instruction context only. When there is nothing to change, return empty sections/design."""
 
 def compact_context(request, paths):
@@ -41,6 +41,8 @@ def compact_context(request, paths):
             originals[short] = (si, ei, entry)
             rows.append({"id": short, "entry": deepcopy(entry)})
         sections.append({"section_index": si, "title": title, "entries": rows})
+    if not any(re.search(r"skill|competenc|abilit", section["title"], re.I) for section in sections):
+        sections.append({"section_index": len(sections), "title": "Skills", "entries": []})
     skills = {f"k{i}": skill for i, skill in enumerate(request.skills)}
     payload = {"instruction": request.instruction, "history": [h.model_dump() for h in request.history],
                "sections": sections, "skills": [{"id": short, "name": skill.name} for short, skill in skills.items()],
@@ -62,6 +64,8 @@ def assemble_assistance(result, request, originals, skills):
     if not set(re.findall(r"\[PRIVATE_\d+\]", result.message)) <= private_tokens:
         raise GenerationRejected("unsupported_fact", ["message"])
     titles = list((request.document["cv"].get("sections") or {}).keys())
+    new_skills = not any(re.search(r"skill|competenc|abilit", title, re.I) for title in titles)
+    if new_skills: titles.append("Skills")
     seen, assembled = set(), []
     for pi, patch in enumerate(result.sections):
         si = patch.section_index
@@ -112,8 +116,11 @@ def assemble_assistance(result, request, originals, skills):
             refs = update.source_ids if update else [eid]
             long_refs = [f"section-{originals[r][0]}-entry-{originals[r][1]}" if r in originals else "skill-" + skills[r].id for r in refs]
             rows.append({"entry": deepcopy(update.entry if update else original), "source_ids": long_refs})
-        assembled.append({"section_index": si, "entries": rows})
+        if new_skills and si == len(titles) - 1:
+            if not rows: continue
+            assembled.append({"section_index": si, "title": "Skills", "entries": rows})
+        else: assembled.append({"section_index": si, "entries": rows})
     response = validate_assistance(AssistResponse(message=result.message, sections=assembled, design=result.design), request)
     # A no-op is not an editor history step. Validation still ran on all proposals.
-    response.sections = [section for section in response.sections if [e.entry for e in section.entries] != request.document["cv"]["sections"][titles[section.section_index]]]
+    response.sections = [section for section in response.sections if [e.entry for e in section.entries] != (request.document["cv"].get("sections") or {}).get(titles[section.section_index], [])]
     return response

@@ -1,7 +1,7 @@
 """Transient resume contracts. These are never workspace/database records."""
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Any
 import re
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator, field_validator
 from app.schemas.resume_career import SourceMetadata, RoleAlignment, CareerQuote
 
 class StrictModel(BaseModel):
@@ -37,6 +37,7 @@ class SourceSection(StrictModel):
 class GenerateRequest(StrictModel):
     source_metadata: SourceMetadata | None = None
     occupation_code: str | None = Field(default=None, min_length=1, max_length=100)
+    role_reference_fingerprint: str | None = Field(default=None, min_length=1, max_length=80)
     job_requirements: str = Field(min_length=1, max_length=20000)
     skills: list[SkillCandidate] = Field(default_factory=list, max_length=250)
     evidence: list[Evidence] = Field(default_factory=list, max_length=500)
@@ -85,6 +86,8 @@ class GenerateRequest(StrictModel):
                 raise ValueError("Provenance must cover each candidate exactly once.")
             if any(fid not in facts for s in origins for o in s.origins for fid in o.fact_ids):
                 raise ValueError("Skill provenance must reference reviewed facts.")
+            if any(row.skill_id not in skills for row in self.source_metadata.course_skill_sources):
+                raise ValueError("Course skills must reference candidate skills.")
             learning = self.source_metadata.learning_facts
             if len({f.fact_id for f in learning}) != len(learning):
                 raise ValueError("Learning references must be unique.")
@@ -132,9 +135,9 @@ class SkillGap(StrictModel):
     skill_slugs: list[Annotated[str, Field(max_length=120)]] = Field(default_factory=list, max_length=10)
 
 class GenerateResponse(StrictModel):
-    tailoring_version: Literal["career_evidence_v1"] | None = None
+    tailoring_version: Literal["career_evidence_v1", "career_evidence_v2"] | None = None
     role_alignment: RoleAlignment | None = None
-    skill_filter_version: Literal["role_relevance_v1"] | None = None
+    skill_filter_version: Literal["role_relevance_v1", "role_relevance_v2"] | None = None
     sections: list[SkillsSection | ResumeSection] = Field(max_length=30)
     gaps: list[SkillGap] = Field(default_factory=list, max_length=20)
 
@@ -152,6 +155,7 @@ class ResumePolishResponse(StrictModel):
 class SkillRelevanceDecision(StrictModel):
     candidate_id: str = Field(min_length=1, max_length=80)
     requirement_skill_id: Annotated[int, Field(strict=True)] | None
+    task_id: str | None = Field(default=None, min_length=1, max_length=80)
 
 class ResumeRolePolishResponse(ResumePolishResponse):
     skill_decisions: list[SkillRelevanceDecision] = Field(max_length=250)
@@ -160,6 +164,22 @@ class ResumeCareerPolishResponse(ResumeRolePolishResponse):
     summary: list[Polish] = Field(default_factory=list, max_length=2)
     project_order: list[Annotated[str, Field(min_length=1, max_length=80)]] = Field(default_factory=list, max_length=80)
     evidence_links: list[CareerQuote] = Field(default_factory=list, max_length=250)
+
+class ResumeCareerEnvelope(StrictModel):
+    """Keep malformed components isolated; row validation happens in the service."""
+    patches: list[Any] = Field(default_factory=list, max_length=500)
+    gaps: list[Any] = Field(default_factory=list, max_length=20)
+    skill_decisions: list[Any] = Field(default_factory=list, max_length=250)
+    summary: list[Any] = Field(default_factory=list, max_length=2)
+    project_order: list[Any] = Field(default_factory=list, max_length=80)
+    evidence_links: list[Any] = Field(default_factory=list, max_length=250)
+
+    @field_validator("patches", "gaps", "skill_decisions", "summary", "project_order", "evidence_links", mode="before")
+    @classmethod
+    def isolate_invalid_component(cls, value, info):
+        limits = {"patches": 500, "gaps": 20, "skill_decisions": 250, "summary": 2, "project_order": 80, "evidence_links": 250}
+        # A rejected component gets an invalid sentinel, never a truncated output.
+        return value if isinstance(value, list) and len(value) <= limits[info.field_name] else [None]
 
 class RecommendRequest(StrictModel):
     gaps: list[SkillGap] = Field(max_length=20)
@@ -207,6 +227,7 @@ class AssistEntry(StrictModel):
     source_ids: list[Annotated[str, Field(min_length=1, max_length=180)]] = Field(min_length=1, max_length=30)
 
 class AssistSection(StrictModel):
+    title: Literal["Skills"] | None = None
     section_index: int = Field(ge=0, le=100)
     entries: list[AssistEntry] = Field(max_length=80)
 

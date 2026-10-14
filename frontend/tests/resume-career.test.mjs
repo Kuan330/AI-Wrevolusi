@@ -46,7 +46,7 @@ test("selecting a learning record alone does not make it generation evidence", (
 });
 test("reviewed learning uses exact separate source section and deduplicates origins", () => {
   const row = record(); const input = composeCareerInput("Skills\nAnalytical thinking\nProfessional Experience\n• Reviewed 180 responses.", baseSkills, [row], [selection(row)], text => text);
-  assert.equal(input.candidates.length, 1); assert.equal(input.metadata.version, "career_evidence_v1");
+  assert.equal(input.candidates.length, 1); assert.equal(input.metadata.version, "career_evidence_v2");
   assert.deepEqual(input.metadata.skill_sources[0].origins.map(origin => origin.kind), ["platform_confirmed", "reviewed_learning"]);
   assert.equal(input.sections.at(-1).title, "Professional Development");
   const learning = input.metadata.learning_facts[0]; assert.equal(learning.kind, "course_completion");

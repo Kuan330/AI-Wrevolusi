@@ -4,7 +4,9 @@ import CareerAlignment from "./CareerAlignment";
 import ResumeLearningRecords from "./ResumeLearningRecords";
 import { appliedCareerAlignment } from "@/features/resume/careerAlignment";
 import { composeCareerInput, resumeLearningRecords, type LearningRecord } from "@/features/resume/learningRecords";
-import { getLearningProgress } from "@/services/learningService";
+import ResumeCourseSkills from "./ResumeCourseSkills";
+import { resumeLearningCourses, reviewedCourseSkills } from "@/features/resume/courseSkills";
+import { getLearningProgress, type LearningChapterProgress } from "@/services/learningService";
 import { readLearningGoals } from "@/features/learning-goals/learningGoals";
 import { reviewedSourceSkills, SKILLS_PARSER_VERSION } from "@/features/resume/sourceSkills";
 import { appliedSkillFilter, invalidateEditedSkills } from "@/features/resume/skillFilter";
@@ -66,11 +68,15 @@ function ResumeWorkspace({ owner }: { owner: string }) {
   const [skillInputs, setSkillInputs] = useState<ResumeSkillInput[]>([]), [skillError, setSkillError] = useState("");
   const [skillsLoading, setSkillsLoading] = useState(true), [skillRetry, setSkillRetry] = useState(0);
   const [learningRecords, setLearningRecords] = useState<LearningRecord[]>([]);
+  const [learningDirectory, setLearningDirectory] = useState<Map<string, Course>>(new Map());
+  const [learningProgress, setLearningProgress] = useState<LearningChapterProgress[] | null>(null);
+  const [learningCourseIds, setLearningCourseIds] = useState<string[]>([]);
+  const learningCourses = useMemo(() => resumeLearningCourses(learningDirectory, learningCourseIds, learningProgress), [learningDirectory, learningCourseIds, learningProgress]);
   const [learningLoading, setLearningLoading] = useState(true), [learningError, setLearningError] = useState("");
   const target = useResumeTarget(owner);
   const targetText = targetRequirements(target.role);
   const targetReady = target.status === "ready" && Boolean(targetText);
-  const targetKey = targetReady ? `${target.role!.occupation_code}:${targetText}` : "";
+  const targetKey = targetReady ? `${target.role!.occupation_code}:${targetText}:${target.role!.reference_fingerprint ?? ""}` : "";
   const targetVersion = useRef(targetKey); targetVersion.current = targetKey;
   const generationRequest = useRef<AbortController | null>(null);
   const [checkingAI, setCheckingAI] = useState(false);
@@ -138,13 +144,15 @@ function ResumeWorkspace({ owner }: { owner: string }) {
         const safe = redactResume(name, source.contacts).trim();
         return safe && !safe.includes("[REDACTED]") ? [{ skill: { id: safe, name: safe }, origin: { kind: "reviewed_resume" as const, label: "Reviewed original CV skills", fact_ids: sourceInput.sections.filter(section => section.title === "Skills").flatMap(section => section.fact_ids).filter(id => sourceInput.evidence.find(fact => fact.id === id)?.text.toLowerCase().includes(safe.toLowerCase())) } }] : [];
       }) : [];
-      const composed = composeCareerInput(source?.reviewed ? redactResume(source.redactedText, source.contacts) : "", [...skillInputs, ...resumeInputs], learningRecords, draft.learningSelections ?? [], value => redactResume(value, source?.contacts ?? emptyContacts()));
+      const courseSkills = reviewedCourseSkills(draft.courseSkillReviews ?? [], learningCourses);
+      const composed = composeCareerInput(source?.reviewed ? redactResume(source.redactedText, source.contacts) : "", [...skillInputs, ...resumeInputs, ...courseSkills.inputs], learningRecords, draft.learningSelections ?? [], value => redactResume(value, source?.contacts ?? emptyContacts()));
+      composed.metadata.course_skill_sources = courseSkills.sources;
       return { ...composed, error: "" };
     } catch (cause) { return { evidence: [], projects: [], sections: [], candidates: [], metadata: undefined, error: message(cause) }; }
-  }, [source, sourceSkillReview, sourceInput, skillInputs, learningRecords, draft.learningSelections]);
+  }, [source, sourceSkillReview, sourceInput, skillInputs, learningRecords, draft.learningSelections, draft.courseSkillReviews, learningCourses]);
   const reviewedFacts = careerInput.evidence, candidates = careerInput.candidates;
   const inputError = sourceInput.error || careerInput.error || (draft.learningSelections?.length ? learningError || (learningLoading ? "Loading selected learning records…" : "") : "");
-  const inputFingerprint = useMemo(() => JSON.stringify([TAILORING_VERSION, SKILL_FILTER_VERSION, targetKey, target.role?.tasks, candidates, careerInput.metadata, source?.reviewed ?? null, careerInput.evidence, careerInput.projects, careerInput.sections]), [targetKey, target.role?.tasks, candidates, careerInput, source?.reviewed]);
+  const inputFingerprint = useMemo(() => JSON.stringify([TAILORING_VERSION, SKILL_FILTER_VERSION, targetKey, target.role?.tasks, target.role?.reference_fingerprint, candidates, careerInput.metadata, source?.reviewed ?? null, careerInput.evidence, careerInput.projects, careerInput.sections]), [targetKey, target.role?.tasks, candidates, careerInput, source?.reviewed]);
   const inputVersion = useRef(inputFingerprint); inputVersion.current = skillsLoading || skillError || inputError ? "loading" : inputFingerprint;
   useEffect(() => {
     if (local.loading || !isCurrent()) return;
@@ -173,7 +181,7 @@ function ResumeWorkspace({ owner }: { owner: string }) {
       const token = ++sequence;
       progressRequest?.abort();
       const request = new AbortController(); progressRequest = request;
-      setSkillsLoading(true); setLearningLoading(true);
+      setSkillsLoading(true); setLearningLoading(true); setLearningProgress(null);
       inputVersion.current = "loading";
       cancelGeneration();
       // Attach a rejection handler immediately; optional progress must not hold up skill readiness.
@@ -195,12 +203,14 @@ function ResumeWorkspace({ owner }: { owner: string }) {
           return;
         }
         const catalogue = catalogueResult.value;
+        setLearningDirectory(catalogue); setLearningCourseIds(selectedResumeCourseIds());
         setSkillInputs(resumeSkillInputs(reference, catalogue)); setSkillError("");
         setSkillsLoading(false);
         const [progress] = await progressResult;
         if (!current()) return;
         try {
           if (progress.status === "rejected") throw progress.reason;
+          setLearningProgress(progress.value.chapters);
           setLearningRecords(resumeLearningRecords(catalogue, progress.value.chapters, readLearningGoals(), course => selectedCourseSkills(reference, catalogue, [course.id]).map(skill => skill.name), goal => canonicalResumeSkill(goal.initial.skill.id, goal.initial.skill.label, reference, catalogue, goal.initial.skill.source === "wef").map(skill => skill.name)));
           setLearningError("");
         } catch (cause) { setLearningError("We couldn't load synchronised learning records. " + message(cause)); }
@@ -310,7 +320,7 @@ function ResumeWorkspace({ owner }: { owner: string }) {
     const job = targetText, capturedTarget = targetKey, capturedInput = inputFingerprint, token = ++run.current;
     const request = controller(); generationRequest.current = request; busy.current = true; setGenerating(true); setRoleNeedsRefresh(false); setGenerationStatus(""); setError(""); setShowTarget(false);
     try {
-      const result = await resumeService.generate(job, candidates, reviewedFacts, Boolean(reviewedFacts.length), request.signal, careerInput.projects, careerInput.sections, target.role!.occupation_code, careerInput.metadata);
+      const result = await resumeService.generate(job, candidates, reviewedFacts, Boolean(reviewedFacts.length), request.signal, careerInput.projects, careerInput.sections, target.role!.occupation_code, careerInput.metadata, target.role!.reference_fingerprint);
       if (!isCurrent() || request.signal.aborted || token !== run.current || targetVersion.current !== capturedTarget || inputVersion.current !== capturedInput) return;
       if (readCareerDirection()?.occupation_code !== target.role?.occupation_code) return;
       if (result.tailoring_version !== TAILORING_VERSION || result.skill_filter_version !== SKILL_FILTER_VERSION) throw new Error("The server did not verify role-related Skills. Restart or refresh the project, then retry.");
@@ -386,7 +396,7 @@ function ResumeWorkspace({ owner }: { owner: string }) {
           <label className="rb-check"><Checkbox disabled={Boolean(sourceInput.error) || hasContactErrors} checked={source.reviewed} onCheckedChange={checked => change(old => old.source ? { ...old, source: { ...old.source, redactedText: redactResume(old.source.redactedText, old.source.contacts), projects: sourceInput.projects, skills: sourceSkillReview.names, ...(old.source.skillsText !== undefined ? { skillsText: sourceSkillReview.names.join("\n") } : {}), skillsParserVersion: SKILLS_PARSER_VERSION, reviewed: checked === true } } : old)} />I have reviewed this text and removed personal or confidential information I do not want sent to AI.</label>
         </div>}
       </fieldset>
-      <fieldset disabled={generating || importing}><ResumeLearningRecords records={learningRecords} selections={draft.learningSelections ?? []} loading={learningLoading} error={learningError} retry={() => setSkillRetry(value => value + 1)} change={learningSelections => change(old => ({ ...old, learningSelections }))} /></fieldset>
+      <fieldset disabled={generating || importing}><ResumeLearningRecords courseSkills={<ResumeCourseSkills contextKey={inputFingerprint} refresh={() => setSkillRetry(value => value + 1)} owner={owner} courses={learningCourses} reviews={draft.courseSkillReviews ?? []} disabled={generating || importing || skillsLoading || Boolean(skillError)} change={courseSkillReviews => change(old => ({ ...old, courseSkillReviews }))} />} records={learningRecords} selections={draft.learningSelections ?? []} loading={learningLoading} error={learningError} retry={() => setSkillRetry(value => value + 1)} change={learningSelections => change(old => ({ ...old, learningSelections }))} /></fieldset>
       {careerInput.error && <p className="rb-warning" role="alert">{careerInput.error}</p>}
       <p className="rb-ai-summary">AI uses your job requirements, skills and any reviewed resume details.</p>
       {!skillsLoading && !skillError && !inputError && !candidates.length && !reviewedFacts.length && <p className="rb-warning" role="status">Add reviewed resume details or selected user skills before generating. Target role requirements are not evidence of your abilities.</p>}

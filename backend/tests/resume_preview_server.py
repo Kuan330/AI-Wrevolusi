@@ -9,7 +9,7 @@ from fastapi import FastAPI, Request
 from types import SimpleNamespace
 from app.routers.resume import router
 from app.services.auth import get_current_user
-from app.routers.resume import get_resume_provider, get_resume_role_loader
+from app.routers.resume import get_resume_provider, get_resume_role_loader, get_resume_course_loader
 
 app = FastAPI()
 app.state.assist_counts = {}
@@ -30,6 +30,11 @@ class SyntheticResumeProvider:
 
     async def complete_json_async(self, **kwargs):
         from app.services.ai_gateway import AIProviderError
+        if kwargs["operation"] == "resume.learning-skills.v1":
+            import asyncio
+            if self.scenario == "learning_slow": await asyncio.sleep(2)
+            if self.scenario == "learning_error": raise AIProviderError("Synthetic timeout", kind="timeout")
+            return {"courses": [{"course_id": row["course_id"], "skills": [{"name": "Strategic marketing communications" if "Marketing" in row["title"] else "Everyday English communication", "quote": row["outcomes"]}]} for row in kwargs["payload"]["courses"]]}
         if kwargs["operation"] == "resume.assist.entries.v2":
             import asyncio
             counts = app.state.assist_counts.setdefault(self.scenario, {"calls": 0, "cancelled": 0})
@@ -47,6 +52,9 @@ class SyntheticResumeProvider:
             updates = []
             for section in payload["sections"]:
                 if section["title"] != "Skills": continue
+                if not section["entries"]:
+                    updates.append({"section_index": section["section_index"], "add_skills": [payload["skills"][0]["id"]]})
+                    break
                 row = section["entries"][0]
                 entry = row["entry"]
                 if self.scenario == "assist_repair" and "repair_feedback" not in payload:
@@ -71,10 +79,16 @@ class SyntheticResumeProvider:
             if self.scenario in {"role_relevance", "all_unrelated", "relevance_invalid"}:
                 anchor = anchor if self.scenario != "all_unrelated" and candidate["name"] in {"SQL", "Excel", "Programming", "Creative thinking", "AI and big data", "Reading, writing and mathematics"} else None
             decisions.append({"candidate_id": candidate["candidate_id"], "requirement_skill_id": anchor})
+        if self.scenario == "new_skills":
+            tasks = kwargs["payload"]["target_role"]["task_references"]
+            relevant = {"Needs analysis": 0, "active listening": 0, "Negotiation": 1, "Strategic marketing communications": 2, "Everyday English communication": 0}
+            for candidate, decision in zip(kwargs["payload"]["skill_candidates"], decisions):
+                decision["requirement_skill_id"] = None
+                decision["task_id"] = tasks[relevant[candidate["name"]]]["id"] if candidate["name"] in relevant else None
         if self.scenario == "relevance_invalid" and decisions:
             decisions[0]["requirement_skill_id"] = 999999
         output = {"skill_decisions": decisions, "patches": [{"fact_id": f["id"], "text": f["text"].lstrip("•●▪*- ")} for f in kwargs["payload"].get("facts", [])], "gaps": []}
-        if kwargs["operation"] == "resume.career.v1":
+        if kwargs["operation"] in {"resume.career.v1", "resume.career.v2"}:
             payload = kwargs["payload"]
             source = payload.get("facts", [])
             output.update(summary=[{"fact_id": source[0]["id"], "text": source[0]["text"].lstrip("• ")}] if source else [],
@@ -134,3 +148,13 @@ def preview_role_loader(request: Request):
     return load
 
 app.dependency_overrides[get_resume_role_loader] = preview_role_loader
+
+
+def preview_course_loader(request: Request):
+    async def load(ids):
+        import json
+        rows = json.loads(request.headers.get("X-Resume-QA-Courses", "[]"))
+        return {row["course_id"]: row for row in rows if row["course_id"] in ids}
+    return load
+
+app.dependency_overrides[get_resume_course_loader] = preview_course_loader

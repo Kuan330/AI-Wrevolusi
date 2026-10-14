@@ -3,7 +3,7 @@ import type { ResumeDocument, SkillCandidate } from "./types.ts";
 export type AssistantMessage = { role: "user" | "assistant"; content: string };
 export type AssistantProposal = {
   message: string;
-  sections: { section_index: number; entries: { entry: string | Record<string, unknown>; source_ids: string[] }[] }[];
+  sections: { title?: "Skills" | null; section_index: number; entries: { entry: string | Record<string, unknown>; source_ids: string[] }[] }[];
   design: { path: string[]; value: string | number | boolean | null }[];
 };
 const ENTRY_FIELDS = new Set("bullet text label details company position institution area degree date start_date end_date location summary highlights name title authors journal doi url number reversed_number".split(" "));
@@ -56,12 +56,15 @@ export function restoreAssistantValue(value: unknown, mapping: Record<string, st
 export function applyAssistantProposal(document: ResumeDocument, proposal: AssistantProposal, selected: string[], mapping: Record<string, string>): ResumeDocument {
   const result = structuredClone(document), titles = Object.keys(document.cv.sections ?? {}), allowed = new Set(controlFields(document, "design").map(field => field.path.join(".")));
   allowed.add("theme");
+  if (new Set(proposal.sections.map(change => change.section_index)).size !== proposal.sections.length) throw new Error("The assistant returned duplicate section changes.");
   for (const change of proposal.sections) {
     if (!selected.includes(`section-${change.section_index}`)) continue;
-    const title = titles[change.section_index];
-    if (title === undefined || !Array.isArray(change.entries)) throw new Error("The proposed section no longer exists.");
-    const old = document.cv.sections![title];
-    result.cv.sections![title] = change.entries.map(candidate => {
+    const adding = change.title === "Skills" && change.section_index === titles.length && !titles.some(title => /skill|competenc|abilit/i.test(title));
+    const title = adding ? "Skills" : titles[change.section_index];
+    if ((change.title != null && !adding) || title === undefined || !Number.isSafeInteger(change.section_index) || change.section_index < 0 || !Array.isArray(change.entries) || change.entries.length > 80) throw new Error("The proposed section no longer exists.");
+    const old = document.cv.sections?.[title] ?? [];
+    result.cv.sections ??= {};
+    result.cv.sections[title] = change.entries.map(candidate => {
       const restored = restoreAssistantValue(candidate.entry, mapping);
       const ref = candidate.source_ids.find(id => id.startsWith(`section-${change.section_index}-entry-`));
       const original = ref ? old[Number(ref.split("-").at(-1))] : undefined;

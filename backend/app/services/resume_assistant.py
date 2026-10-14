@@ -57,10 +57,17 @@ def validate_context(request):
 def validate_assistance(result, request):
     from rendercv.schema.models.rendercv_model import RenderCVModel
     sections = list((request.document["cv"].get("sections") or {}).items())
+    additions = [section for section in result.sections if section.title is not None]
+    if additions:
+        if len(additions) != 1 or additions[0].section_index != len(sections) or any(re.search(r"skill|competenc|abilit", title, re.I) for title, _ in sections):
+            raise GenerationRejected("invalid_reference", ["sections"])
+        sections.append(("Skills", []))
     skills = {"skill-" + s.id: s.name for s in request.skills}
     proposed = deepcopy(request.document)
     # Bound untrusted proposed trees before recursively flattening their text.
     bounded = deepcopy(request.document)
+    bounded["cv"].setdefault("sections", {})
+    proposed["cv"].setdefault("sections", {})
     for change in result.sections:
         if change.section_index >= len(sections): raise GenerationRejected("invalid_reference", ["sections", change.section_index])
         bounded["cv"]["sections"][sections[change.section_index][0]] = [entry.entry for entry in change.entries]
@@ -92,6 +99,8 @@ def validate_assistance(result, request):
                     if entry[field] not in (None, "", []) and not any(isinstance(old, dict) and old.get(field) == entry[field] for old in original_refs):
                         raise GenerationRejected("unsupported_fact", [*path, "entries", ei, field])
             text = entry_text(entry)
+            if change.title is not None and (len(refs) != 1 or refs[0] not in skills or entry != {"bullet": skills[refs[0]]}):
+                raise GenerationRejected("unsupported_fact", [*path, "entries", ei])
             if not text.strip(): raise GenerationRejected("missing_evidence", [*path, "entries", ei])
             # Section titles are not evidence; cite only that section's actual entries.
             history_sources = " ".join(entry_text(old) for old in original_refs)

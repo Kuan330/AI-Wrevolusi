@@ -1,3 +1,4 @@
+import { snapshotRole } from './resume-reference-fixtures.mjs';
 import { applyReviewedResume } from "./resume-browser-review.mjs";
 /** Offline Epic 8 acceptance. Synthetic references do not validate real-model relevance. */
 import assert from "node:assert/strict";
@@ -28,7 +29,7 @@ const browser = await chromium.launch({ headless: true, channel: process.env.AIW
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true }); const page = await context.newPage(); page.setDefaultTimeout(30000);
 let releaseProgress; let progressGate = new Promise(resolve => { releaseProgress = resolve; });
 const requests = [], errors = []; page.on("pageerror", error => errors.push(error.message));
-const json = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
+const json = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(snapshotRole(body)) });
 await context.route("**/*", async route => {
   const req = route.request(), url = new URL(req.url()); if (url.origin !== origin && !["blob:", "data:"].includes(url.protocol)) return route.abort();
   if (!url.pathname.startsWith("/api/")) return route.continue(); const path = url.pathname.replace("/api/v1", "");
@@ -60,9 +61,9 @@ try {
   await page.getByLabel("Upload original resume PDF or DOCX").setInputFiles({ name: "epic8.docx", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", buffer: docxFixture(sample) });
   await page.getByText("I have reviewed this text and removed", { exact: false }).click();
   const learning = page.locator(".rb-learning-records"); await learning.getByRole("button", { name: /Learning records/ }).click();
-  await learning.getByText("You recorded this course as completed", { exact: false }).waitFor();
-  assert.equal(await learning.getByText("Unfinished course must not", { exact: false }).count(), 0);
-  for (const row of await learning.locator(".rb-learning-record").all()) { await row.getByRole("checkbox").first().check(); await row.getByRole("checkbox").last().check(); }
+  await learning.getByText("You recorded this course as completed", { exact: false }).first().waitFor();
+  assert.equal(await learning.locator(".rb-learning-record").filter({has: page.getByRole("checkbox")}).getByText("Unfinished course must not", { exact: false }).count(), 0);
+  for (const row of await learning.locator(".rb-learning-record").filter({has: page.getByRole("checkbox")}).all()) { await row.getByRole("checkbox").first().check(); await row.getByRole("checkbox").last().check(); }
   assert.equal(await page.getByLabel("Skills included in your resume").count(), 0);
   await page.screenshot({ path: out + "/learning-review.png", fullPage: true, animations: "disabled" });
   await page.getByRole("button", { name: "Generate my resume", exact: true }).click(); await proposal.waitFor(); await saved();

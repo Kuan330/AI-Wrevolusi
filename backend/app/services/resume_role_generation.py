@@ -3,11 +3,12 @@ import asyncio
 import logging
 import time
 from pydantic import ValidationError
-from app.schemas.resume import GenerateResponse, GeneratedSection, GeneratedEntry, ResumeRolePolishResponse, ResumeCareerPolishResponse, SkillsSection
+from app.schemas.resume import GenerateResponse, GeneratedSection, GeneratedEntry, ResumeRolePolishResponse, ResumeCareerPolishResponse, ResumeCareerEnvelope, SkillRelevanceDecision, Polish, SkillGap, SkillsSection
 from app.services.ai_gateway import AIProviderError
 from app.services.resume_errors import GenerationFailure
 from app.services.possibilities_reference import requirements_text
-from app.services.resume_relevance import FILTER_VERSION, candidates_for_role, select_related
+from app.services.resume_relevance import FILTER_VERSION, TASK_FILTER_VERSION, candidates_for_role, select_related
+from app.schemas.resume_career import CareerQuote, VERSION
 from app.services import resume_generation as reviewed
 from app.services.resume_career import add_career_presentation, contextual_facts, aliases_for
 
@@ -21,6 +22,31 @@ Additionally return summary (at most two fact_id/text fragments), project_order 
 """
 
 
+TASK_PROMPT = CAREER_PROMPT.replace("using ONLY its short candidate_id and requirement_skill_id", "using its short candidate_id plus one permitted role anchor") + """
+For this v2 contract every pending candidate must return candidate_id, requirement_skill_id and task_id. Select exactly ONE existing requirement_skill_id OR ONE target_role.task_references id; set the other to null. Both null means unrelated. A real user candidate may directly support a concrete occupation task even if the coarse WEF requirements omit it. Use needs assessment/client communication for meeting clients, negotiation for negotiating costs, and marketing communications for event promotion only when the actual candidate meaning supports that task. Never create user skills or experience from tasks. Course teaching objectives are curriculum references, not evidence of completion or competence.
+"""
+
+
+def validated_components(raw):
+    envelope = ResumeCareerEnvelope.model_validate(raw)
+    notices, values, invalid_candidates = [], {}, set()
+    for field, model, code in [("patches", Polish, "unsupported_polish"), ("gaps", SkillGap, "alignment_incomplete"), ("skill_decisions", SkillRelevanceDecision, "skill_relevance_incomplete"), ("summary", Polish, "career_summary_unavailable"), ("evidence_links", CareerQuote, "alignment_incomplete")]:
+        values[field] = []
+        for row in getattr(envelope, field):
+            try: values[field].append(model.model_validate(row))
+            except ValidationError:
+                if code not in notices: notices.append(code)
+                if field == "skill_decisions" and isinstance(row, dict) and isinstance(row.get("candidate_id"), str):
+                    invalid_candidates.add(row["candidate_id"])
+    # An invalid duplicate must not make an otherwise valid decision look unique.
+    values["skill_decisions"] = [row for row in values["skill_decisions"] if row.candidate_id not in invalid_candidates]
+    order = envelope.project_order
+    if any(not isinstance(p, str) or not p or len(p) > 80 for p in order):
+        order = []
+        notices.append("project_order_unverified")
+    return ResumeCareerPolishResponse(**values, project_order=order), notices
+
+
 def assemble_filtered(request, role, selected, *, patches=None, gaps=None, notices=None):
     filtered = request.model_copy(update={"skills": selected})
     result = reviewed.assemble(filtered, patches, gaps, notices)
@@ -30,7 +56,7 @@ def assemble_filtered(request, role, selected, *, patches=None, gaps=None, notic
             raise GenerationFailure("No verified role-related skills or reviewed experience are available. Retry or add reviewed experience before generating.", code="no_related_input")
         result.sections.insert(0, SkillsSection(title="Skills", entries=[]))
         result.notices.append("no_related_skills")
-    result.skill_filter_version = FILTER_VERSION
+    result.skill_filter_version = TASK_FILTER_VERSION if request.source_metadata and request.source_metadata.version == VERSION else FILTER_VERSION
     return result
 
 
@@ -38,6 +64,9 @@ async def generate_role_reviewed_resume(request, provider, role):
     started = time.monotonic()
     if request.occupation_code != role.occupation_code or request.job_requirements != requirements_text(role):
         raise GenerationFailure("The target role requirements changed. Retry role requirements, then generate again.", code="target_role_changed")
+    v2 = request.source_metadata is not None and request.source_metadata.version == VERSION
+    if v2 and request.role_reference_fingerprint != role.reference_fingerprint:
+        raise GenerationFailure("The target role reference changed. Retry role requirements before generating.", code="target_role_changed")
     # Keep the original local fact validation unchanged and before the upstream call.
     facts_by_id = {fact.id: fact for fact in request.evidence}
     for section in request.source_sections:
@@ -57,14 +86,16 @@ async def generate_role_reviewed_resume(request, provider, role):
         payload.update({"career_tasks": role.tasks, "reviewed_context": [f.model_dump() for f in contextual_facts(request) if f.id not in {fact.id for fact in facts}],
             "all_candidates": [{"candidate_id": alias, "name": candidate.name, "origins": next(s for s in request.source_metadata.skill_sources if s.skill_id == candidate.id).model_dump()["origins"]} for alias, candidate in aliases_for(direct, pending).items()],
             "source_projects": [p.model_dump() for p in request.source_projects]})
-    response_model = ResumeCareerPolishResponse if career else ResumeRolePolishResponse
+    if v2:
+        payload["target_role"]["task_references"] = [t.model_dump() for t in role.task_references]
+    response_model = ResumeCareerEnvelope if v2 else ResumeCareerPolishResponse if career else ResumeRolePolishResponse
     tokens = min(6500, max(800, sum(len(f.text) for f in facts)//3 + len(facts)*30 + len(pending)*30 + (len(request.skills)*40 + 1200 if career else 500)))
     try:
         async with asyncio.timeout(reviewed.GENERATION_BUDGET_SECONDS):
-            raw = await provider.complete_json_async(operation="resume.career.v1" if career else "resume.polish.v3", payload=payload,
-                response_model=response_model, system_prompt=CAREER_PROMPT if career else RELEVANCE_PROMPT,
+            raw = await provider.complete_json_async(operation="resume.career.v2" if v2 else "resume.career.v1" if career else "resume.polish.v3", payload=payload,
+                response_model=response_model, system_prompt=TASK_PROMPT if v2 else CAREER_PROMPT if career else RELEVANCE_PROMPT,
                 request_timeout_s=reviewed.GENERATION_BUDGET_SECONDS, request_max_tokens=tokens)
-        output = response_model.model_validate(raw)
+        output, component_notices = validated_components(raw) if v2 else (response_model.model_validate(raw), [])
     except TimeoutError:
         output, notices = None, ["ai_timeout"]
     except AIProviderError as error:
@@ -76,9 +107,9 @@ async def generate_role_reviewed_resume(request, provider, role):
     except ValidationError:
         output, notices = None, ["ai_output_invalid"]
     else:
-        notices = []
-    selected, covered, incomplete = select_related(direct, pending, covered, role, output.skill_decisions if output else None)
-    if incomplete:
+        notices = component_notices
+    selected, covered, incomplete = select_related(direct, pending, covered, role, output.skill_decisions if output else None, allow_tasks=v2)
+    if incomplete and "skill_relevance_incomplete" not in notices:
         notices.append("skill_relevance_incomplete")
     # Do not turn classification failure/exclusion into a new missing-ability claim.
     covered_labels = {skill.name.casefold() for skill in role.skills if skill.skill_id in covered}
