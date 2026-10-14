@@ -22,6 +22,7 @@ def contextual_facts(request):
 
 
 def add_career_presentation(result, request, role, direct, pending, output):
+    aggregate = request.skill_selection == "aggregate"
     facts = {f.id: f for f in request.evidence}
     source = {s.skill_id: s.origins for s in request.source_metadata.skill_sources}
     learning = {f.fact_id: f for f in request.source_metadata.learning_facts}
@@ -65,7 +66,7 @@ def add_career_presentation(result, request, role, direct, pending, output):
         tier = 0 if examples.get(sid) else 1 if any(o.kind in {"platform_confirmed", "reviewed_resume"} for o in origins) else 2
         return tier, 0 if anchors[sid][1] == "standard_mapping" else 1, skill_key(next(s.name for s in request.skills if s.id == sid))
     skills = next((s for s in result.sections if s.title == "Skills"), None)
-    if skills:
+    if skills and not aggregate:
         skills.entries.sort(key=lambda entry: rank(entry.skill_ids[0]))
     # Summary is a bounded extractive synthesis: AI selects/rephrases facts, program supplies the objective.
     summary_refs, summary_parts = [], []
@@ -113,7 +114,7 @@ def add_career_presentation(result, request, role, direct, pending, output):
                     locations.append(AlignmentLocation(section=section.title, entry_index=i))
         links.append(AlignmentLink(skill_id=candidate.id, name=candidate.name, requirement_skill_id=anchor, task_id=task_id, method=method, origins=source[candidate.id], examples=refs, locations=locations))
     result.tailoring_version = request.source_metadata.version
-    result.role_alignment = RoleAlignment(occupation_code=role.occupation_code, title=role.title,
+    result.role_alignment = None if aggregate else RoleAlignment(occupation_code=role.occupation_code, title=role.title,
         requirements=[{"skill_id": s.skill_id, "name": s.name} for s in role.skills], links=links,
         task_references=[t.model_dump() for t in role.task_references] if request.source_metadata.version == VERSION else [],
         summary_fact_ids=summary_refs, project_order=order)

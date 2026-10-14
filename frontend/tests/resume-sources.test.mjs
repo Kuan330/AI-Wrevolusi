@@ -67,7 +67,7 @@ test("missing course or unknown skill mappings fail closed", () => {
   assert.throws(() => selectedCourseSkills(reference, new Map([["a", { skills: ["unknown-skill"] }]]), ["a"]), /unknown skill mapping/);
   assert.throws(() => selectedCourseSkills(reference, new Map([["a", { skills: [] }]]), ["a"]), /could not be resolved/);
 });
-test("all learning intent sources join confirmed skills, never untouched suggestions", () => {
+test("only confirmed skills join My courses; independent learning intentions stay excluded", () => {
   let code = readFileSync(new URL("../src/features/resume/skills.ts", import.meta.url), "utf8");
   code = code.replace(/^import .*;\r?$/gm, "");
   const dependencies = `const resolveCatalogueSkill=(id,ref)=>{const s=ref.find(s=>String(s.wef_skill_id)===String(id)||s.core_skill===id);return s?{id:s.wef_skill_id,name:s.core_skill}:null};
@@ -83,7 +83,7 @@ const readSpecialistState = () => ({entries:[{skillUri:"s",skillLabel:"Specialis
 const specialistEntryIsCurrent = () => true;`;
   const js = ts.transpileModule(dependencies + code, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
   return import("data:text/javascript;base64," + Buffer.from(js).toString("base64")).then(m => {
-    assert.deepEqual(m.resumeSkillSnapshot([...reference,{wef_skill_id:4,core_skill:"Context skill"}]).map(s => s.name), ["Analytical thinking", "Context skill", "Creative thinking", "Goal skill", "Learning skill", "Personal skill", "Specialist learning"]);
+    assert.deepEqual(m.resumeSkillSnapshot([...reference,{wef_skill_id:4,core_skill:"Context skill"}]).map(s => s.name), ["Analytical thinking", "Personal skill"]);
   });
 });
 test("dedup preserves C/C++/C# and learning names without status groups", () => {

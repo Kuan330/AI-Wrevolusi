@@ -4,7 +4,7 @@ import type { LearningChapterProgress } from "../../services/learningService.ts"
 import type { LearningSelection, LearningFact, SourceMetadata } from "./types.ts";
 import { TAILORING_VERSION } from "./types.ts";
 import type { ResumeSkillInput } from "./skills.ts";
-import { mergeSkillInputs } from "./skills.ts";
+import { mergeResumeSkills, mergeSkillInputs } from "./skills.ts";
 import { reviewedResumeInput } from "./projects.ts";
 export type LearningRecord = { id: string; label: string; kind: LearningFact["kind"]; text: string; skillNames: string[]; fingerprint: string };
 /** Only the server-synchronised snapshot counts. Local pending progress is intentionally absent. */
@@ -25,6 +25,7 @@ export function resumeLearningRecords(directory: Map<string, Course>, progress: 
 }
 /** Compose reviewed lines into the SAME exact section parser; never fake an uploaded file. */
 export function composeCareerInput(resumeText: string, baseSkills: ResumeSkillInput[], records: LearningRecord[], selections: LearningSelection[], redact: (value: string) => string) {
+  const selectedSkills = new Map(mergeResumeSkills([baseSkills.map(input => input.skill)]).map(skill => [skill.id, skill]));
   const selected = selections.map(selection => {
     const record = records.find(row => row.id === selection.recordId);
     if (!record || record.fingerprint !== selection.recordFingerprint || !selection.reviewed) throw new Error("Review your selected learning records again. Their source changed or is not confirmed; they have not been silently omitted.");
@@ -51,9 +52,10 @@ export function composeCareerInput(resumeText: string, baseSkills: ResumeSkillIn
     if (!fact || fact.text !== row.text) throw new Error("Learning facts could not be safely assigned. Review their text before generating.");
     learning_facts.push({ fact_id: fact.id, record_id: row.record.id, kind: row.record.kind, label: redact(row.record.label) });
     for (const name of row.record.skillNames) {
-      // Selecting/reviewing a record selects its associated skill, never its course title.
-      const skill = baseSkills.find(input => input.skill.name.toLocaleLowerCase() === name.toLocaleLowerCase())?.skill ?? { id: name, name };
-      extraSkills.push({ skill, origin: { kind: "reviewed_learning", label: redact(row.record.label), fact_ids: [fact.id] } });
+      // Records support the three selected skill sources; they do not add a fourth source.
+      const id = mergeResumeSkills([[{ id: name, name }]])[0]?.id;
+      const skill = id ? selectedSkills.get(id) : undefined;
+      if (skill) extraSkills.push({ skill, origin: { kind: "reviewed_learning", label: redact(row.record.label), fact_ids: [fact.id] } });
     }
   }
   const merged = mergeSkillInputs([...baseSkills, ...extraSkills]);

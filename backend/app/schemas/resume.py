@@ -35,6 +35,7 @@ class SourceSection(StrictModel):
     polishable_fact_ids: list[str] = Field(default_factory=list, max_length=500)
 
 class GenerateRequest(StrictModel):
+    skill_selection: Literal["role_relevance", "aggregate"] = "role_relevance"
     source_metadata: SourceMetadata | None = None
     occupation_code: str | None = Field(default=None, min_length=1, max_length=100)
     role_reference_fingerprint: str | None = Field(default=None, min_length=1, max_length=80)
@@ -47,6 +48,8 @@ class GenerateRequest(StrictModel):
 
     @model_validator(mode="after")
     def bounded_evidence(self):
+        if self.skill_selection == "aggregate" and (self.source_metadata is None or self.source_metadata.version != "career_evidence_v2"):
+            raise ValueError("Aggregated skills require current career sources.")
         if self.occupation_code is not None and self.source_sections is None:
             raise ValueError("Role-filtered generation requires reviewed source sections.")
         if sum(len(f.text) for f in self.evidence) > 60000:
@@ -137,7 +140,7 @@ class SkillGap(StrictModel):
 class GenerateResponse(StrictModel):
     tailoring_version: Literal["career_evidence_v1", "career_evidence_v2"] | None = None
     role_alignment: RoleAlignment | None = None
-    skill_filter_version: Literal["role_relevance_v1", "role_relevance_v2"] | None = None
+    skill_filter_version: Literal["role_relevance_v1", "role_relevance_v2", "all_sources_v1"] | None = None
     sections: list[SkillsSection | ResumeSection] = Field(max_length=30)
     gaps: list[SkillGap] = Field(default_factory=list, max_length=20)
 

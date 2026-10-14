@@ -54,9 +54,10 @@ test("reviewed learning uses exact separate source section and deduplicates orig
   assert.ok(!input.candidates.some(skill => skill.name === course.title));
   assert.deepEqual(input.projects, []);
 });
-test("a reviewed selected record can contribute its associated skill without a saved course", () => {
+test("a reviewed learning record preserves evidence without adding a fourth skill source", () => {
   const row = record(); const input = composeCareerInput("", [], [row], [selection(row)], text => text);
-  assert.deepEqual(input.candidates.map(skill => skill.name), ["Analytical thinking"]);
+  assert.deepEqual(input.candidates, []);
+  assert.equal(input.metadata.learning_facts.length, 1);
 });
 test("learning descriptions are redacted before evidence composition", () => {
   const row = record(); const input = composeCareerInput("", baseSkills, [row], [{ ...selection(row), text: "Private Name used data tools." }], text => text.replaceAll("Private Name", "[REDACTED]"));

@@ -36,7 +36,7 @@ export default function ResumeCourseSkills({ owner, contextKey, courses, reviews
     <Button variant="link" disabled={disabled || busy} onClick={refresh}>Refresh course records</Button>
     {busy && <div role="status">Identifying learning skills… <Button variant="ghost" onClick={cancel}>Cancel skill identification</Button></div>}
     {error && <p role="alert" className="rb-warning">{error}</p>}{status && <p role="status">{status}</p>}
-    {!courses.length && <p>Choose a course or synchronise learning progress to review its skills.</p>}
+    {!courses.length && <p>Add a course to My courses to review its skills.</p>}
     {reviews.filter(review => !courses.some(row => row.course.id === review.course_id)).map(review => <p className="rb-warning" key={review.course_id}>A reviewed course is no longer in the available learning records. Its choices were kept. <Button variant="link" disabled={disabled || busy} onClick={() => change(reviews.filter(row => row.course_id !== review.course_id))}>Remove unavailable choices</Button></p>)}
     {courses.map(({ course, status }) => {
       const review = reviews.find(row => row.course_id === course.id), current = review?.source_fingerprint === course.sourceFingerprint && Boolean(course.sourceFingerprint);

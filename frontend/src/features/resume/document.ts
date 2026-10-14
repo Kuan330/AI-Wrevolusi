@@ -81,7 +81,7 @@ export function applySections(document: ResumeDocument | null, sections: Generat
   const next = structuredClone(document ?? { cv: {}, design: { theme: "engineeringresumes" } });
   next.cv.sections = { ...next.cv.sections };
   for (const section of sections) {
-    if ((filterVersion === "role_relevance_v1" || filterVersion === "role_relevance_v2") && section.title === "Skills" && section.entries.length === 0) {
+    if (filterVersion && section.title === "Skills" && section.entries.length === 0) {
       delete next.cv.sections.Skills;
       continue;
     }

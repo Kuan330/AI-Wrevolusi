@@ -3,7 +3,7 @@ export function appliedSkillFilter(generation: Generation, fingerprint: string |
   return { skillFilterVersion: generation.skill_filter_version === SKILL_FILTER_VERSION ? SKILL_FILTER_VERSION : undefined,
     skillFilterInputFingerprint: generation.skill_filter_version === SKILL_FILTER_VERSION ? fingerprint : undefined };
 }
-/** Manual/assistant edits remain possible, but must not claim the old filter proof. */
+/** Manual/assistant edits invalidate the saved skill-source snapshot. */
 export function invalidateEditedSkills(before: ResumeDraft, after: ResumeDraft): ResumeDraft {
   const beforeSections = before.document?.cv.sections, afterSections = after.document?.cv.sections;
   if (after.careerAlignment && !after.careerAlignment.needsReview && beforeSections !== afterSections && JSON.stringify(beforeSections) !== JSON.stringify(afterSections)) after = { ...after, careerAlignment: { ...after.careerAlignment, needsReview: true } };

@@ -10,8 +10,8 @@ export type CourseSkillReview = { course_id: string; title: string; source_finge
 export type RoleAlignment = { occupation_code: string; title: string; task_references?: { id: string; text: string }[]; requirements: { skill_id: number; name: string }[]; links: { skill_id: string; name: string; requirement_skill_id?: number | null; task_id?: string | null; method: "standard_mapping" | "ai_semantic"; origins: SkillOrigin[]; examples: { fact_id: string; text: string; kind: LearningFact["kind"] | "resume" }[]; locations: { section: string; entry_index: number }[] }[]; summary_fact_ids: string[]; project_order: string[] };
 export type AppliedCareerAlignment = { alignment: RoleAlignment; sections: string[]; contentFingerprint: string; needsReview: boolean };
 export type LearningSelection = { recordId: string; text: string; reviewed: boolean; recordFingerprint: string };
-export const SKILL_FILTER_VERSION = "role_relevance_v2" as const;
-export type SkillFilterVersion = typeof SKILL_FILTER_VERSION | "role_relevance_v1";
+export const SKILL_FILTER_VERSION = "all_sources_v1" as const;
+export type SkillFilterVersion = typeof SKILL_FILTER_VERSION | "role_relevance_v1" | "role_relevance_v2";
 export type ResumeEntry = string | Record<string, unknown>;
 export type ResumeDocument = {
   cv: Record<string, unknown> & { sections?: Record<string, ResumeEntry[]> | null };
