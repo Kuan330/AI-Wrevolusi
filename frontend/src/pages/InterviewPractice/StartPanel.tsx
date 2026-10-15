@@ -9,6 +9,7 @@ import { FormField, Textarea } from "@/components/ui/form-field";
 import { ROUTES } from "@/constants/routes";
 import { prepareInterviewContext } from "@/features/interview/resumeItems";
 import { interviewService } from "@/features/interview/service";
+import { ApiError } from "@/services/api";
 import { createSession, sessionProgress, type InterviewSession } from "@/features/interview/session";
 import { changeTopics, interviewCareer, planBody } from "@/features/interview/start";
 import { loadResumeDraft } from "@/features/resume/repository";
@@ -40,7 +41,10 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
     const controller = new AbortController();
     request.current = controller;
     try {
-      const bank = await interviewService.bank(career?.code ?? "0000", controller.signal).catch(() => null);
+      const bank = await interviewService.bank(career?.code ?? "0000", controller.signal).catch(cause => {
+        if (cause instanceof ApiError && cause.status === 401) throw cause;
+        return null;
+      });
       if (mode === "resume" && (!prepared || !draft || state.status !== "reviewed")) throw new Error("Review your resume first.");
       const plan = mode === "resume" && prepared
         ? await interviewService.plan(planBody(prepared, bank?.questions ?? [], topics, accepted), controller.signal)

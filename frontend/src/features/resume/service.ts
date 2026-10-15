@@ -1,5 +1,5 @@
 import type { AssistantMessage, AssistantProposal } from "./assistant.ts";
-import { api, ApiError, apiErrorDetail } from "../../services/api.ts";
+import { api, ApiError, apiErrorDetail, sessionFetch } from "../../services/api.ts";
 import type { CourseSkillReview, Generation, SourceMetadata, SourceSection, SourceProject, ResumeDocument, ResumeEvidence, SkillCandidate, SkillGap, RecommendedCourse } from "./types.ts";
 export type ResumeCapabilities = { ai_configured: boolean; ai_provider_host: string; ai_model: string; rendercv_version: string };
 export const resumeService = {
@@ -22,7 +22,7 @@ export const resumeService = {
     if (signal.aborted) controller.abort();
     const timer = setTimeout(relay, 35000);
     try {
-      const response = await fetch(`${import.meta.env?.VITE_API_BASE_URL ?? "/api/v1"}/resume/render`, {
+      const response = await sessionFetch("/resume/render", {
         method: "POST", credentials: "include", cache: "no-store", signal: controller.signal,
         headers: { "Content-Type": "application/json" }, body: JSON.stringify({ document }),
       });

@@ -142,3 +142,11 @@
 .rb-course-skills blockquote { border-left: 3px solid #c4b5fd; padding: 8px 12px; margin: 6px 0 12px; background: #fff; border-radius: 0 8px 8px 0; font-size: 13px; color: #52617b; }
 .rb-course-skills > button { margin: 6px 8px 8px 0; }
 .rb-course-skills .rb-check { align-items: flex-start; }
+.rb-skill-summary { margin: 20px 0; padding: 16px; border: 1px solid #dce5ec; border-radius: 12px; background: #f5f9fc; overflow-wrap: anywhere; }
+.rb-skill-summary p { font-size: 12px; color: #52617b; margin-top: 8px; }
+.rb-skill-summary details { margin-top: 10px; font-size: 12px; }
+.rb-skill-summary summary { cursor: pointer; color: #315b78; }
+.rb-skill-summary ul { margin-top: 10px; padding-left: 20px; list-style: disc; }
+.rb-skill-summary li { margin-top: 5px; }
+.rb-skill-summary li strong { color: #947144; font-weight: 500; }
+.rb-pending-skills p { margin-top: 4px; }

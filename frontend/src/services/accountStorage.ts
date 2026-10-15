@@ -1,4 +1,4 @@
-import { api } from "./api.ts";
+import { api, resetApiSession } from "./api.ts";
 
 type Workspace = { data: Record<string, string>; revision: number };
 export const workspaceKeys = [
@@ -44,6 +44,7 @@ const cache = () => {
     );
 };
 export function activateWorkspace(id: string | null, next?: Workspace) {
+  resetApiSession();
   clearTimeout(timer);
   workspaceSession += 1;
   userId = id;

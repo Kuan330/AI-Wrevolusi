@@ -56,6 +56,97 @@ function operationNotice(path: string, method: string | undefined, error?: unkno
   window.dispatchEvent(new CustomEvent("api-operation-result", { detail: { type: error ? "error" : "success", content: error ? (error instanceof Error ? error.message : "Could not complete the operation. Please try again.") : method === "DELETE" ? "Deleted successfully." : "Changes saved successfully." } }));
 }
 
+let sessionVersion = 0;
+let renewalVersion = 0;
+let sessionExpired = false;
+let renewal: Promise<void> | null = null;
+
+/** Invalidate pending requests when the active account or login changes. */
+export function resetApiSession() {
+  sessionVersion++;
+  renewalVersion++;
+  sessionExpired = false;
+  renewal = null;
+}
+
+function expiredSession(): ApiError {
+  if (!sessionExpired) {
+    sessionExpired = true;
+    if (typeof window !== "undefined") window.dispatchEvent(new Event("api-session-expired"));
+  }
+  return new ApiError("Your session expired. Log in again to continue. Your local drafts are kept.", 401, { code: "session_expired" });
+}
+
+function checkSession(version: number, signal?: AbortSignal | null) {
+  signal?.throwIfAborted();
+  if (version !== sessionVersion) throw new ApiError("Your account changed. Please try again.", 409, { code: "session_changed" });
+}
+
+/** Waiters keep their own deadline/cancellation without cancelling shared renewal. */
+function waitForRenewal(pending: Promise<void>, signal?: AbortSignal | null): Promise<void> {
+  signal?.throwIfAborted();
+  return new Promise((resolve, reject) => {
+    const abort = () => reject(signal?.reason ?? new DOMException("Aborted", "AbortError"));
+    signal?.addEventListener("abort", abort, { once: true });
+    pending.then(resolve, reject).finally(() => signal?.removeEventListener("abort", abort));
+  });
+}
+
+function renewSession(version: number): Promise<void> {
+  if (renewal) return renewal;
+  const pending = (async () => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 20000);
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: "POST", credentials: "include", signal: controller.signal,
+        headers: { "Content-Type": "application/json" },
+      });
+      checkSession(version);
+      if (response.status === 401) throw expiredSession();
+      if (!response.ok) {
+        const body = await parseResponseBody(response);
+        throw new ApiError(apiErrorDetail(body, response.status), response.status, body);
+      }
+      renewalVersion++;
+    } finally {
+      clearTimeout(timer);
+    }
+  })();
+  renewal = pending;
+  // Handle both outcomes without leaving an unobserved rejected promise.
+  void pending.then(() => { if (renewal === pending) renewal = null; }, () => { if (renewal === pending) renewal = null; });
+  return pending;
+}
+
+/** Shared cookie renewal for JSON endpoints and binary PDF rendering. */
+export async function sessionFetch(path: string, init: RequestInit): Promise<Response> {
+  const authentication = /^\/(?:auth(?:\/|$)|account\/(?:login|register)(?:[/?]|$))/.test(path);
+  const changesSession = /^\/(?:auth\/(?:login|logout)|account\/(?:login|register))$/.test(path);
+  const version = sessionVersion, renewed = renewalVersion;
+  checkSession(version, init.signal);
+  // Finish the old cookie rotation before login/logout can install different cookies.
+  if (changesSession && renewal) {
+    await waitForRenewal(renewal.catch(() => {}), init.signal);
+    checkSession(version, init.signal);
+  }
+  if (!authentication && sessionExpired) throw expiredSession();
+  let response = await fetch(`${API_BASE_URL}${path}`, { ...init, credentials: "include" });
+  init.signal?.throwIfAborted();
+  // Existing callers guard their normal results; renewal must never cross accounts.
+  if (response.status === 401 || authentication) checkSession(version, init.signal);
+  if (response.status === 401 && !authentication) {
+    if (sessionExpired) throw expiredSession();
+    if (renewed === renewalVersion) await waitForRenewal(renewSession(version), init.signal);
+    checkSession(version, init.signal);
+    response = await fetch(`${API_BASE_URL}${path}`, { ...init, credentials: "include" });
+    checkSession(version, init.signal);
+    if (response.status === 401) throw expiredSession();
+  }
+  if (response.ok && changesSession) resetApiSession();
+  return response;
+}
+
 const request = async <T>(
   path: string,
   init?: RequestInit,
@@ -64,7 +155,6 @@ const request = async <T>(
   // requests the server had already answered, which surfaced as page-level
   // "try again" errors. Endpoints that need a different budget pass their own.
   timeoutMs = 20000,
-  retrySession = true,
 ): Promise<T> => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -84,7 +174,7 @@ const request = async <T>(
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
+    const response = await sessionFetch(path, {
       ...init,
       credentials: "include",
       headers: {
@@ -95,10 +185,6 @@ const request = async <T>(
       signal: controller.signal,
     });
 
-    if (response.status === 401 && path === "/account/workspace" && retrySession) {
-      await request("/auth/refresh", { method: "POST" }, timeoutMs, false);
-      return request<T>(path, init, timeoutMs, false);
-    }
     const body = await parseResponseBody(response);
     if (aiRequest && (modelsChanged || modelVersion !== modelPreferenceSnapshot())) { modelsChanged = true; throw new ApiError("AI models changed. Try again with the new settings.", 409, { code: "ai_models_changed" }); }
     if (!response.ok) {

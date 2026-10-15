@@ -14,6 +14,12 @@ The current frontend sends `skill_selection: aggregate`. The server retains ever
 
 Review AI suggestions offers Select all / Deselect all as well as individual chapter selection. Skills only replaces the current chapter after the user applies it. Existing drafts remain readable; pending suggestions from the earlier rule are invalidated by the versioned input fingerprint. Generate and apply Skills to migrate an existing resume to the combined list.
 
+Target & AI shows the combined skill names and counts from the original resume, confirmed skills and all saved My courses. Overlaps are deduplicated. Existing documents are compared with the current candidates, including restored drafts already marked `all_sources_v1`; missing skills show a Review skill updates action. Uploading a source or saving a course does not silently overwrite the editor. Generate new suggestions and apply Skills to update the document and its asynchronous PDF preview. If all mapped skills already exist, the panel says so rather than implying the course must produce a new skill. Optional teaching-objective skill extraction remains separate.
+
+Vite prebundles the worker's PDF.js and Mammoth imports at startup. Discovering these dependencies only on the first upload otherwise causes a development-page reload, dropping an unfinished import. The browser acceptance also checks that uploading does not navigate the main frame.
+
+`frontend/tests/resume-course-skill-updates.browser.mjs` covers saved-course changes with an existing local resume, complete request/response/application skill coverage, pending-state recovery after reload, undo/redo, PDF readiness and desktop/mobile layouts against the synthetic provider. It accepts `AIW_QA_SOURCE_PDF` for a local fictional PDF fixture; otherwise it uses a synthetic DOCX. No live provider calls are made.
+
 Uploaded and manually entered source details are editable immediately: personal fields, original-resume skills, and experience/background text remain visible. There is no separate source privacy-review checkbox or confirmation gate. Clicking Generate uses the latest edited source, including older local drafts whose legacy `source.reviewed` flag is false. Current requests use `evidence_mode: auto_redacted` and `evidence_reviewed: false`; automatic contact redaction and source validation remain active. Course-skill choices, learning-record confirmation, generated-chapter application and the final interview review remain separate workflows.
 
 ## Local data and privacy boundary

@@ -7,6 +7,11 @@ export default defineConfig(({ mode }) => {
   const environment = loadEnv(mode, process.cwd(), '')
   return {
     plugins: [react()],
+    // Worker-only imports are discovered on first upload unless prebundled.
+    // A late optimization reload would discard the pending resume import.
+    optimizeDeps: {
+      include: ['mammoth/mammoth.browser.js', 'pdfjs-dist'],
+    },
     server: {
       host: '127.0.0.1',
       port: 5173,
