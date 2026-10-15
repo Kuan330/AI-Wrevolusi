@@ -44,7 +44,7 @@ try{
   await page.getByLabel('Upload original resume PDF or DOCX').setInputFiles({name:'insurance-synthetic.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:docxFixture(sample)});
   const skillField=page.getByLabel(/Skills explicitly listed/);await skillField.waitFor();
   const extracted=await skillField.inputValue();assert.ok(extracted.includes('Salesforce')&&extracted.includes('Life, medical, motor, property, and travel insurance'));assert.ok(!/Jaya|Berhad|92%|Professional Experience/.test(extracted));
-  await page.getByText('I have reviewed this text and removed',{exact:false}).click();
+  await page.getByLabel("Resume experience and background").waitFor();
   const started=Date.now();await page.getByRole('button',{name:'Generate my resume',exact:true}).click();await applyReviewedResume(page);await page.locator('.rw-workbench').waitFor();await saved();
   const first=await readDraft();assert.equal(first.generationOutcome,'tailored');assert.ok(Date.now()-started<10000);
   const names=generated[0].skills.map(s=>s.name);assert.ok(names.includes('AI and big data')&&names.includes('Reading, writing and mathematics'));assert.ok(!names.includes('Everyday English 1')&&!names.includes('Analytical thinking')&&!names.includes('Petaling Jaya'));assert.ok(!names.some(s=>s.includes('92%')));

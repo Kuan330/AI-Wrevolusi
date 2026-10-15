@@ -1,14 +1,22 @@
 import { ApiError } from "../../services/api.ts";
 import schema from "./rendercv-2.8.schema.json" with { type: "json" };
 import type { ResumeDocument } from "./types.ts";
-const keys = new Set("message updates entry_id delete add_skills order occupation_code skill_filter_version source_sections source_projects heading_fact_id polishable_fact_ids project_id highlights highlight_fact_ids patches fact_id document job_requirements skills evidence evidence_reviewed id text entries gaps skill_ids fact_ids keywords skill_slugs course_id gap_ids reason courses field instruction context_reviewed context_mode history role content section_index source_ids path value design".split(" "));
+const keys = new Set("message updates entry_id delete add_skills order occupation_code skill_filter_version source_sections source_projects heading_fact_id polishable_fact_ids project_id highlights highlight_fact_ids patches fact_id document job_requirements skills evidence evidence_reviewed evidence_mode id text entries gaps skill_ids fact_ids keywords skill_slugs course_id gap_ids reason courses field instruction context_reviewed context_mode history role content section_index source_ids path value design".split(" "));
 function collect(value: unknown) {
   if (!value || typeof value !== "object") return;
   if (!Array.isArray(value) && "properties" in value && value.properties && typeof value.properties === "object") for (const key of Object.keys(value.properties)) keys.add(key);
   for (const child of Object.values(value)) collect(child);
 }
 collect(schema);
+for (const key of ["target_context", "result_kind", "limitation"]) keys.add(key);
 const label = (key: string) => keys.has(key) ? key.replaceAll("_", " ").replace(/\b\w/g, char => char.toUpperCase()) : "Field";
+const assistantOutputErrors = new Set(["invalid_reference", "unsupported_fact", "unsupported_claim", "unverified_name", "missing_evidence", "unsafe_content", "output_limit", "duplicate_sections"]);
+export function assistantErrorMessage(cause: unknown): string {
+  if (cause instanceof ApiError && cause.code && assistantOutputErrors.has(cause.code)) {
+    return "AI editing could not produce valid changes. Your resume is unchanged. Try again.";
+  }
+  return resumeErrorMessage(cause);
+}
 export function resumeErrorMessage(cause: unknown, document?: ResumeDocument): string {
   let message = cause instanceof Error ? cause.message : "Something went wrong. Your local draft is unchanged.";
   if (!(cause instanceof ApiError) || !cause.fields.length) return message;

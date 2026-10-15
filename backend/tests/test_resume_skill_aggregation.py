@@ -121,3 +121,22 @@ def test_aggregation_requires_current_source_contract():
     data.pop("source_metadata")
     with pytest.raises(ValidationError):
         GenerateRequest.model_validate(data)
+
+
+def test_auto_redacted_source_generates_without_claiming_manual_review():
+    data = request_data()
+    data.update(evidence_reviewed=False, evidence_mode="auto_redacted")
+    parsed = GenerateRequest.model_validate(data)
+    assert parsed.evidence_reviewed is False
+    result = generate(data)
+    assert set(skill_names(result)) == {s["name"] for s in data["skills"]}
+    assert next(section for section in result.sections if section.title == "Experience").entries
+
+
+@pytest.mark.parametrize("text", ["private@example.test", "+61 412 345 678"])
+def test_auto_redacted_mode_still_rejects_contacts_in_evidence(text):
+    data = request_data()
+    data.update(evidence_reviewed=False, evidence_mode="auto_redacted")
+    data["evidence"][0]["text"] = text
+    with pytest.raises(ValidationError, match="contact details"):
+        GenerateRequest.model_validate(data)

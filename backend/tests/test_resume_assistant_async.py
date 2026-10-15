@@ -76,7 +76,9 @@ def test_nine_entry_types(original, edited):
     {"section_index":0,"delete":["e0","e1"],"order":[]},
 ])
 def test_explicit_delete_and_complete_reorder(patch):
-    result = assembled({"message":"Changed", "sections":[patch]})
+    req = request()
+    req.instruction = "Remove the Skills section" if len(patch.get("delete", [])) == 2 else "Remove SQL" if patch.get("delete") else "Reorder skills"
+    result = assembled({"message":"Changed", "sections":[patch]}, req)
     expected = patch["order"]
     assert [e.source_ids[0] for e in result.sections[0].entries] == [f"section-0-entry-{eid[1:]}" for eid in expected]
 
@@ -145,7 +147,11 @@ def test_one_correction_uses_original_input_only():
     assert result.sections and len(provider.calls)==2
     first,second=[call["payload"] for call in provider.calls]
     assert "Expert SQL" not in json.dumps(second)
-    assert second.pop("repair_feedback")=={"code":"unsupported_claim","fields":[["sections",0,"entries",0]]}
+    feedback = second.pop("repair_feedback")
+    assert feedback["code"] == "unsupported_claim"
+    assert feedback["fields"] == [["sections",0,"updates",0]]
+    assert feedback["targets"] == [{"section_index":0,"entry_id":"e0"}]
+    assert "original entry" in feedback["hint"]
     assert first==second
     assert provider.calls[1]["request_timeout_s"] <= provider.calls[0]["request_timeout_s"]
 
@@ -293,6 +299,7 @@ def test_full_asgi_success_returns_without_hanging_disconnect_cleanup():
 def test_compact_wire_size_comparison_synthetic(tmp_path):
     req=request({"cv":{"sections":{"Skills":[{"bullet":"Knowledge of SQL and report analysis"} for i in range(80)]}}})
     compact=deepcopy(GOOD)
+    compact["sections"][0]["updates"][0]["entry"]={"bullet":"SQL and report analysis"}
     response=assembled(compact,req)
     compact_bytes=len(json.dumps(compact).encode())
     full_bytes=len(response.model_dump_json().encode())

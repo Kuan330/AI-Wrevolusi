@@ -49,6 +49,18 @@ class SyntheticResumeProvider:
                     raise
             if self.scenario == "assist_invalid": return {"unexpected": "Synthetic invalid output"}
             payload = kwargs["payload"]
+            if self.scenario == "assist_slow": await asyncio.sleep(1)
+            if self.scenario == "assist_question" and "repair_feedback" not in payload:
+                return {"message": "Would you like me to change the wording?"}
+            if self.scenario == "assist_empty": return {"message": "Updated everything.", "result_kind": "edit"}
+            if self.scenario == "assist_no_change": return {"message": "Already satisfied.", "result_kind": "no_change"}
+            if self.scenario == "assist_unsupported": return {"message": "Missing facts.", "result_kind": "unsupported", "limitation": "missing_facts"}
+            if payload["scope"] == "design":
+                return {"message": "Updated theme.", "design": [{"path": ["theme"], "value": "moderncv"}]}
+            if self.scenario == "assist_partial_highlight":
+                section = next(section for section in payload["sections"] if section["title"] == "Projects")
+                return {"message": "Polished", "sections": [{"section_index": section["section_index"],
+                    "updates": [{"entry_id": section["entries"][0]["id"], "highlight_updates": {"0": "Built reports: 5 teams."}}]}]}
             updates = []
             for section in payload["sections"]:
                 if section["title"] != "Skills": continue
@@ -64,9 +76,16 @@ class SyntheticResumeProvider:
                     # Synthetic-only polish with exactly the same factual words.
                     text = "SQL" if text == "Knowledge of SQL" else "Knowledge of SQL"
                     entry = text if isinstance(entry, str) else {"bullet": text}
-                updates.append({"section_index": section["section_index"], "updates": [{"entry_id": row["id"], "entry": entry, "source_ids": [row["id"]]}]})
+                update = {"entry_id": row["id"], "entry": entry}
+                if (self.scenario == "assist_implicit" or payload["scope"] == "content") and isinstance(entry, dict):
+                    update = {"entry_id": row["id"], "fields": entry}
+                if self.scenario != "assist_implicit" and payload["scope"] != "content":
+                    update["source_ids"] = ["e999"] if self.scenario == "assist_bad_reference" else [row["id"]]
+                updates.append({"section_index": section["section_index"], "updates": [update]})
                 break
-            return {"message": "Refined the existing skill wording.", "sections": updates, "design": []}
+            result = {"message": "Refined the existing skill wording.", "sections": updates}
+            if payload["scope"] != "content": result["design"] = []
+            return result
         if self.scenario == "unavailable": raise AIProviderError("Synthetic offline provider", status_code=503, kind="http")
         if self.scenario == "invalid": return {"unexpected": "Synthetic invalid output"}
         if self.scenario in {"slow", "progress"}:

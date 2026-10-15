@@ -5,10 +5,10 @@ export type ResumeCapabilities = { ai_configured: boolean; ai_provider_host: str
 export const resumeService = {
   capabilities: (signal: AbortSignal) => api.get<ResumeCapabilities>("/resume/capabilities", signal),
   generate: (job: string, skills: SkillCandidate[], evidence: ResumeEvidence[], reviewed: boolean, signal: AbortSignal, projects: SourceProject[] = [], sections?: SourceSection[], occupationCode?: string, metadata?: SourceMetadata, roleFingerprint?: string) =>
-    api.post<Generation>("/resume/generate", { ...(metadata ? { skill_selection: "aggregate", source_metadata: metadata } : {}), ...(roleFingerprint ? { role_reference_fingerprint: roleFingerprint } : {}), ...(occupationCode ? { occupation_code: occupationCode } : {}), job_requirements: job.trim(), skills, evidence, evidence_reviewed: reviewed, source_projects: projects, ...(sections ? { source_sections: sections } : {}) }, sections ? 70000 : 55000, signal),
+    api.post<Generation>("/resume/generate", { ...(metadata ? { skill_selection: "aggregate", evidence_mode: "auto_redacted", source_metadata: metadata } : {}), ...(roleFingerprint ? { role_reference_fingerprint: roleFingerprint } : {}), ...(occupationCode ? { occupation_code: occupationCode } : {}), job_requirements: job.trim(), skills, evidence, evidence_reviewed: metadata ? false : reviewed, source_projects: projects, ...(sections ? { source_sections: sections } : {}) }, sections ? 70000 : 55000, signal),
   learningSkills: (ids: string[], signal: AbortSignal) => api.post<{ courses: CourseSkillReview[] }>("/resume/learning-skills", { course_ids: ids }, 70000, signal),
-  assist: (instruction: string, document: ResumeDocument, skills: SkillCandidate[], history: AssistantMessage[], signal: AbortSignal) =>
-    api.post<AssistantProposal>("/resume/assist", { instruction, document, skills, history, context_mode: "auto_redacted" }, 100000, signal).catch((error: unknown) => {
+  assist: (instruction: string, document: ResumeDocument, skills: SkillCandidate[], history: AssistantMessage[], signal: AbortSignal, targetContext?: string) =>
+    api.post<AssistantProposal>("/resume/assist", { instruction, document, skills, history, ...(targetContext ? { target_context: targetContext } : {}), context_mode: "auto_redacted" }, 100000, signal).catch((error: unknown) => {
       if (error instanceof ApiError && error.status === 408 && !signal.aborted) {
         throw new ApiError("AI editing timed out. Your resume is unchanged. Try again.", 504, { code: "ai_timeout" });
       }

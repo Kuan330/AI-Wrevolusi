@@ -293,8 +293,8 @@ try {
   const dialog = page.getByRole('dialog', { name: 'Review AI suggestions' }); await dialog.waitFor(); await dialog.getByRole('checkbox').check(); await dialog.getByRole('button', { name: 'Apply selected chapters' }).click(); await saved();
   assert.match((await exportFile('YAML')).toString(), /User-entered factual project/); await page.getByRole('button', { name: 'Resume options' }).click(); await page.getByRole('button', { name: 'Undo AI changes' }).click(); await page.getByRole('dialog', { name: 'Resume options' }).getByRole('button', { name: 'Close', exact: true }).click(); await saved(); assert.match((await exportFile('YAML')).toString(), /User-entered factual project/);
   if (!await page.locator('.rb-job-card').count() || !await page.locator('.rb-job-card').isVisible()) await page.getByRole('button', { name: 'Target role' }).click(); await page.locator('input[type=file]').setInputFiles({ name: 'original.pdf', mimeType: 'application/pdf', buffer: pdf });
-  await page.getByLabel(/Resume evidence that AI will receive/).waitFor(); assert.ok((await page.getByLabel(/Resume evidence that AI will receive/).inputValue()).length > 3);
-  assert.equal(await page.getByRole('button', { name: 'Generate new suggestions' }).isDisabled(), true); await page.getByRole('button', { name: 'Remove source' }).click(); await page.getByRole('button', { name: 'Back to editing' }).click();
+  await page.getByLabel(/Resume experience and background/).waitFor(); assert.ok((await page.getByLabel(/Resume experience and background/).inputValue()).length > 3);
+  assert.equal(await page.getByRole('button', { name: 'Generate new suggestions' }).isDisabled(), false); await page.getByRole('button', { name: 'Remove source' }).click(); await page.getByRole('button', { name: 'Back to editing' }).click();
   await page.setViewportSize({ width: 390, height: 844 }); await page.getByRole('tab', { name: 'Preview', exact: true }).click(); await page.getByRole('img', { name: /Resume PDF/ }).first().waitFor(); assert.equal(await page.locator('.rw-edit-pane').isVisible(), false);
   await page.screenshot({ path: `${output}/mobile-preview.png`, fullPage: true }); await page.getByRole('tab', { name: 'Edit', exact: true }).click(); await page.getByRole('tab', { name: 'CV', exact: true }).focus(); await page.keyboard.press('ArrowRight'); await page.getByRole('tab', { name: 'Design', exact: true }).waitFor(); await page.getByRole('button', { name: 'YAML', exact: true }).click(); await editor.waitFor(); await page.screenshot({ path: `${output}/mobile-edit.png`, fullPage: true });
   const multi = 'cv:\n  sections:\n    Skills:\n' + Array.from({ length: 90 }, () => '      - bullet: "' + 'Analytical thinking. '.repeat(20) + '"\n').join('') + 'design:\n  theme: classic\n  entries:\n    allow_page_break: true\n';
@@ -367,9 +367,9 @@ try {
   assert.equal(await page.getByRole('list', { name: 'Attached references' }).count(), 0);
   await page.getByRole('link', { name: /Open Resume builder/ }).click(); await ready();
   assert.equal(await currentRequirements(), ''); assert.equal(await page.getByRole('button', { name: 'Generate my resume' }).isDisabled(), true);
-  await page.getByLabel(/Resume evidence that AI will receive/).waitFor();
-  assert.doesNotMatch(await page.getByLabel(/Resume evidence that AI will receive/).inputValue(), /Alex Example|alex@example|412 345/);
-  await selectTarget('QA TARGET PRIVATE: analysis and Python.'); await page.locator('.rb-source-review .rb-check').getByRole('checkbox').check();
+  await page.getByLabel(/Resume experience and background/).waitFor();
+  assert.doesNotMatch(await page.getByLabel(/Resume experience and background/).inputValue(), /Alex Example|alex@example|412 345/);
+  await selectTarget('QA TARGET PRIVATE: analysis and Python.'); assert.equal(await page.locator('.rb-source-review').getByRole('checkbox').count(), 0);
   assert.match(await page.getByLabel('Skills explicitly listed in your original resume').inputValue(), /Python/); await saved();
   await page.getByRole('button', { name: 'Generate my resume' }).click(); await applyReviewedResume(page); await pdfReady();
   assert.ok(latestInput.skills.some(skill => skill.name === 'Python')); assert.doesNotMatch(JSON.stringify(latestInput), /Alex Example|alex@example.com|412 345/);

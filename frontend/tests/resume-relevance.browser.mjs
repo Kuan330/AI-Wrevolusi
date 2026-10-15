@@ -63,7 +63,7 @@ try{
  const sample=['Alex Example','Core Skills','Excel, SQL, Life insurance','Professional Experience','Synthetic analyst | Apr 2026','• Reviewed 180 records.','Projects','Retail Sales Analysis | Apr 2026','• Cleaned 2,400 records.','• Removed 36 duplicates.'].join('\n');
  const source=docxFixture(sample.split("\n"));
  await page.getByLabel('Upload original resume PDF or DOCX').setInputFiles({name:'synthetic-role.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:source});
- await page.getByText('I have reviewed this text and removed',{exact:false}).click();
+ await page.getByLabel("Resume experience and background").waitFor();
  await page.getByRole('button',{name:'Generate my resume',exact:true}).click();await applyReviewedResume(page);await page.locator('.rw-workbench').waitFor();await saved();
  const first=await read(),names=first.document.cv.sections.Skills.map(e=>e.bullet),candidates=requests[0].skills.map(s=>s.name);
  assert.equal(requests[0].occupation_code,'2421');
@@ -114,6 +114,6 @@ try{
  assert.equal((await read()).document,null);assert.equal((await read()).proposal,null);assert.deepEqual((await read('relevance-a')).document,beforeEmpty.document);
  assert.equal(await page.getByRole('button',{name:'Generate my resume',exact:true}).isDisabled(),true);await page.getByText('Add reviewed resume details or selected user skills before generating.',{exact:false}).waitFor();
  // Skills-only input without any related candidate is an explicit error, not an empty generated document.
- await page.getByRole('button',{name:'Or enter your resume details manually',exact:true}).click();await page.getByLabel('Resume evidence that AI will receive').fill('Skills\nLife insurance');await page.getByText('I have reviewed this text and removed',{exact:false}).click();scenario='all_unrelated';await page.getByRole('button',{name:'Generate my resume',exact:true}).click();await page.getByText('No verified role-related skills or reviewed experience are available.',{exact:false}).waitFor();assert.equal((await read()).document,null);
+ await page.getByRole('button',{name:'Or enter your resume details manually',exact:true}).click();await page.getByLabel('Resume experience and background').fill('Skills\nLife insurance');await page.getByLabel("Resume experience and background").waitFor();scenario='all_unrelated';await page.getByRole('button',{name:'Generate my resume',exact:true}).click();await page.getByText('No verified role-related skills or reviewed experience are available.',{exact:false}).waitFor();assert.equal((await read()).document,null);
  assert.deepEqual(errors,[]);console.log('PASS: three candidate sources, role/code binding, direct+semantic subset, unchanged source/profile, reference retry, conservative fallback, selective apply/undo, zero-match removal/PDF, cancel/retry, legacy proposal invalidation and account isolation');
 }catch(error){console.error('DIAGNOSTIC',JSON.stringify({requests:requests.length,errors,notices:await page.locator('.rb-error,.rb-warning').allTextContents()}));await page.screenshot({path:out+'/failure.png',fullPage:true});throw error;}finally{await context.unrouteAll({behavior:'ignoreErrors'});await browser.close();}

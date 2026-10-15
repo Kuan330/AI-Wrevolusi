@@ -43,6 +43,7 @@ class GenerateRequest(StrictModel):
     skills: list[SkillCandidate] = Field(default_factory=list, max_length=250)
     evidence: list[Evidence] = Field(default_factory=list, max_length=500)
     evidence_reviewed: bool = False
+    evidence_mode: Literal["auto_redacted"] | None = None
     source_projects: list[SourceProject] | None = Field(default=None, max_length=80)
     source_sections: list[SourceSection] | None = Field(default=None, max_length=30)
 
@@ -54,8 +55,8 @@ class GenerateRequest(StrictModel):
             raise ValueError("Role-filtered generation requires reviewed source sections.")
         if sum(len(f.text) for f in self.evidence) > 60000:
             raise ValueError("Resume evidence exceeds the text limit.")
-        if self.evidence and not self.evidence_reviewed:
-            raise ValueError("Review and redact resume evidence before sending it.")
+        if self.evidence and not self.evidence_reviewed and self.evidence_mode != "auto_redacted":
+            raise ValueError("Use automatically redacted resume evidence or review it before sending.")
         if any(re.search(r"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|\+[1-9][0-9 ().-]{7,}[0-9]", f.text) for f in self.evidence):
             raise ValueError("Remove contact details from reviewed evidence before sending it.")
         if len({s.id for s in self.skills}) != len(self.skills) or len({f.id for f in self.evidence}) != len(self.evidence):
@@ -205,6 +206,7 @@ class AssistMessage(StrictModel):
 
 class AssistRequest(StrictModel):
     instruction: str = Field(min_length=1, max_length=5000)
+    target_context: str | None = Field(default=None, max_length=5000)
     document: dict
     skills: list[SkillCandidate] = Field(default_factory=list, max_length=250)
     context_reviewed: bool = False
@@ -240,5 +242,7 @@ class AssistDesign(StrictModel):
 
 class AssistResponse(StrictModel):
     message: str = Field(min_length=1, max_length=500)
+    result_kind: Literal["edit", "no_change", "unsupported"] | None = None
+    limitation: Literal["missing_facts", "unsupported_edit"] | None = None
     sections: list[AssistSection] = Field(default_factory=list, max_length=50)
     design: list[AssistDesign] = Field(default_factory=list, max_length=80)

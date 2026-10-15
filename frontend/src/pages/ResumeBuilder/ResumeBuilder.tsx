@@ -134,25 +134,25 @@ function ResumeWorkspace({ owner }: { owner: string }) {
   const hasContactErrors = Object.values(contactErrors).some(Boolean);
   const sourceSkillReview = useMemo(() => source ? reviewedSourceSkills({ ...source, redactedText: redactResume(source.redactedText, source.contacts) }) : { names: [], rejected: [], text: "" }, [source]);
   const sourceInput = useMemo(() => {
-    if (sourceSkillReview.rejected.length) return { evidence: [], projects: [], sections: [], error: "Some skill entries are work history, locations or achievements. Correct the Skills field before confirming your source." };
+    if (sourceSkillReview.rejected.length) return { evidence: [], projects: [], sections: [], error: "Some skill entries are work history, locations or achievements. Correct the Skills field before generating." };
     try { return { ...reviewedResumeInput(source ? redactResume(source.redactedText, source.contacts) : ""), error: "" }; }
     catch (cause) { return { evidence: [], projects: [], sections: [], error: message(cause) }; }
   }, [source, sourceSkillReview]);
   const careerInput = useMemo(() => {
     try {
-      const resumeInputs: ResumeSkillInput[] = source?.reviewed ? sourceSkillReview.names.flatMap(name => {
+      const resumeInputs: ResumeSkillInput[] = source ? sourceSkillReview.names.flatMap(name => {
         const safe = redactResume(name, source.contacts).trim();
-        return safe && !safe.includes("[REDACTED]") ? [{ skill: { id: safe, name: safe }, origin: { kind: "reviewed_resume" as const, label: "Reviewed original CV skills", fact_ids: sourceInput.sections.filter(section => section.title === "Skills").flatMap(section => section.fact_ids).filter(id => sourceInput.evidence.find(fact => fact.id === id)?.text.toLowerCase().includes(safe.toLowerCase())) } }] : [];
+        return safe && !safe.includes("[REDACTED]") ? [{ skill: { id: safe, name: safe }, origin: { kind: "reviewed_resume" as const, label: "Original CV skills", fact_ids: sourceInput.sections.filter(section => section.title === "Skills").flatMap(section => section.fact_ids).filter(id => sourceInput.evidence.find(fact => fact.id === id)?.text.toLowerCase().includes(safe.toLowerCase())) } }] : [];
       }) : [];
       const courseSkills = reviewedCourseSkills((draft.courseSkillReviews ?? []).filter(review => learningCourseIds.includes(review.course_id)), learningCourses);
-      const composed = composeCareerInput(source?.reviewed ? redactResume(source.redactedText, source.contacts) : "", [...skillInputs, ...resumeInputs, ...courseSkills.inputs], learningRecords, draft.learningSelections ?? [], value => redactResume(value, source?.contacts ?? emptyContacts()));
+      const composed = composeCareerInput(source ? redactResume(source.redactedText, source.contacts) : "", [...skillInputs, ...resumeInputs, ...courseSkills.inputs], learningRecords, draft.learningSelections ?? [], value => redactResume(value, source?.contacts ?? emptyContacts()));
       composed.metadata.course_skill_sources = courseSkills.sources;
       return { ...composed, error: "" };
     } catch (cause) { return { evidence: [], projects: [], sections: [], candidates: [], metadata: undefined, error: message(cause) }; }
   }, [source, sourceSkillReview, sourceInput, skillInputs, learningRecords, draft.learningSelections, draft.courseSkillReviews, learningCourses, learningCourseIds]);
   const reviewedFacts = careerInput.evidence, candidates = careerInput.candidates;
   const inputError = sourceInput.error || careerInput.error || (draft.learningSelections?.length ? learningError || (learningLoading ? "Loading selected learning records…" : "") : "");
-  const inputFingerprint = useMemo(() => JSON.stringify([TAILORING_VERSION, SKILL_FILTER_VERSION, targetKey, target.role?.tasks, target.role?.reference_fingerprint, candidates, careerInput.metadata, source?.reviewed ?? null, careerInput.evidence, careerInput.projects, careerInput.sections]), [targetKey, target.role?.tasks, candidates, careerInput, source?.reviewed]);
+  const inputFingerprint = useMemo(() => JSON.stringify([TAILORING_VERSION, SKILL_FILTER_VERSION, targetKey, target.role?.tasks, target.role?.reference_fingerprint, candidates, careerInput.metadata, careerInput.evidence, careerInput.projects, careerInput.sections]), [targetKey, target.role?.tasks, candidates, careerInput, target.role?.reference_fingerprint]);
   const inputVersion = useRef(inputFingerprint); inputVersion.current = skillsLoading || skillError || inputError ? "loading" : inputFingerprint;
   useEffect(() => {
     if (local.loading || !isCurrent()) return;
@@ -295,7 +295,7 @@ function ResumeWorkspace({ owner }: { owner: string }) {
   const generationAction = !hasContactErrors && candidates.length <= 250 && !candidates.some(skill => skill.name.length > 160 || skill.id.length > 160) && targetReady && draft.pendingJobRequirements === targetText ? resumeGenerationAction({
     jobRequirements: draft.pendingJobRequirements, hasDocument: Boolean(draft.document),
     skillCount: candidates.length, factCount: reviewedFacts.length, skillsLoading, skillError: skillError || inputError,
-    sourceReviewed: source ? source.reviewed : null, aiConfigured: capabilities?.ai_configured ?? null,
+    aiConfigured: capabilities?.ai_configured ?? null,
     busy: generating || importing,
   }) : null;
   const recheckAI = async () => {
@@ -316,11 +316,10 @@ function ResumeWorkspace({ owner }: { owner: string }) {
     if (draft.document && draft.jobRequirements !== draft.pendingJobRequirements.trim() && !targetConfirmed) { setShowTarget(true); return; }
     if (candidates.length > 250 || candidates.some(skill => skill.name.length > 160 || skill.id.length > 160)) { setError("Use at most 250 skill names, each at most 160 characters."); return; }
     if (skillError || inputError) { setError(skillError || inputError); return; }
-    if (source && !source.reviewed) { setError("Review and redact the resume text, then confirm it before sending anything to AI."); return; }
     const job = targetText, capturedTarget = targetKey, capturedInput = inputFingerprint, token = ++run.current;
     const request = controller(); generationRequest.current = request; busy.current = true; setGenerating(true); setRoleNeedsRefresh(false); setGenerationStatus(""); setError(""); setShowTarget(false);
     try {
-      const result = await resumeService.generate(job, candidates, reviewedFacts, Boolean(reviewedFacts.length), request.signal, careerInput.projects, careerInput.sections, target.role!.occupation_code, careerInput.metadata, target.role!.reference_fingerprint);
+      const result = await resumeService.generate(job, candidates, reviewedFacts, false, request.signal, careerInput.projects, careerInput.sections, target.role!.occupation_code, careerInput.metadata, target.role!.reference_fingerprint);
       if (!isCurrent() || request.signal.aborted || token !== run.current || targetVersion.current !== capturedTarget || inputVersion.current !== capturedInput) return;
       if (readCareerDirection()?.occupation_code !== target.role?.occupation_code) return;
       if (result.tailoring_version !== TAILORING_VERSION || result.skill_filter_version !== SKILL_FILTER_VERSION) throw new Error("The server did not return the complete combined Skills list. Restart or refresh the project, then retry.");
@@ -385,21 +384,20 @@ function ResumeWorkspace({ owner }: { owner: string }) {
         <input ref={fileInput} hidden type="file" accept={RESUME_ACCEPT} aria-label="Upload original resume PDF or DOCX" onChange={event => { const file = event.target.files?.[0]; event.target.value = ""; if (file) void attach(file); }} />
         {!source && <Button variant="link" size="sm" onClick={() => change(old => ({ ...old, source: { file: new Blob([]), name: "Manually supplied details", text: "", redactedText: "", contacts: emptyContacts(), reviewed: false } }))}>Or enter your resume details manually</Button>}
         {source && <div className="rb-source-review"><div className="rb-inline"><strong><FileText size={16} />{source.name}</strong><Button variant="ghost" size="sm" onClick={() => change(old => ({ ...old, source: null }))}>Remove source</Button></div>
-          <p>Review these suggested personal fields. Correct mistakes and redact any remaining names, addresses or confidential details below. Automatic redaction is not infallible.</p>
-          <div className="rb-contact-grid">{Object.entries(source.contacts).map(([key, value]) => <FormField key={key} label={`${key.charAt(0).toUpperCase() + key.slice(1)} · local only`}><Input type={key === "email" ? "email" : key === "phone" ? "tel" : "text"} inputMode={key === "email" ? "email" : key === "phone" ? "tel" : "text"} aria-invalid={Boolean(contactErrors[key])} aria-describedby={contactErrors[key] ? `source-${key}-error` : undefined} value={value} onChange={event => change(old => { if (!old.source) return old; const contacts = { ...old.source.contacts, [key]: event.target.value }; return { ...old, source: { ...old.source, contacts, redactedText: redactResume(old.source.redactedText, contacts), reviewed: false } }; })} />{contactErrors[key] && <p id={`source-${key}-error`} role="alert" className="rb-error">{contactErrors[key]}</p>}</FormField>)}</div>
-          <FormField label="Skills explicitly listed in your original resume" hint="Review these local suggestions. Use one skill per line; include only skills actually in your source. Confirmed names join your existing skill list."><Textarea rows={2} maxLength={13000} value={sourceSkillReview.text} onChange={event => change(old => old.source ? { ...old, source: { ...old.source, skillsText: event.target.value, skillsOrigin: "manual", skillsParserVersion: SKILLS_PARSER_VERSION, reviewed: false } } : old)} /></FormField>
-          <FormField label="Resume evidence that AI will receive" hint="Keep only factual background you want to share. Personal fields above are not sent to AI."><Textarea rows={8} maxLength={60000} value={source.redactedText} onChange={event => change(old => old.source ? { ...old, source: { ...old.source, redactedText: event.target.value, reviewed: false } } : old)} /></FormField>
+          <p>Correct any extraction errors and update your personal information, skills and experience.</p>
+          <div className="rb-contact-grid">{Object.entries(source.contacts).map(([key, value]) => <FormField key={key} label={`${key.charAt(0).toUpperCase() + key.slice(1)} · local only`}><Input type={key === "email" ? "email" : key === "phone" ? "tel" : "text"} inputMode={key === "email" ? "email" : key === "phone" ? "tel" : "text"} aria-invalid={Boolean(contactErrors[key])} aria-describedby={contactErrors[key] ? `source-${key}-error` : undefined} value={value} onChange={event => change(old => { if (!old.source) return old; const contacts = { ...old.source.contacts, [key]: event.target.value }; return { ...old, source: { ...old.source, contacts, redactedText: redactResume(old.source.redactedText, contacts) } }; })} />{contactErrors[key] && <p id={`source-${key}-error`} role="alert" className="rb-error">{contactErrors[key]}</p>}</FormField>)}</div>
+          <FormField label="Skills explicitly listed in your original resume" hint="Use one skill per line."><Textarea rows={2} maxLength={13000} value={sourceSkillReview.text} onChange={event => change(old => old.source ? { ...old, source: { ...old.source, skillsText: event.target.value, skillsOrigin: "manual", skillsParserVersion: SKILLS_PARSER_VERSION } } : old)} /></FormField>
+          <FormField label="Resume experience and background"><Textarea rows={8} maxLength={60000} value={source.redactedText} onChange={event => change(old => old.source ? { ...old, source: { ...old.source, redactedText: event.target.value } } : old)} /></FormField>
           {sourceInput.error && <p className="rb-warning" role="alert">{sourceInput.error}</p>}
-          {sourceInput.projects.length > 0 && <div className="rb-source-projects" aria-label="Projects from your reviewed source"><h4>Projects from your source</h4>{sourceInput.projects.map(project => <div key={project.id}>
+          {sourceInput.projects.length > 0 && <div className="rb-source-projects" aria-label="Projects from your source"><h4>Projects from your source</h4>{sourceInput.projects.map(project => <div key={project.id}>
             {project.mode === "structured" ? <><strong>{project.name}</strong>{project.date && <p>{project.date}</p>}<ul>{project.highlight_fact_ids.map(id => <li key={id}>{sourceInput.evidence.find(f => f.id === id)?.text.replace(/^[•●▪*-]\s+/, "")}</li>)}</ul></> : <><p>Project boundaries are unclear. These paragraphs will be kept unchanged, without AI rewriting.</p>{project.fact_ids.map(id => <p key={id}>{sourceInput.evidence.find(f => f.id === id)?.text}</p>)}</>}
           </div>)}</div>}
-          <label className="rb-check"><Checkbox disabled={Boolean(sourceInput.error) || hasContactErrors} checked={source.reviewed} onCheckedChange={checked => change(old => old.source ? { ...old, source: { ...old.source, redactedText: redactResume(old.source.redactedText, old.source.contacts), projects: sourceInput.projects, skills: sourceSkillReview.names, ...(old.source.skillsText !== undefined ? { skillsText: sourceSkillReview.names.join("\n") } : {}), skillsParserVersion: SKILLS_PARSER_VERSION, reviewed: checked === true } } : old)} />I have reviewed this text and removed personal or confidential information I do not want sent to AI.</label>
         </div>}
       </fieldset>
       <fieldset disabled={generating || importing}><ResumeLearningRecords courseSkills={<ResumeCourseSkills contextKey={inputFingerprint} refresh={() => setSkillRetry(value => value + 1)} owner={owner} courses={learningCourses} reviews={draft.courseSkillReviews ?? []} disabled={generating || importing || skillsLoading || Boolean(skillError)} change={courseSkillReviews => change(old => ({ ...old, courseSkillReviews }))} />} records={learningRecords} selections={draft.learningSelections ?? []} loading={learningLoading} error={learningError} retry={() => setSkillRetry(value => value + 1)} change={learningSelections => change(old => ({ ...old, learningSelections }))} /></fieldset>
       {careerInput.error && <p className="rb-warning" role="alert">{careerInput.error}</p>}
-      <p className="rb-ai-summary">AI uses your job requirements, skills and any reviewed resume details.</p>
-      {!skillsLoading && !skillError && !inputError && !candidates.length && !reviewedFacts.length && <p className="rb-warning" role="status">Add reviewed resume details or selected user skills before generating. Target role requirements are not evidence of your abilities.</p>}
+      <p className="rb-ai-summary">AI uses your job requirements, skills and resume details.</p>
+      {!skillsLoading && !skillError && !inputError && !candidates.length && !reviewedFacts.length && <p className="rb-warning" role="status">Add resume details or selected user skills before generating. Target role requirements are not evidence of your abilities.</p>}
       {capabilities?.ai_configured === false && <div className="rb-warning"><p>Resume AI has not been configured on the server. No generation request has been sent. Ask the administrator to enable it, or open an empty template to continue manually.</p><Button variant="outline" size="sm" disabled={checkingAI} onClick={() => { void recheckAI(); }}>{checkingAI ? "Checking…" : "Check again"}</Button></div>}{aiCheckNotice && <p role="status">{aiCheckNotice}</p>}
       {generationStatus && <p role="status">{generationStatus}</p>}
       {generating && <ResumeGenerationProgress seconds={generationSeconds} />}
@@ -409,7 +407,7 @@ function ResumeWorkspace({ owner }: { owner: string }) {
       <p>Your draft stays in this browser. AI generation and PDF preview send data for processing.</p>
       <Accordion type="single" collapsible><AccordionItem value="privacy" className="rb-privacy-item"><AccordionTrigger>Privacy details</AccordionTrigger><AccordionContent>
         <p>Drafts are saved separately for your account in this browser and on this site, with no resume database or cross-device sync. Signing out keeps them. Clearing site data, ending private browsing or browser storage eviction can remove them. Account isolation is not device-level encryption; export a copy you want to keep.</p>
-        <p>Original PDF/DOCX files are parsed locally and are not uploaded. Readable text is required; scanned files need manual details, not OCR. AI generation sends your job requirements, skills and only reviewed, redacted evidence. The editing assistant sends your instructions, automatically redacted sections and skills, safe design settings and recent conversation context; chat is not saved after leaving this page. Personal-field mappings stay local. Third-party provider retention policies still apply; zero retention is not guaranteed. An empty draft does not use AI.</p>
+        <p>Original PDF/DOCX files are parsed locally and are not uploaded. Readable text is required; scanned files need manual details, not OCR. AI generation sends your job requirements, skills and automatically redacted resume details. The editing assistant sends your instructions, automatically redacted sections and skills, safe design settings and recent conversation context; chat is not saved after leaving this page. Personal-field mappings stay local. Third-party provider retention policies still apply; zero retention is not guaranteed. An empty draft does not use AI.</p>
         <p>PDF preview temporarily sends the complete document, including personal fields you add, to our backend renderer. Temporary files are deleted after rendering, including failures and timeouts; there is no server-side resume history.</p>
       </AccordionContent></AccordionItem></Accordion>
     </div>;

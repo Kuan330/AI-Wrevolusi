@@ -48,6 +48,8 @@ test("current generation requests aggregation and timeout notices preserve all s
   t.mock.method(api, "post", async (_url, request) => { body = request; return { sections: [], gaps: [] }; });
   await resumeService.generate("Role", [{ id: "sql", name: "SQL" }], [], false, new AbortController().signal, [], [], "3332", { version: "career_evidence_v2", skill_sources: [], learning_facts: [] }, "reference");
   assert.equal(body.skill_selection, "aggregate");
+  assert.equal(body.evidence_mode, "auto_redacted");
+  assert.equal(body.evidence_reviewed, false);
   assert.equal(SKILL_FILTER_VERSION, "all_sources_v1");
   const notice = generationNotice("source_preserved", ["ai_timeout"], SKILL_FILTER_VERSION);
   assert.match(notice, /Skills are complete/);

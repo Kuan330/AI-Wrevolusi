@@ -59,7 +59,7 @@ try {
   assert.equal(await page.getByRole("button", { name: "Generate my resume", exact: true }).isEnabled(), true, "Optional slow learning progress must not delay generation without selected learning facts");
   releaseProgress(); progressGate = null;
   await page.getByLabel("Upload original resume PDF or DOCX").setInputFiles({ name: "epic8.docx", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", buffer: docxFixture(sample) });
-  await page.getByText("I have reviewed this text and removed", { exact: false }).click();
+  await page.getByLabel("Resume experience and background").waitFor();
   const learning = page.locator(".rb-learning-records"); await learning.getByRole("button", { name: /Learning records/ }).click();
   await learning.getByText("You recorded this course as completed", { exact: false }).first().waitFor();
   assert.equal(await learning.locator(".rb-learning-record").filter({has: page.getByRole("checkbox")}).getByText("Unfinished course must not", { exact: false }).count(), 0);
