@@ -14,6 +14,7 @@ import { ApiError } from "@/services/api";
 import { createSession, sessionProgress, type InterviewSession } from "@/features/interview/session";
 import { availableChangeTasks, changeTopics, futureInterviewOccupation, interviewCareer, planBody } from "@/features/interview/start";
 import { loadResumeDraft } from "@/features/resume/repository";
+import { interviewResumeRequirements } from "@/features/resume/targetRole";
 import type { ResumeDraft } from "@/features/resume/types";
 
 const dateText = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
@@ -36,12 +37,14 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
     return () => window.removeEventListener("workspace-change", update);
   }, []);
 
-  const prepared = useMemo(() => draft?.document ? prepareInterviewContext(draft.document, draft.jobRequirements, extra) : null, [draft, extra]);
+  const resumeRequirements = draft ? interviewResumeRequirements(draft) : "";
+  const prepared = useMemo(() => draft?.document ? prepareInterviewContext(draft.document, resumeRequirements, extra) : null, [draft, resumeRequirements, extra]);
   const changeTasks = useMemo(() => availableChangeTasks(), [workspaceVersion]);
   const topics = useMemo(() => prepared ? changeTopics(prepared, taskLinks) : [], [prepared, taskLinks, workspaceVersion]);
   const career = interviewCareer();
+  const resumeCareer = career?.title.toLowerCase() === prepared?.roleTitle.toLowerCase() ? career : null;
   const future = futureInterviewOccupation();
-  const hasResumeRole = Boolean(draft?.jobRequirements.trim());
+  const hasResumeRole = Boolean(resumeRequirements.trim());
   const hasResumeItems = Boolean(prepared?.display.some(item => item.kind !== "requirement"));
   const ready = !loading && !loadError && hasResumeRole && hasResumeItems;
 
@@ -54,7 +57,7 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
       if (mode === "career" && !future) throw new Error("Choose a future occupation in Possibilities first.");
       if (mode === "resume" && (!ready || !prepared || !draft)) throw new Error("Save your resume sections and target role in Resume Builder first.");
       if (mode === "resume" && !accepted) throw new Error("Confirm that you want to send these resume items to AI first.");
-      const bank = await interviewService.bank(mode === "career" ? future!.code : mode === "resume" ? career?.code ?? "0000" : "0000", controller.signal).catch(cause => {
+      const bank = await interviewService.bank(mode === "career" ? future!.code : mode === "resume" ? resumeCareer?.code ?? "0000" : "0000", controller.signal).catch(cause => {
         if (cause instanceof ApiError && cause.status === 401) throw cause;
         return null;
       });
@@ -64,8 +67,8 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
       if (controller.signal.aborted) return;
       const bankIntents = Object.fromEntries((bank?.questions ?? []).map(question => [question.id, question.intent]));
       const session = mode === "resume" && prepared && draft
-        ? createSession({ mode, role: { title: prepared.roleTitle, sentTitle: prepared.sentRoleTitle, requirements: draft.jobRequirements,
-          ...(career?.title.toLowerCase() === prepared.roleTitle.toLowerCase() ? { occupationCode: career.code } : {}) }, resumeVersion: { savedAt: draft.updatedAt, itemCount: prepared.display.length }, items: prepared.display, plan, restore: prepared.restore, bankIntents })
+        ? createSession({ mode, role: { title: prepared.roleTitle, sentTitle: prepared.sentRoleTitle, requirements: resumeRequirements,
+          ...(resumeCareer ? { occupationCode: resumeCareer.code } : {}) }, resumeVersion: { savedAt: draft.updatedAt, itemCount: prepared.display.length }, items: prepared.display, plan, restore: prepared.restore, bankIntents })
         : createSession({ mode, role: mode === "career" ? { title: future!.title, sentTitle: future!.title, occupationCode: future!.code, requirements: "" } : { title: "General practice", sentTitle: "", requirements: "" }, resumeVersion: null, items: [], plan, bankIntents });
       onStart(session);
     } catch (cause) { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : "Could not prepare your questions. Try again."); }
@@ -98,9 +101,10 @@ export default function StartPanel({ owner, sessions, onStart, onOpen, onDelete 
       {choice === "general" && <p className="ip-hint">You will get 3 to 5 common interview questions that are not tied to a role.</p>}
       {choice === "resume" && (loading ? <p role="status">Loading your resume…</p> : loadError ? <p className="ip-note" role="alert">{loadError}</p> : <div className="ip-resume">
         <dl className="ip-facts">
-          <div><dt>Target role</dt><dd>{prepared?.roleTitle && draft?.jobRequirements.trim() ? prepared.roleTitle : "Not set yet"}</dd></div>
+          <div><dt>Target role</dt><dd>{prepared?.roleTitle && hasResumeRole ? prepared.roleTitle : "Not set yet"}</dd></div>
           <div><dt>Resume version</dt><dd>{draft?.document ? <><CheckCircle2 size={15} className="ip-ok" /> Saved on {dateText(draft.updatedAt)}, {prepared?.display.length ?? 0} items</> : "No resume yet"}</dd></div>
         </dl>
+        {hasResumeRole && !draft?.jobRequirements.trim() && <p className="ip-hint">Practice uses your selected target role. This resume has not been tailored to that role.</p>}
         {!ready && <div className="ip-callout" role="status"><p>{resumeNotice}</p>
           <Button asChild variant="outline"><Link to={ROUTES.resumeBuilder}>Open Resume builder</Link></Button></div>}
         {ready && prepared && <>

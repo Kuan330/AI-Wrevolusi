@@ -10,7 +10,7 @@ from app.services.possibilities_reference import requirements_text
 from app.services.resume_relevance import FILTER_VERSION, TASK_FILTER_VERSION, candidates_for_role, select_related
 from app.schemas.resume_career import CareerQuote, VERSION
 from app.services import resume_generation as reviewed
-from app.services.resume_career import add_career_presentation, contextual_facts, aliases_for
+from app.services.resume_career import add_career_presentation, contextual_facts, aliases_for, summary_fact_ids
 
 logger = logging.getLogger(__name__)
 RELEVANCE_PROMPT = reviewed.PROMPT + """
@@ -19,6 +19,7 @@ Also return skill_decisions: exactly one decision for EACH skill_candidates item
 
 CAREER_INSTRUCTIONS = """
 Additionally return summary (at most two fact_id/text fragments), project_order (a complete permutation of source_projects IDs), and evidence_links (candidate_id, fact_id, exact quote). Use career tasks ONLY to choose relevant emphasis, never as personal facts. Summary fragments must each select ONE reviewed background fact and obey the same strict polishing constraints; preserve its numbers, dates, names, and substantive terms. Never cite skill names, plans or completion records as summary achievements. The program supplies the objective label; do not call the target role the user's present job. When no grounded background can be selected use summary=[]. For evidence_links quote a real concrete reviewed example that meaningfully supports a selected candidate; do not use generic company, date, title or skill-list rows as examples. Refer to all_candidates IDs (including protected d IDs), and reviewed_context/facts. Self-recorded learning is not external certification or assessed competence. Learning intentions are not experience, mastery or completed courses. Do not output new project names, dates, sections, skill names, or invented facts. Prioritise whole structured projects whose reviewed descriptions support the selected role skills and tasks; keep every project, preserving its identity, dates, highlights and fact ownership. Do not reorder work history. If any project has mode=verbatim, keep its original order. Return an empty evidence_links list where no example supports an association.
+summary_fact_ids lists the ONLY eligible summary sources. When it is non-empty, return one or two summary fragments from those IDs, preferring concrete work or project facts. If a safe rewording is unclear, copy the chosen fact verbatim, optionally removing its leading bullet. When summary_fact_ids is empty, return summary=[]. Never use another fact or invent background to fill a summary.
 """
 CAREER_PROMPT = RELEVANCE_PROMPT + CAREER_INSTRUCTIONS
 AGGREGATION_PROMPT = reviewed.PROMPT + CAREER_INSTRUCTIONS + """
@@ -91,6 +92,7 @@ async def generate_role_reviewed_resume(request, provider, role):
         "facts": [fact.model_dump() for fact in facts]}
     if career:
         payload.update({"career_tasks": role.tasks, "reviewed_context": [f.model_dump() for f in contextual_facts(request) if f.id not in {fact.id for fact in facts}],
+            "summary_fact_ids": sorted(summary_fact_ids(request)),
             "all_candidates": [{"candidate_id": alias, "name": candidate.name, "origins": next(s for s in request.source_metadata.skill_sources if s.skill_id == candidate.id).model_dump()["origins"]} for alias, candidate in aliases_for(direct, pending).items()],
             "source_projects": [p.model_dump() for p in request.source_projects]})
     if v2:

@@ -681,6 +681,9 @@ class OpenAICompatibleProvider:
             'response_format': {'type': 'json_object'},
             'temperature': 0,
         }
+        # Keep DeepSeek V4 reasoning from consuming the bounded JSON output budget.
+        if self.model.casefold().startswith(('deepseek-v4', 'deepseek-flash')):
+            body['thinking'] = {'type': 'disabled'}
         if self._max_tokens is not None:
             body['max_tokens'] = self._max_tokens
         return body

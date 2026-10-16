@@ -106,24 +106,24 @@ def _timed_keyword_normaliser(query: str, gateway: AIGateway) -> list[str]:
     from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
 
     strict = bool(getattr(getattr(gateway, "provider", None), "strict_override", False))
+    budget_s = settings.occupation_search_normaliser_timeout_s
     if strict:
-        gateway.provider.timeout_s = min(gateway.provider.timeout_s, settings.occupation_search_normaliser_timeout_s)
-    with ThreadPoolExecutor(max_workers=1) as pool:
-        future = pool.submit(normalise_search_query, query, gateway)
-        try:
-            return list(future.result(timeout=settings.occupation_search_normaliser_timeout_s))
-        except FuturesTimeout:
-            if strict: raise ModelOverrideError("ai_budget_exhausted") from None
-            logger.warning(
-                'occupation_search_normaliser_timeout query=%r budget_s=%.1f',
-                query,
-                settings.occupation_search_normaliser_timeout_s,
-            )
-            return []
-        except ModelOverrideError: raise
-        except Exception:  # noqa: BLE001 - optional layer by design
-            logger.exception('occupation_search_normaliser_failed query=%r', query)
-            return []
+        gateway.provider.timeout_s = min(gateway.provider.timeout_s, budget_s)
+    pool = ThreadPoolExecutor(max_workers=1)
+    future = pool.submit(normalise_search_query, query, gateway, timeout_s=budget_s)
+    try:
+        return list(future.result(timeout=budget_s))
+    except FuturesTimeout:
+        if strict: raise ModelOverrideError("ai_budget_exhausted") from None
+        logger.warning('occupation_search_normaliser_timeout query=%r budget_s=%.1f', query, budget_s)
+        return []
+    except ModelOverrideError: raise
+    except Exception:  # noqa: BLE001 - optional layer by design
+        logger.exception('occupation_search_normaliser_failed query=%r', query)
+        return []
+    finally:
+        # A running provider call must not extend the search deadline during shutdown.
+        pool.shutdown(wait=False, cancel_futures=True)
 
 
 @router.get('/occupations')

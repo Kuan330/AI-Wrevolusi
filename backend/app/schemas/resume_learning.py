@@ -16,6 +16,10 @@ class LearningSkillSuggestion(StrictModel):
     name: str = Field(min_length=1, max_length=160)
     quote: str = Field(min_length=8, max_length=2000)
 
+class CourseSuggestions(StrictModel):
+    course_id: str
+    skills: list[dict] = Field(default_factory=list, max_length=20, json_schema_extra={"items": LearningSkillSuggestion.model_json_schema()})
+
 class CourseSkillsResult(StrictModel):
     course_id: str
     title: str
@@ -28,4 +32,5 @@ class LearningSkillsResponse(StrictModel):
     courses: list[CourseSkillsResult] = Field(max_length=250)
 
 class LearningSkillsEnvelope(StrictModel):
-    courses: list[dict] = Field(max_length=250)
+    # Keep row validation isolated without leaving the provider's shape undefined.
+    courses: list[dict] = Field(max_length=250, json_schema_extra={"items": CourseSuggestions.model_json_schema()})

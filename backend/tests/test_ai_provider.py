@@ -68,6 +68,22 @@ def test_provider_parses_a_valid_json_completion_and_sends_expected_request() ->
     assert captured['body']['messages'][0]['role'] == 'system'
     assert captured['body']['messages'][1]['role'] == 'user'
     assert captured['body']['response_format'] == {'type': 'json_object'}
+    assert 'thinking' not in captured['body']
+
+
+@pytest.mark.parametrize('model', ['deepseek-v4.1-flash', 'deepseek-v4-pro', 'deepseek-flash'])
+def test_deepseek_returns_json_without_spending_the_output_budget_on_reasoning(model) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        assert body['max_tokens'] == 1436
+        if body.get('thinking') == {'type': 'disabled'}:
+            return httpx.Response(200, json=_completion_body('{"answer": 7}'))
+        return httpx.Response(200, json={
+            'choices': [{'message': {'content': None, 'reasoning_content': 'Unfinished analysis'}, 'finish_reason': 'length'}],
+        })
+
+    provider = _build_provider(handler, model=model, max_tokens=1436, max_retries=0)
+    assert _call(provider) == {'answer': 7}
 
 
 def test_provider_strips_markdown_code_fences() -> None:

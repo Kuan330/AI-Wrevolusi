@@ -49,6 +49,14 @@ test('experience level changes the first recommendation', () => {
     assert.equal(recommendCourses(courses, { ...inputs, experience }, 'analytical-thinking').courses[0].id, first);
   }
 });
+test('explicit course choices describe the actual blueprint rather than automatic matches', () => {
+  const selected = generate({ skillId: '', selectedCourseIds: ['a'] });
+  assert.deepEqual(selected.courseIds, ['a']);
+  assert.doesNotMatch(selected.rationale, /No verified courses|No courses selected/);
+  const practiceOnly = generate({ selectedCourseIds: [] });
+  assert.deepEqual(practiceOnly.courseIds, []);
+  assert.match(practiceOnly.rationale, /No courses selected/);
+});
 test('all published chapters and durations are preserved, not truncated to three', () => {
   const chapters = [10, 15, 20, 25, 30].map((min, i) => ({ title: `Chapter ${i}`, min }));
   const plan = generate({ courses: [course('a', 'beginner', { durationMin: 100, chapters })] });

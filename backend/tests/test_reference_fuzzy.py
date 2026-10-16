@@ -8,6 +8,8 @@ optional keyword normaliser through a fake gateway dependency.
 from __future__ import annotations
 
 import time
+from concurrent.futures import ThreadPoolExecutor
+from threading import Event
 from types import SimpleNamespace
 
 from fastapi import FastAPI
@@ -16,6 +18,7 @@ from sqlalchemy import create_engine, text
 
 from app.db.session import get_db
 from app.routers.reference import clear_occupation_search_caches, get_reference_ai_gateway, router
+from app.routers import reference
 from app.services.occupation_search import (
     MAXIMUM_FUZZY_OCCUPATION_RESULTS,
     normalise_search_query,
@@ -255,6 +258,37 @@ def test_keyword_normaliser_failures_are_contained() -> None:
             )
 
     assert normalise_search_query('商店主管', JunkGateway()) == ['shop', 'supervisor']
+
+
+def test_keyword_translation_has_its_own_prompt_and_request_budget() -> None:
+    class TranslationGateway:
+        def run_structured(self, *, response_model, **kwargs):
+            assert 'Translate' in kwargs['system_prompt']
+            assert kwargs['request_timeout_s'] == 12
+            assert kwargs['request_max_retries'] == 0
+            return SimpleNamespace(value=response_model(keywords=['accountant']))
+
+    assert normalise_search_query('会计师', TranslationGateway(), timeout_s=12) == ['accountant']
+
+
+def test_keyword_timeout_does_not_wait_for_the_worker(monkeypatch) -> None:
+    release = Event()
+    entered = Event()
+
+    def slow_normaliser(*args, **kwargs):
+        entered.set()
+        release.wait(2)
+        return ['accountant']
+
+    monkeypatch.setattr(reference, 'normalise_search_query', slow_normaliser)
+    monkeypatch.setattr(reference.settings, 'occupation_search_normaliser_timeout_s', .01)
+    with ThreadPoolExecutor(max_workers=1) as caller:
+        result = caller.submit(reference._timed_keyword_normaliser, '会计师', FakeGateway([]))
+        try:
+            assert entered.wait(1)
+            assert result.result(timeout=.5) == []
+        finally:
+            release.set()
 
 
 def test_scoring_a_thousand_rows_stays_within_the_latency_budget() -> None:

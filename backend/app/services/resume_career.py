@@ -21,6 +21,12 @@ def contextual_facts(request):
     return [f for f in request.evidence if f.id in allowed]
 
 
+def summary_fact_ids(request):
+    allowed = {fid for section in request.source_sections if section.title in {"Experience", "Education", "Summary"} for fid in section.fact_ids}
+    allowed.update(fid for project in request.source_projects if project.mode == "structured" for fid in project.highlight_fact_ids)
+    return allowed
+
+
 def add_career_presentation(result, request, role, direct, pending, output):
     aggregate = request.skill_selection == "aggregate"
     facts = {f.id: f for f in request.evidence}
@@ -70,8 +76,7 @@ def add_career_presentation(result, request, role, direct, pending, output):
         skills.entries.sort(key=lambda entry: rank(entry.skill_ids[0]))
     # Summary is a bounded extractive synthesis: AI selects/rephrases facts, program supplies the objective.
     summary_refs, summary_parts = [], []
-    summary_allowed = {fid for section in request.source_sections if section.title in {"Experience", "Education", "Summary"} for fid in section.fact_ids}
-    summary_allowed.update(fid for p in request.source_projects if p.mode == "structured" for fid in p.highlight_fact_ids)
+    summary_allowed = summary_fact_ids(request)
     if output:
         for fragment in output.summary:
             try:

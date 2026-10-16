@@ -37,8 +37,8 @@ class Settings(BaseSettings):
 
     # Soft ceiling for the optional occupation-search keyword normaliser so a
     # slow LLM never blocks the whole search past the client timeout.
-    # 5s covers Vercel → LLM latency; still well under typical client timeouts.
-    occupation_search_normaliser_timeout_s: float = Field(default=5.0, gt=0, le=10)
+    # Leave time for translation while keeping the search below the client's 20s deadline.
+    occupation_search_normaliser_timeout_s: float = Field(default=15.0, gt=0, le=15)
 
     jwt_secret_key: str = Field(default='change-me-in-production')
     jwt_algorithm: str = 'HS256'

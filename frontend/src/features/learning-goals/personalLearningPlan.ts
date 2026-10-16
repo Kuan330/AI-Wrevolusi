@@ -118,7 +118,11 @@ export function generatePersonalPlan({ goalId, goalTitle, skillId, skillLabel, c
     createdAt: now, updatedAt: now, inputs: { ...inputs, goalText: inputs.goalText.trim() },
     resources: resources.reduce<LearningPlanResource[]>((items, resource) => addPlanResource(items, resource), []),
     courseIds: selected.map(course => course.id), activities, totals,
-    estimatedDays: Math.ceil(totals.minutes / inputs.minutesPerDay), rationale: recommendation.rationale, acceptedAt: null,
+      estimatedDays: Math.ceil(totals.minutes / inputs.minutesPerDay),
+      rationale: selectedCourseIds === undefined ? recommendation.rationale : selected.length
+        ? "Uses the catalogue courses you selected, with practice and review added. Activity times may include planning estimates."
+        : "No courses selected. Start with practice and review; no course content has been generated.",
+      acceptedAt: null,
   };
 }
 const obj = (value: unknown): value is Record<string, unknown> => !!value && typeof value === "object" && !Array.isArray(value);

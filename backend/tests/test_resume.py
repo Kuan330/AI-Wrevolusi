@@ -139,6 +139,23 @@ def test_courses_db_failure_is_optional_silent_and_readonly(client):
     assert response.status_code == 200 and response.json() == {"courses": []}
     assert response.headers["cache-control"] == "no-store"
 
+@pytest.mark.parametrize("kind,status,code", [("timeout", 504, "ai_timeout"), ("transport", 503, "ai_connection_failed"), ("output", 503, "ai_output_invalid")])
+def test_course_provider_failure_is_reported_without_empty_success(client, monkeypatch, kind, status, code):
+    from app.routers import resume
+    from app.services.ai_gateway import AIProviderError
+    http, _, db = client
+    db.rows = ROWS
+    class FailedProvider:
+        def complete_json(self, **kwargs):
+            raise AIProviderError("PRIVATE-UPSTREAM-CONTENT", kind=kind)
+    monkeypatch.setattr(resume, "resume_provider", lambda: FailedProvider())
+    response = http.post("/api/v1/resume/recommend-courses", json={"gaps": [g.model_dump() for g in GAPS]})
+    assert response.status_code == status
+    assert response.json()["code"] == code
+    assert "PRIVATE-UPSTREAM-CONTENT" not in response.text
+    assert "unchanged" in response.json()["detail"]
+    assert response.headers["cache-control"] == "no-store"
+
 @pytest.mark.parametrize("document", [
     {"cv": {}, "design": {"theme": "../../unsafe"}},
     {"cv": {"photo": "https://example.test/private"}},

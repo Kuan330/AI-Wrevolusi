@@ -12,9 +12,10 @@ from app.db.session import get_db
 from app.services.auth import get_current_user
 from app.schemas.resume import GenerateRequest, GenerateResponse, RecommendRequest, RecommendResponse, RenderRequest, AssistRequest, AssistResponse
 from app.services.resume import resume_provider, generate_resume, recommend_courses, provider_description
-from app.services.resume_errors import ResumeProblem, error_body
+from app.services.resume_errors import ResumeProblem, GenerationFailure, error_body
 from app.services.model_overrides import ModelOverrideError
 from app.services.resume_assistant import assist_resume_async, assistant_provider_failure
+from app.services.ai_gateway import AIProviderError
 from app.services.resume_render import render_pdf, InvalidResume, RenderBusy, RenderFailed
 
 logger = logging.getLogger(__name__)
@@ -185,6 +186,12 @@ async def recommendations(payload: RecommendRequest, db: AsyncSession = Depends(
         # The optional client can ignore failures, but configuration errors must
         # not masquerade as a successful empty recommendation response.
         raise
+    except AIProviderError as error:
+        detail = "Course recommendations are unavailable. Your resume is unchanged. Try again."
+        failure = GenerationFailure(detail, code="ai_output_invalid", attempts=1) if error.kind == "output" else assistant_provider_failure(error, 1)
+        failure.detail = detail
+        logger.warning("resume_courses_failed code=%s", failure.code)
+        return JSONResponse(status_code=504 if failure.code == "ai_timeout" else 503, content=error_body(failure), headers={"Cache-Control": "no-store"})
     except Exception as error:
         logger.warning("resume_courses_unavailable category=%s", type(error).__name__)
         return RecommendResponse()

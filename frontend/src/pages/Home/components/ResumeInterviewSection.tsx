@@ -48,7 +48,7 @@ export default function ResumeInterviewSection() {
             <div className="home-career-ready-copy">
               <h3><MessageSquare size={20} aria-hidden="true" /> Tell the story behind your skills.</h3>
               <p>Practise questions for your target role and get feedback to explain your experience more clearly.</p>
-              <div className="home-career-ready-soon">Interview practice <span>Coming soon</span></div>
+              <Link to={ROUTES.interview}>Practise for an interview <ArrowRight size={18} aria-hidden="true" /></Link>
             </div>
           </article>
           </ScrollReveal>

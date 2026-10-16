@@ -171,12 +171,13 @@ class ResumeCareerPolishResponse(ResumeRolePolishResponse):
 
 class ResumeCareerEnvelope(StrictModel):
     """Keep malformed components isolated; row validation happens in the service."""
-    patches: list[Any] = Field(default_factory=list, max_length=500)
-    gaps: list[Any] = Field(default_factory=list, max_length=20)
-    skill_decisions: list[Any] = Field(default_factory=list, max_length=250)
-    summary: list[Any] = Field(default_factory=list, max_length=2)
-    project_order: list[Any] = Field(default_factory=list, max_length=80)
-    evidence_links: list[Any] = Field(default_factory=list, max_length=250)
+    # Explain row shapes to the provider while validating components separately.
+    patches: list[Any] = Field(default_factory=list, max_length=500, json_schema_extra={"items": Polish.model_json_schema()})
+    gaps: list[Any] = Field(default_factory=list, max_length=20, json_schema_extra={"items": SkillGap.model_json_schema()})
+    skill_decisions: list[Any] = Field(default_factory=list, max_length=250, json_schema_extra={"items": SkillRelevanceDecision.model_json_schema()})
+    summary: list[Any] = Field(default_factory=list, max_length=2, json_schema_extra={"items": Polish.model_json_schema()})
+    project_order: list[Any] = Field(default_factory=list, max_length=80, json_schema_extra={"items": {"type": "string", "minLength": 1, "maxLength": 80}})
+    evidence_links: list[Any] = Field(default_factory=list, max_length=250, json_schema_extra={"items": CareerQuote.model_json_schema()})
 
     @field_validator("patches", "gaps", "skill_decisions", "summary", "project_order", "evidence_links", mode="before")
     @classmethod

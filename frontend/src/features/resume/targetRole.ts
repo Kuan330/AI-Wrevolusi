@@ -20,6 +20,11 @@ export function targetRequirements(role: OccupationRequirements | null): string 
   return [role.title, "Required skills:", ...role.skills.map(skill => `- ${skill.name}`)].join("\n");
 }
 
+/** A practice target is not evidence that AI tailored the saved resume. */
+export function interviewResumeRequirements(draft: ResumeDraft): string {
+  return draft.jobRequirements.trim() ? draft.jobRequirements : targetRequirements(draft.targetRole ?? null);
+}
+
 /** Only the pending target changes; applied resume/interview evidence stays intact. */
 export function withTargetRole(draft: ResumeDraft, role: OccupationRequirements | null): ResumeDraft {
   const requirements = targetRequirements(role);
