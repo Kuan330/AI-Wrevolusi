@@ -8,7 +8,7 @@ import re
 import time
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 
-from pydantic import ValidationError
+from pydantic import Field, ValidationError
 from sqlalchemy import text
 
 from app.schemas.interview import (
@@ -21,6 +21,7 @@ from app.schemas.interview import (
     PlanResponse,
     PlannedQuestion,
     QuestionBankResponse,
+    StructureCheck,
 )
 from app.services.ai_gateway import AIProviderError
 from app.services.interview_rubric import focus_for, invented_words, level_cap, rubric_prompt
@@ -386,11 +387,24 @@ def normalise_feedback(result: FeedbackResponse, request: FeedbackRequest) -> Fe
     )
 
 
+# Upstream STAR notes are discarded before public feedback and are never stored.
+class _ProviderStructureCheck(StructureCheck):
+    note: str | None = Field(default=None, max_length=1000)
+
+
+class _ProviderFeedbackResponse(FeedbackResponse):
+    structure: list[_ProviderStructureCheck] = Field(default_factory=list, max_length=4)
+
+
 def feedback_for_answer(request: FeedbackRequest, provider) -> FeedbackResponse:
+    def validated_feedback(raw):
+        result = _ProviderFeedbackResponse.model_validate(raw)
+        public = FeedbackResponse.model_validate(result.model_dump(exclude={"structure": {"__all__": {"note"}}}))
+        return normalise_feedback(public, request)
+
     return _run(
         provider, "interview.feedback.v2", {**request.model_dump(), "focus_competency": focus_for(request.question.kind, request.question.intent)},
-        FeedbackResponse, FEEDBACK_PROMPT,
-        lambda raw: normalise_feedback(FeedbackResponse.model_validate(raw), request), budget_s=50,
+        _ProviderFeedbackResponse, FEEDBACK_PROMPT, validated_feedback, budget_s=50,
     )
 
 

@@ -15,6 +15,7 @@ from app.routers.interview import _optional_provider
 from app.routers.resume import get_resume_provider
 from app.services.ai_gateway import AIProviderError
 from app.services.model_overrides import ModelOverrideError
+from app.services.resume_errors import GenerationFailure
 from app.schemas.interview import FeedbackRequest, FeedbackResponse, PlanModelResponse, PlanRequest
 from app.services.auth import get_current_user
 from app.services.interview import (
@@ -273,6 +274,24 @@ def test_feedback_prompt_bounds_structure_keys_without_relaxing_validation():
         FeedbackResponse.model_validate(invalid)
     assert error.value.errors()[0]["loc"] == ("structure", 0, "note")
     assert error.value.errors()[0]["type"] == "extra_forbidden"
+
+
+def test_private_structure_note_is_discarded_before_public_feedback():
+    raw = feedback().model_dump()
+    raw["structure"] = [{"part": "action", "status": "yes", "quote": "I prepared the weekly sales report myself", "note": "A useful private explanation."}]
+    result = feedback_for_answer(feedback_request(), Provider([raw]))
+    assert len(result.structure) == 1
+    assert set(result.model_dump()["structure"][0]) == {"part", "status", "quote"}
+    assert "A useful private explanation" not in result.model_dump_json()
+
+
+@pytest.mark.parametrize("extra", [{"invented": "unsupported"}, {"note": "x" * 1001}])
+def test_private_structure_envelope_still_rejects_unknown_or_unbounded_fields(extra):
+    raw = feedback().model_dump()
+    raw["structure"] = [{"part": "result", "status": "no", "quote": None, **extra}]
+    with pytest.raises(GenerationFailure) as error:
+        feedback_for_answer(feedback_request(), Provider([raw]))
+    assert error.value.code == "ai_schema_invalid"
 
 
 # --- question bank --------------------------------------------------------------------
