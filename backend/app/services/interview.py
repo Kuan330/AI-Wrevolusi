@@ -89,7 +89,7 @@ If she says she has not used a tool, do not count that as a weakness. Help her e
 Never judge personality, competence, accent, voice, appearance or confidence. Do not predict hiring success. Do not call the answer dishonest. Describe only what this answer showed.
 follow_up: at most one short question (one sentence, ending with ?) that digs into ONE thing she actually said. Set follow_up_quote to the exact words from her answer that it digs into, and follow_up_focus to action, reason, result, obstacle or check. Use only words that appear in her answer or the question. State no fact, name, number or tool she did not say. Use null when the answer is already clear or follow_ups_asked is 2.
 skill_gap: only when a possible_skill_gap improvement exists; skill_id MUST be one of the supplied skills, otherwise null.
-""" + rubric_prompt()
+""" + rubric_prompt() + "\nEach structure item has exactly these keys: part, status, quote. Do not add note or any other key. Put explanations in checks or improvements only."
 
 
 # --- Question bank --------------------------------------------------------------------

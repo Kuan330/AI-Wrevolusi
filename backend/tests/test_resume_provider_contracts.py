@@ -55,3 +55,33 @@ def test_summary_candidates_match_the_grounding_validator():
     assert "f-4" in eligible and "f-9" in eligible
     assert "f-1" not in eligible and "f-8" not in eligible
     assert "copy the chosen fact verbatim" in provider.calls[0]["system_prompt"]
+
+
+@pytest.mark.parametrize("invalid_patch", [False, True])
+def test_empty_polishable_facts_are_explicit_and_context_patches_stay_rejected(invalid_patch):
+    from tests.test_resume_skill_aggregation import request_data, Provider, generate
+
+    data = request_data()
+    data["skills"] = []
+    data["source_metadata"]["skill_sources"] = []
+    for fact in data["evidence"]:
+        fact["text"] = fact["text"].lstrip("•●▪*- ")
+    for section in data["source_sections"]:
+        section["polishable_fact_ids"] = []
+    for project in data["source_projects"]:
+        project.update(mode="verbatim", name=None, date=None, highlight_fact_ids=[])
+    provider = Provider(transform=lambda output: output.update(
+        patches=[{"fact_id": "f-4", "text": "Managed 250+ clients, achieving a 92% renewal rate."}] if invalid_patch else []))
+    result = generate(data, provider)
+    sent = provider.calls[0]
+    assert sent["payload"]["facts"] == []
+    assert "f-4" in sent["payload"]["summary_fact_ids"]
+    assert "When facts is empty, return patches=[]" in sent["system_prompt"]
+    assert "never patch reviewed_context or summary_fact_ids" in sent["system_prompt"]
+    assert "restriction applies ONLY to patches" in sent["system_prompt"]
+    assert result.outcome == ("source_preserved" if invalid_patch else "tailored")
+    assert result.notices == (["unsupported_polish"] if invalid_patch else [])
+    source = {fact["id"]: fact["text"] for fact in data["evidence"]}
+    for section in result.sections:
+        if section.title in {"Experience", "Education", "Projects"}:
+            assert all(entry.text == source[entry.fact_ids[0]] for entry in section.entries)

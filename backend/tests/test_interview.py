@@ -263,6 +263,18 @@ def test_feedback_for_answer_uses_the_provider_once():
     assert len(provider.calls) == 1
 
 
+def test_feedback_prompt_bounds_structure_keys_without_relaxing_validation():
+    provider = Provider([feedback().model_dump()])
+    feedback_for_answer(feedback_request(), provider)
+    assert "Each structure item has exactly these keys: part, status, quote." in provider.calls[0]["system_prompt"]
+    invalid = feedback().model_dump()
+    invalid["structure"] = [{"part": "result", "status": "no", "quote": None, "note": "No outcome was stated."}]
+    with pytest.raises(ValidationError) as error:
+        FeedbackResponse.model_validate(invalid)
+    assert error.value.errors()[0]["loc"] == ("structure", 0, "note")
+    assert error.value.errors()[0]["type"] == "extra_forbidden"
+
+
 # --- question bank --------------------------------------------------------------------
 
 def bank_db(exact=(), family=(), common=()):
