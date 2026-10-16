@@ -29,7 +29,6 @@ export const referenceService = {
     onlyUnits(await api.get<ReferenceOccupation[]>(
       `/reference/occupations?${new URLSearchParams({ ...(query.trim() ? { q: query.trim() } : {}), ...(area ? { area } : {}) })}`,
       signal,
-      12_000,
     )),
   tasks: (occupationCode: string) =>
     api.get<ReferenceTask[]>(
