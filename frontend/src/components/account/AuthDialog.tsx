@@ -20,13 +20,14 @@ export function AuthDialog(props: {
   onClose: () => void;
   destination?: string;
   initialMode?: "login" | "register";
+  reauthenticateUser?: string;
 }) {
   const { open, onClose, destination } = props;
   const { authenticate } = useAccount();
   const navigate = useNavigate();
   const location = useLocation();
   const [mode, setMode] = useState<"login" | "register">(props.initialMode ?? "login");
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(props.reauthenticateUser ?? "");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [importGuest, setImportGuest] = useState(false);
@@ -58,6 +59,7 @@ export function AuthDialog(props: {
     maxLength: 32,
     pattern: "[a-zA-Z0-9_]+",
     value: username,
+    readOnly: Boolean(props.reauthenticateUser),
     onChange: (e) => setUsername(e.target.value),
     disabled: busy,
   } satisfies Partial<ComponentProps<typeof Input>>;
@@ -120,6 +122,7 @@ export function AuthDialog(props: {
             try {
               await authenticate(mode, username.trim(), password, mode === "login" && importGuest);
               onClose();
+              if (props.reauthenticateUser) return;
               const intended = safeJourneyDestination(destination) ??
                 safeJourneyDestination(location.pathname + location.search + location.hash);
               navigate(intended ?? ROUTES.dashboard, { replace: true });
@@ -157,7 +160,7 @@ export function AuthDialog(props: {
               <p className="text-sm text-muted-foreground">Your new account starts empty. Choose your occupation in My work to get personalised skills and career directions.</p>
             </>
           )}
-          {mode === "login" && (
+          {mode === "login" && !props.reauthenticateUser && (
             <label className="flex items-start gap-2 text-sm">
               <input
                 type="checkbox"
@@ -180,11 +183,11 @@ export function AuthDialog(props: {
                 ? "Log in"
                 : "Create account"}
           </AppButton>
-          <Button {...buttonProps8}>
+          {!props.reauthenticateUser && <Button {...buttonProps8}>
             {mode === "login"
               ? "New here? Create an account"
               : "Already have an account? Log in"}
-          </Button>
+          </Button>}
         </form>
       </DialogContent>
     </Dialog>

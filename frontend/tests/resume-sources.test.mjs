@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
 import { sourceProjects, reviewedResumeInput } from "../src/features/resume/projects.ts";
-import { selectedCourseSkills, mergeResumeSkills, resumeSkillSnapshot, resumeSkillInputs, mergeSkillInputs } from "../src/features/resume/skills.ts";
+import { selectedCourseSkills, mergeResumeSkills, resumeSkillSnapshot, resumeSkillInputs } from "../src/features/resume/skills.ts";
 import { createOnboardingRecords } from "../src/features/learning-onboarding/learningOnboarding.ts";
 import { activateWorkspace } from "../src/services/accountStorage.ts";
 import { evidenceFromText, redactResume } from "../src/features/resume/redaction.ts";
@@ -57,7 +57,7 @@ test("editing reviewed text recomputes project references and redaction precedes
   assert.equal(changed.projects[0].date, "May 2026"); assert.notDeepEqual(changed.projects[0].fact_ids, parsed.projects[0].fact_ids);
 });
 const reference = [{ wef_skill_id: 1, core_skill: "Analytical thinking" }, { wef_skill_id: 2, core_skill: "Creative thinking" }];
-test("a saved learning plan contributes its selected skill without courses or completed study", () => {
+test("a standalone learning plan does not add unconfirmed skills to the resume", () => {
   const memory = new Map();
   globalThis.localStorage = { getItem: key => memory.get(key) ?? null, setItem: (key, value) => memory.set(key, value), removeItem: key => memory.delete(key) };
   globalThis.window = new EventTarget();
@@ -73,14 +73,10 @@ test("a saved learning plan contributes its selected skill without courses or co
     return resumeSkillSnapshot(reference);
   };
   try {
-    for (const status of ["draft", "active"]) {
-      const skill = snapshot(status).find(skill => skill.name === "Creative thinking");
-      assert.ok(skill);
-      const source = mergeSkillInputs(resumeSkillInputs(reference)).sources.find(source => source.skill_id === skill.id);
-      assert.deepEqual(source.origins.map(origin => origin.kind), ["learning_intention"]);
-      assert.ok(source.origins.every(origin => origin.fact_ids.length === 0));
+    for (const status of ["draft", "active", "archived"]) {
+      assert.deepEqual(snapshot(status), []);
+      assert.deepEqual(resumeSkillInputs(reference), []);
     }
-    assert.ok(!snapshot("archived").some(skill => skill.name === "Creative thinking"));
   } finally { activateWorkspace(null); }
 });
 test("saved and planned courses resolve canonical skill names, not course titles", () => {
@@ -95,7 +91,7 @@ test("missing course or unknown skill mappings fail closed", () => {
   assert.throws(() => selectedCourseSkills(reference, new Map([["a", { skills: ["unknown-skill"] }]]), ["a"]), /unknown skill mapping/);
   assert.throws(() => selectedCourseSkills(reference, new Map([["a", { skills: [] }]]), ["a"]), /could not be resolved/);
 });
-test("all learning intent sources join confirmed skills, never untouched suggestions", () => {
+test("only confirmed skills join My courses; independent learning intentions stay excluded", () => {
   let code = readFileSync(new URL("../src/features/resume/skills.ts", import.meta.url), "utf8");
   code = code.replace(/^import .*;\r?$/gm, "");
   const dependencies = `const resolveCatalogueSkill=(id,ref)=>{const s=ref.find(s=>String(s.wef_skill_id)===String(id)||s.core_skill===id);return s?{id:s.wef_skill_id,name:s.core_skill}:null};
@@ -112,7 +108,7 @@ const readSpecialistState = () => ({entries:[{skillUri:"s",skillLabel:"Specialis
 const specialistEntryIsCurrent = () => true;`;
   const js = ts.transpileModule(dependencies + code, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
   return import("data:text/javascript;base64," + Buffer.from(js).toString("base64")).then(m => {
-    assert.deepEqual(m.resumeSkillSnapshot([...reference,{wef_skill_id:4,core_skill:"Context skill"}]).map(s => s.name), ["Analytical thinking", "Context skill", "Creative thinking", "Goal skill", "Learning skill", "Personal skill", "Specialist learning"]);
+    assert.deepEqual(m.resumeSkillSnapshot([...reference,{wef_skill_id:4,core_skill:"Context skill"}]).map(s => s.name), ["Analytical thinking", "Personal skill"]);
   });
 });
 test("dedup preserves C/C++/C# and learning names without status groups", () => {

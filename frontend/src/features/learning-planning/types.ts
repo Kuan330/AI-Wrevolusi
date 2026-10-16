@@ -17,6 +17,8 @@ export type Course = {
   outcomes: string[];
   prereq: string;
   catalogueChaptersComplete?: boolean;
+  sourceFingerprint?: string;
+  teachingObjectives?: string;
   chapters: { title: string; min: number | null }[] | null;
   advice: string;
 };

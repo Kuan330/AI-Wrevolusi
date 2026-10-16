@@ -54,12 +54,47 @@ def get_resume_role_loader(db: AsyncSession = Depends(get_db)):
         return await load_role(db, code)
     return load
 
+def get_resume_course_loader(db: AsyncSession = Depends(get_db)):
+    from app.services.resume_learning import load_course_references
+    async def load(ids): return await load_course_references(db, ids)
+    return load
+
+async def cancellable_resume_call(request, work):
+    async def disconnected():
+        while True:
+            if (await request.receive())["type"] == "http.disconnect": return
+    task, disconnect = asyncio.create_task(work), asyncio.create_task(disconnected())
+    try:
+        done, _ = await asyncio.wait({task, disconnect}, return_when=asyncio.FIRST_COMPLETED)
+        if disconnect in done and not task.done(): return Response(status_code=499)
+        return await task
+    finally:
+        for item in (task, disconnect):
+            if not item.done(): item.cancel()
+        await asyncio.gather(task, disconnect, return_exceptions=True)
+
+from app.schemas.resume_learning import LearningSkillsRequest, LearningSkillsResponse
+
+@router.post("/learning-skills", response_model=LearningSkillsResponse)
+async def learning_skills(payload: LearningSkillsRequest, request: Request, provider=Depends(get_resume_provider), course_loader=Depends(get_resume_course_loader)):
+    from app.services.resume_learning import identify_learning_skills
+    try:
+        return await cancellable_resume_call(request, identify_learning_skills(payload.course_ids, provider, course_loader))
+    except ResumeProblem as error:
+        status = 504 if error.code == "ai_timeout" else 409 if error.code == "course_reference_changed" else 422 if error.code in {"output_limit", "ai_output_invalid"} else 503
+        logger.warning("resume_learning_skills_failed code=%s attempts=%s", error.code, error.attempts)
+        return JSONResponse(status_code=status, content=error_body(error), headers={"Cache-Control": "no-store"})
+    except ModelOverrideError: raise
+    except Exception:
+        logger.warning("resume_learning_skills_failed code=internal_error")
+        return JSONResponse(status_code=500, content={"detail": "Learning skill identification failed. Your skills are unchanged. Try again.", "code": "internal_error", "fields": []}, headers={"Cache-Control": "no-store"})
+
 @router.get("/capabilities")
 def capabilities():
     return provider_description()
 
 @router.post("/generate", response_model=GenerateResponse)
-async def generate(payload: GenerateRequest, request: Request, provider=Depends(get_resume_provider), role_loader=Depends(get_resume_role_loader)):
+async def generate(payload: GenerateRequest, request: Request, provider=Depends(get_resume_provider), role_loader=Depends(get_resume_role_loader), course_loader=Depends(get_resume_course_loader)):
     started = time.monotonic()
     try:
         if payload.source_sections is None:
@@ -73,6 +108,8 @@ async def generate(payload: GenerateRequest, request: Request, provider=Depends(
             while True:
                 if (await request.receive())["type"] == "http.disconnect": return
         async def generate_with_role():
+            from app.services.resume_learning import validate_course_skill_sources
+            await validate_course_skill_sources(payload, course_loader)
             role = await role_loader(payload.occupation_code) if payload.occupation_code is not None else None
             return await generate_reviewed_resume(payload, provider, role)
         generation = asyncio.create_task(generate_with_role())
@@ -91,7 +128,7 @@ async def generate(payload: GenerateRequest, request: Request, provider=Depends(
         logger.warning("resume_generate_failed code=%s attempts=%s status=503 duration_ms=%.1f", error.code, error.attempts, (time.monotonic() - started) * 1000)
         body = error_body(error)
         body["detail"] += " Your local input is unchanged. Try again or edit manually." if error.code in {"duplicate_sections", "duplicate_gaps", "missing_evidence", "invalid_reference", "unsupported_fact", "unsupported_claim", "unverified_name", "unsafe_content"} else ""
-        status = 404 if error.code == "target_role_not_found" else 409 if error.code == "target_role_changed" else 422 if error.code in {"role_has_no_skills", "no_related_input"} else 503
+        status = 404 if error.code == "target_role_not_found" else 409 if error.code in {"target_role_changed", "course_reference_changed"} else 422 if error.code in {"role_has_no_skills", "no_related_input"} else 503
         return JSONResponse(status_code=status, content=body, headers={"Cache-Control": "no-store"})
     except ModelOverrideError: raise
     except Exception:

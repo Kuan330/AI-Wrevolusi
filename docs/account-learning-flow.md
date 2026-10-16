@@ -29,9 +29,12 @@ This creates missing account dependencies (`occupations`, `app_users`, `refresh_
 
 The workspace stores work profile/analysis, selected learning themes, resource shortlist, planner activities and possibility choices. Each write verifies the authenticated owner and expected revision. Account-specific browser caches preserve unsynced changes. Failed saves show a retry notice; a conflict can be resolved by exporting the local copy and reloading the server copy. Logout waits for pending saves. Guest data remains separate. Registration offers to import it; login can retain guest-selected learning themes without replacing the account's work profile.
 
+JSON requests and PDF rendering share cookie renewal on HTTP 401. Concurrent requests share one refresh, and each original request is replayed at most once within its existing deadline. Login, registration, logout and refresh endpoints never recursively renew. Cancellation stops the caller from replaying, and account changes invalidate pending renewals. A failed refresh with HTTP 401 shows a same-account login action and stops further protected requests; the current page, unsent input and local drafts stay mounted. Reauthentication keeps the current route. Network/server failures do not silently sign the user out, and successful AI operations or non-401 errors are never replayed.
+
 ## Verification
 
 - `npm run check` in frontend (architecture boundaries, lint, tests, and build).
+- `node tests/session-renewal.browser.mjs` in frontend, with the local production preview and synthetic `tests.resume_preview_server:app` renderer, covers assistant renewal, expired PDF requests, preserved editor/input, reauthentication and resumed rendering. It uses synthetic accounts only.
 - `node --test frontend/tests/*.test.mjs`: 14 tests including account separation and rejected sync preservation.
 - `uv run pytest tests/test_accounts.py tests/test_auth.py -q` in backend.
 - Real database checks: registration, duplicate username, password failure, case-insensitive login, cookies/logout, workspace persistence, revision conflicts and account isolation.

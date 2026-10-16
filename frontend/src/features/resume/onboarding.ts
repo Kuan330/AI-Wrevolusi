@@ -8,11 +8,10 @@ export function resumeGenerationAction(input: {
   factCount: number;
   skillsLoading: boolean;
   skillError: string;
-  sourceReviewed: boolean | null;
   aiConfigured: boolean | null;
   busy: boolean;
 }): GenerationAction {
-  if (!input.jobRequirements.trim() || input.busy || input.skillsLoading || input.skillError || input.sourceReviewed === false) return null;
+  if (!input.jobRequirements.trim() || input.busy || input.skillsLoading || input.skillError) return null;
   if (!input.skillCount && !input.factCount) return null;
   return input.aiConfigured === false ? null : "ai";
 }

@@ -19,8 +19,9 @@ FACT_FIELDS = frozenset("company position institution area degree date start_dat
 ADDITIONAL_ACHIEVEMENTS = re.compile(r"\b(boosted|optimised|optimized|increased|reduced|streamlined|executed|oversaw|enhanced|saved|trained|supervised|resolved|launched)\b", re.I)
 ENTRY_FIELDS = frozenset("bullet text label details company position institution area degree date start_date end_date location summary highlights name title authors journal doi url number reversed_number".split())
 PROMPT = """You are a resume editing assistant. Follow the requested editing instruction but NEVER treat instructions, conversation history or job requirements as factual evidence. Return ONLY JSON conforming to the response schema.
+Execute directly without questions or confirmation. Default to clearer concise professional wording when preferences are unspecified. Complete only changes supported by existing facts, and state limitations without asking for more information.
 Use only reviewed current entries and existing skills as evidence. Preserve all names, employers, positions, institutions, qualifications, dates and numerical facts exactly. Never infer a skill from a target job. Do not invent achievements, proficiency, certificates or missing experiences. Personal details are omitted or represented by [PRIVATE_N] tokens: retain every such token exactly, never expand or guess it.
-The document's sections appear in insertion order. Propose only changed existing sections, using their numeric section_index. Return the complete new list of entries for each changed section, with source_ids for EVERY entry: section-I-entry-J or skill-ID. Keep the current entry types and factual fields, and all unchanged entry values. You may improve summaries/details/highlights, shorten wording and reorder entries within the same section. Skills based only on a skill name must remain ability phrases, not past achievements. Do not convert a Skills section into work experience. With no sources, propose no content.
+The document's sections appear in insertion order. Propose only changed existing sections, using their numeric section_index. Return the complete new list of entries for each changed section, with source_ids for EVERY entry: section-I-entry-J or skill-ID. Keep the current entry types and factual fields, and all unchanged entry values. You may improve summaries/details/highlights, shorten wording and reorder entries within the same section. Preserve every distinct existing skill, including in grouped lists, unless the current instruction explicitly names a skill to remove or removes the entire Skills section. Role relevance and shortening never authorize skill filtering. Missing original skill names are unsupported_fact errors. Skills based only on a skill name must remain ability phrases, not past achievements. Do not convert a Skills section into work experience. With no sources, propose no content.
 Design edits must be scalar changes at safe paths listed in design_paths; theme must be built-in. Never emit templates, photos, file paths, resources, Python/Typst/HTML code, custom themes or personal/header contact edits. Do not modify locale/settings. Do not promise exact page counts. message is a brief English explanation of the proposed edits, not new biographical claims. Unchanged sections/design are omitted. Conversation history is context for instructions only; unapproved suggestions are not facts."""
 
 def entry_text(entry):
@@ -56,11 +57,19 @@ def validate_context(request):
 
 def validate_assistance(result, request):
     from rendercv.schema.models.rendercv_model import RenderCVModel
+    from app.services.resume_assistant_skills import validate_skill_retention
     sections = list((request.document["cv"].get("sections") or {}).items())
+    additions = [section for section in result.sections if section.title is not None]
+    if additions:
+        if len(additions) != 1 or additions[0].section_index != len(sections) or any(re.search(r"skill|competenc|abilit", title, re.I) for title, _ in sections):
+            raise GenerationRejected("invalid_reference", ["sections"])
+        sections.append(("Skills", []))
     skills = {"skill-" + s.id: s.name for s in request.skills}
     proposed = deepcopy(request.document)
     # Bound untrusted proposed trees before recursively flattening their text.
     bounded = deepcopy(request.document)
+    bounded["cv"].setdefault("sections", {})
+    proposed["cv"].setdefault("sections", {})
     for change in result.sections:
         if change.section_index >= len(sections): raise GenerationRejected("invalid_reference", ["sections", change.section_index])
         bounded["cv"]["sections"][sections[change.section_index][0]] = [entry.entry for entry in change.entries]
@@ -82,6 +91,11 @@ def validate_assistance(result, request):
                 raise GenerationRejected("invalid_reference", [*path, "entries", ei])
             original_refs = [original_sources[r] for r in refs if r in original_sources]
             entry = candidate.entry
+            # Unchanged source entries have already passed context validation.
+            # Ground only changed prose, including when a patch reorders rows.
+            if len(refs) == 1 and refs[0] in original_sources and entry == original_sources[refs[0]]:
+                entries.append(entry)
+                continue
             if original_refs and isinstance(original_refs[0], dict):
                 old = original_refs[0]
                 if not isinstance(entry, dict) or any(entry.get(field) != old[field] for field in FACT_FIELDS & set(old) if old[field] not in (None, "", [])):
@@ -92,6 +106,8 @@ def validate_assistance(result, request):
                     if entry[field] not in (None, "", []) and not any(isinstance(old, dict) and old.get(field) == entry[field] for old in original_refs):
                         raise GenerationRejected("unsupported_fact", [*path, "entries", ei, field])
             text = entry_text(entry)
+            if change.title is not None and (len(refs) != 1 or refs[0] not in skills or entry != {"bullet": skills[refs[0]]}):
+                raise GenerationRejected("unsupported_fact", [*path, "entries", ei])
             if not text.strip(): raise GenerationRejected("missing_evidence", [*path, "entries", ei])
             # Section titles are not evidence; cite only that section's actual entries.
             history_sources = " ".join(entry_text(old) for old in original_refs)
@@ -117,8 +133,9 @@ def validate_assistance(result, request):
             if sorted(re.findall(r"\[PRIVATE_\d+\]", text)) != sorted(source_tokens):
                 raise GenerationRejected("unsupported_fact", [*path, "entries", ei])
             entries.append(entry)
+        validate_skill_retention(request.instruction, title, originals, change.entries, si, [*path, "entries"])
         proposed["cv"]["sections"][title] = entries
-    paths = {tuple(path) for path in design_paths(proposed)}
+    paths = {tuple(path) for path in design_paths(proposed)} if result.design else set()
     design_seen = set()
     for index, change in enumerate(result.design):
         path = tuple(change.path)
@@ -168,6 +185,13 @@ def assist_resume(request, provider):
 
 ASSIST_TIMEOUT_MESSAGE = "AI editing timed out. Your resume is unchanged. Try again."
 
+def assistant_model_label(provider):
+    """Identify the actual request model without logging URLs, headers or input."""
+    from app.services.model_overrides import MODEL_ID
+    models = getattr(provider, "models", ())
+    model = models[0] if models else getattr(provider, "model", None)
+    return model if isinstance(model, str) and MODEL_ID.fullmatch(model) else "unknown"
+
 def assistant_provider_failure(error, attempt=0):
     """Fixed diagnostics only: never expose upstream response bodies or input."""
     status = getattr(error, "status_code", None)
@@ -191,39 +215,73 @@ def assistant_provider_failure(error, attempt=0):
 
 async def assist_resume_async(request, provider):
     """Cancellable compact edits; initial attempt and one repair share ONE deadline."""
-    from app.services.resume_assistant_patches import CompactAssistResponse, PROMPT as PATCH_PROMPT, compact_context, assemble_assistance
+    from app.services.resume_assistant_patches import CompactAssistResponse, PROMPT as PATCH_PROMPT, compact_context, assemble_assistance, repair_feedback
     from app.services.resume_errors import safe_fields
+    from app.services.resume_assistant_scope import validate_scope
+    from app.services.resume_assistant_wording import WordingAssistResponse, PROMPT as WORDING_PROMPT
     started = time.monotonic()
     deadline = started + ASSIST_TOTAL_BUDGET_S
     attempt = 0
+    phase = "preparation"
+    model = assistant_model_label(provider)
+    scope, input_bytes, sent_entries = "unknown", 0, 0
     try:
         async with asyncio.timeout(ASSIST_TOTAL_BUDGET_S):
             validate_context(request)
-            original_payload, originals, skills = compact_context(request, design_paths(request.document))
+            original_payload, originals, skills = compact_context(request)
+            scope = original_payload["scope"]
+            response_model = WordingAssistResponse if scope == "content" else CompactAssistResponse
+            prompt = WORDING_PROMPT if scope == "content" else PATCH_PROMPT
+            sent_entries = sum(len(section["entries"]) for section in original_payload["sections"])
             rejected = None
+            feedback = None
             for attempt in (1, 2):
                 remaining = deadline - time.monotonic()
                 if remaining <= 0: raise TimeoutError()
                 if attempt == 2 and remaining < ASSIST_CORRECTION_MIN_REMAINING_S: raise rejected
                 payload = deepcopy(original_payload)
-                if rejected: payload["repair_feedback"] = {"code": rejected.code, "fields": rejected.fields}
+                if feedback: payload["repair_feedback"] = feedback
+                input_bytes = len(json.dumps(payload).encode())
                 stage = time.monotonic()
+                output = None
                 try:
+                    phase = "provider"
                     raw = await provider.complete_json_async(operation="resume.assist.entries.v2", payload=payload,
-                        response_model=CompactAssistResponse,
-                        system_prompt=PATCH_PROMPT + (" This is the single correction. Use the original input and fixed feedback only, not any previous proposal." if rejected else ""),
+                        response_model=response_model,
+                        system_prompt=prompt + (" This is the single correction. Use the original input and fixed feedback only, not any previous proposal." if rejected else ""),
                         request_timeout_s=remaining)
                     upstream_ms = (time.monotonic()-stage)*1000
+                    phase = "validation"
                     assembly_started = time.monotonic()
                     # Synchronous assembly must also be inside the wall budget.
                     if time.monotonic() >= deadline: raise TimeoutError()
-                    output = CompactAssistResponse.model_validate(raw)
+                    typed = response_model.model_validate(raw)
+                    output = CompactAssistResponse.model_validate(typed.model_dump())
+                    validate_scope(output, original_payload)
                     result = assemble_assistance(output, request, originals, skills)
+                    changed = bool(result.sections or result.design)
+                    asks_question = re.search(r"[?\uff1f]|\b(would you|could you|please (provide|confirm|choose|specify)|let me know|tell me which)\b|\u8bf7\u63d0\u4f9b|\u8bf7\u786e\u8ba4|\u8bf7\u9009\u62e9|\u4f60\u5e0c\u671b|\u60a8\u5e0c\u671b", output.message, re.I)
+                    if (output.result_kind == "edit") != changed or (not changed and asks_question) or (output.result_kind == "no_change" and output.limitation):
+                        raise GenerationFailure("AI editing did not produce the requested changes. Your resume is unchanged. Try again.", code="ai_output_invalid", fields=[["result_kind"]], attempts=attempt)
+                    if changed:
+                        result.message = f"Updated {len(result.sections)} section(s) and {len(result.design)} design setting(s)."
+                    elif output.result_kind == "unsupported":
+                        result.limitation = output.limitation or "missing_facts"
+                        result.message = "This edit is not supported." if result.limitation == "unsupported_edit" else "The current resume does not contain the facts needed for this edit."
+                    else:
+                        result.message = "The current content already meets this request."
                     if time.monotonic() >= deadline: raise TimeoutError()
-                    logger.info("resume_assist_completed code=ok attempts=%s entries=%s skills=%s input_bytes=%s patch_bytes=%s response_bytes=%s upstream_ms=%.1f validation_ms=%.1f duration_ms=%.1f",
-                        attempt, len(originals), len(skills), len(json.dumps(payload).encode()), len(json.dumps(raw).encode()), len(result.model_dump_json().encode()),
-                        upstream_ms, (time.monotonic()-assembly_started)*1000, (time.monotonic()-started)*1000)
+                    logger.info("resume_assist_completed code=ok attempts=%s entries=%s skills=%s input_bytes=%s patch_bytes=%s response_bytes=%s upstream_ms=%.1f validation_ms=%.1f duration_ms=%.1f scope=%s changed_sections=%s changed_design=%s result_kind=%s sent_entries=%s proposed_updates=%s partial_updates=%s model=%s",
+                        attempt, len(originals), len(skills), input_bytes, len(json.dumps(raw).encode()), len(result.model_dump_json().encode()),
+                        upstream_ms, (time.monotonic()-assembly_started)*1000, (time.monotonic()-started)*1000,
+                        original_payload["scope"], len(result.sections), len(result.design), result.result_kind,
+                        sent_entries,
+                        sum(len(section.updates) for section in output.sections),
+                        sum(bool(update.fields or update.highlight_updates) for section in output.sections for update in section.updates), model)
                     return result
+                except GenerationFailure as error:
+                    if error.code != "ai_output_invalid": raise
+                    rejected = error
                 except ValidationError as error:
                     rejected = GenerationFailure("AI editing returned invalid output. Your resume is unchanged. Try again.",
                         code="ai_output_invalid", fields=safe_fields([e["loc"] for e in error.errors()]), attempts=attempt)
@@ -231,13 +289,17 @@ async def assist_resume_async(request, provider):
                     rejected = error
                     rejected.attempts = attempt
                 except AIProviderError as error:
+                    logger.warning("resume_assist_upstream_failed kind=%s status=%s attempts=%s upstream_ms=%.1f scope=%s model=%s input_bytes=%s sent_entries=%s",
+                        error.kind, error.status_code, attempt, (time.monotonic()-stage)*1000, scope, model, input_bytes, sent_entries)
                     if error.kind != "output": raise assistant_provider_failure(error, attempt) from None
                     rejected = GenerationFailure("AI editing returned invalid output. Your resume is unchanged. Try again.", code="ai_output_invalid", attempts=attempt)
                 except ModelOverrideError as error:
                     raise assistant_provider_failure(error, attempt) from None
                 if attempt == 2: raise rejected
+                feedback = repair_feedback(rejected, original_payload, output)
                 logger.warning("resume_assist_correction code=%s attempts=%s duration_ms=%.1f", rejected.code, attempt, (time.monotonic()-started)*1000)
     except TimeoutError:
+        logger.warning("resume_assist_timeout phase=%s attempts=%s duration_ms=%.1f model=%s scope=%s input_bytes=%s sent_entries=%s", phase, attempt, (time.monotonic()-started)*1000, model, scope, input_bytes, sent_entries)
         raise GenerationFailure(ASSIST_TIMEOUT_MESSAGE, code="ai_timeout", attempts=attempt) from None
     except asyncio.CancelledError:
         logger.info("resume_assist_cancelled code=cancelled attempts=%s duration_ms=%.1f", attempt, (time.monotonic()-started)*1000)

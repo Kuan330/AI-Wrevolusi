@@ -138,7 +138,7 @@ test('typed service uses only the proposed endpoints and shared api wrapper', ()
   assert.match(service, /api\.get<PossibilitiesResponse>\("\/possibilities"/);
   assert.match(service, /api\.get<PossibilitiesResponse>\("\/possibilities"/);
   assert.doesNotMatch(service, /api\.put/);
-  assert.doesNotMatch(service, /sessionStorage/);
+  assert.doesNotMatch(service, /localStorage|sessionStorage/);
 });
 
 test('live response maps backend scores and skills without recomputing them', () => {

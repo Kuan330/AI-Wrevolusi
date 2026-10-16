@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { applyAssistantProposal, assistantReviewKey, prepareAssistantContext, restoreAssistantValue } from "../src/features/resume/assistant.ts";
+import { applyAssistantProposal, assistantResultSummary, assistantReviewKey, prepareAssistantContext, recentAssistantHistory, restoreAssistantValue } from "../src/features/resume/assistant.ts";
 import { createEditorHistory } from "../src/features/resume/editorHistory.ts";
 import { documentYaml } from "../src/features/resume/document.ts";
 import { emptyDraft } from "../src/features/resume/types.ts";
@@ -92,4 +92,28 @@ test("assistant captures selected target changes without substituting the applie
  const parent=readFileSync(new URL("../src/pages/ResumeBuilder/ResumeBuilder.tsx",import.meta.url),"utf8");
  assert.match(assistant,/props\.jobRequirements, props\.targetKey/);
  assert.match(parent,/skills=\{candidates\} targetKey=\{targetKey\} jobRequirements=\{draft\.jobRequirements\}/);
+});
+
+test("assistant summary reflects actual changes and never displays model questions", () => {
+ const next=structuredClone(document);next.cv.sections.Skills[0].bullet="Knowledge of SQL";next.design.theme="moderncv";
+ const proposal={message:"Would you like more changes?",result_kind:"edit",sections:[],design:[{path:["theme"],value:"moderncv"}]};
+ assert.equal(assistantResultSummary(document,next,proposal),"Updated Skills (1 entry), 1 design setting.");
+ assert.match(assistantResultSummary(document,next,{...proposal,limitation:"missing_facts"}),/facts not in the current resume/);
+ assert.equal(assistantResultSummary(document,document,{...proposal,result_kind:"no_change"}),"The current content already meets this request.");
+ assert.match(assistantResultSummary(document,document,{...proposal,result_kind:"unsupported",limitation:"missing_facts"}),/does not contain the facts/);
+ assert.match(assistantResultSummary(document,document,{...proposal,result_kind:"unsupported",limitation:"unsupported_edit"}),/outside the supported changes/);
+ assert.match(assistantResultSummary(document,document,{...proposal,result_kind:undefined}),/No edits were returned/);
+});
+
+test("history contains only the most recent two complete user-assistant pairs", () => {
+ const messages=Array.from({length:5},(_,i)=>[{role:"user",content:`request ${i}`},{role:"assistant",content:`result ${i}`}]).flat();
+ assert.deepEqual(recentAssistantHistory(messages),messages.slice(-4));
+ assert.deepEqual(recentAssistantHistory([...messages,{role:"user",content:"pending"}]),messages.slice(-4));
+ assert.deepEqual(recentAssistantHistory([{role:"assistant",content:"orphan"}]),[]);
+});
+
+test("target context travels separately without consuming the editing instruction", async () => {
+ const {resumeService}=await import("../src/features/resume/service.ts");const {api}=await import("../src/services/api.ts");
+ const original=api.post,calls=[];api.post=async(...args)=>{calls.push(args);return {message:"Done",sections:[],design:[]};};
+ try {await resumeService.assist("Polish Skills",{cv:{sections:{}}},[],[],new AbortController().signal,"Analyst");assert.equal(calls[0][1].instruction,"Polish Skills");assert.equal(calls[0][1].target_context,"Analyst");}finally{api.post=original;}
 });

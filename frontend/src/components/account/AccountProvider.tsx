@@ -8,11 +8,13 @@ import {
   activateWorkspace,
   clearWorkspaceOnLogout,
   accountStorage,
+  currentWorkspaceOwner,
   flushWorkspace,
   workspaceKeys,
   syncError,
 } from "@/services/accountStorage";
 import { Button } from "@/components/ui/button";
+import { AuthDialog } from "./AuthDialog";
 
 export function AccountProvider(props: { children: ReactNode }) {
   const { children } = props;
@@ -21,6 +23,8 @@ export function AccountProvider(props: { children: ReactNode }) {
   const [error, setError] = useState("");
   const [, refresh] = useState(0);
   const [attempt, setAttempt] = useState(0);
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   async function load(account: Account) {
     const data = await api.get<{
       owner_id: string;
@@ -37,14 +41,7 @@ export function AccountProvider(props: { children: ReactNode }) {
     let active = true;
     (async () => {
       try {
-        let account: Account;
-        try {
-          account = await api.get<Account>("/account/me");
-        } catch (e) {
-          if (!(e instanceof ApiError) || e.status !== 401) throw e;
-          await authService.refresh();
-          account = await api.get<Account>("/account/me");
-        }
+        const account = await api.get<Account>("/account/me");
         if (active) await load(account);
       } catch (e) {
         if (active) {
@@ -63,6 +60,12 @@ export function AccountProvider(props: { children: ReactNode }) {
       active = false;
     };
   }, [attempt]);
+  useEffect(() => {
+    // Keep the workspace and page mounted so unsent edits survive reauthentication.
+    const expired = () => { if (user) setSessionExpired(true); };
+    window.addEventListener("api-session-expired", expired);
+    return () => window.removeEventListener("api-session-expired", expired);
+  }, [user]);
   useEffect(() => {
     const update = () => refresh((value) => value + 1);
     window.addEventListener("workspace-change", update);
@@ -88,7 +91,10 @@ export function AccountProvider(props: { children: ReactNode }) {
       },
       15_000,
     );
-    await load(account);
+    // Same-account renewal must retain in-memory drafts and workspace session guards.
+    if (user?.id === account.id && currentWorkspaceOwner() === account.id) setUser(account);
+    else await load(account);
+    setSessionExpired(false);
     setError("");
     if (importGuest && mode === "login") {
       if (guest["aiwrevolusi.learningCentre"]) {
@@ -113,6 +119,7 @@ export function AccountProvider(props: { children: ReactNode }) {
     clearSelectedOccupation();
     clearWorkspaceOnLogout();
     setUser(null);
+    setSessionExpired(false);
   }
   return (
     <Context.Provider
@@ -129,6 +136,13 @@ export function AccountProvider(props: { children: ReactNode }) {
         },
       }}
     >
+      {user && sessionExpired && (
+        <div role="alert" className="bg-amber-50 px-5 py-3 text-sm text-amber-950">
+          Your session expired. Log in again to continue. Your local drafts are kept.
+          <Button variant="link" onClick={() => setLoginOpen(true)}>Log in again</Button>
+        </div>
+      )}
+      {user && loginOpen && <AuthDialog open onClose={() => setLoginOpen(false)} reauthenticateUser={user.username} />}
       {error && !loading && (
         <div role="alert" className="bg-amber-50 px-5 py-3 text-sm text-amber-950">
           We could not restore your account. Your saved work has not been reset.

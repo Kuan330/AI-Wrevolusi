@@ -1,0 +1,69 @@
+{
+  "checks": "passed",
+  "pages": 1,
+  "bytes": 3619,
+  "contacts": {
+    "name": "ALEX MORGAN",
+    "email": "alex.morgan@example.com",
+    "phone": "",
+    "location": "",
+    "website": ""
+  },
+  "skills": [
+    "Analytical thinking",
+    "Technological literacy",
+    "Service orientation and customer service",
+    "Empathy and active listening",
+    "Financial report writing",
+    "Financial reporting",
+    "Budgeting and forecasting",
+    "Bank reconciliations",
+    "Microsoft Excel",
+    "Xero",
+    "MYOB",
+    "Client needs analysis"
+  ],
+  "projects": [
+    {
+      "id": "project-1",
+      "mode": "structured",
+      "name": "Cloud Accounting Software Evaluation",
+      "date": "Apr 2026",
+      "fact_ids": [
+        "fact-32",
+        "fact-33",
+        "fact-34",
+        "fact-35"
+      ],
+      "highlight_fact_ids": [
+        "fact-33",
+        "fact-34",
+        "fact-35"
+      ]
+    },
+    {
+      "id": "project-2",
+      "mode": "structured",
+      "name": "Monthly Reporting Improvement",
+      "date": "Nov 2025",
+      "fact_ids": [
+        "fact-36",
+        "fact-37",
+        "fact-38"
+      ],
+      "highlight_fact_ids": [
+        "fact-37",
+        "fact-38"
+      ]
+    }
+  ],
+  "sections": [
+    "Additional information",
+    "Summary",
+    "Skills",
+    "Experience",
+    "Projects",
+    "Education",
+    "DISCLAIMER"
+  ]
+}

@@ -1,3 +1,4 @@
+import { snapshotRole } from './resume-reference-fixtures.mjs';
 import { applyReviewedResume } from "./resume-browser-review.mjs";
 /** End-to-end local QA: synthetic accounts, real generation validation/assembly and PDF renderer. */
 import assert from "node:assert/strict";
@@ -26,7 +27,7 @@ const browser = await chromium.launch({headless:true,channel:process.env.AIW_QA_
 const context = await browser.newContext({viewport:{width:1440,height:1100},acceptDownloads:true});
 const page = await context.newPage(); page.setDefaultTimeout(25000);
 const errors = [], generated = []; page.on("pageerror", e => errors.push(e.message));
-const json = (route, body, status = 200) => route.fulfill({status,contentType:"application/json",body:JSON.stringify(body)});
+const json = (route, body, status = 200) => route.fulfill({status,contentType:"application/json",body:JSON.stringify(snapshotRole(body))});
 await context.route("**/*", async route => {
   const req = route.request(), url = new URL(req.url());
   if (url.origin !== origin && !["blob:","data:"].includes(url.protocol)) return route.abort();
@@ -53,7 +54,7 @@ try {
   await page.getByRole("button",{name:"Generate my resume",exact:true}).waitFor();
   await page.getByLabel("Upload original resume PDF or DOCX").setInputFiles({name:"sample.docx",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",buffer:docxFixture(sample)});
   await page.getByLabel("Projects from your reviewed source").getByText("Retail Sales Analysis",{exact:true}).waitFor();
-  await page.getByText("I have reviewed this text and removed",{exact:false}).click();
+  await page.getByLabel("Resume experience and background").waitFor();
   assert.ok((await page.getByLabel(/Skills explicitly listed/).inputValue()).includes("SQL"));
   await page.screenshot({path:output+"/reviewed-source.png",fullPage:true});
   await page.getByRole("button",{name:"Generate my resume",exact:true}).click();
@@ -77,9 +78,9 @@ try {
   await page.getByRole("button",{name:"Undo",exact:true}).click();await saved();assert.deepEqual((await readDraft()).document,first.document);
   // PDF import either restores structure or conservatively keeps project text, never invents it.
   await openTarget();await page.getByLabel("Upload original resume PDF or DOCX").setInputFiles({name:"generated.pdf",mimeType:"application/pdf",buffer:pdfBytes});await page.getByText("generated.pdf",{exact:true}).waitFor();
-  const text=await page.getByLabel(/Resume evidence that AI will receive/).inputValue();assert.ok(text.includes("Retail Sales Analysis")&&text.includes("2,400")&&text.includes("Nov 2025"));
+  const text=await page.getByLabel(/Resume experience and background/).inputValue();assert.ok(text.includes("Retail Sales Analysis")&&text.includes("2,400")&&text.includes("Nov 2025"));
   // Ambiguous text is kept verbatim by the real backend.
-  const raw="Projects\nMy ambiguous project details\nUsed SQL for 180 responses.";await page.getByLabel(/Resume evidence that AI will receive/).fill(raw);await page.getByText("I have reviewed this text and removed",{exact:false}).click();
+  const raw="Projects\nMy ambiguous project details\nUsed SQL for 180 responses.";await page.getByLabel(/Resume experience and background/).fill(raw);await page.getByLabel("Resume experience and background").waitFor();
   await page.getByRole("button",{name:"Generate new suggestions",exact:true}).click();await proposal.waitFor();const pending=await readDraft();const rawProjects=pending.proposal.sections.find(s=>s.title==="Projects");assert.deepEqual(rawProjects.entries.map(e=>e.text),raw.split("\n").slice(1));assert.ok(rawProjects.entries.every(e=>!e.project));
   await proposal.getByRole("checkbox",{name:"Projects",exact:true}).check();await proposal.getByRole("button",{name:"Apply selected chapters",exact:true}).click();await saved();assert.deepEqual((await readDraft()).document.cv.sections.Projects,raw.split("\n").slice(1));
   const rawDownload=page.waitForEvent("download");await page.getByRole("button",{name:"PDF",exact:true}).click();await rawDownload;

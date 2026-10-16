@@ -3,9 +3,37 @@ import type { ResumeDocument, SkillCandidate } from "./types.ts";
 export type AssistantMessage = { role: "user" | "assistant"; content: string };
 export type AssistantProposal = {
   message: string;
-  sections: { section_index: number; entries: { entry: string | Record<string, unknown>; source_ids: string[] }[] }[];
+  result_kind?: "edit" | "no_change" | "unsupported" | null;
+  limitation?: "missing_facts" | "unsupported_edit" | null;
+  sections: { title?: "Skills" | null; section_index: number; entries: { entry: string | Record<string, unknown>; source_ids: string[] }[] }[];
   design: { path: string[]; value: string | number | boolean | null }[];
 };
+export function recentAssistantHistory(messages: AssistantMessage[]): AssistantMessage[] {
+  const pairs: AssistantMessage[][] = [];
+  for (let index = 0; index < messages.length - 1; index++) {
+    if (messages[index].role === "user" && messages[index + 1].role === "assistant") pairs.push(messages.slice(index, index + 2));
+  }
+  return pairs.slice(-2).flat();
+}
+
+export function assistantResultSummary(before: ResumeDocument, after: ResumeDocument, result: AssistantProposal): string {
+  const changed: string[] = [];
+  const titles = new Set([...Object.keys(before.cv.sections ?? {}), ...Object.keys(after.cv.sections ?? {})]);
+  for (const title of titles) {
+    const old = before.cv.sections?.[title] ?? [], next = after.cv.sections?.[title] ?? [];
+    const count = Array.from({ length: Math.max(old.length, next.length) }, (_, index) => JSON.stringify(old[index]) !== JSON.stringify(next[index])).filter(Boolean).length;
+    if (count) changed.push(`${title} (${count} ${count === 1 ? "entry" : "entries"})`);
+  }
+  const designCount = result.design.filter(change => JSON.stringify(readPath(before.design, change.path)) !== JSON.stringify(readPath(after.design, change.path))).length;
+  if (designCount) changed.push(`${designCount} design ${designCount === 1 ? "setting" : "settings"}`);
+  if (changed.length) {
+    const summary = changed.length > 3 ? `${changed.slice(0, 3).join(", ")} and ${changed.length - 3} more` : changed.join(", ");
+    const limitation = result.limitation === "missing_facts" ? " Some requested changes need facts not in the current resume." : result.limitation === "unsupported_edit" ? " Some requested changes are outside the supported edits." : "";
+    return `Updated ${summary}.${limitation}`;
+  }
+  if (result.result_kind === "unsupported") return result.limitation === "unsupported_edit" ? "This edit is outside the supported changes. Your resume is unchanged." : "The current resume does not contain the facts needed for this edit. Your resume is unchanged.";
+  return result.result_kind === "no_change" ? "The current content already meets this request." : "No edits were returned. Your resume is unchanged.";
+}
 const ENTRY_FIELDS = new Set("bullet text label details company position institution area degree date start_date end_date location summary highlights name title authors journal doi url number reversed_number".split(" "));
 const PRIVATE_FIELDS = ["name", "email", "phone", "website", "location", "social_networks", "custom_connections"];
 const EMAIL = /[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g;
@@ -56,12 +84,15 @@ export function restoreAssistantValue(value: unknown, mapping: Record<string, st
 export function applyAssistantProposal(document: ResumeDocument, proposal: AssistantProposal, selected: string[], mapping: Record<string, string>): ResumeDocument {
   const result = structuredClone(document), titles = Object.keys(document.cv.sections ?? {}), allowed = new Set(controlFields(document, "design").map(field => field.path.join(".")));
   allowed.add("theme");
+  if (new Set(proposal.sections.map(change => change.section_index)).size !== proposal.sections.length) throw new Error("The assistant returned duplicate section changes.");
   for (const change of proposal.sections) {
     if (!selected.includes(`section-${change.section_index}`)) continue;
-    const title = titles[change.section_index];
-    if (title === undefined || !Array.isArray(change.entries)) throw new Error("The proposed section no longer exists.");
-    const old = document.cv.sections![title];
-    result.cv.sections![title] = change.entries.map(candidate => {
+    const adding = change.title === "Skills" && change.section_index === titles.length && !titles.some(title => /skill|competenc|abilit/i.test(title));
+    const title = adding ? "Skills" : titles[change.section_index];
+    if ((change.title != null && !adding) || title === undefined || !Number.isSafeInteger(change.section_index) || change.section_index < 0 || !Array.isArray(change.entries) || change.entries.length > 80) throw new Error("The proposed section no longer exists.");
+    const old = document.cv.sections?.[title] ?? [];
+    result.cv.sections ??= {};
+    result.cv.sections[title] = change.entries.map(candidate => {
       const restored = restoreAssistantValue(candidate.entry, mapping);
       const ref = candidate.source_ids.find(id => id.startsWith(`section-${change.section_index}-entry-`));
       const original = ref ? old[Number(ref.split("-").at(-1))] : undefined;

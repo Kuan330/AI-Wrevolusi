@@ -1,0 +1,63 @@
+{
+  "checks": "passed",
+  "pages": 1,
+  "bytes": 3469,
+  "contacts": {
+    "name": "ALEX MORGAN",
+    "email": "alex.morgan@example.com",
+    "phone": "",
+    "location": "",
+    "website": ""
+  },
+  "skills": [
+    "Financial reporting",
+    "Budgeting and forecasting",
+    "Bank reconciliations",
+    "Microsoft Excel",
+    "Xero",
+    "MYOB"
+  ],
+  "projects": [
+    {
+      "id": "project-1",
+      "mode": "structured",
+      "name": "Cloud Accounting Software Evaluation",
+      "date": "Apr 2026",
+      "fact_ids": [
+        "fact-26",
+        "fact-27",
+        "fact-28",
+        "fact-29"
+      ],
+      "highlight_fact_ids": [
+        "fact-27",
+        "fact-28",
+        "fact-29"
+      ]
+    },
+    {
+      "id": "project-2",
+      "mode": "structured",
+      "name": "Monthly Reporting Improvement",
+      "date": "Nov 2025",
+      "fact_ids": [
+        "fact-30",
+        "fact-31",
+        "fact-32"
+      ],
+      "highlight_fact_ids": [
+        "fact-31",
+        "fact-32"
+      ]
+    }
+  ],
+  "sections": [
+    "Additional information",
+    "Summary",
+    "Skills",
+    "Experience",
+    "Projects",
+    "Education",
+    "DISCLAIMER"
+  ]
+}

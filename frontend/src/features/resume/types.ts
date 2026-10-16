@@ -1,14 +1,17 @@
 import type { OccupationRequirements } from "../../services/possibilitiesTypes.ts";
-export const TAILORING_VERSION = "career_evidence_v1" as const;
+export const TAILORING_VERSION = "career_evidence_v2" as const;
 export type SkillOrigin = { kind: "reviewed_resume" | "platform_confirmed" | "learning_intention" | "reviewed_learning"; label: string; fact_ids: string[] };
 export type SkillSources = { skill_id: string; origins: SkillOrigin[] };
 export type LearningFact = { fact_id: string; record_id: string; kind: "course_completion" | "study" | "course_practice" | "workplace_practice"; label: string };
-export type SourceMetadata = { version: typeof TAILORING_VERSION; skill_sources: SkillSources[]; learning_facts: LearningFact[] };
-export type RoleAlignment = { occupation_code: string; title: string; requirements: { skill_id: number; name: string }[]; links: { skill_id: string; name: string; requirement_skill_id: number; method: "standard_mapping" | "ai_semantic"; origins: SkillOrigin[]; examples: { fact_id: string; text: string; kind: LearningFact["kind"] | "resume" }[]; locations: { section: string; entry_index: number }[] }[]; summary_fact_ids: string[]; project_order: string[] };
+export type SourceMetadata = { version: typeof TAILORING_VERSION | "career_evidence_v1"; skill_sources: SkillSources[]; learning_facts: LearningFact[]; course_skill_sources?: CourseSkillSource[] };
+export type CourseSkillSource = { skill_id: string; course_id: string; source_fingerprint: string; quote: string };
+export type CourseSkillSuggestion = { name: string; quote: string; selected?: boolean };
+export type CourseSkillReview = { course_id: string; title: string; source_fingerprint: string; outcomes: string; skills: CourseSkillSuggestion[]; notices: string[]; reviewed?: boolean };
+export type RoleAlignment = { occupation_code: string; title: string; task_references?: { id: string; text: string }[]; requirements: { skill_id: number; name: string }[]; links: { skill_id: string; name: string; requirement_skill_id?: number | null; task_id?: string | null; method: "standard_mapping" | "ai_semantic"; origins: SkillOrigin[]; examples: { fact_id: string; text: string; kind: LearningFact["kind"] | "resume" }[]; locations: { section: string; entry_index: number }[] }[]; summary_fact_ids: string[]; project_order: string[] };
 export type AppliedCareerAlignment = { alignment: RoleAlignment; sections: string[]; contentFingerprint: string; needsReview: boolean };
 export type LearningSelection = { recordId: string; text: string; reviewed: boolean; recordFingerprint: string };
-export const SKILL_FILTER_VERSION = "role_relevance_v1" as const;
-export type SkillFilterVersion = typeof SKILL_FILTER_VERSION;
+export const SKILL_FILTER_VERSION = "all_sources_v1" as const;
+export type SkillFilterVersion = typeof SKILL_FILTER_VERSION | "role_relevance_v1" | "role_relevance_v2";
 export type ResumeEntry = string | Record<string, unknown>;
 export type ResumeDocument = {
   cv: Record<string, unknown> & { sections?: Record<string, ResumeEntry[]> | null };
@@ -23,7 +26,7 @@ export type SourceProject = { id: string; mode: "structured" | "verbatim"; fact_
 export type SourceSection = { title: string; heading_fact_id: string | null; fact_ids: string[]; polishable_fact_ids: string[] };
 export type ProjectEntry = { name: string; date: string | null; highlights: string[] };
 export type GeneratedSection = { title: string; entries: { text: string; skill_ids: string[]; fact_ids: string[]; project_id?: string | null; project?: ProjectEntry | null; verbatim?: boolean }[] };
-export type Generation = { tailoring_version?: typeof TAILORING_VERSION | null; role_alignment?: RoleAlignment | null; skill_filter_version?: SkillFilterVersion | null; sections: GeneratedSection[]; gaps: SkillGap[]; outcome?: "tailored" | "source_preserved" | null; notices?: string[] };
+export type Generation = { tailoring_version?: typeof TAILORING_VERSION | "career_evidence_v1" | null; role_alignment?: RoleAlignment | null; skill_filter_version?: SkillFilterVersion | null; sections: GeneratedSection[]; gaps: SkillGap[]; outcome?: "tailored" | "source_preserved" | null; notices?: string[] };
 export type RecommendedCourse = { course_id: string; gap_ids: string[]; reason: string };
 export type Contacts = { name: string; email: string; phone: string; location: string; website: string };
 export type ResumeSource = { file: Blob; name: string; text: string; redactedText: string; contacts: Contacts; skills?: string[]; skillsText?: string; skillsParserVersion?: number; skillsOrigin?: "extracted" | "manual"; projects?: SourceProject[]; reviewed: boolean };
@@ -35,7 +38,7 @@ export type InterviewSuggestion = {
   id: string; sessionId: string; createdAt: string; section: string; entryIndex: number; entryLabel: string; text: string; question: string;
 };
 export type ResumeDraft = {
-  careerAlignment?: AppliedCareerAlignment; learningSelections?: LearningSelection[];
+  careerAlignment?: AppliedCareerAlignment; learningSelections?: LearningSelection[]; courseSkillReviews?: CourseSkillReview[];
   version: 1; owner: string; revision: number; updatedAt: string;
   reviewed?: ReviewedMark | null; interviewSuggestions?: InterviewSuggestion[];
   skillFilterVersion?: SkillFilterVersion; skillFilterInputFingerprint?: string; generationInputFingerprint?: string; generationOutcome?: Generation["outcome"]; generationNotices?: string[]; targetRole?: OccupationRequirements | null; legacyPendingJobRequirements?: string;

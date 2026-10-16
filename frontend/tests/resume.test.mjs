@@ -152,7 +152,7 @@ test("encrypted Office containers get an actionable message, not an OCR/password
 import { emptyResumeDocument, resumeGenerationAction } from "../src/features/resume/onboarding.ts";
 import { targetRequirements } from "../src/features/resume/targetRole.ts";
 const TARGET_JOB_REQUIREMENTS = targetRequirements({ occupation_code: "2421", title: "Management and Organization Analysts", skills: [{ skill_id: 1, skill_slug: "analytical-thinking", name: "Analytical thinking" }] });
-const firstUse = { jobRequirements: TARGET_JOB_REQUIREMENTS, hasDocument: false, skillCount: 0, factCount: 0, skillsLoading: false, skillError: "", sourceReviewed: null, aiConfigured: false, busy: false };
+const firstUse = { jobRequirements: TARGET_JOB_REQUIREMENTS, hasDocument: false, skillCount: 0, factCount: 0, skillsLoading: false, skillError: "", aiConfigured: false, busy: false };
 test("selected role requirements are separate from personal facts or skill seeding", () => {
   assert.match(TARGET_JOB_REQUIREMENTS, /^Management and Organization Analysts\nRequired skills:/);
   assert.match(TARGET_JOB_REQUIREMENTS, /Analytical thinking/);
@@ -170,27 +170,30 @@ test("job requirements and successful skill loading remain mandatory", () => {
     assert.equal(resumeGenerationAction({ ...firstUse, ...change }), null);
   }
 });
-test("unreviewed source cannot bypass consent through empty-draft generation", () => {
-  assert.equal(resumeGenerationAction({ ...firstUse, sourceReviewed: false }), null);
-  assert.equal(resumeGenerationAction({ ...firstUse, sourceReviewed: true }), null);
+test("source details can generate without a separate privacy confirmation", () => {
+  assert.equal(resumeGenerationAction({ ...firstUse, factCount: 1, sourceReviewed: false, aiConfigured: true }), "ai");
+  assert.equal(resumeGenerationAction({ ...firstUse, skillCount: 1, sourceReviewed: false, aiConfigured: true }), "ai");
+  assert.equal(resumeGenerationAction({ ...firstUse, factCount: 1, skillError: "Invalid source", aiConfigured: true }), null);
 });
 test("existing drafts are never replaced by an empty generation fallback", () => {
   assert.equal(resumeGenerationAction({ ...firstUse, hasDocument: true }), null);
   assert.equal(resumeGenerationAction({ ...firstUse, hasDocument: true, skillCount: 1, aiConfigured: true }), "ai");
 });
 test("skills or reviewed evidence use AI and retain provider-availability protection", () => {
-  for (const source of [{ skillCount: 1 }, { factCount: 1, sourceReviewed: true }]) {
+  for (const source of [{ skillCount: 1 }, { factCount: 1 }]) {
     assert.equal(resumeGenerationAction({ ...firstUse, ...source, aiConfigured: true }), "ai");
     assert.equal(resumeGenerationAction({ ...firstUse, ...source, aiConfigured: false }), null);
   }
 });
-test("first-use controls hide provider details and preserve expandable privacy/confirmation", () => {
+test("source editing remains available without a privacy confirmation step", () => {
   const page = file("../src/pages/ResumeBuilder/ResumeBuilder.tsx");
   assert.doesNotMatch(page, /ai_provider_host|ai_model|available skills|20,000 characters|rb-skill-chips/);
   assert.match(page, /Privacy details/); assert.match(page, /Third-party provider retention policies/);
   assert.doesNotMatch(page, /Replace your job requirements|rb-example-action|Use an example|Target job requirements · required/);
   assert.match(page, /Selected target role/); assert.match(page, /Change target role/);
-  assert.match(page, /Retry skills/); assert.match(page, /Add reviewed resume details or selected user skills before generating/);
+  assert.match(page, /Retry skills/); assert.match(page, /Add resume details or selected user skills before generating/);
+  assert.match(page, /Resume experience and background/);
+  assert.doesNotMatch(page, /I have reviewed this text and removed|source\?\.reviewed|source\.reviewed/);
 });
 test("nullable engine section mapping restores without treating a valid saved draft as corruption", () => {
   const doc = { cv: { sections: null } };

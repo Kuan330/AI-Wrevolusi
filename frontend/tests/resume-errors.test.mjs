@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { ApiError, apiErrorDetail } from "../src/services/api.ts";
-import { resumeErrorMessage } from "../src/features/resume/errors.ts";
+import { assistantErrorMessage, resumeErrorMessage } from "../src/features/resume/errors.ts";
 const document = { cv: { sections: { Skills: [], "Local project": [] } } };
 test("legacy errors retain string detail and need no structured fields", () => {
   const error = new ApiError(apiErrorDetail({ detail: "Legacy message" }, 422), 422);
@@ -33,4 +33,19 @@ test("request paths and empty root paths have readable labels", () => {
   const error = new ApiError("Invalid request.", 422, { code: "invalid_request", fields: [["document", "cv", "phone"], []] });
   assert.equal(resumeErrorMessage(error), "Invalid request. Check: Phone; YAML document.");
   assert.equal(resumeErrorMessage(new Error("Read error")), "Read error");
+});
+
+test("assistant output failures do not ask users to correct generated citation IDs", () => {
+  for (const code of ["invalid_reference", "unverified_name", "unsupported_fact", "unsupported_claim"]) {
+    const error = new ApiError("AI editing returned changes that failed safety checks. Try a more specific instruction.", 422, { code, fields: [["sections", 0, "updates", 0, "source_ids"]] });
+    assert.equal(assistantErrorMessage(error), "AI editing could not produce valid changes. Your resume is unchanged. Try again.");
+    assert.deepEqual(error.fields, [["sections", 0, "updates", 0, "source_ids"]]);
+  }
+});
+
+test("assistant preserves actionable timeout, configuration and input errors", () => {
+  const timeout = new ApiError("AI editing timed out. Your resume is unchanged. Try again.", 504, { code: "ai_timeout" });
+  assert.equal(assistantErrorMessage(timeout), timeout.message);
+  const input = new ApiError("Correct the resume structure.", 422, { code: "invalid_request", fields: [["document", "cv", "phone"]] });
+  assert.match(assistantErrorMessage(input), /Check: Phone/);
 });

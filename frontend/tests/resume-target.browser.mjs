@@ -1,3 +1,4 @@
+import { snapshotRole } from './resume-reference-fixtures.mjs';
 import { applyReviewedResume } from "./resume-browser-review.mjs";
 /** Offline browser acceptance: synthetic accounts/reference data/AI; no live user data. */
 import assert from "node:assert/strict";
@@ -31,7 +32,7 @@ const personal = { "aiwrevolusi.learningSkills.v1": JSON.stringify([{ id: "sql",
 let owner = "target-account-a", workspace = { ...personal }, revision = 0, saveFailure = false, roleFailure = false, roleGate = null, generationGate = null;
 const generated = [], pageErrors = [];
 page.on("pageerror", error => pageErrors.push(error.message));
-const json = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
+const json = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(snapshotRole(body)) });
 await context.route("**/*", async route => {
   const request = route.request(), url = new URL(request.url());
   if (url.origin !== origin && !["blob:", "data:"].includes(url.protocol)) return route.abort();
@@ -65,7 +66,7 @@ await context.route("**/*", async route => {
   if (path === "/resume/generate") {
     const input = request.postDataJSON(); generated.push(input);
     if (generationGate) await generationGate;
-    return json(route, { tailoring_version: "career_evidence_v1", skill_filter_version: "role_relevance_v1", sections: [{ title: "Skills", entries: [{ text: "Understanding SQL", skill_ids: input.skills.map(skill => skill.id), fact_ids: [] }] }], gaps: [] });
+    return json(route, { tailoring_version: "career_evidence_v2", skill_filter_version: "role_relevance_v2", sections: [{ title: "Skills", entries: [{ text: "Understanding SQL", skill_ids: input.skills.map(skill => skill.id), fact_ids: [] }] }], gaps: [] });
   }
   return json(route, { detail: "Offline QA endpoint unavailable" }, 503);
 });

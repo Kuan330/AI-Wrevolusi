@@ -4,9 +4,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea, FormField } from "@/components/ui/form-field";
 import type { LearningSelection } from "@/features/resume/types";
 import type { LearningRecord } from "@/features/resume/learningRecords";
-export default function ResumeLearningRecords({ records, selections, loading, error, retry, change }: { records: LearningRecord[]; selections: LearningSelection[]; loading: boolean; error: string; retry: () => void; change: (selections: LearningSelection[]) => void }) {
+export default function ResumeLearningRecords({ records, selections, loading, error, retry, change, courseSkills }: { courseSkills?: React.ReactNode; records: LearningRecord[]; selections: LearningSelection[]; loading: boolean; error: string; retry: () => void; change: (selections: LearningSelection[]) => void }) {
   return <Accordion type="single" collapsible className="rb-learning-records"><AccordionItem value="learning"><AccordionTrigger>Learning records · {selections.length} selected</AccordionTrigger><AccordionContent>
     <p>Choose factual learning records to include, review the description and remove confidential information. Completed courses reflect your synchronised chapter progress; they are not external certificates or an assessment of mastery. No completion date is inferred.</p>
+    {courseSkills}
     {loading && <p role="status">Loading synchronised learning records…</p>}
     {error && <p className="rb-warning" role="alert">{error} <Button variant="link" size="sm" onClick={retry}>Retry learning records</Button></p>}
     {!loading && !error && !records.length && <p>No completed courses or recorded practice are available yet. Unfinished or unsynchronised course progress is not completion evidence.</p>}

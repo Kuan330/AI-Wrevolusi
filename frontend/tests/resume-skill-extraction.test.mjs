@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { explicitResumeSkills, reviewedSourceSkills, SKILLS_PARSER_VERSION } from "../src/features/resume/sourceSkills.ts";
 import { reviewedResumeInput } from "../src/features/resume/projects.ts";
 import { sourceHeading } from "../src/features/resume/sections.ts";
+import { detectContacts, redactResume } from "../src/features/resume/redaction.ts";
 import { generationNotice } from "../src/features/resume/generationNotice.ts";
 import { applySections } from "../src/features/resume/document.ts";
 import { mergeResumeSkills, canonicalResumeSkill } from "../src/features/resume/skills.ts";
@@ -42,6 +43,77 @@ test("standard section variants terminate both Skills and Projects", () => {
   }
   assert.equal(sourceHeading("SQL"), null);
 });
+test("nested and repeated Skills headings retain every explicitly listed skill", () => {
+  const text = "Skills\nSQL\nTechnical Skills\nPython, C++\nSoft Skills\nCommunication\nExperience\nWorked with records\nProfessional Skills\nSQL; Negotiation\nEducation\nSample University";
+  assert.deepEqual(explicitResumeSkills(text), ["SQL", "Python", "C++", "Communication", "Negotiation"]);
+});
+test("inline skill labels retain their values and resume scanning later skill blocks", () => {
+  const text = "Technical Skills: SQL, Python\nTools:\nExcel\nExperience\nWorked with Java\n• Soft Skills：Communication; Negotiation\nEducation\nSample University";
+  assert.deepEqual(explicitResumeSkills(text), ["SQL", "Python", "Excel", "Communication", "Negotiation"]);
+  assert.deepEqual(explicitResumeSkills("Worked with SQL and Python\nEducation\nSample University"), []);
+});
+test("standalone tool category labels are not skills", () => {
+  assert.deepEqual(explicitResumeSkills("Skills\nTools\nExcel\nTechnologies\nPython\nExperience\nSample employer"), ["Excel", "Python"]);
+});
+test("explicit skill labels survive verbs that also begin work descriptions", () => {
+  assert.deepEqual(explicitResumeSkills("Skills\nSupport\nManaged services\nWork ethic\nHandling objections"), ["Support", "Managed services", "Work ethic", "Handling objections"]);
+});
+test("terminal software versions remain skills while quantified achievements are rejected", () => {
+  const text = "Skills\nPython 3+\n.NET 6+\nJava 8+\nPostgreSQL 13.2+\nManaged 250+ clients\nManaged 250+\n250+ clients\nAchieved 95% satisfaction";
+  const expected = ["Python 3+", ".NET 6+", "Java 8+", "PostgreSQL 13.2+"];
+  assert.deepEqual(explicitResumeSkills(text), expected);
+  const manual = reviewedSourceSkills({redactedText:text,skillsText:expected.join("\n"),skillsOrigin:"manual",skillsParserVersion:SKILLS_PARSER_VERSION});
+  assert.deepEqual(manual.names, expected);
+  assert.deepEqual(manual.rejected, []);
+});
+test("indented skill bullets normalize before deduplication", () => {
+  assert.deepEqual(explicitResumeSkills("Skills\n  - SQL\n  * Python\n  • C++\nSQL"), ["SQL", "Python", "C++"]);
+});
+test("recognized inline non-skill headings stop skill scanning without losing source facts", () => {
+  const parsed = reviewedResumeInput("Skills: SQL\nExperience: Analyst\n- Managed reports\nSummary: Experienced analyst\nEducation: Example University\nTechnical Skills: Python");
+  assert.deepEqual(explicitResumeSkills(parsed.evidence.map(fact => fact.text).join("\n")), ["SQL", "Python"]);
+  assert.deepEqual(parsed.sections, [
+    {title:"Skills",heading_fact_id:null,fact_ids:["fact-1"],polishable_fact_ids:[]},
+    {title:"Experience",heading_fact_id:null,fact_ids:["fact-2","fact-3"],polishable_fact_ids:["fact-3"]},
+    {title:"Summary",heading_fact_id:null,fact_ids:["fact-4"],polishable_fact_ids:["fact-4"]},
+    {title:"Education",heading_fact_id:null,fact_ids:["fact-5"],polishable_fact_ids:[]},
+    {title:"Skills",heading_fact_id:null,fact_ids:["fact-6"],polishable_fact_ids:[]},
+  ]);
+});
+test("competency and expertise headings retain skill ownership", () => {
+  for (const heading of ["Core competencies", "Key competencies", "Technical expertise", "• Technical Skills"]) {
+    assert.equal(sourceHeading(heading), "Skills");
+    assert.deepEqual(explicitResumeSkills(`${heading}\nSQL\nExperience\nSample employer`), ["SQL"]);
+    assert.deepEqual(reviewedResumeInput(`${heading}\nSQL`).sections, [{title:"Skills",heading_fact_id:"fact-1",fact_ids:["fact-2"],polishable_fact_ids:[]}]);
+  }
+});
+
+test("nameless resumes keep first-line skill headings through contact redaction", () => {
+  for (const heading of ["Core competencies", "Key competencies", "Technical expertise", "Core competencies: SQL, Python"]) {
+    const text = `${heading}\nSQL\nPython\nExperience\nSample employer`;
+    const contacts = detectContacts(text);
+    assert.equal(contacts.name, "");
+    assert.deepEqual(explicitResumeSkills(redactResume(text, contacts)), ["SQL", "Python"]);
+  }
+});
+
+test("real names are still redacted without losing later skill blocks", () => {
+  const text = "Jane Doe\nCore competencies\nSQL\nTechnical expertise: Python";
+  const contacts = detectContacts(text);
+  assert.equal(contacts.name, "Jane Doe");
+  const redacted = redactResume(text, contacts);
+  assert.ok(!redacted.includes("Jane Doe"));
+  assert.deepEqual(explicitResumeSkills(redacted), ["SQL", "Python"]);
+});
+test("inline skill blocks keep their entire source fact and terminate project ownership", () => {
+  const parsed = reviewedResumeInput("Projects\nSales | Apr 2026\n- Cleaned 36 records.\nTechnical Skills: Data visualization\nCore competencies：SQL, Python\nEducation\nSample University");
+  assert.deepEqual(parsed.projects[0].fact_ids, ["fact-2", "fact-3"]);
+  assert.deepEqual(parsed.sections.filter(section => section.title === "Skills"), [
+    {title:"Skills",heading_fact_id:null,fact_ids:["fact-4"],polishable_fact_ids:[]},
+    {title:"Skills",heading_fact_id:null,fact_ids:["fact-5"],polishable_fact_ids:[]},
+  ]);
+  assert.deepEqual(explicitResumeSkills(parsed.evidence.map(fact => fact.text).join("\n")), ["Data visualization", "SQL", "Python"]);
+});
 test("legacy automatic skills are rederived, not loaded from the polluted array", () => {
   const source = {redactedText: insurance, skills: ["Petaling Jaya", "achieving a 92% policy renewal rate"]};
   const clean = reviewedSourceSkills(source);
@@ -53,6 +125,12 @@ test("manual real skills survive and definite history contamination requires cor
   assert.deepEqual(clean.names, ["SQL", "C++"]);
   assert.deepEqual(clean.rejected, ["Petaling Jaya", "achieving a 92% policy renewal rate"]);
   assert.deepEqual(reviewedSourceSkills({redactedText: "Skills\nSQL", skillsText:"SQL, C++"}).names, ["SQL", "C++"]);
+});
+test("manually removed skills stay removed even when later source blocks contain them", () => {
+  const source = {redactedText:"Skills: SQL, Python\nExperience\nSample employer\nSoft Skills\nCommunication",skillsOrigin:"manual",skillsParserVersion:SKILLS_PARSER_VERSION};
+  assert.deepEqual(reviewedSourceSkills({...source,skillsText:"SQL"}).names, ["SQL"]);
+  assert.deepEqual(reviewedSourceSkills({...source,skillsText:""}).names, []);
+  assert.deepEqual(reviewedSourceSkills({...source,skillsText:"SQL\nCommunication"}).rejected, []);
 });
 test("skill-bearing punctuation remains intact in new one-per-line manual records", () => {
   assert.deepEqual(reviewedSourceSkills({redactedText: insurance,skillsText:"Life, medical, motor, property, and travel insurance\nC#",skillsParserVersion:2,skillsOrigin:"manual"}).names, ["Life, medical, motor, property, and travel insurance", "C#"]);

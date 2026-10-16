@@ -1,7 +1,9 @@
-import test from 'node:test';
+import test, { beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { api } from '../src/services/api.ts';
+import { api, resetApiSession } from '../src/services/api.ts';
+
+beforeEach(() => resetApiSession());
 
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 function stub(handler) {
@@ -20,9 +22,9 @@ test('an expired access cookie is renewed once and the request is repeated', asy
   assert.deepEqual(calls, ['POST /interview/feedback', 'POST /auth/refresh', 'POST /interview/feedback']);
 });
 
-test('when the sign-in itself has expired the original 401 is shown and nothing loops', async () => {
+test('when the sign-in itself has expired the session error is shown and nothing loops', async () => {
   const calls = stub(path => path === '/auth/refresh' ? json(401, { detail: 'Unauthenticated' }) : json(401, { detail: 'Missing auth cookie.' }));
-  await assert.rejects(api.get('/interview/question-bank?occupation_code=2512'), error => error.status === 401 && /sign-in has ended/.test(error.message));
+  await assert.rejects(api.get('/interview/question-bank?occupation_code=2512'), error => error.status === 401 && error.code === 'session_expired');
   assert.equal(calls.length, 2);
 });
 
@@ -37,12 +39,20 @@ test('several expired requests share one renewal', async () => {
   assert.deepEqual(results.map(item => item.ok), ['/a', '/b', '/c']);
 });
 
-test('sign-in and account lookups never trigger a renewal', async () => {
-  for (const path of ['/auth/login', '/account/login', '/account/register', '/account/me']) {
+test('sign-in calls never trigger a renewal', async () => {
+  for (const path of ['/auth/login', '/account/login', '/account/register']) {
     const calls = stub(() => json(401, { detail: 'No' }));
     await assert.rejects(api.post(path, {}));
     assert.deepEqual(calls, [`POST ${path}`]);
   }
+});
+
+test('an expired account lookup renews before returning the signed-in account', async () => {
+  let served = 0;
+  const calls = stub(path => path === '/auth/refresh' ? json(200, {})
+    : ++served === 1 ? json(401, { detail: 'Expired.' }) : json(200, { id: 'same-account' }));
+  assert.deepEqual(await api.get('/account/me'), { id: 'same-account' });
+  assert.deepEqual(calls, ['GET /account/me', 'POST /auth/refresh', 'GET /account/me']);
 });
 
 test('audio uploads retain their bytes and MIME type through session renewal', async () => {

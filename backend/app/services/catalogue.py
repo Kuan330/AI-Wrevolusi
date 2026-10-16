@@ -6,6 +6,8 @@ course metadata available to the frontend.
 """
 
 import re
+import hashlib
+import json
 import unicodedata
 from collections import OrderedDict
 from collections.abc import Iterable, Mapping
@@ -70,6 +72,11 @@ def build_bot_catalogue(rows: Iterable[Mapping]) -> list[dict]:
 PAGE_LEVEL_ORDER = {'Beginner': 0, 'Intermediate': 1, 'Advanced': 2}
 
 
+def curriculum_fingerprint(course_id, title, outcomes, core_skill):
+    value = [course_id, title or "", outcomes or "", core_skill or ""]
+    return hashlib.sha256(json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()
+
+
 def build_page_catalogue(
     course_rows: Iterable[Mapping],
     chapter_rows: Iterable[Mapping],
@@ -106,6 +113,7 @@ def build_page_catalogue(
         courses.append(
             {
                 'course_id': course_id,
+                'source_fingerprint': curriculum_fingerprint(course_id, row.get('title'), row.get('outcomes'), row.get('core_skill')),
                 'skill_id': skill_slug(str(row.get('core_skill') or '')),
                 'skill_name': str(row.get('core_skill') or ''),
                 'title': row.get('title'),

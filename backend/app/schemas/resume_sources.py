@@ -3,9 +3,11 @@ import re
 
 
 def section_heading(value):
-    value = re.sub(r"\s+", " ", re.sub(r"[:：]\s*$", "", value.strip()))
+    value = re.sub(r"^[•●▪*\-]\s*", "", value.strip())
+    value = re.sub(r"\s+", " ", re.sub(r"[:：]\s*$", "", value))
     for pattern, title in [
         (r"(?:(?:technical|professional|core|key|soft|personal|specialist)\s+)?skills?", "Skills"),
+        (r"(?:(?:core|key)\s+)?competencies|technical expertise", "Skills"),
         (r"(?:(?:professional|work|employment|relevant|career)\s+)?experience|employment|work history|employment history", "Experience"),
         (r"(?:(?:academic|personal|selected|professional)\s+)?projects?", "Projects"),
         (r"education(?:\s+(?:and|&)\s+qualifications)?|academic background", "Education"),
@@ -20,6 +22,13 @@ def section_heading(value):
     return None
 
 
+def inline_source_section(value):
+    value = re.sub(r"^[•●▪*\-]\s*", "", value.strip())
+    parts = re.split(r"[:：]", value, maxsplit=1)
+    title = section_heading(parts[0]) if len(parts) == 2 else None
+    return (title, parts[1].strip()) if title else None
+
+
 def validate_source_sections(request):
     expected, active = [], None
     for fact in request.evidence:
@@ -28,6 +37,10 @@ def validate_source_sections(request):
             active = {"title": title, "heading_fact_id": fact.id, "fact_ids": [], "polishable_fact_ids": []}
             expected.append(active)
             continue
+        inline = inline_source_section(fact.text)
+        if inline:
+            active = {"title": inline[0], "heading_fact_id": None, "fact_ids": [], "polishable_fact_ids": []}
+            expected.append(active)
         if active is None:
             active = {"title": "Additional information", "heading_fact_id": None, "fact_ids": [], "polishable_fact_ids": []}
             expected.append(active)

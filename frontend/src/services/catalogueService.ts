@@ -21,6 +21,7 @@ type ApiChapter = {
 
 type ApiCourse = {
   course_id: string;
+  source_fingerprint?: string;
   skill_id: string;
   skill_name: string;
   title: string | null;
@@ -64,6 +65,8 @@ function mapCourse(item: ApiCourse): Course {
       : null;
   return {
     id: item.course_id,
+    sourceFingerprint: item.source_fingerprint,
+    teachingObjectives: item.outcomes ?? "",
     title: item.title ?? "",
     provider: PROVIDER_DISPLAY[item.provider ?? ""] ?? (item.provider ?? ""),
     level: LEVEL_BY_API_VALUE[item.level ?? ""] ?? "unknown",

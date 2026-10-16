@@ -1,3 +1,4 @@
+import { snapshotRole } from './resume-reference-fixtures.mjs';
 import { applyReviewedResume } from "./resume-browser-review.mjs";
 /** Synthetic-only acceptance of role-filtered Skills through the real local generator. */
 import assert from "node:assert/strict";
@@ -27,7 +28,7 @@ const browser=await chromium.launch({headless:true,channel:process.env.AIW_QA_BR
 const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
 const page=await context.newPage();page.setDefaultTimeout(25000);
 const errors=[],requests=[],renders=[];page.on("pageerror",error=>errors.push(error.message));
-const json=(route,body,status=200)=>route.fulfill({status,contentType:"application/json",body:JSON.stringify(body)});
+const json=(route,body,status=200)=>route.fulfill({status,contentType:"application/json",body:JSON.stringify(snapshotRole(body))});
 await context.route("**/*",async route=>{
  const request=route.request(),url=new URL(request.url());if(url.origin!==origin&&!['blob:','data:'].includes(url.protocol))return route.abort();
  if(!url.pathname.startsWith('/api/'))return route.continue();const path=url.pathname.replace('/api/v1','');
@@ -62,14 +63,14 @@ try{
  const sample=['Alex Example','Core Skills','Excel, SQL, Life insurance','Professional Experience','Synthetic analyst | Apr 2026','• Reviewed 180 records.','Projects','Retail Sales Analysis | Apr 2026','• Cleaned 2,400 records.','• Removed 36 duplicates.'].join('\n');
  const source=docxFixture(sample.split("\n"));
  await page.getByLabel('Upload original resume PDF or DOCX').setInputFiles({name:'synthetic-role.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:source});
- await page.getByText('I have reviewed this text and removed',{exact:false}).click();
+ await page.getByLabel("Resume experience and background").waitFor();
  await page.getByRole('button',{name:'Generate my resume',exact:true}).click();await applyReviewedResume(page);await page.locator('.rw-workbench').waitFor();await saved();
  const first=await read(),names=first.document.cv.sections.Skills.map(e=>e.bullet),candidates=requests[0].skills.map(s=>s.name);
  assert.equal(requests[0].occupation_code,'2421');
  for(const skill of ['Excel','SQL','Life insurance','Analytical thinking','Programming','AI and big data','Reading, writing and mathematics'])assert.ok(candidates.includes(skill),skill);
  assert.ok(!candidates.includes('Leadership')&&!candidates.includes('Synthetic reading course'));
  assert.deepEqual(new Set(names),new Set(candidates.filter(name=>name!=='Life insurance')));
- assert.equal(first.skillFilterVersion,'role_relevance_v1');assert.equal(first.skillFilterInputFingerprint,first.generationInputFingerprint);
+ assert.equal(first.skillFilterVersion,'role_relevance_v2');assert.equal(first.skillFilterInputFingerprint,first.generationInputFingerprint);
  assert.ok(first.source.redactedText.includes('Life insurance'));assert.equal(first.source.file.size,source.length);
  assert.deepEqual(first.document.cv.sections.Projects[0],{name:'Retail Sales Analysis',date:'Apr 2026',highlights:['Cleaned 2,400 records.','Removed 36 duplicates.']});
  for(const storageKey of Object.keys(base).filter(k=>k!==key))assert.equal(workspace[storageKey],base[storageKey]);
@@ -113,6 +114,6 @@ try{
  assert.equal((await read()).document,null);assert.equal((await read()).proposal,null);assert.deepEqual((await read('relevance-a')).document,beforeEmpty.document);
  assert.equal(await page.getByRole('button',{name:'Generate my resume',exact:true}).isDisabled(),true);await page.getByText('Add reviewed resume details or selected user skills before generating.',{exact:false}).waitFor();
  // Skills-only input without any related candidate is an explicit error, not an empty generated document.
- await page.getByRole('button',{name:'Or enter your resume details manually',exact:true}).click();await page.getByLabel('Resume evidence that AI will receive').fill('Skills\nLife insurance');await page.getByText('I have reviewed this text and removed',{exact:false}).click();scenario='all_unrelated';await page.getByRole('button',{name:'Generate my resume',exact:true}).click();await page.getByText('No verified role-related skills or reviewed experience are available.',{exact:false}).waitFor();assert.equal((await read()).document,null);
+ await page.getByRole('button',{name:'Or enter your resume details manually',exact:true}).click();await page.getByLabel('Resume experience and background').fill('Skills\nLife insurance');await page.getByLabel("Resume experience and background").waitFor();scenario='all_unrelated';await page.getByRole('button',{name:'Generate my resume',exact:true}).click();await page.getByText('No verified role-related skills or reviewed experience are available.',{exact:false}).waitFor();assert.equal((await read()).document,null);
  assert.deepEqual(errors,[]);console.log('PASS: three candidate sources, role/code binding, direct+semantic subset, unchanged source/profile, reference retry, conservative fallback, selective apply/undo, zero-match removal/PDF, cancel/retry, legacy proposal invalidation and account isolation');
 }catch(error){console.error('DIAGNOSTIC',JSON.stringify({requests:requests.length,errors,notices:await page.locator('.rb-error,.rb-warning').allTextContents()}));await page.screenshot({path:out+'/failure.png',fullPage:true});throw error;}finally{await context.unrouteAll({behavior:'ignoreErrors'});await browser.close();}

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator
+import hashlib
+import json
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator, model_validator
 
 SkillState = Literal['have', 'learning', 'suggested', 'shortlisted', 'missing']
 PositiveStrictInt = Annotated[StrictInt, Field(gt=0)]
@@ -37,11 +39,25 @@ class OccupationRequirementSkill(PossibilitiesSchema):
     name: str = Field(min_length=1, max_length=120)
 
 
+class OccupationTaskReference(PossibilitiesSchema):
+    id: str = Field(min_length=1, max_length=80)
+    text: str = Field(min_length=1, max_length=5000)
+
+
 class OccupationRequirements(PossibilitiesSchema):
     occupation_code: str = Field(min_length=1, max_length=100)
     title: str = Field(min_length=1, max_length=300)
     skills: list[OccupationRequirementSkill] = Field(default_factory=list, max_length=60)
     tasks: list[str] = Field(default_factory=list, max_length=100)
+    task_references: list[OccupationTaskReference] = Field(default_factory=list, max_length=100)
+    reference_fingerprint: str | None = None
+
+    @model_validator(mode="after")
+    def reference_snapshot(self):
+        self.task_references = [OccupationTaskReference(id="task:" + hashlib.sha256((self.occupation_code + "\0" + task).encode()).hexdigest()[:24], text=task) for task in dict.fromkeys(self.tasks) if task.strip()]
+        snapshot = [self.occupation_code, self.title, [s.model_dump() for s in self.skills], [t.model_dump() for t in self.task_references]]
+        self.reference_fingerprint = hashlib.sha256(json.dumps(snapshot, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()
+        return self
 
 
 class CareerSkill(PossibilitiesSchema):
