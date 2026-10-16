@@ -12,7 +12,7 @@ const TREND = { up: "Improving over your practice", down: "Less clear in recent 
 
 function SkillHead({ row }: { row: SkillRow }) {
   return <>
-    <div className="ip-score-head"><strong>{row.label}</strong><span className={`ip-level ip-level-${row.level}`}>{LEVEL_LABEL[row.level!]}</span><LevelBar level={row.mean!} /></div>
+    <div className="ip-score-head"><strong>{row.label}</strong><span className="sr-only">{LEVEL_LABEL[row.level!]}</span><LevelBar level={row.mean!} /></div>
     <p className="ip-hint">{CONFIDENCE[row.confidence]}{row.trend ? ` · ${TREND[row.trend]}` : ""}</p>
   </>;
 }
