@@ -294,6 +294,37 @@ def test_private_structure_envelope_still_rejects_unknown_or_unbounded_fields(ex
     assert error.value.code == "ai_schema_invalid"
 
 
+def test_private_summary_is_shortened_to_the_public_limit():
+    raw = feedback().model_dump()
+    raw["summary"] = ("The answer describes careful report checking and a teammate review. " * 8)[:405]
+    result = feedback_for_answer(feedback_request(), Provider([raw]))
+    assert 1 < len(result.summary) <= 400
+    assert result.summary.endswith("…")
+    FeedbackResponse.model_validate(result.model_dump())
+
+
+def test_short_summary_preserves_existing_whitespace():
+    raw = feedback().model_dump()
+    raw["summary"] = "You described  your actions.\nAdd the report outcome."
+    assert feedback_for_answer(feedback_request(), Provider([raw])).summary == raw["summary"]
+
+
+def test_private_summary_still_has_a_bounded_limit():
+    raw = feedback().model_dump()
+    raw["summary"] = "x" * 1001
+    with pytest.raises(GenerationFailure) as error:
+        feedback_for_answer(feedback_request(), Provider([raw]))
+    assert error.value.code == "ai_schema_invalid"
+
+
+@pytest.mark.parametrize("unsafe", ["Your personality seems shy.", "You will be hired for sure."])
+def test_shortening_never_hides_an_unsafe_summary_tail(unsafe):
+    raw = feedback().model_dump()
+    raw["summary"] = "The answer describes careful report checking. " * 10 + unsafe
+    with pytest.raises(InterviewRejected):
+        feedback_for_answer(feedback_request(), Provider([raw]))
+
+
 # --- question bank --------------------------------------------------------------------
 
 def bank_db(exact=(), family=(), common=()):

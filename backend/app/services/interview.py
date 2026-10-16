@@ -7,6 +7,7 @@ import logging
 import re
 import time
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from textwrap import shorten
 
 from pydantic import Field, ValidationError
 from sqlalchemy import text
@@ -393,13 +394,21 @@ class _ProviderStructureCheck(StructureCheck):
 
 
 class _ProviderFeedbackResponse(FeedbackResponse):
+    summary: str = Field(min_length=1, max_length=1000)
     structure: list[_ProviderStructureCheck] = Field(default_factory=list, max_length=4)
 
 
 def feedback_for_answer(request: FeedbackRequest, provider) -> FeedbackResponse:
     def validated_feedback(raw):
         result = _ProviderFeedbackResponse.model_validate(raw)
-        public = FeedbackResponse.model_validate(result.model_dump(exclude={"structure": {"__all__": {"note"}}}))
+        if JUDGES_PERSON.search(result.summary):
+            raise InterviewRejected("judges_person")
+        if PREDICTS_HIRING.search(result.summary):
+            raise InterviewRejected("predicts_hiring")
+        data = result.model_dump(exclude={"structure": {"__all__": {"note"}}})
+        if len(result.summary) > 400:
+            data["summary"] = shorten(result.summary, width=400, placeholder="…")
+        public = FeedbackResponse.model_validate(data)
         return normalise_feedback(public, request)
 
     return _run(
